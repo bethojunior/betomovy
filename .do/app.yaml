@@ -1,0 +1,43 @@
+name: movy-platform
+region: nyc
+
+services:
+  # 1. API PHP Principal (Mobilidade Urbana Core)
+  - name: api-php
+    source_dir: mobilidade-api-php-master
+    dockerfile_path: Dockerfile
+    http_port: 81
+    instance_count: 1
+    instance_size_slug: basic-xs
+    routes:
+      - path: /api
+
+  # 2. WebSocket Node.js (Rastreamento GPS em tempo real)
+  - name: api-node-ws
+    source_dir: mobilidade-api-node-main
+    dockerfile_path: Dockerfile
+    http_port: 85
+    instance_count: 1
+    instance_size_slug: basic-xs
+    routes:
+      - path: /ws
+
+  # 3. MonitorPro (Painel Web Administrativo React + Vite)
+  - name: monitor-web
+    source_dir: mobilidade-monitor-new-main
+    dockerfile_path: Dockerfile
+    http_port: 80
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /monitor
+
+  # 4. Site Institucional (React SPA)
+  - name: site-web
+    source_dir: mobilidade-site-novo-main
+    dockerfile_path: Dockerfile
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /

@@ -1,286 +1,84 @@
-# ---------------------------------------------- Build Time Arguments --------------------------------------------------
-ARG PHP_VERSION="7.4"
-ARG PHP_ALPINE_VERSION="3.16"
-ARG NGINX_VERSION="1.21"
-ARG COMPOSER_VERSION="2"
-ARG XDEBUG_VERSION="3.1.3"
-ARG COMPOSER_AUTH
-ARG APP_BASE_DIR="."
-
-# -------------------------------------------------- Composer Image ----------------------------------------------------
-
-FROM composer:${COMPOSER_VERSION} as composer
-
-FROM 471044102763.dkr.ecr.us-east-1.amazonaws.com/mobilidade-php-base-image:php7.4-kubephp-90940ac AS base
-# ------------------------------------------------- Datadog --------------------------------------------------------
-## install datadog
-RUN curl -LO https://github.com/DataDog/dd-trace-php/releases/latest/download/datadog-setup.php
-RUN php datadog-setup.php --php-bin=all --enable-appsec --enable-profiling
-# ------------------------------------------------- Permissions --------------------------------------------------------
-
-RUN apk add --update --no-cache bash nodejs npm
-
-
-# INSTALL SUPERCRONIC
-ENV SUPERCRONIC_VERSION="v0.2.27" \
-    SUPERCRONIC_PACKAGE=supercronic-linux-amd64 \
-    SUPERCRONIC_SHA1SUM=7dadd4ac827e7bd60b386414dfefc898ae5b6c63
-
-ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/$SUPERCRONIC_VERSION/$SUPERCRONIC_PACKAGE
-
-# install dependencies
-RUN apk add --update --no-cache ca-certificates curl \
-# install supercronic
-    && curl -fsSLO "$SUPERCRONIC_URL" \
-    && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC_PACKAGE}" | sha1sum -c - \
-    && chmod +x "${SUPERCRONIC_PACKAGE}" \
-    && mv "${SUPERCRONIC_PACKAGE}" "/bin/${SUPERCRONIC_PACKAGE}" \
-    && ln -s "/bin/${SUPERCRONIC_PACKAGE}" /bin/supercronic \
-# remove unwanted deps & cleanup
-    && apk del --purge ca-certificates curl \
-    && rm -rf /tmp/* /var/cache/apk/*
-
-# Enter inside /app/scripts/import folder and install npm dependencies
-COPY scripts/import/package-lock.json /app/scripts/import/package-lock.json
-COPY scripts/import/package.json /app/scripts/import/package.json
-
-RUN cd /app/scripts/import && npm install
-
-# - Clean bundled config/users & recreate them with UID 1000 for docker compatability in dev container.
-# - Create composer directories (since we run as non-root later)
-# - Add Default Config
-RUN deluser --remove-home www-data && adduser -u1000 -D www-data && rm -rf /var/www /usr/local/etc/php-fpm.d/* && \
-    mkdir -p /var/www/.composer /app && chown -R www-data:www-data /app /var/www/.composer; \
-# ------------------------------------------------ PHP Configuration ---------------------------------------------------
-    mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-
-# Add in Base PHP Config
-COPY docker/php/base-*   $PHP_INI_DIR/conf.d
-
-# ---------------------------------------------- PHP FPM Configuration -------------------------------------------------
-
-# PHP-FPM config
-COPY docker/fpm/*.conf  /usr/local/etc/php-fpm.d/
-
-
-# --------------------------------------------------- Scripts ----------------------------------------------------------
-
-COPY docker/entrypoint/*-base docker/post-build/*-base docker/pre-run/*-base \
-     docker/fpm/healthcheck-fpm		\
-     docker/scripts/command-loop*	\
-     # to
-     /usr/local/bin/
-
-RUN  chmod +x /usr/local/bin/*-base /usr/local/bin/healthcheck-fpm /usr/local/bin/command-loop*
-
-# ---------------------------------------------------- Composer --------------------------------------------------------
-
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-
-# ----------------------------------------------------- MISC -----------------------------------------------------------
-
-WORKDIR /app
-USER www-data
-
-# Common PHP Frameworks Env Variables
-ENV APP_ENV prod
-ENV APP_DEBUG 0
-
-# Validate FPM config (must use the non-root user)
-RUN php-fpm -t
-
-# ---------------------------------------------------- HEALTH ----------------------------------------------------------
-
-HEALTHCHECK CMD ["healthcheck-fpm"]
-
-# -------------------------------------------------- ENTRYPOINT --------------------------------------------------------
-
-ENTRYPOINT ["entrypoint-base"]
-CMD ["php-fpm"]
-
-# ======================================================================================================================
-#                                                  --- Vendor ---
-# ---------------  This stage will install composer runtime dependinces and install app dependinces.  ------------------
-# ======================================================================================================================
-
-FROM composer as vendor
-
-ARG PHP_VERSION
-ARG COMPOSER_AUTH
-ARG APP_BASE_DIR
-
-# A Json Object with remote repository token to clone private Repos with composer
-# Reference: https://getcomposer.org/doc/03-cli.md#composer-auth
-ENV COMPOSER_AUTH $COMPOSER_AUTH
-
-WORKDIR /app
-
-# Copy Dependencies files
-COPY $APP_BASE_DIR/composer.json composer.json
-COPY $APP_BASE_DIR/composer.lock composer.lock
-
-# Set PHP Version of the Image
-RUN composer config platform.php ${PHP_VERSION}; \
-    # Install Dependencies
-    composer install -n --no-progress --ignore-platform-reqs --no-dev --prefer-dist --no-scripts --no-autoloader
-
-# ======================================================================================================================
-# ==============================================  PRODUCTION IMAGE  ====================================================
-#                                                   --- PROD ---
-# ======================================================================================================================
-
-FROM base AS app
-
-ARG APP_BASE_DIR
-USER root
-
-COPY docker/scripts/start-cron.sh /usr/local/bin/start-cronjob.sh
-RUN chmod +x /usr/local/bin/start-cronjob.sh
-
-COPY docker/scripts/validate-leader.sh /usr/local/bin/validate-leader.sh
-RUN chmod +x /usr/local/bin/validate-leader.sh
-
-# Copy PHP Production Configuration
-COPY docker/php/prod-*   $PHP_INI_DIR/conf.d/
-
-# Copy Prod Scripts && delete xdebug
-COPY docker/entrypoint/*-prod docker/post-build/*-prod docker/pre-run/*-prod \
-     # to
-     /usr/local/bin/
-
-RUN chmod +x /usr/local/bin/*-prod && pecl uninstall xdebug
-
-USER www-data
-
-RUN mkdir -p /home/www-data/crontabs
-# ----------------------------------------------- Production Config -----------------------------------------------------
-
-# Copy Vendor
-COPY --chown=www-data:www-data --from=vendor /app/vendor /app/vendor
-
-# Copy App Code
-COPY --chown=www-data:www-data $APP_BASE_DIR/ .
-
-# Copy node_modules
-COPY --chown=www-data:www-data --from=base /app/scripts/import/node_modules /app/scripts/import/node_modules
-
-## Run Composer Install again
-## ( this time to run post-install scripts, autoloader, and post-autoload scripts using one command )
-RUN composer install --optimize-autoloader --apcu-autoloader --no-dev -n --no-progress && \
-    composer check-platform-reqs && \
-    post-build-base && post-build-prod
-
-ENTRYPOINT ["entrypoint-prod"]
-CMD ["php-fpm"]
-
-# ======================================================================================================================
-# ==============================================  DEVELOPMENT IMAGE  ===================================================
-#                                                   --- DEV ---
-# ======================================================================================================================
-
-FROM base as app-dev
-
-
-ENV APP_ENV dev
-ENV APP_DEBUG 1
-
-# Switch root to install stuff
-USER root
-
-COPY docker/scripts/start-cron.sh /usr/local/bin/start-cronjob.sh
-RUN chmod +x /usr/local/bin/start-cronjob.sh
-
-COPY docker/scripts/validate-leader.sh /usr/local/bin/validate-leader.sh
-RUN chmod +x /usr/local/bin/validate-leader.sh
-
-# For Composer Installs
-RUN apk --no-cache add git openssh bash bind-tools; \
- # Enable Xdebug
- docker-php-ext-enable xdebug
-
-# Copy node_modules
-COPY --chown=www-data:www-data --from=base /app/scripts/import/node_modules /app/scripts/import/node_modules
-
-# For Xdebuger to work, it needs the docker host IP
-# - in Mac AND Windows, `host.docker.internal` resolve to Docker host IP
-# - in Linux, `172.17.0.1` is the host IP
-# By default, `host.docker.internal` is set as extra host in docker-compose.yml, so it also works in Linux without any
-# additional setting. This env is reserved for people who want to customize their own compose configuration.
-ENV XDEBUG_CLIENT_HOST="host.docker.internal"
-
-# ---------------------------------------------------- Scripts ---------------------------------------------------------
-
-# Copy Dev Scripts
-COPY docker/php/dev-*   $PHP_INI_DIR/conf.d/
-COPY docker/entrypoint/*-dev  docker/post-build/*-dev docker/pre-run/*-dev \
-     # to
-     /usr/local/bin/
-
-RUN chmod +x /usr/local/bin/*-dev; \
-    mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-
-USER www-data
-
-RUN mkdir -p /home/www-data/crontabs
-# ------------------------------------------------- Entry Point --------------------------------------------------------
-
-# Entrypoints
-ENTRYPOINT ["entrypoint-dev"]
-CMD ["php-fpm"]
-
-
-# ======================================================================================================================
-# ======================================================================================================================
-#                                                  --- NGINX ---
-# ======================================================================================================================
-# ======================================================================================================================
-FROM nginx:${NGINX_VERSION}-alpine AS nginx
-
-RUN rm -rf /var/www/* /etc/nginx/conf.d/* && adduser -u 1000 -D -S -G www-data www-data
-COPY docker/nginx/nginx-*   /usr/local/bin/
-COPY docker/nginx/          /etc/nginx/
-RUN chown -R www-data /etc/nginx/ && chmod +x /usr/local/bin/nginx-*
-
-# The PHP-FPM Host
-## Localhost is the sensible default assuming image run on a k8S Pod
-ENV PHP_FPM_HOST "localhost"
-ENV PHP_FPM_PORT "9000"
-ENV NGINX_LOG_FORMAT "json"
-
-# For Documentation
-EXPOSE 8080
-
-# Switch User
-USER www-data
-
-# Add Healthcheck
-HEALTHCHECK CMD ["nginx-healthcheck"]
-
-# Add Entrypoint
-ENTRYPOINT ["nginx-entrypoint"]
-
-# ======================================================================================================================
-#                                                 --- NGINX PROD ---
-# ======================================================================================================================
-
-FROM nginx AS web
-
-USER root
-
-RUN SECURITY_UPGRADES="curl"; \
-    apk add --no-cache --upgrade ${SECURITY_UPGRADES}
-
-USER www-data
-
-# Copy Public folder + Assets that's going to be served from Nginx
-COPY --chown=www-data:www-data --from=app /app/public /app/public
-
-# ======================================================================================================================
-#                                                 --- NGINX DEV ---
-# ======================================================================================================================
-FROM nginx AS web-dev
-
-ENV NGINX_LOG_FORMAT "combined"
-
-COPY --chown=www-data:www-data docker/nginx/dev/*.conf   /etc/nginx/conf.d/
-COPY --chown=www-data:www-data docker/nginx/dev/certs/   /etc/nginx/certs/
+# Set master image
+FROM rockylinux:8
+
+LABEL maintainer="704apps" \
+      description="Laravel API - Mobilidade Monitor API v2" \
+      version="1.0"
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Repositórios Remi + PHP 7.4
+RUN dnf -y update \
+    && dnf -y install epel-release dnf-plugins-core \
+    && dnf -y install https://rpms.remirepo.net/enterprise/remi-release-8.rpm \
+    && dnf -y module reset php \
+    && dnf -y module enable php:remi-7.4
+
+# PHP 7.4 + extensões e utilitários
+RUN dnf -y install \
+    php php-fpm php-cli php-common php-opcache \
+    php-mbstring php-xml php-gd php-zip php-dom php-session \
+    php-mysqlnd \
+    php-pecl-mongodb php-pecl-grpc \
+    curl nginx wget unzip procps iproute cronie bash \
+    && dnf clean all
+
+# Composer
+RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
+    && curl -sS https://composer.github.io/installer.sig -o composer.sig \
+    && php -r "if (hash_file('sha384', 'composer-setup.php') !== trim(file_get_contents('composer.sig'))) { echo 'Invalid installer' . PHP_EOL; exit(1); }" \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && rm -f composer-setup.php composer.sig
+
+# Configs nginx / php-fpm / php.ini
+COPY docker-prod/config/nginx.conf /etc/nginx/nginx.conf
+COPY docker-prod/config/www.conf   /etc/php-fpm.d/www.conf
+COPY docker-prod/config/local.ini  /etc/php.d/zz-local.ini
+
+# Suprimir apenas deprecations (não quebra artisan/web)
+RUN printf "error_reporting = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_NOTICE\n" > /etc/php.d/90-deprecations.ini
+
+# Diretórios do sistema
+RUN mkdir -p /var/lib/php/session \
+    && mkdir -p /var/lib/php/wsdlcache \
+    && mkdir -p /var/log/cron \
+    && mkdir -p /var/log/php \
+    && mkdir -p /run/php-fpm \
+    && touch /var/log/php/errors.log \
+    && chown -R nginx:nginx /var/lib/php/session \
+    && chown -R nginx:nginx /var/lib/php/wsdlcache \
+    && chmod 1733 /var/lib/php/session \
+    && chmod 0777 /var/log/php/errors.log
+
+# Cron do scheduler
+COPY docker-prod/config/crontab /etc/cron.d/laravel-schedule
+RUN chmod 0644 /etc/cron.d/laravel-schedule \
+    && crontab /etc/cron.d/laravel-schedule
+
+# Runner
+COPY docker-prod/config/runner.sh /runner.sh
+RUN chmod +x /runner.sh
+
+# Instalar dependências do Composer
+COPY composer.json composer.lock* ./
+RUN composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist --no-scripts \
+    && composer clear-cache
+
+# Copiar o resto da aplicação
+COPY ./ /var/www/html
+
+# Executar scripts do Composer após copiar todos os arquivos
+RUN php artisan package:discover --ansi || true
+
+# Criar e configurar diretórios do Laravel
+RUN mkdir -p storage/framework/{sessions,views,cache} \
+    && mkdir -p storage/logs \
+    && mkdir -p bootstrap/cache \
+    && chown -R nginx:nginx /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 775 storage bootstrap/cache \
+    && chmod -R 700 storage/framework/sessions
+
+# ENTRYPOINT
+ENTRYPOINT ["/runner.sh", "start"]

@@ -1,43 +1,87 @@
-# DEPRECATED - OLDACCOUNT - FROM 931373685066.dkr.ecr.us-east-1.amazonaws.com/mobilidade-php-base-image:2
-FROM 471044102763.dkr.ecr.us-east-1.amazonaws.com/mobilidade-php-base-image:d5e491c
+# Imagem base: Rocky Linux 8 (RHEL-compatible, suporte até 2029)
+FROM rockylinux:8
 
-## install datadog
-RUN curl -LO https://github.com/DataDog/dd-trace-php/releases/latest/download/datadog-setup.php
-RUN php datadog-setup.php --php-bin=all --enable-appsec --enable-profiling
+# Metadados da imagem Docker
+LABEL maintainer="704apps" \
+      description="PHP API - Mobilidade API PHP" \
+      version="1.0"
 
-## install Redis
-RUN pecl install --force redis \
-&& rm -rf /tmp/pear \
-&& docker-php-ext-enable redis
+# Define o diretório de trabalho para a aplicação
+WORKDIR /var/www/html
 
-COPY --chown=www-data:www-data . /var/www
+# Set working directory
+WORKDIR /var/www/html
 
-RUN sed -i 's/;\(slowlog = log\/\$pool\.log\.slow\)/slowlog = \/tmp\/slowlog/' /usr/local/etc/php-fpm.d/www.conf
-RUN sed -i 's/;\(request_slowlog_timeout = 0\)/request_slowlog_timeout = 1s/' /usr/local/etc/php-fpm.d/www.conf
+# Repositórios Remi + PHP 7.4
+RUN dnf -y update \
+    && dnf -y install epel-release dnf-plugins-core \
+    && dnf -y install https://rpms.remirepo.net/enterprise/remi-release-8.rpm \
+    && dnf -y module reset php \
+    && dnf -y module enable php:remi-7.4
 
-RUN mkdir -p /var/www/storage/temp/
+# PHP 7.4 + extensões e utilitários
+RUN dnf -y install \
+    php php-fpm php-cli php-common php-opcache \
+    php-mbstring php-xml php-gd php-zip php-dom php-session \
+    php-mysqlnd \
+    php-pecl-mongodb php-pecl-grpc \
+    curl nginx wget unzip procps iproute cronie bash supervisor \
+    && dnf clean all
 
-RUN chmod -R ug+w /var/www/storage
-RUN chown www-data:www-data -R /var/www/
-RUN chmod 774 -R /var/www/
+# Composer
+RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
+    && curl -sS https://composer.github.io/installer.sig -o composer.sig \
+    && php -r "if (hash_file('sha384', 'composer-setup.php') !== trim(file_get_contents('composer.sig'))) { echo 'Invalid installer' . PHP_EOL; exit(1); }" \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && rm -f composer-setup.php composer.sig
 
-# Copy nginx/php/supervisor configs
-RUN cp docker/supervisor.conf /etc/supervisord.conf
-RUN cp docker/php.ini /usr/local/etc/php/conf.d/app.ini
-RUN cp docker/nginx.conf /etc/nginx/sites-enabled/default
+# Configs nginx / php-fpm / php.ini
+COPY docker-prod/config/nginx.conf /etc/nginx/nginx.conf
+COPY docker-prod/config/www.conf   /etc/php-fpm.d/www.conf
+COPY docker-prod/config/local.ini  /etc/php.d/zz-local.ini
+COPY docker-prod/config/supervisord.conf /etc/supervisord.conf
 
-# PHP Error Log Files
-# RUN mkdir -p /var/log/php /var/www/app/utils
-# RUN touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
+# Suprimir apenas deprecations (não quebra artisan/web)
+RUN printf "error_reporting = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_NOTICE\n" > /etc/php.d/90-deprecations.ini
 
-# Deployment steps
-RUN composer update && composer install --optimize-autoloader --no-dev
-RUN chmod +x /var/www/docker/run.sh
+# Diretórios do sistema
+RUN mkdir -p /var/lib/php/session \
+    && mkdir -p /var/lib/php/wsdlcache \
+    && mkdir -p /var/log/cron \
+    && mkdir -p /var/log/php \
+    && mkdir -p /var/log/supervisor \
+    && mkdir -p /run/php-fpm \
+    && touch /var/log/php/errors.log \
+    && chown -R nginx:nginx /var/lib/php/session \
+    && chown -R nginx:nginx /var/lib/php/wsdlcache \
+    && chmod 1733 /var/lib/php/session \
+    && chmod 0777 /var/log/php/errors.log
 
-RUN chown www-data:www-data -R /var/www/
+# Cron do scheduler
+COPY docker-prod/config/crontab /etc/cron.d/laravel-schedule
+RUN chmod 0644 /etc/cron.d/laravel-schedule \
+    && crontab /etc/cron.d/laravel-schedule
 
-#USER $user
+# Runner
+COPY docker-prod/config/runner.sh /runner.sh
+RUN chmod +x /runner.sh
 
-EXPOSE 80
-CMD ["sh", "-c", "sleep 5; /usr/local/bin/start-cronjob.sh; /var/www/docker/run.sh"]
+# Instalar dependências do Composer
+COPY composer.json composer.lock* ./
+RUN composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist --no-scripts \
+    && composer clear-cache
 
+# Copiar o resto da aplicação
+COPY ./ /var/www/html
+
+# Executar scripts do Composer após copiar todos os arquivos
+RUN php artisan package:discover --ansi || true
+
+# Criar e configurar diretórios
+RUN mkdir -p /var/www/html/storage/temp \
+    && chown -R nginx:nginx /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 775 /var/www/html/storage
+
+# ENTRYPOINT
+ENTRYPOINT ["/runner.sh", "start"]
