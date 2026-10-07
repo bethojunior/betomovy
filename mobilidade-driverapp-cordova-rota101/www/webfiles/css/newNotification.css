@@ -1,0 +1,11 @@
+#modalNotification.modal .modal-content img{
+    width: 68vw;
+}
+#modalNotification.modal .modal-content .alignCenter{
+    display: block;
+    font-size: 9vw;
+    text-align: center;
+}
+#modalNotification.modal .modal-content #post{
+
+}

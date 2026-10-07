@@ -1,0 +1,71 @@
+.general-load {
+    padding: 2vw;
+    margin-left: 17vw;
+}
+.general-load .container{
+    background-color: white;
+    padding: 1vw;
+}
+.general-load .container .section{
+    display: flex;
+}
+.general-load .container .section .first{
+    width: 35%;
+    background-color: whitesmoke;
+    margin: 1vw;
+    padding: 0.5vw;
+}
+.general-load .container .section .second .form-group textarea , .general-load .container .section .third .form-group textarea{
+    resize: none;
+    height: 20vh;
+}
+.general-load .container .section .first .form-group button , .general-load .container .section .second .form-group button, .general-load .container .section .third .form-group button{
+    margin-top: 1vw;
+}
+.general-load .container .section .second{
+    width: 35%;
+    background-color: whitesmoke;
+    margin: 1vw;
+    padding: 0.5vw;
+}
+.general-load .container .section .third{
+    width: 35%;
+    background-color: whitesmoke;
+    margin: 1vw;
+    padding: 0.5vw;
+}
+.general-load .container .divider{
+    display: flex;
+}
+.general-load .container .divider .first{
+    width: 35%;
+    background-color: whitesmoke;
+    margin: 1vw;
+    padding: 1vw;
+}
+.general-load .container .divider .first .type-load{
+    background-color: white;
+    padding: 0.5vw;
+    margin: 0.5vw;
+    position: relative;
+}
+.general-load .container .divider .first .type-load i.material-icons.delete{
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+.general-load .container .divider .first .type-load i.material-icons.disable{
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+}
+.general-load .container .divider .second{
+    width: 65%;
+    background-color: whitesmoke;
+    margin: 1vw;
+    padding: 1vw;
+}
+.general-load .container .divider .second button{
+    margin-top: 1vw;
+}

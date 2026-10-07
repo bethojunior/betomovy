@@ -1,0 +1,368 @@
+*{
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.wrapper-form {
+    flex: 8;
+}
+
+.wrapper-form h3 {
+    text-align: center;
+    text-transform: uppercase;
+}
+
+
+.wrapper-form .container-form {
+    margin: 0 10px;
+}
+.wrapper-form .container-form.active {
+    padding-bottom: 15vw;
+}
+
+.wrapper-form .container-form input,
+.wrapper-form .container-form select {
+    width: calc(100% - 14px);
+    height: 13vw;
+    border-radius: 3vw;
+    background: #eee;
+    border: none;
+    padding-left: 14px;
+    margin-top: 10px;
+}
+
+.wrapper-form .container-form .half-input {
+    display: flex;
+    justify-content: space-between;
+}
+.wrapper-form .container-form .half-input > .input-uf{
+    width: 20%;
+    margin: 3vw;
+}
+.wrapper-form .container-form .half-input > .number-half{
+    width: 20%;
+    margin: 3vw 1vw;
+}
+.wrapper-form .container-form .half-input > .input-cep{
+    width: 22%;
+}
+.wrapper-form .container-form .half-input > .address-hostel{
+    width: 80%;
+}
+.wrapper-form .container-form #banks,
+.wrapper-form .container-form #bank-types,
+.wrapper-form .container-form #occupation-type {
+    width: 100%;
+}
+
+.wrapper-form .container-form .half-input input {
+    width: calc(48% - 14px);
+}
+
+.wrapper-form .container-form .half-input select {
+    width: 48%;
+}
+
+.btn-add-establishment {
+    border-radius: 50px;
+    border: 0;
+    font-size: 0.8em;
+    color: #FFF;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: rgb(233, 153, 26);
+    display: flex;
+    width: 150px !important;
+    height: 35px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 12px #a5a4a4;
+    margin: 0 auto;
+    margin-top: 3vw;
+    text-align: center;
+    padding: 2vw;
+}
+.btn-add-establishment.active{
+    position: fixed;
+    bottom: 0;
+    top: unset;
+    width: 100% !important;
+    border-radius: unset;
+    margin: 0;
+    left: 0;
+    right: 0;
+    font-size: 5vw;
+}
+
+.progress {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 20px;
+    height: 2vw;
+}
+
+.progress-width {
+    width: 12.5%;
+    height: 2vw;
+    background-color: rgb(233, 153, 26);
+    border-radius: 20px;
+    transition: width 0.7s;
+}
+.wrapper-progressbar {
+    /*flex: 1;*/
+}
+
+.content-images {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.main-image {
+    width: 200px;
+    height: 200px;
+    cursor: pointer;
+    position: relative;
+}
+
+.main-image input {
+    opacity: 0;
+    top: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.main-image label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    background: #e4e4e4;
+    border-radius: 10px;
+}
+
+.main-image img {
+    width: 50%;
+    height: 50%;
+}
+
+.alternative-images {
+    width: 50px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.alternative-images .block-image {
+    max-width: 46px;
+    height: 46px;
+    cursor: pointer;
+    position: relative;
+}
+
+.alternative-images .block-image input {
+    max-width: 46px;
+    max-height: 46px;
+    opacity: 0;
+    top: -46px;
+    left: 0;
+    position: relative;
+}
+
+.alternative-images .block-image label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: #e4e4e4;
+    border-radius: 10px;
+}
+
+.alternative-images .block-image img {
+    width: 71%;
+    height: 71%;
+}
+
+.wrapper-form .container-form.add-employees input,
+.wrapper-form .container-form.add-employees select {
+    height: 11vw;
+}
+
+.wrapper-form .container-form.add-employees .btns {
+    width: 100%;
+    margin: 0;
+    margin-top: 3vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+.wrapper-form .container-form.add-employees .btns a {
+    margin: 0;
+    font-size: 2.5vw;
+    width: 121px;
+}
+
+.hide-element {
+    display: none;
+}
+
+#table-employees {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#table-employees thead {
+    background: #f9a825;
+    color: #fff;
+    font-weight: 500;
+}
+
+#table-employees thead th {
+    height: 10vw;
+}
+
+#table-employees thead th:first-child {
+    border-radius: 15px 0 0 6px;
+}
+
+#table-employees thead th:last-child {
+    border-radius: 0 15px 6px 0;
+}
+
+#table-employees tbody {
+    background: #e4e4e4;
+}
+
+#table-employees tbody td {
+    height: 13vw;
+    color: #777;
+    border-bottom: 1px solid;
+    text-align: center;
+}
+
+#table-employees tbody td:last-child {
+    height: 10vw;
+    position: relative;
+}
+
+#table-employees tbody td:last-child a {
+    position: absolute;
+    right: 10px;
+}
+
+.wrapper-form .container-form.add-employees .btns-table-employee {
+    width: 100%;
+    margin: 0;
+    margin-top: 3vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+.wrapper-form .container-form.add-employees .btns-table-employee a {
+    margin: 0;
+    font-size: 2.5vw;
+    width: 30%;
+    padding: 1vw 2vw;
+}
+
+.screenWebSignUp{
+    margin-left : 30vw;
+    margin-right: 30vw;
+
+}
+.screenWebSignUp .container-form input{
+    height: 5vw;
+}
+.screenWebSignUp select#bank-types{
+    height: 5vw;
+}
+.screenWebSignUp select#document-bank-type{
+    height: 5vw;
+}
+.screenWebSignUp .container-form.add-employees input{
+    height: 5vw;
+}
+.screenWebSignUp .btnScreenWebSignp{
+    border-radius: 50px;
+    border: 0;
+    font-size: 0.8em;
+    color: #FFF;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: rgb(233, 153, 26);
+    display: flex;
+    width: 100px;
+    height: 0px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 12px #a5a4a4;
+    margin: 0 auto;
+    margin-top: 3vw;
+    text-align: center;
+    padding: 2vw;
+    cursor: pointer;
+}
+
+.screenWebSignUp .half-input .btnScreenWebSignp{
+    border-radius: 50px;
+    border: 0;
+    font-size: 0.8em;
+    color: #FFF;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: rgb(233, 153, 26);
+    display: flex;
+    width: 100px;
+    height: 0px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 12px #a5a4a4;
+    margin: 0 auto;
+    margin-top: 3vw;
+    text-align: center;
+    padding: 2vw;
+    cursor: pointer;
+}
+
+.wrapper-form .container-form input, .wrapper-form .container-form select {
+    width: calc(100% - 14px);
+    background: #eee;
+    border: none;
+    padding-left: 14px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.screenWebSignUp .btn-add-establishment {
+    border-radius: 1vw;
+    border: 0;
+    font-size: 0.8em;
+    color: #FFF;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: rgb(233, 153, 26);
+    display: flex;
+    width: 10vw;
+    height: 1vw;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 12px #a5a4a4;
+    margin: 0 auto;
+    margin-top: 3vw;
+    text-align: center;
+    padding: 2vw;
+}

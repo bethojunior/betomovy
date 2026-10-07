@@ -1,0 +1,358 @@
+.container-hostel{
+    padding:5vw;
+    background-color: rgb(236,234,234);
+    margin-top: -6px;
+}
+
+h2.describ-text{
+    text-align: justify;
+    font-size: 1.8vw;
+    text-indent: 3vw;
+    margin-bottom: 3em;
+    font-weight: 300;
+}
+
+h2.describ-text strong {
+    font-weight: 300;
+}
+
+.row-because-taxi-return{
+    display: flex;
+    justify-content: space-between;
+}
+
+.row-because-taxi-return .descript-because{
+    width:26%;
+}
+
+#main-hostel {
+    margin-top: 86px;
+    position: relative;
+}
+
+#main-hostel img {
+    width: 100%;
+}
+
+#main-hostel h1 {
+    position: absolute;
+    top: 8vw;
+    left: 5vw;
+    font-size: 4.1vw;
+}
+
+#main-hostel h1 strong {
+    font-weight: 600;
+}
+
+.row-because-taxi-return p{
+    font-size: 1.2em;
+}
+
+
+.bg-hostl-hero{
+    background-image: url('../img/hero/baner_site_hotel.png'); 
+}
+
+.row-because-taxi-return  div:nth-child(1) h2{
+    font-size: 2em;
+    letter-spacing: 2px; 
+    text-transform: uppercase; font-weight: 800;
+    margin-bottom: 1vw;
+}
+
+.row-because-taxi-return div img{
+    width: 150px;   
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.4vw;
+}
+
+.hero-hostel-home-mobile{
+    display: none;
+}
+.row-because-taxi-return div h2.align-text-center-img{
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 1.3em;
+}
+
+a.btn-comece-agr{
+    width: 33%;
+    /* background-color: red; */
+    height: 58px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    justify-content: center;
+    font-size: 1.3em;
+    background-color: rgb(255,174,43);
+    border-radius: 25px;
+    font-weight: 500;
+    border: none;
+}
+
+.row-because-taxi-return div:nth-child(2){}
+
+
+
+div.div-box-absolute{
+    position: relative; 
+    height: 31vw;
+ }
+
+ .div-box-absolute .bg-dark-yellow{
+    background: #ff9a00;
+    height: 100%;
+    margin-left: 5%; 
+    
+    border-radius: 16vw 0 0 12vw;
+ }
+.div-box-absolute img.img-lange{ 
+    position: absolute;
+    float: right;
+    height: 40vw;  
+    top: -3.2vw;
+    left: 2vw;
+    width: auto;
+}
+
+.div-box-absolute .descript-box-absolute
+{
+    width: 50%; 
+    margin-left: 41vw;
+    height: 100%; 
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 1.5vw;
+    color: #FFF;
+}
+ 
+.wrapper-btn {
+    padding: 20px 0;
+}
+
+ .btn-section-ahref-about{
+    color: #fff;
+    border-bottom: 1px solId #FFF;
+    font-weight: 800;
+ }
+.btn-icon-wrapper{
+    width: 16px;
+    height: 16px;
+    top: 0.2vw;
+    left: 0.6vw;
+}
+
+
+.wrapper-btn a:last-child {
+    top: 3px;
+    position: relative;
+    left: 4px;
+}
+
+div.inf-start-now{
+    display: flex;
+    margin-top: 4vw;
+    align-items: center;
+}
+
+div.inf-start-now p{ 
+    font-size: 2.5em;
+    width: 58%;
+    color: #333;
+    width: 100%;
+    font-size: 4.5vw;
+    font-weight: 100;
+    color: #4d535c;
+    text-transform: none;
+    line-height: 1;
+    margin-bottom: 2vw;
+}
+div.inf-start-now a{ 
+    width: 51%;
+    margin-left: 8%; 
+    height: 5.5vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border-radius: 3vw;
+    font-size: 2.2vw;
+    font-weight: bold;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+    margin-bottom: -5px;
+}
+
+.hero-hostel-home{
+    width: 100%;
+    height: auto;
+    margin-bottom: -6px;
+    /* background-size: 100%;  */
+    /* background-image: url(../img/hero-img-hostel.png); */
+}
+
+a.btn-call-taxi-hostel {
+    position: absolute;
+    bottom: 15vw;
+    left: 5vw;
+    font-size: 2.3vw;
+    font-weight: bold;
+    background: #fff;
+    border: 1.5px solid #ff9a00;
+    border-radius: 1.5vw;
+    color: #4d535c;
+    text-transform: uppercase;
+    width: 21vw;
+    height: 4vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 8px 21px rgba(0, 0, 0, 0.2);
+}
+.img-resposive-hero-mobile{display: none;}
+
+
+/* Mobile  */ 
+@media (max-width: 798px) {
+    header{
+        display: none;
+    } 
+    
+    #main-hostel h1 {
+        position: absolute;
+        top: 8vw;
+        left: 11vw;
+        font-size: 8.1vw;
+        text-align: center;
+    }
+
+    p.describ-text {
+        text-indent: 1em;
+    }
+    .row-because-taxi-return {
+        flex-direction: column;
+        width: 100%;
+    }
+    .row-because-taxi-return .descript-because {
+        width: 100%;
+    }
+    .row-because-taxi-return p {
+        font-size: 5.2vw;
+        margin-bottom: 10vw;
+    }
+
+    h2.describ-text {
+        font-size: 5.2vw;
+    }
+
+    .row-because-taxi-return div.box-mobile{
+        display: flex;
+        margin: 5%;
+    }
+    .row-because-taxi-return div img {
+        width: 90px;
+        height: 99px;
+        margin-right: 9%;
+    }
+    .row-because-taxi-return div h2.align-text-center-img {
+        display: flex;
+        text-align: left;
+        align-items: center;
+    } 
+    .hero-hostel-home{
+        display: none;
+    }
+    .hero-hostel-home-mobile{
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+    div.inf-start-now {
+        flex-direction: column;
+        text-align: left; 
+    }
+    div.inf-start-now p{
+        font-size: 6.2vw;
+        margin: 0px 0;
+        margin-left: 5%;
+        margin-bottom: 5vw;
+    }
+    div.inf-start-now button{
+        width: 36vh;
+        height: 13.5vw;
+        border-radius: 7vw;
+        font-size: 6.2vw;
+        font-weight: 600;
+        margin-left: 0%;
+        margin-top:7vw;
+        margin-bottom: 5vw;
+    }
+    div.div-box-absolute{
+        height: auto;
+    }
+    .div-box-absolute .bg-dark-yellow{
+        display: flex;
+        flex-direction: column;
+        border-radius: 0;
+        margin-left: 0;
+        align-items: center;
+        height: auto;
+    }
+    .div-box-absolute img.img-lange{
+        position: relative;
+        height: auto;
+        top: 3vw;
+        left: 0vw;
+        width: 60vw;
+    }
+    .div-box-absolute .descript-box-absolute{
+        margin: 0;
+        top: 4vw;
+        font-size: 5.5vw;
+        position: relative;
+        padding: 0 19px;
+        text-align: justify;
+        width: 100%;
+    }
+    .wrapper-btn{
+        margin-bottom: 5vw;
+    }
+    button.btn-call-taxi-hostel{
+        /* top: 50vw;
+        bottom: 0; */ 
+        top: 54vw;
+        left: calc(50% - 21.5vw);
+        font-size: 4.1vw;
+        border-radius: 2vw;
+        width: 43vw;
+        height: 10vw;
+        box-shadow: 4px 8px 21px rgba(0,0,0,0.2);
+        background-color:white;
+    } 
+    .img-resposive-hero-mobile{
+        display: block;
+        width: 100%;
+        height: auto;
+        background-repeat: no-repeat;
+    }
+    .img-resposive-hero{display: none;}
+    a.btn-call-taxi-hostel {
+        top:54.1vw;
+        left: calc(50% - 23.5vw);
+        padding: 0;
+        border-radius: 4vw;
+        font-size: 4.5vw;
+        width: 45vw;
+        height: 12vw;
+    }
+    div.inf-start-now a{
+    width: 62vw;
+    height: 13vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5vw;
+    margin-left: 0;}
+}

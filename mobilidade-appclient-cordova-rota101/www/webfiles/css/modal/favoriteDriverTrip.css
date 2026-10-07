@@ -1,0 +1,193 @@
+.favorite-driver-trip {
+    position: absolute;
+    width: 100%;
+    right: 0;
+    display: flex;
+    z-index: 100;
+    bottom:0;
+    box-shadow: 0 0 10px #bab8b8;
+    min-height: 89vw;
+    transform:translateY(150%);
+    transition: transform 0.5s;
+}
+
+.favorite-driver-trip.active {
+    transform:translateY(0);
+    transition: transform 0.5s;
+}
+
+.favorite-driver-trip > div {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 1.5vw;
+    opacity: 0;
+    transition: 0.5s;
+    position: relative;
+    padding: 5vw 2vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.favorite-driver-trip.active > div {
+    opacity: 1;
+    transition: 0.5s;
+}
+
+.favorite-driver-trip > div > div.list-driver-favorite,
+.favorite-driver-trip > div > div.offline-driver-favorite {
+    display: none;
+}
+
+.favorite-driver-trip > div > div.list-driver-favorite.active,
+.favorite-driver-trip > div > div.offline-driver-favorite.active {
+    display: block;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.favorite-driver-trip > div > i {
+    position: absolute;
+    right: 2vw;
+    top: 2vw;
+    font-size: 8vw;
+}
+
+.favorite-driver-trip > div > div > h4 {
+    display: block;
+    text-align: center;
+    font-size: 15pt;
+    font-weight: 500;
+    margin-top: 2vw;
+}
+
+.favorite-driver-trip > div > div > p {
+    width: 85%;
+    text-align: center;
+    margin: 0 0 2px;
+}
+
+.favorite-driver-trip > div > button {
+    padding: 5vw;
+    text-transform: uppercase;
+    margin: auto;
+    display: block;
+    margin-top: 4vw;
+    font-size: 5vw;
+    color: #fff;
+    font-weight: 600;
+    width: 80%;
+    border-radius: 5px;
+    animation: pulse 2s infinite;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--main-seconds-color);
+    border: 1px solid #ffeed9;
+}
+
+.favorite-driver-trip > div > div > ul {
+    margin: 5vw;
+    list-style: none;
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.favorite-driver-trip > div > div > ul > li {
+    display: flex;
+    background-color: #e8e8e8;
+    padding: 2vw;
+    border-bottom: 1px solid #b9b3b3;
+    border-radius: 2px;
+    align-items: center;
+    position: relative;
+    width: 25vw;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #c2b6b6;
+}
+
+.favorite-driver-trip > div > div > ul > li:last-child {
+    border-bottom: unset;
+}
+
+.favorite-driver-trip > div > div > ul > li > img {
+    width: 20vw;
+    height: 20vw;
+    background-color: #fafafa;
+    border-radius: 100%;
+    border: unset;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.favorite-driver-trip > div > div > ul > li > div {
+    font-size: 4.5vw;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.favorite-driver-trip > div > div > ul > li > div > .plate-driver{
+    text-align:center;
+}
+
+.favorite-driver-trip > div > div > ul > li > div > i {
+    position: absolute;
+    top: 5vw;
+    right: 2vw;
+    font-size: 9vw;
+    color: #b4b3b3;
+    display:none;
+}
+
+.favorite-driver-trip > div > div > ul > li.active {
+    background-color: #ffce76;
+}
+.favorite-driver-trip > div > div > ul > li.active > div > i {
+    display: none;
+    color: #00be45;
+}
+
+.favorite-driver-trip > div > div > ul > li > div > div:empty {
+    margin-bottom: 5px;
+    float: left;
+    width: 100%;
+}
+
+.favorite-driver-trip > div > div > ul > li > div > div:empty:before {
+    background-color: #ccc;
+    content: "_";
+    width: 100%;
+    float: left;
+    color: #ccc;
+}
+
+.favorite-driver-trip > div > div > ul > li > div > div:last-child {
+    width: 40%;
+}
+
+
+.favorite-driver-trip.active.drivers-disabled > div > i {
+    display:none;
+}
+
+.favorite-driver-trip.active.drivers-disabled > div > button {
+    display:none;
+}
+
+.favorite-driver-trip.active.drivers-disabled > div {
+    padding: 2vw;
+}

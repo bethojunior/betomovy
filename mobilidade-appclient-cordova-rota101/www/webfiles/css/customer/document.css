@@ -1,0 +1,252 @@
+.container-document-user {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    z-index: 30;
+    transform: translateY(150%);
+    transition: transform 0.5s;
+}
+
+
+.preload-document-user.active,
+.container-document-user.active {
+    transform: translateY(0%);
+    transition: transform 0.5s;
+}
+
+.container-document-user > div {
+    width: 100%;
+    background-color: #e5e5e5;
+    opacity: 1;
+    transition: 0.5s;
+    position: relative;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.container-document-user.active > div {
+}
+
+.container-document-user > h4 {
+    border-bottom: 1px solid #ccc;
+    font-size: 6vw;
+    font-weight: 500;
+    text-align: center;
+    color: #5c5b5b;
+    padding: 3vw 0;
+    background-color: #fff;
+    width: 100%;
+}
+
+.container-document-user > div > div > label {
+    margin: 0 10px;
+}
+
+.container-document-user > div > input,
+.container-document-user > div > div > input,
+.container-document-user > div > div > select {
+    width: calc(100% - 10vw);
+    margin: 2vw 2vw;
+    padding: 4vw 3vw;
+    font-size: 4.5vw;
+    border: unset;
+    border-bottom: 1px solid #dedede;
+    outline: unset;
+    background-color: #fff;
+    border-radius: 5px;
+    color: #000;
+}
+
+.container-document-user > div > div > select {
+    width: calc(100% - 5vw);
+}
+
+.container-document-user > div > input.active {
+    display: block;
+}
+
+.container-document-user > div > button {
+    border: unset;
+    padding: 5vw 5vw;
+    font-size: 5vw;
+    margin: 2vw auto;
+    display: block;
+    border-radius: 1vw;
+    text-transform: uppercase;
+    background-color: var(--main-color);
+    color: #fff;
+    width: 95%;
+    font-weight: 500;
+    outline: unset;
+}
+
+.container-document-user > div > div > img {
+    width: 20vw;
+    height: 20vw;
+    border-radius: 100%;
+    border: 1px solid #ccc;
+    display: block;
+    margin: 5vw auto 2vw;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-image: url("../../img/icon/default.jpg");
+}
+
+.container-document-user > div > div {
+    position: relative;
+    /* border-bottom:1px solid #666363; */
+    padding-bottom: 2.5vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-document-user > div > div.container-document-pre-sign-up {
+    background-color: #fff;
+    margin: 0 10px 15px;
+    padding: 2vw 3vw;
+    font-size: 4.5vw;
+    font-weight: 400;
+    font-family: sans-serif;
+    display: none;
+    border-radius: 5px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container-document-user > div > div.container-document-pre-sign-up.active {
+    display: flex;
+}
+
+.container-document-user > div > div.container-document-pre-sign-up.active.progressing:after {
+    content: "";
+    display: block;
+    width: 30px;
+    height: 30px;
+    border: 3px solid transparent;
+    border-top-color: #000;
+    border-radius: 100%;
+    animation: 300ms spinner linear infinite;
+}
+
+.container-document-user > div > div.container-document-pre-sign-up.active.progressing.success:after {
+    opacity: 0;
+}
+
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.container-document-user > div > div.container-document-pre-sign-up.active.progressing > i {
+    display: none;
+}
+
+
+.container-document-user > div > div.container-document-pre-sign-up.success {
+    background-color: #39e44e;
+}
+
+
+.container-document-user > div > div.container-document-pre-sign-up.success > i {
+    opacity: 0;
+}
+
+.container-document-user > div > div.container-document-pre-sign-up > label {
+    margin: 0;
+    font-size: 13pt;
+}
+
+.container-document-user > div > div.container-document-pre-sign-up > i {
+    position: relative;
+    right: unset;
+    bottom: unset;
+    border: none;
+    display: block;
+    font-size: 18pt;
+}
+
+.container-document-user > div > div > i {
+    position: absolute;
+    right: 35%;
+    bottom: 5vw;
+    font-size: 15pt;
+    border-radius: 100%;
+    border: 1px solid #cccaca;
+    padding: 2vw;
+    background-color: #fff;
+}
+
+.container-document-user > div > div > span {
+    padding: 2vw;
+    display: block;
+    text-align: justify;
+    font-size: 4vw;
+}
+
+.container-document-user > div > .container-half-input > div > label {
+    margin: 0 2vw;
+}
+
+
+.container-document-user > div > .container-half-input {
+    border: none;
+    display: flex;
+    align-items: center;
+    margin-top: 2vw;
+}
+
+.container-document-user > div > input.filled-field,
+.container-document-user > div > div > div > input.filled-field {
+    background-color: #a4e5a6;
+    pointer-events: none;
+}
+
+.container-document-user > div > div.container-input-om,
+.container-document-user > div > div.container-filed-military {
+    display: none;
+}
+
+.container-document-user > div > div.container-input-om.active,
+.container-document-user > div > div.container-filed-military.active {
+    display: flex;
+}
+
+.preload-document-user {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    z-index: 31;
+    transform: translateY(150%);
+    transition: transform 0.5s;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.preload-document-user:before {
+    content: "";
+    border-radius: 100%;;
+    height: 40px;
+    width: 40px;
+    display: block;
+    border: 2px solid transparent;;
+    border-top-color: #fff;
+    animation: 300ms spin linear infinite;
+}

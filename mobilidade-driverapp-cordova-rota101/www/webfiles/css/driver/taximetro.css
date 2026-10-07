@@ -1,0 +1,299 @@
+.btn-taximetro.hidden {
+    display: none !important;
+}
+
+.btn-taximetro {
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    z-index: 95;
+    margin: auto;
+    border-radius: 100%;
+    background-color: #fff;
+    width: 65px;
+    height: 65px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px #e0e0e0;
+    left: 10px;
+    transition: 1s all;
+}
+
+.btn-taximetro.active {
+    transform: translateX(-200%);
+}
+
+.btn-taximetro > img {
+    width: 35px;
+}
+
+.container-taximetro {
+    margin: 0 auto;
+    width: 100%;
+    z-index: 205;
+    position: absolute;
+    padding: 10px;
+    background-color: var(--main-color);
+    border-radius: 5px;
+    transition: 1s;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateY(150%);
+}
+
+.container-taximetro.active {
+    transform: translateY(0%);
+}
+
+body.v2 .container-taximetro.active {
+    transform: unset;
+    bottom: 0;
+    padding: 10px;
+    width: 100%;
+    z-index: 205;
+    margin: 0;
+    border-radius: 0;
+}
+
+.container-taximetro.active.start-taximetro {
+    transform: translateY(0%);
+}
+
+
+body.v2 .container-taximetro.active.start-taximetro {
+    transform: unset;
+
+}
+
+.container-taximetro > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 10px;
+    color: #fff;
+
+}
+
+.container-taximetro > header > .close-taximetro.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.container-taximetro > span {
+    font-weight: 600;
+    margin: 5px 0;
+}
+
+.container-taximetro > div {
+    background-color: #000;
+    padding: 5px;
+    border-radius: 5px;
+    color: #fff;
+    position: relative;
+}
+
+.container-taximetro > div:not(.active) > * {
+    opacity: 0;
+}
+
+.container-taximetro > div:not(.active):not(.trip-destination-neighborhood):before {
+    content: "LIVRE";
+    position: absolute;
+    font-size: 30pt;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.container-taximetro > div > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.container-taximetro > div > ul {
+    display: flex;
+    list-style: none;
+}
+
+.container-taximetro > div > ul > li {
+    margin-right: 5px;
+    font-size: 8pt;
+    font-family: sans-serif;
+}
+
+.container-taximetro > ul {
+    list-style: none;
+    display: flex;
+    margin: 10px 0 0;
+    justify-content: space-between;
+
+}
+
+.container-taximetro > p {
+    display: flex;
+    flex-direction: column;
+    font-size: 9pt;
+    margin: 10px 0;
+    font-weight: 600;
+    font-family: sans-serif;
+}
+
+.container-taximetro > p > span:first-child {
+    border-bottom: 1px solid #444;
+}
+
+.container-taximetro > ul > li {
+    padding: 10px;
+    flex: 1;
+    text-align: center;
+    background-color: #eee;
+    max-width: 30%;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.75;
+    pointer-events: none;
+}
+
+.container-taximetro > ul > li.active {
+    opacity: 1;
+    pointer-events: unset;
+}
+
+.footer-race.hidden-to-taximetro,
+body.v2 .footer-race.hidden-to-taximetro {
+    display: none !important;
+}
+
+.center-camera-map-position.active.taximetro-active {
+    top: 0;
+    transform: translateY(150%);
+}
+
+.modal-type-driver-taximetro {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    z-index: 503;
+    transform: translateY(200%);
+    transition: all 500ms;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-type-driver-taximetro.active {
+    transform: translateY(0%);
+}
+
+.modal-type-driver-taximetro > div {
+    background-color: #fff;
+    padding: 10px;
+    width: 80%;
+    border-radius: 5px;
+    position: relative;
+}
+
+.modal-type-driver-taximetro > div > .close-modal-type-taximetro {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    padding: 5px;
+    color: #333;
+    font-size: 20px;
+}
+
+.modal-type-driver-taximetro > div > span {
+    text-align: center;
+    display: block;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.modal-type-driver-taximetro > div > ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    margin: 5px 0;
+}
+
+.modal-type-driver-taximetro > div > ul > li {
+    padding: 10px;
+    display: block;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.container-taximetro.trip-neighborhood > div,
+.container-taximetro.trip-neighborhood > span,
+.container-taximetro.trip-neighborhood > p,
+.container-taximetro.trip-neighborhood > ul,
+.container-taximetro.trip-neighborhood > header {
+    display: none;
+}
+
+.container-taximetro:not(.trip-destination-neighborhood) > .trip-destination-neighborhood {
+    display: none;
+}
+
+
+.container-taximetro.trip-neighborhood > .trip-destination-neighborhood {
+    display: flex;
+    background-color: transparent;
+    color: #fff;
+    z-index: 1;
+    flex-direction:column;
+    padding: 20px 0 10px;
+}
+
+
+.container-taximetro.trip-neighborhood > .trip-destination-neighborhood > button,
+.container-taximetro.trip-neighborhood > .trip-destination-neighborhood > p{
+    opacity:1;
+}
+
+.container-taximetro.trip-neighborhood > .trip-destination-neighborhood > p{
+    font-size: 22pt;
+    margin-bottom:10px;
+    font-weight:bold;
+    text-align:center;
+}
+
+.container-taximetro.trip-neighborhood > .trip-destination-neighborhood > p{
+    display:flex;
+    flex-direction:column;
+}
+
+.container-taximetro.trip-neighborhood > .trip-destination-neighborhood > p > span:first-child{
+    font-size:12pt;
+    margin-bottom: 10px;
+}
+
+.container-taximetro.trip-neighborhood > .trip-destination-neighborhood > p > span:last-child {
+    text-transform: uppercase;
+}
+
+.container-taximetro.trip-neighborhood > .trip-destination-neighborhood > button{
+    border-radius:5px;
+    padding:10px;
+    background-color:#1e88e5;
+    color:#fff;
+    font-weight:bold;
+    font-size:12pt;
+    text-transform:uppercase;
+    border:none;
+}

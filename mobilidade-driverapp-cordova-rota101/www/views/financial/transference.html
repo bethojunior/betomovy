@@ -1,0 +1,93 @@
+<div class="menu-account">
+    <div class="hearder-title-account">
+        <i class="material-icons back-to">arrow_back</i>
+        <span>Transferência</span>
+        <i class="material-icons icon-menu"></i>
+    </div>
+    <header class="extract-header">
+        <div class="row-custom">
+            <div class="t8">
+                <span>MOTORISTA</span>
+                <span id="nameClientTransference" class="client-data">-</span>
+            </div>
+            <div class="t4">
+                <span>CPF</span>
+                <span id="nameCPFTransference" class="client-data">-</span>
+            </div>
+        </div>
+        <div class="row-custom">
+            <div class="t8">
+                <span>DATA DE TRANSFÊRENCIA</span>
+                <span id="dateTransference" class="client-data">-</span>
+            </div>
+            <div class="t4">
+                <span>SALDO</span>
+                <span class="value-balance client-data">-</span>
+            </div>
+        </div>
+    </header>
+</div>
+<div class="container-account">
+    <div class="body-account transference">
+        <div class="container-transference-middle">
+            <div class="container-value-transference">
+                <p class="description-value">valor a transferir</p>
+                <p class="description-type"></p>
+                <input type="tel" id="valueTransference">
+            </div>
+            <div class="img-transference" id="imgTransference">
+                <img src="webfiles/img/icon/icon_moeda.png" class="icon-moeda" id="btnIconMoney">
+                <div class="description-setas">
+                    <p> CLIQUE PARA TRANSFERIR</p>
+                    <img src="webfiles/img/icon/icon_setas.png" class="icon-setas">
+                </div>
+                <img src="webfiles/img/icon/icon-porquinho.png" class="icon-porquinho">
+            </div>
+        </div>
+        <div class="container-transference-footer">
+            <span class="edit-account-bank">
+                <i class="material-icons">edit</i>
+            </span>
+            <div style="margin-top: 30px">
+                <span style="width: 50%">
+                    <p class="name-bank-transference"></p>
+                    <p class="name-client-data"></p>
+                </span>
+                <span>
+                    <p>CPF</p>
+                    <p class="transference-cpf">-</p>
+                </span>
+                <span>
+                    <p>AGÊNCIA/OP/CONTA/DIGITO</p>
+                    <p class="date-account-transference"></p>
+                </span>
+                <span>
+                    <p>PIX</p>
+                    <p class="pix-account-transference"></p>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalReceivedTransfer" class="modal">
+    <img id="srcImg">
+    <p class="title center">Solicitação de transferência</p>
+    <p class="date center" id="date"></p>
+    <label>Valor</label><br>
+    <span id="valueTranference"></span>
+    <div class="divider"></div>
+    <label>Agência</label><br>
+    <span id="agencia"></span><br>
+    <label>Conta</label><br>
+    <span id="account"></span><br>
+    <span id="spanDocument">Documento</span><br>
+    <label>Favorecido</label><br>
+    <span id="nameUser"></span>
+    <div class="divider"></div>
+    <b class="centerFlex codeVerify">Código de verificação</b>
+    <br>
+    <span class="centerFlex" id="codeVerify"></span>
+    <br>
+    <label class="centerFlex nameLogo">TaxiReturn</label>
+</div>

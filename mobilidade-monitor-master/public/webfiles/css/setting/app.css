@@ -1,0 +1,100 @@
+@media (max-width: 991px) {
+    .web{
+        display: none;
+    }
+    .mobile{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+@media (min-width: 992px) {
+    .web{
+        display: block;
+    }
+    .mobile{
+        display: none;
+    }
+    textarea {
+        resize: none;
+    }
+
+    .general-app {
+        margin-top: 2vw;
+        padding: 1vw;
+    }
+
+    #accordion #collapseOne.collapse.show .card-body.general-app .row {
+        display: flex;
+        flex-wrap: nowrap;
+        margin-right: -15px;
+        margin-left: -15px;
+        overflow-y: scroll;
+    }
+
+    .general-app .row .col-lg-3 .container.container-preview-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .general-app .row .col-lg-3 .container.container-preview-icon img {
+        max-width: 10vw;
+    }
+
+    #accordion .card #collapse3.collapse.show .card-body.general-app .row button.button {
+        padding: 0.4vw;
+        border: none;
+        border-radius: 0.2vw;
+    }
+
+    #accordion .card {
+        color: black;
+    }
+
+    #accordion .card #collapse4 .card-body.general-app .col-lg-4 .form-group button {
+        margin-top: 1vw;
+    }
+
+    #accordion .card #collapse5 .card-body.general-app .row .col-lg-4 .input-group {
+        margin-bottom: 1vw;
+    }
+
+    #accordion .card #collapse5 .card-body.general-app .col-lg-4 .col-lg-12 #list-type-items .data-type-item {
+        background-color: whitesmoke;
+        display: block;
+        margin: 0.5vw;
+        padding: 0.3vw;
+        width: auto;
+    }
+
+    #accordion .card #collapse5 .card-body.general-app .col-lg-4 .col-lg-12 #list-type-items .data-type-item {
+        position: relative;
+    }
+
+    #accordion .card #collapse5 .card-body.general-app .col-lg-4 .col-lg-12 #list-type-items .data-type-item .option {
+        position: absolute;
+        right: 0;
+        margin-right: -9vw;
+        top: -4.5vh;
+        cursor: pointer;
+    }
+
+    #accordion .card #collapse5 .card-body.general-app .col-lg-4 .col-lg-12 #list-type-items .data-type-item .icon img {
+        max-width: 50%;
+    }
+
+    .card #collapse6.collapse.show .card-body.general-app .col-lg-4 .input-group {
+        margin: 1vw;
+    }
+
+    .card #collapse6.collapse.show .card-body.general-app #list-helpers {
+        overflow: scroll;
+        height: 30vh;
+    }
+
+    .card #collapse7.collapse.show .card-body.general-app #list-obstacles {
+        overflow: scroll;
+        height: 30vh;
+    }
+}

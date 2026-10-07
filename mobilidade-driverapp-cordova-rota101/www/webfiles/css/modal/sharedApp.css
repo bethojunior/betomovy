@@ -1,0 +1,89 @@
+.container-modal-share-app{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    z-index: 302;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.container-modal-share-app.active{
+    display: flex;
+}
+
+.container-modal-share-app > div{
+    width: 90%;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.container-modal-share-app > div > h4{
+    padding:0;
+    margin: 0;
+    font-size: 6vw;
+    text-align: center;
+}
+
+.container-modal-share-app > div > input[type="tel"]{
+    display:block;
+    margin: 1vw 5vw;
+    width:calc(100% - 10vw);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 7vw;
+}
+
+
+.container-modal-share-app > div > input[type=tel]:not(.browser-default):focus:not([readonly]){
+    border-bottom: 1px solid #ccc;
+    -webkit-box-shadow: 0 1px 0 0 #26a69a;
+    box-shadow: none;
+}
+
+.container-modal-share-app > div > div{
+    width:100%;
+    display:flex;
+}
+
+.container-modal-share-app > div > div > div{
+    width:50%;
+    padding:2vw;
+    text-align:center;
+
+}
+
+.container-modal-share-app > div > button{
+    width:100%;
+    padding:2vw;
+    font-size:5vw;
+    border-radius:0 0 5px 5px;
+    border:none;
+    margin-top:2vw;
+    background-color: var(--main-color);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-modal-share-app > div > button:disabled:before{
+    content:"";
+    width:5vw;
+    height:5vw;
+    border:2.5px solid transparent;
+    border-top:2.5px solid #fff;
+    border-radius:100%;
+    margin-right:5px;
+    animation: spin 1.5s linear infinite;
+}
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

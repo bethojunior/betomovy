@@ -1,0 +1,22 @@
+.container-gps-disabled{
+    position: absolute;
+    top: -50vw;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    transition:0.5s;
+}
+.container-gps-disabled.active{
+    top: 15vw;
+    transition:0.5s;
+}
+.container-gps-disabled > span{
+    background-color: #c24439;
+    color: #fff;
+    padding: 2vw;
+    width: 80%;
+    border-radius: 2vw;
+    text-align: center;
+}

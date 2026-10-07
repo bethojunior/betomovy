@@ -1,0 +1,172 @@
+.component-order-active {
+    position: absolute;
+    width: calc(100% - 260px);
+    height: calc(100% - 60px);
+    top: 57px;
+    left: 250px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    transition: all 300ms;
+}
+
+.sidebar-mini.sidebar-collapse .component-order-active {
+    width: calc(100% - 75px);
+    left: 75px;
+}
+
+.container-order {
+    flex: 1;
+    display: flex;
+}
+
+.container-order > div:first-child {
+    height: 100%;
+    background-color: #fff;
+    max-width: 25%;
+    min-width: 25%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-order > div:first-child > h4 {
+    padding: 10px;
+    display: block;
+    text-align: center;
+    margin: 0;
+    font-size: 13pt;
+    background-color: #f0eeee;
+}
+
+.container-order > div:first-child > ul {
+    list-style: none;
+    flex: 1;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    overflow-y: auto;
+}
+
+.container-order > div:first-child > ul > li {
+    box-shadow: 0 0 10px #ccc;
+    max-width: 90%;
+    min-width: 90%;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+.container-order > div:first-child > ul > li.active {
+    background-color: #cefdce;
+}
+
+.container-order > div:first-child > ul > li.waiting-confirmation {
+    animation: 2s animationWaitingConfirmation linear infinite;
+}
+
+@keyframes animationWaitingConfirmation {
+    0% {
+        background-color: #fff;
+    }
+    50% {
+        background-color: #ffa99b;
+    }
+    100% {
+        background-color: #fff;
+    }
+}
+
+.container-order > div:first-child > ul > li > span {
+    font-size: 9pt;
+    color: #777;
+}
+
+.container-order > div:first-child > ul > li > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container-order > div:first-child > ul > li > div > p,
+.container-order > div:first-child > ul > li > div > label {
+    margin: 0;
+    font-size: 11pt;
+}
+
+.container-order > div:first-child > ul > li > div > label {
+    font-size: 7pt;
+    background-color: #ddd;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 400;
+    padding: 5px;
+}
+
+.container-order > div:last-child {
+    flex: 1;
+    display: flex;
+    overflow-y: auto;
+}
+
+.container-order > div:last-child > nav {
+    display: none;
+}
+
+@media only screen and (max-width: 990px) {
+    .component-order-active {
+        width: 100%;
+        left: 0;
+    }
+    .sidebar-mini.sidebar-collapse .component-order-active {
+        width: 100%;
+        left: 0px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .main-header{
+        z-index: 450;
+    }
+
+    .container-order > div:first-child {
+        max-width: 100%;
+        min-width: 100%;
+    }
+
+    .container-order > div:last-child {
+        position: fixed;
+        width: 100%;
+        z-index: 500;
+        top: 0;
+        left: 0;
+        height: 100%;
+        overflow-y: auto;
+        background-color: #fff;
+        transform: translateY(150%);
+        transition: 500ms all;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .container-order > div.active:last-child {
+        transform: translateY(0%);
+    }
+
+    .sidebar-mini.sidebar-collapse .component-order-active {
+        width: 100%;
+        left: 0px;
+    }
+
+    .container-order > div:last-child > nav {
+        display: flex;
+        padding: 10px;
+        background-color: #fff;
+        font-size: 18pt;
+    }
+}

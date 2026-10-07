@@ -1,0 +1,570 @@
+import { Card, Carousel, Image } from "antd";
+import styled from "styled-components";
+
+interface ButtonsFilteredProps {
+  selected: boolean;
+}
+
+export const DashBoardContainer = styled.div`
+  @media (max-width: 800px) {
+    padding: 10px;
+  }
+`;
+
+export const GridButtonRefresh = styled.div`
+  display: flex;
+  padding: 3px;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+export const TypesOfDrivers = styled.div`
+  display: flex;
+  padding: 15px;
+  width: 100%;
+  flex-direction: column;
+`;
+
+export const TitleNotTypesDrivers = styled.h1`
+  font-size: 2rem;
+  text-align: center;
+`;
+
+export const TypeDriversCarousel = styled(Carousel)`
+  display: flex;
+  padding: 15px;
+  background-color: #f0f2f5 !important;
+  width: 100%;
+  .slick-dots {
+    & > li {
+      & > button {
+        background-color: #000 !important;
+      }
+    }
+  }
+
+  @media (min-width: 800px) {
+    border-radius: 10px;
+    background-color: #fff;
+    flex: 1;
+
+    & .slick-dots-bottom {
+      bottom: 0 !important;
+    }
+
+    & .slick-dots li button {
+      background: #003566;
+      height: 10px;
+      border-radius: 8px;
+    }
+
+    & .slick-dots li.slick-active button {
+      background: #001529;
+    }
+  }
+`;
+
+export const CardTyperDriverContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`;
+
+export const TypeDriverDataContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+export const TypeDriverDataLabel = styled.p`
+  margin-bottom: 0;
+`;
+
+export const TypeDriverDataItem = styled.p`
+  margin-bottom: 0;
+`;
+
+export const StatisticContainer = styled.div`
+  margin-top: 10px;
+`;
+
+export const LineConatiner = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+
+  @media (max-width: 800px) {
+    flex-direction: column;
+    margin-bottom: 0;
+  }
+`;
+
+export const StatisticRealTime = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 49%;
+
+  @media (max-width: 800px) {
+    width: 100%;
+  }
+`;
+
+export const CardOfInformations = styled.div`
+  width: 49%;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px,
+    rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @media (max-width: 800px) {
+    margin-top: 10px;
+    width: 100%;
+  }
+`;
+
+export const ContentCardInformations = styled.div`
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (max-width: 800px) {
+    flex-direction: column;
+    height: auto;
+  }
+`;
+
+export const CardHeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 10px 6px 10px;
+`;
+
+export const ContentFilteredMonthAndDay = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+export const ButtonsFiltered = styled.button<ButtonsFilteredProps>`
+  background-color: ${(props) => (props.selected ? "#e6f7ff" : "#fff")};
+  border: 1px solid ${(props) => (props.selected ? "#40a9ff" : "#d9d9d9")};
+  padding: 2px 10px;
+  font-size: 12px;
+  color: ${(props) => (props.selected ? "#40a9ff" : "#595959")};
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    color: #40a9ff;
+    border-color: #40a9ff;
+  }
+`;
+
+export const TopDriversAndClients = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-bottom: 70px;
+
+  @media (max-width: 800px) {
+    flex-direction: column;
+    height: auto;
+    padding-bottom: 50px;
+  }
+`;
+
+export const TripAndTicketOfToday = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+  margin-bottom: 2.5px;
+  border-radius: 5px;
+  height: 50%;
+  box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px,
+    rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+`;
+
+export const ClientsAndDriversRealTime = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+  margin-top: 2.5px;
+  border-radius: 5px;
+  height: 50%;
+  box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px,
+    rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+`;
+
+export const TripAndTicketContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+export const CardContainerMap = styled.div`
+  display: flex !important;
+  justify-content: center;
+  @media (max-width: 800px) {
+    padding-bottom: 30px;
+  }
+`;
+
+export const TripAndTicketData = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const TripAndTicked = styled.p`
+  font-size: 17px;
+  margin-bottom: 0;
+`;
+
+export const TypeDriversCard = styled(Card)`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border-radius: 5px;
+  margin-right: 10px;
+  width: 100%;
+  height: auto;
+
+  .ant-card-body {
+    padding-bottom: 14px;
+    padding-top: 14px;
+  }
+  @media (min-width: 800px) {
+    width: 20%;
+  }
+`;
+
+export const TypeDriverImageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  padding-bottom: 10px;
+`;
+
+export const TypeDriverImage = styled(Image)`
+  min-height: 100px;
+  max-height: 100px;
+`;
+
+export const TypeDriverContainer = styled.div`
+  margin-bottom: 10px;
+  color: #404040;
+  text-align: center;
+`;
+
+export const CustomersCardWrapper = styled(CardContainerMap)`
+  flex-direction: column;
+  align-items: center;
+`;
+
+export const CustomersTypeTitle = styled(TypeDriverContainer)`
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  width: 100%;
+`;
+
+export const CustomersCardsRow = styled(LineConatiner)`
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const CustomerMetricCard = styled(TypeDriversCard)`
+  min-width: 140px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 8px;
+
+  .ant-card-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+`;
+
+export const CustomerMetricContent = styled(TypeDriverDataContainer)`
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+`;
+
+export const CustomerMetricLabel = styled(TypeDriverDataLabel)`
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+`;
+
+export const CustomerMetricValue = styled(TypeDriverDataItem)`
+  font-size: 18px;
+`;
+
+export const TripsAcceptedContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+`;
+
+export const TripsLabel = styled.p`
+  margin-bottom: 0;
+`;
+
+export const TripsItem = styled.p`
+  margin-bottom: 0;
+`;
+
+export const TextOfCard = styled.p`
+  padding: 10px;
+  padding-bottom: 0;
+  font-size: 18px;
+  margin: 0;
+  flex-shrink: 0;
+`;
+
+export const ContainerInformationsData = styled.div`
+  border-radius: 5px;
+  min-width: 200px;
+  max-width: 200px;
+  border: 1px solid #dfdfdf;
+  @media (max-width: 800px) {
+    min-width: 100%;
+    max-width: 100%;
+  }
+`;
+
+export const InformationsDataMap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #dfdfdfdf;
+`;
+
+export const ContainerOfCarInformationGlobal = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #dfdfdf;
+
+  @media (max-width: 800px) {
+    padding: 15px;
+  }
+`;
+
+export const ParagraphBasicGlobal = styled.p`
+  margin-bottom: 0;
+`;
+
+export const TopItem = styled.p`
+  margin-bottom: 0;
+  margin-left: 4px;
+  @media (max-width: 800px) {
+    font-size: 14px;
+  }
+`;
+
+export const TopContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+export const TopName = styled.p`
+  margin-bottom: 0;
+
+  @media (max-width: 800px) {
+    font-size: 14px;
+  }
+`;
+
+export const SkeletonContainer = styled.div`
+  padding: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+`;
+
+export const ContainerInput = styled.div`
+  button {
+    margin-top: 10px;
+  }
+`;
+
+export const TopListContainer = styled.div`
+  max-height: 250px;
+  height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  flex: 1;
+  min-height: 0;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+
+  @media (max-width: 800px) {
+    max-height: 200px;
+    height: 200px;
+  }
+`;
+
+export const TopItemContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #dfdfdf;
+  gap: 8px;
+
+  @media (max-width: 800px) {
+    padding: 15px;
+  }
+`;
+
+export const TopItemContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+`;
+
+export const TopItemActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  flex-shrink: 0;
+`;
+
+export const WhatsAppLink = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 50%;
+  background-color: #25d366;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: #128c7e;
+    transform: scale(1.1);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+export const TicketMedioText = styled.span`
+  font-size: 12px;
+  color: #666;
+  margin-left: 8px;
+`;
+
+export const LoadingMoreText = styled.p`
+  text-align: center;
+  padding: 15px;
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+`;
+
+export const LoadingMoreContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 10px;
+`;
+
+export const LoadingMoreSpinner = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+`;
+
+export const ButtonParabens = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #333;
+  background-color: #f5f5f5;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    color: #40a9ff;
+    border-color: #40a9ff;
+    background-color: #fff;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  @media (max-width: 800px) {
+    font-size: 10px;
+    padding: 5px 8px;
+  }
+`;
+
+export const RankingFilterLabel = styled.span`
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-right: 4px;
+`;

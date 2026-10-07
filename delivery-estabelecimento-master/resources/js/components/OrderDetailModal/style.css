@@ -1,0 +1,32 @@
+.modal-order-detail{
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+    display: none;
+}
+
+.modal-order-detail.active{
+    display: flex;
+}
+
+.modal-order-detail > div{
+    background-color: #eee;
+    padding: 10px;
+    min-width: 75%;
+    border-radius: 5px;
+    z-index: 10000;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.modal-order-detail > div > h4{
+    font-weight: 400;
+    font-size: 15pt;
+    padding: 14px 0;
+}

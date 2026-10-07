@@ -1,0 +1,83 @@
+/* Largura da barra de rolagem */
+::-webkit-scrollbar {
+    width: 10px;
+    display: none;
+
+}
+/* Fundo da barra de rolagem */
+::-webkit-scrollbar-track-piece {
+    background-color: #05395b;
+    border-left: 1px solid #CCC;
+}
+
+/* Cor do indicador de rolagem */
+::-webkit-scrollbar-thumb:vertical,
+::-webkit-scrollbar-thumb:horizontal {
+    background-color: #3490cc;
+}
+
+/* Cor do indicador de rolagem - ao passar o mouse */
+::-webkit-scrollbar-thumb:vertical:hover,
+::-webkit-scrollbar-thumb:horizontal:hover {
+    background-color: #717171;
+}
+/**
+web
+ */
+@media (min-width: 992px) {
+    .absolute{
+        position: absolute;
+    }
+    .relative{
+        position: relative;
+    }
+    .iconAbsolute{
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin-top: 1vw;
+        margin-right: 1vw;
+    }
+    .web{
+        display: block;
+    }
+    .mobile{
+        display: none;
+    }
+    .pdl-0{
+        padding-left: 0!important;
+    }
+    .mt-05{
+        margin-top: 0.5vw!important;
+    }
+    .enterprise-data{
+        display: none;
+    }
+    .general-register .web .row.col-lg-12 .col-lg-5.first{
+        background-image: url(/webfiles/img/icon/contact.png);
+        background-repeat: no-repeat;
+        background-color: var(--main-color);
+        background-position: center;
+        color: white;
+    }
+    .general-register .web .row.col-lg-12 .col-lg-5.first{
+        padding-top: 5vw;
+    }
+    .general-register .web .row.col-lg-12 .col-lg-7 .col-lg-12.scroll{
+        height: 100vh;
+        overflow: scroll;
+        padding-bottom: 5vw;
+    }
+}
+/**
+mobile
+ */
+@media (max-width: 991px){
+    .web{
+        display: none;
+    }
+    .mobile{
+        display: block;
+    }
+}

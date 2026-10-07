@@ -1,0 +1,131 @@
+{
+  "expo": {
+    "name": "Movy",
+    "scheme": "rota101pro",
+    "slug": "expoappv2",
+    "version": "8.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "splash": {
+      "image": "./assets/splashPhoto.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "jsEngine": "hermes",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "A câmera é usada durante o cadastro para tirar sua foto de perfil e fotografar os documentos necessários para o cadastro. Ela também é usada quando você troca sua foto de perfil no aplicativo.",
+          "microphonePermission": "O microfone é usado para gravar e enviar mensagens de áudio no chat entre motoristas e passageiros e para informar endereços por voz ao realizar um chamado.",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Queremos ajudar você a se conectar com seus contatos. Precisamos da sua permissão para o ${PRODUCT_NAME} acessar sua agenda e facilitar o envio de mensagens e SMS."
+        }
+      ],
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      ["./plugins/addServiceToMainApplication", ["com.bubblebutton.BubbleService"]],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "buildToolsVersion": "36.0.0"
+          }
+        }
+      ],
+      ["./plugins/addVolumeToMainActivity"],
+      "expo-asset",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "O microfone é usado para informar um endereço por voz e convertê-lo em texto ao realizar um chamado no aplicativo.",
+          "speechRecognitionPermission": "O reconhecimento de fala é usado para converter em texto o endereço informado por voz ao realizar um chamado.",
+          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+        }
+      ],
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "sounds": ["./src/driver/src/assets/songs/assobio.mp3"]
+        }
+      ],
+      "./plugins/fixFirebaseDuplicateClasses",
+      [
+        "react-native-maps",
+        {
+          "iosGoogleMapsApiKey": "AIzaSyAgipJ5ZnlBpE-pqVsnljRPhF8jRL2RQIg",
+          "androidGoogleMapsApiKey": "AIzaSyAi8KBHM6dO6tpF7apf8B5qnftv_wfpytg"
+        }
+      ]
+    ],
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "NSCameraUsageDescription": "A câmera é usada durante o cadastro para tirar sua foto de perfil e fotografar os documentos necessários para o cadastro. Ela também é usada quando você troca sua foto de perfil no aplicativo.",
+        "NSMicrophoneUsageDescription": "O microfone é usado para gravar e enviar mensagens de áudio no chat entre motoristas e passageiros e para informar endereços por voz ao realizar um chamado.",
+        "NSPhotoLibraryUsageDescription": "A biblioteca de fotos é utilizada para selecionar fotos do perfil e enviar imagens ou documentos salvos no aparelho.",
+        "UIBackgroundModes": ["location", "fetch"],
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
+        "NSLocationWhenInUseUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
+        "NSSpeechRecognitionUsageDescription": "O reconhecimento de fala é usado para converter em texto o endereço informado por voz ao realizar um chamado no aplicativo."
+      },
+      "bundleIdentifier": "br.com.client.rota101",
+      "config": {
+        "googleMapsApiKey": "AIzaSyAgipJ5ZnlBpE-pqVsnljRPhF8jRL2RQIg"
+      }
+    },
+    "android": {
+      "package": "br.com.client.rota101",
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 80000,
+      "edgeToEdgeEnabled": true,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAi8KBHM6dO6tpF7apf8B5qnftv_wfpytg"
+        }
+      },
+      "permissions": [
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "RECORD_AUDIO",
+        "VIBRATE",
+        "SYSTEM_ALERT_WINDOW",
+        "FOREGROUND_SERVICE",
+        "POST_NOTIFICATIONS",
+        "CAMERA",
+        "FLASHLIGHT",
+        "BLUETOOTH_CONNECT",
+        "BLUETOOTH",
+        "BLUETOOTH_SCAN",
+        "BLUETOOTH_ADVERTISE",
+        "BLUETOOTH_ADMIN",
+        "INTERNET",
+        "READ_PHONE_STATE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "068f585d-93b1-440c-9b3f-c8b42bd803cf"
+      }
+    },
+    "owner": "fabrica704"
+  }
+}

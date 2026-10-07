@@ -1,0 +1,21 @@
+.container-general {
+    background-color: whitesmoke;
+    border-radius: 8px;
+    width: 70%;
+    margin: auto;
+    padding: 1vw;
+}
+
+.table-status {
+    margin-top: 20px;
+    margin-bottom: 20px !important;
+}
+
+.edit-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.edit-container input {
+    width: 50%;
+}

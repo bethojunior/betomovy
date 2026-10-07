@@ -1,0 +1,66 @@
+/* The location pointed to by the popup tip. */
+.popup-tip-anchor {
+    height: 0;
+    position: absolute;
+    /* The max width of the info window. */
+    width: 200px;
+}
+
+/* The bubble is anchored above the tip. */
+.popup-bubble-anchor {
+    position: absolute;
+    width: 100%;
+    top: -10vw;
+}
+
+.popup-custom-destination,
+.popup-custom-origin {
+    position: absolute;
+    width: 230px;
+    height: 50px;
+    background-color: #fff;
+    overflow: hidden;
+    padding: 5px;
+    border-radius: 5px;
+    color: #000;
+}
+
+.popup-custom-destination {
+    display: flex;
+    padding: 0;
+}
+
+.popup-custom-origin > span {
+    max-height: 40px;
+    overflow: hidden;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 14.5pt;
+}
+
+.popup-custom-destination > span {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    background-color: #000;
+    color: #fff;
+}
+
+.popup-custom-destination > span > .time {
+    font-size: 15pt;
+}
+
+.popup-custom-destination > span > .minute {
+    font-size: 10pt;
+}
+
+.popup-custom-destination > p {
+    flex: 1;
+    padding: 5px;
+    max-height: 40px;
+    overflow: hidden;
+    border-radius: 5px;
+}

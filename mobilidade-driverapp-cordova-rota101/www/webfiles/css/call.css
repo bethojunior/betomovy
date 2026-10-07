@@ -1,0 +1,374 @@
+* {
+    margin: 0;
+    padding: 0
+}
+
+html, body {
+    height: 100%;
+}
+
+.container-hush {
+    position: absolute;
+    height: 0;
+    width: 100%;
+    bottom: 0;
+    z-index: 505;
+    visibility: hidden;
+    opacity: 0;
+    background-color: #FFFFFF;
+    transition: 0.5s;
+}
+
+.container-hush.active {
+    visibility: visible;
+    opacity: 1;
+    transition: 0.5s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.container-hush.accept {
+    top: -105%;
+}
+
+.container-hush > .container-info-return > .container-info-trip-client {
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+.container-hush > .container-info-return > .container-info-trip-client > div {
+    border-bottom: 1px solid #ccc;
+    padding: 0px 5px;
+}
+
+.container-hush > .container-info-return > .container-info-trip-client > div > label {
+    width: 100%;
+    display: block;
+    font-size: 3.5vw;
+    text-transform: uppercase;
+    color: #7e7e7e;
+}
+
+.stop-list {
+    list-style: none;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    padding: 10px
+}
+
+.stop-list > li{
+    padding: 8px 20px;
+    position:relative;
+}
+
+.stop-list > li:before {
+    position:absolute;
+    background-color: black;
+    content:"";
+    width:2px;
+    height:calc(100% - 25px);
+    left:8px;
+    top:42px;
+}
+
+.stop-list > li:after {
+    background-image: url(../img/svg/gps-fixed-indicator.svg);
+    background-size: cover;
+    position:absolute;
+    content:"";
+    width: 20px;
+    height: 20px;
+    left: -1px;
+    top:20px;
+}
+
+.stop-list > li:first-child:after {
+    background-image: url(../img/icon/destination.png);
+    background-size: cover;
+    content:"";
+    position:absolute;
+    width: 20px;
+    height: 20px;
+    left: -1px;
+    top:20px;
+}
+
+.stop-list > li:last-child:before{
+    display:none;
+}
+
+.stop-list > li > div {
+    display: flex;
+}
+
+.stop-list > li > div > p {
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.stop-list > li > div > i {
+    font-size: 20px;
+    color: red;
+    margin-top: 10px;
+}
+
+.stop-list > li > small {
+    font-size: 15px;
+    margin-left: 5px;
+    font-weight: 700;
+}
+
+.stop-list > li > p {
+    margin-left: 5px;
+    margin-top: 10px;
+}
+
+/* Estilos para o container de paradas com dropdown */
+.waypoints-container {
+    display: none;
+    padding: 8px 20px !important;
+}
+
+.waypoints-container.show {
+    display: block !important;
+}
+
+#tripWayPoints.single-waypoint #waypointsMoreBtn {
+    display: none !important;
+}
+
+.waypoints-container > div > p {
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.waypoints-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background-color: var(--main-color);
+    border-radius: 15px;
+    width: fit-content;
+}
+
+.waypoints-more-btn > span {
+    font-size: 13px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.waypoints-toggle {
+    font-size: 18px;
+    color: #fff;
+    transition: transform 0.3s ease;
+    margin-left: 4px;
+}
+
+.waypoints-toggle.expanded {
+    transform: rotate(180deg);
+}
+
+.waypoints-list {
+    list-style: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0;
+    margin: 0;
+    margin-top: 8px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+.waypoints-list.expanded {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.waypoints-list > li {
+    padding: 10px 8px;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid #ddd;
+    position: relative;
+    padding-left: 25px;
+}
+
+.waypoints-list > li:before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background-color: var(--main-color);
+    border-radius: 50%;
+}
+
+.waypoints-list > li:last-child {
+    border-bottom: none;
+}
+
+.container-progress{
+    width: 80vw;
+    height: 6vw;
+    border: 1px solid #b0b0b0;
+    border-radius: 10px;
+    background-color: #e4e4e4;
+    overflow: hidden;
+    position:relative;
+    margin: 1vw auto;
+}
+
+.container-progress > div{
+    position:absolute;
+    height:100%;
+    width: 0;
+    transition: 1.5s;
+    overflow: hidden;
+    overflow-x: scroll;
+    white-space: nowrap;
+    font-size: 0;
+}
+
+.container-progress > div > div{
+    height: 100%;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-content > div > a {
+    font-size: 40px;
+    color: black;
+}
+
+.client-information {
+    display: flex;
+}
+
+.client-information > p {
+    font-size: 18px;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.trip-information-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center
+}
+
+.trip-information-content > h2 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.trip-information-content > h5 {
+    color: #0fe648;
+    font-weight: bold;
+}
+
+.trip-information-content > p {
+    font-weight: bold;
+}
+
+.trip-information-content > div {
+    display: contents;
+}
+
+.trip-information-content > div > #haveReturn {
+    background-color: orange;
+    color: #000;
+    padding: 4px 7px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 7px;
+}
+
+.more-information-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.more-information-content > div {
+    border: none;
+    background-color: var(--main-color);;
+    color: #ffff;
+    border-radius: 5px;
+    padding-right: 10px;
+    align-items: center;
+    padding-left: 10px;
+    display: flex;
+    flex-direction: row
+}
+
+.more-information-content > div > p {
+    font-size: 17px;
+}
+
+.more-information-content > div > i {
+    margin: 5px;
+}
+
+.content-accept-trip {
+    position: relative;
+    height: 55px;
+    width: 85%;
+    align-self: center;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.btn-accept-trip {
+    width: 100%;
+    align-self: center;
+    font-size: 23;
+    border-radius: 20px;
+    color: black;
+    position: absolute;
+    background-color: transparent;
+    border: 1px solid black;
+    height: 100%;
+    z-index: 1;
+    margin-top: -55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-accept-trip:focus{
+    background-color: var(--main-color);
+}
+
+.progress-time-to-accept{
+    height: 55px;
+    background-color: orange;
+    border-radius: 20px;
+    max-width: 100%;
+    transition: 1.5s all;
+}
+
+.version-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.version-content > small {
+    font-size: 11px;
+}
+

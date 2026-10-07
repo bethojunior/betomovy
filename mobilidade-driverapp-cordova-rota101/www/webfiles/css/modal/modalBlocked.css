@@ -1,0 +1,107 @@
+.container-modal-blocked{
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    position: absolute;
+}
+
+.container-modal-blocked.active{
+    display: flex;
+}
+
+.container-modal-blocked > div{
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 5px;
+    width:90%;
+}
+
+.container-modal-blocked > div > .logo-block{
+    height: 15vw;
+    width: 15vw;
+    display: block;
+    margin: auto;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("../../img/svg/traffic-light.svg");
+}
+
+
+.container-modal-blocked.enabled > div > .logo-block{
+    background-image: url("../../img/svg/traffic-light-green.svg");
+}
+
+.container-modal-blocked > div > h4{
+    font-size:6vw;
+    text-align:center;
+}
+
+.container-modal-blocked > div > ul {
+    padding: 0 20px;
+    display: block;
+}
+.container-modal-blocked > div > ul > li{
+    padding: 10px 5px;
+    margin-bottom: 10px;
+    border: 1px  solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items:center;
+}
+
+
+.container-modal-blocked > div > ul > li > div:first-child{
+    font-size:14pt;
+}
+
+.container-modal-blocked > div > ul > li > div:last-child{
+    font-size:9pt;
+    text-transform:uppercase;
+    color:#f84747;
+    font-weight:600;
+}
+
+.container-modal-blocked > div > ul > li > div:last-child:before{
+    content:"enviar";
+}
+
+.container-modal-blocked > div > ul > li.active > div:last-child:before{
+    content:"ok";
+    color: #42c563;
+}
+
+.container-modal-blocked > div > button{
+    margin-top:5vw;
+    width:100%;
+    padding:5px;
+    font-size:6vw;
+    border:none;
+    border-radius:5px;
+    color:#fff;
+    display: flex;
+    background-color:var(--main-color);
+    justify-content: center;
+    align-items: center;
+}
+
+.container-modal-blocked > div > button:disabled:before{
+    content:"";
+    width: 5vw;
+    height: 5vw;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+    border:2px solid transparent;
+    border-top-color: #000;
+    animation: spin 1s linear infinite;
+    left: -5vw;
+    position: relative;
+}

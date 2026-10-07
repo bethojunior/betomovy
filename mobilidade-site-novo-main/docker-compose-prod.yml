@@ -1,0 +1,14 @@
+services:
+  mobilidade-site-new:
+    platform: linux/amd64
+    build:
+      dockerfile: docker-prod/dockerfile
+    container_name: mobilidade-site-new-prod
+    image: mobilidade-site-new-prod-local
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./.env:/usr/share/nginx/html/.env:ro
+    ports:
+      - 88:87

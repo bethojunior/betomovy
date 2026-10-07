@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat|Montserrat+ ');
+@import url('https://fonts.googleapis.com/css?family=Monda|Montserrat+Alternates');
+body{
+    background-color: #e8ebed;
+}
+.navBlog{
+    top: 0;
+    position: fixed;
+    opacity: 0.8;
+    background-color: white;
+    color: #FFAF00;
+    font-size: 2vw;
+    padding-left: 4vw;
+    height: auto;
+}
+.navBlog .index{
+    cursor: pointer;
+}
+.navBlog .index .logoHeader{
+    padding-top: 1vw;
+}
+.navBlog .index .opacityIndex:hover{
+    opacity: 0.4;
+    transition: 0.5s;
+}
+.mtNav{
+    margin-top: 8vw;
+}
+.row .generalBlog .col.l10#mainBlog{
+    box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.26);
+    padding: 1vw;
+    border-radius: 0.5vw;
+    transition: 0.5s;
+}
+.row .generalBlog .col.l10#mainBlog:hover{
+    box-shadow: 1px 1px 30px 0px rgba(0,0,0,0.26);
+    transition: 1s;
+    cursor: pointer;
+}
+.row .generalBlog .col.l10#mainBlog .col.l5 img#imageMainBlog{
+    z-index: 99999;
+}
+.row .generalBlog .col.l10#mainBlog .col.l7{
+    /*box-shadow: 1px 1px 20px 0px rgba(0,0,0,0.26);*/
+    margin: 0;
+    padding-left: 2vw;
+}
+.row .generalBlog .col.l10#mainBlog .col.l7 .descriptionMainBlog{
+    font-family: 'Montserrat';
+}
+.row .generalBlog .col.l10#mainBlog .col.l7 .descriptionMainBlog .titleMainBlog{
+    font-size: 3vw;
+    font-weight: 500;
+}
+
+.row .col.l10 .divider{
+    margin-top: 1vw;
+}
+.row .col.l10 .panelBestsPosts{
+    margin-top: 1vw;
+}
+.row .col.l10 .panelBestsPosts .bestPost{
+    transition: 0.5s;
+    padding: 1vw;
+    border-radius: 0.5vw;
+}
+.row .col.l10 .panelBestsPosts .bestPost:hover{
+    cursor: pointer;
+    transition: 1s;
+    box-shadow: 1px 1px 30px 0px rgba(0,0,0,0.26);
+}
+.row .col.l10 .panelBestsPosts .bestPost.col.l4 .col.l12 .descriptioFirstPost{
+    text-align: center;
+    font-family: Montserrat;
+    font-size: 0.8vw;
+}
+
+.row .thirdPartBlog .col.l10{
+    background-color: white;
+    border-radius: 0.3vw;
+}
+.row .thirdPartBlog .col.l12 .col.l3 .title{
+    font-size: 2vw;
+    font-family: Monda;
+    color: #8BC543;
+}
+.row .thirdPartBlog .col.l10 .col.l12 .col.l3{
+    border: solid 1px transparent;
+}
+.row .thirdPartBlog .col.l10 .col.l12 .col.l3 #morePopular.morePopular{
+    overflow: scroll;
+    height: 17vw;
+}
+.row .thirdPartBlog .col.l10 .col.l12 .col.l3 #morePopular.morePopular .col.l12.divPopular{
+    cursor: pointer;
+    padding: 0.5vw;
+    transition: 0.3s;
+}
+.row .thirdPartBlog .col.l10 .col.l12 .col.l3 #morePopular.morePopular .col.l12.divPopular:hover{
+    cursor: pointer;
+    box-shadow: 1px 1px 10px 0px rgba(0,0,0,0.26);
+    transition: 0.5s;
+    background-color: #8BC543;
+    color: white;
+    -webkit-border-radius: 0.4vw;
+    -moz-border-radius: 0.4vw;
+    border-radius: 0.4vw;
+}
+
+.mtNav .row .fourthBlog .col.l10 .col.l3{
+    transition: 1s;
+}
+.mtNav .row .fourthBlog .col.l10 .col.l3:hover{
+    transition: 1s;
+    box-shadow: 1px 1px 20px 0px rgba(0,0,0,0.26);
+    border: none;
+    cursor: pointer;
+    background-color: white;
+    padding-bottom: 3vw;
+}
+.mtNav .row .fourthBlog .col.l10 .col.l3 .col.l12.aboutSubtitle{
+    background-color: white;
+    -webkit-border-radius: 0vw 0vw 0.5vw 0.5vw;
+    -moz-border-radius: 0vw 0vw 0.5vw 0.5vw;
+    border-radius: 0vw 0vw 0.5vw 0.5vw;
+}

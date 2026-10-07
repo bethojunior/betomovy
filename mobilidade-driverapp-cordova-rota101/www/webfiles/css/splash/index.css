@@ -1,0 +1,105 @@
+.container-splash{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    background-color:var(--main-color);
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.5s;
+    display: flex;
+    background-image: url("../../img/logo/splash.png");
+    background-position: center;
+    background-size: cover;
+}
+
+.container-splash.disabled{
+    display: none;
+}
+
+.container-splash.active{
+    display: flex;
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
+.container-splash > div.logo-splash{
+    width: 40vw;
+    height: 40vw;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: relative;
+}
+
+.container-splash > div.logo-splash > span{
+    display:block;
+    font-weight:600;
+    font-size: 20pt;
+    bottom: -40px;
+    position: absolute;
+    color: var(--main-color);
+}
+
+.loader-splash{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader-splash > div{
+    width: 5vw;
+    height: 5vw;
+    background-color: var(--text-color-main);
+    border-radius: 100%;
+    margin: 5px;
+
+}
+
+.container-splash.active > .loader-splash > div:nth-child(1){
+    animation:0.5s animation-preload-splash linear infinite;
+}
+
+.container-splash.active > .loader-splash > div:nth-child(2){
+    animation:0.5s animation-preload-splash linear infinite;
+    animation-delay:0.25s;
+}
+
+.container-splash.active > .loader-splash > div:nth-child(3){
+    animation:0.5s animation-preload-splash linear infinite;
+}
+
+@keyframes animation-preload-splash{
+    0%{
+        transform:translateY(0vw);
+    }
+    50%{
+        transform:translateY(-5vw);
+    }
+    100%{
+        transform:translateY(0vw);
+    }
+}
+
+#splash-version {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    z-index: 10001;
+    white-space: nowrap;
+    color: var(--text-color-main);
+}

@@ -1,0 +1,10 @@
+<?php
+
+namespace Delivery\Models\Config;
+
+use Illuminate\Database\Eloquent\Model;
+
+class PushConfig extends Model
+{
+    protected $table = 'pushConfig';
+}

@@ -1,0 +1,67 @@
+.container-option-security {
+    position: absolute;
+    bottom: 0;
+    z-index: 500;
+    background-color: #fff;
+    width: 100%;
+    height: 75%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding:10px;
+    box-shadow:0 0 10px #ccc;
+    transform:translateY(120%);
+    transition:all 300ms;
+}
+
+.container-option-security.active {
+    transform:translateY(0%);
+
+}
+
+.container-option-security > button{
+    width:25vw;
+    height:25vw;
+    border:none;
+    border-radius:100%;
+    background-color:green;
+    color:#fff;
+    box-shadow:0 0 10px #d6d6d6;
+    margin:5px 0 20px;
+}
+
+.container-option-security > button > i{
+    font-size:30pt;
+}
+
+.container-option-security > div{
+    margin-top:5px;
+    width:100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+
+.container-option-security > div > p{
+    font-size:15pt;
+    text-align:center;
+    margin-bottom:15px;
+}
+
+.container-option-security > div > ul{
+    height: 100%;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.container-option-security > div > ul > li{
+    width:90%;
+    background-color:#f3f3f3;
+    padding:10px;
+    border-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    margin: 0 auto 10px;
+}

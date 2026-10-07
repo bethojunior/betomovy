@@ -1,0 +1,161 @@
+<div id="popUpCustom" style="position: absolute; top: -100%"></div>
+<div>
+    <div id="panelDetail">
+        <div id="gps"></div>
+        <div id="route"></div>
+        <a href="index.html?Driver&Setting" class="btn">Configuração</a>
+        <button type="button" class="btn test-ping">Ping</button>
+    </div>
+    <div class="move-map"></div>
+    <div class="map" style="min-height: 150px;min-width: 150px;" id="map"></div>
+    <p class="text-alert-driver"></p>
+    <footer class="footer-race">
+        <div class="footer-arrow">
+            <!--<img id="footerArrow" src="webfiles/img/icon/arrow-subir.png">-->
+            <i id="footerArrow" class="material-icons">expand_less</i>
+        </div>
+        <!--<div class="apps-hotel"><img src="webfiles/img/icon/icon_hotel_map.png"></div>-->
+        <div class="toggle-status-driver">
+            <p id="textTripToggle">-</p>
+            <div class="toggle-button" id="btnStatusDriver">
+                <input type="checkbox" id="toggleStatusDriver">
+                <span data-i18n-content="home-content-toggle" data-content-after data-content-before>
+                    <i class="material-icons">arrow_forward_ios</i>
+                </span>
+            </div>
+            <div class="container-return-driver" message-after="Função retorno ativa, você receberá apenas viagens para o seu destino!">
+                <i class="material-icons" id="infoUseReturn">
+                    info
+                </i>
+                <p data-i18n="home-p-my-returns"></p>
+                <ul id="listReturn">
+                </ul>
+                <!-- <button type="button" id="isReturnActive"></button>-->
+            </div>
+            <ul class="container-detail-driver">
+                <li>
+                    <div class="info-driver-status">
+                        <label data-i18n="home-span-today">Hoje</label>
+                        <label id="negativeBalanceAmount"></label>
+                        <h4 id="valueCollected"><span>R$</span>0,00</h4>
+                        <div id="containerQuantityCall">
+                            <ul>
+                                <li>
+                                    <span data-i18n="home-li-calls"></span> <span id="quantityCalls">00</span>
+                                </li>
+                                <li>
+                                    <span data-i18n="home-li-answers"></span><span id="quantityAcceptedCalls">00</span>
+                                </li>
+                                <li>
+                                    <span data-i18n="home-li-rejected"></span> <span id="quantityRefusedCalls">00</span>
+                                </li>
+                                <li>
+                                    <span data-i18n="home-li-canceled"></span><span id="quantityCanceledCalls">00</span>
+                                </li>
+                                <li>
+                                    <span data-i18n="home-li-finished"></span><span id="quantityFinishedCalls">00</span>
+                                </li>
+                            </ul>
+                            <div>
+                                <label data-i18n="home-label-rating"></label>
+                                <h4 id="ratingDriver">0,00</h4>
+                            </div>
+                        </div>
+                        <label><small data-i18n="home-gross-amount"></small></label>
+                    </div>
+                </li>
+                <li>
+                    <div class="driver-graphic">
+                        <h4 data-i18n="home-h4-week-day"></h4>
+                        <canvas id="driverGraphicWeek"></canvas>
+                        <span id="earningsTotal">R$0,00</span>
+                    </div>
+                </li>
+            </ul>
+            <ul class="count-item-detail">
+                <li class="active"></li>
+                <li></li>
+            </ul>
+        </div>
+        <div class="data-trip">
+            <a class="apps-route">
+                <i class="material-icons">
+                    navigation
+                </i>
+            </a>
+
+            <span class="point-minimize"><i class="material-icons">keyboard_arrow_up</i></span>
+
+            <div class="name-client btn-info-trip">
+                <i class="material-icons" id="detailFreight">local_shipping</i>
+                <i class="material-icons" id="cancelTrip">close</i>
+                <div id="openChat">
+                    <i class="material-icons">chat_bubble</i>
+                    <p class="amount-msg"></p>
+                </div>
+                <div id="showRouteInApp" style="display: none">
+                    <i class="material-icons">map</i>
+                </div>
+                <div id="openDirection">
+                    <i class="material-icons">directions</i>
+                </div>
+                <div id="openDetailRouteCorporate">
+                    <i class="material-icons btn-show-detail-route">airline_seat_recline_normal</i>
+                </div>
+                <div id="openCustomerRouteRide">
+                    <i class="material-icons">supervisor_account</i>
+                </div>
+                <div id="openCustomerChatRider">
+                    <i class="material-icons">chat</i>
+                </div>
+
+            </div>
+            <div class="container-info-customer-trip">
+                <div class="profile-image-customer">
+                    <span id="nameClient"></span>
+                </div>
+            </div>
+            <ul class="list-place-trip"></ul>
+            <p class="info-trip btn-move">
+                <span id="btnChangeStatusTrip">Sinalizar chegada</span>
+                <i class="material-icons">keyboard_arrow_right</i>
+            </p>
+        </div>
+        <div class="container-option-detail-status-driver">
+            <div>
+                <div class="button-float-home waves-effect waves-light offline" id="disabledOnlineDriver">
+                    <i class="material-icons">pan_tool</i>
+                </div>
+                <span>OFFLINE</span>
+            </div>
+        </div>
+    </footer>
+
+    <div class="btn-security-drive" id="btnSecurityDriver">
+        <i class="material-icons">security</i>
+        <div>
+            Dois toques parar ativar o alerta de segurança
+        </div>
+    </div>
+
+    <a class="apps-route">
+        <i class="material-icons">
+            navigation
+        </i>
+    </a>
+
+    <div class="center-camera-map-position"></div>
+    <div id="driverBlock" class="modal">
+        <span></span><span id="messageDenied"></span>
+    </div>
+
+    <div class="button-float-datasheet hidden">
+        <i class="material-icons">
+            assignment_ind
+        </i>
+    </div>
+
+    <div class="button-float-home waves-effect waves-light hidden" id="enableOnlineDriver">
+        <span data-i18n="home-start-button"></span>
+    </div>
+</div>

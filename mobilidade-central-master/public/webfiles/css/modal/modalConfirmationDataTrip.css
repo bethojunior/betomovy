@@ -1,0 +1,221 @@
+/* ── Modal Dados da Viagem ── */
+
+.modal-confirmation-data-trip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-confirmation-data-trip.active {
+    display: flex;
+}
+
+/* ── Card ── */
+.modal-confirmation-data-trip > div {
+    background: var(--color-bg-surface);
+    border-radius: 14px;
+    width: min(94vw, 520px);
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Header ── */
+.modal-confirmation-data-trip > div > .data-customer {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    padding: 14px 18px;
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-confirmation-data-trip > div > .data-customer h6 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    color: var(--color-text-inverse);
+}
+
+.modal-confirmation-data-trip > div > .data-customer .data-customer-icon {
+    font-size: 18px;
+    font-family: 'Material Icons';
+    opacity: 0.8;
+}
+
+/* ── Body ── */
+.modal-confirmation-data-trip > div > .data-trip {
+    padding: 16px 18px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal-confirmation-data-trip > div > .data-trip > p {
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--color-bg-muted);
+}
+
+.modal-confirmation-data-trip > div > .data-trip > p:last-of-type {
+    border-bottom: none;
+}
+
+.modal-confirmation-data-trip > div > .data-trip > p > span:first-child {
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+
+.modal-confirmation-data-trip > div > .data-trip > p > span:last-child {
+    text-align: right;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+/* ── Rota com linha vertical ── */
+.modal-confirmation-data-trip #routeTrip {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    position: relative;
+}
+
+.modal-confirmation-data-trip #routeTrip li {
+    position: relative;
+    padding: 0 0 14px 28px;
+    font-size: 12.5px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+.modal-confirmation-data-trip #routeTrip li:last-child {
+    padding-bottom: 4px;
+}
+
+/* Linha vertical conectando as paradas */
+.modal-confirmation-data-trip #routeTrip li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 16px;
+    bottom: 0;
+    width: 2px;
+    background: var(--color-border);
+    z-index: 0;
+}
+
+/* Origem — círculo verde */
+.modal-confirmation-data-trip #routeTrip li.route-origin::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-success);
+    box-shadow: 0 0 0 2px rgba(16,185,129,0.25);
+    z-index: 1;
+}
+
+/* Paradas intermediárias — ponto cinza menor */
+.modal-confirmation-data-trip #routeTrip li.route-waypoint::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-text-disabled);
+    z-index: 1;
+}
+
+/* Destino — quadrado vermelho */
+.modal-confirmation-data-trip #routeTrip li.route-destination::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--color-danger);
+    box-shadow: 0 0 0 2px rgba(239,68,68,0.25);
+    z-index: 1;
+}
+
+/* ── Checkbox retorno ── */
+.modal-confirmation-data-trip .form-check {
+    padding: 8px 18px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+/* ── Divisor ── */
+.modal-confirmation-data-trip hr {
+    margin: 0;
+    border: none;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+/* ── Footer / botões ── */
+.modal-confirmation-data-trip .data-footer {
+    display: flex;
+    gap: 8px;
+    padding: 12px 18px 16px;
+}
+
+.modal-confirmation-data-trip .data-footer > button {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.15s, opacity 0.15s;
+    letter-spacing: 0.2px;
+}
+
+.modal-confirmation-data-trip #btnConfirmationTrip {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+.modal-confirmation-data-trip #btnConfirmationTrip:hover {
+    background: var(--color-primary-hover);
+}
+
+.modal-confirmation-data-trip #btnCancelConfirmationTrip {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+}
+
+.modal-confirmation-data-trip #btnCancelConfirmationTrip:hover {
+    background: rgba(0, 0, 0, 0.05);
+}

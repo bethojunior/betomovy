@@ -1,0 +1,430 @@
+/* ── Modal Editar Viagem Agendada ── */
+
+.modal-edit-scheduled-trip {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-edit-scheduled-trip.active {
+    display: flex;
+}
+
+/* ── Card ── */
+.modal-edit-scheduled-trip > div {
+    position: relative;
+    background: var(--color-bg-surface);
+    border-radius: 14px;
+    width: min(94vw, 560px);
+    max-width: 560px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Header ── */
+.modal-edit-scheduled-trip > div > .data-customer {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    padding: 14px 18px;
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-edit-scheduled-trip > div > .data-customer h6 {
+    margin: 0;
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    color: var(--color-text-inverse);
+}
+
+.modal-edit-scheduled-trip > div > .data-customer .data-customer-icon {
+    flex: none;
+    font-size: 18px;
+    font-family: 'Material Icons';
+    opacity: 0.8;
+}
+
+.modal-edit-scheduled-trip > div > .data-customer .close-edit-scheduled-trip {
+    flex: none;
+    font-size: 20px;
+    font-family: 'Material Icons';
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+.modal-edit-scheduled-trip > div > .data-customer .close-edit-scheduled-trip:hover {
+    opacity: 1;
+}
+
+/* ── Body ── */
+.modal-edit-scheduled-trip > div > .data-trip {
+    padding: 16px 18px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.edit-scheduled-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.edit-scheduled-field > label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--color-text-muted);
+}
+
+.edit-scheduled-field input {
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid var(--color-border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface);
+    outline: none;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+    transition: border-color 0.15s;
+}
+
+.edit-scheduled-field input:focus {
+    border-color: var(--color-text-muted);
+}
+
+.edit-scheduled-field input.edit-scheduled-address-input {
+    cursor: pointer;
+    background: var(--color-bg-muted);
+}
+
+/* ── Paradas ── */
+#editScheduledWaypoints {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-scheduled-waypoint-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.edit-scheduled-waypoint-badge {
+    flex: none;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.edit-scheduled-waypoint-row {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.edit-scheduled-waypoint-row > input.edit-scheduled-waypoint-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 2.5rem 0 14px;
+    border: 1px solid var(--color-border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    background: var(--color-bg-muted);
+    outline: none;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
+}
+
+.edit-scheduled-remove-waypoint {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: var(--color-text-disabled);
+    cursor: pointer;
+    transition: color 0.12s;
+}
+
+.edit-scheduled-remove-waypoint:hover {
+    color: var(--color-danger-strong);
+}
+
+.edit-scheduled-add-waypoint-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    height: 44px;
+    border: 1.5px dashed var(--color-border-input);
+    border-radius: 8px;
+    background: var(--color-bg-muted);
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+.edit-scheduled-add-waypoint-btn:hover {
+    background: var(--color-bg-surface);
+    border-color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.edit-scheduled-add-waypoint-btn:focus-visible {
+    outline: 2px solid rgba(6, 19, 47, 0.25);
+    outline-offset: 1px;
+}
+
+.edit-scheduled-add-waypoint-btn .material-icons {
+    font-size: 18px;
+}
+
+/* ── Valor + Data lado a lado ── */
+.edit-scheduled-row {
+    display: flex;
+    gap: 12px;
+}
+
+.edit-scheduled-row > .edit-scheduled-field {
+    flex: 1 1 50%;
+    min-width: 0;
+}
+
+/* ── Valor + recalcular ── */
+.edit-scheduled-price-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.edit-scheduled-price-row > .input-value-price {
+    flex: 1 1 0%;
+    min-width: 0;
+}
+
+.edit-scheduled-recalculate-btn {
+    position: relative;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid var(--color-primary);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.edit-scheduled-recalculate-btn > .material-icons {
+    font-size: 20px;
+}
+
+.edit-scheduled-recalculate-btn:hover:not([aria-disabled="true"]) {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.edit-scheduled-recalculate-btn:focus-visible {
+    outline: 2px solid rgba(6, 19, 47, 0.25);
+    outline-offset: 1px;
+}
+
+.edit-scheduled-recalculate-btn[aria-disabled="true"] {
+    border-color: var(--color-border);
+    color: var(--color-text-disabled);
+    cursor: not-allowed;
+}
+
+.edit-scheduled-recalculate-btn:hover .app-tooltip,
+.edit-scheduled-recalculate-btn:focus-visible .app-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.edit-scheduled-recalc-hint {
+    display: none;
+    font-size: 11px;
+    color: var(--color-danger-text);
+}
+
+.edit-scheduled-recalc-hint.active {
+    display: block;
+}
+
+/* ── Aplicar edição a todo o lote ── */
+.edit-scheduled-group-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    margin: 0;
+}
+
+.edit-scheduled-group-check input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+/* ── Footer / botões ── */
+.modal-edit-scheduled-trip .data-footer {
+    display: flex;
+    gap: 8px;
+    padding: 12px 18px 16px;
+}
+
+.modal-edit-scheduled-trip .data-footer > button {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.15s, opacity 0.15s;
+    letter-spacing: 0.2px;
+}
+
+.modal-edit-scheduled-trip #btnSaveEditScheduledTrip {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+.modal-edit-scheduled-trip #btnSaveEditScheduledTrip:hover {
+    background: var(--color-primary-hover);
+}
+
+.modal-edit-scheduled-trip #btnSaveEditScheduledTrip.disabled,
+.modal-edit-scheduled-trip #btnSaveEditScheduledTrip:disabled {
+    background: var(--color-bg-muted);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
+
+.modal-edit-scheduled-trip #btnSaveEditScheduledTrip.disabled:hover,
+.modal-edit-scheduled-trip #btnSaveEditScheduledTrip:disabled:hover {
+    background: var(--color-bg-muted);
+}
+
+.modal-edit-scheduled-trip #btnCancelEditScheduledTrip {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+}
+
+.modal-edit-scheduled-trip #btnCancelEditScheduledTrip:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.modal-edit-scheduled-trip .data-footer > button:focus-visible {
+    outline: 2px solid rgba(6, 19, 47, 0.25);
+    outline-offset: 1px;
+}
+
+/* ── Painel de busca de endereço (sobrepõe o card) ── */
+.edit-scheduled-search-local {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg-surface);
+    display: flex;
+    flex-direction: column;
+    transform: translateY(110%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 10;
+}
+
+.edit-scheduled-search-local.active {
+    transform: translateY(0%);
+}
+
+.edit-scheduled-search-local > .back-edit-scheduled-search {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin: 8px 8px 0;
+    font-size: 22px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.12s;
+}
+
+.edit-scheduled-search-local > .back-edit-scheduled-search:hover {
+    background: var(--color-bg-muted);
+}
+
+.edit-scheduled-search-content {
+    padding: 8px 12px 10px;
+}
+
+.edit-scheduled-search-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid var(--color-border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface);
+    outline: none;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.edit-scheduled-search-local #editScheduledSearchResults {
+    flex: 1;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0 12px;
+    list-style: none;
+}

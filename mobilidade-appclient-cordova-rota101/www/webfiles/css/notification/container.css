@@ -1,0 +1,56 @@
+.container-notification {
+    top: 18vw;
+    position: absolute;
+    width: 98%;
+    background-color: #fff;
+    border-radius: 1vw;
+    height: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+    box-shadow: 0 0 10px #828080;
+    z-index: 10;
+}
+
+.container-notification.active {
+    height: calc(100% - 19vw);
+}
+
+.container-notification.active:before {
+    height: 5vw;
+    transition-delay: unset;
+}
+
+.container-notification:before {
+    content: "";
+    height: 0;
+    width: 5vw;
+    background: linear-gradient(to left bottom, #fff 50%, transparent 50%);
+    position: absolute;
+    top: -2.5vw;
+    transform: rotate(-45deg);
+    left: 3.5vw;
+    box-shadow: 0 0 10px #828080;
+}
+
+.container-notification > ul,
+.container-notification > iframe {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 1vw;
+    border: none;
+}
+
+.container-notification > ul:empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-notification.active > ul:empty::after {
+    content: "Nenhuma notificação no momento";
+    color: #9a9d9f;
+}

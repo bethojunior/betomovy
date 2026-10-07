@@ -1,0 +1,106 @@
+.container-finish-trip{
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    background-color: var(--color-bg-surface);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+.container-finish-trip.active{
+    display: flex;
+}
+.container-finish-trip > div {
+    position: absolute;
+    width: 100%;
+    height: 85%;
+}
+.container-finish-trip > div > .info-trip-finish{
+    float:left;
+    width:100%;
+    margin:1vw 0;
+}
+.container-finish-trip > div > .info-trip-finish > h4{
+    text-align:center;
+    width:100%;
+    font-size: 5.5vw;
+    font-weight: 500;
+}
+.container-finish-trip > div > .info-trip-finish > span{
+    text-align:center;
+    width: calc(100% - 10vw);
+    float: left;
+    font-size: 4vw;
+    margin: 1vw 5vw;
+    font-weight: 500;
+    /* display: block; */
+}
+
+.container-finish-trip > div > .info-trip-finish > span.value-trip-finish{
+    font-size: 8vw;
+    font-weight:600;
+}
+.container-finish-trip > div >.info-trip-finish.img-cars{
+    display:flex;
+    justify-content: space-evenly;
+    width: calc(100% - 14vw);
+    border-top: 1px solid var(--color-border-subtle);
+    padding: 2vw 5vw 0;
+    margin: 0 2vw 10vw;
+}
+
+.container-finish-trip > div > .info-trip-finish.img-cars > .img-car-finish {
+    position: relative;
+}
+.container-finish-trip > div > .info-trip-finish.img-cars > .img-car-finish > div {
+    position: absolute;
+    top: 15vw;
+    right: 3.5vw;
+    font-size: 4vw;
+}
+.container-finish-trip > div > .info-trip-finish.img-cars > .img-car-finish > div > span{
+    font-size:2vw;
+}
+.container-finish-trip > div > .info-trip-finish.img-cars > .img-car-finish:last-child > div {
+    color:var(--color-text-inverse);
+}
+.container-finish-trip > div > .info-trip-finish.img-cars > .img-car-finish > img{
+    width: 100%;
+    display:block;
+    margin:auto;
+}
+.container-finish-trip > div > .footer-finish-trip{
+    font-size: 5vw;
+    text-align: center;
+}
+.container-finish-trip > div > .footer-finish-trip > footer{
+    position: absolute;
+    color: #b6b6b6;
+    font-size: 4vw;
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+
+.container-finish-trip > div > i.material-icons{
+    position: absolute;
+    top: -10vw;
+    right: 2vw;
+    font-size: 10vw;
+}
+.container-finish-trip > div >.trip-normal-finish {
+    width: 100%;
+}
+.container-finish-trip > div >.trip-normal-finish > img{
+    width: 80%;
+    display: block;
+    margin: auto;
+}
+.container-finish-trip > div >.trip-normal-finish > h4{
+    text-align: center;
+    margin-top: 4vw;
+    font-size: 7vw;
+    font-weight: 500;
+}

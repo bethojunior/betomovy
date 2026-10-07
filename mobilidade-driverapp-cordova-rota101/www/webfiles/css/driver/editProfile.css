@@ -1,0 +1,96 @@
+.container-edit-profile > div{
+    width:90%;
+}
+
+.container-edit-profile{
+    width: 100%;
+    height: calc(100% - 17vw);
+    background-color: #ececec;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+}
+
+.container-edit-profile > div{
+    width: 95%;
+    margin-top: 2vw;
+    margin-bottom:1vw;
+}
+
+.container-edit-profile > div > div:first-child{
+    border:1px solid #ccc;
+    border-radius: 2vw 2vw 0 0;
+    display: flex;
+    padding: 2vw;
+    align-items: center;
+    background-color: var(--main-color);
+    color:#fff;
+}
+
+.container-edit-profile > div > div:first-child > i {
+    margin-right: 1.5vw;
+}
+
+.container-edit-profile > div > div:last-child{
+    border:1px solid #ccc;
+    border-top:none;
+    padding:2vw;
+    background-color: #fff;
+    border-radius: 0 0 2vw 2vw;
+}
+
+
+.container-edit-profile > div > div:last-child > .container-edit-profile-preview{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+
+.container-edit-profile > div > div:last-child > .container-edit-profile-preview >  .edit-profile-driver{
+    width:30vw;
+    height:30vw;
+    background-color: #dbdbdb;
+    border-radius: 100%;
+    position:relative;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+
+.container-edit-profile > div > div:last-child >
+.container-edit-profile-preview >  .edit-profile-driver > div{
+    position:absolute;
+    bottom: 5vw;
+    right:0;
+    left:0;
+    margin:auto;
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #fff;
+    background-color: rgba(0,0,0,0.5);
+    color: #fff;
+    border-radius: 1vw;
+}
+
+
+.container-edit-profile > div > div:last-child > div > button{
+    width:100%;
+    border:none;
+    padding:2vw;
+    border-radius:1.5vw;
+    background-color: var(--main-color);
+    color:#fff;
+    font-weight:600;
+}
+
+
+.container-edit-profile > div > div:last-child > div > div > label{
+    color:#000;
+    font-size:3.5vw
+}

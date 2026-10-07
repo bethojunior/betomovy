@@ -1,0 +1,73 @@
+name: Build App
+on:
+  push:
+    branches:
+      - "test"
+  workflow_dispatch:
+    inputs:
+      os:
+        type: choice
+        description: OS to build on. Ubuntu is faster, MacOS supports iOS builds, Windows is unsupported
+        options:
+          - macos-latest
+          - ubuntu-latest
+          - self-hosted
+      platform:
+        type: choice
+        description: Platform to build for
+        options:
+          - android
+          - ios
+      profile:
+        type: choice
+        description: Build profile to use
+        options:
+          - development
+          - preview
+          - production
+jobs:
+  build:
+    runs-on: ${{ github.event.inputs.os || 'self-hosted' }}
+    strategy:
+      matrix:
+        node: [20.5.0]
+    steps:
+    - name: 🏗 Setup repo
+      uses: actions/checkout@v2
+
+    - name: 🏗 Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node }}
+        cache: yarn
+
+    - name: 🏗 Setup Expo and EAS
+      uses: expo/expo-github-action@v7
+      with:
+        token: "SXSmdtdeII5BAswfbanjEnI6ieJvVRhtiA5s31Bh"
+        expo-version: latest
+        eas-version: latest
+
+    - name: 🏗 Setup EAS local builds
+      run: yarn global add eas-cli-local-build-plugin
+
+    - name: 📦 Install dependencies
+      run: yarn
+
+    # - name: 📋 Test project
+    #   # run: yarn test
+
+    - name: 👷 Build app
+      run: |
+        eas build --local \
+          --non-interactive \
+          --output=./app-build \
+          --platform=${{ github.event.inputs.platform || 'android' }} \
+          --profile=${{ github.event.inputs.profile || 'production'}}
+
+    - name: 📱 Upload binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-${{ github.event.inputs.platform || 'android' }}
+        path: app-build
+      

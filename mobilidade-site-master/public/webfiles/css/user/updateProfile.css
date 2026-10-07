@@ -1,0 +1,56 @@
+.container-update-profile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-update-profile > h4 {
+    text-align: center;
+    margin: 5px 0;
+    font-size: 16pt;
+}
+
+.container-update-profile > .preview-profile {
+    flex: 1;
+    margin: 10px;
+    background-color: #ccc;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.container-update-profile > .preview-profile:before {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 50px;
+    background-image: url("../../img/camera.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.container-update-profile > .preview-profile > input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+.container-update-profile > button {
+    padding: 10px;
+    border: none;
+    background-color: var(--main-color);
+    color: #fff;
+    text-transform: uppercase;
+}

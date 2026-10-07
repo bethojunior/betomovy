@@ -1,0 +1,28 @@
+/* ── Modal Restringir a motoristas (pool de agendamento) ── */
+
+#schedule-driver-pool-modal .drivers-modal__footer {
+    justify-content: space-between;
+    align-items: center;
+}
+
+#schedule-driver-pool-modal .drivers-modal__count {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+
+/* Aqui, ao contrário do picker de chamada personalizada, motoristas offline
+   também podem ser selecionados. */
+#schedule-driver-pool-modal .driver-card:not([status="disponivel"]) {
+    cursor: pointer;
+}
+
+#schedule-driver-pool-modal .driver-card:not([status="disponivel"]):hover {
+    background: var(--color-bg-muted);
+}
+
+/* Estrela é só indicativo de favorito aqui — não alterna favorito nesta modal. */
+#schedule-driver-pool-modal .star-icon {
+    cursor: default;
+    pointer-events: none;
+}

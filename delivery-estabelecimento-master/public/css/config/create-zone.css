@@ -1,0 +1,10 @@
+.row.col-lg-12 .col-lg-7.col-sm-12.relative .form-group.col-lg-12 .absolute{
+    right: 0;
+    bottom: 0;
+    margin-bottom: 0.7vw;
+    margin-right: 1.5vw;
+    cursor: pointer;
+}
+.row.col-lg-12 .col-lg-7.col-sm-12.relative{
+    border-left: solid 0.1vw;
+}

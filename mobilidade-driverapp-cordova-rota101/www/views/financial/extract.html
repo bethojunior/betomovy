@@ -1,0 +1,57 @@
+<div class="menu-account">
+    <div class="hearder-title-account">
+        <i class="material-icons back-to">arrow_back</i>
+        <span>Extrato</span>
+        <i class="material-icons icon-menu"></i>
+    </div>
+    <header class="extract-header">
+        <div class="row-custom">
+            <div class="t8">
+                <span>MOTORISTA</span>
+                <span id="nameClientExtract" class="client-data">-</span>
+            </div>
+            <div class="t4">
+                <span>CPF</span>
+                <span id="cpfClientExtract" class="client-data">-</span>
+            </div>
+        </div>
+        <div class="row-custom">
+            <div class="t8">
+                <span>PERÍODO</span>
+                <span id="periodExtract" class="client-data">-</span>
+            </div>
+            <div class="t4">
+                <span>SALDO</span>
+                <span class="value-balance client-data">-</span>
+            </div>
+        </div>
+    </header>
+</div>
+<div class="container-account">
+    <div class="body-account">
+        <ul id="listTransactionsExtract">
+        </ul>
+        <div class="preloader-wrapper small active custom-preloader" id="preloadExtract">
+            <div class="spinner-layer spinner-green-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div><div class="gap-patch">
+                <div class="circle"></div>
+            </div><div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer-extract">
+    <div class="container-value-extract">
+        <span>TOTAL CREDITOS <span id="totalCredit"></span></span>
+        <span>TOTAL DEBITOS <span id="totalDebit"></span></span>
+        <span>BLOQUEADOS <span id="pendingBalanceWithdraw"></span></span>
+    </div>
+    <div class="container-value-extract t4">
+        <span>SALDO ATUAL</span>
+        <span class="value-balance big-size"></span>
+    </div>
+</footer>

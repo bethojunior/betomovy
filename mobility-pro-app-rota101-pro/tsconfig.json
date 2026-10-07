@@ -1,0 +1,18 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "noImplicitAny": false,
+    "useUnknownInCatchVariables": false,
+    "strictNullChecks": false,
+    "typeRoots": [
+      "node_modules/@types",
+      "./node_modules/@bugsnag/react-native"
+    ],
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  }
+}

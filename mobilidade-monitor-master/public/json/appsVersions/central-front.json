@@ -1,0 +1,10 @@
+{
+  "title": "Central Monitor (Front)",
+  "version": "1.3.2",
+  "items": [
+    {
+      "description": "Corrigido: Adicionar bairros, tanto para dinâmica por área como bairros na central."
+    }
+  ],
+  "updateDate": "20/10/2023"
+}

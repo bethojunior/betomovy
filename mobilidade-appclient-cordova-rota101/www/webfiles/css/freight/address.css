@@ -1,0 +1,220 @@
+.address-freight{
+    float: left;
+    width: 100%;
+}
+
+.address-freight > .content-address{
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 120;
+    transform: translateY(-200%);
+    transition: transform 0.5s;
+    display: flex;
+    flex-direction: column;
+}
+
+.address-freight > .content-address.active {
+    transform: translateY(0);
+    transition: transform 0.5s;
+}
+
+
+.address-freight .content-address > .form-trip {
+    background-color: #Fff;
+    opacity: 0;
+    transition: 0.1s;
+}
+
+.address-freight .content-address.active > .form-trip {
+    /* margin-top: 3vw; */
+    opacity: 1;
+    transition: 1s;
+}
+
+.col.s12.input-custom-freight {
+    color: #000;
+    margin-bottom: 3vw;
+    border: none;
+    background-color: #f8f8f8;
+    padding: 2vw 10vw 2vw 2vw;
+    outline: none;
+    width: calc(82% - 10vw);
+    font-size: 5vw;
+}
+
+.col.s12.input-custom-freight.error {
+    border: 1px solid #ff9696;
+    background-color: #ffd9d9;
+}
+
+.col.s12.input-custom-freight:focus {
+    background-color: #f0f0f0;
+    border-bottom: none !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.input-custom-freight::placeholder {
+    color: #969393;
+}
+
+
+.history-trips-freight {
+    width: 100%;
+    margin: auto;
+    background-color: rgba(250,250,250,1);
+    border-top: 1px solid #ccc;
+    height: 138vw;
+    overflow-y: auto;
+    display: none;
+    flex: 1;
+}
+
+.history-trips-freight.active {display: block;}
+
+.history-trips-freight > div.places-save {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-trips-freight > div.places-save > ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+}
+
+
+.history-trips-freight > div.places-save > ul:empty {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex:1;
+    height: 100%;
+}
+
+
+.history-trips-freight > div.places-save > ul.empty:empty:before{
+    content:"Nenhum local encontrado";
+    animation:none;
+    width:100%;
+    border:none;
+    text-align:center;
+    color:#898989;
+}
+
+.history-trips-freight > div.places-save > ul:empty:before{
+    content:"";
+    width:10vw;
+    height:10vw;
+    border:5px solid transparent;
+    border-top-color: #686868;
+    border-radius:100%;
+    animation: spin 1s linear infinite;
+}
+
+
+.history-trips-freight > div.places-save > ul > li {
+    color: #0b0b0b;
+    border-bottom: 1px solid #ececec;
+    font-size: 5.5vw;
+    width: calc(100% - 6vw);
+    padding: 5vw 3vw;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.history-trips-freight > div.places-save > ul > li > i {
+    margin-right: 2vw;
+}
+
+.history-trips-freight > div.places-save > ul > li > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+    /* white-space: nowrap; */
+    width: 100%;
+}
+
+.history-trips-freight > div > ul > li > div {
+    width: 80%;
+}
+
+.history-trips-freight > div > ul > li > i.remove-place-customer {
+    position: absolute;
+    right: 0.5vw;
+    font-size: 8vw;
+    padding: 1vw;
+}
+
+.history-trips-freight > div.places-save > ul > li > span,
+.history-trips-freight > div.places-save > ul > li > div > span {
+    font-size: 4.5vw;
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+    /* white-space: nowrap; */
+}
+
+.history-trips-freight > div.places-save > ul > li > div > label {
+    font-size: 3.5vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* white-space: nowrap; */
+    width: 90%;
+    position: relative;
+}
+
+.history-trips-freight > div.last-trips > p {
+    font-size: 3vw;
+    width: calc(100% - 2vw);
+    float: left;
+    padding: 1vw;
+    border: 1px solid #Ccc;
+    border-left: none;
+    border-right: none;
+    color: #8e8888;
+    font-weight: 600;
+    text-align: center;
+}
+
+.history-trips-freight > div.last-trips > ul {
+    list-style: none;
+}
+
+.history-trips-freight > div.last-trips > ul > li {
+    float: left;
+    width: calc(100% - 6vw);
+    padding: 3vw;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.history-trips-freight > div.last-trips > ul > li > p {
+    font-size: 4.5vw;
+}
+
+.history-trips-freight > div.last-trips > ul > li > i {
+    margin: 0 2vw;
+}
+
+
+.address-freight > .content-address > .form-trip{
+    padding-top: 35px;
+}
+
+.address-freight > .content-address > .form-trip .input-custom-freight {
+    width: 80%;
+}
+
+.address-freight > .content-address > .form-trip .form-data-passenger > div > i {
+    right:35px;
+}

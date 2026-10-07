@@ -1,0 +1,27 @@
+.list-report {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.list-report > details{
+    display:flex;
+    flex-direction:column;
+    border:1px solid #ccc;
+}
+
+.list-report > details > summary{
+    padding:10px;
+    border-bottom:1px solid #ccc;
+}
+
+.list-report > details > a{
+    display:block;
+    padding:10px;
+    background-color:#f7f7f7;
+    border-bottom:1px solid #ccc;
+}
+
+.list-report > details > a:last-child{
+    border:none;
+}

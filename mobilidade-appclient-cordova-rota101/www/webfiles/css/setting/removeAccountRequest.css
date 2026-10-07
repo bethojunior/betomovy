@@ -1,0 +1,64 @@
+.container-remove-account-request {
+    padding: 5vw;
+    width: calc(100% - 10vw);
+    display: block;
+    height: 100%;
+    position: absolute;
+    background-color: var(--main-seconds-color);
+}
+.container-remove-account-request > div > input{
+    border: none;
+    background-color: #f7f7f7;
+    color: #000;
+    border-bottom: 1px solid #9e9e9e;
+    width: calc(100% - 4vw);
+    margin-bottom: 5vw;
+    padding: 2vw;
+    outline: unset;
+    font-size: 4vw;
+}
+.container-remove-account-request > div > input[type=tel]{
+    display: block;
+    text-align: center;
+    width: 24%;
+    letter-spacing: 4px;
+    margin: auto;
+}
+.container-remove-account-request > div > p{
+    font-size:4vw;
+    color:#625a5a;
+}
+.container-remove-account-request > div  > p > a{
+    color:var(--main-seconds-color);
+    font-weight: 600;
+}
+.container-remove-account-request > div  > button{
+    border: none;
+    background-color: var(--main-color);
+    color:#fff;
+    padding: 4vw 5vw;
+    text-transform: uppercase;
+    border-radius: 1vw;
+    display: block;
+    margin: 7vw auto;
+    box-shadow: 0 0 10px #bfbfbf;
+}
+.container-remove-account-request > div  > span{
+    display: block;
+    margin: 5vw auto;
+    width: 100%;
+    text-align: center;
+}
+.container-remove-account-request > div > textarea {
+    height: 19vw;
+    width: 97%;
+    outline: none;
+    padding: 5px;
+    color: #000;
+    background-color: #f7f7f7;
+    border-radius: 0;
+    border: 1px solid #e2e2e2;
+}
+#containerConfirmationCodePassword{
+    display: none;
+}

@@ -1,0 +1,12 @@
+services:
+  mobilidade-delivery-estabelecimento:
+    platform: linux/amd64
+    build:
+      dockerfile: docker-prod/dockerfile
+    container_name: mobilidade-delivery-estabelecimento-prod
+    image: mobilidade-delivery-estabelecimento-prod-local
+    restart: always
+    ports:
+      - 93:93
+    env_file:
+      - .env

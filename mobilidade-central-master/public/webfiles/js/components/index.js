@@ -1,0 +1,1 @@
+const COMPONENT_CREATE_TRIP = "create-trip";

@@ -1,0 +1,64 @@
+.modal-permission-local {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    z-index: 10000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-permission-local.active{
+    display: flex;
+    overflow-y: auto;
+}
+
+.modal-permission-local > i {
+    margin: 20px 0;
+    font-size: 30pt;
+    color: #265ec9;
+}
+
+
+.modal-permission-local > h4 {
+    font-family: sans-serif;
+    font-size: 16pt;
+}
+
+.modal-permission-local > p {
+    margin: 0 20px 20px;
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 12pt;
+}
+
+
+.modal-permission-local > p > nameapp{
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 12pt;
+}
+
+.modal-permission-local > img {
+    width: 30%;
+    margin: 30px 0 auto;
+}
+
+.modal-permission-local > ul {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.modal-permission-local > ul > li {
+    padding: 10px;
+    font-family: sans-serif;
+    font-size: 14pt;
+    color: #1463aa;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}

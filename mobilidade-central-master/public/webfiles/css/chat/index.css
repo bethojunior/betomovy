@@ -1,0 +1,441 @@
+/* ─────────────────────────────────────────────────────────────
+   Chat — sidebar de mensagens por viagem ativa
+───────────────────────────────────────────────────────────── */
+
+.container-chat-map {
+    z-index: 10;
+}
+
+/* ── Botão flutuante ─────────────────────────────────────── */
+.container-chat-map > .box-chat {
+    width: clamp(44px, 13vw, 58px);
+    height: clamp(44px, 13vw, 58px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
+
+.container-chat-map > .box-chat > img {
+    width: 100%;
+    cursor: pointer;
+    border: 2.5px solid #fff;
+    border-radius: 100%;
+    transition: border-color 0.2s, transform 0.18s;
+}
+
+.container-chat-map > .box-chat > img:hover {
+    transform: scale(1.05);
+}
+
+.container-chat-map > .box-chat.active > img {
+    border-color: transparent;
+}
+
+.container-chat-map > .box-chat.notification-active > img {
+    animation: notification-chat 1s infinite linear;
+}
+
+@keyframes notification-chat {
+    0%   { border-color: #e46f3f; }
+    50%  { border-color: #e44b24; }
+    100% { border-color: #e46f3f; }
+}
+
+/* ── Painel lateral (mobile: slide from bottom) ────────────── */
+.container-chat-map > .container-box-chat {
+    transform: translateY(500%);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-bg-muted);
+    display: flex;
+    overflow: hidden;
+    transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+/* ── Barra de header (via ::before pseudo-elemento) ─────────── */
+.container-chat-map > .box-chat.active + .container-box-chat {
+    padding: 56px 0 0;
+    max-width: 100%;
+    max-height: 100%;
+    top: 0;
+    left: 0;
+    transform: translateY(0%);
+}
+
+.container-chat-map > .box-chat.active + .container-box-chat::before {
+    content: "Mensagens por viagens ativas";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    z-index: 10;
+}
+
+/* ── Ícone de fechar a lista (arrow_back) ────────────────────── */
+.container-chat-map > .box-chat.active + .container-box-chat > i.close-chat {
+    position: absolute;
+    top: 0;
+    left: 12px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.85);
+    z-index: 11;
+    cursor: pointer;
+    font-size: 22px;
+    transition: color 0.15s;
+}
+
+.container-chat-map > .box-chat.active + .container-box-chat > i.close-chat:hover {
+    color: var(--color-text-inverse);
+}
+
+/* ── Lista de viagens ─────────────────────────────────────── */
+.container-chat-map > .container-box-chat > ul {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-border);
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-width: 100%;
+    transition: max-width 300ms;
+    background-color: var(--color-bg-surface);
+    position: absolute;
+}
+
+.container-chat-map > .container-box-chat > ul:empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-chat-map > .container-box-chat > ul:empty::before {
+    content: "Nenhuma viagem ativa";
+    color: var(--color-text-disabled);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+}
+
+/* ── Item da lista ─────────────────────────────────────────── */
+.container-chat-map > .container-box-chat > ul > li {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid var(--color-border-subtle);
+    align-items: center;
+    padding: 12px 8px;
+    cursor: pointer;
+    background-color: var(--color-bg-surface);
+    transition: background 0.15s;
+}
+
+.container-chat-map > .container-box-chat > ul > li:hover {
+    background-color: var(--color-bg-muted);
+}
+
+.container-chat-map > .container-box-chat > ul > li.notification-active {
+    animation: notification-chat-background 1s infinite linear;
+}
+
+@keyframes notification-chat-background {
+    0%   { background-color: #fef3ee; }
+    50%  { background-color: #fde8de; }
+    100% { background-color: #fef3ee; }
+}
+
+.container-chat-map > .container-box-chat > ul > li p {
+    margin: 0;
+}
+
+/* ── Foto do motorista ────────────────────────────────────── */
+.container-chat-map > .container-box-chat > ul > li > .photo-driver {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background-color: var(--color-border);
+    margin: 0 14px 0 8px;
+    border-radius: 50%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 2px solid var(--color-border-subtle);
+}
+
+.container-chat-map > .container-box-chat > ul > li > .info-chat-driver {
+    flex: 1;
+    min-width: 0;
+}
+
+.container-chat-map > .container-box-chat > ul > li > i {
+    position: absolute;
+    right: 12px;
+    color: var(--color-text-disabled);
+    font-size: 18px;
+}
+
+.container-chat-map > .container-box-chat > ul > li > .info-chat-driver > p {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.container-chat-map > .container-box-chat > ul > li > .info-chat-driver > p > span:first-child {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.container-chat-map > .container-box-chat > ul > li > .info-chat-driver > p > span:last-child {
+    font-size: 11px;
+    color: var(--color-text-disabled);
+    white-space: nowrap;
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* ── Painel de conversa (container-chat-open) ──────────────── */
+.container-chat-map > .container-box-chat.active > div {
+    max-width: 100%;
+    transition: max-width 300ms;
+}
+
+.container-chat-map > .container-box-chat.active > ul {
+    max-width: 0;
+    transition: max-width 300ms;
+}
+
+.container-chat-map > .container-box-chat > div {
+    max-width: 0;
+    overflow: hidden;
+    transition: max-width 300ms;
+    flex: 1;
+    background-color: var(--color-bg-muted);
+    flex-direction: column;
+    display: flex;
+    position: relative;
+}
+
+/* Título da conversa */
+.container-chat-map > .container-box-chat > div > .title-chat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    padding: 0 48px;
+    height: 56px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.container-chat-map > .container-box-chat > div > .title-chat > i {
+    position: absolute;
+    left: 12px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 22px;
+    transition: color 0.15s;
+}
+
+.container-chat-map > .container-box-chat > div > .title-chat > i:hover {
+    color: var(--color-text-inverse);
+}
+
+/* Área de mensagens */
+.container-chat-map > .container-box-chat > div > .container-chat {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    list-style: none;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul > li.customer {
+    justify-content: flex-end;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul > li.driver {
+    justify-content: flex-start;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul > li {
+    display: flex;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul > li > div {
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul > li.customer > div {
+    background-color: var(--color-success-bg);
+    border-radius: 12px 12px 2px 12px;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul > li.driver > div {
+    background-color: var(--color-bg-surface);
+    border-radius: 12px 12px 12px 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul > li.driver > div::before {
+    content: "Motorista";
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul > li.customer > div::before {
+    content: "Central";
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-success-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    text-align: right;
+}
+
+/* Barra de envio */
+.container-chat-map > .container-box-chat > div > .container-chat > div {
+    border-top: 1px solid var(--color-border);
+    padding: 10px 12px;
+    background-color: var(--color-bg-surface);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > div > input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 20px;
+    outline: none;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    transition: border-color 0.2s;
+    background: var(--color-bg-muted);
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > div > input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg-surface);
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > div > input::placeholder {
+    color: var(--color-text-disabled);
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > div > button {
+    padding: 10px 16px;
+    border: none;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border-radius: 20px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > div > button:hover {
+    background: var(--color-primary-hover);
+}
+
+.container-chat-map > .container-box-chat > div > .container-chat > ul > li.driver audio::-webkit-media-controls-panel {
+    background-color: var(--color-bg-surface);
+}
+
+/* ── Desktop (≥ 992px) ─────────────────────────────────────── */
+@media (min-width: 992px) {
+    .container-chat-map {
+        position: absolute;
+        z-index: 10;
+        top: 10px;
+        left: 10px;
+    }
+
+    .container-chat-map > .box-chat {
+        width: clamp(40px, 3vw, 52px);
+        height: clamp(40px, 3vw, 52px);
+        position: relative;
+    }
+
+    .container-chat-map > .container-box-chat {
+        position: absolute;
+        width: 340px;
+        height: 560px;
+        background-color: var(--color-bg-surface);
+        top: 10px;
+        left: 10px;
+        border-radius: 12px 4px 4px 4px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+        display: flex;
+        max-width: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-width 300ms, max-height 300ms, padding 300ms, top 150ms, left 150ms;
+    }
+
+    .container-chat-map > .box-chat.active + .container-box-chat {
+        padding: 56px 0 0;
+        max-width: 340px;
+        max-height: 560px;
+        top: 5px;
+        left: 5px;
+        transition: max-width 300ms, max-height 300ms, padding 300ms, top 150ms, left 150ms;
+    }
+
+    .container-chat-map > .box-chat.active + .container-box-chat::before {
+        border-radius: 12px 4px 0 0;
+    }
+}

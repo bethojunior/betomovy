@@ -1,0 +1,68 @@
+.delimit-line{
+    display: inline-block;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+}
+
+/* --------    Estilos de input modal cidade  ---------- */
+
+#message {
+    resize: none;
+}
+
+#citiesDropdown {
+    display: none;
+}
+
+#citiesLoading {
+    display: none;
+}
+
+.cities-dropdown-hidden {
+    display: none !important;
+}
+
+.cities-dropdown-scroll {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.cities-loading-hidden {
+    display: none;
+}
+
+#citiesDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    background-color: #fff;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+#citiesDropdown .city-option {
+    padding: 0.5rem 1rem;
+    color: #212529;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+#citiesDropdown .city-option:hover,
+#citiesDropdown .city-option.active {
+    background-color: #f8f9fa;
+    color: #16181b;
+}
+
+#citiesDropdown .dropdown-item-text {
+    padding: 0.5rem 1rem;
+    color: #6c757d;
+}

@@ -1,0 +1,106 @@
+.container-profile {
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+}
+
+.container-profile > .container-data-profile {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    height: 24%;
+    background-color: var(--main-color);
+    border-bottom: 1px solid var(--main-color);
+}
+
+.container-profile > .container-data-profile > .image-profile-driver {
+    height: 30vw;
+    width: 30vw;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 100%;
+    background-color: #f0f0f0;
+    box-shadow: 0 0 10px #8b8b8b;
+    position: relative;
+}
+
+
+.container-profile > .container-data-profile > .image-profile-driver > i {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #fff;
+    color: #ffaf23;
+    border-radius: 100%;
+    padding: 1vw;
+    border: 1px solid #dadada;
+}
+
+.container-profile > .container-data-profile > p {
+    color: #fff;
+    font-weight: 600;
+    margin-top: 3vw;
+    font-size: 5vw;
+}
+
+.container-profile > .container-data-profile > span {
+    color: #fff;
+    font-size: 4vw;
+}
+
+.container-profile > .container-data-driver {
+    padding: 3vw 5vw;
+    display: flex;
+    background-color: var(--main-color);
+    justify-content: space-around;
+    align-items: center;
+    color: #fff;
+    border-bottom: 1px solid rgb(176, 176, 176);
+    height: 10%;
+}
+
+
+.container-profile > .container-data-driver > div {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-profile > .container-data-driver > div > p {
+    line-height: 6vw;
+    font-size: 7vw;
+}
+
+.container-profile > ul {
+    width: 100%;
+}
+
+.container-profile > ul > li {
+    width: 100%;
+    display: flex;
+    padding: 4vw;
+    border-bottom: 1px solid #e8e8e8;
+    align-items: center;
+}
+
+.container-profile > ul > li:last-child {
+    border-bottom: none;
+}
+
+.container-profile > ul > li > i {
+    font-size: 8vw;
+    margin-right: 5vw;
+}
+
+.container-profile > ul > li > p {
+    font-size: 5vw;
+}
+.container-data-driver-options {
+    overflow-y: scroll;
+    height: 56%;
+}

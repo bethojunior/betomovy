@@ -1,0 +1,41 @@
+.container-request-delete-data{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #eee;
+}
+
+.container-request-delete-data > form {
+    padding: 20px;
+    background-color: #fff;
+    width: 33%;
+    border-radius: 5px;
+}
+
+.container-request-delete-data > form > p {
+    font-size: 14pt;
+    margin-bottom: 40px;
+    color: #555;
+}
+
+.container-request-delete-data > form > input[type="submit"]{
+    padding: 10px;
+    background-color: #ee1f1f;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-family: sans-serif;
+    box-shadow: 0 0 10px #dedcdc;
+    float: right;
+}
+
+@media only screen and (max-width: 900px) {
+    .container-request-delete-data > form {
+        width: 90%;
+    }
+}

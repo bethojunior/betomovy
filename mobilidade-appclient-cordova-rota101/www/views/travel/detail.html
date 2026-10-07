@@ -1,0 +1,185 @@
+<div class="container-detail-travel">
+    <nav class="go-back">
+        <i class="material-icons">keyboard_backspace</i>
+        <span>Voltar</span>
+    </nav>
+    <div class="container-image-map" id="showMapRoute" style="display:block;min-height: 150px; min-width: 150px;"></div>
+    <div class="container-passenger-travel">
+        <div>
+            <div class="detail-basic-travel">
+                <div class="dispatch-something">
+                    <div style="display: none">
+                        <span>Despachar algo</span>
+                        <i class="material-icons">arrow_right_alt</i>
+                    </div>
+                </div>
+                <h1>Detalhes</h1>
+                <p id="datetimeScheduleRoute"></p>
+                <p id="nameRoute" class="travel-address"></p>
+            </div>
+            <div class="count-passenger-travel">
+                <p>
+                    <span class="type-coin">R$</span>
+                    <span class="value-travel" id="valueRouteSchedule"></span>
+                </p>
+                <div>
+                    <i class="material-icons remove-person-reserve">remove</i>
+                    <input type="number" id="amountPeople" value="1">
+                    <i class="material-icons add-person-reserve">add</i>
+                </div>
+            </div>
+            <div class="reserve-for-who">
+                <p>Para quem é essa reserva ?</p>
+                <div>
+                    <button type="button" id="btnForMeReserve">PARA MIM</button>
+                    <button type="button">OUTRA PESSOA</button>
+                </div>
+            </div>
+        </div>
+        <button type="button" id="btnAmountPeopleConfirmation">CONFIRMAR</button>
+    </div>
+    <div class="container-dispatch-travel">
+        <div>
+            <div class="detail-basic-travel">
+                <div class="passenger-travel">
+                    <div class="go-back">
+                        <i class="material-icons">keyboard_backspace</i>
+                        <span>Passagens</span>
+                    </div>
+                </div>
+                <h1>Detalhes</h1>
+            </div>
+            <ul>
+                <li>
+                    <div>
+                        <img src="webfiles/img/svg/letter.svg">
+                        <div>
+                            <p>Envelope</p>
+                            <p>Max: 10x10</p>
+                            <p>R$10,00</p>
+                        </div>
+                    </div>
+                    <div>
+                        <i class="material-icons">remove</i>
+                        <input type="number" value="1">
+                        <i class="material-icons">add</i>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <img src="webfiles/img/svg/box.svg">
+                        <div>
+                            <p>Caixa</p>
+                            <p>Max: 20x20</p>
+                            <p>R$22,00</p>
+                        </div>
+                    </div>
+                    <div>
+                        <i class="material-icons">remove</i>
+                        <input type="number" value="1">
+                        <i class="material-icons">add</i>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <button>CONFIRMAR</button>
+    </div>
+    <div class="container-boarding-unloading">
+        <div>
+            <div class="detail-basic-travel">
+                <div>
+                    <div class="go-back">
+                        <i class="material-icons">keyboard_backspace</i>
+                    </div>
+                </div>
+                <h1 id="typeLocalReserve">Embarque</h1>
+            </div>
+            <div>
+                <div class="animation-images-boarding">
+                    <img src="webfiles/img/svg/next.svg">
+                    <img src="webfiles/img/svg/car.svg">
+                </div>
+                <div class="container-list-option-local active" id="optionBoarding"></div>
+                <div class="container-list-option-local" id="optionUnloading"></div>
+                <div class="container-payment-form-route">
+                    <ul id="listPaymentFormRoute"></ul>
+                </div>
+            </div>
+        </div>
+        <button id="btnNextLocal">CONFIRMAR</button>
+    </div>
+    <div class="modal-another-boarding-place">
+        <div>
+            <div class="go-back">
+                <i class="material-icons">keyboard_backspace</i>
+            </div>
+            <label>Procure seu local de embarque</label>
+            <input type="text" id="searchPlaceAnotherPlace" />
+        </div>
+        <ul id="listAnotherBoarding"> </ul>
+    </div>
+    <div class="modal-location-prior-to-your">
+        <div class="go-back">
+            <i class="material-icons">keyboard_backspace</i>
+        </div>
+        <p>Referência da parada</p>
+        <input type="text" id="tagAnotherBoardingPlace" />
+        <p>Selecione o local anterior ao seu embarque</p>
+        <ul id="listBoardingPlaceTrip"> </ul>
+        <button type="button" class="btn-another-boarding-place-select">Continuar</button>
+    </div>
+    <div class="container-list-ride">
+        <nav>
+            <i class="material-icons go-back">keyboard_arrow_left</i>
+            <span>Passageiros</span>
+        </nav>
+        <div class="content-list-rides">
+            <ul id="listRidesRoute"></ul>
+        </div>
+        <button type="button" id="btnNextPaymentFormRoute">
+            <span>CONTINUAR</span>
+            <i class="material-icons">keyboard_arrow_right</i>
+        </button>
+    </div>
+    <div class="container-add-ride">
+        <nav>
+            <i class="material-icons go-back">keyboard_arrow_left</i>
+            <span>Informação do passageiro</span>
+        </nav>
+        <div class="content-ride">
+            <div class="choice-type-customer active">
+                <ul>
+                    <li class="type-ride-chosen" type="me">
+                        <img src="webfiles/img/svg/account.svg">
+                        <span>Para mim</span>
+                    </li>
+                    <li class="type-ride-chosen" type="another">
+                        <img src="webfiles/img/svg/employees.svg">
+                        <span>Para outra pesssoa</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="another-name-customer">
+                <div>
+                    <label for="nameAnotherRide">Nome do passageiro</label>
+                    <input type="text" id="nameAnotherRide"/>
+                </div>
+                <div>
+                    <label for="documentAnotherRide">CPF do passageiro</label>
+                    <input type="tel" id="documentAnotherRide"/>
+                </div>
+            </div>
+        </div>
+        <button type="button" id="btnNextTypeChoice">
+            <span>CONTINUAR</span>
+            <i class="material-icons">keyboard_arrow_right</i>
+        </button>
+    </div>
+    <div class="container-local-customer-stop">
+        <div>
+            <i class="material-icons">arrow_back</i>
+            <input type="text" id="addressCustomerStop">
+        </div>
+        <ul id="listAddressCustomerLocal"></ul>
+    </div>
+</div>

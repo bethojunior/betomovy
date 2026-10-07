@@ -1,0 +1,15 @@
+services:
+  mobilidade-delivery-realtime-api:
+    build:
+      dockerfile: Dockerfile
+      target: production
+    platform: linux/amd64
+    container_name: mobilidade-delivery-realtime-api-prod
+    image: mobilidade-delivery-realtime-api-prod-local
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - .env:/usr/src/app/.env:ro
+    env_file:
+      - .env

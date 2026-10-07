@@ -1,0 +1,69 @@
+.container-customer-wait-time{
+    position:absolute;
+    background-color: #fff;
+    width: 90%;
+    right: 0;
+    left: 0;
+    z-index: 10;
+    top: -55vw;
+    display: flex;
+    flex-direction: column;
+    padding: 1vw;
+    box-shadow: 0 0 10px #bdbdbd;
+    margin: auto;
+    border-radius: 2vw;
+    transition: 0.3s transform;
+}
+
+.container-customer-wait-time.active{
+    transform: translateY(80vw);
+}
+
+.container-customer-wait-time > h4{
+    font-size: 11pt;
+    font-weight: 500;
+    width: 100%;
+    margin: 1vw;
+    text-align: center;
+}
+
+.container-customer-wait-time > .container-progress{
+    width: 80vw;
+    height: 6vw;
+    border: 1px solid #b0b0b0;
+    border-radius: 10px;
+    background-color: #e4e4e4;
+    overflow: hidden;
+    position:relative;
+    margin: 1vw auto;
+}
+
+.container-customer-wait-time > .container-progress > div{
+    position:absolute;
+    height:100%;
+    width: 0;
+    transition: 1.5s;
+    overflow: hidden;
+    overflow-x: scroll;
+    white-space: nowrap;
+    font-size: 0;
+}
+
+.container-customer-wait-time > .container-progress > div > div{
+    height: 100%;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.container-customer-wait-time > .container-progress > div > div:nth-child(1){
+    background-image: linear-gradient(to right, #4ee94e 90% , #9cf43b);
+    width: 40vw;
+}
+.container-customer-wait-time > .container-progress > div > div:nth-child(2){
+    background-image: linear-gradient(to right, #9cf43b , #fffa79 );
+    width: 20vw;
+}
+.container-customer-wait-time > .container-progress > div > div:nth-child(3){
+    background-image: linear-gradient(to right, #fffa79 , #d70404);
+    width: 20vw;
+}

@@ -1,0 +1,62 @@
+.select2-selection--single{
+    height: 2.5vw!important;
+    padding: 0.4vw!important;
+}
+.row .row.container.col-lg-12{
+    margin-top: 2vw;
+}
+.border-right{
+    border-right: solid 1px;
+}
+
+.list-address{
+    position: relative;
+    overflow-y: auto;
+    height: 20vw;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}
+
+.map-example{
+    width: 100%;
+    height: 300px;
+    background-color: #e2e2e2;
+    border-radius: 5px;
+    pointer-events: none;
+}
+
+.map-example.active{
+    pointer-events: unset;
+}
+
+.waypoint-item{
+    font-size:9pt;
+    position:relative;
+    border-bottom:1px solid #Ccc;
+    padding:5px;
+}
+
+.waypoint-item > p{
+    margin: 0;
+}
+
+.waypoint-item > p > span:first-child{
+    font-weight:600;
+}
+
+.waypoint-item > p > span:last-child{
+    text-transform:capitalize;
+}
+
+.waypoint-item > button.deleteWayPoint{
+    position:absolute;
+    top:0;
+    right:0;
+    padding: 5px;
+    background-color:transparent !important;
+    border:none;
+}
+
+.waypoint-item > button > i{
+    color:#000;
+}

@@ -1,0 +1,26 @@
+.container-map-toll,
+.container-map-toll-view
+{
+    display: block;
+    width: 100%;
+    height: 200px;
+    background-color: #eee;
+}
+
+.autocomplete-address{
+    list-style: none;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 1;
+    top: 100%;
+    border: 1px solid #eee;
+}
+
+
+.autocomplete-address > li{
+    background-color: #fff;
+    border: 1px solid #eee;
+    padding: 10px;
+    cursor: pointer;
+}

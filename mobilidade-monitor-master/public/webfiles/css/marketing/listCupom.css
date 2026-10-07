@@ -1,0 +1,293 @@
+.btn-add-coupon {
+    margin: 1vw 0vw 1vw 2vw;
+}
+
+.table {
+    margin-left: 1vw;
+    width: 100%;
+}
+
+.date-th {
+    display: flex;
+    flex-direction: column;
+
+    width: 50%;
+}
+
+.modal-body {
+    display: flex;
+}
+
+.left-side-container {
+    width: 75%;
+}
+
+.right-side-container {
+    width: 25%;
+}
+
+.top-container-modal {
+    display: flex;
+    justify-content: flex-start;
+    width: 90%;
+}
+
+.code {
+    width: 70%;
+}
+
+.top-container-modal select {
+    width: 80%;
+    margin-right: 2vw;
+}
+
+.select-span {
+    margin-left: -0.8vw;
+}
+
+.city-select {
+    margin-right: 2vw;
+}
+
+.mid-container-modal {
+    display: flex;
+    justify-content: space-between;
+    margin: 1.5vw 1vw 1vw 0.5vw;
+}
+
+.cash-input {
+    width: 6vw;
+    height: 2vw;
+}
+
+.value-container {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+}
+
+.type-value-coupon {
+    margin: 1vw 0vw 0vw 1vw;
+}
+
+.discount-container {
+    display: flex;
+}
+
+.value-form {
+    margin-left: 0.5vw;
+}
+
+
+.bottom-container-modal {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    margin: 1.5vw 1vw 1vw 0vw;
+}
+
+.public-container {
+    margin-top: 1vw;
+}
+
+.time-coupon {
+    width: 90%;
+    height: 60%;
+}
+
+.valid-container {
+    margin-top: 1vw;
+}
+
+.btn-radio {
+    margin-left: 1vw;
+}
+
+@media (min-width: 509px)   and  (max-width: 995px) {
+
+    .btn-add-coupon {
+        margin-left: 2vw;
+    }
+
+    .modal-body {
+        display: block;
+    }
+
+    .left-side-container {
+        width: 100%;
+    }
+
+    .top-container-modal{
+        display: block;
+    }
+
+    .top-container-modal span {
+        font-size: 2vw;
+        margin-left: 0.5vw;
+    }
+
+    .select-div {
+        margin-left: 0.5vw;
+        margin-bottom: 1vw;
+    }
+
+    .top-container-modal select {
+        width: 100%;
+        height: 5vw;
+        font-size: 2vw;
+    }
+
+    .code {
+        margin-left: 0.5vw;
+        width: 100%;
+        height: 5vw;
+    }
+
+    .value-container {
+        display: block;
+        margin: 1vw 0vw 0vw 0vw;
+        width: 100%;
+        font-size: 2vw;
+    }
+
+    .cash-input {
+        width: 40%;
+        height: 3vw;
+        font-size: 2vw;
+    }
+
+    .value-form {
+        display: flex;
+        justify-content: space-between;
+        width: 80%;
+    }
+
+    .discount-container {
+        display: flex;
+    }
+
+    .type-value-coupon {
+        margin: 0.5vw 0vw 0vw 1vw;
+    }
+
+    #value-discount {
+        margin-top: 1vw;
+    }
+
+    .bottom-container-modal {
+        display: block;
+        font-size: 2vw;
+    }
+
+    .time-coupon {
+        height: 5vw;
+        width: 100%;
+        margin-right: 1vw;
+    }
+
+    .right-side-container {
+        display: block;
+        width: 100%;
+        font-size: 2vw;
+    }
+
+    .valid-container {
+        margin: 1vw 0vw 1vw 0vw;
+    }
+}
+
+@media (min-width:360px)   and  (max-width: 508px) {
+
+    .btn-add-coupon {
+        margin-left: 5vw;
+    }
+
+    .modal-body {
+        display: block;
+    }
+
+    .left-side-container {
+        width: 100%;
+    }
+
+    .top-container-modal{
+        display: block;
+    }
+
+    .top-container-modal span {
+        font-size: 5vw;
+    }
+
+    .select-div {
+        margin-left: 0.5vw;
+        margin-bottom: 1vw;
+    }
+
+    .city-select span {
+        margin-bottom: 2vw;
+    }
+
+    .top-container-modal select {
+        width: 100%;
+        height: 12vw;
+        margin-top: 2vw;
+    }
+
+    .code {
+        width: 100%;
+        height: 12vw;
+    }
+
+    .value-container {
+        display: block;
+        margin: 5vw 0vw 0vw 1vw;
+        width: 100%;
+        font-size: 5vw;
+    }
+
+    .cash-input {
+        width: 40%;
+        height: 40%;
+        font-size: 5vw;
+    }
+
+    .value-form {
+        display: flex;
+        justify-content: space-between;
+        width: 80%;
+        margin-left: 0.5vw;
+    }
+
+    .discount-container {
+        display: flex;
+    }
+
+    .type-value-coupon {
+        margin: -1.5vw 0vw 0vw 1vw;
+    }
+
+    #value-discount {
+        height: 9vw;
+    }
+
+    .bottom-container-modal {
+        display: block;
+        font-size: 5vw;
+    }
+
+    .time-coupon {
+        height: 15vw;
+        width: 100%;
+        margin-right: 1vw;
+    }
+
+    .right-side-container {
+        display: block;
+        width: 100%;
+        font-size: 5vw;
+    }
+
+    .valid-container {
+        margin: 5vw 0vw 5vw 0vw;
+    }
+}

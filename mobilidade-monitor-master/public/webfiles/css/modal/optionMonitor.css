@@ -1,0 +1,136 @@
+@media (max-width: 991px) {
+    .container-option-monitor {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        opacity: 0;
+        z-index: -50;
+        transition: 0.5s;
+    }
+
+    .container-option-monitor.active {
+        opacity: 1;
+        z-index: 100;
+        transition: 0.5s;
+    }
+
+    .container-option-monitor > div {
+        position: relative;
+        background-color: #fff;
+        padding: 0.5vw;
+        width: 90%;
+        left: calc(-20% - 1vw);
+        transition: 0.5s;
+    }
+
+    .container-option-monitor.active > div {
+        left: 0%;
+        transition: 1s;
+    }
+
+    .container-option-monitor > div > ul {
+        list-style: none;
+    }
+
+    .container-option-monitor > div > ul > li {
+        padding: 3vw;
+        text-align: center;
+    }
+
+    .container-option-monitor > div > ul > li {
+        border-bottom: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    .container-option-monitor > div > ul > li > a {
+        text-decoration: none;
+        color: #000;
+        width: 100%;
+        display: block;
+    }
+
+    .container-option-monitor > div > button {
+        display: block;
+        margin: auto;
+        border: none;
+        padding: 2vw;
+        margin-top: 5vw;
+        outline: unset;
+        cursor: pointer;
+        width: 80%;
+        border-radius: 1vw;
+        background-color: #d18526;
+        color: #fff;
+    }
+
+}
+
+@media (min-width: 992px) {
+    .container-option-monitor {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        opacity: 0;
+        z-index: -50;
+        transition: 0.5s;
+    }
+
+    .container-option-monitor.active {
+        opacity: 1;
+        z-index: 100;
+        transition: 0.5s;
+    }
+
+    .container-option-monitor > div {
+        position: relative;
+        background-color: #fff;
+        padding: 0.5vw;
+        width: 20%;
+        left: calc(-20% - 1vw);
+        transition: 0.5s;
+    }
+
+    .container-option-monitor.active > div {
+        left: 0%;
+        transition: 1s;
+    }
+
+    .container-option-monitor > div > ul {
+        list-style: none;
+    }
+
+    .container-option-monitor > div > ul > li {
+        padding: 0.5vw 1vw;
+        text-align: center;
+    }
+
+    .container-option-monitor > div > ul > li {
+        border-bottom: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    .container-option-monitor > div > ul > li > a {
+        text-decoration: none;
+        color: #000;
+        width: 100%;
+        display: block;
+    }
+
+    .container-option-monitor > div > button {
+        display: block;
+        margin: auto;
+        border: none;
+        padding: 0.5vw 1vw;
+        border-radius: 0.25vw;
+        margin-top: 0.5vw;
+        outline: unset;
+        cursor: pointer;
+    }
+
+}

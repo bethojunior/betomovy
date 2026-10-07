@@ -1,0 +1,47 @@
+<div class='modal-bank-account'>
+    <div>
+        <i class="material-icons" id="closeModalBankAccount">close</i>
+        <h4 id="titleBankAccount">Cadastro de conta</h4>
+        <form id="formSignupAccount">
+            <input type="text" name="holderName" class="input-customer-bank" placeholder="Nome">
+            <input type="tel" name="document" id="documentBank" class="input-customer-bank cpf-bank" placeholder="CPF">
+            <select name="typeAccount">
+                <option disabled selected>TIPO DA CONTA</option>
+                <option value="corrente">CORRENTE</option>
+                <option value="poupanca">POUPANÇA</option>
+            </select>
+           <!-- <select name="bankId" id="bankAccount">
+                <option disabled selected>SELECIONE UM BANCO</option>
+            </select>-->
+            <input type="text" name="bankId" id="bankAccount" placeholder="Nome do banco">
+            <input type="text" name="agency" class="input-customer-bank agency-bank" placeholder="Agência">
+            <input type="text" name="agencyDigit" class="input-customer-bank agency-digit-bank" placeholder="Digito">
+            <input type="text" name="numberAccount" class="input-customer-bank number-account-bank" placeholder="Numero da conta">
+            <input type="text" name="numberAccountDigit" class="input-customer-bank number-account-digit-bank" placeholder="Digito">
+            <input type="text" name="op" class="input-customer-bank op-bank" id="opBank" placeholder="OP">
+            <input type="text" name="pix" class="input-customer-bank pix-bank" id="pixBank-transfer" placeholder="PIX">
+            <div class="form-zip">
+                <div class="form-group">
+                    <input type="text" name="dateOfBirth" class="input-customer-bank" id="date-birthday" placeholder="Data de nascimento">
+                </div>
+                <div class="form-group half">
+                    <input type="text" name="zipCode" class="input-customer-bank" id="cepBank" placeholder="Cep">
+                    <input type="text" name="street" class="input-customer-bank" id="streetBank" placeholder="Rua">
+                </div>
+                <div class="form-group half">
+                    <input type="text" name="number" class="input-customer-bank" id="numberBank" placeholder="Numero">
+                    <input type="text" name="complement" class="input-customer-bank" id="complementBank" placeholder="Complemento">
+                </div>
+                <div class="form-group half">
+                    <input type="text" name="neighborhood" class="input-customer-bank" id="neighborhoodBank" placeholder="Bairro">
+                    <input type="text" name="city" class="input-customer-bank" id="cityBank" placeholder="Cidade">
+                    <input type="text" name="state" class="input-customer-bank" id="stateBank" placeholder="Estado">
+                </div>
+        </div>
+
+        </form>
+        <div>
+            <button type="button" id="btnSaveAccountBank">SALVAR</button>
+        </div>
+    </div>
+</div>

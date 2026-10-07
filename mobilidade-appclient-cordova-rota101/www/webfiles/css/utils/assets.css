@@ -1,0 +1,59 @@
+body{
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Likely future */   
+}
+.geral404{
+    margin-top: 40vw;
+}
+.upperCase {
+    text-transform: uppercase;
+}
+.fontMontserrat {
+    font-family: "Montserrat";
+}
+.alignCenter {
+    text-align: center;
+}
+.ft-5 {
+    font-size: 5vw;
+}
+.underLine {
+     text-decoration: underline;
+}
+.hide-element {
+    z-index: -1;
+}
+div.disapear {
+    display: none;
+}
+@media(min-width: 992px) {
+    body {
+        overflow-y: hidden;
+    }
+}
+#navNotification{
+    display: none;
+}
+.navNotification{
+    background-color: #000000;
+    width: 100%;
+    text-align: left;
+    z-index: 999;
+    padding-left: 2vw;
+    position: absolute;
+    font-size: 1.5vw;
+}
+.navNotification #requestPermissionNotifications{
+    text-decoration: underline;
+    cursor: pointer;
+}
+.navNotification i.material-icons.closeBtn{
+    position: absolute;
+    top: 0;
+    padding-right: 4vw;
+    right: 0;
+    margin-top: 0.5vw;
+    cursor: pointer;
+}

@@ -1,0 +1,74 @@
+.progress-ring {
+    margin-top: 2vw;
+    width: 100%;
+    height: 50vw;
+    padding: 1vw 6vw;
+    transform: rotate(-90deg);
+}
+
+.end-start-progress{
+    position: absolute;
+    height: 7vw;
+    width: 4vw;
+    background-color: rgb(59,64,68);
+    margin: auto;
+    top: 10.6vw;
+    left: 0;
+    z-index: 10;
+    right: 0;
+}
+
+.progress-ring__circle {
+    fill: rgb(233, 153, 26);
+    transition: 0.35s stroke-dashoffset;
+/* // axis compensation */
+    transform: rotate(0deg);
+    transform-origin: 50% 50%;
+}
+
+.progress-ring__circle{
+    stroke: rgb(59,64,68);
+    stroke-width: 3vw;
+    r: 23vw;
+    cx: 24.5vw;
+    cy: 24.5vw;
+    stroke-dasharray: 0 , 0;
+    stroke-dashoffset: 0;
+    transition: 0.25s;
+}
+
+@media(min-width: 992px) {
+    .container-time-wait-taxi {
+        top: 73vw;
+        left: 17vw;
+    }
+    
+    .progress-ring {
+        margin: 0;
+        left: -1.5vw;
+        position: relative;
+    }
+
+    .progress-ring__circle {
+        stroke-width: 1vw;
+        r: 9vw;
+        cx: 5vw;
+        cy: 8.5vw;
+        transform-origin: 139% 32%;
+    }
+    
+    .container-time-wait-taxi p {
+        left: -34vw;
+        top: 38vw;
+        font-size: 1.7vw;
+        line-height: 1.7vw;
+    }
+
+    .container-menu .container-logo h4 {
+        font-weight: 500;
+        font-size: 3vw;
+        left: -17vw;
+        top: -27vw;
+        position: relative;
+    }
+}

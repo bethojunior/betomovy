@@ -1,0 +1,72 @@
+.container-delivery-occurrence{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+}
+
+.container-delivery-occurrence > nav{
+    background-color:var(--main-color);
+    color:#fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16pt;
+    font-family: sans-serif;
+    font-weight: 600;
+    position:relative;
+    text-transform:capitalize;
+}
+
+.container-delivery-occurrence > nav > i{
+    position:absolute;
+    left:10px;
+    font-size:22pt;
+}
+
+.container-delivery-occurrence > textarea{
+    flex:1;
+    margin:10px;
+    width:calc(100% - 20px);
+    padding: 10px;
+}
+
+.container-delivery-occurrence > button{
+    margin:10px;
+    background-color:var(--main-color);
+    border:none;
+    padding:10px;
+    font-weight:500;
+    font-size:16pt;
+    font-family:sans-serif;
+    border-radius:5px;
+    color:#fff;
+    box-shadow:0 0 10px #d2d2d2;
+    transition:300ms all;
+}
+
+
+.container-delivery-occurrence > button:disabled{
+    background-color:#313131;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+
+.container-delivery-occurrence > button:disabled:before{
+    content:"";
+    display:block;
+    width:30px;
+    height:30px;
+    border-radius:100%;
+    border:2px solid transparent;
+    border-top-color:#fff;
+    position:absolute;
+    left:30px;
+    animation:1s spin linear infinite;
+}

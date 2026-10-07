@@ -1,0 +1,13 @@
+services:
+      
+  mobilidade-central:
+    platform: linux/amd64
+    build:
+      dockerfile: docker-prod/dockerfile 
+    container_name: mobilidade-central-prod
+    image: mobilidade-central-prod-local
+    restart: always
+    ports:
+      - 92:92
+    env_file:
+      - .env

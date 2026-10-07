@@ -1,0 +1,18 @@
+.send-config{
+    display: none;
+}
+#mount-configs{
+    display: flex;
+    overflow: auto;
+}
+.data{
+    width:  20vw;
+    height: 40vw;
+    margin: 1vw;
+}
+.form-group{
+    width: 17vw;
+}
+
+
+

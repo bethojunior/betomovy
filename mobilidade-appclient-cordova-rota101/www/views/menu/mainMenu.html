@@ -1,0 +1,113 @@
+<div class="main-menu">
+    <div class="list-trips-active-partner">
+        <div class="options-partner">
+            <button type="button" id="btnNewTrip" data-i18n="home-btn-new-trip"></button>
+        </div>
+        <ul id="listTripPartner"></ul>
+        <i class="material-icons expand-options-trips-partner">expand_more</i>
+    </div>
+    <i class="material-icons notification-item" id="notificationCustomer">notifications</i>
+
+    <div class="menu-close" id="optionMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="container-menu-options">
+        <div id="containerMenuOptions">
+            <div class="row info-user">
+                <i class="material-icons hidden-menu">arrow_back</i>
+                <div id="imageUserMenu"></div>
+                <div class="container-menu-info">
+                    <h4 id="nameUser"></h4>
+                    <span id="ratingCustomerProfile"></span>
+                    <div class="container-menu-indication" style="opacity: 0;">
+                        <p>Nível</p>
+                        <span id="labelIndicationType">-</span>
+                        <p>(<span id="labelUserIndications">-</span> <span data-i18n="menu-user-indication"></span>)</p>
+                    </div>
+                </div>
+            </div>
+            <ul id="menuOptionUser">
+                <li>
+                    <i class="material-icons">home</i><a class="option-li" href="index.html?Client&Profile" data-i18n="menu-profile"></a>
+                </li>
+                <li>
+                    <div>
+                        <i class="material-icons">linear_scale</i>
+                        <a class="option-li" href="index.html?Trip&Trips" data-i18n="menu-trips"></a>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <i class="material-icons">card_giftcard</i>
+                        <a class="option-li" href="index.html?Client&Coupon" data-i18n="menu-coupons"></a>
+                    </div>
+                </li>
+                <li id="accountCustomer">
+                    <div>
+                        <i class="material-icons">trending_up</i>
+                        <a class="option-li" href="index.html?Financial&Account" data-i18n="menu-account"></a>
+                    </div>
+                </li>
+                <li id="itemMenuIndication" style="display: none;">
+                    <div>
+                        <i class="material-icons">group_add</i>
+                        <a class="option-li" href="index.html?Client&Indication" data-i18n="menu-indication"></a>
+                    </div>
+                </li>
+                <li id="itemMenuDependent" style="display: none;">
+                    <div>
+                        <i class="material-icons">supervised_user_circle</i>
+                        <a class="option-li" href="index.html?Dependent&List" data-i18n="menu-dependents"></a>
+                    </div>
+                </li>
+                <li id="itemFavoriteDriver" style="display: none;">
+                    <div>
+                        <i class="material-icons">favorite_border</i>
+                        <a class="option-li" href="index.html?Driver&Favorites" data-i18n="menu-favorite-driver"></a>
+                    </div>
+                </li>
+                <li>
+                    <div id="btnBalanceClient">
+                        <i class="material-icons">payment</i>
+                        <a class="option-li" data-i18n="menu-payments"></a>
+                    </div>
+                </li>
+                <li id="adsMenu" style="display: none;">
+                    <div>
+                        <i class="material-icons">language</i>
+                        <a class="ads-menu-link option-li"></a>
+                    </div>
+                </li>
+                <li id="shareApp">
+                    <i class="material-icons">share</i>
+                    <a class="option-li" data-i18n="menu-share"></a>
+                </li>
+                <li>
+                    <i class="material-icons">chat_bubble_outline</i>
+                    <a class="option-li" href="index.html?Client&ContactUs" data-i18n="menu-contact-us"></a>
+                </li>
+                <li id="logout">
+                    <i class="material-icons">label_outline</i>
+                    <span class="option-li" data-i18n="menu-logout"></span>
+                </li>
+            </ul>
+            <div id='version-content' class="footer-ios-x">
+                <ul class="list-social-networks">
+                    <li type="facebook" id="openFacebookApp"></li>
+                    <li type="instagram" id="openInstagramApp"></li>
+                </ul>
+                <p>
+                    <nameapp></nameapp>
+                </p>
+                <p>powered by <a id="openProfileInsta">@fb704</a></p>
+                <span id='version'></span>
+            </div>
+        </div>
+    </div>
+</div>

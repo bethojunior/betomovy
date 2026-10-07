@@ -1,0 +1,290 @@
+.map.disabled-map-corporate ~ .footer-race,
+.map.disabled-map ~ .footer-race {
+    position: relative;
+    height: calc(100% - 17vw);
+    transform: translateY(0);
+    display: flex !important;
+    flex-direction: column;
+    top: 0;
+}
+
+.map.disabled-map-corporate ~ .footer-race.show-route{
+    height: 30%;
+    bottom: 0;
+    top: unset;
+    position: absolute;
+}
+
+.v2 .map.disabled-map-corporate ~ .footer-race, .v2 .map.disabled-map-corporate ~ .footer-race.active.min-v2{
+    top:20vw;
+    height: calc(100% - 20vw);
+}
+
+.map.disabled-map-corporate ~ .footer-race > .footer-arrow,
+.map.disabled-map ~ .footer-race > .footer-arrow {
+    display: none !important;
+}
+
+.map.disabled-map-corporate ~ .footer-race .container-return-driver,
+.map.disabled-map ~ .footer-race .container-return-driver {
+    display: none;
+}
+
+.map.disabled-map-corporate ~ .footer-race > .toggle-status-driver > .container-detail-driver,
+.map.disabled-map ~ .footer-race > .toggle-status-driver > .container-detail-driver {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.map.disabled-map-corporate ~ .footer-race > .toggle-status-driver > .container-detail-driver > li,
+.map.disabled-map ~ .footer-race > .toggle-status-driver > .container-detail-driver > li {
+    height: unset;
+    margin: 0 0 10px;
+    padding: 15px;
+}
+
+.map.disabled-map-corporate ~ .footer-race > .toggle-status-driver > .container-detail-driver > li > div,
+.map.disabled-map ~ .footer-race > .toggle-status-driver > .container-detail-driver > li > div {
+    position: relative;
+}
+
+.map.disabled-map-corporate ~ .footer-race > .data-trip > .container-info-customer-trip,
+.map.disabled-map ~ .footer-race > .data-trip > .container-info-customer-trip {
+    height: unset;
+    margin-bottom: 13px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #fff;
+}
+
+
+.map.disabled-map-corporate ~ .footer-race > .data-trip > .container-info-customer-trip{
+    height: 40px;
+}
+
+.map.disabled-map-corporate ~ .footer-race > .data-trip > .point-minimize,
+.map.disabled-map ~ .footer-race > .data-trip > .point-minimize {
+    display: none;
+}
+
+
+.map.disabled-map-corporate ~ .footer-race.active > .data-trip > .container-info-customer-trip > .profile-image-customer,
+.map.disabled-map ~ .footer-race.active > .data-trip > .container-info-customer-trip > .profile-image-customer {
+    display: block;
+}
+
+.map.disabled-map-corporate ~ .footer-race > .data-trip > .container-info-customer-trip > .profile-image-customer,
+.map.disabled-map ~ .footer-race > .data-trip > .container-info-customer-trip > .profile-image-customer {
+    position: relative;
+    top: 0;
+    display: none;
+}
+
+.map.disabled-map-corporate ~ .footer-race.active .name-client,
+.map.disabled-map ~ .footer-race.active .name-client {
+    display: flex;
+}
+
+.map.disabled-map-corporate ~ .footer-race .name-client,
+.map.disabled-map ~ .footer-race .name-client {
+    top: 10vw;
+    background-color: unset;
+    border: unset;
+    box-shadow: none;
+    display: none;
+}
+
+.map.disabled-map-corporate ~ .footer-race .name-client{
+    top:5px;
+}
+
+.map.disabled-map-corporate ~ .footer-race > .data-trip,
+.map.disabled-map ~ .footer-race > .data-trip {
+    flex: 1;
+    flex-direction: column;
+    display: flex !important;
+    height: 100%;
+}
+
+
+.map.disabled-map-corporate ~ .footer-race.active .list-place-trip,
+.map.disabled-map ~ .footer-race.active .list-place-trip {
+    display: block;
+    overflow-y: auto;
+    /* max-height: 50%; */
+}
+
+.map.disabled-map-corporate ~ .footer-race .list-place-trip,
+.map.disabled-map ~ .footer-race .list-place-trip {
+    overflow-y: auto;
+    flex: 1;
+    display: none;
+}
+
+#openDetailRouteCorporate,
+#openCustomerRouteRide,
+#openCustomerChatRider,
+#openDirection{
+    display: none;
+}
+
+.map.disabled-map-corporate ~ .footer-race .name-client.btn-info-trip > #openDetailRouteCorporate,
+.map.disabled-map-corporate ~ .footer-race .name-client.btn-info-trip > #openCustomerRouteRide,
+.map.disabled-map-corporate ~ .footer-race .name-client.btn-info-trip > #openDirection,
+.map.disabled-map-corporate ~ .footer-race .name-client.btn-info-trip > #showRouteInApp,
+.map.disabled-map-corporate ~ .footer-race .name-client.btn-info-trip > #openCustomerChatRider,
+.map.disabled-map ~ .footer-race .name-client.btn-info-trip > #openDirection {
+    color: #fff;
+    width: 12.5vw;
+    height: 12.5vw;
+    font-size: 10vw;
+    background-color: #444;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-left: 10px;
+}
+
+.map.disabled-map-corporate ~ .footer-race .name-client.btn-info-trip > #openCustomerChatRider.active{
+    animation: 2.5s notify-multi-chat  infinite;
+}
+
+@keyframes notify-multi-chat{
+    to{
+        background-color: #444;
+    }
+    from{
+        background-color:red;
+    }
+}
+
+.map.disabled-map-corporate ~ .footer-race .name-client.btn-info-trip > #openDirection > i,
+.map.disabled-map ~ .footer-race .name-client.btn-info-trip > #openDirection > i {
+    color: #fff;
+}
+
+
+.map.disabled-map-corporate ~ .footer-race > .toggle-status-driver > .count-item-detail,
+.map.disabled-map ~ .footer-race > .toggle-status-driver > .count-item-detail {
+    display: none;
+}
+
+
+.container-qrcode-driver.lite-map-corporate,
+.container-qrcode-driver.lite-map {
+    z-index: 201;
+    bottom: unset;
+    top: 20vw;
+}
+
+.container-qrcode-driver.lite-map-corporate.active,
+.container-qrcode-driver.lite-map.active {
+    top: 0;
+    z-index: 1001;
+}
+
+.container-qrcode-driver.lite-map-corporate > div > div,
+.container-qrcode-driver.lite-map > div > div {
+    display: none;
+}
+
+
+.container-qrcode-driver.lite-map-corporate.active > div > div,
+.container-qrcode-driver.lite-map.active > div > div {
+    display: block;
+}
+
+.btn-taximetro.lite-map-corporate,
+.btn-taximetro.lite-map {
+    transition: 300ms all;
+    z-index: 201;
+    top: 20vw;
+    bottom: unset;
+    width: unset;
+    height: unset;
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+
+.btn-taximetro.lite-map-corporate:before,
+.btn-taximetro.lite-map:before {
+    content: "TAXIMETRO";
+    font-weight: 600;
+    font-size: 10pt;
+}
+
+.btn-taximetro.lite-map > img {
+    width: 15px;
+    display: none;
+}
+
+.container-taximetro.lite-map {
+    z-index: 1004;
+    height: 100%;
+    margin: 0;
+    width: 100%;
+    border-radius: 0;
+    transform: translateY(150%);
+    transition: 300ms;
+}
+
+.container-taximetro.lite-map.active {
+    transform: translateY(0);
+}
+
+
+.preload-request.lite-map-corporate,
+.preload-request.lite-map {
+    top: 0;
+    width: 100%;
+    position: absolute;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-150%);
+    transition: 300ms all;
+    height: 17vw;
+    z-index: 1051;
+}
+
+.preload-request.lite-map-corporate.active,
+.preload-request.lite-map.active {
+    transform: translateY(0%);
+}
+
+
+.preload-request.lite-map-corporate.info,
+.preload-request.lite-map-corporate.success,
+.preload-request.lite-map.info,
+.preload-request.lite-map.success {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(0vw);
+    z-index: 1051;
+    animation-name: animation-info-preload-lite;
+    animation-duration: 3s;
+}
+
+@keyframes animation-info-preload-lite {
+    0% {
+        max-height: 100px;
+        opacity: 1;
+    }
+    95% {
+        max-height: 100px;
+        opacity: 1;
+    }
+    100% {
+        max-height: 0;
+        opacity: 0;
+    }
+}
+
+.map.disabled-map-corporate ~ .footer-race p#textTripToggle,
+.map.disabled-map ~ .footer-race p#textTripToggle {
+    opacity: 0;
+}

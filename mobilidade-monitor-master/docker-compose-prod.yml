@@ -1,0 +1,15 @@
+services:
+      
+  mobilidade-monitor:
+    platform: linux/amd64
+    build:
+      dockerfile: docker-prod/dockerfile 
+    container_name: mobilidade-monitor-prod
+    image: mobilidade-monitor-prod-local
+    restart: always
+    ports:
+      - 83:83
+    env_file:
+      - .env
+
+      

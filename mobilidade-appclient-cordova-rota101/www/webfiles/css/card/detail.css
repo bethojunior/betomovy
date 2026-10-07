@@ -1,0 +1,55 @@
+.detail-card-client{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.detail-card-client > nav{
+    width:calc(100% - 4vw);
+    background-color:#ff9319;
+    padding: 4vw 2vw;
+    color:#fff;
+    display:flex;
+    justify-content:left;
+    align-items: center;
+}
+.detail-card-client > nav > i{
+    font-size:8vw;
+}
+.detail-card-client > nav > span{
+    font-size: 6vw;
+    margin-left:2.5vw;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.detail-card-client > div{
+    display:block;
+    padding:5vw;
+}
+
+.detail-card-client > div > div{
+    padding:2vw;
+    display:block
+}
+.detail-card-client > div > div > label{
+    display:block;
+}
+.detail-card-client > div > div >  input{
+    background-color:#fff;
+    border:none;
+    font-size: 5vw;
+    color: #000;
+    margin: 3vw 0;
+}
+.detail-card-client > div > button{
+    border:none;
+    display:block;
+    margin: 5vw auto;
+    padding:2vw 5vw;
+    font-size:4vw;
+    text-transform:uppercase;
+    background-color:#ff7f66;
+    color:#fff;
+    border-radius:1vw;
+}

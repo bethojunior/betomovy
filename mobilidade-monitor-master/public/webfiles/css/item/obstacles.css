@@ -1,0 +1,37 @@
+.btn.btn-info.add-new-obstacles{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 5vw;
+    margin-right: 3vw;
+}
+.general-obstacles{
+}
+.general-obstacles .row#mount-obstacles .data{
+    background-color: whitesmoke;
+    padding: 2vw;
+    margin: 1vw;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.general-obstacles .row#mount-obstacles .data:hover{
+    box-shadow: 1px 1px 20px 0px rgba(0,0,0,0.26);
+    transition: 0.5s;
+}
+.general-obstacles .row#mount-obstacles .data .options{
+    position: relative;
+}
+.general-obstacles .row#mount-obstacles .data .col-lg-4.options .that{
+    position: absolute;
+    right: 0;
+}
+.btn.btn-success#create-price{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 5vw;
+    border-radius: 52vw;
+    height: 4vw;
+    width: auto;
+    margin-right: 1vw;
+}

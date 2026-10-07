@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+    apiv2:
+        build:
+            args:
+                user: sammy
+                uid: 1000
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        working_dir: /var/www/
+        volumes:
+            - ./:/var/www
+            - ./docker-compose/nginx:/etc/nginx/conf.d/
+
+    nginx:
+        image: nginx:alpine
+        container_name: apiv2-nginx
+        restart: unless-stopped
+        links:
+            - "apiv2:apiv2"
+        ports:
+            - 8100:80
+        volumes:
+            - ./:/var/www
+            - ./docker-compose/nginx:/etc/nginx/conf.d/

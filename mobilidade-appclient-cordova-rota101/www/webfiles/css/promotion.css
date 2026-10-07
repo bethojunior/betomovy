@@ -1,0 +1,31 @@
+.row.generalPromotion{
+    padding-top: 2vw;
+    margin-top: 3vw;
+}
+.row.generalPromotion .col.s12#listPromotion{
+    overflow-x: auto;
+    overflow-y: auto;
+    height: 100%;
+    padding-bottom: 10vw;
+}
+.row.generalPromotion .col.s12#listPromotion .card{
+    box-shadow: 1px 1px 20px 0 rgba(0,0,0,0.26);
+    -webkit-border-radius: 10vw;
+    -moz-border-radius: 10vw;
+    border-radius: 0.8vw;
+    padding: 2vw;
+}
+.row.generalPromotion .col.s12#listPromotion .card .titleCard{
+    font-weight: bold;
+}
+.row.generalPromotion .col.s12#listPromotion .card .bodyCard{
+    margin-top: 2vw;
+}
+#modalCard.modal.row{
+    padding: 2vw;
+}
+#modalCard.modal.row .col.s12#titleModal{
+    font-size: 5vw;
+    text-align: center;
+    font-weight: bold;
+}

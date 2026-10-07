@@ -1,0 +1,179 @@
+.floating-icon-coupon{
+    position: absolute;
+    right: 5%;
+    color: #fff;
+    left: unset !important;
+}
+
+.floating-icon-coupon.active{
+    display:none
+}
+
+.modal-add-coupon{
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 550;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transform: translateY(150%);
+    transition: 300ms all;
+}
+
+.modal-add-coupon.active{
+    transform: translateY(0%);
+}
+
+.modal-add-coupon > .container-get-code{
+    width: 80%;
+    background-color: #fff;
+    border-radius: 15px 0 15px 15px;
+    padding:10px;
+    position: relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.modal-add-coupon > .container-get-code.active > div > button{
+    display:none;
+}
+
+.modal-add-coupon > .container-get-code.active > div > input{
+    border:none;
+    pointer-events: none;
+}
+
+.modal-add-coupon > .container-get-code > img{
+    width:60px;
+    position:absolute;
+    left:-15px;
+    top:-15px;
+}
+
+.modal-add-coupon > .container-get-code >h4{
+    font-family: sans-serif;
+    font-weight: 500;
+    padding: 10px;
+    font-size: 14pt;
+    margin-bottom:10px;
+}
+
+.modal-add-coupon > .container-get-code > i{
+    position:absolute;
+    top:0;
+    right:0;
+    height:5vw;
+    transform:translateY(-9vw);
+    background-color:red;
+    color: #fff;
+    padding:2vw;
+    border-radius:10px 10px 0 0;
+    text-align:center;
+    display:flex;
+    align-items:center;
+}
+
+.modal-add-coupon > .container-get-code.active >h4{
+    margin:0;
+}
+
+.modal-add-coupon > .container-get-code > div > button{
+    border:none;
+    padding:5px;
+    text-transform:uppercase;
+    background-color:var(--main-color);
+    color:#fff;
+    font-size:14pt;
+    width: 100%;
+    border-radius: 15px;
+    font-weight: 400;
+    animation-delay: 1.5s;
+    /*transition:all 300ms;*/
+}
+
+.modal-add-coupon > .container-get-code > div > button:disabled{
+    width: 10vw;
+    height: 10vw;
+    color: #fff;
+    background-color: #fff;
+    border: 2px solid transparent;
+    border-top: 2px solid var(--main-color);
+    border-radius: 100%;
+    display:block;
+    margin:auto;
+    animation: spin 500ms linear infinite;
+}
+
+.modal-add-coupon > .container-get-code > div{
+    display:flex;
+    justify-content: center;
+    border-top: 1px solid #ccc;
+    padding: 5px;
+    width: 100%;
+    flex-direction: column;
+}
+
+.modal-add-coupon > .container-get-code > div > input{
+    flex:1;
+    margin: 5px 0 2.5vw;
+    border: none;
+    padding: 5px 0;
+    outline: none;
+    border-bottom: 1px solid #efefef;
+    text-align: center;
+    font-size: 14pt;
+    color: #f00;
+    max-width: 100%;
+    text-transform: uppercase;
+    background-color: transparent;
+}
+
+.modal-add-coupon > .container-get-code > div > input::placeholder{
+    color:#d0d0d0;
+
+}
+
+.modal-add-coupon > .coupon-acquired-success{
+    width: 60%;
+    background-color: #0bb728;
+    color: #fff;
+    border-radius: 0 0 15px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 0;
+    overflow:hidden;
+    padding: 0 10px;
+    transition:500ms max-height;
+}
+
+.modal-add-coupon >  .container-get-code.active + .coupon-acquired-success{
+    padding: 10px;
+    max-height: 100%;
+}
+
+.modal-add-coupon > .coupon-acquired-success > span{
+    text-align:center;
+    font-weight:500;
+    font-size:12pt;
+}
+
+
+.modal-add-coupon > .coupon-acquired-success > div{
+    display:flex;
+}
+
+.modal-add-coupon > .coupon-acquired-success > div > span:first-child{
+    font-size:15pt;
+}
+
+.modal-add-coupon > .coupon-acquired-success > div > span:last-child{
+    font-size:45pt;
+}

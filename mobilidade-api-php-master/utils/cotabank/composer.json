@@ -1,0 +1,28 @@
+{
+    "name": "speedapps/cotabank",
+    "description": "package for integration with Cota Bank payment method",
+    "homepage": "https://www.cotabank.com.br/",
+    "keywords": [
+        "Cotabank",
+        "CotaBank",
+        "API",
+        "Payment SaaS",
+        "Credit Card",
+        "Boleto"
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": "true",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Johnson Rodrigues",
+            "email": "sertanustecnologia@gmail.com",
+            "homepage": "https://www.sertanus.com.br"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SpeedApps\\CotaBank\\": "src"
+        }
+    }
+}

@@ -1,0 +1,386 @@
+*{
+    margin:0;
+    padding:0;
+    font-family: 'Open Sans', sans-serif;
+}
+body{
+     background-color: var(--color-bg-page);
+}
+
+:root {
+    --main-color: var(--color-primary);
+    --main-seconds-color: var(--color-white);
+}
+
+/* ── Scrollbar global ── */
+::-webkit-scrollbar-track-piece {
+    background-color: var(--color-scrollbar-track);
+    border-left: 1px solid var(--color-border);
+}
+
+::-webkit-scrollbar-thumb:vertical,
+::-webkit-scrollbar-thumb:horizontal {
+    background-color: var(--color-scrollbar-thumb);
+}
+
+::-webkit-scrollbar-thumb:vertical:hover,
+::-webkit-scrollbar-thumb:horizontal:hover {
+    background-color: var(--color-scrollbar-thumb-hover);
+}
+
+/* ── Bootstrap overrides globais ── */
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-text-inverse) !important;
+    box-shadow: none !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
+}
+
+.btn-success {
+    background-color: var(--color-success) !important;
+    border-color: var(--color-success) !important;
+}
+
+.btn-success.btn-whatsapp-call {
+    background-color: var(--color-whatsapp) !important;
+    border-color: var(--color-whatsapp) !important;
+}
+
+.btn-success.btn-whatsapp-call:hover {
+    background-color: var(--color-whatsapp-hover) !important;
+    border-color: var(--color-whatsapp-hover) !important;
+}
+
+.btn-info {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.btn-info:hover {
+    background-color: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
+}
+
+.btn-outline-secondary {
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--color-bg-muted) !important;
+    color: var(--color-primary) !important;
+}
+
+.modal{
+    display: none;
+}
+.modal.show{
+    display: block;
+    transition: 1s;
+    position: fixed;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    display: -ms-flexbox;
+    display: flex;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    background-color: var(--color-overlay);
+}
+.modal.show .modalContent{
+    z-index: 999;
+    background-color: var(--color-bg-surface);
+    width: auto;
+    padding: 1vw;
+    -webkit-border-radius: 0.2vw;
+    -moz-border-radius: 0.2vw;
+    border-radius: 0.2vw;
+}
+
+.container-default-monitor{
+    position: relative;
+    width: calc(100% - 18%);
+    float: left;
+    max-height: calc(100% - 4vw);
+    overflow-y: auto;
+}
+
+
+.modal-backdrop{
+    display: none !important;
+}
+
+/* ── Utilitários de tamanho para Material Icons ── */
+.mi-sm { font-size: 14px; }
+.mi-md { font-size: 16px; }
+.mi-lg { font-size: 18px; }
+
+/* ── Utilitário de campo com erro de validação (aplicar em qualquer input/.form-control) ── */
+.form-control.is-invalid {
+    border-color: var(--color-danger-text) !important;
+}
+
+.form-control.is-invalid:focus {
+    border-color: var(--color-danger-text) !important;
+    box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .25) !important;
+}
+
+/* ── Utilitários de texto ── */
+.label-nowrap { white-space: nowrap; }
+
+/* ── Utilitário de tooltip (topo, por padrão) ──
+   Uso: elemento pai com position:relative + <span class="app-tooltip">Texto</span> dentro.
+   O elemento pai precisa declarar o próprio gatilho de hover/focus, ex:
+   .meu-botao:hover .app-tooltip, .meu-botao:focus-visible .app-tooltip { visibility: visible; opacity: 1; } */
+.app-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    background-color: var(--color-text-muted);
+    color: var(--color-text-inverse);
+    font-size: 11px;
+    line-height: 1.3;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 2000;
+}
+
+.app-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--color-text-muted) transparent transparent transparent;
+}
+
+/* Variante: tooltip à esquerda (usar quando não houver espaço/for clipado no topo) */
+.app-tooltip--left {
+    bottom: auto;
+    top: 50%;
+    left: auto;
+    right: calc(100% + 8px);
+    transform: translateY(-50%);
+}
+
+.app-tooltip--left::after {
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    border-color: transparent transparent transparent var(--color-text-muted);
+}
+
+@media (max-width: 991px) {
+    .container-default-monitor{
+        width: 100%;
+        max-height: calc(100% - 19vw);
+    }
+
+    /* Largura da barra de rolagem */
+    ::-webkit-scrollbar {
+        width: 10px;
+        display: none;
+
+    }
+}
+
+.container-main{
+    background-color: var(--color-bg-surface);
+    padding: 12px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+}
+
+.container .row{
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* ── SweetAlert overrides ── */
+.swal-overlay {
+    background-color: var(--color-overlay);
+}
+
+.swal-modal {
+    border-radius: 16px;
+    padding: 28px 24px 20px;
+    box-shadow: 0 20px 60px var(--color-shadow-lg);
+    font-family: 'Open Sans', sans-serif;
+    max-width: 360px;
+    width: calc(100% - 32px);
+    animation: swal-pop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Sem ícone (swal-icon só existe no DOM quando um tipo é passado): aproxima o título do topo */
+.swal-modal:not(:has(.swal-icon)) {
+    padding-top: 18px;
+}
+
+/* Variante mais larga, para diálogos com 3+ botões (ex.: cancelamento em lote) */
+.swal-modal--wide {
+    max-width: 440px;
+}
+
+/* Diálogos de alerta (SwalCustom.messageDialog) — mensagens de erro em lote podem ser longas */
+.swal-modal--alert {
+    min-width: 440px;
+}
+
+@keyframes swal-pop {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1);    }
+}
+
+.swal-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+    padding: 0;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.swal-text {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    text-align: center;
+    line-height: 1.55;
+    padding: 0;
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    white-space: pre-line;
+}
+
+/* Icon cleanup — ícone padrão da lib é 80px, desproporcional nos modais estreitos do app */
+.swal-icon {
+    margin: -4px auto 0;
+    transform: scale(0.6);
+}
+
+/* especificidade extra: sweetalert injeta seu CSS via <style> em runtime, depois deste arquivo */
+.swal-modal .swal-icon:first-child {
+    margin-top: 0;
+}
+
+.swal-icon--info {
+    border-color: var(--color-info);
+}
+
+.swal-icon--info::before,
+.swal-icon--info::after {
+    background-color: var(--color-info);
+}
+
+.swal-icon--warning {
+    border-color: var(--color-warning-border);
+}
+
+.swal-icon--warning__body,
+.swal-icon--warning__dot {
+    background-color: var(--color-warning);
+}
+
+.swal-icon--success {
+    border-color: var(--color-success-border);
+}
+
+.swal-icon--success__line {
+    background-color: var(--color-success);
+}
+
+.swal-icon--success__ring {
+    border-color: rgba(16, 185, 129, 0.25);
+}
+
+.swal-icon--error {
+    border-color: var(--color-danger-strong);
+}
+
+.swal-icon--error__line {
+    background-color: var(--color-danger-strong);
+}
+
+/* Footer */
+.swal-footer {
+    padding: 20px 0 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* Buttons */
+.swal-button {
+    height: 40px;
+    padding: 0 22px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Open Sans', sans-serif;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    box-shadow: none;
+}
+
+.swal-button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.swal-button--confirm {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+.swal-button--confirm:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+}
+
+.swal-button--cancel {
+    background: var(--color-bg-muted);
+    color: var(--color-text-secondary);
+}
+
+.swal-button--cancel:hover:not(:disabled) {
+    background: var(--color-border);
+}
+
+.swal-button--danger {
+    background: var(--color-danger-strong);
+    color: var(--color-text-inverse);
+}
+
+.swal-button--danger:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+}
+
+.swal-button-container {
+    margin: 0;
+}

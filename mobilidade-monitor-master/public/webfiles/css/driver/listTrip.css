@@ -1,0 +1,77 @@
+@media (max-width: 991px){
+    .general {
+        margin: 1vw;
+        height: calc(100% - 19vw);
+    }
+
+    .general #listTrips {
+        height: 100%;
+        overflow: scroll;
+    }
+
+    .general #listTrips .dataListTrip {
+        background-color: white;
+        padding: 0.5vw;
+        border-radius: 0.5vw;
+        margin: 0.3vw;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        border-bottom: 1px solid #060606;
+        word-wrap: break-word;
+    }
+
+    .general #listTrips .dataListTrip .first {
+        width: 100%;
+        word-wrap: break-word;
+        /* display: flex; */
+        /* justify-content: space-between; */
+    }
+
+    .general #listTrips .dataListTrip .second {
+        width: 100%;
+        word-wrap: break-word;
+    }
+
+    .general #listTrips .dataListTrip .third {
+        width: 100%;
+        word-wrap: break-word;
+    }
+}
+
+@media (min-width: 992px) {
+    .general {
+        padding-left: 17vw;
+        margin: 1vw;
+    }
+
+    .general #listTrips {
+        height: 50vw;
+        overflow: scroll;
+    }
+
+    .general #listTrips .dataListTrip {
+        background-color: white;
+        padding: 0.5vw;
+        border-radius: 0.5vw;
+        margin: 0.3vw;
+        cursor: pointer;
+        display: flex;
+        word-wrap: break-word;
+    }
+
+    .general #listTrips .dataListTrip .first {
+        width: 25vw;
+        word-wrap: break-word;
+    }
+
+    .general #listTrips .dataListTrip .second {
+        width: 25vw;
+        word-wrap: break-word;
+    }
+
+    .general #listTrips .dataListTrip .third {
+        width: 25vw;
+        word-wrap: break-word;
+    }
+}

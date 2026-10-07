@@ -1,0 +1,66 @@
+on:
+  push:
+    branches:
+      - disabled-branch
+
+jobs:
+  ecr:
+    runs-on: ubuntu-latest
+    name: Docker build and push to ECR
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - uses: int128/create-ecr-repository-action@v1
+        id: ecr
+        with:
+          repository: mobilidade-monitorapiv2
+
+      - name: Build, tag, and push docker image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: mobilidade-monitorapiv2
+          IMAGE_TAG: ${{ github.run_number }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG . -f Dockerfile-prd
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          export OLDREGISTRY="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          echo "oldregistry=$OLDREGISTRY" >> $GITHUB_ENV
+          echo ${{ env.oldregistry }}
+          
+      - name: 20buscar Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_20BUSCAR }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_20BUSCAR }}
+          aws-region: us-east-1
+          
+      - name: 20buscar Login to Amazon ECR
+        id: login-ecr-20buscar
+        uses: aws-actions/amazon-ecr-login@v1
+        
+      - uses: int128/create-ecr-repository-action@v1
+        id: ecr-20buscar
+        with:
+          repository: mobilidade-monitorapiv2
+          
+      - name: 20buscar Build, tag, and push docker image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr-20buscar.outputs.registry }}
+          REPOSITORY: mobilidade-monitorapiv2
+          IMAGE_TAG: ${{ github.run_number }}
+          OLDREGISTRY: ${{ env.oldregistry }}
+        run: |
+          docker tag $OLDREGISTRY $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG

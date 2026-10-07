@@ -1,0 +1,35 @@
+.generalContactUs{
+    padding-left: 10vw;
+    margin: 1vw;
+}
+
+.generalContactUs #mountListContact{
+    height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.generalContactUs #mountListContact .container{
+    margin: 1vw;
+    background-color: white;
+    padding: 0.3vw;
+    border-radius: 0.3vw;
+    margin-right: 3vw;
+}
+
+.generalContactUs #mountListContact .container .content.row.col-lg-12{
+    padding: 1vw;
+    position: relative;
+}
+
+.generalContactUs #mountListContact .container .content.row.col-lg-12 .date{
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.9vw;
+}
+
+.generalContactUs #mountListContact .container .content.row.col-lg-12 .data-contact.col-lg-4 textarea{
+    resize: none;
+    height: 9.5vw;
+}

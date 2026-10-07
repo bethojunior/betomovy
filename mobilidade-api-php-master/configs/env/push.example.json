@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "affable-hydra-255311",
+  "private_key_id": "dff92f870c2e12044d630bcbe8c540b4c552a721",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC0h2aCIs60hkE8\n5MvzDEwGbvTG+alMy4rM3Y9lv+5pcNDRebs9XYt0mh7v4PJ+QNQScksxUG/IquEK\nkG7ymFZi0i/ZBjrTjcGAcnxFxdcOChckQaqEXj3vkf0m3ninH0RwXftX/wJXC2XD\nfx6DTzxZbQCfV3zir4YZryCldF1YdOfyZAXDhyCVjr0KHitbnu+Had4vGmvPrx+0\nt/r7JePfRYxTYAqzZxVkX8LO14tRgfad6Yehlabn/XZNXZmf9usyNZeLS7jvxRwL\nn1BdV/LZQIaAFMvOaxAhVormHwGncBmOcPCjYEZN9f0r0FbYVTiV0rihovOxtnso\njlNbfbvlAgMBAAECggEAUnb7c3zU8Y/WYyucooS+gb3ToMTQ+lyMJfMbmv4muRGo\nwdeamXiOyI/Si/80pkmU1mxRPtCgj4jHTd0WYUkHRRMAemGnI5ZAix1A+VpbV3Vy\nhsRcUST/o90LR+MeODFHQREdTGAXwI1bSgdad98NEUiCnUcIrEBDwJ3ICuxx64KO\ngP5od1VMZgXvs7Xx9R2m9klsbMCJ+cM80eBGcVLlzpFX25LafX+iGVVoGB3+eD++\nfeBOcQT6Zc0+MshGGzPjSqCdK6XrwTG3HJIwCMRqsaAyikXLffWb88oTSFPqB7Zd\n62mb6DJR5LceCcWd+CQLoozPgd1/a6YgDFVZCBUtDQKBgQDqcjjma8vmUUnhsLgm\n21AvNZ/a8bszOuq79Y7oCo8uFvByYEsNB0+9Ju9dfP0VSJnTxPZEbt5zESRcb2zn\nxt97gOX3wf45x7HrxKOTEKr5VOrhrUZvRe5E8LYfbPrZfwmFepqInPBGgetSOqxG\nmPkawwxsNXJbBezoRlNtuppcmwKBgQDFIDcU7e/SAa+Nu277b7IgCNxDebxfYDEm\nBcSEQaKLQMR8odSBTJs+RR9RPKDYk+osbZuMl083GWODIhTXi+y8SDmbN7u6Wyxn\nWovQomYFSqyTKTj7IKPFcKiRjqVjtCJKfKnM0iT4K0Kcxf53NQVs6L0zD/A+1qZ9\ni1h218KRfwKBgByM7mr5I6qXqaSnbbWlrZ0iLaZvG7oAaceb/tw5NPiK6Js1KM6c\nXlSNokbDStrFrZ4BdXAeBE8E/mWXWC7dpCeZKehDIp+MtxkcKENnmzqj4bq77EDu\nxjZ1DejDz8Se2Nz9ckZCvmwHtE2eQY6TYHqm2CNxWszE6vXaYpyRRe0TAoGACu44\nX66555k0VNWZ19NfuysCm7M6YMeCsisLtJG3I6WZv5dxoyHOUeufSu/js16wU3pY\nb7lMKS/9Np5DLZiSrfYLS7IRdMntcmWw7wayRYTYgOh+Ql6S9jXDAx83yImKhTrY\nZ4UXi7NKZEsOSynjfSCCrTwrBDD+1mNNqnlYTp0CgYArAEDhIO+6N0bEEJtgMQ4d\nOp+SR54xnXypeKMsiGotDV0HaZu2qOOeGJ035+6DoKtF4zPUFf0Q0MLA0oGc1KD2\nvqrehV7bDuIlgrxzkRacVIWxaTD/Mbrcg6cfTYAL/aZLk178Hw+sAdPZQqd647zH\nifZJYfdX/tQp6oOGptDFAw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "affable-hydra-255311@appspot.gserviceaccount.com",
+  "client_id": "106153799845080086696",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/affable-hydra-255311%40appspot.gserviceaccount.com"
+}

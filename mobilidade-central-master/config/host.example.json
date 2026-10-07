@@ -1,0 +1,5 @@
+{
+  "HOST":  "/",
+  "PATH_CENTRAL": "https://taxireturn.s3-sa-east-1.amazonaws.com/",
+  "LOGO_CENTRAL": "https://taxireturn.s3-sa-east-1.amazonaws.com/"
+}

@@ -1,0 +1,86 @@
+<div class="container-detail-freight">
+    <nav class="title-detail-freight">
+        <i class="material-icons go-back-freight">keyboard_arrow_left</i>
+        <span>Detalhes de frete</span>
+        <span id="timeAcceptFreight"></span>
+    </nav>
+    <div>
+        <div class="freight-info">
+            <p><span>Veículo:</span><span id="valueTripType"></span></p>
+            <p><span>Tipo:</span><span id="valueTripCallType"></span></p>
+            <p><span>Distância:</span><span id="distanceTripDetail"></span></p>
+        </div>
+        <div class="freight-info">
+            <p><span>Data/Horário:</span><span id="scheduleFreight"></span></p>
+        </div>
+        <div class="freight-detail-trip">
+            <p>Detalhes de coleta:</p>
+            <span id="freightDetailCollect"></span>
+        </div>
+        <div class="freight-detail-trip">
+            <p>Detalhes de entrega:</p>
+            <span id="freightDetailDelivery"></span>
+        </div>
+        <div class="freight-observation">
+            <p>Observações:</p>
+            <span id="observationFreight"></span>
+        </div>
+        <span class="freight-type-payment-form">Pagamento Cartão de Crédito</span>
+        <span class="freight-total-detail">
+            <span class="total-freight"></span>
+            <a class="show-detail-price-freight">Clique aqui para + detalhes</a>
+        </span>
+
+    </div>
+    <div class="container-accept-option-freight">
+        <button type="button" id="btnAcceptedFreightDetail">CONFIRMAR</button>
+        <button type="button" id="btnCancelFreightDetail">CANCELAR</button>
+    </div>
+    <button type="button" class="btn-accepted-freight hidden">ACEITAR</button>
+    <button type="button" class="btn-cancel-freight hidden">CANCELAR</button>
+</div>
+<div class="container-more-detail-freight">
+    <div>
+        <nav class="title-detail-freight">
+            <i class="material-icons go-back-freight">keyboard_arrow_left</i>
+            <span>Detalhes</span>
+        </nav>
+        <div>
+            <div class="freight-detail-price">
+                <p>Formação de Preços</p>
+                <ul class="item-additional-price"></ul>
+                <hr/>
+                <p>Itens</p>
+                <ul class="item-selected-customer"></ul>
+                <ul class="photo-item-selected"></ul>
+                <hr/>
+                <p>Assistantes</p>
+                <ul class="assistant-freight"></ul>
+                <p>
+                    <span>Andar da coleta:</span>
+                    <span id="spanCollectionFloor"></span>
+                </p>
+                <p>
+                    <span>Andar da entrega:</span>
+                    <span id="spanDeliveryFloor"></span>
+                </p>
+                <p>
+                    <span>Prôximo da coleta:</span>
+                    <span id="spanIsNearCollection"></span>
+                </p>
+                <p>
+                    <span>Prôximo da entrega:</span>
+                    <span id="spanIsNearDelivery"></span>
+                </p>
+                <hr/>
+                <span class="total-freight"></span>
+            </div>
+        </div>
+        <button type="button" class="btn-accepted-freight">ACEITAR</button>
+    </div>
+</div>
+<div class="modal-photo-item-delivery">
+    <div id="photoItemDelivery">
+        <i class="material-icons close-photo-item">close</i>
+    </div>
+</div>

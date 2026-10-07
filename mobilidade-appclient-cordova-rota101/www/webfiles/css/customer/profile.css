@@ -1,0 +1,227 @@
+.general-profile{
+    margin: 0;
+    padding: 0;
+    background-color: #ebeaea;
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 14vw);
+    overflow-y: auto;
+}
+.general-profile > div.profile-image-driver{
+    width:100%;
+    position:relative;
+    background-color: var(--main-color);
+    padding: 3vw 0;
+}
+.general-profile > div.profile-image-driver > div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width:100%;
+}
+
+.general-profile > div.profile-image-driver > p {
+    width:100%;
+    display:block;
+    text-align: center;
+    margin: 2vw 0 0;
+    color: var(--text-color-main);
+    font-size: 6vw;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.general-profile > div.profile-image-driver > div > div{
+    width:30vw;
+    height:30vw;
+    border-radius:100%;
+    border:2.5px solid #fff;
+    background-image: url("../../img/icon/default.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.general-profile > div.profile-image-driver > div > div > i{
+    position:absolute;
+    top: 5vw;
+    margin-left: 22vw;
+    background-color:#e1910d;
+    color:#fff;
+    padding:1vw;
+    border-radius:100%;
+    border:2.5px solid #fff;
+}
+
+.general-profile > form.container-edit-user{
+    display: block;
+    width: calc(100% - 10vw);
+    margin:5vw;
+}
+.general-profile > form.container-edit-user > div.not-view{
+    display: none;
+}
+.general-profile > form.container-edit-user > div.not-view.active{
+    display: block;
+}
+.general-profile > form.container-edit-user > div{
+    margin:2.5vw 0;
+    position: relative;
+    font-weight: 600;
+    display: flex;
+}
+.general-profile > form.container-edit-user > div > span{
+    position:absolute;
+    bottom:2vw;
+    left: 1vw;
+    font-size: calc(4.5vw + 1px);
+}
+.general-profile > form.container-edit-user > div > input{
+    width: calc(100% - 20vw);
+    display:block;
+    border:none;
+    padding: 2vw 0 2vw 20vw;
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    font-size: 4.5vw;
+    font-weight: 300;
+    outline: unset;
+    color: #000 !important;
+}
+.general-profile > form.container-edit-user > div > input[disabled]{
+    background-color: transparent;
+}
+.general-profile > form.container-edit-user > div > input#nameProfileUser{
+    text-transform: capitalize;
+}
+.general-profile > form.container-edit-user > div > input#birthDateProfileUser{
+    padding-left: 140px;
+}
+.general-profile > ul{
+    display: flex;
+    justify-content: left;
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    position:relative;
+}
+.general-profile > ul >li{
+    width:10vw;
+    padding: 2vw 5vw;
+    text-align: center;
+}
+.general-profile > ul >li.active{
+    border-bottom: 1px solid #e1910d;
+}
+.general-profile > footer.footer-profile{
+    position: absolute;
+    bottom: 5vw;
+    color: #afafaf;
+    right: 0;
+    left: 0;
+    margin: auto;
+    text-align: center;
+    font-size: 3.5vw;
+}
+.general-profile > footer.footer-profile.active{
+    display: none;
+}
+.general-profile > form.container-edit-user > button.edit-btn{
+    border:none;
+    background-color:#878787;
+    color:#fff;
+    padding:1vw 5vw;
+    border-radius:1vw;
+    display:flex;
+    margin:5vw auto 0;
+    text-align:center;
+    align-items:center;
+    justify-content:center;
+    font-size:4vw;
+    outline: unset;
+}
+.general-profile > form.container-edit-user > button.edit-btn.active{
+    display: none;
+}
+.general-profile > form.container-edit-user > button.edit-btn > i{
+    margin-right:2vw;
+}
+.general-profile > form.container-edit-user > .container-save-profile{
+    margin-top:5vw;
+    display:none;
+    justify-content:space-evenly;
+}
+.general-profile > form.container-edit-user > .container-save-profile.active{
+    display: flex;
+}
+.general-profile > form.container-edit-user > .container-save-profile > button{
+    border:none;
+    background-color:#878787;
+    color:#fff;
+    padding:1vw 5vw;
+    border-radius:1vw;
+    display:flex;
+    margin:5vw auto 0;
+    text-align:center;
+    align-items:center;
+    justify-content:center;
+    font-size:4vw;
+    outline: unset;
+    width:40%;
+}
+.general-profile > form.container-edit-user > .container-save-profile > button:last-child{
+    background-color:#c3715b;
+}
+.general-profile > form.container-edit-user > .container-save-profile > button:first-child{
+    background-color:#52c105;
+}
+.general-profile > div.profile-image-driver > div > div > #spinner.active {
+    display: block;
+}
+.general-profile > div.profile-image-driver > div > div > #spinner {
+    display: none;
+    position: absolute;
+    height: 60px;
+    width: 60px;
+    top: 22%;
+    left: 0;
+    z-index: 1;
+    right: 0;
+    margin: auto;
+}
+.general-profile > div.profile-image-driver > div > div > #spinner > .spinner_ball {
+    position: absolute;
+    display: block;
+    background-color: #d18911;
+    left: 24px;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+}
+.general-profile > div.profile-image-driver > div > div > #spinner > #ball_1 {
+    -webkit-animation-timing-function: cubic-bezier(0.5, 0.3, 0.9, 0.9);
+    -webkit-animation-name: rotate;
+    -webkit-animation-duration: 2s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-transform-origin: 6px 30px;
+}
+
+.general-profile > div.profile-image-driver > div > div > #spinner > #ball_2 {
+    -webkit-animation-timing-function: cubic-bezier(0.5, 0.5, 0.9, 0.9);
+    -webkit-animation-name: rotate;
+    -webkit-animation-duration: 2s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-transform-origin: 6px 30px;
+}
+.general-profile > div.profile-image-driver > div > div > #spinner > #ball_3 {
+    -webkit-animation-timing-function: cubic-bezier(0.5, 0.7, 0.9, 0.9);
+    -webkit-animation-name: rotate;
+    -webkit-animation-duration: 2s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-transform-origin: 6px 30px;
+}
+@-webkit-keyframes rotate {
+    0% {
+        -webkit-transform: rotate(0deg) scale(1);
+    }
+    100% {
+        -webkit-transform: rotate(1440deg) scale(1);
+    }
+}

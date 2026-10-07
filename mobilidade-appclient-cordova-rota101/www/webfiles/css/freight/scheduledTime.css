@@ -1,0 +1,56 @@
+.container-scheduled-time{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    background-color: #fff;
+    align-items:center;
+    justify-content:center;
+    box-shadow: 0 0 10px #CCD;
+    transform:translateY(150%);
+    transition:transform 0.3s;
+}
+
+.container-scheduled-time.active{
+    transform:translateY(0%);
+    transition:transform 0.3s;
+}
+
+
+.container-scheduled-time > p{
+    text-align:center;
+    font-size: 16pt;
+    font-weight:500;
+    margin: 20px 0;
+}
+
+.container-scheduled-time > div{
+    /* margin-top: 10vw; */
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.container-scheduled-time > div > button{
+    width:100%;
+    font-size: 15pt;
+    padding:10px;
+    border:none;
+    background-color: var(--main-color);
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #ccc;
+    margin-bottom: 15px;
+}
+
+.container-scheduled-time > div >  p{
+    font-size: 18pt;
+    text-align: center;
+    width: 100%;
+    margin: 8px 0;
+    text-transform: uppercase;
+}

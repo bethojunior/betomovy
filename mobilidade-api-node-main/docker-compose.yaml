@@ -1,0 +1,48 @@
+version: "3.7"
+services:
+    # app:
+    #     build:
+    #         context: .
+    #         dockerfile: Dockerfile-dev
+    #     ports:
+    #     - 3000
+    #     environment:
+    #     - NODE_ENV=production
+    #     deploy:
+    #         replicas: 2
+    #     networks:
+    #     - apps704node
+    #     volumes:
+    #     - .:/usr/src/app
+    #     env_file:
+    #      - .env
+
+    # nginx:
+    #     image: nginx:alpine
+    #     ports:
+    #     - "3704:80"
+    #     volumes:
+    #     - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    #     depends_on:
+    #     - app
+    #     networks:
+    #     - apps704node
+
+    redis-node:
+        image: redis:latest
+        container_name: redis-node
+        ports:
+            - "6379:6379"
+        command: ["redis-server"]
+        volumes:
+            - redis-data:/data
+        networks:
+            - apps704node
+
+networks:
+    apps704node:
+        driver: bridge
+volumes:
+  redis-data:
+    driver: local
+

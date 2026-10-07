@@ -1,0 +1,90 @@
+.container-order-detail {
+    display: block;
+    padding: 10px;
+    height: 100%;
+    width: 100%;
+}
+
+.container-order-detail > div > div p,
+.container-order-detail > div > div span,
+.container-order-detail > div > div label {
+    margin: 0;
+}
+
+.container-order-detail > div {
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.container-order-detail > div > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.container-order-detail > div > ul {
+    margin: 0;
+    padding: 0;
+}
+
+.container-order-detail > div > div > small {
+    font-size: 9pt;
+    color: #777;
+}
+
+.item-complement {
+    font-size: 8pt;
+    color: #584f4f;
+}
+
+li > small {
+    padding: 0 8px;
+}
+
+.text-observation {
+    padding: 0 10px;
+    font-size: 10pt;
+    margin: 0;
+    color: #444;
+}
+
+.item-list {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.preload-list {
+    display: flex;
+    justify-content: center;
+}
+
+.preload-list:before {
+    content: "";
+    display: block;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    margin: 10px 0;
+    border: 2px solid transparent;
+    border-top-color: #444;
+    animation: 1s animationSpinner linear infinite;
+}
+
+@keyframes animationSpinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .container-order-detail > div > div label,
+    .container-order-detail > div > ul {
+        font-size: 10pt;
+    }
+}

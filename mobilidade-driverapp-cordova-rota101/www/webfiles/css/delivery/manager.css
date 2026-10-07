@@ -1,0 +1,347 @@
+.list-orders-actives,
+.modal-info-delivery-order {
+    position: absolute;
+    height: calc(100% - 17vw);
+    top: 17vw;
+    width: 100%;
+    background-color: #fff;
+    z-index: 203;
+    display: flex;
+    flex-direction: column;
+    transition: 300ms all;
+    transform: translateY(150%);
+}
+
+.list-orders-actives.active,
+.modal-info-delivery-order.active {
+    transform: translateY(0%);
+}
+
+
+.modal-info-delivery-order > .option-manager-delivery {
+    display: block;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.modal-info-delivery-order > .option-manager-delivery > ul {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.modal-info-delivery-order > .option-manager-delivery > ul > li > span {
+    background-color: #eee;
+    padding: 10px;
+    border-radius: 100%;
+    margin: 0 10px;
+}
+
+.modal-info-delivery-order > .option-manager-delivery > ul > li > span {
+    font-size: 20pt;
+}
+
+.modal-info-delivery-order > ul {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal-info-delivery-order > ul > li {
+    position: relative;
+    margin-bottom: 15px;
+    padding-left: 30px;
+}
+
+.modal-info-delivery-order > ul > li:before {
+    content: "";
+    display: block;
+    width: 15px;
+    height: 15px;
+    background-color: #888;
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    border-radius: 3px;
+}
+
+.modal-info-delivery-order > ul > li:first-child:not(.active):before,
+.modal-info-delivery-order > ul > li.active + li:before {
+    background-color: var(--main-color);
+}
+
+
+.modal-info-delivery-order > ul > li:first-child:after {
+    content: "";
+    position: absolute;
+    top: 25px;
+    left: 10px;
+    width: 5px;
+    height: calc(100% - 10px);
+    background-color: #ccc;
+}
+
+.modal-info-delivery-order > ul > li > p {
+    font-weight: 600;
+    font-size: 13pt;
+}
+
+.modal-info-delivery-order > ul > li:first-child:not(.active) > div,
+.modal-info-delivery-order > ul > li.active + li > div {
+    display: flex;
+}
+
+.modal-info-delivery-order > ul > li > div {
+    display: none;
+    flex-direction: column;
+}
+
+.modal-info-delivery-order > ul > li > div > h4 {
+    font-size: 18pt;
+    color: var(--main-color);
+    font-weight: 600;
+    font-family: sans-serif;
+}
+
+
+.modal-info-delivery-order > ul > li > div > p {
+    font-size: 14pt;
+    font-weight: 500;
+    font-family: sans-serif;
+    margin-bottom: 10px;
+
+}
+
+.modal-info-delivery-order > ul > li > div > label {
+    font-size: 12pt;
+    color: #444;
+    font-family: sans-serif;
+}
+
+.modal-info-delivery-order > .footer-manager-delivery {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 10px;
+    border-top: 1px solid #ccc;
+}
+
+
+.modal-info-delivery-order > .footer-manager-delivery > button {
+    border: 2px solid;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    color: var(--main-color);
+    background-color: transparent;
+    border-radius: 5px;
+    font-size: 13pt;
+    font-weight: 600;
+}
+
+.modal-info-delivery-order > .footer-manager-delivery > button:disabled {
+    opacity: 0.5;
+    color: #777;
+}
+
+.modal-info-delivery-order > ul > li.success:before {
+    background-color: transparent !important;
+    border-bottom: 3px solid var(--main-color);
+    border-right: 3px solid var(--main-color);
+    border-radius: 1px;
+    width: 8px;
+    transform: rotate(45deg);
+}
+
+.info-number-order-label,
+.info-number-order-label + p {
+    display: none;
+}
+
+.info-number-order-label.active,
+.info-number-order-label.active + p {
+    display: block;
+}
+
+.modal-payment-pix-delivery {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    z-index: 500;
+    transition: 300ms all;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10px;
+    transform: translateY(150%);
+}
+
+
+.modal-payment-pix-delivery.active {
+    transform: translateY(0%);
+}
+
+.modal-payment-pix-delivery > div {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.modal-payment-pix-delivery > div > span {
+    font-size: 14pt;
+    font-weight: bold;
+    font-family: sans-serif;
+    margin-top: 20px;
+    border-bottom: 2px solid #e09696;
+    padding: 0 5px;
+}
+
+.modal-payment-pix-delivery > div > div {
+    content: "";
+    display: block;
+    width: 250px;
+    height: 250px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    box-shadow: 0 0 1px 2px #e08a8a;
+    border: 8px solid transparent;
+    border-radius: 5px;
+}
+
+.modal-payment-pix-delivery > p {
+    text-align: center;
+    font-size: 12pt;
+}
+
+.modal-payment-pix-delivery > button {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #000;
+    border-radius: 5px;
+    font-weight: bold;
+    font-family: sans-serif;
+    background-color: #fff;
+    margin-bottom: 10px;
+}
+
+.modal-payment-pix-delivery > nav {
+    width: calc(100% + 20px);
+    display: flex;
+    align-items: center;
+    background-color: #000;
+}
+
+
+.modal-payment-pix-delivery > nav > span {
+    padding: 10px;
+    font-size: 25pt;
+}
+
+.modal-delivery-confirmation-code {
+    position: absolute;
+    z-index: 500;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+    top: 0;
+    left: 0;
+    transition: 300ms all;
+    transform: translateY(150%);
+}
+
+
+.modal-delivery-confirmation-code.active {
+    transform: translateY(0%);
+}
+
+.modal-delivery-confirmation-code > div {
+    padding: 10px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+
+.modal-delivery-confirmation-code > div > p {
+    font-size: 16pt;
+    font-weight: bold;
+
+}
+
+
+.modal-delivery-confirmation-code > div > input {
+    text-align: center;
+    font-size: 22pt !important;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 30px 0 !important;
+}
+
+.modal-delivery-confirmation-code > div > button {
+    background-color: var(--main-color);
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    font-weight: bold;
+    color: #fff;
+    font-size: 14pt;
+}
+
+
+.list-orders-actives > nav{
+    background-color:#fff;
+    color:#000;
+    text-align:center;
+    font-weight:bold
+}
+
+
+.list-orders-actives > ul{
+    flex:1;
+    flex-direction:column;
+    overflow-y:auto;
+}
+
+.list-orders-actives > ul > li{
+    border-radius: 5px;
+    margin: 10px 10px 15px;
+    box-shadow: 0 0 8px #ccc;
+    background-color:#fff;
+    padding: 10px 0px;
+    display: flex;
+    align-items: center;
+}
+
+
+.list-orders-actives > ul > li.active{
+    background-color: #b6f5a6;
+}
+
+.list-orders-actives > ul > li > div{
+    flex: 1;
+    padding: 0 10px;
+}
+
+.list-orders-actives > ul > li > div > p{
+    font-family:sans-serif;
+    font-weight:bold;
+    color:#444;
+    font-size: 12pt;
+}
+
+.list-orders-actives > ul > li > div > span{
+    margin-top: 5px;
+    display: block;
+}
+
+.list-orders-actives > ul > li > span{
+    font-size:30pt;
+    color:#444;
+}

@@ -1,0 +1,621 @@
+@media (max-width: 991px) {
+    .generalCostumers {
+        width: 100%;
+        height: calc(100% - 23vw);
+        padding-top: 3vw;
+    }
+    .generalCostumers .search {
+        margin-bottom: 1vw;
+        display: block;
+        background-color: #fff;
+        padding: 2vw 0;
+    }
+
+    .generalCostumers .row.col-lg-12.container-search .filter-costumers{
+        display: none;
+    }
+    .generalCostumers .row.col-lg-12.container-search #filter-mobile{
+        display: block;
+        width: 100%;
+        margin-left: 4vw;
+    }
+    .generalCostumers .row.col-lg-12.container-search #filter-mobile .collapse .card-body .col-lg-6 .form-group.relative #search-costumer{
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        margin-bottom: 1.2vw;
+        margin-right: 1vw;
+        cursor: pointer;
+    }
+    .generalCostumers #mountListDriver {
+        overflow: scroll;
+        overflow-x: hidden;
+        height: 90%;
+    }
+    .generalCostumers #mountListDriver .modal {
+        display: none;
+        transition: 1s;
+    }
+    .generalCostumers #mountListDriver .modal.show {
+        display: block;
+        transition: 1s;
+        position: fixed;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        display: -ms-flexbox;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 999;
+        background-color: rgba(0, 0, 0, .3);
+    }
+
+    .generalCostumers #mountListDriver .modal.show.modalContent {
+        background-color: white;
+        width: 80%;
+        padding: 1vw;
+        border-radius: 2vw;
+    }
+
+    .generalCostumers #mountListDriver .modal.show .modalContent .closeModalContent {
+        color: #000;
+        padding: 0.1vw;
+        cursor: pointer;
+        float: right;
+        margin-bottom: 2vw;
+        font-size: 9vw;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button,
+    .generalCostumers #mountListDriver .fivePart a {
+        display: block;
+        border: none;
+        width: 45% !important;
+        padding: 1.5vw;
+        border-radius: 2vw;
+        cursor: pointer;
+        color: white;
+        font-size: 3vw;
+        text-transform: uppercase;
+        margin-bottom: 2vw;
+        padding: 2vw 0 !important;
+    }
+
+    .generalCostumers #mountListDriver .fivePart a {
+        background-color: #4ec984;
+        text-align:center;
+        font-weight:600;
+        border:1px solid #b7b1b1;
+        border-radius:5px;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.blockDriver {
+        cursor: pointer;
+        background-color: #5BCE51;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+    .generalCostumers #mountListDriver .fivePart button.add-balance {
+        cursor: pointer;
+        background-color: #5BCE51;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+    .generalCostumers #mountListDriver .dataCostumer .margin-buttons{
+        /*margin: 2vw 4vw 2vw 0;*/
+    }
+    .generalCostumers #mountListDriver .fivePart button.remove-balance {
+        cursor: pointer;
+        background-color: #5BCE51;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+    .generalCostumers #mountListDriver .fivePart button.open-financial {
+        cursor: pointer;
+        background-color: #5BCE51;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.editDriver {
+
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.generatePass {
+        background-color: #5BCE51;
+        width: 80%;
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.irfinanceiro {
+        background-color: #5BCE51;
+        width: 80%;
+        cursor: pointer;
+        background-color: #4ec984;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer {
+        background-color: white;
+        padding: 0vw 2vw;
+        margin: 1vw;
+        cursor: pointer;
+        transition: 0.5s;
+        position: relative;
+        border-radius: 1vw;
+        box-shadow: 0 0 10px #777;
+        margin-bottom: 2vw;
+    }
+    .generalCostumers #mountListDriver .fivePart {
+        width: 100%;
+        margin-bottom: 0vw;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .divImage{
+
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer:hover {
+        transition: 1s;
+        box-shadow: 1px 1px 20px 0px rgba(0, 0, 0, 0.26);
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .firstPart {
+        width: calc(70% - 4vw);
+        padding: 2vw 2vw 0;
+        margin-bottom: 2vw;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .secondPart {
+        width: 100%;
+        padding: 2vw;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        border-top:1px solid #cbcbcb;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .col-lg-3 .form-control.false {
+        background-color: red;
+        color: white;
+        padding: 1vw;
+        border-radius: 1vw;
+        margin-right: 2vw;
+        top: 1vw;
+        left: 4vw;
+        margin-bottom: 3vw;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .col-lg-3 .form-control.true {
+        background-color: #5bce51;
+        color: white;
+        padding: 1vw;
+        border-radius: 1vw;
+        top: 1vw;
+        width: 100%;
+        margin-bottom: 2vw;
+        text-align: center;
+    }
+    .generalCostumers #mountListDriver .dataCostumer .secondPart span{
+        margin: 0 1vw;
+        font-size: 3.5vw;
+        width: calc(33% - 2vw);
+        display:flex;
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+    .generalCostumers #mountListDriver .dataCostumer .secondPart span label{
+        width:100%;
+        text-align:center;
+    }
+    .generalCostumers #mountListDriver .dataCostumer .secondPart span:last-child{
+        width:100%;
+    }
+    .generalCostumers #mountListDriver .dataCostumer .secondPart span:last-child a{
+        width:100%;
+        color:#fff;
+        border-radius:2vw;
+        text-align:center;
+        text-transform:uppercase;
+        padding:2vw;
+        text-decoration:none;
+        margin-top: 2vw;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .thirdPart {
+        width: 100%;
+        display: none;
+        flex-wrap: wrap;
+        font-size: 3.5vw;
+    }
+    .generalCostumers #mountListDriver .dataCostumer .fivePart{
+        right:1vw;
+        top:1vw;
+        justify-content: space-between;
+        border-top: 1px solid #ccc;
+        padding: 4vw;
+    }
+
+
+
+    .generalCostumers #mountListDriver .dataCostumer .divImage .responsiveImage {
+        border-radius: 100%;
+        width: 20vw;
+        justify-content: center;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px #a7a3a3;
+        height: 20vw;
+        display: block;
+        margin: auto;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .moreThisClient {
+        display: none;
+    }
+    .show-more-drivers{
+        display: block;
+        text-align: center;
+        background-color: #fff;
+        padding: 4vw;
+        width: 100%;
+    }
+}
+
+@media (min-width: 992px) {
+    .generalCostumers .row.col-lg-12.container-search #filter-mobile{
+        display: none;
+    }
+    .generalCostumers .row.col-lg-12.container-search .filter{
+        padding-bottom: 1.5vw;
+    }
+    .generalCostumers .row.col-lg-12.container-search .filter .col-lg-6 .form-group.relative{
+        position: relative;
+    }
+    .generalCostumers .row.col-lg-12.container-search .filter .col-lg-6 .form-group.relative #search-costumer{
+        position: absolute;
+        bottom: 0;
+        right: -8px;
+        margin-bottom: 0.2vw;
+        margin-right: 1vw;
+        cursor: pointer;
+    }
+
+    .type-user{
+        background: var(--main-color);
+        color: white;
+        text-align: center;
+        border-radius: 0vw 0vw 1vw 1vw;
+        font-size: 0.8vw;
+    }
+    .generalCostumers .search {
+        margin-left: 78%;
+        margin-top: 1%;
+        padding-bottom: 1vw;
+    }
+
+    .generalCostumers .search #searchCostumer {
+        width: 15vw;
+        border: none;
+        padding: 1vw;
+    }
+
+    .generalCostumers #mountListDriver {
+        overflow-y: auto;
+        /*height: 80%;*/
+        margin: 0 10px 0;
+    }
+
+    .generalCostumers #mountListDriver .modal {
+        display: none;
+        transition: 1s;
+    }
+
+
+
+    .generalCostumers #mountListDriver .modal.show .modalContent {
+        background-color: white;
+        width: auto;
+        padding: 1vw;
+        border-radius: 0.2vw;
+        position: fixed;
+    }
+
+    .generalCostumers #mountListDriver .modal.show .modalContent .closeModalContent {
+        color: white;
+        background-color: red;
+        padding: 0.1vw;
+        border-radius: 0.2vw;
+        cursor: pointer;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button {
+        display: block;
+        border: none;
+        width: 100%;
+        padding: 0.2vw;
+        margin: 0.2vw;
+        border-radius: 0.2vw;
+        cursor: pointer;
+        color: white;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .fivePart i{
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.blockDriver {
+        background-color: #5BCE51;
+        width: 100%;
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.add-balance {
+        background-color: #5BCE51;
+        width: 100%;
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.remove-balance {
+        background-color: #5BCE51;
+        width: 100%;
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.open-financial {
+        background-color: #5BCE51;
+        width: 100%;
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.editDriver {
+        background-color: #5BCE51;
+        width: 100%;
+        cursor: pointer;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.generatePass {
+        background-color: #5BCE51;
+        width: 100%;
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.open-financial{
+        background-color: #5BCE51;
+        width: 100%;
+        cursor: pointer;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+    }
+    .generalCostumers #mountListDriver .fivePart button.open-financial a{
+        color: whitesmoke;
+    }
+
+    .generalCostumers #mountListDriver .fivePart button.irfinanceiro {
+        background-color: #5BCE51;
+        width: 100%;
+        cursor: pointer;
+        background-color: #4ec984;
+        padding: 5px;
+        border: 1px solid #b4b4b4;
+        border-radius: 5px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+
+    }
+    .generalCostumers #mountListDriver .dataCostumer {
+        background-color: white;
+        cursor: pointer;
+        transition: 0.5s;
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 2vw;
+        padding:1vw;
+    }
+
+    .generalCostumers #mountListDriver .fivePart {
+        /* padding-left: 0.5vw;
+         padding-top: 9px;
+         width: 200px;
+         height: 100px;*/
+        display:flex;
+        flex-direction:column;
+
+    }
+
+    .generalCostumers #mountListDriver .fivePart i{
+        margin: 0.3vw;
+    }
+
+
+    .generalCostumers #mountListDriver .dataCostumer:hover {
+        transition: 1s;
+        background-color: #f2f2f2;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .firstPart {
+        word-wrap: break-word;
+        width: 25vw;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .secondPart {
+        /*padding-left: 5vw;*/
+        margin-left: 5vw;
+        width: 25vw;
+    }
+    .generalCostumers #mountListDriver .dataCostumer .secondPart span{
+        display:block;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .col-lg-3 .form-control.false {
+        color: red;
+        padding: 0.3vw;
+        border-radius: 0.2vw;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .col-lg-3 .form-control.true {
+        color: #5bce51;
+        padding: 0.3vw;
+        border-radius: 0.2vw;
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .thirdPart {
+
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .divImage .responsiveImage {
+
+    }
+
+    .generalCostumers #mountListDriver .dataCostumer .moreThisClient {
+        display: none;
+    }
+
+    .show-more-drivers{
+        display: block;
+        text-align: center;
+        background-color: #fff;
+        padding: 5px 10px;
+        border-radius: 15px;
+        color: #444;
+        margin: 0 auto 10px;
+    }
+}
+
+#valueBalance::-webkit-outer-spin-button,
+#valueBalance::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#valueBalance[type=number] {
+    -moz-appearance: textfield;
+}
+
+.container-information-value {
+    display: flex;
+    align-items: center;
+}
+
+.container-information-value > label {
+    font-size: 14pt;
+}
+
+.container-information-value > span {
+    font-size: 15pt;
+    margin: 0 0 8px 8px;
+}
+
+.observation-body {
+    height: 7vw;
+}
+.observation-input {
+    height: 100%;
+}
+
+.title-note-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-details-of-trip {
+    color: black;
+}
+
+.btn-details-of-trip:hover {
+    color: black;
+}
+
+.btn-note-driver {
+    background-color: rgb(222,187,4);
+}
+
+.show-more-notes-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2vw;
+}
+
+.container-comment:before{
+    content:"Comentario:";
+    font-size:9pt;
+}
+
+.container-comment{
+    display:flex;
+    flex-direction:column;
+}

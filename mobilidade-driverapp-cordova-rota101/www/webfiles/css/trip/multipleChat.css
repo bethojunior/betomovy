@@ -1,0 +1,97 @@
+.container-multiple-chat{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-multiple-chat > nav{
+    background-color: var(--main-color);
+    color: #fff;
+    padding: 10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.container-multiple-chat > nav > span{
+    position:absolute;
+    left:5px;
+    font-size:30pt;
+}
+
+.container-multiple-chat > nav > p{
+    font-size:16pt;
+    font-family:sans-serif;
+}
+
+.container-multiple-chat > ul{
+    flex: 1;
+    overflow-y:auto;
+    background-color:#fff;
+}
+
+.container-multiple-chat > ul > li.active{
+    animation: 2s notify-multiple-chat linear infinite;
+}
+
+@keyframes notify-multiple-chat{
+    0%{
+        background-color:#fff;
+    }
+    50%{
+        background-color: #c9f9f8;
+    }
+    100%{
+        background-color:#fff;
+    }
+}
+
+.container-multiple-chat > ul > li{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+    display:flex;
+}
+
+.container-multiple-chat > ul > li.is-not-responsible{
+    opacity:0.8;
+    background-color:#e5e5e5;
+}
+
+
+.container-multiple-chat > ul > li:not(.is-not-responsible) > div > p{
+    display:none;
+}
+
+.container-multiple-chat > ul > li > .profile-image-chat{
+    display:block;
+    width:50px;
+    height:50px;
+    background-color:#ccc;
+    border-radius:100%;
+    margin:0 10px;
+    background-image: url(../../img/icon/chat-user.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.container-multiple-chat > ul > li > div:last-child{
+    flex:1;
+    display:flex;
+    justify-content: center;
+    font-size:13pt;
+    font-family:sans-serif;
+    color:#555;
+    flex-direction: column;
+}
+
+.container-multiple-chat > ul > li> div > b{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* number of lines to show */
+    -webkit-box-orient: vertical;
+}

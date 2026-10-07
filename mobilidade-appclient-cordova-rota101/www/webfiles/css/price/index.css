@@ -1,0 +1,274 @@
+.footer-container-trip > .container-box-price > .type-cars {
+    width: 100%;
+    margin: 2vw 0;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+    display: inline;
+    float: left;
+    z-index: 10;
+}
+
+.footer-container-trip > .container-box-price > .type-cars:empty{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:50vw;
+}
+
+.footer-container-trip > .container-box-price > .type-cars:empty:before {
+    content:"";
+    height:20vw;
+    width:20vw;
+    border:8px solid #f3f3f3;
+    border-top: 8px solid var(--main-seconds-color);
+    border-radius:100%;
+    animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.footer-container-trip > .container-box-price > .type-cars:empty + .indication-list-prices,
+.footer-container-trip > .container-box-price > .type-cars:empty + .indication-list-prices + .arrows-indication-list{
+    display:none;
+}
+
+.footer-container-trip > .container-box-price.update + .edit-price,
+.footer-container-trip > .container-box-price.update + .edit-price + .payment-trip,
+.footer-container-trip > .container-box-price.update + .edit-price + .payment-trip + .switch-type-trip,
+.footer-container-trip > .container-box-price.update + .edit-price + .payment-trip + .switch-type-trip + .btn-confirm-scheduled-trip{
+    display:none;
+}
+
+
+.footer-container-trip > .container-box-price > .type-cars > div {
+    width: calc(100% - 12vw);
+    display: inline-block;
+    padding: 0 6vw;
+}
+
+
+.footer-container-trip > .container-box-price > .type-cars > div > div{
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    margin: 1vw 0;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div{
+    padding: 1vw 2vw 0;
+    width: 18vw;
+    border-radius: 100%;
+    opacity: 1;
+    float: left;
+    position: relative;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active {
+    box-shadow: 0 0 3px #626262;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    overflow: hidden;
+}
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type.active > p {
+    color: var(--main-seconds-color);
+}
+
+.footer-container-trip > .container-box-price > .type-cars.without-destination >  div > div > div.trip-type.active > p {
+    opacity:0;
+}
+
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type.active.remove-price-old > p {
+    text-decoration:line-through;
+    opacity: 0.5;
+}
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type > span {
+    /* position: absolute; */
+    top: -1.5vw;
+    font-size: 2.5vw;
+    right: 0;
+    left: 0;
+    margin: auto;
+    text-align: center;
+    width: 80%;
+    background-color: #3a434c;
+    color: #fff;
+    padding: 0.5vw 1vw;
+    border-radius: 1vw;
+    display: block;
+}
+
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type > div{
+    display:none;
+    justify-content:space-between;
+}
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type.active > div{
+    display:flex;
+    width: calc(100% + 2vw);
+    background-color: #e8e8e8;
+    margin: 0 2vw;
+    margin-left: -2vw;
+    align-items: center;
+    word-wrap: break-word;
+    padding: 1vw 1vw;
+}
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type > div > img{
+    width:5vw;
+}
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type > div.active > img{
+    width: 4vw;
+}
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type > div > span{
+    font-size: 8pt;
+    overflow: hidden;
+    word-break: break-all;
+}
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type > div.active > span{
+    font-size: 16pt;
+}
+
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.trip-type > div.active > span > span{
+    font-size:8pt;
+}
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div  > img {
+    display: block;
+    width: 15vw;
+    margin: 2.5vw auto;
+    transition: transform 0.3s;
+    height: 15vw;
+}
+
+.footer-container-trip > .container-box-price > .type-cars >  div > div > div.active > img{
+    transform: scale(1.25);
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div > p {
+    text-align: center;
+    font-size: 6.5vw;
+    color:  var(--main-seconds-color);
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.type-trip-offer {
+    position:relative;
+}
+
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.type-trip-offer > div.label-trip-bid-offer:before{
+    content:"";
+    position:absolute;
+    background:#f2f2f2;
+    height: 7px;
+    width:100%;
+    left:0;
+    top: -1px;
+    border-radius: 0px 0px 30px 30px;
+    box-shadow: 0px 2px 2px rgb(0 0 0 / 25%);
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.type-trip-offer > div.label-trip-bid-offer{
+    position:relative;
+    background-color: #00B10D;
+    justify-content: flex-start;
+    font-family: sans-serif;
+    padding-top: 8px;
+    margin-top: -4px;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div:not(.type-trip-offer) > div.label-trip-bid-offer{
+    display:none;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.type-trip-offer > div.label-trip-bid-offer > img{
+    width: 15px;
+    margin-right:2px;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.type-trip-offer > div.label-trip-bid-offer > span{
+    color:#fff;
+    font-size: 11pt;
+    font-weight:bold;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.type-trip-offer > p,
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.type-trip-offer.active > p {
+    /* color:#444; */
+    margin-bottom: 2px;
+    font-weight:400;
+    font-family:sans-serif;
+    /* z-index: 100; */
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div > p > span {
+    font-size: 3vw;
+    margin-right: 0.5vw;
+    position: relative;
+    font-weight: 400;
+}
+
+.indication-list-prices{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.indication-list-prices > div{
+    width: 5px;
+    height: 5px;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+    background-color: #393939;
+    margin: 0 2.5px;
+}
+
+.indication-list-prices > div.active{
+    background-color: var(--main-color);
+}
+
+.container-box-price{
+    position: relative;
+    width: 100%;
+}
+
+.arrows-indication-list{
+    display: flex;
+    justify-content: space-between;
+    margin: auto;
+    padding: 0 1vw;
+    width: calc(100% - 2vw);
+}
+
+.arrows-indication-list > div{
+    position:absolute;
+    width: 20px;
+    height: 20px;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5px;
+    visibility: hidden;
+    top:30vw;
+}
+
+.arrows-indication-list > div:last-child{
+    right:0;
+}
+.arrows-indication-list > div.active{
+    visibility: visible;
+}

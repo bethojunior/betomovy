@@ -1,0 +1,12 @@
+services:
+  mobilidade-monitor-new:
+    build:
+      dockerfile: docker-prod/dockerfile
+    platform: linux/amd64
+    container_name: mobilidade-monitor-new-prod
+    image: mobilidade-monitor-new-prod-local
+    restart: always
+    ports:
+      - 86:86
+    volumes:
+      - .env:/usr/share/nginx/html/.env:ro

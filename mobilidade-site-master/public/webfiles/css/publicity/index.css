@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat|Montserrat+ ');
+
+body{
+    margin:0
+}
+.container-publicity {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 1vw;
+    right: 0;
+    left: 0;
+    margin: auto;
+    z-index: 10;
+    transition: 0.5s;
+}
+
+.container-publicity.active:before {
+    height: 5vw;
+    transition-delay: unset;
+
+}
+
+.container-publicity:before {
+    content: "";
+    height: 0;
+    width: 5vw;
+    background: linear-gradient(to left bottom, #fff 50%, transparent 50%);
+    position: absolute;
+    top: -2.5vw;
+    transform: rotate(-45deg);
+    left: 3.5vw;
+    box-shadow: 0 0 10px #828080;
+    transition-delay: 0.3s;
+}
+
+.container-publicity > ul,
+.container-publicity > iframe {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 1vw;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.container-publicity > ul:empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-publicity > ul:empty::after {
+    content: "Nenhuma notificação no momento";
+    color: #9a9d9f;
+    transition-delay: 0.3s;
+    font-family:sans-serif;
+}
+
+.container-publicity ul.listPost li.post{
+    margin: 2vw;
+    box-shadow: 1px 1px 10px 1px rgba(0,0,0,0.26);
+    padding: 1vw;
+    -webkit-border-radius: 0.5vw;
+    -moz-border-radius: 0.5vw;
+    border-radius: 0.5vw;
+}
+
+.container-publicity ul.listPost li.post .imagePost{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container-publicity ul.listPost li.post .imagePost img.responsive-img{
+    max-width: 100%;
+    width: 50%;
+}
+.container-publicity ul.listPost li.post .containerAbout{
+    text-align: left;
+    padding: 2vw;
+    padding-top: 5vw;
+}
+.container-publicity ul.listPost li.post .containerAbout span.aboutPost{
+    font-family: Montserrat;
+    text-align: center;
+}
+.container-publicity ul.listPost li.post .containerAbout .whoPost{
+    text-align: right;
+    display: block;
+    color: #D2D2D2;
+    font-family: Montserrat;
+    font-size: 3vw;
+}

@@ -1,0 +1,8 @@
+.add-new-version{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 43px;
+    height: 32px;
+    cursor: pointer;
+}

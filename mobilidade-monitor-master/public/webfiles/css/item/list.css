@@ -1,0 +1,56 @@
+.general-list-items{
+
+}
+.general-list-items .row .col-lg-12.main{
+    background-color: whitesmoke;
+}
+.general-list-items .row .col-lg-12.main #list-items{
+    overflow-y: auto;
+    height: 95vh;
+}
+.general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content{
+    transition: 0.4s;
+    margin: 1vw;
+    padding: 0.4vw;
+    background-color: white;
+}
+.general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content:hover{
+    background-color: #fff9ce;
+    transition: 0.4s;
+    cursor: pointer;
+}
+.general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content .col-lg-4{
+    font-size: 1vw;
+}
+.general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content .col-lg-4 button{
+    margin: 0.2vw;
+    font-size: 1vw;
+}
+.general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content .col-lg-4.div-image{
+
+}
+.general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content .col-lg-4.div-image img{
+    width: 60%;
+}
+
+#modal-update-item .modal-dialog .modal-content #content-modal .input-group{
+    margin: 0.4vw;
+}
+
+@media (max-width: 992px) {
+    .general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content{
+        transition: 0.4s;
+        margin: 1vw;
+        padding: 0.4vw;
+        background-color: white;
+    }
+    .general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content .col-lg-4 {
+        font-size: 4vw;
+    }
+    .general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content .col-lg-4.div-image{
+
+    }
+    .general-list-items .row .col-lg-12.main #list-items .col-lg-6 .main-content .col-lg-4.div-image img{
+        width: 30%;
+    }
+}

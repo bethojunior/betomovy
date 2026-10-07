@@ -1,0 +1,132 @@
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover' name='viewport'/>
+    <meta name="color-scheme" content="light dark"/>
+    <link rel="stylesheet" href="webfiles/css/icons/Material-Icons.css">
+    <link rel="stylesheet" href="webfiles/css/materialize.min.css">
+    <link rel="stylesheet" href="webfiles/css/autocompleteCustom.css">
+    <link rel="stylesheet" href="webfiles/fonts/montserrat/montserrat.css">
+    <link rel="stylesheet" href="webfiles/css/utils/Chart.min.css">
+    <link rel="stylesheet" href="webfiles/css/font-awesome-4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="webfiles/css/default.css">
+    <link rel="stylesheet" href="webfiles/css/beta/tag.css">
+    <script src="webfiles/js/utils/Host.js"></script>
+    <script src="webfiles/js/utils/PulseLogger.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
+    <style id="appConfigStyle"></style>
+</head>
+<body>
+<div id="containerViews">
+</div>
+<div class="tag-beta"></div>
+<div id="containerLanguage" style="display: none"></div>
+<script src="cordova.js"></script>
+<script src="webfiles/js/libs/jquery-3.4.1.min.js"></script>
+<script src="webfiles/js/libs/jquery.cookie.js"></script>
+<script src="webfiles/js/libs/html2canvas.min.js"></script>
+<script src="webfiles/js/libs/socket.io.js"></script>
+<script src="webfiles/js/service/ElementProperty.js"></script>
+<script src="webfiles/js/libs/jquery.mask.min.js"></script>
+<script src="webfiles/js/libs/fastclick.js"></script>
+<script src="webfiles/js/libs/reconnectinwebsocket.js"></script>
+<script src="webfiles/js/libs/jquery.inputmask.bundle.js"></script>
+<script src="webfiles/js/service/PathUrl.js"></script>
+<script src="webfiles/js/service/ConfigGeneral.js"></script>
+<script src="webfiles/js/libs/sweetalert.min.js"></script>
+<script src="webfiles/js/libs/materialize.min.js"></script>
+<script src="webfiles/js/libs/Chart.min.js"></script>
+<script src="webfiles/js/utils/translate.js"></script>
+<script src="webfiles/js/utils/controller.js"></script>
+<script src="webfiles/js/utils/manager.js"></script>
+<script src="webfiles/js/utils/Log.js"></script>
+<script src="webfiles/js/utils/Session.js"></script>
+<script src="webfiles/js/utils/PreloadRequest.js"></script>
+<script src="webfiles/js/modulos/firebase/init.js"></script>
+<script src="webfiles/js/service/ConnectionServer.js"></script>
+<script src="webfiles/js/service/Progress.js"></script>
+<script src="webfiles/js/service/CityConfig.js"></script>
+<script src="webfiles/js/service/Position.js"></script>
+<script src="webfiles/js/service/Mask.js"></script>
+<script src="webfiles/js/service/DateService.js"></script>
+<script src="webfiles/js/service/ChatNotification.js"></script>
+<script src="webfiles/js/service/EventTouche.js"></script>
+<script src="webfiles/js/service/Autocomplete.js"></script>
+<script src="webfiles/js/service/formatValue.js"></script>
+<script src="webfiles/js/service/PaginateService.js"></script>
+<script src="webfiles/js/service/Pulse.js"></script>
+<script src="webfiles/js/service/SocketConnection.js"></script>
+<script src="webfiles/js/modulos/trip/tripQuestion.js"></script>
+<script src="webfiles/js/modulos/log/LogEvent.js"></script>
+<script src="webfiles/js/modulos/log/capture.js"></script>
+<script src="webfiles/js/utils/CodeSecurity.js"></script>
+<script src="webfiles/js/utils/DateCustom.js"></script>
+<script src="webfiles/js/utils/CapturePhoto.js"></script>
+<script src="webfiles/js/utils/SwalCustom.js"></script>
+<script src="webfiles/js/utils/componentView.js"></script>
+<script src="webfiles/js/utils/ValidateForm.js"></script>
+<script src="webfiles/js/utils/PreloaderCustomer.js"></script>
+<script src="webfiles/js/utils/appVersion.js"></script>
+<script src="webfiles/js/utils/preload.js"></script>
+<script src="webfiles/js/utils/config.js"></script>
+<script src="webfiles/js/utils/stack.js"></script>
+<script src="webfiles/js/utils/HttpInterceptor.js"></script>
+<script src="webfiles/js/utils/TripUtils.js"></script>
+<script src="webfiles/js/utils/RetryUtils.js"></script>
+<script src="webfiles/js/utils/UrlBuilder.js"></script>
+<script src="webfiles/js/utils/MapStyle.js"></script>
+<script src="webfiles/js/views/DriverView.js"></script>
+<script src="webfiles/js/views/EstablishmentView.js"></script>
+<script src="webfiles/js/views/MainView.js"></script>
+<script src="webfiles/js/views/FinancialView.js"></script>
+<script src="webfiles/js/views/AppView.js"></script>
+<script src="webfiles/js/views/KnowView.js"></script>
+<script src="webfiles/js/views/PrepaidView.js"></script>
+<script src="webfiles/js/views/RouteView.js"></script>
+<script src="webfiles/js/views/MapView.js"></script>
+<script src="webfiles/js/realtime/trip/TripEvent.js"></script>
+<script src="webfiles/js/realtime/trip/TripRealtimeFirebase.js"></script>
+<script src="webfiles/js/realtime/trip/TripRealtimeSocket.js"></script>
+<script src="webfiles/js/realtime/trip/TripRealtime.js"></script>
+
+<script>
+    document.addEventListener("deviceready", function () {
+        document.body.style.display = "none";
+
+        if (window.StatusBar) {
+            StatusBar.overlaysWebView(false);
+            const mainColor = getComputedStyle(document.documentElement).getPropertyValue('--main-color-hex').trim();
+            StatusBar.backgroundColorByHexString(mainColor);
+            StatusBar.styleLightContent();
+        }
+
+        if (window.MobileAccessibility) {
+            window.MobileAccessibility.usePreferredTextZoom(false);
+        }
+
+        Promise.all([
+            checkLayoutByConfig(),
+            verifyPreferredLanguage(),
+            new Promise(resolve => {
+                if (cordova?.getAppVersion) {
+                    cordova.getAppVersion.getVersionNumber(
+                        v => { setAppVersion(v); resolve(); },
+                        () => { setAppVersion(""); resolve(); }
+                    );
+                } else {
+                    setAppVersion("");
+                    resolve();
+                }
+            })
+        ]).then(values => {
+            setPreferredLanguage(values[1]).then(() => {
+                const route = Route.getClassAndAction();
+                ManagerView[route.classView][route.actionName]();
+            })
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+
+
+@import url('https://fonts.googleapis.com/css?family=Montserrat|Montserrat+Alternates&display=swap');
+
+.modal{
+    display: none;
+}
+.modal.active{
+    transition: 1s;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    display: -ms-flexbox;
+    display: flex;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    background-color: rgba(0,0,0,.3);
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    max-height: unset;
+}
+.modal.active .contentModal{
+    background-color: white;
+    padding: 3vw;
+}
+.modal.active .contentModal button{
+    margin-top: 1vw;
+    margin-bottom: 1vw;
+}
+.modal.active .contentModal .btnAndroid{
+    border: none;
+    border-radius: 1vw;
+    padding: 0 4vw 13px;
+    color: white;
+    background-color: cadetblue;
+    font-size: 3vw;
+    width: 100%;
+}
+.modal.active .contentModal .btnIos{
+    border: none;
+    border-radius: 1vw;
+    padding: 0 4vw 13px;
+    color: white;
+    background-color: cadetblue;
+    font-size: 3vw;
+    width: 100%;
+}
+
+.select-language {
+    margin-left: 2rem;
+    margin-right: 2rem;
+    margin-top: 1rem;
+    width: 150px;
+    height: 100%;
+    display: block;
+    cursor: pointer;
+    color: black;
+}
+
+.main-color{
+    color: var(--main-color);
+}
+.parallax-container .parallax img{
+    display: block;
+}
+.carousel-item.white-text.card-one{
+    background-image: url("/webfiles/img/site/user.jpg");
+
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.carousel-item.white-text.card-two{
+    background-image: url("/webfiles/img/site/user2.jpg");
+
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.footer{
+    background-color: var(--main-color);
+    color: white;
+    padding: 2vw;
+    position: relative;
+    font-size: 1vw;
+}
+
+
+/** MOBILE **/
+@media (max-width: 991px) {
+    *{
+        font-family: Montserrat;
+        font-size: 4vw;
+    }
+    nav .brand-logo {
+        position: absolute;
+        color: #fff;
+        display: inline-block;
+        font-size: 6vw;
+        padding: 0;
+    }
+    .mid-site.row.col.l12.s12{
+        margin-top: 2vw;
+    }
+    .nav-wrapper{
+        background-color: var(--main-color);
+    }
+    .col.l12.s12.footer .row.col.l4.s12.form-contact{
+        color: var(--main-color);
+        background-color: white;
+        padding: 0.5vw;
+        border-radius: 0.3vw;
+    }
+}
+
+@media (min-width: 991px) {
+    .main-size{
+        font-size: 1.5vw;
+    }
+    .button-collapse.mobile{
+        display: none;
+    }
+    *{
+        font-family: Montserrat;
+        font-size: 1vw;
+    }
+    .nav-wrapper{
+        background-color: var(--main-color);
+        padding-left: 1vw;
+    }
+    .modal#modal-cad {
+        display: none;
+        position: fixed;
+        left: 0;
+        right: 0;
+        background-color: var(--main-color);
+        padding: 0;
+        max-height: 70%;
+        width: 20%;
+        margin: auto;
+        overflow-y: auto;
+        border-radius: 2px;
+        will-change: top, opacity;
+    }
+    .col.l12.s12.carousel.carousel-slider.center{
+        height: 30vw;
+    }
+    .mid-site.row.col.l12.s12{
+        margin-top: 2vw;
+    }
+    .mid-site.row.col.l12.s12 .col.l8.s12.data{
+        font-size: 1.3vw;
+        margin-top: 5vw;
+    }
+    .row.col.l12.s12.footer{
+        margin-bottom: 0;
+    }
+    .col.l12.s12.footer .row.col.l4.s12.form-contact{
+        color: var(--main-color);
+        background-color: white;
+        padding: 0.5vw;
+        border-radius: 0.3vw;
+    }
+
+}
+

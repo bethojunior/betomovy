@@ -1,0 +1,11 @@
+.menu-general{
+    background-color: var(--main-seconds-color);
+    padding: 2vw;
+    height: 10vw;
+    display: flex;
+    justify-content: space-between;
+}
+.menu-general > .material-icons{
+    color: var(--text-color-seconds);
+    font-size: 9vw;
+}

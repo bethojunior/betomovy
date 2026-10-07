@@ -1,0 +1,413 @@
+.container-travel-detail,
+.container-travel-detail-available {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    z-index: 205;
+    bottom: 0;
+    border-top: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(150%);
+    transition: 300ms all;
+}
+
+.container-travel-detail.active {
+    transform: translateY(0%);
+}
+
+.container-travel-detail > h4 {
+    display: flex;
+    justify-content: center;
+    font-size: 15pt;
+    background-color: #fff;
+    margin: 0;
+    padding: 10px;
+}
+
+.container-travel-detail > .travel-details-locales {
+    display: flex;
+    justify-content: space-evenly;
+    border-bottom: 1px solid #dedede;
+    padding: 10px 0;
+    align-items: center;
+    background-color: var(--second-color);
+    color: var(--text-color-second);
+}
+
+.container-travel-detail > .travel-details-locales > i {
+    font-size: 40pt;
+}
+
+.container-travel-detail > .travel-details-locales > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    font-family: sans-serif;
+}
+
+.container-travel-detail > .all-info-travel {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 10px 20vw;
+    border-bottom: 1px solid #ccc;
+    flex: 1;
+    overflow-y: auto;
+    background-color: #fafafa;
+}
+
+.container-travel-detail > .all-info-travel > ul > li:before {
+    content: " - ";
+}
+
+.container-travel-detail > .all-info-travel > ul {
+    margin-bottom: 2.5vw;
+}
+
+.container-travel-detail > .all-info-travel > h4 {
+    font-size: 13pt;
+    margin: 0;
+}
+
+.container-travel-detail > .all-info-travel > div {
+    border: 1px solid #ccc;
+    padding: 0 5px 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+
+.container-travel-detail > .all-info-travel > div > span {
+    padding: 10px;
+    background-color: #ededed;
+    display: block;
+    margin-left: -5px;
+    margin-right: -5px;
+    margin-bottom: 5px;
+}
+
+.container-travel-detail > .all-info-travel > div > ul:empty:before {
+    content: "Nenhum item ofertado nessa viagem";
+    display: block;
+    text-align: center;
+}
+
+.container-travel-detail > .all-info-travel > div > div {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-travel-detail > .all-info-travel > div > div > div {
+    width: 30%;
+    margin: 0 10px;
+}
+
+.container-travel-detail > button {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: var(--main-color);
+    color: var(--text-color-main);
+    font-weight: 600;
+    font-size: 15pt;
+}
+
+.modal-confirm-offer,
+.modal-dialog-offer {
+    position: absolute;
+    top: 0;
+    z-index: 500;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-end;
+    transform: translateY(100%);
+    transition: 300ms;
+}
+
+.modal-confirm-offer.active,
+.modal-dialog-offer.active {
+    transform: translateY(0);
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-confirm-offer > div,
+.modal-dialog-offer > div {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5vw 10vw 2.5vw;
+}
+
+.modal-confirm-offer > div > h4,
+.modal-dialog-offer > div > h4 {
+    width: 100%;
+    text-align: center;
+}
+
+.modal-confirm-offer > div > span,
+.modal-dialog-offer > div > span {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 12pt;
+}
+
+.modal-confirm-offer > div > div,
+.modal-dialog-offer > div > div {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    margin: 10px 0 0;
+}
+
+.modal-confirm-offer > div > div > button,
+.modal-dialog-offer > div > div > button {
+    width: 45%;
+    padding: 10px;
+    background-color: var(--main-color);
+    color: var(--text-color-main);
+    border-radius: 5px;
+    border: none;
+}
+
+.container-travel-detail > .all-info-travel > .datetime-travel-detail,
+.container-travel-detail > button#btnOfferRideCar,
+.container-travel-detail > button#btnCancelOfferRideCar,
+.container-travel-detail > .all-info-travel > .list-customers,
+.container-travel-detail > .all-info-travel > .offer-travel-detail {
+    display: none;
+}
+
+.container-travel-detail.active
+> .all-info-travel
+> .list-container {
+    display: none;
+}
+
+.container-travel-detail > button#btnAwaitingRelease {
+    display: none;
+    background-color: red;
+}
+
+.container-travel-detail.not-active-request > button#btnAwaitingRelease {
+    display: block;
+}
+
+.container-travel-detail.not-active-request > button#btnRequestRoute {
+    display: none;
+}
+
+.container-travel-detail.active-offer
+> .all-info-travel
+> .datetime-travel-detail,
+.container-travel-detail.active-offer > button#btnOfferRideCar,
+.container-travel-detail.active-offer
+> .all-info-travel
+> .offer-travel-detail {
+    display: block;
+}
+
+.container-travel-detail.is-offer
+> .all-info-travel
+> .list-container {
+    display: block;
+}
+
+.container-travel-detail > .all-info-travel > div > ul > li {
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 5px 0;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.container-travel-detail > .all-info-travel > div > ul > li:before {
+    content: "";
+    width: 15px;
+    height: 15px;
+    margin: 0 10px;
+    border: 1px solid #000;
+    transition: all 500ms;
+}
+
+.container-travel-detail > .all-info-travel > div > ul > li.active:before {
+    width: 4.5px;
+    border-left: none;
+    border-top: none;
+    transform: rotate(45deg);
+}
+
+.container-travel-detail.not-active-request.is-offer
+> button#btnAwaitingRelease,
+.container-travel-detail.active-offer.is-offer > button#btnOfferRideCar {
+    display: none;
+}
+
+.container-travel-detail.is-offer > .all-info-travel > div > div > div {
+    pointer-events: none;
+}
+
+.container-travel-detail.active-offer > button#btnCancelOfferRideCar {
+    display: none;
+}
+
+.container-travel-detail.active-offer.is-offer > button#btnCancelOfferRideCar {
+    display: block;
+}
+
+.container-travel-detail > .all-info-travel > div > div input {
+    margin: 0;
+}
+
+.list-customers {
+    display: block !important;
+    flex-direction: column;
+    max-height: 125px;
+    overflow-y: auto;
+}
+
+.list-customers::-webkit-scrollbar {
+    width: 3px;
+  }
+  
+  .list-customers::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+    border-radius: 8px;
+  }
+  
+  .list-customers::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #808080;
+  }
+
+.card-user{
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    height: 60px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 98% !important;
+    margin: 5 0px !important;
+}
+
+.img-user {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    width: 65px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+.icon-user{
+    font-size: 60px;
+}
+
+.info-user {
+    width: 100% !important;
+    margin-left: 10px;
+}
+
+.container-number-vacancies {
+    position: absolute;
+    top: 0;
+    z-index: 206;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    transform: translateY(150%);
+    transition: all 300ms;
+}
+
+
+.container-number-vacancies.active {
+    transform: translateY(0%);
+}
+
+.container-number-vacancies > div {
+    background-color: #fff;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.container-number-vacancies > div > div {
+    display: flex;
+    justify-content: center;
+}
+
+.container-number-vacancies > div > div:first-child {
+    font-family: sans-serif;
+    font-weight: 400;
+    font-size: 16pt;
+    margin: 0 0 10px;
+}
+
+.container-number-vacancies > div > div:last-child {
+    display: flex;
+    justify-content: space-between;
+}
+
+.container-number-vacancies > div > div:last-child > button {
+    flex: 1;
+    margin: 0 0 0 15px;
+    border: none;
+    background-color: var(--main-color);
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 14pt;
+    border-radius: 5px;
+}
+
+.container-number-vacancies > div > div > .input-number-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;;
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 35%;
+    border-radius: 5px;
+}
+
+.container-number-vacancies > div > div > .input-number-item > span {
+    font-size: 14pt;
+}
+
+.container-number-vacancies > div > div > .input-number-item > i {
+    color: #b3b3b3
+}
+
+.container-number-vacancies > div > div > .input-number-item > i.active {
+    color: #000;
+}
+
+.modal-dialog-offer > div > p {
+    display:flex;
+    width:100%;
+    align-items:center;
+    justify-content: flex-start;
+    margin-bottom: 5px;
+}
+
+.modal-dialog-offer > div > p > span{
+    font-family: sans-serif;
+    font-weight: 500;
+    margin:0 0 0 10px;
+}

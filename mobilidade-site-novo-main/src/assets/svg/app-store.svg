@@ -1,0 +1,27 @@
+<svg id="App_Store" data-name="App Store" xmlns="http://www.w3.org/2000/svg" width="243" height="67.5" viewBox="0 0 243 67.5">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        font-size: 21px;
+        font-family: Roboto-Bold, Roboto;
+        font-weight: 700;
+      }
+
+      .cls-3 {
+        font-size: 16px;
+        font-family: Roboto-Light, Roboto;
+        font-weight: 300;
+      }
+    </style>
+  </defs>
+  <path id="Caminho_7566" data-name="Caminho 7566" class="cls-1" d="M13.5,0h216A13.5,13.5,0,0,1,243,13.5V54a13.5,13.5,0,0,1-13.5,13.5H13.5A13.5,13.5,0,0,1,0,54V13.5A13.5,13.5,0,0,1,13.5,0Z" transform="translate(0 0)"/>
+  <g id="Grupo_21009" data-name="Grupo 21009" transform="translate(23.219 9.45)">
+    <text id="APP_STORE-2" data-name="APP STORE" class="cls-2" transform="translate(127.627 42.942)"><tspan x="-55.889" y="0">APP STORE</tspan></text>
+    <text id="Disponível_na" data-name="Disponível na" class="cls-3" transform="translate(125.377 16.342)"><tspan x="-46.52" y="0">Disponível na</tspan></text>
+    <path id="Icon_metro-apple" data-name="Icon metro-apple" d="M34.8,24.873a9.77,9.77,0,0,1,4.662-8.222,10.085,10.085,0,0,0-7.9-4.279c-3.363-.34-6.562,1.98-8.268,1.98s-4.336-1.93-7.125-1.879a10.565,10.565,0,0,0-8.932,5.414C3.435,24.5,6.268,34.285,9.98,39.644c1.814,2.623,3.976,5.57,6.816,5.465,2.734-.109,3.769-1.769,7.075-1.769S28.106,45.109,31,45.055c2.942-.055,4.807-2.674,6.608-5.305A23.8,23.8,0,0,0,40.6,33.608,9.538,9.538,0,0,1,34.8,24.873ZM29.366,8.824a9.517,9.517,0,0,0,2.247-6.9,9.681,9.681,0,0,0-6.36,3.27A9.053,9.053,0,0,0,22.96,11.88,8.009,8.009,0,0,0,29.366,8.824Z" transform="translate(-5.436 -1.928)"/>
+  </g>
+</svg>

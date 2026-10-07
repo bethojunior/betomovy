@@ -1,0 +1,16 @@
+.general-charge .accordion.col-lg-12 .card .collapse.show .card-body .row .col-lg-4 #nav-type-trip {
+    overflow: auto;
+    height: 50vh;
+}
+
+.general-charge .accordion.col-lg-12 .card .collapse.show .card-body .row .col-lg-4 #nav-type-trip .tab-pane.fade.show.that-type .form-group  .btn-primary.add-balance-trip-type{
+/*    padding: 0.3vw;
+    border-radius: 0.3vw;*/
+}
+
+@media (max-width: 992px) {
+    .general-charge .accordion.col-lg-12 .card .collapse.show .card-body .row .col-lg-4{
+        margin-top: 4vw;
+        background-color: whitesmoke;
+    }
+}

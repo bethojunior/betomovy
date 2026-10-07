@@ -1,0 +1,496 @@
+import { Button, Image, Progress } from 'antd'
+import { AiOutlineAlert } from 'react-icons/ai'
+import { FiMoreHorizontal } from 'react-icons/fi'
+import styled from 'styled-components'
+import {
+  Adress,
+  AdressWrapper,
+  CardBody,
+  ContainerDestination,
+  ContainerDetailsTrip,
+  DetailsWrapper,
+  FooterContainer,
+  FooterContent,
+  PanelCollapse,
+  SectionAdress,
+  TitleAdress,
+  TitleDetails,
+  ToggleButton,
+  ValueDetail
+} from '../sharedStyles'
+
+export const CardTripList = styled.div`
+  background-color: #fff;
+  border-radius: 13px;
+  align-self: center;
+  box-shadow: 1px 2px 10px #a2a2a2;
+  box-sizing: border-box;
+`
+
+export const CardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: -12px;
+  font-weight: bold;
+`
+
+export const StatusTrip = styled.div<{ layout?: string }>`
+  align-items: center;
+  color: black;
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: 5px 5px 0 0;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: ${({ layout }) => layout === 'simple' ? '20px' : '0px'};
+
+  &.gradientRed {
+    background-image: linear-gradient(to right, #ff3232, #ff7f7f);
+  }
+
+  &.gradientYellow {
+    background-image: linear-gradient(to right, #d8931b, #f3b641);
+  }
+
+  &.gradientGreen {
+    background-image: linear-gradient(to right, #007300, #4ca64c);
+  }
+
+  &.gradientScheduled {
+    background-image: linear-gradient(to right, #024d24, #028a51);
+  }
+
+  @media (max-width: 800px) {
+    padding: 8px 5px;
+  }
+`
+
+export const StatusTripTitle = styled.span`
+  margin-left: 10px;
+  font-size: 17px;
+  color: white;
+`
+
+export const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+export const HeaderTimestamp = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  display: flex;
+  gap: 4px;
+  white-space: nowrap;
+`
+
+export const HeaderTimestampValue = styled.span`
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+`
+
+export const HeaderDate = styled.span`
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.95;
+  margin-left: auto;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+`
+
+export const IconMoreDetails = styled(FiMoreHorizontal)`
+  font-size: 20px;
+  color: #fff;
+`
+
+export const ButtonAlertTrip = styled(Button)`
+  margin-right: 5px;
+  &:hover {
+    border-color: red;
+  }
+`
+
+export const IconALert = styled(AiOutlineAlert)`
+  color: red;
+  font-size: 20px;
+`
+
+export const GraphicTrip = styled(Progress)`
+  width: 100%;
+
+  .ant-progress-inner {
+    background-color: #c3c1c1;
+  }
+
+  .ant-progress-outer {
+    width: 100%;
+  }
+`
+
+export const CustomersContainer = styled.div`
+  padding: 16px 16px 6px 16px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  @media (max-width: 800px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+`
+
+export const TitleUser = styled.p`
+  margin: 0;
+  font-size: 14px;
+  color: #000;
+  font-weight: 400;
+`
+
+export const NameUser = styled.p`
+  margin: 0;
+  font-weight: bold;
+  font-size: 16px;
+  color: #000;
+`
+
+export const VersionApp = styled.p`
+  font-size: 11px;
+  color: #000;
+  margin: 0;
+  margin-top: 2px;
+`
+
+export const TitleGraphic = styled.p`
+  margin-bottom: 4px;
+  font-size: 14px;
+`
+
+export const UsersSection = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+`
+
+export const Users = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`
+
+export const PictureContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+`
+
+export const ProgressContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 200px;
+
+  @media (max-width: 800px) {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    align-items: stretch;
+    overflow: hidden;
+  }
+`
+
+export const TripDateContainer = styled.div<{ layout?: string }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  ${({ layout }) => layout === 'simple' ? `
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 12px;
+  ` : `
+    justify-content: flex-end;
+  `}
+`
+
+export const TripDateText = styled.p`
+  font-weight: normal;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin: 0;
+  font-size: 14px;
+  color: #fff;
+  white-space: nowrap;
+`
+
+export const TripDateValue = styled.span`
+  font-weight: bold;
+  font-size: 14px;
+  color: #fff;
+`
+
+export const TripTimeValue = styled.span`
+  font-weight: bold;
+  font-size: 14px;
+  color: #fff;
+`
+
+export const BadgeHourRequested = styled.div<{ layout?: string }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0f7fa;
+  color: #007bff;
+  border-radius: 16px;
+  font-weight: 500;
+  border: 1px solid ${({ layout }) => layout === 'simple' ? '#007bff' : '#b3e5fc'};
+  ${({ layout }) => layout === 'simple' ? `
+    padding: 8px 12px;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 12px;
+  ` : `
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+    margin: 0;
+    width: auto;
+    min-width: 180px;
+  `}
+`
+
+export const BadgeText = styled.p`
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`
+
+export const ContainerCustomer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+
+  @media (max-width: 800px) {
+    gap: 12px;
+  }
+`
+
+export const CardAvatar = styled(Image)`
+  padding: 10px;
+  border-radius: 100%;
+`
+
+export const GeneralInformationsTrip = styled.div`
+  width: 100%;
+`
+
+export const LabelInformationTrip = styled.p`
+  margin-bottom: 2px;
+  font-size: 14px;
+  margin: 0 !important;
+`
+
+export const InformationTrip = styled.p`
+  margin-bottom: 0;
+  font-weight: bold;
+  margin-left: 2px;
+  font-size: 14px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: 320px) {
+    font-size: 12px;
+  }
+`
+
+export const TripInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+`
+
+export const AdressContainer = styled.div<{ layout?: string }>`
+  margin-top: ${({ layout }) => layout === 'simple' ? '12px' : '20px'};
+  margin-bottom: 12px;
+  width: 100%;
+  border-bottom-color: #d3d3d3;
+  border-bottom-width: 2px;
+  border-top-width: 0px;
+  border-left-width: 0px;
+  border-right-width: 0px;
+  border-style: solid;
+`
+
+export const AdressSimple = styled.div`
+  display: flex;
+  font-size: 17px;
+  color: black;
+
+  @media (max-width: 800px) {
+    font-size: 15px;
+  }
+`
+
+export const AdressLabel = styled.p`
+  width: 21%;
+  white-space: nowrap;
+  font-size: 15px;
+
+  @media (max-width: 800px) {
+    width: 25%;
+  }
+`
+
+export const AdressLocation = styled.p`
+  font-weight: bold;
+  margin-left: 4px;
+  white-space: nowrap;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 15px;
+
+  @media (max-width: 800px) {
+    font-size: 13px;
+  }
+`
+
+export const DriversCalledContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 12px;
+  padding-bottom: 8px;
+
+  @media (width: 768px) {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  @media (width: 1024px) {
+    width: 80%;
+    margin: 0 auto;
+  }
+  @media (width: 1440px) {
+    width: 90%;
+    margin: 0 auto;
+  }
+  @media (min-width: 1800px) {
+    width: 80%;
+    margin: 0 auto;
+  }
+`
+
+export const DriversCalledSection = styled.ul`
+  display: grid;
+  width: 100%;
+  margin: 0 auto;
+  list-style: none;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  align-items: center;
+  column-gap: 6px;
+  row-gap: 6px;
+  max-height: 130px;
+  overflow-y: auto;
+    margin-bottom: 5px;
+
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
+`
+
+enum DriversCalledBackgrounds {
+  'default' = '#aaaaaa',
+  'not_answered' = '#8c8c89',
+  'refused' = '#ee4839',
+  'calling' = '#269900'
+}
+
+interface DriversCalledProps {
+  status: 'default' | 'not_answered' | 'refused' | 'calling'
+}
+
+export const DriversCalled = styled.div<DriversCalledProps>`
+  background-color: ${({ status }) => (status ? DriversCalledBackgrounds[status] : '#8c8c89')};
+  color: ${({ status }) => (status === 'calling' ? '#fff' : '#000')};
+  padding: 2px;
+  text-align: center;
+  border-radius: 5px;
+  width: 100px;
+  font-size: 15px;
+  box-shadow: #808080 1px 1px 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+
+  @media (max-width: 320px) {
+    width: 85px;
+  }
+`
+
+export const DriversCalledText = styled.p`
+  margin: 0 auto;
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  text-align: center;
+
+  @media (max-width: 320px) {
+    font-size: 12px;
+  }
+`
+
+export {
+  Adress,
+  AdressWrapper,
+  CardBody,
+  ContainerDestination,
+  ContainerDetailsTrip,
+  DetailsWrapper,
+  FooterContainer,
+  FooterContent,
+  PanelCollapse,
+  SectionAdress,
+  TitleAdress,
+  TitleDetails,
+  ToggleButton,
+  ValueDetail
+}

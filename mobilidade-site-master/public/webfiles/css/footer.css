@@ -1,0 +1,112 @@
+footer.footer{ 
+    padding: 3vw 6vw;  
+    color: #FFF;
+}
+footer.footer .footer-container {
+    display: flex;
+    width: 100%;
+    /* justify-content: space-between; */
+    font-size: 13pt;
+}
+footer.footer .footer-container p {
+    font-size: 13pt;
+    font-weight: 500;
+}
+.footer-container div.collun-container{
+    display: flex;
+    width: 30%;
+    flex-direction: column;
+    justify-content: space-between
+}
+.footer-container div.collun-container .first p{
+    margin-bottom: 0.5vw;
+}
+.footer-container div.collun-container .first label{
+    padding-left: 0.5vw;
+}
+.footer-container div.collun-container .sub-header{
+    padding: 1vw;
+}
+.footer-container div.collun-container .sub-header label{
+    font-size: 2vw;
+}
+/* .footer-container div:nth-child(2){ width:25%; } */
+/* .footer-container div:nth-child(2) p{ padding-bottom: 4px; }
+.footer-container div:nth-child(3) p{ font-weight: 700; padding-bottom: 15px; }  */
+
+footer.footer .copy{
+    padding: 3.3vw 0vw 0vw;
+    font-size: 1em;
+    text-align: center;
+}
+.footer-container div.collun-container .divForm{
+    padding: 0.5vw;
+}
+.footer-container div.collun-container .divForm input{
+    /*margin: 0.5vw;*/
+    border: none;
+    padding: 0.2vw;
+    border-radius: 0.1vw;
+    width: 100% ;
+}
+
+.footer-container div.collun-container .divForm textarea{
+    width: 100% ;
+    border: none;
+    padding: 0.2vw;
+    resize: none;
+    /*margin: 0.5vw;*/
+}
+.footer-container div.collun-container .divForm .btn {
+    border-radius: 0.7vw;
+    padding: 0.5vw;
+    background-color: #e59112;
+    text-align: center;
+    /*margin: 0.5vw;*/
+    cursor: pointer;
+}
+.flexbox-form-group{
+    display: flex;
+}
+
+.flexbox-form-group input.input-footer-contato{ 
+    border: 0;
+    width: 204px;
+    border-radius: 20px;
+    padding-left: 25px;
+    color: rgb(255,174,43);
+    margin-right: 5px;
+}
+
+input.input-footer-contato::placeholder{
+    color:rgb(255,174,43);
+    font-weight: bold;
+}
+.check-button{
+    border: 0;
+    width: 50px;
+    border-radius: 25px;
+    background-color: #fff;
+    padding: 8px 8px;
+    color: rgb(255,174,43);
+    height: 42px;
+    top: 15px;
+    position: relative;
+    width: 58px;
+}
+
+footer a {
+    color: #fff;
+}
+
+@media (max-width: 798px) {
+    
+    footer.footer .footer-container {
+        flex-direction: column;
+    }
+    
+    .footer-container div.collun-container {
+        width: 100%;
+        margin-top: 30px;
+    }
+}

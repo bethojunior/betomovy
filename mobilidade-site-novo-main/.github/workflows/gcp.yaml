@@ -1,0 +1,41 @@
+name: Build Develop Push
+on: push
+
+env:
+  APPLICATION_NAME: "mobilidade-site-novo"
+  MANIFEST_REPO: "704apps/kubernetes-manifest"
+  BRANCH: ${{ github.ref_name }}
+  PROJECT_ID: services-704
+  REGION: us-central1
+  GAR_LOCATION: us-central1-docker.pkg.dev/services-704/images/
+
+jobs:
+  build:
+    runs-on: gcp
+    outputs:
+      TAG: ${{ steps.vars.outputs.tag }}  
+    name: Docker build and push to Registry
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.BRANCH }}
+
+      - name: Set output
+        id: vars
+        run: echo "::set-output name=tag::$(git rev-parse --short $GITHUB_SHA)" 
+      
+      - id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
+
+      - name: "Docker auth"
+        run: |-
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+        
+              
+      - name: Docker Build and Push
+        run: |               
+          docker build -t ${{ env.GAR_LOCATION }}${{ env.APPLICATION_NAME }}:${{ steps.vars.outputs.tag }} .
+          docker push ${{ env.GAR_LOCATION }}${{ env.APPLICATION_NAME }}:${{ steps.vars.outputs.tag }}

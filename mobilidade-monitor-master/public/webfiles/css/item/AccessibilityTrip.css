@@ -1,0 +1,11 @@
+.btn-floating{
+    position: absolute;
+    right: 0;
+    margin-right: 1vw;
+    margin-top: 1vw;
+    background-color: var(--main-color);
+    color: white;
+    padding: 0.3vw;
+    border-radius: 5vw;
+    cursor: pointer;
+}

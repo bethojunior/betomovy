@@ -1,0 +1,95 @@
+<audio id="songCallTaxi" loop>
+    <source src="webfiles/assets/songs/songCallTaxi.mp3" type="audio/mpeg">
+</audio>
+<audio id="songCallCar" loop>
+    <source src="webfiles/assets/songs/assobio.mp3" type="audio/mpeg"> 
+</audio>
+<audio id="songClientCancelTrip">
+    <source src="webfiles/assets/songs/alertClientCancelTrip.mp3" type="audio/mpeg">
+</audio>
+<audio id="songNewMessageChat">
+    <source src="webfiles/assets/songs/alertNewMessageChat.mp3" type="audio/mpeg">
+</audio>
+<audio id="scheduledTrip">
+    <source src="webfiles/assets/songs/scheduledTrip.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container-hush" id="container-hush">
+    <div class="header-content">
+        <div>
+            <div class="client-information">
+                <i class="material-icons">person</i>
+                <p id="clientName"></p>
+            </div>
+            <div class="client-information">
+                <i class="material-icons" id="iconFavorite">favorite</i>
+                <p id="favoriteTrip"></p>
+            </div>
+            <div class="client-information">
+                <i class="material-icons">star</i>
+                <p id="ratingCustomer"></p>
+            </div>
+            <div class="client-information">
+                <i class="material-icons">drive_eta</i>
+                <p id="tripType"></p>
+            </div>
+        </div>
+        <div>
+            <a id="closeContainerHush" class="material-icons">close</a>
+        </div>
+    </div>
+    <div class="trip-information-content">
+        <h2 id="priceTrip"></h2>
+        <h5 id="bonusTrip"></h5>
+        <div>
+            <p id="formPayment"></p>
+            <p id="haveReturn"></h4>
+        </div>
+        
+    </div>
+    <ul class="stop-list">
+        <li id="liAddressOrigin">
+            <div>
+                <p id="addressOrigin"></p>
+                <i class="material-icons" id="riskAreaOrigin">report</i>
+            </div>
+            <small id="estimatedStartTrip"></small>
+        </li>
+        <li id="tripWayPoints" class="waypoints-container">
+            <div>
+                <p id="firstWayPointAddress"></p>
+            </div>
+            <div class="waypoints-more-btn" id="waypointsMoreBtn">
+                <span id="waypointsMoreText"></span>
+                <i class="material-icons waypoints-toggle" id="waypointsToggle">expand_more</i>
+            </div>
+            <ul class="waypoints-list" id="waypointsList"></ul>
+        </li>
+        <li id="liAddressDestination">
+            <div>
+                <p id="addressDestination"></p>
+                <i class="material-icons" id="riskAreaDestination">report</i>
+            </div>
+            <small id="estimatedEndTrip"></small>
+        </li>
+    </ul>
+    <div class="more-information-content">
+        <p id="toll"></p>
+        <div id="dynamicPriceContent">
+            <p id="multiplierValueDynamic"></p>
+            <i class="material-icons">trending_up</i>
+            <p id="tripPriceDynamic"></p>
+        </div>
+    </div>
+    <div class="content-accept-trip">
+        <div class="progress-time-to-accept"></div>
+        <button class="btn-accept-trip" id="btn-accept-trip" type="button">
+            ACEITAR 
+        </button>
+    </div>
+    <div class="version-content">
+        <small id="tripReference"></small>
+        <small id="versionsApp"></small>
+    </div>
+</div>
+<div class="container-km-time-trip"></div>

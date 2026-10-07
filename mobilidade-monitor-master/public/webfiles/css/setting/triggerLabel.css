@@ -1,0 +1,145 @@
+.container-header h5 {
+    margin-top: 1vw;
+    font-weight: bold;
+}
+
+.modal-content {
+    padding: 1vw;
+}
+
+.container-hours {
+    display: flex;
+}
+
+.data-date {
+    display: flex;
+}
+
+.checkbox-days {
+    margin-left: 1vw;
+}
+
+.form-check {
+    margin-left: 0.5vw;
+}
+
+.form-check label {
+    margin-right: 1vw;
+}
+
+.modal-title {
+    margin-left: -1vw;
+}
+
+#title-add-trigger {
+    margin-top: 1vw;
+}
+
+.container-header {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 1vw;
+    margin-right: 1vw;
+}
+
+table {
+    width: 100%;
+}
+
+.container-list-trigger {
+    margin: 0 1vw 0 1vw;
+    border-radius: 6px;
+    background-color: #fffafa;
+}
+
+.container-list-trigger thead {
+    font-weight: bold;
+}
+
+.container-list-trigger td {
+    padding: 1vw;
+}
+
+.btn-edit-trigger {
+    margin-right: 1vw;
+    background-color: cadetblue;
+    color: #FFF;
+    border: none;
+    padding: 3px;
+    border-radius: 5px;
+}
+
+.btn-delete-trigger {
+    background-color: #d64937;
+    color: #FFF;
+    border: none;
+    padding: 3px;
+    border-radius: 5px;
+}
+
+.btn-find-trigger {
+    background-color: #0168D9;
+    color: #FFF;
+    border: none;
+    padding: 3px;
+    border-radius: 5px;
+}
+
+.table-responsive{
+    display:table;
+}
+
+@media (min-width: 1241px){
+    .rates-input {
+        font-size: 1vw;
+    }
+
+    .select-modality {
+        font-size: 1vw;
+    }
+
+    .time {
+        font-size: 1vw;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1240px) {
+    .select-modality {
+        font-size: 1.5vw;
+    }
+
+    .input-rate  {
+        flex-direction:column;
+    }
+
+    .data-date{
+        flex-direction:column;
+        flex:1;
+        margin:5px;
+    }
+}
+
+@media (max-width: 640px) {
+
+    .container-header h5 {
+        margin-top: 2vw;
+    }
+
+    .input-rate  {
+        flex-direction:column;
+    }
+
+    .data-date{
+        flex-direction:column;
+        flex:1;
+        margin:5px;
+    }
+
+    .date-week {
+        margin-left: 0.5vw;
+    }
+
+    .table-responsive{
+        display:block;
+    }
+}

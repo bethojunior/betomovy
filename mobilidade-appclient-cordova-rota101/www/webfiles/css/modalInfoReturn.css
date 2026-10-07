@@ -1,0 +1,118 @@
+.container-info-details-price{
+    width: 100%;
+    position: absolute;
+    z-index: 1000;
+    min-height: 100%;
+    box-shadow: 0 0 10px #dcd8d8;
+    bottom: 0;
+    background-color: transparent;
+    display:flex;
+    transform:translateY(150%);
+    transition:transform 0.3s, background-color 0.3s;
+    justify-content:center;
+    align-items:center;
+}
+
+.container-info-details-price.active{
+    background-color: rgba(0,0,0,0.5);
+    transform:translateY(0%);
+    transition:transform 0.3s, background-color 1s;
+}
+
+.container-info-details-price > div{
+    display:flex;
+    background-color:#fff;
+    flex-direction:column;
+    width:90%;
+    border-radius: 5px;
+    position: relative;
+    padding-top: 5vw;
+}
+
+
+.container-info-details-price > div > i{
+    position: absolute;
+    right: 0;
+    font-size: 8vw;
+    top: 1vw;
+    padding: 1vw;
+}
+
+.container-info-details-price > div > div{
+    background-color: var(--main-color);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(100% - 5vw);
+    margin: 2.5vw;
+    border-radius: 10px 0 10px 0;
+    padding: 1vw 0;
+}
+
+.container-info-details-price > div > div > i{
+    position:absolute;
+    right:5px;
+    font-size:10vw;
+}
+
+.container-info-details-price > div > div > div{
+    text-align:center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container-info-details-price > div > div > div > p{
+    font-weight:600;
+    font-size:14pt;
+    width: 80%;
+}
+
+.container-info-details-price > div > div > div > span{
+    width: 90%;
+    text-align: center;
+}
+
+.container-info-details-price > div > ul{
+    width:100%;
+    flex:1;
+    list-style: none;
+    max-height: 120vw;
+    overflow-y: auto;
+}
+
+
+.container-info-details-price > div > ul > li{
+    display:flex;
+    width: calc(100% - 2vw);
+    margin-bottom:2vw;
+    padding:1vw;
+    border-bottom: 1px solid #ccc;
+}
+
+.container-info-details-price > div > ul > li:last-child{
+    border-bottom:none;
+}
+
+.container-info-details-price > div > ul > li > .logo-price{
+    width:20vw;
+    height: 20vw;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin:1vw;
+    background-size: contain;
+    margin-right: 5vw;
+}
+
+.container-info-details-price > div > ul > li > .info-price{
+    width:80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.container-info-details-price > div > ul > li > .info-price > p{
+    font-weight:600;
+    text-transform:uppercase;
+}

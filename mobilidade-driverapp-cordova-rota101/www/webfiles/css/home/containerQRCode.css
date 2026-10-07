@@ -1,0 +1,202 @@
+.container-qrcode-driver{
+    position: absolute;
+    padding: 2vw;
+    width: 20vw;
+    background-color: #fff;
+    border-radius: 1vw;
+    box-shadow: 0 0 10px #b5b5b5;
+    bottom: 32vw;
+    z-index: 10;
+    right: 2vw;
+}
+
+.container-qrcode-driver.hidden{
+    display:none;
+}
+
+.container-qrcode-driver > div > div{
+    width:100%;
+    height:15vw;
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:contain;
+}
+
+.container-qrcode-driver > div > canvas{
+    display:none;
+}
+
+.container-qrcode-driver > div > img{
+    width:80%;
+    display:block;
+    margin:auto;
+}
+
+
+.footer-race.active > .container-qrcode-driver.active{
+    transform: translateY(-35vw);
+}
+.container-qrcode-driver.active{
+    width:100%;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    position: fixed;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+    border: none;
+    border-radius: 0;
+}
+
+.container-qrcode-driver.active > div{
+    width:80%;
+    background-color:#fff;
+    padding:2vw;
+    border-radius: 3vw;
+    position: relative;
+}
+
+.container-qrcode-driver > div > .close-modal-qrcode {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    padding: 5px;
+    color: #333;
+    font-size: 24px;
+    display: none;
+}
+
+.container-qrcode-driver.active > div > .close-modal-qrcode {
+    display: block;
+}
+
+.container-qrcode-driver > div > label{
+    font-weight:600;
+    color:#000;
+    display:block;
+    text-align:center;
+}
+
+.container-qrcode-driver p,
+.container-qrcode-driver span,
+.container-qrcode-driver button{
+    display:none;
+}
+
+
+.container-qrcode-driver.active p,
+.container-qrcode-driver.active span,
+.container-qrcode-driver.active button{
+    display:block;
+}
+
+
+.container-qrcode-driver.active label{
+    display:none;
+}
+
+.container-qrcode-driver.active .title-qrcode{
+    text-align:center;
+    display:block;
+    font-size:6vw;
+    font-weight:600;
+    margin-bottom:2.5vw;
+    border-bottom:1px solid #ccc;
+
+}
+
+.container-qrcode-driver.active .description-qrcode{
+    border-top:1px solid #ccc;
+    margin-top:2.5vw;
+    text-align:center;
+}
+
+.text-alert-driver{
+    position: absolute;
+    z-index: 50;
+    background-color: #00c260;
+    color: #fff;
+    top: 2vw;
+    left: 2vw;
+    padding: 4vw;
+    box-shadow: 0 0 10px #cfcfcf;
+    border-radius: 2vw;
+    font-weight: 600;
+    opacity: 0;
+}
+.text-alert-driver.active{
+    opacity: 0;
+    animation-name: hidden-text-alert;
+    animation-duration: 15s;
+}
+
+
+.text-alert-driver.active:empty{
+    display:none;
+}
+
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes hidden-text-alert {
+    0%{
+        opacity: 1;
+    }
+    90%{
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
+    }
+}
+
+/* Standard syntax */
+@keyframes hidden-text-alert {
+    0%{
+        opacity: 1;
+    }
+    90%{
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
+    }
+}
+
+.container-qrcode-driver.active > div > div {
+    height:50vw;
+}
+
+
+.container-qrcode-driver.active > div > span{
+    display:flex;
+    justify-content:center;
+    margin:10px 0;
+    align-items:center;
+}
+
+.container-qrcode-driver.active > div > span:before,
+.container-qrcode-driver.active > div > span:after{
+    content:"";
+    width:40%;
+    height:1px;
+    background-color:#c5c5c5;
+    margin:0 5px;
+}
+
+.container-qrcode-driver.active > div > button{
+    width:80%;
+    display:block;
+    margin:10px auto;
+    border:none;
+    background-color:var(--main-color);
+    padding:10px;
+    border-radius:5px;
+    font-weight:600;
+    color:#fff;
+}

@@ -1,0 +1,40 @@
+.generalDriver{
+    background-color: white;
+}
+.generalDriver .mountList{
+    height: 90%;
+    overflow-y: auto;
+}
+
+
+.generalDriver .mountList#listPreRegister .dataCostumer {
+    background-color: white;
+    padding: 2vw;
+    border-radius: 0.8vw;
+    margin: 0.8vw;
+    cursor: pointer;
+    transition: 0.5s;
+    box-shadow: 1px 1px 20px 0px rgba(0,0,0,0.26);
+    display: flex;
+}
+
+.generalDriver .mountList#listPreRegister .dataCostumer:hover{
+    box-shadow: 1px 1px 20px 10px rgba(88, 86, 86, 0.39);
+    transition: 1s;
+    background-color: #ececec;
+}
+
+.generalDriver .mountList#listPreRegister .dataCostumer .fistMark {
+    word-wrap: break-word;
+    width: 25vw;
+}
+
+.generalDriver .mountList#listPreRegister .dataCostumer .secondMark {
+    /*padding-left: 10vw;*/
+    margin-left: 5vw;
+    width: 25vw;
+
+}
+
+
+

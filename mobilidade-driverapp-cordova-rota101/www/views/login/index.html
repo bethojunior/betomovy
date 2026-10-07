@@ -1,0 +1,26 @@
+<div class="container-login">
+    <div class="form-login" id="form-login">
+        <div class="col s12 input-field data-login">
+            <form>
+                <input type="email" id="email" name="email" placeholder="" class="custom" data-i18n="login-placeholder-email">
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" placeholder="" class="custom" data-i18n="login-placeholder-password" />
+                    <i class="material-icons toggle-password" id="togglePassword">visibility_off</i>
+                </div>
+                <a class="forgot-password" id="forgetPassword" onclick="forgetPassword()" data-i18n="login-a-forgot-password"></a>
+            </form>
+        </div>
+        <div class="col s12 input-field data-login">
+            <div class="bu">
+                <button type="button" ID="authenticateUser" class="btn-login" data-i18n="login-btn-auth"></button>
+            </div>
+        </div>
+        <div class="more-info"></div>
+    </div>
+    <div id="login-version"></div>
+</div>
+
+<div id="preloadLogin">
+    <div id="loader"></div>
+</div>
+

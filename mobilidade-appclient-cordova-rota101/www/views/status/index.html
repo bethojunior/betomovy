@@ -1,0 +1,62 @@
+<div class="container-status-customer">
+  <nav>
+    <span>STATUS</span>
+  </nav>
+  <div class="form-data-user">
+    <div>
+      <label>Nome Completo</label>
+      <p id="nameStatusCustomer"></p>
+    </div>
+    <div>
+      <label>CPF</label>
+      <p id="documentStatusCustomer"></p>
+    </div>
+    <div>
+      <label>Telefone</label>
+      <p id="phoneStatusCustomer"></p>
+    </div>
+    <div>
+      <label>E-mail</label>
+      <p id="emailStatusCustomer"></p>
+    </div>
+    <div>
+      <label>NUMERO DO RG</label>
+      <p id="numberRGStatus"></p>
+    </div>
+    <div id="showDocumentStatus">
+      <label>Documentos</label>
+      <p>Ver imagens</p>
+      <p class="reject-documents-text">Existem documentos pendentes</p>
+      <i class="material-icons">keyboard_arrow_right</i>
+    </div>
+    <div>
+      <label>Status Atual</label>
+      <p id="statusCustomerRegisterStatusId">Pendente</p>
+    </div>
+  </div>
+  <div class="modal-status-customer">
+    <div>
+      <i class="material-icons go-back-document">arrow_back</i>
+      <h4>Documentos</h4>
+      <ul id="listDocumentPendency"></ul>
+    </div>
+  </div>
+  <div class="modal-open-photo-document">
+    <nav>
+      <i class="material-icons go-back-document">arrow_back</i>
+      <span id="descriptionPendencyPhoto"></span>
+      <i class="material-icons" id="captureDocumentStatus">autorenew</i>
+    </nav>
+    <div id="boxPhotoDocument"></div>
+  </div>
+  <div class="modal-open-text-document">
+    <div>
+      <nav>
+        <i class="material-icons go-back-document">arrow_back</i>
+      </nav>
+      <label id="descriptionPendencyText" for="valuePendencyText"></label>
+      <input type="text" id="valuePendencyText" />
+      <button id="btnUpdateDocumentText">ATUALIZAR</button>
+    </div>
+  </div>
+</div>

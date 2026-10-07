@@ -1,0 +1,92 @@
+.container-modal-info-extract {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    width: 100%;
+    z-index: 100;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+}
+
+.container-modal-info-extract.active {
+    display: flex;
+}
+
+.container-modal-info-extract > div {
+    width: 80%;
+    background-color: #fff;
+    border-radius: 2vw;
+    padding: 2vw;
+    position: relative;
+}
+
+.container-modal-info-extract > div > h4{
+
+    border-bottom: 1px solid #525151;
+
+    margin: 0;
+
+    font-size: 7.5vw;
+
+    width: 100%;
+
+    padding: 1vw;
+
+    text-align: center;
+
+    font-weight: 400;
+}
+.container-modal-info-extract > div > i {
+    position: absolute;
+    right: 2vw;
+    top: 1vw;
+    font-size: 6vw;
+}
+
+.container-modal-info-extract > div > ul {
+    width: 100%;
+    display: block;
+}
+
+.container-modal-info-extract > div > ul > li {
+    font-size: 5vw;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border-bottom: 1px solid #dfdfdf;
+    padding: 2vw 0;
+}
+
+.container-modal-info-extract > div > ul > li > div {
+    height: 5vw;
+    width: 5vw;
+    border: 1px solid #ccc;
+    border-radius: 100%;
+    margin-right: 2.5vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-modal-info-extract > div > ul > li > div > div {
+    content: "";
+    height: 2.5vw;
+    width: 2.5vw;
+    border-radius: 100%;
+    background-color: #141414;
+    display: block;
+}
+
+
+.container-modal-info-extract > div > span {
+    width:80%;
+    display:block;
+    margin:auto;
+    padding: 2vw;
+    text-align: center;
+    font-size: 4vw;
+    margin-top: 3vw;
+    border-radius: 2vw;
+}

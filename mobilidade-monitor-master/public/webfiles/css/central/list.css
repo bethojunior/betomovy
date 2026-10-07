@@ -1,0 +1,52 @@
+.container-default-monitor .collapse {
+    margin-top: 1vw;
+    padding: 1vw;
+    border-top: 1px solid #ccc;
+    background-color: #e6e6e6;
+}
+
+.container-default-monitor .list-group-item {
+    padding: 1.75vw 0.2vw;
+}
+
+#listCentral {
+    height: 70%;
+    max-height: 70%;
+    overflow-y: auto;
+}
+
+#listCentral > tr > td:nth-child(2) {
+    width: 50%;
+}
+
+#listCentral > tr > td:nth-child(2) > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+
+.list-users-central {
+    margin-top: 1vw;
+    list-style: none;
+    background-color: #fff;
+    height: 300px;
+    overflow-y: auto;
+}
+
+.list-users-central > li {
+    padding: 10px;
+    border-bottom: 1px solid #Cccc;
+}
+
+.voucher-value-container {
+    position: relative
+}
+
+.coin-icon {
+    position: absolute;
+    left: 5px;
+    top: 7px;
+    color: #696969;
+}

@@ -1,0 +1,118 @@
+.footer-container-trip > .edit-price {
+    display: none;
+    justify-content: center;
+}
+
+.footer-container-trip > .edit-price.active {
+    display: flex;
+}
+
+.footer-container-trip > .edit-price > button {
+    padding: 2vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    width: 40%;
+    margin-top: 2.5vw;
+    border: none;
+    background-color: #1565c0;
+    color: #fff;
+}
+
+.footer-container-trip > .edit-price > button > i {
+    margin-right: 1vw;
+}
+
+.container-edit-price {
+    position: absolute;
+    bottom: 0;
+    z-index: 10;
+    width: 100%;
+    min-height: 90vw;
+    background-color: #fff;
+    box-shadow: 0 0 10px #cecbcb;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transform: translateY(150%);
+    transition: transform 0.3s;
+}
+
+.container-edit-price.active {
+    transform: translateY(0);
+    transition: transform 0.3s;
+}
+
+
+.container-edit-price > div.close-edit-price {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.container-edit-price > div.close-edit-price > i {
+    padding: 2.5vw;
+    font-size: 10vw;
+}
+
+.container-edit-price > div.container-info-price {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4vw;
+}
+
+
+.container-edit-price > div.container-info-price > p {
+    color: var(--main-color);
+    font-weight: 600;
+}
+
+.container-edit-price > div.container-info-price > div {
+    width: 25vw;
+    height: 25vw;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-bottom: 3vw;
+}
+
+.container-edit-price > div.container-info-price > input {
+    text-align: center !important;
+    padding: 10px;
+    font-size: 18pt;
+    width: 50%;
+    border-radius: 2px;
+    outline: none;
+    border: 1px solid #939393;
+}
+
+.container-edit-price > button {
+    width: 90%;
+    display: block;
+    padding: 10px;
+    font-size: 5vw;
+    background-color: var(--main-color);
+    border: none;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #cecbcb;
+    margin: 2.5vw auto;
+}
+
+.container-edit-price > p {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-edit-price > p > i {
+    font-size: 15pt;
+    margin-right: 5px;
+}
+
+.footer-container-trip > .edit-price.active ~ div > #btnScheduleTrip {
+    display: none;
+}

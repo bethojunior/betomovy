@@ -1,0 +1,81 @@
+<div class="container-accessibility-item">
+    <a class="go-back-form-travel">
+        <i class="material-icons">keyboard_arrow_left</i>
+    </a>
+    <p>Detalhes da entrega</p>
+    <div class="info-accessibility">
+        <div>
+            <p>A RETIRADA DO(s) objeto(s) se dará por:</p>
+            <ul id="listAccessibilityGetItem"></ul>
+            <div class="count-floor">
+                <span>Selecione o andar APENAS se for escada</span>
+                <h4 id="numberFloorGetItemValue">0</h4>
+                <input type="range" id="numberFloorGetItem" value="0" min="0" max="20">
+            </div>
+        </div>
+        <div>
+            <p>A ENTREGA do(s) objeto(s) se dará por</p>
+            <ul id="listAccessibilityDeliveryItem"></ul>
+            <div class="count-floor">
+                <span>Selecione o andar APENAS se for escada</span>
+                <h4 id="numberFloorDeliveryItemValue">0</h4>
+                <input type="range" id="numberFloorDeliveryItem" value="0" min="0" max="20">
+            </div>
+        </div>
+        <div>
+            <p>O carro ou caminhão ficará bem próximo ao local para carregar e entregar?</p>
+            <div class="container-question-local">
+                <div>
+                    <span>Carregar:</span>
+                    <div>
+                        <p><input type="radio" name="approximateLoading" value="1"><label>SIM</label></p>
+                        <p><input type="radio" name="approximateLoading" value="0" checked><label>NÂO</label></p>
+                    </div>
+                </div>
+                <div>
+                    <span>Entregar:</span>
+                    <div>
+                        <p><input type="radio" name="approximateDeliver" value="1"><label>SIM</label></p>
+                        <p><input type="radio" name="approximateDeliver" value="0" checked><label>NÂO</label></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <p>Quantos ajudantes serão necessários?</p>
+            <ul class="list-helper"></ul>
+        </div>
+    </div>
+    <div class="data-transport">
+        <div id="listAdditional">
+            <p><span>Adicional Elevador:</span><span id="additionalElevator">0 x R$20,00 = R$0,00</span></p>
+            <p><span>Adicional Ajudante:</span><span id="additionalHelper">0 x R$50,00 = R$0,00</span></p>
+        </div>
+        <div>
+            <p id="additionalApproximateLoading"><span>Adicional Coleta:</span></p>
+            <p id="additionalApproximateDeliver"><span>Adicional Entrega:</span></p>
+        </div>
+        <div></div>
+    </div>
+    <button type="button" id="confirmationAccessibilityItem">AVANÇAR</button>
+</div>
+<div class="container-alert-info-travel">
+    <a class="go-back-form-travel">
+        <i class="material-icons">keyboard_arrow_left</i>
+    </a>
+    <div>
+        <h4>IMPORTANTE</h4>
+        <p>Omissões sobre dificuldade de retirada ou
+            entrega, tais como: A necessidade de içar
+            determinado objeto pela sacada ou janela (por
+            não caber no elevador ou escada); ou por ser
+            demasiado pesado; ou pela dificuldade do carro
+            chegar próximo ao local de embarque ou
+            entrega, entre outros problemas, poderão
+            incidir taxas extras no valor total.
+            Ao abrir a caixa de diálogo com o motorista dê
+            mais detalhes ao mesmo, se for o caso ou entre
+            em contato com o whatsapp do <nameapp></nameapp>.</p>
+    </div>
+    <button type="button" id="btnAlertInfoTravel">AVANÇAR</button>
+</div>

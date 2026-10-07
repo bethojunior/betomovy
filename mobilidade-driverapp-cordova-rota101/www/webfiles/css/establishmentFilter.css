@@ -1,0 +1,223 @@
+body{
+    overflow: scroll;
+}
+.container-filter-establishment .container-form-filter .input-shared-establishment{
+    background-color:rgb(227,227,227);
+    border:none;
+    margin-bottom:1vw;
+    padding:0 2vw;
+    width:calc(100% - 4vw);
+    height: 10vw;   
+}
+.container-filter-establishment{
+    margin-top: 3vw ;
+    overflow: scroll;
+}
+.container-filter-establishment .close-filter-establishment{
+    margin: 2vw;
+    font-size: 10vw;
+    color: rgb(255,154,0);
+}
+.container-filter-establishment .title-page{
+    margin: auto;
+    text-align: center;
+    font-size: 5vw;
+    text-transform: uppercase;
+    font-weight: bolder;
+    color: rgb(255,154,0);
+    width:70%;
+    position:  absolute;
+    top: 20vw;
+    right: 0;
+    left: 0;
+}
+.container-filter-establishment .container-form-filter{
+    width: 90%;
+    display: block;
+    margin: 0 auto;
+}
+.container-filter-establishment .container-form-filter .range-custom{
+    margin-top: 4vw;
+}
+.container-filter-establishment .container-form-filter .range-custom::-webkit-slider-runnable-track{
+    background-color: rgb(74,78,87);
+}
+.container-filter-establishment .container-form-filter .range-custom::-webkit-slider-thumb{
+    background-color: rgb(241,172,59);
+    border-radius: 3vw;
+    padding: 3vw 6vw;
+    margin-top: -2.5vw
+}
+.container-filter-establishment .container-form-filter .range-custom+.thumb {
+    margin-top: 5vw;
+    background-color: rgb(241,172,59);
+}
+.container-filter-establishment .container-form-filter .min-value-establishment{
+    float:left;
+    width:50%;
+    margin-bottom: 0.5vw;
+    font-size:2.5vw;
+}
+.container-filter-establishment .container-form-filter .max-value-establishment{
+    float:left;
+    width:50%;
+    text-align:right;
+    margin-bottom: 0.5vw;
+    font-size:2.5vw;
+}
+.container-filter-establishment .container-form-filter  .establishment-classification{
+    margin-top:2vw
+}
+.container-filter-establishment .container-form-filter  .establishment-classification .star-classification{
+    float: left;
+    font-size: 8vw;
+    margin: 1vw;
+}
+.container-filter-establishment .container-form-filter  .establishment-classification .star-classification.active{
+    color: rgb(241,172,59);
+}
+.container-filter-establishment .container-form-filter b {
+    width:100%;
+    float:  left;
+    font-size:3vw;
+    margin: 0vw auto 1.5vw;
+    text-transform: uppercase;
+}
+.container-filter-establishment .container-form-filter .browser-default.select-custom{
+    background-color:rgb(227,227,227);
+    outline:none;
+    margin-top:5vw;
+    height:  10vw;
+}
+.container-filter-establishment .container-form-filter p{
+    margin-bottom: 1vw;
+}
+.container-filter-establishment .paddingThis .tabs.tabs-custom{
+    height: 10vw;
+    background-color: transparent;
+}
+.container-filter-establishment .paddingThis .tabs.tabs-custom a{
+    color:#000;
+    font-size: 3vw;
+}
+.container-filter-establishment .paddingThis .tabs.tabs-custom a.active{
+    background-color:rgb(241,172,59);
+    color:#fff;
+    border-radius: 5vw 5vw 0 0;
+}
+.container-filter-establishment .paddingThis .tabs .indicator{
+    background-color:transparent;
+}
+.container-filter-establishment .paddingThis .tab{
+    width:50%;
+}
+.container-filter-establishment .paddingThis .input-shared-establishment{
+    background-color:rgb(227,227,227);
+    border:none;
+    margin-bottom:1vw;
+    padding:0 2vw;
+    width:calc(100% - 4vw);
+    height: 10vw;
+}
+.container-filter-establishment .paddingThis .input-shared-establishment::placeholder{
+    color:#000;
+}
+.container-filter-establishment .paddingThis input.input-shared-establishment:focus{
+    border-bottom: none;
+    box-shadow:none;
+}
+.container-filter-establishment .btn-filter-establishment{
+    position: fixed;
+    bottom: 0;
+    font-size: 4vw;
+    padding-bottom: 6vw;
+    border: none;
+    color: #fff;
+    text-transform: uppercase;
+    background-color: rgb(241,172,59);
+    width: 100%;
+}
+.link-back{
+    display: block;
+    z-index: 10;
+}
+.container-filter-establishment .row.listTop3Hostel#listTop3Hostel{
+    position: fixed;
+    margin-bottom: -100vw;
+}
+.container-filter-establishment .row.listTop3Hostel#listTop3Hostel .marginCardHostel{
+    font-size: 3.8vw;
+    margin-top: 1vw;
+}
+.container-filter-establishment .row.listTop3Hostel#listTop3Hostel .marginCardHostel .col.s4 .imgHostel{
+    width: 100%;
+}
+.container-filter-establishment .row.listTop3Hostel#listTop3Hostel .marginCardHostel ul{
+    font-size: 5vw;
+}
+.hostelSelect{
+    background-color: #d4ecf9;
+    box-shadow: 1px 1px 20px 0px rgba(0,0,0,0.26);
+}
+.container-filter-establishment .btn-filter-establishment .nameBtn{
+    position: relative;
+    top: 3vw;
+    font-size: 5vw;
+}
+.container-filter-establishment .col.s12.hostelIndication{
+    margin-top: 2vw;
+}
+.container-filter-establishment .col.s12.hostelIndication .footer-arrow-hostel{
+    width: 10%;
+    background-color: #fff;
+    padding: 2vw;
+    left: 0;
+    right: 0;
+    margin: auto;
+    border-radius: 100%;
+    box-shadow: 0 0 2vw #CCC;
+    transition: 0.5s;
+}
+.container-filter-establishment .col.s12.hostelIndication .footer-arrow-hostel img {
+    width: 100%;
+    animation-name: animation-up-arrow-footer;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    position: relative;
+}
+.container-filter-establishment .col.s12.hostelIndication .title{
+    font-size: 7vw;
+    margin-left: 5vw;
+    position: relative;
+    top: 1vw;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+.container-filter-establishment  .row.listTop3Hostel{
+    position: relative;
+    bottom: -50vw;
+    transition: 1s;
+}
+.container-filter-establishment  .row.listTop3Hostel.active{
+    transition: 1.5s;
+    position: absolute;
+    bottom: auto;
+    margin-left: 1vw;
+}
+.container-filter-establishment .col.s12.hostelIndication .footer-arrow-hostel.openHosteis{
+    animation-play-state: paused;
+    transform: rotate(180deg);
+    transition: 0.5s;
+}
+.limitName{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 30vw;
+}
+.paddingThis{
+    width: 90%;
+    display: block;
+    margin: 0 auto;
+}

@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+    monitor:
+        build:
+            args:
+                user: sammy
+                uid: 1000
+            context: .
+            dockerfile: Dockerfile-dockerhub
+        image: monitor
+        container_name: monitor
+        restart: unless-stopped
+        working_dir: /var/www/
+        env_file:
+            - .env
+        ports:
+            - 8105:80
+        volumes:
+            - ./:/var/www

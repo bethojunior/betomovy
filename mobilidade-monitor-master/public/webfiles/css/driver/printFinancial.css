@@ -1,0 +1,97 @@
+/* #printable{ display: none;} */
+
+div#printable{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+div#printable div.title-head{
+  display: flex;
+  /* justify-content: space-between; */
+  align-items: center;
+  text-align: center;
+  /* border-bottom: 1px solid #ccc; */
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+div#printable div.title-head img {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    left: 5px;
+    top: 5px;
+}
+div#printable h2{
+    font-weight: 600;
+    margin: 12px 25px;
+    text-transform: uppercase;
+}
+div#printable p.detalhes{ 
+  margin: 0;
+  padding: 0;
+  line-height: 15px;
+}
+div#printable p.detalhes span{
+  text-transform: uppercase;  
+  font-size: 10px;
+}
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20vh;
+    borderWidth: 'thin';
+    margin-bottom: 15px;
+    font-size: 10px;
+  }
+  table span{
+    border:none;
+    borderWidth: 'thin',
+
+  }
+  fieldset{
+    position: absolute;
+    padding: 8px;
+    right:1.6cm;
+    width: 4cm;
+    top: 7%;
+    border: 1px solid #000;
+  }
+  fieldset legend{
+    text-align: center;
+    padding: 2px;
+    font-weight: 600;
+  }
+  .left{ text-align: left;}
+  .rigth { text-align:  right;}
+   .numberReal{
+    display: flex;
+    /* border: none;  */
+    /* border-bottom: 1px soli */
+    justify-content: space-between;
+  }
+  td, th {
+    border: 1px solid #000;
+    
+    text-align: left;
+    padding: 2px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+/* Print */
+@media print {
+    /* @page { margin: 0; } */
+    @page{
+      size: auto; 
+      margin-bottom: 1.8cm;
+    } 
+    body { 
+      margin: 1.6cm; 
+    }
+    
+}

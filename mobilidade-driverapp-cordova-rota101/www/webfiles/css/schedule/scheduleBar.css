@@ -1,0 +1,52 @@
+.schedule-bar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    display: flex;
+    padding: 5px 10px 10px;
+    background-color: var(--main-color);
+    color: #fff;
+    z-index: 200;
+    transform: translateY(17vw);
+    flex-direction: column;
+}
+
+.schedule-bar.hidden{
+    display: none;
+}
+
+.schedule-bar > p {
+    text-align: center;
+    font-size: 10pt;
+    font-family: sans-serif;
+    margin-bottom: 5px;
+    border-bottom: 1px solid;
+    padding: 5px;
+}
+
+.schedule-bar > ul {
+    display: flex;
+}
+
+.schedule-bar > ul > li {
+    width: 100%;
+    text-align: center;
+}
+
+
+.schedule-bar > ul > li > p {
+    font-size: 13pt;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+}
+
+.schedule-bar > ul > li > p > span {
+    display: block;
+    width: 25px;
+    height: 25px;
+    background-color: #fff;
+    color: #000;
+    margin-right: 5px;
+    border-radius: 100%;
+}

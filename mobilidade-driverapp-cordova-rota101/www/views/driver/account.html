@@ -1,0 +1,24 @@
+<div class='driver-account'>
+    <div>
+        <i class="material-icons" id="closeModalBankAccountProfile">close</i>
+        <form id="formSignupAccountPerfil">
+            <input type="text" name="holderName" class="input-driver-bank user-name" placeholder="Nome">
+            <input type="tel" name="document" class="input-driver-bank cpf-bank-driver" placeholder="CPF">
+            <select name="typeAccount" class="select-wrapper">
+                <option disabled selected>TIPO DA CONTA</option>
+                <option value="corrente">CORRENTE</option>
+                <option value="poupanca">POUPANÇA</option>
+            </select>
+            <input type="text" name="bankId" id="bankAccountDriver" placeholder="Nome do banco">
+            <input type="text" name="agency" class="input-driver-bank agency-bank-driver" placeholder="Agência">
+            <input type="text" name="agencyDigit" class="input-driver-bank agency-digit-bank-driver" placeholder="Digito">
+            <input type="text" name="numberAccount" class="input-driver-bank number-account-bank-driver"placeholder="Numero da conta">
+            <input type="text" name="numberAccountDigit" class="input-driver-bank number-account-digit-bank-driver" placeholder="Digito">
+            <input type="text" name="op" class="input-driver-bank op-bank-driver" id="opBank" placeholder="OP">
+            <input type="text" name="pix" class="input-driver-bank pix-bank-driver" id="pixBank" placeholder="PIX">
+        </form>
+        <div>
+            <button type="button" id="btnSaveAccount">SALVAR</button>
+        </div>
+    </div>
+</div>

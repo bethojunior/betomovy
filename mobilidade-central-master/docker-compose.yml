@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+    site:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: central
+        container_name: central
+        restart: unless-stopped
+        working_dir: /var/www/
+        ports:
+            - 8004:80
+        volumes:
+            - ./:/var/www

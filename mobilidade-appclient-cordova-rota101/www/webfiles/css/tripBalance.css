@@ -1,0 +1,361 @@
+/*defaults*/
+
+.label {
+    display: block;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.wrapper-balance-trip {
+    width: 100%;
+    height: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.wrapper-balance-trip .container-balance {
+    width: 400px;
+    height: 90%;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#btn-step-1-trip-balance,
+#btn-step-2-trip-balance,
+#btn-step-3-trip-balance,
+#new-card {
+    cursor: pointer;
+}
+
+/*show balance*/
+.wrapper-balance-trip .container-balance .block-balance {
+    width: 100%;
+    height: 45px;
+    border-radius: 10px;
+    border: 2px solid #00b73e;
+    margin-top: 5px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.wrapper-balance-trip .container-balance .block-balance .image-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.wrapper-balance-trip .container-balance .block-balance .image-label img {
+    width: 30px;
+    height: auto;
+}
+
+.wrapper-balance-trip .container-balance .block-balance #value-balance {
+    font-size: 20px;
+}
+
+
+.wrapper-balance-trip .container-balance .container-btn {
+    height: 40px;
+}
+
+.wrapper-balance-trip .container-balance .btn-buy-balance {
+    background: #ff9b00;
+    width: 100%;
+    color: #fff;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 20px;
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.3);
+}
+
+/*buy credit*/
+
+.wrapper-balance-trip .container-balance .buy-balance .input-content .grey-input {
+    background: #edebeb;
+    border: none;
+    margin-top: 5px;
+    border-radius: 10px;
+    padding: 0 10px;
+    position: relative;
+    width: 95%;
+}
+
+.wrapper-balance-trip .container-balance .buy-balance .input-content
+input[type=text]:not(.browser-default):focus:not([readonly]) {
+    border-bottom: transparent;
+    -webkit-box-shadow: 0 0 0 transparent;
+    box-shadow:0 0 0 transparent;
+}
+
+.wrapper-balance-trip .container-balance .buy-balance .input-content label {
+    font-size: 16px;
+    color: #000;
+    font-weight: 400;
+}
+
+.wrapper-balance-trip .container-balance .buy-balance .input-content .green-input {
+    background: #fff;
+    border: 2px solid #00b73e;
+    margin-top: 5px;
+    border-radius: 10px;
+    padding: 0 10px;
+    position: relative;
+    width: 93.5%;
+}
+
+.wrapper-balance-trip .container-balance .buy-balance .input-content
+input.green-input[type=text]:not(.browser-default):focus:not([readonly]) {
+    border: 2px solid #00b73e;
+}
+
+.wrapper-balance-trip .container-balance .buy-balance .select-wrapper input.select-dropdown {
+    border: none;
+    border-radius: 10px;
+    padding: 0 10px;
+    width: 95%;
+    background: #ebebeb;
+}
+
+.wrapper-balance-trip .container-balance .buy-balance .select-wrapper .caret {
+    z-index: 2;
+}
+
+.wrapper-balance-trip .container-balance .buy-balance .input-content #new-card {
+    background: #49494b;
+    width: 95px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    float: right;
+}
+
+.wrapper-balance-trip .container-balance .buy-balance .input-content #new-card img{
+    background: #49494b;
+    width: 60px;
+}
+
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content input {
+    border: none;
+    background: #ebebeb;
+    border-radius: 10px;
+    padding: 0 10px;
+    width: 95%;
+}
+
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content.two-data input {
+    width: 95%;
+    padding: 0 10px;
+}
+
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content.two-data .col {
+    padding: 0;
+}
+
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content.two-data .row {
+    margin-bottom: 0;
+}
+
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content.two-data input{
+    width: 84%;
+}
+
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content.two-data .col:last-child label,
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content.two-data .col:last-child input{
+    margin-left: 5%;
+}
+
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content input[type=text]:not(.browser-default):focus:not([readonly]) {
+    border-bottom: transparent;
+    -webkit-box-shadow: 0 0 0 transparent;
+    box-shadow:0 0 0 transparent;
+}
+
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content label {
+    font-size: 16px;
+    color: #000;
+    font-weight: 400;
+}
+
+.wrapper-balance-trip .container-balance .new-credit-card-balance .input-content .caret {
+    z-index: 2;
+}
+
+.wrapper-balance-trip .container-balance.hide-step {
+    display: none;
+}
+
+.wrapper-balance-trip .container-balance.show-step {
+    display: flex;
+}
+
+@media (max-width: 991px) {
+    .wrapper-balance-trip {
+        height: 87%;
+    }
+}
+
+@media (max-width: 600px) {
+    .wrapper-balance-trip .container-balance {
+        width: 93%;
+        border: none;
+        box-shadow: none;
+    }
+
+    .wrapper-balance-trip .container-balance .new-credit-card-balance .input-content input {
+        margin-bottom: 2px;
+    }
+
+    .wrapper-balance-trip .container-balance .buy-balance .input-content .grey-input {
+        margin-bottom: 2px;
+    }
+}
+
+.container-trip-balance{
+    float:left;
+    position: relative;
+    width: 80%;
+    right: 10%;
+    left: 10%;
+    display:block;
+    margin: 1vw auto 0;
+    padding: 2vw;
+    border: 1px solid #ccc;
+    border-radius: 0.5vw;
+}
+
+.container-trip-balance > h4{
+    margin: 0 0 2vw;
+    font-size: 2vw;
+    padding: 0 0 1vw;
+    border-bottom: 1px dashed #ccc;
+}
+
+.container-trip-balance > div{
+    float:left;
+    width:100%;
+    border-bottom: 1px dashed #ccc;
+    padding: 0 0 1vw;
+}
+.container-trip-balance > div:last-child{
+    border: none;
+}
+
+.container-trip-balance > div > label,
+.container-trip-balance > div > div > label,
+.container-trip-balance > div > div > div > div > label,
+.container-trip-balance > div > p{
+    float: left;
+    width: 100%;
+    color: #726e6e;
+    font-size: 1.2vw;
+    margin: 0.5vw;
+}
+.container-trip-balance > div > input[type].value-payment{
+    width: 15%;
+}
+.container-trip-balance > div > input[type],
+.container-trip-balance > div > div > input[type],
+.container-trip-balance > div > div > div > div > input[type]{
+    width:30%;
+    padding: 0 1vw;
+    float:left;
+    border:1px solid #ccc;
+    border-radius:0.5vw;
+}
+
+.container-trip-balance > div > div >  input.number-card{
+    width: 27%;
+}
+.container-trip-balance > div > div > div > div > input[type]{
+    width: 90%;
+}
+.container-trip-balance > div > div  input[type=month]{
+    height: 3rem;
+    width: 20%;
+}
+.container-trip-balance > div > input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):focus:not([readonly]), input[type=password]:not(.browser-default):focus:not([readonly]), input[type=email]:not(.browser-default):focus:not([readonly]), input[type=url]:not(.browser-default):focus:not([readonly]), input[type=time]:not(.browser-default):focus:not([readonly]), input[type=date]:not(.browser-default):focus:not([readonly]), input[type=datetime]:not(.browser-default):focus:not([readonly]), input[type=datetime-local]:not(.browser-default):focus:not([readonly]), input[type=tel]:not(.browser-default):focus:not([readonly]), input[type=number]:not(.browser-default):focus:not([readonly]), input[type=search]:not(.browser-default):focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]){
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0 0 0 0 #cccc;
+}
+.container-trip-balance > div > div.select-paymentform{
+    float: left;
+    width: 30%;
+    border: 1px solid #ccc;
+    border-radius: 0.5vw;
+    padding: 0 1vw;
+}
+.container-trip-balance > div > div.select-paymentform .select-dropdown{
+    margin: 0;
+    border: none;
+    padding: 0 1vw;
+}
+
+.container-trip-balance > div > div > div{
+    float: left;
+    width: 100%;
+}
+.container-trip-balance > div > div > div > div.left-customer{
+    width: 20%;
+    float: left;
+}
+.container-trip-balance > div > div > div > div.left-customer > .code-security{
+    width: 35%;
+    text-align: center;
+
+}
+.container-trip-balance > div > a.btn-finish-payment{
+    float: left;
+    padding: 1vw;
+    color: #fff;
+    background-color: #8bc34c;
+    font-weight: bolder;
+    margin-top: 1vw;
+    font-size: 1.25vw;
+    cursor: pointer;
+}
+
+.container-trip-balance > div > div > span{
+    float: left;
+    margin: 1vw 1vw 0;
+    font-weight: bolder;
+}
+.container-trip-balance > div > div > span > span{
+    font-weight: 400;
+}
+.container-trip-balance > div > div > span:before{
+    content: '';
+    float: left;
+    height: 0.5vw;
+    width: 0.5vw;
+    background-color: #000;
+    margin: 0.5vw 1vw 0 0;
+    border-radius: 10vw;
+}
+
+.container-trip-balance > div > h4{
+    float: left;
+    width: 100%;
+    margin: 2vw 0 2vw;
+    font-size: 2vw;
+    padding: 0 0 1vw;
+    border-bottom: 1px dashed #ccc;
+}
+.container-trip-balance > div > div > div > ul.list-rules:not(.browser-default)>li{
+    list-style-type: square;
+}

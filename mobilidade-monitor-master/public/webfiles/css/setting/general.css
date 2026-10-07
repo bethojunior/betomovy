@@ -1,0 +1,320 @@
+
+@media (max-width: 991px) {
+    .container-block-type-setting{
+        display: block;
+        width: 97%;
+        margin: 10px auto;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0 0 10px #ccc;
+    }
+
+    .container-block-type-setting > h4{
+        font-weight: 500;
+        display: block;
+        background-color: #efc171;
+        padding: 10px;
+        font-size: 15pt;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .container-block-type-setting > ul{
+        list-style: none;
+        /* padding: 10px; */
+    }
+
+    .container-block-type-setting > ul > li{
+        display: flex;
+        justify-content: space-between;
+        align-items:center;
+        border-bottom: 1px solid #ccc;
+        padding: 5px;
+    }
+
+
+    .container-block-type-setting > ul > li:last-child{
+        border:none;
+    }
+
+    .container-block-type-setting > ul > li > button{
+        padding:10px;
+        border:1px solid #e8e8e8;
+        cursor:pointer;
+        display: flex;
+        align-items: center;
+        font-size: 12pt;
+        justify-content: space-around;
+        width: 20%;
+        background-color: #e6e6e6;
+        border-radius:5px;
+    }
+
+    .container-block-type-setting > ul > li > button.disabled:before{
+        content:"";
+        width: 15px;
+        height: 15px;
+        border: 1px solid #777676;
+        transition: transform 0.5s;
+    }
+
+
+    .container-block-type-setting > ul > li > button:disabled,
+    .container-block-type-setting > ul > li > button.active:disabled,
+    .container-block-type-setting > ul > li > button.disabled:disabled{
+        background-color:#364759;
+        color:#fff;
+    }
+
+    .container-block-type-setting > ul > li > button:disabled:before,
+    .container-block-type-setting > ul > li > button.active:disabled:before,
+    .container-block-type-setting > ul > li > button:disabled:before{
+        border-radius:100%;
+        border-color:transparent;
+        border-top: 2px solid #fff;
+        animation: spin 2s linear infinite;
+        width:15px;
+        height:15px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+
+    .container-block-type-setting > ul > li > button.active{
+        background-color:#00c56f;
+        color:#fff;
+    }
+
+
+    .container-block-type-setting > ul > li > button.active:before{
+        content:"";
+        width: 3.5px;
+        transform:rotate(45deg);
+        border-width: 2px;
+        border-color:#fff;
+        height: 7px;
+        border: 2px solid #fff;
+        border-top: none;
+        border-left: none;
+    }
+
+
+    .container-block-type-setting > ul > li > button{
+        background-color:transparent;
+        color:transparent;
+        border-color:transparent;
+    }
+
+
+    .container-block-type-setting > ul > li > button:after{
+        content:"";
+        border-radius:100%;
+        border:5px solid transparent;
+        border-top:5px solid #353535;
+        width:25px;
+        height:25px;
+        animation: spin 2s linear infinite;
+        cursor:none;
+        position: absolute;
+    }
+
+    .container-block-type-setting > ul > li > button.disabled{
+        color: #000;
+        background-color: #e6e6e6;
+    }
+
+
+    .container-block-type-setting > ul > li > span{
+        text-align: justify;
+        margin-right: 15px;
+        width: 70%;
+    }
+
+    .container-block-type-setting > ul > li > button.default,
+    .container-block-type-setting > ul > li > button.disabled,
+    .container-block-type-setting > ul > li > button.active,
+    .container-block-type-setting > ul > li > button:disabled{
+        padding:10px;
+        border:1px solid #e8e8e8;
+        cursor:pointer;
+        display: flex;
+        align-items: center;
+        font-size: 10pt;
+        justify-content: space-evenly;
+        width: 30%;
+        border-radius:5px;
+    }
+
+    .container-block-type-setting > ul > li > button.default:after,
+    .container-block-type-setting > ul > li > button.disabled:after,
+    .container-block-type-setting > ul > li > button.active:after,
+    .container-block-type-setting > ul > li > button:disabled:after{
+        display:none;
+    }
+
+
+    .container-block-type-setting > ul > li > button.default{
+        background-color:#f8782f;
+        color:#fff;
+    }
+
+}
+
+
+@media (min-width: 992px) {
+    .container-block-type-setting{
+        display: block;
+        width: 80%;
+        margin: 10px auto;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0 0 10px #ccc;
+    }
+
+    .container-block-type-setting > h4{
+        font-weight: 500;
+        display: block;
+        background-color: #efc171;
+        padding: 10px;
+        font-size: 17pt;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .container-block-type-setting > ul{
+        list-style: none;
+        padding: 10px;
+    }
+
+    .container-block-type-setting > ul > li{
+        display: flex;
+        justify-content: space-between;
+        align-items:center;
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+    }
+
+
+    .container-block-type-setting > ul > li:last-child{
+        border:none;
+    }
+
+    .container-block-type-setting > ul > li > button{
+        padding:10px;
+        border:1px solid #e8e8e8;
+        cursor:pointer;
+        display: flex;
+        align-items: center;
+        font-size: 12pt;
+        justify-content: space-around;
+        width: 20%;
+        background-color: #e6e6e6;
+        border-radius:5px;
+    }
+
+    .container-block-type-setting > ul > li > button.disabled:before{
+        content:"";
+        width: 15px;
+        height: 15px;
+        border: 1px solid #777676;
+        transition: transform 0.5s;
+    }
+
+
+    .container-block-type-setting > ul > li > button:disabled,
+    .container-block-type-setting > ul > li > button.active:disabled,
+    .container-block-type-setting > ul > li > button.disabled:disabled{
+        background-color:#364759;
+        color:#fff;
+    }
+
+    .container-block-type-setting > ul > li > button:disabled:before,
+    .container-block-type-setting > ul > li > button.active:disabled:before,
+    .container-block-type-setting > ul > li > button:disabled:before{
+        border-radius:100%;
+        border-color:transparent;
+        border-top: 2px solid #fff;
+        animation: spin 2s linear infinite;
+        width:15px;
+        height:15px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+
+    .container-block-type-setting > ul > li > button.active{
+        background-color:#00c56f;
+        color:#fff;
+    }
+
+
+    .container-block-type-setting > ul > li > button.active:before{
+        content:"";
+        width:7.5px;
+        transform:rotate(45deg);
+        border-width: 2px;
+        border-color:#fff;
+        height: 15px;
+        border: 2px solid #fff;
+        border-top: none;
+        border-left: none;
+    }
+
+
+    .container-block-type-setting > ul > li > button{
+        background-color:transparent;
+        color:transparent;
+        border-color:transparent;
+    }
+
+
+    .container-block-type-setting > ul > li > button:after{
+        content:"";
+        border-radius:100%;
+        border:5px solid transparent;
+        border-top:5px solid #353535;
+        width:25px;
+        height:25px;
+        animation: spin 2s linear infinite;
+        cursor:none;
+        position: absolute;
+    }
+
+    .container-block-type-setting > ul > li > button.disabled{
+        color: #000;
+        background-color: #e6e6e6;
+    }
+
+
+    .container-block-type-setting > ul > li > button.default,
+    .container-block-type-setting > ul > li > button.disabled,
+    .container-block-type-setting > ul > li > button.active,
+    .container-block-type-setting > ul > li > button:disabled{
+        padding:10px;
+        border:1px solid #e8e8e8;
+        cursor:pointer;
+        display: flex;
+        align-items: center;
+        font-size: 12pt;
+        justify-content: space-evenly;
+        width: 20%;
+        border-radius:5px;
+    }
+
+    .container-block-type-setting > ul > li > button.default:after,
+    .container-block-type-setting > ul > li > button.disabled:after,
+    .container-block-type-setting > ul > li > button.active:after,
+    .container-block-type-setting > ul > li > button:disabled:after {
+        display: none;
+    }
+
+
+    .container-block-type-setting > ul > li > button.default{
+        background-color:#f8782f;
+        color:#fff;
+    }
+}

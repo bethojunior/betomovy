@@ -1,0 +1,292 @@
+/* ── Overlay ── */
+.modal-find-customer {
+    position: absolute;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: flex-end;
+    background: var(--color-overlay);
+    z-index: 1000;
+    padding: 0;
+}
+
+.modal-find-customer.active {
+    display: flex;
+}
+
+/* ── Card ── */
+.mfc-card {
+    width: 100%;
+    max-height: 88vh;
+    background: var(--color-bg-surface);
+    border-radius: 18px 18px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.14);
+    animation: mfc-slide-up 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes mfc-slide-up {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0);    }
+}
+
+/* ── Header ── */
+.mfc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 0;
+    flex-shrink: 0;
+}
+
+/* drag handle via pseudo */
+.mfc-card::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 2px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+}
+
+.mfc-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.mfc-close {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-muted);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.12s;
+    flex-shrink: 0;
+}
+
+.mfc-close:hover { background: var(--color-border); }
+
+.mfc-close .material-icons {
+    font-size: 18px;
+    color: var(--color-text-secondary);
+}
+
+/* ── Search row ── */
+.mfc-search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px 0;
+    flex-shrink: 0;
+}
+
+.mfc-search-wrap {
+    position: relative;
+    flex: 1;
+}
+
+.mfc-search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--color-text-disabled);
+    pointer-events: none;
+}
+
+.mfc-search-input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px 0 36px;
+    border: 1px solid var(--color-border-input);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface);
+    outline: none;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+    transition: border-color 0.15s;
+}
+
+.mfc-search-input:focus { border-color: var(--color-text-muted); }
+.mfc-search-input::placeholder { color: var(--color-text-disabled); }
+
+.mfc-btn-new {
+    height: 40px;
+    padding: 0 14px;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.mfc-btn-new:hover { background: var(--color-primary-hover); }
+
+/* ── Filter pills ── */
+.mfc-filters {
+    display: flex;
+    gap: 6px;
+    padding: 10px 16px 0;
+    flex-shrink: 0;
+}
+
+.mfc-pill {
+    cursor: pointer;
+    margin: 0;
+}
+
+.mfc-pill input { display: none; }
+
+.mfc-pill span {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--color-bg-muted);
+    color: var(--color-text-muted);
+    border: 1px solid transparent;
+    transition: background 0.13s, color 0.13s;
+    user-select: none;
+}
+
+.mfc-pill input:checked + span {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+.mfc-pill:hover span {
+    background: var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+.mfc-pill input:checked + span:hover {
+    background: var(--color-primary-hover);
+}
+
+/* ── Results list ── */
+.mfc-list {
+    list-style: none;
+    padding: 10px 0 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mfc-list .select-customer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--color-bg-muted);
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.mfc-list .select-customer:hover { background: var(--color-bg-hover); }
+.mfc-list .select-customer:last-child { border-bottom: none; }
+
+.mfc-list .select-customer > div {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mfc-list .select-customer p {
+    margin: 0;
+    display: flex;
+    gap: 5px;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Label "Nome:" hidden — show only value */
+.mfc-list .select-customer p span:first-child {
+    display: none;
+}
+
+/* Name row */
+.mfc-list .select-customer p:first-child span:last-child {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Phone and CPF rows */
+.mfc-list .select-customer p:not(:first-child) span:last-child {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    display: block;
+}
+
+.mfc-list .select-customer > .material-icons {
+    font-size: 16px;
+    color: var(--color-border-input);
+    flex-shrink: 0;
+}
+
+.mfc-list:empty::after {
+    content: "Nenhum cliente encontrado.";
+    display: block;
+    padding: 24px 16px;
+    font-size: 13px;
+    color: var(--color-text-disabled);
+    text-align: center;
+}
+
+.mfc-empty {
+    display: block;
+    padding: 24px 16px;
+    font-size: 13px;
+    color: var(--color-text-disabled);
+    text-align: center;
+}
+
+/* ── Desktop ── */
+@media (min-width: 992px) {
+    .modal-find-customer {
+        align-items: center;
+        padding: 0;
+    }
+
+    .mfc-card {
+        width: min(90vw, 520px);
+        max-height: 80vh;
+        border-radius: 14px;
+        animation: mfc-fade-in 0.22s ease;
+    }
+
+    .mfc-card::before { display: none; }
+
+    @keyframes mfc-fade-in {
+        from { opacity: 0; transform: scale(0.96) translateY(8px); }
+        to   { opacity: 1; transform: scale(1) translateY(0);      }
+    }
+}

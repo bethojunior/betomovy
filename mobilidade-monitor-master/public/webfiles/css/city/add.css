@@ -1,0 +1,189 @@
+@media (max-width: 991px)  {
+    .container-city-add > .map-city {
+        display: block;
+        margin: 2% auto;
+        width: 90%;
+        height: 60%;
+        background-color: #c4c4c4;
+        border: 1px solid #a9a9a9;
+    }
+
+    .container-city-add > .simulation-point-map,
+    .container-city-add > .select-city {
+        display: flex;
+        width: 90%;
+        margin: 2% auto;
+    }
+
+    .container-city-add > .select-city > div {
+        display: flex;
+        width: 30%;
+        flex-direction: column;
+    }
+
+    .container-city-add > .select-city > div > select {
+        width: 90%;
+        padding: 0.5rem;
+    }
+
+    .container-city-add > .simulation-point-map > div {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .container-city-add > .simulation-point-map > div > textarea {
+        width: 90%;
+        resize: none;
+        overflow-y: auto;
+        border-radius: 5px;
+    }
+
+    .container-city-add > .simulation-point-map > button {
+        padding: 10px 20px;
+        background-color: #f5a00f;
+        color: #fff;
+        border: none;
+        text-transform: uppercase;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+}
+@media (min-width: 992px) {
+    .container-city-add > div .map-city {
+        display: block;
+        /* width: 90%; */
+        background-color: #c4c4c4;
+        border: 1px solid #a9a9a9;
+    }
+
+
+    .container-city-add > div .map-city.no-city:before {
+        content: "";
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.75);
+        position: absolute;
+        z-index: 10;
+    }
+
+    .container-city-add > div .map-city.no-city:after {
+        content: "Cidade não possui cadastro";
+        color: #fff;
+        font-size: 22pt;
+        text-align: center;
+        position: absolute;
+        z-index: 11;
+        margin-top: 30%;
+        width: 100%;
+    }
+
+    .container-city-add > button {
+        margin:10px 5%;
+    }
+
+    .container-city-add > .simulation-point-map,
+    .container-city-add > .select-city {
+        display: flex;
+        width: 90%;
+        margin: auto;
+    }
+
+
+    .container-city-add > .select-city > div {
+        display: flex;
+        width: 30%;
+        flex-direction: column;
+    }
+
+    .container-city-add > .select-city > div > select {
+        width: 100%;
+        padding: 0.5rem;
+    }
+
+    .container-city-add > .simulation-point-map > div {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .container-city-add > .simulation-point-map > div > textarea {
+        width: 90%;
+        resize: none;
+        overflow-y: auto;
+        border-radius: 5px;
+    }
+
+    .container-city-add > .simulation-point-map > button {
+        padding: 10px 20px;
+        background-color: #f5a00f;
+        color: #fff;
+        border: none;
+        text-transform: uppercase;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .container-add-city {
+        display: flex;
+        height: 60%;
+        width: 90%;
+        margin: 5px 5% 0 4vw;
+    }
+
+    .container-add-city > ul {
+        flex: 1;
+        background-color: #ccc;
+        margin: 0;
+        border: 1px solid #a9a9a9;
+        border-right: none;
+        list-style: none;
+        overflow-y: auto;
+    }
+
+    .container-add-city > ul > li {
+        background-color: #fff;
+        border-bottom: 1px solid #9d9d9d;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .container-add-city > div {
+        flex: 1;
+    }
+
+    .modal-setting-city {
+        position: absolute;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.5);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-setting-city > div{
+        width: 30%;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+
+    .modal-setting-city.active{
+        display: flex;
+    }
+
+    .select2-selection__rendered {
+        line-height: 31px !important;
+    }
+    .select2-container .select2-selection--single {
+        height: 37px !important;
+    }
+    .select2-selection__arrow {
+        height: 34px !important;
+    }
+}

@@ -1,0 +1,118 @@
+.container-app-setting{
+    display: flex;
+    height: calc(100% - 17vw);
+    width: 100%;
+    overflow-y: auto;
+    align-items: center;
+    flex-direction: column;
+    background-color: #ddd;
+    position: absolute;
+    top: 17vw;
+    overflow-y: auto;
+}
+
+.container-app-setting > div{
+    width:95%;
+    margin-top: 2vw;
+}
+
+.container-app-setting > div > div:first-child{
+    display:flex;
+    padding: 2vw;
+    border-radius: 2vw 2vw 0 0;
+    background-color: var(--main-color);
+    color: #fff;
+    align-items:center;
+}
+
+.container-app-setting > div > div:first-child > p{
+    font-size: 4.5vw;
+    margin-left:2vw;
+}
+
+
+.container-app-setting > div > div:last-child > ul > li{
+    background-color: #fff;
+    display:flex;
+    justify-content:space-between;
+    padding:2vw;
+    border-bottom:1px solid #ccc;
+    align-items:center;
+}
+
+
+.container-app-setting > div > div:last-child > ul > li:last-child{
+    border-bottom:none;
+}
+
+.container-app-setting > div > div:last-child{
+    border:1px solid #dcdcdc;
+}
+
+
+.container-app-setting > div > div > div{
+    display:flex;
+    background-color:#fff;
+    padding:2vw;
+    justify-content:space-between;
+    border-bottom: 1px solid #ccc;
+}
+
+
+.container-app-setting > div > div > div > button{
+    padding:1vw 4vw;
+    border:none;
+    background-color:var(--main-color);
+    color:#fff;
+    border-radius:5px;
+}
+
+.container-choice-payment-form{
+    width: 100%;
+}
+
+.container-choice-payment-form p{
+    margin-bottom:10px;
+    border-bottom:1px solid #ddd;
+}
+
+.container-choice-payment-form p.item-required{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    pointer-events: none;
+}
+
+
+.container-choice-payment-form p:after{
+    content:"";
+    padding:5px;
+    font-size: 8pt;
+    margin-bottom: 10px;
+}
+
+.container-choice-payment-form p.item-required:after{
+    content:attr(messageRequired);
+    background-color: #e53935;
+    padding:5px;
+    border-radius:5px;
+    color:#fff;
+    font-size: 8pt;
+    margin-bottom: 10px;
+}
+
+.container-choice-payment-form label{
+    color:#000;
+    font-size:12pt;
+}
+
+.container-choice-payment-form > button,
+.container-choice-payment-form > button:hover,
+.container-choice-payment-form > button:focus{
+    width:100%;
+    background-color:var(--main-color);
+}
+
+.container-choice-payment-form > button:disabled{
+    background-color:#ddd !important;
+}

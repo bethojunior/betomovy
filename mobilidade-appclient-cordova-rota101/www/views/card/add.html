@@ -1,0 +1,73 @@
+<div class="container-add-card">
+    <div>
+        <nav>
+            <i class="material-icons" id="backPaymentForm">arrow_back</i>
+            <p data-i18n="card-p-title"></p>
+        </nav>
+        <form method="post" id="addCard" name="addCard">
+            <div>
+                <label for="cardholderName" data-i18n="card-label-cardholder-name"></label>
+                <input type="text" id="cardholderName" data-checkout="cardholderName" placeholder="" data-i18n="card-placeholder-name"/>
+            </div>
+            <div class="divider-container">
+                <div>
+                    <label for="documentCard" data-i18n="card-document-card"></label>
+                    <input type="tel"  id="documentCard"  placeholder="###.###.###-##"/>
+                </div>
+                <div>
+                    <label for="show-birthday">Data de nascimento</label>
+                    <input type="tel" id="dateOfBirth" placeholder="DD/MM/YYYY"/>
+                </div>
+            </div>
+            <div>
+                <label for="cardNumber" data-i18n="card-number-text"></label>
+                <div>
+                    <i class="material-icons">
+                        credit_card
+                    </i>
+                    <input type="tel" id="cardNumber" data-checkout="cardNumber" placeholder=""
+                           onselectstart="return false" onpaste="return false" onCopy="return false"
+                           onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off/>
+                </div>
+            </div>
+            <div class="divider-container">
+                <div>
+                    <label for="cardNumber" data-i18n="card-month-year"></label>
+                    <input type="tel" id="dateMonthYear" placeholder="" data-i18n="card-placeholder-month-year"/>
+                </div>
+                <div>
+                    <label for="securityCode" data-i18n="card-cvv"></label>
+                    <input type="tel" id="securityCode" data-checkout="securityCode" placeholder="" data-i18n="card-placeholder-cvv"
+                           onselectstart="return false" onpaste="return false" onCopy="return false"
+                           onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off/>
+                </div>
+            </div>
+            <div hidden>
+                <label for="cardExpirationMonth">Expiration month:</label>
+                <input type="text" id="cardExpirationMonth" data-checkout="cardExpirationMonth" placeholder="12"
+                       onselectstart="return false" onpaste="return false" onCopy="return false"
+                       onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off/>
+            </div>
+            <div hidden>
+                <label for="cardExpirationYear">Expiration year:</label>
+                <input type="text" id="cardExpirationYear" data-checkout="cardExpirationYear" placeholder="2015"
+                       onselectstart="return false" onpaste="return false" onCopy="return false"
+                       onCut="return false" onDrag="return false" onDrop="return false" autocomplete=off/>
+            </div>
+            <div hidden>
+                <li>
+                    <label for="docNumber">Document number:</label>
+                    <input type="text" id="docNumber" data-checkout="docNumber" placeholder="12345678" />
+                </li>
+            </div>
+            <div hidden>
+                <label for="docType">Document type:</label>
+                <select id="docType" data-checkout="docType">
+                    <option value="CPF" selected>CPF</option>
+                </select>
+            </div>
+            <input type="hidden" name="paymentMethodId"/>
+            <button type="submit" data-i18n="card-btn-add"></button>
+        </form>
+    </div>
+</div>

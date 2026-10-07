@@ -1,0 +1,41 @@
+#contentSearch {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-bottom: 15px;
+}
+
+.section-search {
+    width: 20%;
+}
+
+#btnSearch {
+    align-self: end;
+}
+
+#contentTable {
+    background-color: #FFFFFF;
+    margin: 5px 5px 50px 5px;
+    border-radius: 10px;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+
+@media (max-width: 800px) {
+    #contentSearch {
+        flex-direction: column;
+        padding: 8px;
+    }
+
+    .section-search {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #btnSearch {
+        width: 100%;
+    }
+}

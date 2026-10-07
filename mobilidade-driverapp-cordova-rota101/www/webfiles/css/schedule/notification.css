@@ -1,0 +1,55 @@
+.container-notification-scheduled-trip{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    background-color:rgba(0,0,0,0.5);
+    transform:translateY(150%);
+    transition: transform 0.5s;
+}
+.container-notification-scheduled-trip.active{
+    transform:translateY(0%);
+    transition: transform 0.5s;
+}
+
+.container-notification-scheduled-trip > div{
+    width: 80%;
+    background-color: #fff;
+    padding: 5px 10px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+
+}
+
+.container-notification-scheduled-trip > div > div:first-child{
+    font-size: 25pt;
+    font-weight: 500;
+    display: block;
+    text-align: center;
+    padding: 1vw;
+    border-bottom: 1px solid #ccc;
+}
+
+.container-notification-scheduled-trip > div > div:nth-child(2){
+    text-align:justify;
+    font-size:12pt;
+    margin:10px 0;
+}
+
+.container-notification-scheduled-trip > div > button{
+    display:block;
+    width:100%;
+    font-size:22pt;
+    border:none;
+    background-color:var(--main-color);
+    color:#fff;
+    font-weight:600;
+    border-radius:5px;
+    box-shadow:0 0 10px #ccc;
+}

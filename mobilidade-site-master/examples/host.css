@@ -1,0 +1,9 @@
+:root{
+    --color-main: #367FAE;
+    --main-color: #367FAE;
+    --color-main-light: #3b91c8;
+    --colot-btn-main : #3b91c8;
+}
+.name-application:before{
+    content: '<CUSTOMER_NAME>';
+}

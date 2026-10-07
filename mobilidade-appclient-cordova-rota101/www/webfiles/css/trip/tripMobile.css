@@ -1,0 +1,257 @@
+.wrapper-trip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 92%;
+    position: relative;
+}
+
+.wrapper-trip .filter-trip-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 9;
+    float: right;
+    width: 375px;
+    margin-top: -3vw;
+    position: fixed;
+    background: #fff;
+}
+
+.wrapper-trip .filter-trip-content .box {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.wrapper-trip .filter-trip-content img{
+    width: 32px;
+    height: auto;
+
+
+}
+.wrapper-trip #filter-trips {
+    width: 25px;
+    height: auto;
+}
+
+.wrapper-trip #trips-list {
+    width: 400px;
+    height: 81vh;
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 20px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.wrapper-trip #trips-list::-webkit-scrollbar {
+    width: 4px;
+    background: transparent;
+}
+
+.wrapper-trip #trips-list::-webkit-scrollbar-button {
+    width: 20px;
+    background: transparent;
+}
+
+.wrapper-trip #trips-list::-webkit-scrollbar-thumb {
+    background: #333;
+}
+
+.wrapper-trip #trips-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.wrapper-trip #trips-list .trip-item {
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    border: 1px solid rgba(0,0,0,0.2);
+    position: relative;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    margin-top: 40px;
+    margin-bottom: -20px;
+}
+
+.wrapper-trip #trips-list .trip-item .access-trip {
+    position: absolute;
+    right: 3px;
+    top: 7px;
+}
+
+.wrapper-trip #trips-list .trip-item .access-trip img {
+    width: 20px;
+}
+
+.wrapper-trip #trips-list .trip-item .title-trip-item {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+
+.wrapper-trip #trips-list .trip-item .title-trip-item img {
+    width: 20px;
+    height: auto;
+    margin-right: 9px;
+}
+
+.wrapper-trip #trips-list .trip-item .title-trip-item span {
+    color: #464d54;
+    font-weight: 600;
+    font-size: 1.2vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+}
+
+.wrapper-trip #trips-list .trip-item .trip-content {
+    display: flex;
+    flex-direction: column;
+    color: #999;
+    font-weight: 600;
+    margin-left: 1px;
+    font-size: 16px;
+}
+
+.wrapper-trip #trips-list .trip-item .trip-content img,
+.wrapper-trip #trips-list .trip-item .footer-trip-item img{
+    width: 20px;
+    height: auto;
+}
+
+.wrapper-trip #trips-list .trip-item .trip-content .content-departure img,
+.wrapper-trip #trips-list .trip-item .trip-content .content-arrival img {
+    width: 15px;
+}
+
+.wrapper-trip #trips-list .trip-item .trip-content .content-departure:before,
+.wrapper-trip #trips-list .trip-item .trip-content .content-arrival:before {
+    width: 10px;
+    border: 0.2px solid #aaa;
+    content: "";
+    left: -0.6vw;
+    position: absolute;
+    height: 1px;
+}
+
+.wrapper-trip #trips-list .trip-item .trip-content .content-departure:after {
+    border-left: 0.2px solid #aaa;
+    height: 23.5px;
+    content: "";
+    position: absolute;
+    left: -0.6vw;
+    top: 12px;
+    width: 1px;
+}
+
+.wrapper-trip #trips-list .trip-item .trip-content .content-departure,
+.wrapper-trip #trips-list .trip-item .trip-content .content-arrival {
+    margin-left: 1vw;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.wrapper-trip #trips-list .trip-item .trip-content .content-date-trip,
+.wrapper-trip #trips-list .trip-item .footer-trip-item {
+    display: flex;
+    align-items: center;
+    /*margin-left: 0.5vw;*/
+    height: 30px;
+}
+
+.wrapper-trip #trips-list .trip-item .trip-content .content-date-trip span,
+.wrapper-trip #trips-list .trip-item .trip-content .content-departure span,
+.wrapper-trip #trips-list .trip-item .trip-content .content-arrival span {
+    margin-left: 9px;
+}
+
+
+.wrapper-trip #trips-list .trip-item .trip-content .content-departure img::before {
+    width: 3px;
+}
+
+.wrapper-trip #trips-list .trip-item .footer-trip-item span img {
+    margin-right: 9px;
+}
+.wrapper-trip #trips-list .trip-item .footer-trip-item span {
+    display: flex;
+    align-items: center;
+    color: #999;
+    font-weight: 600;
+}
+
+
+.wrapper-trip #trips-list .trip-item .footer-trip-item {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 0.2vw;
+}
+
+@media(max-width: 1200px) {
+    .wrapper-trip #trips-list {
+        height: 60vh;
+    }
+}
+
+
+@media (max-width: 992px) {
+    .wrapper-trip #trips-list .trip-item .title-trip-item span {
+        font-size: 2vw;
+    }
+
+    .wrapper-trip #trips-list .trip-item .trip-content .content-departure:after {
+        content: "";
+        position: absolute;
+        width: 1px;
+        left: -1vw;
+    }
+
+    .wrapper-trip #trips-list .trip-item .trip-content .content-departure:before,
+    .wrapper-trip #trips-list .trip-item .trip-content .content-arrival:before {
+        left: -1vw;
+        width: 5px;
+    }
+}
+
+@media (max-width: 600px) {
+    .wrapper-trip {
+        height: 87%;
+    }
+    .wrapper-trip #trips-list {
+        height: 90%;
+    }
+}
+
+@media (max-width: 657px) {
+
+    .wrapper-trip #trips-list .trip-item .title-trip-item span {
+        font-size: 5.5vw;
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .wrapper-trip .filter-trip-content {
+        width: 86%;
+    }
+
+    .wrapper-trip #trips-list {
+        width: 92%;
+        border: none;
+        box-shadow: none;
+    }
+
+}

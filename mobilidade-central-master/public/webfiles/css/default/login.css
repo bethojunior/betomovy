@@ -1,0 +1,330 @@
+/* ─────────────────────────────────────────────────
+   Login
+───────────────────────────────────────────────── */
+:root {
+    --login-blue:      var(--color-info);
+    --login-blue-dark: var(--color-link);
+    --login-blue-glow: rgba(59, 130, 246, 0.15);
+    --login-dark:      var(--color-primary);
+    --login-slate:     var(--color-text-primary);
+    --login-text:      var(--color-text-primary);
+    --login-muted:     var(--color-text-disabled);
+    --login-border:    var(--color-border);
+    --login-input-bg:  var(--color-bg-subtle);
+    --login-radius:    12px;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--login-dark);
+}
+
+.container-login *,
+.container-login *::before,
+.container-login *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Layout: banner 55% | form 45% ── */
+.container-login {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: grid;
+    grid-template-columns: 55% 45%;
+    font-family: 'Dosis', sans-serif;
+    background: var(--login-dark);
+}
+
+/* ── Banner (esquerda) ── */
+.login-banner {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--login-slate);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.login-banner__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 64px;
+}
+
+.login-banner__content {
+    max-width: 520px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.login-banner__headline {
+    color: var(--color-text-inverse);
+    font-size: 26pt;
+    font-weight: 800;
+    line-height: 1.25;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+}
+
+.login-banner__desc {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 13pt;
+    line-height: 1.65;
+}
+
+/* ── Painel direito (45%) ── */
+.login-panel {
+    height: 100%;
+    overflow-y: auto;
+    background: var(--color-bg-surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 52px 32px;
+    box-shadow: -8px 0 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Card do formulário ── */
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo-company {
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    border-radius: 14px;
+    display: block;
+    margin-bottom: 28px;
+}
+
+.login-title {
+    font-size: 22pt;
+    font-weight: 800;
+    color: var(--login-dark);
+    text-align: center;
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+
+.login-subtitle {
+    font-size: 11pt;
+    color: var(--login-muted);
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+/* ── Formulário ── */
+.form-login {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Inputs ── */
+.input-group {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.input-group > i.material-icons {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--login-muted);
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 1;
+    font-family: 'Material Icons';
+    transition: color 0.2s;
+}
+
+.input-group:focus-within > i.material-icons {
+    color: var(--color-primary);
+}
+
+.input-group > input {
+    width: 100%;
+    padding: 15px 18px 15px 48px;
+    border: 1.5px solid var(--login-border);
+    border-radius: var(--login-radius);
+    font-size: 12pt;
+    font-weight: 500;
+    color: var(--login-text);
+    background: var(--login-input-bg);
+    outline: none;
+    font-family: 'Dosis', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.input-group > input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg-surface);
+    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.12);
+}
+
+.input-group > input::placeholder {
+    color: var(--login-muted);
+    font-weight: 400;
+}
+
+/* ── Botão entrar ── */
+.authenticate-user {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 15px;
+    border: none;
+    border-radius: var(--login-radius);
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    font-size: 13pt;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    font-family: 'Dosis', sans-serif;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.authenticate-user:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.authenticate-user:active {
+    transform: translateY(0);
+}
+
+/* ── Link de cadastro ── */
+.register-link,
+.register-link:visited {
+    display: block;
+    text-align: center;
+    margin-top: 24px;
+    font-size: 10.5pt;
+    color: var(--login-muted);
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.register-link:hover,
+.register-link:focus,
+.register-link:active {
+    color: var(--login-muted);
+    text-decoration: none;
+    opacity: 0.72;
+}
+
+.register-link strong {
+    color: var(--login-slate);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1.5px;
+}
+
+.register-link:hover strong,
+.register-link:focus strong,
+.register-link:active strong {
+    color: var(--login-slate);
+    text-decoration: underline;
+}
+
+/* ── Rodapé do painel ── */
+.login-panel__footer {
+    font-size: 9pt;
+    color: var(--color-border-input);
+    text-align: center;
+}
+
+/* ── Responsivo: tela menor que 1100px ── */
+@media (max-width: 1100px) {
+    .login-banner__headline {
+        font-size: 22pt;
+    }
+
+    .login-panel {
+        padding: 48px 36px 28px;
+    }
+}
+
+/* ── Responsivo: mobile ≤ 768px ── */
+@media (max-width: 768px) {
+    html, body {
+        overflow: auto;
+    }
+
+    .container-login {
+        position: relative;
+        top: unset; left: unset; right: unset; bottom: unset;
+        grid-template-columns: 1fr;
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--login-dark) 0%, var(--color-primary) 100%);
+        align-items: center;
+        justify-items: center;
+        padding: 24px 16px;
+        overflow-y: auto;
+    }
+
+    .login-banner {
+        display: none;
+    }
+
+    .login-panel {
+        width: 100%;
+        max-width: 420px;
+        height: auto;
+        border-radius: 18px;
+        padding: 36px 28px 28px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        justify-content: flex-start;
+    }
+
+    .login-panel__footer {
+        margin-top: 24px;
+    }
+
+    .login-title {
+        font-size: 20pt;
+    }
+}
+
+/* ── Responsivo: mobile pequeno ≤ 400px ── */
+@media (max-width: 400px) {
+    .login-panel {
+        padding: 28px 20px 24px;
+        border-radius: 14px;
+    }
+
+    .login-title {
+        font-size: 17pt;
+    }
+
+    .input-group > input {
+        font-size: 11pt;
+        padding: 13px 14px 13px 44px;
+    }
+
+    .authenticate-user {
+        font-size: 12pt;
+        padding: 13px;
+    }
+}

@@ -1,0 +1,68 @@
+name: Build Develop Push
+on: push
+env:
+  APPLICATION_NAME: 'mobilidade-monitorapiv2'
+  MANIFEST_REPO: '704apps/kubernetes-manifest'
+  BRANCH: ${{ github.ref_name }}
+  PROJECT_ID: services-704
+  REGION: us-central1
+  GAR_LOCATION: us-central1-docker.pkg.dev/services-704/images/
+
+jobs:
+  build:
+    runs-on: gcp
+    outputs:
+      TAG: ${{ steps.vars.outputs.tag }}    
+    environment: 
+      name: develop
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.BRANCH }}
+
+      - name: Set output
+        id: vars
+        run: echo "::set-output name=tag::$(git rev-parse --short $GITHUB_SHA)"    
+              
+      - id: "auth"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
+
+      - name: "Docker auth"
+        run: |-
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+        
+      - name: Docker Build and Push
+        run: |               
+          docker build -t ${{ env.GAR_LOCATION }}${{ env.APPLICATION_NAME }}:app-${{ steps.vars.outputs.tag }} --target app  -f Dockerfile-gcp .
+          docker build -t ${{ env.GAR_LOCATION }}${{ env.APPLICATION_NAME }}:web-${{ steps.vars.outputs.tag }} --target web  -f Dockerfile-gcp .
+          docker push ${{ env.GAR_LOCATION }}${{ env.APPLICATION_NAME }}:app-${{ steps.vars.outputs.tag }}
+          docker push ${{ env.GAR_LOCATION }}${{ env.APPLICATION_NAME }}:web-${{ steps.vars.outputs.tag }}  
+          
+  # deploy:
+  #   runs-on: self-hosted
+  #   needs: [build]
+  #   environment: 
+  #     name: develop
+  #   steps:
+  #     - name: Check out Argo Manifests
+  #       uses: actions/checkout@master
+  #       with:
+  #         repository: ${{ env.MANIFEST_REPO }}
+  #         ref: main
+  #         token: ${{ secrets.CI_TOKEN }}
+
+  #     - name: Update Manifest
+  #       run: |
+  #         export IMAGE_TAG=${{ needs.build.outputs.TAG }}
+  #         wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && chmod +x /usr/bin/yq
+  #         yq e '.image.tag = env(IMAGE_TAG)' -i ${{ env.APPLICATION_NAME }}/dev/values.yaml
+
+  #     - name: Commit & Push Argo
+  #       uses: actions-js/push@master
+  #       with:
+  #         github_token: ${{ secrets.CI_TOKEN }}
+  #         repository: ${{ env.MANIFEST_REPO }}
+  #         branch: main

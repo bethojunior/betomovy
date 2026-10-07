@@ -1,0 +1,91 @@
+<link rel="stylesheet" href="webfiles/css/routes/details.css"/>
+<div class="container-travel-detail">
+    <h4>Detalhes de Rota</h4>
+    <div class="travel-details-locales">
+        <div>
+            <h4 id="name-route"></h4>
+        </div>
+    </div>
+    <div class="all-info-travel">
+        <h4>Informações:</h4>
+        <hr/>
+        <p>Duração média: <span id="duration-trip"></span>minutos</p>
+        <p>Km média: <span id="distance-trip"></span></p>
+        <label id="about-route"></label>
+        <hr/>
+        <p>O que você pode ofertar:</p>
+        <ul id="listOfferRoute"></ul>
+        <hr/>
+        <p>Paradas de Embarque:</p>
+        <ul id="listBoardingOffer"></ul>
+        <p>Paradas de Desembarque:</p>
+        <ul id="listLandingOffer"></ul>
+        <div class="offer-travel-detail">
+            <span>Minhas Ofertas</span>
+            <ul id="typeItemTrip"></ul>
+        </div>
+        <div class="datetime-travel-detail">
+            <span>Quando e que horas você deseja ofertar carona</span>
+            <div>
+                <span>Dia</span>
+                <div>
+                    <input type="date" id="routeScheduleDate"/>
+                </div>
+                <span>as</span>
+                <div>
+                    <input type="time" id="routeScheduleTime"/>
+                </div>
+                <span>Hs</span>
+            </div>
+        </div>
+        <div class="list-container">
+            <span>Clientes confirmados</span>
+            <div class="list-customers"></div>
+        </div>
+
+    </div>
+    <button type="button" id="btnAwaitingRelease">AGUARDANDO LIBERAÇÃO</button>
+    <button type="button" id="btnRequestRoute">TENHO INTERESSE</button>
+    <button type="button" id="btnOfferRideCar">OFERTAR CARONA</button>
+    <button type="button" id="btnCancelOfferRideCar">CANCELAR CARONA</button>
+</div>
+<div class="container-number-vacancies">
+    <div>
+        <div>
+            Quantidade de vagas
+        </div>
+        <div>
+            <div class="input-number-item">
+                <i class="material-icons" id="removeVacancies">remove</i>
+                <span id="amountVacancies">1</span>
+                <i class="material-icons active" id="addVacancies">add</i>
+            </div>
+            <button type="button" id="btnConfirmVacancies">Confirmar</button>
+        </div>
+    </div>
+</div>
+<div class="modal-dialog-offer">
+    <div>
+        <h4>Deseja oferta a viagem?</h4>
+        <p><i class="material-icons">map</i><span id="nameRouteInfoDriver"></span></p>
+        <p><i class="material-icons">calendar_today</i> <span id="datetimeInfoDriver"></span></p>
+        <p><i class="material-icons">people</i> <span id="amountTotalVacancies"></span></p>
+        <div>
+            <button type="button" id="acceptedOffer">SIM</button>
+            <button type="button" id="rejectOffer">NÂO</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-confirm-offer">
+    <div>
+        <h4>
+            Oferta registrado <br/>
+            com sucesso!
+        </h4>
+        <span>Em breve você receberá uma notificação sobre este pedido</span>
+        <div>
+            <button type="button" id="closeConfirmOffer">OK</button>
+        </div>
+    </div>
+</div>

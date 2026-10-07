@@ -1,0 +1,486 @@
+/* ─────────────────────────────────────────────────
+   Register Central
+───────────────────────────────────────────────── */
+:root {
+    --reg-dark:   var(--color-text-primary);
+    --reg-darker: var(--color-primary);
+    --reg-text:   var(--color-text-primary);
+    --reg-muted:  var(--color-text-muted);
+    --reg-subtle: var(--color-text-disabled);
+    --reg-border: var(--color-border);
+    --reg-bg-in:  var(--color-bg-subtle);
+    --reg-blue:   var(--color-info);
+    --reg-radius: 8px;
+    --reg-error:  var(--color-danger-strong);
+}
+
+html, body {
+    height: 100%;
+    background: var(--reg-darker);
+}
+
+/* ── Layout: banner 42% | form 58% ── */
+.register-page {
+    display: grid;
+    grid-template-columns: 42% 58%;
+    min-height: 100vh;
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* ── Banner (esquerda) ── */
+.reg-banner {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--reg-dark);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.reg-banner__overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.62);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 40px;
+}
+
+.reg-banner__content {
+    text-align: center;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.reg-banner__logo {
+    width: 76px;
+    height: 76px;
+    object-fit: contain;
+    border-radius: 14px;
+    display: block;
+}
+
+.reg-banner__title {
+    font-size: 22pt;
+    font-weight: 700;
+    color: var(--color-text-inverse);
+    line-height: 1.2;
+}
+
+.reg-banner__desc {
+    font-size: 11pt;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.65;
+}
+
+/* ── Painel direito (58%) ── */
+.reg-panel {
+    background: var(--color-bg-surface);
+    min-height: 100vh;
+    padding: 40px 24px 48px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;   /* coluna → align-items centra na horizontal */
+    align-items: center;      /* centraliza o wrap horizontalmente */
+    overflow-y: auto;
+}
+
+/* ── Wrap — ocupa até 580px, centralizado sem espaço lateral ── */
+.reg-wrap {
+    width: 100%;
+    max-width: 580px;
+}
+
+/* ── Botão voltar ── */
+.reg-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 24px;
+    color: var(--reg-muted);
+    font-size: 10pt;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.18s;
+}
+
+.reg-back:hover {
+    color: var(--reg-dark);
+}
+
+.reg-back .material-icons {
+    font-size: 17px;
+    font-family: 'Material Icons';
+}
+
+/* ── Cabeçalho ── */
+.reg-header {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--reg-border);
+}
+
+.reg-title {
+    font-size: 18pt;
+    font-weight: 700;
+    color: var(--reg-darker);
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.reg-subtitle {
+    font-size: 10.5pt;
+    color: var(--reg-subtle);
+}
+
+/* ── Erros ── */
+#listErrors:not(:empty) {
+    margin-bottom: 20px;
+}
+
+#listErrors .alert-danger {
+    padding: 10px 14px;
+    background: var(--color-danger-bg);
+    border: 1px solid #fecaca;
+    border-radius: var(--reg-radius);
+    color: var(--reg-error);
+    font-size: 10pt;
+    margin-bottom: 6px;
+    list-style: none;
+}
+
+/* ── Toggle internacional ── */
+.reg-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: var(--reg-text);
+    cursor: pointer;
+    user-select: none;
+}
+
+.reg-toggle input[type="checkbox"] {
+    width: 36px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--reg-dark);
+    flex-shrink: 0;
+}
+
+/* ── Seções ── */
+.reg-section {
+    margin-bottom: 22px;
+}
+
+.reg-section__title {
+    font-size: 9.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    color: var(--reg-muted);
+    border-bottom: 1px solid var(--reg-border);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+}
+
+/* ── Campos ── */
+.reg-field {
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.reg-field > label:first-child {
+    display: block;
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--reg-text);
+    margin-bottom: 5px;
+}
+
+.reg-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* ── Inputs — override Bootstrap ── */
+.form-control {
+    display: block !important;
+    width: 100% !important;
+    padding: 11px 13px !important;
+    border: 1.5px solid var(--reg-border) !important;
+    border-radius: var(--reg-radius) !important;
+    font-size: 10.5pt !important;
+    font-family: 'Open Sans', sans-serif;
+    color: var(--reg-text) !important;
+    background: var(--reg-bg-in) !important;
+    box-shadow: none !important;
+    outline: none;
+    height: auto !important;
+    transition: border-color 0.18s, background 0.18s;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    border-color: var(--color-text-muted) !important;
+    background: var(--color-bg-surface) !important;
+    box-shadow: none !important;
+}
+
+.form-control::placeholder {
+    color: #b0bec5;
+    font-size: 10pt;
+}
+
+select.form-control {
+    cursor: pointer;
+    appearance: auto;
+}
+
+/* ── Validação ── */
+.form-control.is-invalid {
+    border-color: var(--color-danger-text) !important;
+}
+
+.form-control.is-valid {
+    border-color: #86efac !important;
+    background-image: none !important;
+}
+
+.invalid-feedback {
+    display: none;
+    font-size: 9pt;
+    color: var(--reg-error);
+    margin-top: 4px;
+}
+
+.form-control.is-invalid ~ .invalid-feedback,
+.was-validated .form-control:invalid ~ .invalid-feedback {
+    display: block;
+}
+
+/* ── Autocomplete ── */
+.container-autocomplete {
+    position: relative;
+}
+
+.container-autocomplete > ul:empty {
+    display: none;
+}
+
+.container-autocomplete > ul {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--reg-border);
+    border-top: none;
+    border-radius: 0 0 var(--reg-radius) var(--reg-radius);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.container-autocomplete > ul > li {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 10pt;
+    color: var(--reg-text);
+    border-bottom: 1px solid var(--color-bg-subtle);
+    transition: background 0.12s;
+}
+
+.container-autocomplete > ul > li:hover {
+    background: var(--color-bg-subtle);
+}
+
+.container-autocomplete > ul > li:last-child {
+    border-bottom: none;
+}
+
+/* ── Upload de logo ── */
+.reg-file {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* O input ocupa toda a área do wrapper, invisível, clickável */
+.reg-file .custom-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+    margin: 0;
+}
+
+/* Override do Bootstrap: label vira área dashed estilizada */
+.reg-file .custom-file-label {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    position: static !important;  /* cancela o absolute do Bootstrap */
+    width: 100% !important;
+    height: auto !important;
+    padding: 14px !important;
+    border: 1.5px dashed var(--reg-border) !important;
+    border-radius: var(--reg-radius) !important;
+    background: var(--reg-bg-in) !important;
+    font-size: 10.5pt !important;
+    color: var(--reg-subtle) !important;
+    font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.18s, background 0.18s, color 0.18s;
+    box-shadow: none !important;
+}
+
+.reg-file .custom-file-label::after {
+    display: none !important;
+}
+
+.reg-file:hover .custom-file-label {
+    border-color: var(--color-text-disabled) !important;
+    background: var(--color-bg-muted) !important;
+    color: var(--reg-text) !important;
+}
+
+/* ── Botão criar conta ── */
+.reg-btn {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    margin-top: 36px;
+    border: none;
+    border-radius: var(--reg-radius);
+    background: var(--reg-dark);
+    color: var(--color-text-inverse);
+    font-size: 12pt;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.18s, transform 0.12s;
+}
+
+.reg-btn:hover {
+    background: var(--reg-darker);
+    transform: translateY(-1px);
+}
+
+.reg-btn:active {
+    transform: translateY(0);
+}
+
+.reg-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ── Link de login ── */
+.reg-login-link,
+.reg-login-link:visited {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 10.5pt;
+    color: var(--reg-subtle);
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.reg-login-link:hover,
+.reg-login-link:focus,
+.reg-login-link:active {
+    color: var(--reg-subtle);
+    text-decoration: none;
+    opacity: 0.72;
+}
+
+.reg-login-link strong {
+    color: var(--color-primary);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1.5px;
+}
+
+.reg-login-link:hover strong,
+.reg-login-link:focus strong,
+.reg-login-link:active strong {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+/* ── Rodapé ── */
+.reg-panel__footer {
+    font-size: 9pt;
+    color: var(--color-text-disabled);
+    text-align: center;
+    margin-top: 24px;
+}
+
+/* ── Responsivo: tela média ≤ 1100px ── */
+@media (max-width: 1100px) {
+    .reg-panel {
+        padding: 32px 36px 36px;
+    }
+
+    .reg-banner__title {
+        font-size: 18pt;
+    }
+}
+
+/* ── Responsivo: mobile ≤ 768px ── */
+@media (max-width: 768px) {
+    .register-page {
+        grid-template-columns: 1fr;
+    }
+
+    .reg-banner {
+        display: none;
+    }
+
+    .reg-panel {
+        padding: 28px 20px 48px;
+        min-height: 100vh;
+    }
+
+    .reg-wrap {
+        max-width: 100%;
+    }
+}
+
+/* ── Responsivo: mobile pequeno ≤ 480px ── */
+@media (max-width: 480px) {
+    .reg-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .reg-title {
+        font-size: 16pt;
+    }
+}

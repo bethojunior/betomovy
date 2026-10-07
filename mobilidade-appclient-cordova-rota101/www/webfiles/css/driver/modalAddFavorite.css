@@ -1,0 +1,168 @@
+.modal-add-driver-favorite {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    transition: 1s;
+    z-index: -1;
+}
+
+.modal-add-driver-favorite.active{
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 500;
+    transition: 1s;
+}
+
+.modal-add-driver-favorite > div {
+    width: 80%;
+    background-color: #fff;
+    border-radius: 1.5vw;
+    opacity: 0;
+    transition: 0.5s;
+}
+.modal-add-driver-favorite.active > div {
+    opacity: 1;
+    transition: 0.5s;
+}
+
+.modal-add-driver-favorite > div > span {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    padding: 2vw;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-add-driver-favorite > div > span > span{
+    font-size:4.5vw;
+}
+
+.modal-add-driver-favorite > div > div {
+    margin: 2vw;
+}
+
+.modal-add-driver-favorite > div > div > input {
+    border: unset;
+    border-bottom: 1px solid #ccc;
+    width: calc(100% - 10vw);
+    margin-bottom: 3vw;
+    padding: 2vw 5vw;
+    text-align: center;
+    color: #000;
+    outline: unset;
+    font-size: 4.5vw;
+    text-transform: uppercase;
+    background-color: transparent;
+}
+
+.modal-add-driver-favorite > div > div > div {
+    display: flex;
+}
+
+.modal-add-driver-favorite > div > div > div > button {
+    border: 1px solid #fff;
+    padding: 2vw 5vw;
+    text-transform: uppercase;
+    border-radius: 1vw;
+    font-size:4.5vw;
+    outline: unset;
+}
+
+.modal-add-driver-favorite > div > div > div > button:last-child {
+    background-color: var(--main-color);
+    color: #fff;
+    display: block;
+    margin: auto;
+}
+
+.container-confirmation-driver-favorite{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    transition: 1s;
+    z-index: -1;
+}
+
+.container-confirmation-driver-favorite.active{
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 500;
+    transition: 1s;
+}
+
+.container-confirmation-driver-favorite > div {
+    width: 80%;
+    background-color: #fff;
+    border-radius: 1.5vw;
+    opacity: 0;
+    transition: 0.5s;
+    position:relative;
+    padding:5vw 2vw;
+}
+.container-confirmation-driver-favorite.active > div {
+    opacity: 1;
+    transition: 0.5s;
+}
+.container-confirmation-driver-favorite.active > div > i{
+    position:absolute;
+    right:2vw;
+    top:2vw;
+    font-size:8vw;
+}
+.container-confirmation-driver-favorite.active > div > img{
+    width:50vw;
+    height:50vw;
+    display:block;
+    margin:auto;
+    border-radius:100%;
+    background-color:#ccc;
+    margin-top:2.5vw;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.container-confirmation-driver-favorite.active > div > p{
+    text-align:center;
+    margin-top:2.5vw;
+    font-size:6.5vw;
+}
+
+.container-confirmation-driver-favorite.active > div > p:empty{
+
+    float: left;
+
+    width: 100%;
+
+    height: 8vw;
+
+    background-color: #e6e6e6;
+
+    margin-bottom: 1vw;
+}
+
+.container-confirmation-driver-favorite.active > div > span{
+    display:block;
+    width:100%;
+    text-align:center;
+    color:#3e3d3d;
+    font-size:4.5vw;
+}
+.container-confirmation-driver-favorite.active > div > button{
+    display:block;
+    border: 1px solid #fff;
+    padding: 2vw 5vw;
+    text-transform: uppercase;
+    border-radius: 1vw;
+    font-size:4.5vw;
+    outline: unset;
+    margin: 5vw auto 0;
+    background-color: var(--main-color);
+    color: #fff;
+}

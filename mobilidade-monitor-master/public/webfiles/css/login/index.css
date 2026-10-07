@@ -1,0 +1,177 @@
+@media (max-width: 991px) {
+    .container-login {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ccc;
+    }
+
+    .container-login > div > .logo-monitor{
+        height: 30vw;
+        width: 30vw;
+        display: block;
+        margin: auto;
+        background-repeat: no-repeat;
+        background-size: 80%;
+        background-position: center;
+        /*background-image: url('../../img/logo/fabrica.jpeg');*/
+        background-color: transparent;
+        box-shadow: none;
+        position: relative;
+        left: 0;
+        right:0;
+        top: 1vw;
+    }
+
+    .container-login > div {
+        width: 90%;
+        background-color: #fff;
+        padding: 3vw;
+        border-radius: 1vw;
+        box-shadow: 0 0 10px #7b7b7b;
+    }
+
+    .container-login > div > h4 {
+        text-align: center;
+        font-size: 6vw;
+    }
+
+    .container-login > div > form > div > label {
+        width: 100%;
+        float: left;
+        font-size: 5vw;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+    }
+    .container-login > div > form > div > label > i{
+        margin-right: 2vw;
+    }
+
+    .container-login > div > form > div > input {
+        width: 100%;
+        float: left;
+        font-size: 5.5vw;
+        margin-bottom: 4vw;
+        padding: 3vw 5vw;
+        border: 1px solid #a3a3a3cc;
+        outline: unset;
+        border-radius: 3vw;
+    }
+
+    .container-login > div > form > input[type=submit] {
+        padding: 4vw 5vw;
+        display: block;
+        margin: 4vw auto 0;
+        border: 1px solid #a5a0a0;
+        text-transform: uppercase;
+        background-color: var(--main-color);
+        color: #fff;
+        outline: chartreuse;
+        cursor: pointer;
+        width: 80%;
+        font-size: 5vw;
+        border-radius: 2vw;
+        box-shadow: 0 0 10px #a9a9a9;
+    }
+
+    .container-login > div > form > div > a {
+        font-size: 15px;
+        margin-top: 15px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container-login {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ccc;
+    }
+
+    .container-login > div > .logo-monitor{
+        height: 6vw;
+        width: 10vw;
+        display: block;
+        margin: auto;
+        background-repeat: no-repeat;
+        background-size: 50%;
+        background-position: center;
+        /*background-image: url('../../img/logo/fabrica.jpeg');*/
+        background-color: transparent;
+        box-shadow: none;
+        position: relative;
+    }
+
+
+    .container-login > div {
+        width: 30%;
+        background-color: #fff;
+        padding: 0.5vw;
+        border-radius: 0.5vw;
+        box-shadow: 0 0 10px #7b7b7b;
+    }
+
+    .container-login > div > h4 {
+        text-align: center;
+        font-size: 1.5vw;
+    }
+
+    .container-login > div > form > div > label {
+        width: 100%;
+        float: left;
+        font-size: 1vw;
+        display: flex;
+        align-items: center;
+    }
+
+    .container-login > div > form > div > input {
+        width: 100%;
+        float: left;
+        font-size: 1vw;
+        margin-bottom: .5vw;
+        padding: .5vw 1vw;
+        border-radius: 0.5vw;
+        border: 1px solid #cccc;
+        outline: unset;
+    }
+
+    .container-login > div > form > input[type=submit] {
+        padding: 0.5vw 2vw;
+        display: block;
+        margin: auto;
+        border: none;
+        border-radius: 0.5vw;
+        text-transform: uppercase;
+        background-color: var(--main-color);
+        color: #fff;
+        outline: chartreuse;
+        box-shadow: 0 0 10px #e8dfdf;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    #modal-forgot-password .modal-body label {
+        font-size: 14px;
+    }
+
+    .container-login > div > form > div > a {
+        font-size: 11px;
+    }
+}
+
+.container-login > div > form > .forgot-password-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 1vw;
+}
+
+.container-login > div > form > div > a {
+    text-decoration: none;
+}

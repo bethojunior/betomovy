@@ -1,0 +1,286 @@
+/* ─────────────────────────────────────────────────
+   Hamburger — três traços → X
+───────────────────────────────────────────────── */
+.menu-close {
+    width: 24px;
+    height: 20px;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.menu-close span {
+    display: block;
+    width: 100%;
+    height: 2.5px;
+    background-color: var(--color-bg-surface);
+    border-radius: 2px;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.18s ease;
+    transform-origin: center;
+}
+
+.menu-close:hover span {
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+/* Estado X */
+.menu-close.open span:nth-child(1),
+.container-menu-options.active .menu-drawer-navbar .menu-close span:nth-child(1) {
+    transform: translateY(8.75px) rotate(45deg);
+}
+.menu-close.open span:nth-child(2),
+.container-menu-options.active .menu-drawer-navbar .menu-close span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+.menu-close.open span:nth-child(3),
+.container-menu-options.active .menu-drawer-navbar .menu-close span:nth-child(3) {
+    transform: translateY(-8.75px) rotate(-45deg);
+}
+
+/* Ponteiros */
+#optionMenu,
+#btnCloseMenuDrawer {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────────
+   Header principal
+   Grid: [48px hamburger] [1fr brand] [auto select]
+   → nunca quebra, sem wrappers aninhados
+───────────────────────────────────────────────── */
+.app-header {
+    position: relative;
+    z-index: 1000;
+    pointer-events: auto;
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    align-items: center;
+    padding-right: 16px;
+    height: 64px;
+    background: var(--color-header-gradient, linear-gradient(105deg, var(--color-primary) 0%, var(--color-primary-hover) 100%));
+    border-bottom: 1px solid var(--color-surface);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+/* ── Coluna 1: hamburger centralizado nos 52px ── */
+.app-header > .menu-close {
+    justify-self: center;
+    left: 0;
+    margin: 0;
+}
+
+/* ── Coluna 2: logo + nome (1fr) ── */
+.app-header__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+    padding: 5px 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.18s;
+}
+
+.app-header__brand:hover {
+    background: var(--color-surface);
+}
+
+.app-header__logo {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 7px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+.app-header__name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--color-text-inverse);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Coluna 3: select branco (auto) ── */
+.app-header__select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--color-bg-surface);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23111111' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    border: none;
+    border-radius: 8px;
+    color: var(--color-primary);
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 8px 30px 8px 12px;
+    cursor: pointer;
+    min-width: 130px;
+    max-width: 200px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
+    outline: none;
+    letter-spacing: 0.2px;
+    transition: box-shadow 0.18s;
+}
+
+.app-header__select:hover {
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.32);
+}
+
+.app-header__select:focus {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.app-header__select option {
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+/* ── Responsivo ≤ 600px: nome da central some ── */
+@media (max-width: 600px) {
+    .app-header {
+        grid-template-columns: 48px 1fr auto;
+    }
+
+    .app-header__name {
+        display: none;
+    }
+
+    .app-header__select {
+        min-width: 110px;
+        font-size: 11.5px;
+        padding: 7px 26px 7px 10px;
+    }
+}
+
+/* ── Responsivo ≤ 400px ── */
+@media (max-width: 400px) {
+    .app-header {
+        grid-template-columns: 44px 0 auto;
+        padding-right: 12px;
+    }
+
+    .app-header__brand {
+        display: none;
+    }
+
+    .app-header__select {
+        min-width: 90px;
+        font-size: 11px;
+        padding: 6px 22px 6px 8px;
+    }
+}
+
+/* ─────────────────────────────────────────────────
+   Modal Limpar cache
+───────────────────────────────────────────────── */
+.cache-modal__dialog {
+    max-width: 360px;
+}
+
+.cache-modal {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+    overflow: hidden;
+    font-family: 'Open Sans', sans-serif;
+    padding: 24px 24px 20px;
+}
+
+/* Faixa vermelha no topo — indica ação destrutiva */
+.cache-modal::before {
+    content: '';
+    display: block;
+    height: 3px;
+    background: var(--color-danger);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-radius: 12px 12px 0 0;
+}
+
+/* Linha de cabeçalho: título + fechar */
+.cache-modal__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.cache-modal__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.cache-modal__close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--color-text-disabled);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.15s;
+}
+
+.cache-modal__close:hover { color: var(--color-text-secondary); }
+
+/* Texto */
+.cache-modal__text {
+    font-size: 13.5px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0 0 22px;
+}
+
+/* Botões */
+.cache-modal__footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.cache-modal__cancel,
+.cache-modal__confirm {
+    height: 36px;
+    padding: 0 18px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.15s;
+}
+
+.cache-modal__cancel {
+    background: var(--color-bg-muted);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.cache-modal__cancel:hover { background: var(--color-border); }
+
+.cache-modal__confirm {
+    background: var(--color-danger-strong);
+    color: var(--color-text-inverse);
+}
+
+.cache-modal__confirm:hover { background: var(--color-danger-strong); }

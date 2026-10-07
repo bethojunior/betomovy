@@ -1,0 +1,10 @@
+0 * * * * cd /var/www/html/console && /usr/bin/php command.php sync-drivers-active >> /tmp/cronjob-sync-drivers-active.log 2>&1
+0 * * * * cd /var/www/html/console && /usr/bin/php command.php sync-trip-card-payment >> /tmp/cronjob-sync-trip-card-payment.log 2>&1
+* * * * * cd /var/www/html/console && /usr/bin/php command.php remove-expired-blacklist >> /tmp/cronjob-remove-expired-blacklist.log 2>&1
+* * * * * cd /var/www/html/console && /usr/bin/php command.php trip-call-scheduled >> /tmp/cronjob-trip-call-scheduled.log 2>&1
+30 2 * * * cd /var/www/html/console && /usr/bin/php command.php bill-cancellation-fees >> /tmp/cronjob-bill-cancellation-fees.log 2>&1
+30 3 * * * cd /var/www/html/console && /usr/bin/php command.php clear-driver-penalties >> /tmp/cronjob-clear-driver-penalties.log 2>&1
+40 3 * * * cd /var/www/html/console && /usr/bin/php command.php release-blocked-trips >> /tmp/cronjob-release-blocked-trips.log 2>&1
+0 0,12 * * * cd /var/www/html/console && /usr/bin/php command.php driver-leveling >> /tmp/cronjob-driver-leveling.log 2>&1
+0 23 * * * cd /var/www/html/console && /usr/bin/php command.php fee-devolution-drivers-indicated >> /tmp/cronjob-fee-devolution-drivers-indicated.log 2>&1
+

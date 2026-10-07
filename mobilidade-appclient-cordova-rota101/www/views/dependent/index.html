@@ -1,0 +1,53 @@
+<div class="container-dependent">
+    <nav>
+        <i class="material-icons back-dependent">keyboard_arrow_left</i>
+        <span>Dependentes</span>
+        <i class="material-icons" id="addDependent">add</i>
+    </nav>
+    <div>
+        <ul id="listDependents"></ul>
+    </div>
+</div>
+
+<div class="modal-add-dependent">
+    <div>
+        <i class="material-icons back-dependent">keyboard_arrow_left</i>
+        <span>Cadastro de dependente</span>
+    </div>
+    <form>
+        <div>
+            <label>Nome</label>
+            <input type="text" placeholder="Nome" id="nameDependent">
+        </div>
+        <div>
+            <label>E-mail</label>
+            <input type="email" placeholder="E-mail" id="emailDependent">
+        </div>
+        <div>
+            <label>Telefone</label>
+            <input type="tel" placeholder="Telefone" id="phoneDependent">
+        </div>
+        <div>
+            <label>Parentesco</label>
+            <input type="text" placeholder="Parentesco" id="relationshipDependent">
+        </div>
+        <div>
+            <label>Gênero</label>
+            <select id="genderDependent">
+                <option value="" disabled selected>Gênero</option>
+                <option value="masculino">Masculino</option>
+                <option value="feminino">Feminino</option>
+                <option value="outro">Outro</option>
+            </select>
+        </div>
+        <div>
+            <label>Senha</label>
+            <input type="password" placeholder="Senha" id="passwordDependent">
+        </div>
+        <div>
+            <label>Confirmar Senha</label>
+            <input type="password" placeholder="Confirmar Senha" id="repasswordDependent">
+        </div>
+        <button type="button" id="btnAddDependent">CONFIRMAR</button>
+    </form>
+</div>

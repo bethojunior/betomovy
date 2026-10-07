@@ -1,0 +1,39 @@
+<div class="container-offer-driver-modal">
+    <div>
+        <i class="material-icons go-back">keyboard_backspace</i>
+        <p data-i18n="trip-bid-title"></p>
+    </div>
+    <ul id="listTripBidOffer" class="list-trip-bid-offer">
+        <li class="container-btn-show-more" id="liShowMoreOffer">
+            <button
+                type="button"
+                id="btnShowMoreOffer"
+                class="btn btn-primary btn-show-more"
+                data-i18n="list-trips-btn-show-more"
+            ></button>
+        </li>
+    </ul>
+    <div id="preloadOffer">
+        <div class="loader-global"></div>
+    </div>
+</div>
+
+<div class="price-offer-modal">
+    <div>
+        <i class="material-icons go-back">arrow_back</i>
+        <div>
+            <button type="button" id="decreaseOfferValue"><span>-</span></button>
+            <input type="tel" id="priceOfferTrip" readonly />
+            <button type="button" id="increaseOfferValue"><span>+</span></button>
+        </div>
+        <ul id="suggestedValues"></ul>
+        <label for="priceOfferTrip"
+            ><b data-i18n="offer-b-price-offer-trip"></b> <label data-i18n="offer-label-price-offer-trip"></label
+        ></label>
+        <button type="button" id="btnConfirmValueOffer" data-i18n="trip-bid-button-confirm"></button>
+    </div>
+</div>
+
+<div class="content-only-offer-driver-modal">
+    <ul class="list-trip-bid-offer"></ul>
+</div>

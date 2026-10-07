@@ -1,0 +1,76 @@
+<div class="container-knob-manual">
+    <div class="container-search-locales">
+        <div class="search-locales">
+            <i class="material-icons close-knob-manual">keyboard_backspace</i>
+            <div>
+                <input type="text" id="origin"
+                       class="search-address-location"
+                       placeholder="" data-i18n="knob-placeholder-origin">
+                <label for="origin"></label>
+                <i class="material-icons clear-input" for="origin">cancel</i>
+            </div>
+            <div id="containerInputDestination">
+                <input type="text" id="destination"
+                       class="search-address-location"
+                       placeholder="" data-i18n="knob-placeholder-destination">
+                <label for="destination"></label>
+                <i class="material-icons clear-input" for="destination">cancel</i>
+                <!--<i class="material-icons add-place-stop">add</i>-->
+            </div>
+        </div>
+        <ul id="listPlaceKnob"> </ul>
+        <div class="data-trip-knob">
+            <div class="value-trip-knob">
+                <h4 id="detailValueTripKnob"></h4>
+                <button type="button" id="btnEditPriceKnob" data-i18n="knob-edit-price"></button>
+            </div>
+            <form class="form-customer-knob">
+                <div>
+                    <label for="nameCustomerKnob" data-i18n="knob-name-customer"></label>
+                    <input type="text" id="nameCustomerKnob">
+                </div>
+                <div>
+                    <label for="phoneCustomerKnob" data-i18n="knob-phone-customer"></label>
+                    <input type="tel" id="phoneCustomerKnob">
+                </div>
+                <div>
+                    <label for="documentCustomerKnob" data-i18n="knob-document-customer"></label>
+                    <input type="tel" id="documentCustomerKnob">
+                </div>
+                <div>
+                    <label for="emailCustomerKnob" data-i18n="knob-email-customer"></label>
+                    <input type="email" id="emailCustomerKnob">
+                </div>
+                <div>
+                    <label for="paymentFormKnobTrip" data-i18n="knob-payment-form-trip"></label>
+                    <select id="paymentFormKnobTrip"></select>
+                </div>
+            </form>
+            <button type="button" id="createTripKnobManual" data-i18n="knob-btn-create-knob"></button>
+        </div>
+    </div>
+    <div id="mapKnobTrip" class="container-map-knob"></div>
+</div>
+
+<div class="container-edit-price">
+    <div class="close-edit-price">
+        <i class="material-icons" id="closeEditPrice">close</i>
+    </div>
+    <p>
+        <i class="material-icons">info</i>
+        <span data-i18n="knob-span-title-edit-price"></span>
+    </p>
+    <div class="container-info-price">
+        <p id="typeEditPrice"></p>
+        <input type="tel" id="valueNewPrice">
+    </div>
+    <button type="button" id="btnConfirmationNewPrice" data-i18n="knob-btn-confirmation-new-price"></button>
+</div>
+
+<div class="container-modal-trip-knob active">
+    <div>
+        <i class="material-icons close-modal-type-knob">close</i>
+        <span data-i18n="knob-span-title-trip-type-modal"></span>
+        <ul id="listTripTypeKnob"></ul>
+    </div>
+</div>

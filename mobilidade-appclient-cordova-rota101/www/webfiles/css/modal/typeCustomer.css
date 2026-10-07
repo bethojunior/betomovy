@@ -1,0 +1,111 @@
+.modal-type-customer{
+    z-index: 150;
+    position: absolute;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    /* height: 100%; */
+    transform: translateY(200%);
+    background-color: transparent;
+    transition: tranform 0.5s;
+    bottom: 0;
+}
+
+.modal-type-customer.active {
+    transform: translateY(0);
+}
+
+.modal-type-customer > div{
+    background-color: #fff;
+    padding:2vw;
+    width: 100%;
+    transform: translateY(150%);
+    transition-delay: 1.5s;
+    transition: 0.8s transform;
+    box-shadow: 0 0 10px #ccc;
+}
+
+.modal-type-customer.active > div{
+    transform: translateY(0);
+}
+
+.modal-type-customer > div > div > h4{
+    display:block;
+    text-align:center;
+    font-weight:600;
+    font-size:6vw;
+    margin-bottom:5vw;
+}
+
+.modal-type-customer > div > div > ul{
+    list-style:none;
+    display:flex;
+    justify-content:space-around;
+    margin:2vw 1vw;
+}
+
+.modal-type-customer > div > div > ul > li{
+    width:48%;
+    text-align:center;
+    border:1px solid #ccc;
+    height:30vw;
+    align-items:center;
+    display:flex;
+    border-radius:2vw;
+    justify-content:center;
+    font-size:5vw;
+    box-shadow:0 0 10px #f7f7f7;
+    background-color: #e39b00;
+    color:#fff;
+    font-weight:600;
+}
+
+.modal-type-customer.form-customer{
+    align-items:center;
+}
+
+.modal-type-customer.form-customer > div{
+    width: 100%;
+}
+
+.modal-type-customer > div > .form-another-customer{
+    display: none;
+}
+
+.modal-type-customer.form-customer > div > .form-another-customer{
+    display: block;
+    padding:2vw;
+}
+
+.modal-type-customer.form-customer > div > .type-customer-trip{
+    display: none;
+}
+
+
+.modal-type-customer > div > div > form{
+    display:flex;
+    flex-direction:column;
+    margin:5px 0;
+}
+
+
+.modal-type-customer > div > div > form > input{
+    padding:2vw;
+    margin-bottom:2.5vw;
+    font-size:4.5vw;
+}
+
+
+.modal-type-customer > div > div > button{
+    background-color:#ec9114;
+    color:#fff;
+    border:1px solid #ccc;
+    padding: 4vw;
+    display:block;
+    margin:auto;
+    border-radius: 5px;
+    width: 100%;
+    font-size:5vw;
+}

@@ -1,0 +1,158 @@
+@media (max-width: 991px) {
+    .list-customer {}
+
+    .list-customer > .title-list {
+        display: none;
+        background-color: #3e5163;
+        color: #fff;
+    }
+
+
+    .list-customer > .title-list > span {
+        border-right: 1px solid #313b44;
+        padding: 1rem;
+    }
+
+    .list-customer > .title-list > span:last-child {
+        border: none
+    }
+
+    .list-customer > .title-list > span:nth-child(1) {
+        width: 30%;
+        max-width: 30%;
+    }
+
+    .list-customer > .title-list > span:nth-child(2) {
+        width: 20%;
+        max-width: 20%;
+    }
+
+    .list-customer > .title-list > span:nth-child(3) {
+        width: 15%;
+        max-width: 15%;
+    }
+
+    .list-customer > .title-list > span:nth-child(4) {
+        width: 35%;
+        max-width: 35%;
+    }
+
+    .list-customer > ul {
+        height: 80%;
+        max-height: 80%;
+        overflow-y: auto;
+    }
+
+    .list-customer > ul > li {
+        display: flex;
+        border-bottom: 1px solid #ccc;
+        background-color: #fff;
+        flex-direction: column;
+        padding:2vw;
+    }
+
+    .list-customer > ul > li > span {
+        display:block;
+        margin-bottom: 2vw;
+        width:100%;
+    }
+
+    .list-customer > ul > li > span:nth-child(1):before {
+        content:"Nome: ";
+        font-weight:600;
+    }
+
+    .list-customer > ul > li > span:nth-child(2):before {
+        content:"Apelido: ";
+        font-weight:600;
+    }
+
+    .list-customer > ul > li > span:nth-child(3):before {
+        content:"Telefone: ";
+        font-weight:600;
+    }
+
+    .list-customer > ul > li > span:nth-child(4):before {
+        content:"E-mail: ";
+        font-weight:600;
+    }
+}
+
+@media (min-width: 992px) {
+    .list-customer {
+        margin: 10px;
+    }
+
+    .list-customer > .title-list {
+        display: flex;
+        background-color: #3e5163;
+        color: #fff;
+    }
+
+
+    .list-customer > .title-list > span {
+        border-right: 1px solid #313b44;
+        padding: 1rem;
+    }
+
+    .list-customer > .title-list > span:last-child {
+        border: none
+    }
+
+    .list-customer > .title-list > span:nth-child(1) {
+        width: 30%;
+        max-width: 30%;
+    }
+
+    .list-customer > .title-list > span:nth-child(2) {
+        width: 20%;
+        max-width: 20%;
+    }
+
+    .list-customer > .title-list > span:nth-child(3) {
+        width: 15%;
+        max-width: 15%;
+    }
+
+    .list-customer > .title-list > span:nth-child(4) {
+        width: 35%;
+        max-width: 35%;
+    }
+
+    .list-customer > ul {
+        background-color: #d5d5d5;
+        height: 75%;
+        max-height: 75%;
+        overflow-y: auto;
+    }
+
+    .list-customer > ul > li {
+        display: flex;
+        border-bottom: 1px solid #ccc;
+        background-color: #fff;
+    }
+
+    .list-customer > ul > li > span {
+        padding: 1rem;
+    }
+
+    .list-customer > ul > li > span:nth-child(1) {
+        width: 30%;
+        max-width: 30%;
+    }
+
+    .list-customer > ul > li > span:nth-child(2) {
+        width: 20%;
+        max-width: 20%;
+    }
+
+    .list-customer > ul > li > span:nth-child(3) {
+        width: 15%;
+        max-width: 15%;
+    }
+
+    .list-customer > ul > li > span:nth-child(4) {
+        width: 35%;
+        max-width: 35%;
+    }
+}

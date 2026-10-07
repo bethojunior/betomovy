@@ -1,0 +1,171 @@
+.favorite-driver-trip {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    z-index: -1;
+}
+
+.favorite-driver-trip.active {
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 500;
+    transition: 1s;
+}
+
+.favorite-driver-trip > div {
+    width: 80%;
+    background-color: var(--color-bg-surface);
+    border-radius: 1.5vw;
+    opacity: 0;
+    transition: 0.5s;
+    position: relative;
+    padding: 5vw 2vw;
+}
+
+.favorite-driver-trip.active > div {
+    opacity: 1;
+    transition: 0.5s;
+}
+
+.favorite-driver-trip > div > div.list-driver-favorite,
+.favorite-driver-trip > div > div.offline-driver-favorite {
+    display: none;
+}
+
+.favorite-driver-trip > div > div.list-driver-favorite.active,
+.favorite-driver-trip > div > div.offline-driver-favorite.active {
+    display: block;
+}
+
+.favorite-driver-trip > div > i {
+    position: absolute;
+    right: 2vw;
+    top: 2vw;
+    font-size: 8vw;
+}
+
+.favorite-driver-trip > div > div > h4 {
+    display: block;
+    text-align: center;
+    font-size: 10vw;
+    font-weight: 500;
+    margin-top: 2vw;
+}
+
+.favorite-driver-trip > div > div > p {
+    width: 80%;
+    margin: auto;
+    text-align: center;
+    margin-top: 2vw;
+}
+
+.favorite-driver-trip > div > button {
+    padding: 2vw 5vw;
+    text-transform: uppercase;
+    margin: auto;
+    display: block;
+    margin-top: 4vw;
+    font-size: 5vw;
+    color: #f1921c;
+    font-weight: 600;
+    height: 40vw;
+    width: 40vw;
+    border-radius: 100vw;
+    animation: pulse 2s infinite;
+    background-image: url(../../img/icon/setas-return.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--color-bg-surface);
+    border: 1px solid #ffeed9;
+}
+
+.favorite-driver-trip > div > div > ul {
+    margin: 5vw;
+    list-style: none;
+    position: relative;
+}
+
+.favorite-driver-trip > div > div > ul > li {
+    display: flex;
+    background-color: #e8e8e8;
+    padding: 2vw;
+    border-bottom: 1px solid #b9b3b3;
+    border-radius: 2px;
+    align-items: center;
+    position: relative;
+}
+
+.favorite-driver-trip > div > div > ul > li:last-child {
+    border-bottom: unset;
+}
+
+.favorite-driver-trip > div > div > ul > li > img {
+    width: 15vw;
+    height: 15vw;
+    background-color: var(--color-border);
+    border-radius: 100%;
+    border: unset;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.favorite-driver-trip > div > div > ul > li > div {
+    margin-left: 4vw;
+    font-size: 4.5vw;
+    width: 75%;
+    overflow: hidden;
+}
+
+.favorite-driver-trip > div > div > ul > li > div > i {
+    position: absolute;
+    top: 5vw;
+    right: 2vw;
+    font-size: 9vw;
+    color: #b4b3b3;
+    display:none;
+}
+
+.favorite-driver-trip > div > div > ul > li.active {
+    /* background-color:#93ebc5; */
+}
+.favorite-driver-trip > div > div > ul > li.active > div > i {
+    display:block;
+    color: #00be45;
+}
+
+.favorite-driver-trip > div > div > ul > li > div > div:empty {
+    margin-bottom: 5px;
+    float: left;
+    width: 100%;
+}
+
+.favorite-driver-trip > div > div > ul > li > div > div:empty:before {
+    background-color: var(--color-border);
+    content: "_";
+    width: 100%;
+    float: left;
+    color: var(--color-border);
+}
+
+.favorite-driver-trip > div > div > ul > li > div > div:last-child {
+    width: 40%;
+}
+
+
+.favorite-driver-trip.active.drivers-disabled > div > i {
+    display:none;
+}
+
+.favorite-driver-trip.active.drivers-disabled > div > button {
+    display:none;
+}
+
+.favorite-driver-trip.active.drivers-disabled > div {
+    padding: 2vw;
+}

@@ -1,0 +1,80 @@
+.container-finish-pay{
+    position: absolute;
+    top: 200%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    background-color: #fff;
+    transition: 0.5s;
+}
+.container-finish-pay.active{
+    top: 0;
+    transition: 0.5s;
+}
+.container-finish-pay > nav{
+    width:calc(100% - 4vw);
+    background-color:var(--main-seconds-color);
+    padding: 4vw 2vw;
+    color:#fff;
+    display:flex;
+    justify-content:left;
+    align-items: center;
+    height:8vw;
+    box-shadow: 0 0 5px #9c9b9b;
+}
+.container-finish-pay > nav > div{
+    background-color: #fff;
+    padding: 2vw;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+.container-finish-pay > div > img{
+    width: 80%;
+    padding:2vw;
+    margin:auto;
+    display:block;
+}
+.container-finish-pay > div > p{
+    display:block;
+    text-align:center;
+    font-size:7.5vw;
+}
+.container-finish-pay > div > b{
+    display:block;
+    font-size:8vw;
+    text-align:center;
+    font-weight:600;
+}
+.container-finish-pay > div > h4{
+    display: flex;
+    font-size: 10vw;
+    font-weight:500;
+    text-align:center;
+    margin-top:2vw;
+    justify-content: space-evenly;
+    align-items: center;
+}
+.container-finish-pay > div > h4 > span > label{
+    font-size:4vw;
+    display:block;
+    color:#544949;
+}
+.container-finish-pay > div > h4 >i {
+    font-size:8vw;
+}
+.container-finish-pay > div > button{
+    padding:2vw 4vw;
+    font-size:8vw;
+    color:#fff;
+    border:none;
+    background-color:var(--main-color);
+    display:block;
+    margin:8vw auto 0;
+    width:60%;
+    border-radius:1vw;
+    box-shadow:0 0 10px #959191;
+}

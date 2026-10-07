@@ -1,0 +1,43 @@
+.upload-image-central{
+    margin-top: 2vw;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.upload-image-central > input[type='file']{
+    position: absolute;
+    width: 280px;
+    height: 150px;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.upload-image-central > input[type='file']:disabled + img{
+    opacity:0.5;
+
+}
+.upload-image-central > img{
+    width: 280px;
+    height: 150px;
+    background-color: #f7f7f7;
+}
+.upload-image-central > input{
+    width: 10vw;
+    height: 10vw;
+}
+
+.upload-image-central:before{
+    content:"Logo da central";
+    position:absolute;
+    z-index:1;
+    display:block;
+    text-align:center;
+    margin:auto;
+    color:#444;
+    font-weight:600;
+    font-size:16pt;
+    opacity: 0.1;
+}

@@ -1,0 +1,36 @@
+.row.general-list-route .col-lg-12 .form-control.col-lg-3{
+    margin-top: 2vw;
+}
+.row.general-list-route .col-lg-12#mount-list-routes{
+
+}
+.row.general-list-route .col-lg-12#mount-list-routes .row.col-lg-12.data-route{
+    background-color: white;
+    margin-left: 0;
+    margin-top: 1vw;
+    cursor: pointer;
+    padding-top: 1vw;
+    padding-bottom: 1vw;
+    border-radius: 0.2vw;
+}
+.row.general-list-route .col-lg-12#mount-list-routes .row.col-lg-12.data-route .destiny ,.row.general-list-route .col-lg-12#mount-list-routes .row.col-lg-12.data-route .origin{
+    background-color: whitesmoke;
+    margin-left: 0;
+    margin-top: 0.5vw;
+    padding-top: 0.5vw;
+    border-radius: 0.2vw;
+}
+.row.general-list-route .col-lg-12#mount-list-routes .row.col-lg-12.data-route .col-lg-2.form-group .ativo{
+    text-align: center;
+    width: 7vw;
+    border-radius: 0.2vw;
+    background-color: forestgreen;
+    color: white;
+}
+.row.general-list-route .col-lg-12#mount-list-routes .row.col-lg-12.data-route .col-lg-2.form-group .bloqueado{
+    text-align: center;
+    width: 7vw;
+    border-radius: 0.2vw;
+    background-color: red;
+    color: white;
+}

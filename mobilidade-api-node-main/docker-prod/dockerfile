@@ -1,0 +1,58 @@
+# ---------- STAGE 1: deps ----------
+  FROM rockylinux:8 AS deps
+
+  WORKDIR /app
+  
+  RUN dnf update -y && dnf install -y epel-release curl wget unzip procps iproute \
+    && curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo \
+    && rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg \
+    && dnf module enable nodejs:18 -y \
+    && dnf install -y nodejs yarn \
+    && dnf clean all
+  
+  # Copie só manifests primeiro (melhor cache)
+  COPY package.json package-lock.json ./
+  
+  # Instala dependências travadas
+  RUN yarn install --frozen-lockfile
+  
+  # ---------- STAGE 2: build ----------
+  FROM deps AS build
+  WORKDIR /app
+  
+  # Copie o resto do código
+  COPY . .
+  
+  # Build do Nest (gera /dist)
+  RUN yarn build
+  
+  # ---------- STAGE 3: runtime ----------
+  FROM rockylinux:8 AS runtime
+  
+  WORKDIR /app
+  
+  RUN dnf update -y && dnf install -y epel-release curl \
+    && curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo \
+    && rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg \
+    && dnf module enable nodejs:18 -y \
+    && dnf install -y nodejs yarn \
+    && dnf clean all
+  
+  ENV NODE_ENV=production
+  ENV NODE_OPTIONS="--max-old-space-size=1024"
+  
+  # (Opcional) Se seu problema era o crash do dd-trace no websocket:
+  # ENV DD_TRACE_DISABLED_PLUGINS=ws
+  
+  # Copia somente o necessário para rodar
+  COPY --from=deps  /app/node_modules ./node_modules
+  COPY --from=build /app/dist        ./dist
+  COPY --from=build /app/package.json ./package.json
+  
+  # Se você usa views/assets/etc, copie também:
+  # COPY --from=build /app/public ./public
+  
+  # Porta padrão (ajuste se necessário)
+  
+  # Start (Nest normalmente roda "node dist/main.js")
+  CMD ["node", "dist/main.js"]

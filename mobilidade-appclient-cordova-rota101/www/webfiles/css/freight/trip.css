@@ -1,0 +1,117 @@
+.container-freight-trip {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 10px 0;
+    background-color: #fff;
+    box-shadow: 0 0 10px #979797;
+    transform:translateY(150%);
+    transition:300ms all;
+}
+
+.container-freight-trip.active {
+    transform:translateY(0%);
+}
+
+.container-freight-trip > label {
+    text-align:center;
+    display:block;
+    margin-bottom: 10px;
+    font-size:14pt;
+}
+
+.container-freight-trip > ul {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+}
+
+.container-freight-trip > ul > li{
+    display:block;
+    padding:10px;
+    text-align:center;
+    background-color:#444;
+    color:#fff;
+    margin:5px 10px;
+    border-radius:5px;
+}
+
+.container-freight-trip > ul > li.active{
+    animation: 2s notification-chat-freight linear infinite;
+}
+
+@keyframes notification-chat-freight{
+    0%{
+        background-color:#444;
+    }
+    50%{
+        background-color:#cd2828;
+    }
+    100%{
+        background-color:#444;
+    }
+
+}
+
+
+.container-freight-trip > .info-driver-freight{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border-bottom:1px solid #ccc;
+    margin-bottom:10px;
+}
+
+.container-freight-trip > .info-driver-freight > .profile-driver-freight{
+    display:block;
+    width:70px;
+    height:70px;
+    background-color:#ccc;
+    border-radius:100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin:5px 0;
+}
+
+.container-freight-trip > .info-driver-freight > label{
+    margin:10px 0;
+    font-size:14pt;
+    font-weight:600;;
+}
+
+
+.container-freight-trip.active.search-freight > .info-driver-freight{
+    display:none;
+}
+
+
+.container-freight-trip.active.search-freight > ul > li:nth-child(1),
+.container-freight-trip.active.search-freight > ul > li:nth-child(2){
+    display:none;
+}
+
+.container-freight-trip.active.search-freight:before{
+    content:"";
+    width:45px;
+    height:5px;
+    background-color:#000;
+    display:block;
+    animation: 2.5s animation-search-freiht  linear infinite;
+    position:relative;
+    margin:10px 0;
+
+}
+
+@keyframes animation-search-freiht{
+    0%{
+        left:0%;
+    }
+    50%{
+        left:100%;
+    }
+    100%{
+        left:0%;
+    }
+}

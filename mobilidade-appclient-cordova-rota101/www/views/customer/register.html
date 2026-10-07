@@ -1,0 +1,162 @@
+<div class="wrapper-mobile">
+    <header id="header-steps">
+        <div class="content-icon">
+            <a class="go-back"
+            ><img src="webfiles/img/icon/left-arrow.png" alt="Voltar"
+            /></a>
+        </div>
+        <div id="title-header-steps" data-i18n="signup-header-title"></div>
+    </header>
+
+    <div class="wrapper-form">
+        <div class="container-form active">
+            <form class="remove-submit-event">
+                <div>
+                    <label data-i18n="signup-label-full-name"></label>
+                    <input
+                            type="text"
+                            tabindex="0"
+                            placeholder=""
+                            name="name-user"
+                            id="name-user"
+                            data-i18n="placeholder-full-name"
+                    />
+                </div>
+                <div class="half-input">
+                    <div class="container-compel-field" type="document">
+                        <label data-i18n="signup-label-document"></label>
+                        <input tabindex="0" type="tel" placeholder="" id="cpf-user" name="cpf-user"
+                               data-i18n="signup-placeholder-document"/>
+                    </div>
+                    <div>
+                        <label data-i18n="signup-label-phone"></label>
+                        <input
+                                type="tel"
+                                tabindex="0"
+                                placeholder=""
+                                id="phone-user"
+                                name="phone-user"
+                                class="mask-telefone"
+                                data-i18n="signup-placeholder-phone"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label data-i18n="signup-label-email"></label>
+                    <input
+                            type="email"
+                            tabindex="0"
+                            placeholder=""
+                            data-i18n="signup-placeholder-email"
+                            id="email-user"
+                            name="email-user"
+                    />
+                </div>
+                <div id="fieldGender">
+                    <label data-i18n="signup-label-gender"></label>
+                    <select id="gender" tabindex="0" class="input-custom-signup">
+                        <option value="" disabled selected data-i18n="signup-label-gender"></option>
+                        <option value="masculino" data-i18n="signup-option-male-gender"></option>
+                        <option value="feminino" data-i18n="signup-option-female-gender"></option>
+                        <option value="outro" data-i18n="signup-option-other-gender"></option>
+                        <option value="não informado" data-i18n="signup-option-no-inform"></option>
+                    </select>
+                    <small data-i18n="signup-small-info"></small>
+                </div>
+                <div id="fieldCity">
+                    <label data-i18n="signup-label-city"></label>
+                    <select id="city" tabindex="0" class="input-custom-signup">
+                        <option value="" disabled selected data-i18n="signup-label-city"></option>
+                    </select>
+                </div>
+                <div>
+                    <label data-i18n="signup-label-password"></label>
+                    <input
+                            tabindex="0"
+                            type="password"
+                            placeholder=""
+                            data-i18n="signup-placeholder-password"
+                            id="password-user"
+                            name="password-user"
+                    />
+                </div>
+                <div>
+                    <label data-i18n="signup-label-confirm-password"></label>
+                    <input
+                            tabindex="0"
+                            type="password"
+                            placeholder=""
+                            data-i18n="signup-placeholder-confirm-password"
+                            id="confirm-password-user"
+                            name="confirm-password-user"
+                    />
+                </div>
+                <a tabindex="0" id="btn-user-info" class="btn-add-establishment" data-i18n="signup-btn-next-page"></a>
+            </form>
+        </div>
+        <div class="container-form" id="boxMilitary">
+            <form class="remove-submit-event">
+                <div>
+                    <label data-i18n="signup-label-type-military-force"></label>
+                    <select class="input-custom-signup" id="typeMilitaryForce">
+                        <option value="" disabled selected data-i18n="signup-option-type-military-force"></option>
+                    </select>
+                </div>
+                <div>
+                    <label data-i18n="signup-label-type-graduation"></label>
+                    <select class="input-custom-signup" id="typeGraduations">
+                        <option value="" disabled selected data-i18n="signup-option-type-graduation"></option>
+                    </select>
+                </div>
+                <div>
+                    <label data-i18n="signup-label-type-status"></label>
+                    <select class="input-custom-signup" id="typeStatus">
+                        <option value="" disabled selected data-i18n="signup-option-type-status"></option>
+                    </select>
+                </div>
+                <div class="container-input-om">
+                    <label data-i18n="signup-label-number-om"></label>
+                    <input type="text" placeholder="" id="numberOM" data-i18n="signup-placeholder-number-om"/>
+                </div>
+                <a id="btnMilitary" class="btn-add-establishment" data-i18n="signup-btn-next-page"></a>
+            </form>
+        </div>
+        <div class="container-form" id="boxRGMilitary">
+            <h4 data-i18n="signup-hr-photo-rg"></h4>
+            <div class="container-documents">
+                <div value="RG_FRONT" class="btn-document-photo">
+                    <label data-i18n="signup-label-front-rg"></label>
+                </div>
+                <div value="RG_BACK" class="btn-document-photo">
+                    <label data-i18n="signup-label-back-rg"></label>
+                </div>
+            </div>
+            <form class="remove-submit-event">
+                <div>
+                    <label data-i18n="signup-label-number-rg"></label>
+                    <input type="tel" placeholder="" id="numberRGMilitary" data-i18n="signup-placeholder-number-rg"/>
+                </div>
+            </form>
+            <a id="btnRGMilitary" class="btn-add-establishment" data-i18n="signup-btn-next-page"></a>
+        </div>
+        <div class="container-form" id="boxPhotoCustomer">
+            <h4>Foto de Perfil</h4>
+            <div class="container-photo-profile btn-document-photo" value="photo"></div>
+            <div id="fieldDateOfBirth" class="remove-field-ios" style="display: none">
+                <label data-i18n="signup-label-date-of-birth"></label>
+                <input type="tel" id="dateOfBirth"/>
+                <small data-i18n="signup-small-date-of-birth"></small>
+            </div>
+            <a id="btnPhotoProfile" class="btn-add-establishment" data-i18n="signup-btn-next-page"></a>
+        </div>
+        <div class="container-form" id="boxDocument">
+            <ul class="list-documents-customer"></ul>
+            <a id="btnDocumentCustomer" class="btn-add-establishment" data-i18n="signup-btn-next-page"></a>
+        </div>
+    </div>
+</div>
+<div class="toast-signup-helper">
+    <p>
+        Em caso de dificuldade no cadastro <a id="contactSupport">Clique aqui</a>
+    </p>
+</div>

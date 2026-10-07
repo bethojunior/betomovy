@@ -1,0 +1,76 @@
+nav.nav-bar-option {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: block;
+    transition: top 0.8s;
+    height: 86px;  
+    box-shadow: 0 2px 10px #ccc;
+    z-index: 999;
+    background: #fff;
+}
+nav.nav-bar-option .brand-icon img {
+    width: 60px;
+    height: 60px;
+    margin-top: 14px; 
+}
+nav.nav-bar-option ul {
+    list-style-type: none;
+    overflow: hidden;
+    background-color: rgb(255, 255, 255);
+    height: 86px;
+    display: flex;
+    align-items: center;
+}
+nav.nav-bar-option ul li {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10vw;
+}
+
+nav.nav-bar-option ul li:last-child {
+    width: 11.7vw;
+    margin-left: 3vw;
+}
+
+nav.nav-bar-option ul li a:hover {
+    background: none;
+}
+
+.quero-dirigir  {
+    font-weight: 800;
+    border: 1.5px solid rgb(234, 157,27);
+    text-shadow: 0.5px 0.5px #000;
+    border-radius: 20px;
+}
+nav.nav-bar-option ul li a {
+    text-transform: uppercase;
+    display: block;
+    color: #000;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+}
+ 
+
+@media(max-width: 798px) {
+    
+    nav.nav-bar-option {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        height: 56px;
+    }
+
+    nav.nav-bar-option .brand-icon img {
+        width: 52px;
+        height: auto;
+        margin-top: 3px;
+    }
+
+    nav.nav-bar-option ul li a {
+        font-size: 1.3vw;
+    }
+}

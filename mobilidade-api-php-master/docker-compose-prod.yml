@@ -1,0 +1,12 @@
+services:
+  mobilidade-api-php:
+    platform: linux/amd64
+    build:
+      dockerfile: docker-prod/dockerfile
+    container_name: mobilidade-api-php-prod
+    image: mobilidade-api-php-prod-local
+    restart: always
+    ports:
+      - 81:81
+    volumes:
+      - .env:/var/www/html/.env

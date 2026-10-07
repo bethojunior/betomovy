@@ -1,0 +1,140 @@
+{
+  "name": "br.com.taxireturn.client",
+  "displayName": "Taxireturn - Cliente",
+  "version": "1.0.0",
+  "description": "A sample Apache Cordova application that responds to the deviceready event.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Apache Cordova Team",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "cordova-plugin-add-swift-support": "^2.0.2",
+    "cordova-plugin-android-gpsdetect": "0.0.3",
+    "cordova-plugin-android-permissions": "^1.0.2",
+    "cordova-plugin-app-version": "^0.1.9",
+    "cordova-plugin-appminimize": "^1.0.1",
+    "cordova-plugin-background-mode": "^0.7.3",
+    "cordova-plugin-call-number": "^1.0.1",
+    "cordova-plugin-dialogs": "^2.0.2",
+    "cordova-plugin-facebook4": "^4.0.0",
+    "cordova-plugin-inappbrowser": "^4.0.0",
+    "cordova-plugin-ionic-keyboard": "^2.2.0",
+    "cordova-plugin-ios-camera-permissions": "^1.2.0",
+    "cordova-plugin-qrscanner": "^3.0.1",
+    "cordova-plugin-sim": "^1.3.3",
+    "cordova-plugin-splashscreen": "^5.0.3",
+    "cordova-plugin-statusbar": "^2.4.3",
+    "cordova-show-on-block-screen-plugin": "git://github.com/goinnn/cordova-show-on-block-screen-plugin.git",
+    "in.lucasdup.bringtofront": "https://github.com/markeeftb/cordova-bring-to-front"
+  },
+  "cordova": {
+    "plugins": {
+      "phonegap-plugin-mobile-accessibility": {},
+      "cordova-plugin-ionic-keyboard": {},
+      "cordova-plugin-appminimize": {},
+      "cordova-plugin-app-version": {},
+      "in.lucasdup.bringtofront": {},
+      "cordova-plugin-googleplus": {
+        "REVERSED_CLIENT_ID": "com.googleusercontent.apps.916434253280-uu69islng3bcehilrdoi258mlfk5jsd9",
+        "PLAY_SERVICES_VERSION": "15.0.1",
+        "GOOGLE_MAPS_PLAY_SERVICES_VERSION": "15.0.1"
+      },
+      "cordova-plugin-facebook4": {
+        "APP_ID": "355558601660582",
+        "APP_NAME": "return app",
+        "FACEBOOK_ANDROID_SDK_VERSION": "4.38.1",
+        "FACEBOOK_HYBRID_APP_EVENTS": "false"
+      },
+      "cordova-plugin-call-number": {},
+      "cordova-plugin-android-gpsdetect": {},
+      "cordova-plugin-ios-camera-permissions": {
+        "CAMERA_USAGE_DESCRIPTION": "This app needs camera access",
+        "MICROPHONE_USAGE_DESCRIPTION": "This app needs microphone access",
+        "PHOTOLIBRARY_ADD_USAGE_DESCRIPTION": "This app needs write-access to photo library",
+        "PHOTOLIBRARY_USAGE_DESCRIPTION": "This app needs read/write-access photo library access"
+      },
+      "cordova-plugin-splashscreen": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-android-permissions": {},
+      "cordova-plugin-dialogs": {},
+      "cordova-plugin-sim": {},
+      "cordova-plugin-qrscanner": {},
+      "cordova-plugin-add-swift-support": {},
+      "cordova-permission-ignore-battery-optimization": {},
+      "cordova-plugin-background-mode": {},
+      "cordova-plugin-wkwebview-engine-allowfileaccess": {},
+      "cordova-plugin-inappbrowser": {},
+      "cordova-plugin-globalization": {},
+      "phonegap-plugin-multidex": {},
+      "cordova-plugin-androidx-adapter": {},
+      "cordova-plugin-googlemaps": {
+        "LOCATION_WHEN_IN_USE_DESCRIPTION": "This app wants to get your location while this app runs only.",
+        "LOCATION_ALWAYS_USAGE_DESCRIPTION": "This app wants to get your location always, even this app runs in background."
+      },
+      "@globules-io/cordova-plugin-ios-xhr": {},
+      "cordova-plugin-geolocation": {},
+      "cordova-plugin-x-socialsharing": {},
+      "cordova-plugin-device": {},
+      "cordova-plugin-file": {
+        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+      },
+      "@havesource/cordova-plugin-push": {
+        "ANDROIDX_CORE_VERSION": "1.6.+",
+        "FCM_VERSION": "23.+"
+      },
+      "cordova-plugin-media-capture": {},
+      "cordova-plugin-camera": {
+        "ANDROIDX_CORE_VERSION": "1.6.+"
+      },
+      "cordova-plugin-media": {}
+    },
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "devDependencies": {
+    "@globules-io/cordova-plugin-ios-xhr": "^1.2.2",
+    "@havesource/cordova-plugin-push": "github:alejandro-argus/cordova-plugin-push",
+    "cordova-android": "^12.0.1",
+    "cordova-bring-to-front": "github:markeeftb/cordova-bring-to-front",
+    "cordova-ios": "^6.2.0",
+    "cordova-permission-ignore-battery-optimization": "github:EmersonAlves/RequestIgnoreBatteryOptimizationCordova",
+    "cordova-plugin-add-swift-support": "^2.0.2",
+    "cordova-plugin-android-gpsdetect": "0.0.3",
+    "cordova-plugin-android-permissions": "^1.1.2",
+    "cordova-plugin-androidx-adapter": "^1.1.3",
+    "cordova-plugin-app-version": "^0.1.12",
+    "cordova-plugin-appminimize": "^1.0.1",
+    "cordova-plugin-background-mode": "^0.7.3",
+    "cordova-plugin-call-number": "^1.0.1",
+    "cordova-plugin-camera": "github:binhnt13682104/cordova-plugin-camera",
+    "cordova-plugin-device": "github:apache/cordova-plugin-device",
+    "cordova-plugin-dialogs": "^2.0.2",
+    "cordova-plugin-facebook4": "^4.0.0",
+    "cordova-plugin-geolocation": "4.0.2",
+    "cordova-plugin-globalization": "^1.11.0",
+    "cordova-plugin-googlemaps": "github:kaddyadriano/cordova-plugin-googlemaps",
+    "cordova-plugin-googlemaps-sdk": "github:mapsplugin/cordova-plugin-googlemaps-sdk",
+    "cordova-plugin-googleplus": "^5.3.2",
+    "cordova-plugin-inappbrowser": "^4.1.0",
+    "cordova-plugin-ionic-keyboard": "^2.2.0",
+    "cordova-plugin-ios-camera-permissions": "^1.2.0",
+    "cordova-plugin-media": "7.0.0",
+     "cordova-plugin-media-capture": "github:kemp/cordova-plugin-media-capture",
+    "cordova-plugin-network-information": "github:apache/cordova-plugin-network-information",
+    "cordova-plugin-qrscanner": "^3.0.1",
+    "cordova-plugin-sim": "^1.3.3",
+    "cordova-plugin-splashscreen": "^5.0.4",
+    "cordova-plugin-statusbar": "^2.4.3",
+    "cordova-plugin-wkwebview-engine": "^1.2.2",
+    "cordova-plugin-wkwebview-engine-allowfileaccess": "github:knight9999/cordova-plugin-wkwebview-engine-allowfileaccess",
+    "cordova-plugin-x-socialsharing": "^5.3.1",
+    "cordova-support-google-services": "~1.3.1",
+    "es6-promise-plugin": "^4.1.0",
+    "phonegap-plugin-mobile-accessibility": "github:phonegap/phonegap-mobile-accessibility",
+    "phonegap-plugin-multidex": "^1.0.0"
+  }
+}

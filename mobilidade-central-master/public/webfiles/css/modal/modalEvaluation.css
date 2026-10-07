@@ -1,0 +1,109 @@
+.modal-evaluation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+.modal-evaluation.active{
+    display: flex;
+}
+.modal-evaluation > div {
+    width: 80%;
+    background-color: var(--color-bg-surface);
+    border-radius: 1vw;
+    padding: 2vw;
+}
+.modal-evaluation > div > i {
+    display: block;
+    margin: 0;
+    width: 100%;
+    text-align: right;
+    color: #ed8923;
+    font-size: 10vw;
+}
+.modal-evaluation > div > div > div.container-img {
+    position: relative;
+    height: 50vw;
+    width: 50vw;
+    left: 0;
+    right: 0;
+    margin: auto;
+    overflow: hidden;
+    border-radius: 100%;
+}
+.modal-evaluation > div > div > div > img {
+    position: absolute;
+    right: 0;
+    margin: auto;
+    width: 100%;
+    background-image: url('../../img/icon/default.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100%;
+}
+
+.modal-evaluation > div > div > h4 {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 8vw;
+    font-weight: 500;
+    margin-top: 4vw;
+    text-transform: capitalize;
+}
+.modal-evaluation > div > label {
+    border-top: 1px solid var(--color-border);
+    width: 80%;
+    display: block;
+    text-align: center;
+    margin: auto;
+    color: #6f6d6d;
+    font-size: 4vw;
+    padding-top: 1vw;
+}
+.modal-evaluation > div > div > label {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 4vw;
+    color: #6c6262;
+}
+.modal-evaluation > div > div > div {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 0.5vw;
+    font-size: 6vw;
+}
+.modal-evaluation > div > .container-rate-stars {
+    display: flex;
+    justify-content: center;
+    margin: 0 3vw 0;
+    padding: 3vw;
+}
+.modal-evaluation > div > .container-rate-stars > i{
+    font-size: 13vw;
+    width: 20%;
+    text-align: center;
+    display: block;
+}
+.modal-evaluation > div > .container-rate-stars > i.active{
+    color: #ffb114;
+}
+.modal-evaluation > div >button{
+    width:100%;
+    padding:2vw;
+    font-size:6vw;
+    background-color:#ff9114;
+    color:var(--color-text-inverse);
+    border:none;
+    border-radius:2vw;
+}

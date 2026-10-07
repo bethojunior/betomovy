@@ -1,0 +1,72 @@
+.container-evaluation-locations{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    transform: translateY(150%);
+    transition: 300ms;
+}
+
+.container-evaluation-locations.active{
+    transform: translateY(0%);
+}
+
+.container-evaluation-locations > div{
+    width: 95%;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.container-evaluation-locations > div > h4{
+    margin:0 0 10px;
+    font-size:14pt;
+    text-align:center;
+}
+
+.container-evaluation-locations > div > ul > li{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:5px 0;
+    border-bottom:1px solid #eee;
+}
+
+.container-evaluation-locations > div > ul > li > p{
+    flex:1;
+    font-size:10pt;
+    font-weight:400;
+    font-family:sans-serif;
+}
+
+.container-evaluation-locations > div > ul > li > div{
+    display:flex;
+}
+
+.container-evaluation-locations > div > ul > li > div > span{
+    font-size:20pt;
+    padding:5px;
+    opacity:0.25;
+    transition:300ms;
+}
+
+.container-evaluation-locations > div > ul > li > div > span.active{
+    opacity:1;
+}
+
+.container-evaluation-locations > div > button{
+    margin:15px 0 0;
+    width:100%;
+    border-radius:5px;
+    border:none;
+    font-size: 15pt;
+    padding:5px;
+    color:#fff;
+    background-color:var(--main-color);
+}

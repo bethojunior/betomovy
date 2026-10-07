@@ -1,0 +1,239 @@
+.modal-data-client {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    background-color: transparent;
+    transform:translateY(150%);
+    transition:300ms all;
+}
+
+.modal-data-client.active{
+    transition:300ms all;
+    background-color: rgba(0, 0, 0, 0.25);
+    transform:translateY(0%);
+}
+.modal-data-client > div {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 1vw;
+    padding: 2vw;
+    position: absolute;
+    bottom: 0;
+    border-radius: 15px 15px 0 0;
+    transform: translateY(100%);
+    transition: all 500ms;
+}
+.modal-data-client.active > div{
+    transform: translateY(0%);
+}
+
+.modal-data-client > div > i {
+    display: block;
+    margin: 0;
+    width: 100%;
+    text-align: right;
+    color: var(--main-color);
+    font-size: 10vw;
+}
+.modal-data-client > div > div > img {
+    width: 50vw;
+    height: 50vw;
+    min-width: 50vw;
+    min-height: 50vw;
+    max-width: 50vw;
+    max-height: 50vw;
+    aspect-ratio: 1;
+    border: 1px solid #ccc;
+    display: block;
+    margin: auto;
+    position: relative;
+    border-radius: 100%;
+    object-fit: cover;
+    object-position: center;
+    box-sizing: border-box;
+}
+
+.modal-data-client > div > div > h4 {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 8vw;
+    font-weight: 500;
+    margin-top: 4vw;
+    text-transform: capitalize;
+}
+.modal-data-client > div > div > label {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 4vw;
+    color: #6c6262;
+}
+.modal-data-client > div > div > div {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 0.5vw;
+    font-size: 6vw;
+}
+.modal-data-client > div > div.trip-client > div {
+    box-shadow: 0 0 10px #cdcaca;
+    font-size:4vw;
+    margin: 3vw auto;
+    text-align:left;
+    padding:2vw 5vw;
+    font-weight:500;
+    position: relative;
+}
+.modal-data-client > div > div.trip-client > div:before{
+    content:"";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 3vw;
+    background-color: #ccc;
+}
+.modal-data-client > div > .option-message-driver {
+    display: flex;
+    justify-content: space-evenly;
+    font-size: 15vw;
+    margin: 3vw 3vw 0;
+    border-top: 1px solid #ccc;
+    padding: 3vw;
+}
+.modal-data-client > div > div.trip-client > div.origin-client:before{
+    background-color: #14b062;
+}
+.modal-data-client > div > div.trip-client > div.destination-client:before{
+    background-color: #e11c1b;
+}
+
+/* Estilos para paradas no modal */
+.waypoints-client-container {
+    display: none;
+    box-shadow: 0 0 10px #cdcaca;
+    font-size: 4vw;
+    margin: 3vw auto;
+    text-align: left;
+    padding: 2vw 5vw;
+    font-weight: 500;
+    position: relative;
+}
+
+.waypoints-client-container.show {
+    display: block;
+}
+
+.waypoints-client-container:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 3vw;
+    background-color: var(--main-color);
+}
+
+.waypoints-client-container > span.first-waypoint-client {
+    display: block;
+    font-size: 4vw;
+    font-weight: 500;
+}
+
+.waypoints-client-more-btn {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-top: 2vw;
+    padding: 1.5vw 3vw;
+    background-color: var(--main-color);
+    border-radius: 4vw;
+    width: fit-content;
+}
+
+.waypoints-client-more-btn > span {
+    font-size: 3vw;
+    color: #fff;
+    font-weight: 600;
+}
+
+.waypoints-client-toggle {
+    font-size: 4vw;
+    color: #fff;
+    transition: transform 0.3s ease;
+    margin-left: 1vw;
+}
+
+.waypoints-client-toggle.expanded {
+    transform: rotate(180deg);
+}
+
+.waypoints-client-list {
+    list-style: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0;
+    margin: 0;
+    background-color: #f5f5f5;
+    border-radius: 2vw;
+}
+
+.waypoints-client-list.expanded {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 2vw;
+    padding: 2vw;
+}
+
+.waypoints-client-list > li {
+    padding: 2vw 0;
+    font-size: 3.5vw;
+    border-bottom: 1px solid #ddd;
+    position: relative;
+    padding-left: 5vw;
+}
+
+.waypoints-client-list > li:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2.5vw;
+    height: 2.5vw;
+    background-color: var(--main-color);
+    border-radius: 50%;
+}
+
+.waypoints-client-list > li:last-child {
+    border-bottom: none;
+}
+.modal-data-client > div > h4{
+    text-align:center;
+    display:block;
+    margin:auto;
+    color: var(--main-color);
+    font-size:15vw;
+    font-weight:bolder;
+    width:80%;
+    padding:2vw 0 0 0;
+    border-top:1px solid #ccc;
+    line-height: 80%;
+}
+.modal-data-client > div > h4 > span{
+    font-size:4vw;
+}
+.modal-data-client > div > label{
+    text-align:center;
+    display:block;
+    font-size:5vw;
+    color:#000;
+}

@@ -1,0 +1,21 @@
+{
+  "name": "v2realtime",
+  "version": "1.0.0",
+  "description": "iniciando versão v2 realtime",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.17.1",
+    "node-cron": "^3.0.2",
+    "rethinkdb": "^2.4.2",
+    "rethinkdbdash": "^2.3.31",
+    "socket.io": "^2.3.0"
+  }
+}

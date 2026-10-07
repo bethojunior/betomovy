@@ -1,0 +1,2 @@
+# Laravel Schedule - Executar a cada minuto (como nginx = mesmo usuário do PHP-FPM, evita permissão em logs)
+* * * * * nginx cd /var/www/html && /usr/bin/php artisan schedule:run > /tmp/cronjob-schedule-run.log 2>&1

@@ -1,0 +1,350 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Dosis', sans-serif;
+    font-weight: 600;
+}
+
+body{
+    position: absolute;
+    height: 100%;
+    top: 0;
+    width: 100%;
+    background: var(--main-color) !important;
+}
+.container-login .logo-company{
+    width: 55%;
+    display: block;
+    margin: 5vw auto;
+}
+
+.container-login .form-login{
+    margin-top: 20vw;
+}
+.container-login .form-login .col.s12.input-field input.custom {
+    border:none;
+    background-color:#fff;
+    border-radius: 3vw;
+    padding: 1vw 10vw 0 5vw;
+    width: calc(90% - 20vw);
+    display: block;
+    margin: 0 auto 5vw;
+    color: var(--main-color);
+
+}
+
+.container-login .form-login .col.s12.input-field input[type=password],
+.container-login .form-login .col.s12.input-field input[type=text] {
+    margin-bottom: 0;
+}
+
+
+.container-login .form-login .col.s12.input-field input.custom::placeholder{
+    color:var(--main-color);
+}
+.container-checkbox{
+    display: block;
+    margin: 5vw auto 10vw;
+    width: 80%;
+}
+
+.container-checkbox>label,.container-login>label>a{
+    color: #fff;
+}
+.container-login label a{
+    color: #fff;
+    text-decoration: underline;
+}
+.container-login .form-login .col.s12.input-field button.btn-login{
+    background: var(--main-color);
+    padding: 4vw 5vw;
+    text-decoration: none;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 2vw;
+    display: block;
+    width: calc(90% - 5vw);
+    text-align: center;
+    font-weight: bolder;
+    font-size: 8vw;
+    box-shadow: 0 0 10px #717171;
+    position: absolute;
+    margin: 50vw auto 0;
+    right: 0;
+    left: 0;
+}
+
+.container-login .form-login .col.s12.input-field button.btn-login.active{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    background: #fff;
+    color: var(--main-color);
+    font-size: 6vw;
+    font-weight: 400;
+    margin: 0;
+    box-shadow: 0 0 10px #4b4b4b;
+    padding-bottom: var(--safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+}
+
+.container-login .form-login .col.s12.input-field:last-child{
+    display: none;
+}
+
+.container-login .form-login .col.s12.input-field i.material-icons{
+    position: absolute;
+    top: 4vw;
+    right: 10vw;
+    color: #fff;
+}
+
+.container-login .form-login .col.s12.input-field .password-wrapper {
+    position: relative;
+    display: block;
+}
+
+.container-login .form-login .col.s12.input-field i.material-icons.toggle-password{
+    cursor: pointer;
+    user-select: none;
+    color: var(--main-color);
+    position: absolute;
+    top: 50%;
+    right: 10vw;
+    transform: translateY(-50%);
+    z-index: 20;
+    pointer-events: auto;
+}
+
+.container-login .form-login .col.s12.input-field input::placeholder{
+    color: #fff;
+    opacity: 0.6;
+}
+.container-login .form-login .col.s12.input-field input.invalid{
+    box-shadow: none;
+}
+.container-login .form-login .col.s12.input-field input.invalid + label:after{
+    margin-top: -12vw;
+    margin-left: 12vw;
+}
+.container-login .form-login .col.s12.input-field input:focus{
+    box-shadow: none;
+}
+.container-login .more-info{
+    width: 100%;
+    margin-top: 10vw;
+}
+
+.container-login .more-info p{
+    text-align: center;
+    color: #fff;
+    font-size: 6vw;
+}
+
+.container-login .more-info a{
+    color: #fff;
+    display: block;
+    width: 100%;
+    text-align: center;
+    text-decoration: underline;
+    font-size: 5vw;
+    text-transform: uppercase;
+}
+
+.toast div{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    line-height: 13vw;
+    background-color: #fff;
+    color: #000;
+    font-weight: bolder;
+}
+
+#menuLogin{
+    display: none;
+}
+
+.alignCenter{
+    text-align: center;
+    text-transform: uppercase;
+    font-family: "Montserrat";
+    font-size: 5vw;
+}
+
+.inputForgetEmail{
+    margin-top: 10vw;
+    text-align: center;
+}
+#modalForgetPassword.modal.modal-fixed-footer{
+    height: 70vw;
+}
+
+.close-modal-forget-password{
+    padding: 2vw;
+    font-size: 9vw;
+    position: absolute;
+    z-index: 30;
+}
+
+#preloadLogin {
+    display: none;
+    position: absolute;
+    z-index: 1050 !important;
+    top: 0;
+    margin-left: 44vw;
+    background-color: rgba(0,0,0,0.5);
+}
+#contentModalTwo{
+    display: none;
+}
+#contentModalTwo > p{
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+.closeModal{
+    transition: 1s;
+    width: 10vw;
+}
+#modalForgetPassword.modal.modal-fixed-footer #contentModalTwo .modal-content{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+#modalForgetPassword.modal.modal-fixed-footer #contentModalTwo input{
+    width: 15vw;
+    border: solid 1px;
+    text-align: center;
+}
+#modalForgetPassword.modal.modal-fixed-footer .modal-content #contentModalThree{
+    text-align: center;
+}
+.mt-6{
+    margin-top: 6vw;
+}
+#contentModalThree{
+    display: none;
+}
+.titleHeaderModal{
+    display: block;
+    text-align: center;
+    font-size: 5vw;
+    font-family: Montserrat;
+    margin-bottom: 4vw;
+}
+/* DESKTOP */
+@media (min-width: 992px){
+    .container-login{
+        margin: -2vw auto;
+        width: 50%;
+    }
+
+    #menuLogin{
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        height: 6vw;
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+    #menuLogin li {
+        float: right;
+    }
+
+    #menuLogin li:first-child a {
+        border: 0.15vw solid #ffa200;
+        border-radius: 2vw;
+        padding: 0.5vw 1.5vw 0.5vw 1.5vw;
+        margin-right: 6vw;
+        margin-left: 5vw;
+        margin-top: 1.2vw;
+        font-weight: bold;
+    }
+    #menuLogin li a {
+        display: block;
+        color: #000;
+        font-size: 1.5vw;
+        text-align: center;
+        padding: 2vw;
+        text-decoration: none;
+    }
+
+    #menuLogin .active img {
+        width: 5vw;
+        position: absolute;
+        margin-left: 4vw;
+        margin-top: -1.5vw;
+    }
+
+    .container-login .logo-company {
+        width: 28%;
+    }
+
+    .container-login .form-login {
+        margin-top: -1vw;
+    }
+
+    .container-login .form-login .col.s12.input-field input {
+        border: 0.3vw solid #fff;
+        padding: 0vw 10vw 0vw 2vw;
+        margin: 0 auto 2vw;
+        font-size: 1.4rem;
+    }
+    .container-login .form-login .col.s12.input-field button {
+        padding: 1vw;
+        width: calc(90% - 7vw);
+        font-size: 1.4rem;
+    }
+    .container-login .form-login .col.s12.input-field i.material-icons{
+        display: none;
+    }
+    .container-login .more-info{
+        margin-top: 3vw;
+    }
+    .container-login .more-info p{
+        font-size: 1.5vw;
+        text-decoration: none;
+        text-transform: none;
+    }
+    .container-login .more-info a{
+        font-size: 1.5vw;
+    }
+}
+
+/* END DESKTOP */
+
+.forgot-password{
+    width: 100%;
+    text-align: center;
+    float: left;
+    margin-top: 5vw;
+    color: #fff;
+    text-decoration: underline;
+
+    position: relative;
+    z-index: 1;
+}
+
+#login-version {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    z-index: 10001;
+    white-space: nowrap;
+    color: #fff;
+}

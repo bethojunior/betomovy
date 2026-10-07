@@ -1,0 +1,12 @@
+{
+    "HOST":       "/",
+    "RETURN":     "https://beta.taxireturn.com.br/",
+    "IMAGE":      "https://apiteste.taxireturn.com.br/storage/images/",
+    "API":        "https://apiteste.taxireturn.com.br/",
+    "PWA":        "https://pwatest.taxireturn.com.br/",
+    "HOSTEL":     "https://beta.taxireturn.com.br/Hotelaria/sistema-para-hoteis-e-pousadas",
+    "CABBY":      "https://beta.taxireturn.com.br/Taxista/aplicativo-taxista-em-fortaleza",
+    "STORE":      "https://play.google.com/store/apps/details?id=br.com.taxireturn.driver",
+    "ID_GOOGLE" : "993728659062-d3se0r153p504ipu8p6k63lg1ad7pe8f.apps.googleusercontent.com",
+    "PATH_IMAGE": "https://s3-sa-east-1.amazonaws.com/taxireturnteste/establishment/compressed/"
+}

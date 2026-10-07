@@ -1,0 +1,71 @@
+<div class="list-orders-actives">
+    <nav>
+        <span>Pedidos</span>
+    </nav>
+    <ul id="listOrdersActives"></ul>
+</div>
+<div class="modal-info-delivery-order">
+    <div class="option-manager-delivery">
+        <ul>
+            <li id="chatDeliveryOrder" style="display: none"><span class="material-icons">chat</span></li>
+            <li id="btnCancelDeliveryOrder"><span class="material-icons">close</span></li>
+            <li id="btnDeliveryOccurrence"><span class="material-icons">warning</span></li>
+            <li id="callDeliveryOrder"><span class="material-icons">call</span></li>
+            <li id="directionDeliveryOrder"><span class="material-icons">directions</span></li>
+        </ul>
+    </div>
+    <ul>
+        <li id="statusDriverCompanyOrder">
+            <p>Coleta</p>
+            <div>
+                <h4 id="fantasyNameOrder"></h4>
+                <label>Endereço</label>
+                <p id="addressCompanyOrder"></p>
+                <label class="info-number-order-label">Coletar pedido</label>
+                <p class="number-order-label"></p>
+                <p class="change-value-delivery"></p>
+        
+            </div>
+        </li>
+        <li id="statusDriverCustomerOrder">
+            <p>Entrega</p>
+            <div>
+                <h4 id="nameCustomerOrder"></h4>
+                <label>Endereço</label>
+                <p id="addressCustomerOrder"></p>
+                <label>Nº do local</label>
+                <p id="numberLocalCustomerDelivery"></p>
+                <label>Complemento</label>
+                <p id="complementCustomerOrder"></p>
+                <label>Ponto de referência</label>
+                <p id="referencePointCustomerOrder"></p>
+                <label class="info-number-order-label">Entregar pedido</label>
+                <p class="number-order-label"></p>
+                <p class="change-value-delivery"></p>
+                <p id="haveReturnMachine"></p>
+            </div>
+        </li>
+    </ul>
+    <div class="footer-manager-delivery">
+        <button type="button" id="btnEventChangeStatusOrder">Cheguei na coleta</button>
+    </div>
+</div>
+<div class="modal-payment-pix-delivery">
+    <nav>
+        <span class="material-icons go-back">arrow_back</span>
+    </nav>
+    <h4>Pagamento via PIX</h4>
+    <p>Informe o QRCode para o cliente para realizar o pix e depois confirme o pagamento</p>
+    <div>
+        <div id="contentQrCodePix"></div>
+        <span id="codePixKey"></span>
+    </div>
+    <button type="button" id="btnConfirmPaymentByPix">CONFIRMAR PAGAMENTO</button>
+</div>
+<div class="modal-delivery-confirmation-code">
+    <div>
+        <p>Solicite o nº do pedido ao cliente e digite abaixo:</p>
+        <input type="tel" id="inputDeliveryConfirmationCode"/>
+        <button type="button" id="btnDeliveryConfirmationCode">CONFIRMAR</button>
+    </div>
+</div>

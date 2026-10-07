@@ -1,0 +1,16 @@
+:root {
+    --orange-default: #27283C;
+    --main-color: #27283C;
+}
+.container-select-location > div > ul > li > div:empty:before{
+    content: "<CUSTOMER_NAME>";
+}
+.container-select-location > div > ul > li > div:empty:before {
+    content: "<CUSTOMER_NAME>";
+}
+
+@media (max-width: 800px) {
+    .crisp-client .cc-kv6t {
+        z-index: 0!important;
+    }
+}

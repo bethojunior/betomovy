@@ -1,0 +1,158 @@
+<div class="container-signup">
+    <form>
+        <div class="group-signup all-size container-user-type active" value="TYPE_DRIVER">
+            <h4 data-i18n="sign-up-a-driver-type"></h4>
+            <ul id="listUserType"></ul>
+        </div>
+        <div class="group-signup all-size" value="PERSONAL_DATA">
+            <h4 data-i18n="sign-up-title-personal-data"></h4>
+            <div>
+                <input type="text" name="name" id="name" class="input-custom-signup" placeholder=""
+                       data-i18n="sign-up-placeholder-name">
+                <input 
+                    type="tel" 
+                    name="cpf" 
+                    id="cpf" 
+                    placeholder="CPF" 
+                    class="input-custom-signup"
+                    data-i18n="sign-up-placeholder-document"
+                    maxlength="100"
+                >
+                <select id="gender" class="input-custom-signup">
+                    <option value="" disabled selected data-i18n="sign-up-gender"></option>
+                    <option value="masculino" data-i18n="sign-up-gender-male"></option>
+                    <option value="feminino" data-i18n="sign-up-gender-female"></option>
+                    <option value="outro" data-i18n="sign-up-gender-other"></option>
+                </select>
+                <input type="email" name="email" id="email" placeholder="" class="input-custom-signup"
+                       data-i18n="sign-up-placeholder-email">
+                <input type="tel" name="phone" id="phone" placeholder="" class="input-custom-signup"
+                       data-i18n="sign-up-placeholder-phone">
+            </div>
+            <button class="btn-next-signup" id="btnPersonalData" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+        <div class="group-signup" value="VALIDATE_NUMBER">
+            <h4 data-i18n="sign-up-h4-confirmation-code"></h4>
+            <div class="container-validate-code">
+                <input type="tel" class="input-custom-signup code-phone" title="0" maxlength="1">
+                <input type="tel" class="input-custom-signup code-phone" title="1" maxlength="1">
+                <input type="tel" class="input-custom-signup code-phone" title="2" maxlength="1">
+                <input type="tel" class="input-custom-signup code-phone" title="3" maxlength="1">
+                <input type="text" id="verifyCode" hidden>
+            </div>
+            <p><span data-i18n="sign-up-span-did-not-receive"></span><a></a></p>
+            <button class="btn-next-signup" id="btnValidateNumber" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+        <div class="group-signup all-size" value="SAFETY">
+            <h4 data-i18n="sign-up-h4-security"></h4>
+            <div>
+                <div class="password-wrapper">
+                    <input type="password" id="password" class="input-custom-signup" placeholder=""
+                           data-i18n="sign-up-placeholder-password">
+                    <i class="material-icons toggle-password" id="togglePasswordSignup">visibility_off</i>
+                </div>
+                <div class="password-wrapper">
+                    <input type="password" id="repassowrd" class="input-custom-signup" placeholder=""
+                           data-i18n="sign-up-placeholder-confirm-password">
+                    <i class="material-icons toggle-password" id="toggleRepassword">visibility_off</i>
+                </div>
+            </div>
+            <button class="btn-next-signup" id="btnSafety" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+        <div class="group-signup all-size" value="MILITARY_FIELDS">
+            <h4 data-i18n="sign-up-h4-title-military"></h4>
+            <div>
+                <select id="typeMilitaryForce" class="input-custom-signup">
+                    <option value="" disabled selected>Escolha o tipo de força</option>
+                </select>
+
+                <select id="typeGraduations" class="input-custom-signup">
+                    <option value="" disabled selected>Escolha o tipo de patente</option>
+                </select>
+
+                <select id="typeStatus" class="input-custom-signup">
+                    <option value="" disabled selected>Tipo de status</option>
+                </select>
+
+                <input type="tel" name="text" id="numberOM" placeholder="Organização Militar"
+                       class="input-custom-signup">
+            </div>
+            <button class="btn-next-signup" id="btnMilitaryFields" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+        <div class="group-signup all-size" id="groupReturnDriver" value="CITY">
+            <h4></h4>
+            <div class="row" style="width: 80%;margin: 10px auto;">
+                <div class="col s12 remove-margin">
+                    <select id="cityWork"></select>
+                </div>
+            </div>
+            <button class="btn-next-signup" id="btnCompany" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+        <div class="group-signup all-size" value="CAR_DATA">
+            <h4 data-i18n="sign-up-h4-title-crlv"></h4>
+            <div>
+                <input type="text" id="markCar" maxlength="30" data-i18n="sign-up-placeholder-mark-car"
+                       class="input-custom-signup" placeholder="">
+                <input type="text" id="modelCar" maxlength="30" data-i18n="sign-up-placeholder-model-car"
+                       class="input-custom-signup" placeholder="">
+                <input type="text" id="licensePlate" data-i18n="sign-up-placeholder-license-plate"
+                       class="input-custom-signup" placeholder="">
+                <input type="tel" id="renavam" maxlength="15" data-i18n="sign-up-placeholder-renavam"
+                       class="input-custom-signup" placeholder="">
+                <input type="text" id="colorCar" data-i18n="sign-up-placeholder-color"
+                       class="input-custom-signup" placeholder="">
+                <input type="tel" id="numberSeatingCar" maxlength="3" data-i18n="sign-up-placeholder-number-seating-car"
+                       class="input-custom-signup" placeholder="">
+                <input type="text" id="yearCar" maxlength="9" data-i18n="sign-up-placeholder-year-car"
+                       class="input-custom-signup" placeholder="">
+                <p>
+                    <input type="checkbox" id="isRentalOfVehicles"/>
+                    <label for="isRentalOfVehicles" data-i18n="sign-up-label-rental-of-vehicle"></label>
+                </p>
+                <input type="text" id="cnpjCompany" style="display: none"
+                       data-i18n="sign-up-placeholder-document-company"
+                       class="input-custom-signup" placeholder="">
+            </div>
+            <button class="btn-next-signup" id="btCRLV" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+        <div class="container-document-list" value="DOCUMENT"></div>
+        <div class="group-signup all-size" value="PROFILE_IMAGE">
+            <h4 data-i18n="sign-up-h4-title-profile"></h4>
+            <div>
+                <div class="profile-driver-preview">
+                    <i class="material-icons" id="btnCaptureProfile" value="PROFILE">
+                        camera_alt
+                    </i>
+                </div>
+            </div>
+            <button class="btn-next-signup" id="btnProfile" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+        <div class="group-signup all-size" value="TERMS">
+            <h4 data-i18n="sign-up-h4-title-term"></h4>
+            <div>
+                <iframe id="termsOfUse"></iframe>
+                <p>
+                    <input type="checkbox" id="useTerm"/>
+                    <label for="useTerm"><span data-i18n="sign-up-span-term-us"></span> <a data-i18n="sign-up-a-term-us"></a></label>
+                </p>
+            </div>
+            <button class="btn-next-signup" id="btnTerm" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+        <div class="group-signup all-size" value="DRIVER_ATTACHMENT">
+            <h4 data-i18n="sign-up-h4-title-attachment-type"></h4>
+            <p data-i18n="p-subtitle-attachment-type"></p>
+            <ul class="list-driver-attachment-type"></ul>
+            <p id="descriptionBag"></p>
+            <button class="btn-next-signup" id="btnDriverAttachment" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+        <div class="group-signup-finish">
+            <img class="icon-taxista" src="webfiles/img/icon/icon_taxista_zinho.png">
+            <p class="text-info" data-i18n="sign-up-success-message-p1"></p>
+            <p class="text-info" data-i18n="sign-up-success-message-p2"></p>
+            <button class="btn-next-signup finish-form" type="button" data-i18n="sign-up-btn-next"></button>
+        </div>
+    </form>
+    <div>
+        <div class="preload-return"></div>
+    </div>
+</div>

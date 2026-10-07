@@ -1,0 +1,123 @@
+.container-favorites-driver {
+    position: absolute;
+    z-index: 10;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: #fff;
+}
+
+.container-favorites-driver > img {
+    position: relative;
+    height: 25vw;
+    display: block;
+    margin: 2.5vw auto;
+}
+
+.container-favorites-driver > nav {
+    background-color: var(--main-seconds-color);
+    padding: 2vw;
+    height: 10vw;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+}
+
+.container-favorites-driver > nav .material-icons {
+    color: var(--text-color-main);
+    font-size: 9vw;
+}
+
+.container-favorites-driver > nav > p {
+    margin-left: 5vw;
+    font-size: 5.5vw;
+    color: var(--text-color-seconds);
+}
+
+.container-favorites-driver > ul {
+    margin: 5vw;
+    list-style: none;
+    position: relative;
+}
+
+.container-favorites-driver > ul > li {
+    display: flex;
+    background-color: #e8e8e8;
+    padding: 2vw;
+    border-bottom: 1px solid #b9b3b3;
+    border-radius: 2px;
+    align-items: center;
+    position: relative;
+}
+
+.container-favorites-driver > ul > li:last-child {
+    border-bottom: unset;
+}
+
+.container-favorites-driver > ul > li > img {
+    width: 15vw;
+    height: 15vw;
+    background-color: #ccc;
+    border-radius: 100%;
+    border: unset;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.container-favorites-driver > ul > li > div {
+    margin-left: 4vw;
+    font-size: 4.5vw;
+    width: 75%;
+    overflow: hidden;
+}
+
+.container-favorites-driver > ul > li > div > i {
+    position: absolute;
+    top: 5vw;
+    right: 2vw;
+    font-size: 9vw;
+    color: #b4b3b3;
+}
+
+.container-favorites-driver > ul > li > div > div:empty {
+    margin-bottom: 5px;
+    float: left;
+    width: 100%;
+}
+
+.container-favorites-driver > ul > li > div > div:empty:before {
+    background-color: #ccc;
+    content: "_";
+    width: 100%;
+    float: left;
+    color: #ccc;
+}
+
+.container-favorites-driver > ul > li > div > div:last-child {
+    width: 40%;
+}
+
+.container-favorites-driver > button {
+    display: block;
+    margin: auto;
+    padding: 2vw 5vw;
+    border: unset;
+    color: var(--text-color-main);
+    background-color: var(--main-color);
+    font-size: 4.5vw;
+    text-transform: uppercase;
+    border-radius: 1vw;
+    outline: unset;
+}
+
+.container-favorites-driver > span {
+    width: 80%;
+    text-align: center;
+    display: block;
+    margin: 5vw auto;
+    color: #595757;
+    font-size: 4vw;
+}

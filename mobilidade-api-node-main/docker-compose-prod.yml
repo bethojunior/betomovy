@@ -1,0 +1,12 @@
+services:
+  mobilidade-api-node:
+    build:
+      dockerfile: docker-prod/dockerfile.optimized
+    platform: linux/amd64
+    container_name: mobilidade-api-node-prod
+    image: mobilidade-api-node-prod-local
+    restart: always
+    ports:
+      - 8085:85
+    env_file:
+      - .env

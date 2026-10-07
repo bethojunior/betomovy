@@ -1,0 +1,25 @@
+{
+  "title": "Painel Monitor",
+  "version": "1.3.6",
+  "items": [
+    {
+      "description": "Corrigido: foi corrigida a Comissão no preço mínimo promocional."
+    },
+    {
+      "description": "Criado: foi adicionado o campo de Cidade na Importação de Motoristas no Painel Monitor."
+    },
+    {
+      "description": "Corrigido: foi corrigido a finalização de viagem na maçaneta pelo Painel Monitor. Quando isso acontecia, não movimentava o relatório financeiro do motorista."
+    },
+    {
+      "description": "Criado: foi adicionado na listagem de usuários do Painel o perfil a qual pertence o tipo de Usuário do Monitor."
+    },
+    {
+      "description": "Corrigido: foi corrigido a palavra Exlcuir' no Pré-pago financeiro do motorista."
+    },
+    {
+      "description": "Corrigido: foi corrigido a marcação do Pedágio no mapa."
+    }
+  ],
+  "updateDate": "10/01/2024"
+}

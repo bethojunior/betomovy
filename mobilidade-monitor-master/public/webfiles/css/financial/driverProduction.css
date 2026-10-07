@@ -1,0 +1,10 @@
+@media (max-width: 991px) {
+    .row .container-financial-driver.row.col-lg-12{
+        margin-left: 0vw;
+    }
+
+}
+.row .container-financial-driver.row.col-lg-12{
+    margin-top: 2vw;
+    padding: 1vw;
+}

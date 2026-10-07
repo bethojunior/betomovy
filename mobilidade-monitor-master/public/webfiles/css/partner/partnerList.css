@@ -1,0 +1,195 @@
+.btn-create-new-partner {
+    margin-left: 1vw;
+}
+
+.modal-body label {
+    margin: 1vw 0vw -0.1vw 0vw;
+}
+
+.container {
+    width: 98%;
+    display: flex;
+    justify-content: center;
+}
+
+#listPartner {
+    width: 100%;
+}
+
+.container-information {
+    display: block;
+    margin: 0vw 0vw 0vw 2vw;
+}
+
+.name-partner {
+    font-weight: bolder;
+    font-size: large;
+}
+
+.container-information div label {
+    font-size: 15px;
+}
+
+.data-partner {
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-container {
+    padding-left: 9px;
+    padding-right: 9px;
+}
+
+.filter-container div label {
+    margin-bottom: 0.1vw;
+}
+
+.filter-container .form-group.relative {
+    position: relative;
+}
+
+.select-container label {
+    margin-bottom: 0.1vw;
+}
+
+.radio-container div {
+    margin-right: 1vw;
+}
+
+@media (min-width: 994px) {
+
+    .filter-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .filter-container div div input {
+        width: 30vw;
+    }
+
+    .btn-filter {
+        position: absolute;
+        right: -5px;
+        margin-right: 0.5vw;
+        height: 55%;
+        width: 12%;
+    }
+
+    .select-container {
+        margin-left: 2vw;
+        width: 25%;
+    }
+
+    .options-filter-container {
+        margin-bottom: 2vw;
+    }
+
+    img {
+        width: 7vw;
+        height: 7vw;
+        border-radius: 8px;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .container-button {
+        margin-top: 3vw;
+    }
+}
+
+@media (min-width: 501px) and (max-width: 993px){
+
+    .header-container {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .filter-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .filter-container div div input {
+        width: 50vw;
+    }
+
+    .btn-filter {
+        position: absolute;
+        right: -5px;
+        margin-right: 0.5vw;
+        height: 60%;
+        width: 10%;
+    }
+
+    .select-container select {
+        margin-right: 3vw;
+    }
+
+    .options-filter-container {
+        margin-bottom: 2vw;
+        width: 95vw;
+    }
+
+    img {
+        width: 7vw;
+        height: 7vw;
+        border-radius: 8px;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .container-button {
+        margin-top: 3vw;
+    }
+}
+
+@media (min-width: 280px) and (max-width: 500px) {
+
+    .input-filter {
+        width: 100%;
+    }
+
+    .btn-filter {
+        position: absolute;
+        right: -5px;
+        margin-right: 0.5vw;
+        margin-top: 0.5vw;
+        height: 55%;
+        width: 16%;
+    }
+
+    .select-container select{
+        width: 100%;
+    }
+
+    .options-filter-container {
+        margin-bottom: 5vw;
+        margin-top: 3vw;
+    }
+
+    .card-header {
+        display: block;
+    }
+
+    img {
+        width: 30vw;
+        height: 50vw;
+        border-radius: 8px;
+    }
+
+    label .phone-number {
+        display: block;
+    }
+
+    .container-button {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+}

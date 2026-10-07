@@ -1,0 +1,52 @@
+<div class="container-menu" id="containerMenu">
+    <div class="container-logo" id="callRunning">
+        <div class="container-logo-menu">
+            <img src="webfiles/img/logo/logo.png"
+                 class="logo-preview-app">
+        </div>
+        <div class="row form-trip" id="formPassenger">
+            <div class="form-data-passenger">
+                <div>
+                    <input type="text" id="origin"
+                           class="col s12 input-custom search-address-location"
+                           placeholder="" data-i18n="home-placeholder-origin">
+                    <label for="origin"></label>
+                    <i class="material-icons clear-input" for="origin">cancel</i>
+                </div>
+                <div id="containerInputDestination">
+                    <input type="text" id="destination"
+                           class="col s12 input-custom validate-phone search-address-location"
+                           placeholder=""
+                           data-i18n="home-placeholder-destination"
+                    >
+                    <label for="destination"></label>
+                    <i class="material-icons clear-input" for="destination">cancel</i>
+                    <i class="material-icons add-place-stop">add</i>
+                </div>
+            </div>
+        </div>
+        <div class="history-trips">
+            <div class="places-save">
+                <ul id="containerCustomerPlaces"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="btn-call-trip footer-ios-x active">
+    <img id="logoCompany" src="webfiles/img/icon/setas-return.png">
+    <p data-i18n="home-btn-start"></p>
+    <p class="v2-title">
+        <i class="material-icons">search</i>
+        <span data-i18n="home-btn-start-v2" id="titleForHome"></span>
+    </p>
+    <ul id="listAddressShortcutDestination"></ul>
+</div>
+
+<div class="btn-travel-track-shared">
+    <div>
+        <p data-i18n="home-travel-track-shared-title"></p>
+        <p data-i18n="home-travel-track-shared-description"></p>
+    </div>
+    <span class="material-icons">chevron_right</span>
+</div>

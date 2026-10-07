@@ -1,0 +1,2 @@
+Verificar camada de checkout (CheckoutService.php).
+Adicionar redis nas chamdas da AcquirerMetaData.

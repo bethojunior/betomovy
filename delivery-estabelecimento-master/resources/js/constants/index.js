@@ -1,0 +1,14 @@
+export const waiting_confirmation = 1;
+export const order_confirmed = 2;
+export const in_preparation = 3;
+export const searching_delivery_man = 4;
+export const order_accepted_delivery_man = 5;
+export const withdrawing_order = 6;
+export const out_for_delivery = 7;
+export const arrived = 8;
+export const delivered = 9;
+export const returning = 10;
+export const canceled = 11;
+export const finished = 12;
+export const order_refused = 13;
+export const withdraw_in_local = 14;

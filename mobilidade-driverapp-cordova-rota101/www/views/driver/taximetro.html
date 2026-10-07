@@ -1,0 +1,51 @@
+<div class="btn-taximetro hidden" style="display: none">
+    <img src="webfiles/img/icon/taximetro.png">
+</div>
+<div class="container-taximetro">
+    <header>
+        <i class="material-icons close-taximetro">arrow_back</i>
+        <span class="material-icons" style="display:none;">info</span>
+    </header>
+    <span data-i18n="taximeter-span-title-taximeter"></span>
+    <div id="displayValueTaximetro">
+        <div>
+            <span id="typeCoin">R$</span>
+            <h4 id="priceTaximeterCalculate">-</h4>
+        </div>
+        <ul>
+            <li id="kmProgressTaximetro">Km: 0</li>
+            <li id="timeProgressTaximetro"><span data-i18n="taximeter-time-progress-taximeter"></span>: 0min</li>
+        </ul>
+    </div>
+    <p>
+        <span data-i18n="taximeter-span-fare"></span>
+        <span id="valueTaximetro"></span>
+    </p>
+    <div class="trip-destination-neighborhood">
+        <p class="container-info-destination-taxi">
+            <span>Destino:</span>
+            <span id="nameNeighborhoodTrip"></span>
+        </p>
+        <button type="button" class="btn-finish-taximeter">Finalizar</button>
+    </div>
+    <ul>
+        <li id="startTaximetro" class="active">
+            <span class="material-icons">play_arrow</span>
+        </li>
+        <li id="pauseTaximetro">
+            <span class="material-icons">pause</span>
+        </li>
+        <li id="stopTaximetro">
+            <span class="material-icons">stop</span>
+        </li>
+    </ul>
+</div>
+
+
+<div class="modal-type-driver-taximetro">
+    <div>
+        <i class="material-icons close-modal-type-taximetro">close</i>
+        <span data-i18n="taximeter-span-modal-type-driver-taximeter"></span>
+        <ul id="listTripTypeTaximetro"></ul>
+    </div>
+</div>

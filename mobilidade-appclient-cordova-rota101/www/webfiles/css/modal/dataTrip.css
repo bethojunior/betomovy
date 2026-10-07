@@ -1,0 +1,182 @@
+.modal-data-trip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 500;
+    background-color: rgba(0, 0, 0, 0.5);
+    transform: translateY(150%);
+    transition: all 300ms;
+}
+.modal-data-trip.active{
+    transform: translateY(0);
+}
+.modal-data-trip > div {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 1vw;
+    padding: 5vw 4vw 2vw;
+    position: relative;
+}
+.modal-data-trip > div > i {
+    margin: 0 0 15px;
+    color: #000;
+    font-size: 8vw;
+}
+.modal-data-trip > div > div.container-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    margin: auto;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px;
+}
+.modal-data-trip > div > div.container-image > img {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 55px;
+    width: 55px;
+    border-radius: 100%;
+    margin-right: 10px;
+}
+
+.modal-data-trip > div > div > h4 {
+    display: block;
+    font-size: 13pt;
+    font-weight: 500;
+    text-transform: capitalize;
+    font-family: sans-serif;
+    display:flex;
+    flex-direction:column;
+}
+
+
+.modal-data-trip > div > div > h4:before {
+    content: "Motorista";
+    font-size: 9pt;
+}
+
+.modal-data-trip > div > div > label {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 4vw;
+    color: #6c6262;
+}
+.modal-data-trip > div > div > div {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 0.5vw;
+    font-size: 6vw;
+}
+
+.modal-data-trip > div > div.trip-info {
+    border-bottom: 1px solid #ccc;
+}
+
+.modal-data-trip > div > div.trip-info > div {
+    font-size: 11pt;
+    font-weight:500;
+    position: relative;
+    text-align: left;
+    padding: 5px 10px 5px 20px;
+    width: unset;
+}
+.modal-data-trip > div > div.trip-info > div:before{
+    content:"";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 7px;
+    width: 7px;
+    background-color: #5f5f5f;
+    margin: 15px 5px;
+    z-index: 1;
+}
+
+.modal-data-trip > div > div.trip-info > div:after{
+    content:"";
+    width:2.5px;
+    height: 100%;
+    background-color: #bfbfbf;
+    position: absolute;
+    top: 20px;
+    left: 7px;
+}
+
+
+.modal-data-trip > div > div.trip-info > div:last-child:after{
+    display:none;
+}
+
+.modal-data-trip > div > .option-message-driver {
+    display: flex;
+    justify-content: space-evenly;
+    font-size: 15vw;
+    margin: 3vw 3vw 0;
+    border-top: 1px solid #ccc;
+    padding: 3vw;
+}
+.modal-data-trip > div > div.trip-info > div.origin-client:before{
+
+}
+.modal-data-trip > div > div.trip-info > div.destination-client:before{
+
+}
+.modal-data-trip > div > h4{
+    display:block;
+    color: #232323;
+    font-size: 13pt;
+    width: calc(100% - 20px);
+    font-weight:700;
+    padding:2vw 0 0 0;
+    line-height: 80%;
+    font-family: sans-serif;
+    margin-top:5px;
+    display:flex;
+    padding:10px 10px 15px;
+    border-bottom:1px solid #ccc;
+}
+
+
+.modal-data-trip > div > h4 > span{
+    margin-left:auto;
+}
+
+.modal-data-trip > div > h4:before{
+    content: "Valor:";
+    color: #444;
+    font-weight:500;
+}
+
+.modal-data-trip > div > label{
+    display:block;
+    font-size: 13pt;
+    color: #444;
+    font-family: sans-serif;
+    padding: 10px;
+    text-align: center;
+}
+
+
+.modal-data-trip > div > a {
+    color:#0d62e8;
+    padding: 10px;
+    display: block;
+    border-bottom: 1px solid #ccc;
+    font-weight: 500;
+    font-family: sans-serif;
+    font-size: 10pt;
+    text-align: center;
+}

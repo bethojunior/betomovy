@@ -1,0 +1,219 @@
+#optionMenu {
+    cursor: pointer;
+}
+
+@media(min-width: 798px) {
+    .menu-close {
+        display: none;
+    }    
+}
+
+.menu-close {
+    width: 12vw;
+    position: fixed;
+    z-index: 9999;
+    right: 4vw;
+    top: 5vw;
+}
+
+.menu-close span {
+    display: block;
+    position: absolute;
+    height: 1vw;
+    width: 50%;
+    background: #000;
+    opacity: 1;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+    -webkit-transition: .25s ease-in-out;
+    -moz-transition: .25s ease-in-out;
+    -o-transition: .25s ease-in-out;
+    transition: .25s ease-in-out;
+}
+
+.menu-close.open span {
+    background: #fff;
+}
+
+.menu-close span:nth-child(even) {
+    left: 50%;
+    border-radius: 0 9px 9px 0;
+}
+
+.menu-close span:nth-child(odd) {
+    left:0;
+    border-radius: 9px 0 0 9px;
+}
+
+.menu-close span:nth-child(1), .menu-close span:nth-child(2) {
+    top: 0;
+}
+
+.menu-close span:nth-child(3), .menu-close span:nth-child(4) {
+    top: 3vw;
+}
+
+.menu-close span:nth-child(5), .menu-close span:nth-child(6) {
+    top: 6vw;
+}
+
+.menu-close.open span:nth-child(1),.menu-close.open span:nth-child(6) {
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.menu-close.open span:nth-child(2),.menu-close.open span:nth-child(5) {
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+.menu-close.open span:nth-child(1) {
+    left: 1.5vw;
+    top: 1.5vw;
+}
+
+.menu-close.open span:nth-child(2) {
+    left: calc(50% - 1vw);
+    top: 1.5vw;
+}
+
+.menu-close.open span:nth-child(3) {
+    left: -50%;
+    opacity: 0;
+}
+
+.menu-close.open span:nth-child(4) {
+    left: 100%;
+    opacity: 0;
+}
+
+.menu-close.open span:nth-child(5) {
+    left: 1.5vw;
+    top: 5vw;
+}
+
+.menu-close.open span:nth-child(6) {
+    left: calc(50% - 1vw);
+    top: 5vw;
+}
+
+.container-menu-options {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(-90deg, rgb(228, 132, 20), rgb(240, 184, 33));
+    z-index: 99;
+    top: -180vw;
+    transition: 0.25s;
+}
+.container-menu-options.active {
+    top: 0;
+    transition: 0.25s;
+    z-index: 999;
+}
+
+.container-menu-options .logo-white-return {
+    width: 13.5vw;
+    margin: 4vw;
+}
+
+.container-menu-options .info-user {
+    color: #fff;
+    margin-top: 5vw;
+}
+
+.container-menu-options .info-user img {
+    width: 18vw;
+    float: left;
+    margin: -2vw 5vw;
+}
+.container-menu-options .info-user h4 {
+    font-size: 8vw;
+    padding: 0;
+    margin: 0;
+}
+.container-menu-options .info-user p {
+    font-size: 4vw;
+}
+
+.container-menu-options ul {
+    margin: 5vw ;
+}
+
+.container-menu-options ul li {
+    color: #fff;
+    text-transform: uppercase;
+    margin: 5vw 0;
+    font-weight: 400;
+}
+
+.container-menu-options ul li button {
+    background-color: #fff;
+    color: rgb(228, 132, 20);
+    border: none;
+    padding: 2vw 5vw;
+    border-radius: 10vw;
+    font-size: 4vw;
+    text-transform: uppercase;
+    font-weight: bolder;
+}
+
+.container-menu-options ul li ul {
+    margin: 0 10vw;
+    display: none;
+}
+
+.container-menu-options ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+
+.container-menu-options ul li.active ul {
+    display: block;
+
+}
+.container-menu-options ul li ul li {
+    position: relative;
+    width: 100%;
+    right: 300vw;
+    transition: 1s;
+}
+
+.container-menu-options ul li.active ul li {
+    display: block;
+    left: 0;
+    animation-name:  item-menu;
+    animation-duration: 0.3s;
+}
+
+@keyframes item-menu {
+    0%   {
+        opacity: 0;
+        left: 300vw;
+    }
+    100% {
+        opacity: 1;
+        left: 0;
+    }
+}
+
+@media (min-width: 498px) and (max-width: 798px) {
+    .menu-close span:nth-child(3), .menu-close span:nth-child(4) {
+        top: 2.1vw;
+    }
+    
+    .menu-close span:nth-child(5), .menu-close span:nth-child(6) {
+        top: 4.2vw;
+    }
+
+    .menu-close {
+        top: 1.5vw;
+    }
+}

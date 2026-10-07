@@ -1,0 +1,40 @@
+.container-request-release{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #f4f4f4;
+    padding:2vw;
+}
+.container-request-release > h4{
+    display:block;
+    text-align:center;
+    font-size:5vw;
+    font-weight: 600;
+}
+.container-request-release > label{
+    font-size:5vw;
+    color:#353434;
+}
+.container-request-release > textarea{
+    display:block;
+    border:1px solid #ccc;
+    border-radius:1vw;
+    margin-bottom:5vw;
+    height:80vw;
+    background-color:#fff;
+    width:100%;
+    outline:unset;
+    padding:2.5vw;
+}
+
+.container-request-release > button{
+    display:block;
+    margin:auto;
+    padding:2vw 5vw;
+    border:none;
+    background-color:#f09b0e;
+    color:#fff;
+    border-radius:1vw;
+    font-size:4vw;
+    outline:unset;
+}

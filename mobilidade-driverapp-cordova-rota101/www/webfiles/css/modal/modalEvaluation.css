@@ -1,0 +1,172 @@
+.modal-evaluation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+.modal-evaluation.active{
+    display: flex;
+}
+.modal-evaluation > div {
+    width: 80%;
+    background-color: #fff;
+    border-radius: 1vw;
+    padding: 2vw;
+}
+.modal-evaluation > div > i {
+    display: block;
+    margin: 0;
+    width: 100%;
+    text-align: right;
+    color: var(--main-color);
+    font-size: 10vw;
+}
+.modal-evaluation > div > div > div.container-img-evaluation {
+    height: 80px;
+    width: 80px;
+    min-width: 80px;
+    margin: auto 0;
+    overflow: hidden;
+    border-radius: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+    background-color: #cccc;
+}
+.modal-evaluation > div > div > div > img {
+    position: absolute;
+    right: 0;
+    margin: auto;
+    top: -25%;
+    width: 100%;
+}
+
+.modal-evaluation > div > .content-evaluation > div > h4 {
+    font-size: 12pt;
+    font-weight: 500;
+    margin-top: 4vw;
+    text-transform: capitalize;
+}
+.modal-evaluation > div > label {
+    display: block;
+    text-align: center;
+    margin: 0 auto 10px;
+    color: #222;
+    font-size: 12pt;
+    font-family: sans-serif;
+}
+.modal-evaluation > div > div > label {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 4vw;
+    color: #6c6262;
+}
+.modal-evaluation > div > .content-evaluation > div:last-child{
+    display: flex;
+    margin: 10px 20px;
+    flex: 1;
+    flex-direction: column;
+}
+.modal-evaluation > div > .content-evaluation > div > .container-rate-stars {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    width: 100%;
+}
+.modal-evaluation > div > .content-evaluation > div > .container-rate-stars > i{
+    font-size: 25pt;
+    /* flex: 1; */
+    width: 40px;
+    text-align: center;
+}
+.modal-evaluation > div > .content-evaluation > div > .container-rate-stars > i.active{
+    color: #ffb114;
+}
+.modal-evaluation > div > button{
+    background-color: var(--main-color);
+    color: #fff;
+    width: 100%;
+    padding: 2vw;
+    text-transform: uppercase;
+    border: none;
+    font-size: 14pt;
+    font-weight: 500;
+    margin: auto;
+    display: block;
+    border-radius: 5px;
+    font-family: sans-serif;
+}
+
+.modal-evaluation > div > .content-evaluation{
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 5px;
+}
+
+.modal-evaluation > div > .content-evaluation-locations{
+    display:flex;
+    flex-direction:column;
+    margin-bottom: 10px;
+}
+
+
+.modal-evaluation > div > .content-evaluation-locations > h4{
+    font-size:12pt;
+    text-align:center;
+    margin-bottom:20px;
+    font-family: sans-serif;
+}
+.modal-evaluation > div > .content-evaluation-locations > ul{
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.modal-evaluation > div > .content-evaluation-locations > ul > li{
+    display:flex;
+    padding:5px 0;
+    border-bottom:1px solid #eee;
+    flex-direction: column;
+}
+
+.modal-evaluation > div > .content-evaluation-locations > ul > li > p{
+    flex:1;
+    font-size:10pt;
+    font-weight:400;
+    font-family:sans-serif;
+    margin-bottom: 10px;
+}
+
+
+.modal-evaluation > div > .content-evaluation-locations > ul > li > div > div{
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+}
+
+.modal-evaluation > div > .content-evaluation-locations > ul > li > div,
+.modal-evaluation > div > .content-evaluation-locations > ul > li > div > div > div{
+    display:flex;
+}
+
+.modal-evaluation > div > .content-evaluation-locations > ul > li > div > div > div > span{
+    font-size:20pt;
+    padding:5px;
+    opacity:0.25;
+    transition:300ms;
+}
+
+.modal-evaluation > div > .content-evaluation-locations > ul > li > div > div > div > span.active{
+    opacity:1;
+}

@@ -1,0 +1,16 @@
+{
+  "title": "App Passageiro",
+  "version": "1.59.144",
+  "items": [
+    {
+      "description": "Corrigido: Viagem agendada (Sem aceite)."
+    },
+    {
+      "description": "Corrigido: Imagem de cartão da compra de voucher."
+    },
+    {
+      "description": "Criado: Alterar dados de cadastro de Usuário quando é para outro país."
+    }
+  ],
+  "updateDate": "07/12/2023"
+}

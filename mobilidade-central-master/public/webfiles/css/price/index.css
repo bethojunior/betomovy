@@ -1,0 +1,240 @@
+/* ─────────────────────────────────────
+   Tipos de viagem — sidebar Valor fixo
+───────────────────────────────────── */
+
+.container-box-price {
+    position: relative;
+    width: 100%;
+}
+
+/* Carousel */
+.footer-container-trip > .container-box-price > .type-cars {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+}
+
+/* Spinner de loading */
+.footer-container-trip > .container-box-price > .type-cars:empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 160px;
+    white-space: normal;
+}
+
+.footer-container-trip > .container-box-price > .type-cars:empty::before {
+    content: "";
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e9e9e9;
+    border-top-color: var(--color-text-primary);
+    border-radius: 50%;
+    animation: price-spin 0.85s linear infinite;
+}
+
+@keyframes price-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Esconde pagamento/botões durante loading */
+.footer-container-trip > .container-box-price.update ~ .payment-trip,
+.footer-container-trip > .container-box-price.update ~ .schedule-trip,
+.footer-container-trip > .container-box-price.update ~ .switch-type-trip {
+    display: none;
+}
+
+/* ── Página (bloco de 3 cards, carousel por scroll) ── */
+.footer-container-trip > .container-box-price > .type-cars > div {
+    width: 100%;
+    display: inline-block;
+    padding: 18px 14px 10px;
+    vertical-align: top;
+    white-space: normal;
+    box-sizing: border-box;
+}
+
+/* ── Linha de 3 cards ── */
+.footer-container-trip > .container-box-price > .type-cars > div > div {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 10px;
+}
+
+/* Outros desbotados quando há seleção */
+.footer-container-trip > .container-box-price > .type-cars.trip-type-selected
+> div > div > div:not(.active) {
+    opacity: 0.25;
+}
+
+/* ── Card ── */
+.footer-container-trip > .container-box-price > .type-cars > div > div > div {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 6px 14px;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 14px;
+    background: #fdfdfd;
+    cursor: pointer;
+    position: relative;
+    float: none;
+    margin: 0;
+    opacity: 1;
+    transition: border-color 0.15s, background 0.15s, opacity 0.2s, transform 0.15s;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div:hover {
+    border-color: #bbb;
+    transform: translateY(-2px);
+}
+
+/* ── Card ativo ── */
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active {
+    border: 2px solid var(--color-text-primary);
+    background: var(--color-bg-surface);
+    transform: none;
+}
+
+/* Sem destino */
+.footer-container-trip.no-destination > .container-box-price > .type-cars
+> div > div > div.trip-type > p {
+    display: none;
+}
+
+/* ── Imagem do carro ── */
+.footer-container-trip > .container-box-price > .type-cars > div > div > div > img {
+    order: 1;
+    display: block;
+    width: 100%;
+    max-width: 88px;
+    height: 60px;
+    object-fit: contain;
+    margin: 0 auto 4px;
+    transition: transform 0.22s;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.active > img {
+    transform: scale(1.06);
+}
+
+/* ── Nome do tipo ── */
+/* background-color inline tem !important para sobrescrever */
+.footer-container-trip > .container-box-price > .type-cars > div > div > div > span {
+    order: 2;
+    display: block;
+    position: static  !important;
+    transform: none   !important;
+    top: auto  !important;
+    left: auto !important;
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #888 !important;
+    background-color: transparent !important;
+    padding: 6px 2px 0;
+    margin: 0;
+    border-radius: 0;
+    white-space: normal;
+    word-break: break-word;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active > span {
+    color: var(--color-text-primary) !important;
+    font-weight: 800;
+}
+
+/* ── Preço ── */
+.footer-container-trip > .container-box-price > .type-cars > div > div > div > p {
+    order: 3;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 800;
+    color: #bbb;
+    margin: 5px 0 0;
+    padding: 0;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active > p {
+    color: var(--color-text-primary);
+    font-size: 16px;
+}
+
+/* prefixo "R$" */
+.footer-container-trip > .container-box-price > .type-cars > div > div > div > p > span {
+    font-size: 10px;
+    font-weight: 600;
+    margin-right: 1px;
+    vertical-align: 1px;
+}
+
+/* ── Dots ── */
+.indication-list-prices {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0 12px;
+}
+
+.indication-list-prices > div {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-border-input);
+    transition: background 0.15s, width 0.2s;
+}
+
+.indication-list-prices > div.active {
+    background: var(--color-primary);
+    width: 18px;
+    border-radius: 3px;
+}
+
+/* ── Setas prev/next ── */
+.arrows-indication-list {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+}
+
+.arrows-indication-list > div {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background: var(--color-bg-surface);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    pointer-events: auto;
+    transition: box-shadow 0.12s, background 0.12s;
+    z-index: 5;
+}
+
+.arrows-indication-list > div:hover {
+    background: #f5f5f5;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.14);
+}
+
+.arrows-indication-list > div.active         { visibility: visible; }
+.arrows-indication-list > div .material-icons { font-size: 16px; color: var(--color-text-muted); }
+.arrows-indication-list > .prev-container-price { left: 4px; }
+.arrows-indication-list > div:last-child        { right: 4px; }

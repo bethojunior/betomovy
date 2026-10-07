@@ -1,0 +1,70 @@
+# Set master image
+FROM rockylinux:8
+
+
+LABEL maintainer="704apps" \
+      description="Mobilidade Monitor" \
+      version="1.0"
+
+# Set working directory
+WORKDIR /var/www/html
+
+RUN dnf update -y && dnf install -y \
+    epel-release
+
+RUN dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+RUN dnf install dnf-plugins-core -y
+# PHP 7.4
+RUN dnf module install php:remi-7.4 -y
+
+# Install Additional dependencies
+RUN dnf install -y vim curl \
+    php \
+    php-fpm \
+    php-common \
+    php-pdo \
+    php-pdo_mysql \
+    php-mysqli \
+    php-mcrypt \
+    php-mbstring \
+    php-xml \
+    php-openssl \
+    php-json \
+    php-phar \
+    php-zip \
+    php-gd \
+    php-dom \
+    php-session \
+    php-zlib \
+    php-pecl-mongodb \
+    php-pecl-grpc \
+    nginx \
+    wget unzip \
+    procps iproute
+
+# Install composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && HASH="$(wget -q -O - https://composer.github.io/installer.sig)" \
+    && php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+# Ajustes Nginx
+COPY docker-prod/config/nginx.conf /etc/nginx/nginx.conf
+# Ajustes php-fpm
+COPY docker-prod/config/www.conf /etc/php-fpm.d/www.conf
+# Ajustes PHP
+COPY docker-prod/config/local.ini /etc/php.d/local.ini
+
+# Roda os serviços
+COPY docker-prod/config/runner.sh /runner.sh
+RUN chmod +x /runner.sh
+
+# Copia o conteúdo do projeto (deve ser depois de todas as instalações)
+COPY . /var/www/html
+
+RUN mkdir -p /var/lib/php/session && \
+    chown -R nginx:nginx /var/www/html && \
+    chown -R nginx:nginx /var/lib/php/session && \
+    chmod 1733 /var/lib/php/session
+
+ENTRYPOINT [ "/runner.sh", "start" ]

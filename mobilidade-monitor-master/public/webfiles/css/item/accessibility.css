@@ -1,0 +1,31 @@
+.general-acessibilidade{
+
+}
+.general-acessibilidade .row#mount-priceHelpers .data{
+    background-color: whitesmoke;
+    padding: 2vw;
+    margin: 1vw;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.general-acessibilidade .row#mount-priceHelpers .data:hover{
+    box-shadow: 1px 1px 20px 0px rgba(0,0,0,0.26);
+    transition: 0.5s;
+}
+.general-acessibilidade .row#mount-priceHelpers .data .options{
+    position: relative;
+}
+.general-acessibilidade .row#mount-priceHelpers .data .col-lg-4.options .that{
+    position: absolute;
+    right: 0;
+}
+.btn.btn-success#create-price{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 5vw;
+    border-radius: 52vw;
+    height: 4vw;
+    width: auto;
+    margin-right: 1vw;
+}

@@ -1,0 +1,55 @@
+.title-form-publicity {
+   font-weight: bold;
+   font-size: 16px;
+}
+
+.title-form-publicity > label {
+   font-size: 12px;
+}
+
+.general-publicidade {
+   overflow-x: hidden;
+}
+
+.button-save-publicity {
+   margin-left: 50px;
+}
+
+@media (max-width: 991px) {
+   .row .general-publicidade {
+      margin-left: 5vw;
+   }
+}
+
+@media (max-width: 600px) {
+   .container-form {
+      margin-left: -11%;
+      width: 115%;
+      margin-top: 5%;
+   }
+
+   .button-save-publicity {
+      margin-left: 1vh;
+   }
+}
+@media (min-width: 992px) {
+   .row .general-publicidade {
+      margin-top: 2vw;
+   }
+
+   .row .general-publicidade .row.col-lg-12.col-sm-12 .col-lg-4.col-sm-12 .custom-file {
+      margin-top: 1vw;
+      width: 91%;
+      margin-left: 1vw;
+   }
+
+   .row .general-publicidade .row.col-lg-12.col-sm-12 .col-lg-8.col-sm-12.form-group textarea {
+      resize: none;
+      height: 12.5vw;
+   }
+
+   .row .general-publicidade .row.col-lg-12.col-sm-12 .row.col-lg-12.col-sm-12.enterprise {
+      /*margin-top: 2vw;*/
+      /*margin-left: 0vw;*/
+   }
+}

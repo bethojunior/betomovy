@@ -1,0 +1,12 @@
+services:
+  mobilidade-monitorapiv2:
+    platform: linux/amd64
+    build:
+      dockerfile: docker-prod/dockerfile
+    container_name: mobilidade-monitorapiv2-prod
+    image: mobilidade-monitorapiv2-prod-local
+    restart: always
+    ports:
+      - 82:82
+    env_file:
+      - .env

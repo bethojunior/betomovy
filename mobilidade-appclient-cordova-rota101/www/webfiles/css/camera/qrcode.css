@@ -1,0 +1,85 @@
+.container-qrcode{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-qrcode > i{
+    position: absolute;
+    top: 4vw;
+    left: 2vw;
+    font-size: 12vw;
+    color: #fff;
+}
+
+.container-qrcode > div{
+    width:60vw;
+    height:60vw;
+    display: flex;
+    position: relative;
+    flex-wrap: wrap;
+}
+
+.container-qrcode > div > div{
+    height:15vw;
+    width:15vw;
+    position:absolute;
+    border-width:5vw !important;
+    border-color: rgba(255,255,255,0.25) !important;
+}
+
+
+.container-qrcode > div > div:nth-child(1){
+    top:0;
+    left:0;
+    border-left:1px solid #fff;
+    border-top:1px solid #fff;
+    border-radius: 5vw 0 0 0;
+}
+
+
+.container-qrcode > div > div:nth-child(2){
+    top:0;
+    right:0;
+    border-right:1px solid #fff;
+    border-top:1px solid #fff;
+    border-radius: 0 5vw 0 0;
+}
+
+
+.container-qrcode > div > div:nth-child(3){
+    bottom:0;
+    left:0;
+    border-left:1px solid #fff;
+    border-bottom:1px solid #fff;
+    border-radius: 0 0 0 5vw;
+}
+
+.container-qrcode > div > div:nth-child(4){
+    bottom:0;
+    right:0;
+    border-right:1px solid #fff;
+    border-bottom:1px solid #fff;
+    border-radius: 0 0 5vw 0;
+}
+
+.container-qrcode > h4{
+    color:#fff;
+    position:absolute;
+    top:15%;
+    font-size:8vw;
+    font-weight:600;
+}
+
+.container-qrcode > p{
+    position:absolute;
+    color:#fff;
+    bottom:15%;
+    font-size:6.5vw;
+    text-align:center;
+    width:90%;
+}

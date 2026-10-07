@@ -1,0 +1,51 @@
+<div class="container-info-delivery footer-ios-x">
+    <nav>
+        <a class="go-back-form-travel back-delivery-item">
+            <i class="material-icons">keyboard_arrow_left</i>
+        </a>
+        <span data-i18n="home-delivery-details"></span>
+    </nav>
+    <div>
+        <p data-i18n="home-delivery-type"></p>
+        <ul id="listItemDelivery"></ul>
+        <hr/>
+        <p data-i18n="home-additional-information"></p>
+        <div class="detail-delivery">
+            <span>
+                <span class="icon-custom" style="background-image: url('webfiles/img/svg/collect.svg')"></span>
+                <span data-i18n="home-text-collection-details"></span>
+            </span>
+            <pre class="obs-text-area" id="obsOrigin" title="Observação coleta"></pre>
+        </div>
+        <hr>
+        <p data-i18n="home-p-delivery"></p>
+        <div id="listWayPointsDelivery"></div>
+        <div class="detail-delivery">
+            <span>
+                 <span class="icon-custom" style="background-image: url('webfiles/img/svg/tools.svg')"></span>
+                <span id="obsFinishWayPoint"></span>
+            </span>
+            <pre class="obs-text-area" id="obsDestination" title="Observação entrega"></pre>
+        </div>
+        <div class="detail-delivery">
+            <span>
+                 <span class="material-icons">message</span>
+                <span data-i18n="home-delivery-observation"></span>
+            </span>
+            <pre class="obs-text-area" id="obs" title="Outras observações"></pre>
+        </div>
+    </div>
+    <div class="switch-type-trip is-content-schedule">
+        <button type="button" id="btnSaveInfoDelivery" data-i18n="home-btn-save-info-delivery"></button>
+    </div>
+</div>
+
+<div class="container-obs-delivery-info">
+    <nav>
+        <i class="material-icons back-delivery-item">keyboard_arrow_down</i>
+        <span id="titleObs"></span>
+        <span id="countLengthObs">0/150</span>
+    </nav>
+    <textarea id="textAreaObs" placeholder="Digite algo aqui" maxlength="150"></textarea>
+    <button type="button" id="btnSaveObs">Salvar</button>
+</div>

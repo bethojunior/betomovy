@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="O melhor app com vantagens para motoristas e passageiros" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="" id="og-url-initial" />
+    <meta
+      property="og:title"
+      content="O melhor app com vantagens para motoristas e passageiros"
+      id="og-title-initial"
+    />
+    <meta
+      property="og:description"
+      content="O melhor app com vantagens para motoristas e passageiros"
+    />
+    <meta property="og:image" content="/logo.png" id="og-image-initial" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="" id="twitter-url-initial" />
+    <meta
+      property="twitter:title"
+      content="O melhor app com vantagens para motoristas e passageiros"
+      id="twitter-title-initial"
+    />
+    <meta
+      property="twitter:description"
+      content="O melhor app com vantagens para motoristas e passageiros"
+    />
+    <meta property="twitter:image" content="/logo.png" id="twitter-image-initial" />
+
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="%PUBLIC_URL%/env-config.js"></script>
+    <title id="page-title-initial">
+      O melhor app com vantagens para motoristas e passageiros
+    </title>
+    <script>
+      ;(function setShareMeta() {
+        var urlParams = new URLSearchParams(window.location.search)
+        var nameApp = urlParams.get('name_app')
+        var baseUrl = window.location.origin
+        var currentUrl = window.location.href
+        var appName = (window.env && window.env.REACT_APP_PROJECT_NAME) ? window.env.REACT_APP_PROJECT_NAME : ''
+        if (nameApp) {
+          appName = nameApp.charAt(0).toUpperCase() + nameApp.slice(1)
+        }
+        var suffix = 'O melhor app com vantagens para motoristas e passageiros'
+        var title = appName ? appName + ' - ' + suffix : suffix
+        var imageUrl = baseUrl + '/logo.png'
+        document.title = title
+        var ogTitle = document.getElementById('og-title-initial')
+        var twTitle = document.getElementById('twitter-title-initial')
+        if (ogTitle) ogTitle.setAttribute('content', title)
+        if (twTitle) twTitle.setAttribute('content', title)
+        document.getElementById('og-image-initial').setAttribute('content', imageUrl)
+        document.getElementById('twitter-image-initial').setAttribute('content', imageUrl)
+        document.getElementById('og-url-initial').setAttribute('content', currentUrl)
+        document.getElementById('twitter-url-initial').setAttribute('content', currentUrl)
+      })()
+    </script>
+  </head>
+
+  <body>
+    <noscript>Você precisa habilitar o JavaScript para executar este aplicativo.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

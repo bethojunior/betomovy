@@ -1,0 +1,13 @@
+{
+  "title": "App Motorista",
+  "version": "1.59.027",
+  "items": [
+    {
+      "description": "Corrigido:  Envio de foto por pendência."
+    },
+    {
+      "description": "Criado: Alterar dados de cadastro de Usuário quando é para outro país."
+    }
+  ],
+  "updateDate": "07/12/2023"
+}

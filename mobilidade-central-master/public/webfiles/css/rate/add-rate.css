@@ -1,0 +1,853 @@
+@media (max-width: 992px) {
+    .container-add-rate {
+        display: block;
+        float: left;
+        width: 100%;
+        height: calc(100% - 6vw);
+        /* overflow-y: auto; */
+        /* margin-bottom: 20vw; */
+    }
+
+    .container-add-rate > div {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 2vw;
+    }
+
+    .container-option-price{
+        position: fixed;
+        bottom: -100%;
+        width: 100%;
+        background-color: #f3a41c;
+        transition: 0.5s;
+    }
+
+    .container-option-price.active{
+        bottom:0;
+        transition:0.5s;
+    }
+
+    .container-option-price > ul{
+        display: flex;
+        justify-content: left;
+        list-style: none;
+        align-items: center;
+    }
+
+    .container-option-price > ul > li{
+        display: flex;
+        padding: 4vw;
+        border-top: 5px solid transparent;
+        border-right: 0.5px solid #e69305;
+    }
+
+    .container-option-price > ul > li.active{
+        color:var(--color-text-inverse);
+        border-top:5px solid #fff;
+    }
+
+    .container-option-price > ul > li > i{
+        font-size: 9vw;
+    }
+
+    .container-add-rate > div.list-prices > ul {
+        width:100%;
+        display:flex;
+        list-style:none;
+        background-color: var(--color-border-subtle);
+        border-bottom: 1px solid #808080cc;
+    }
+
+    .container-add-rate > div.list-prices > ul > li {
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        border-right: 1px solid var(--color-border);
+        cursor: pointer;
+        background-color: var(--color-bg-surface);
+        opacity: 0.5;
+        overflow-x: auto;
+    }
+
+    .container-add-rate > div.list-prices > ul > li.option-trip-type.active {
+        opacity:1;
+        background-color:#d6edc4;
+    }
+
+    .container-add-rate > div.list-prices > ul > li > img{
+        width: 60%;
+    }
+
+
+    .container-add-rate > div.list-prices > ul > li > span{
+        font-size:3vw;
+    }
+
+    .container-add-rate > div:first-child{
+        border-bottom:1px solid var(--color-border);
+    }
+
+    .container-add-rate > div > div {
+        /* margin: 0.5rem 0; */
+        position: relative;
+        width: 100%;
+    }
+
+    .container-add-rate > div > div > div > input ,
+    .container-add-rate > div > div > label {
+        display: block;
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .container-add-rate > div > div > div > input ,
+    .container-add-rate > div > div > input {
+        width: 100%;
+        padding: 10px;
+        display: block;
+        margin: auto;
+        border-radius: 5px;
+        border: 1px solid #a4a4a4;
+        outline: none;
+        font-size: 14pt;
+    }
+
+    .container-add-rate > div > div > select {
+        width: 70%;
+        margin: auto;
+        display: block;
+        padding: 0.1em 0.5em;
+        border-radius: 0.5rem;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > label{
+        width: 37%;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > input[type=text],
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > input[type=number],
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > input[type=tel]{
+        width: 30%;
+        margin-right: 5vw;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > input:nth-child(4){
+        width:40%
+    }
+
+    .container-add-rate >.container-rates-change > div > details{
+        margin:0 2vw;
+        background-color: var(--color-bg-surface);
+        padding: 0 0 2vw;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > summary{
+        outline: none;
+        padding: 3vw 3vw;
+        border-bottom: 1px solid var(--color-bg-subtle);
+        background-color: #4381bc;
+        color: var(--color-text-inverse);
+
+    }
+
+    .container-add-rate > button {
+        display: block;
+        margin: 3em auto 0;
+        background-color: #20bb26;
+        padding: 12px 30px;
+        color: var(--color-text-inverse);
+        cursor: pointer;
+        text-transform: uppercase;
+        outline: unset;
+        border-radius: 0.5rem;
+        border: none;
+        font-size: 13pt;
+        box-shadow: 0 0 10px #a9a9a9;
+    }
+
+    .container-add-rate >.container-rates-change > .option-menu-rate{
+        display: none;
+    }
+
+    .container-add-rate >.container-rates-change > .option-menu-rate.active{
+        display: block;
+    }
+
+    .container-add-rate >.container-rates-change{
+        display: flex;
+        justify-content: unset;
+        border-radius: unset;
+        margin-top: unset;
+        height: 0;
+        transition: 0.5s;
+        padding: unset;
+        overflow-y: hidden;
+    }
+
+    .container-add-rate >.container-rates-change.active{
+        height: unset;
+        transition:0.5s;
+        margin-bottom: 20vw;
+    }
+
+    .container-add-rate >.container-rates-change > details > div{
+        width: 100%;
+        /* height: 100%; */
+        margin: 0;
+        overflow-y: auto;
+    }
+
+    .container-add-rate >.container-rates-change > details > div:last-child{
+        overflow-y:hidden;
+        height: 90%;
+    }
+
+    .container-add-rate >.container-rates-change > div > button {
+        border: none;
+        padding: 10px 15px;
+        margin: 5px auto;
+        display: block;
+        outline: none;
+        border-radius: 5px;
+        font-size: 12pt;
+        box-shadow: 0 0 2px #6a6a6a;
+        background-color: #4ba066;
+        color: var(--color-text-inverse);
+        width: 80%;
+    }
+
+
+    .container-add-rate >.container-rates-change > div > details > div > div,
+    .container-add-rate >.container-rates-change > div > div > div {
+        display: flex;
+        width: calc(100% - 20px);
+        padding: 10px;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+    .container-add-rate >.container-rates-change > div > details > div > div[hidden]{
+        display: none;
+    }
+
+
+    .container-add-rate >.container-rates-change > div > details > div > div > label,
+    .container-add-rate >.container-rates-change > div > div > div > label{
+        font-size: 12pt;
+        text-transform: uppercase;
+
+    }
+    .container-add-rate >.container-rates-change > div > details >  div > div > input[type=text],
+    .container-add-rate >.container-rates-change > div > details > div > div > input[type=number],
+    .container-add-rate >.container-rates-change > div > details > div > div > input[type=tel],
+    .container-add-rate >.container-rates-change > div > div > div > input[type=text],
+    .container-add-rate >.container-rates-change > div > div > div > input[type=number],
+    .container-add-rate >.container-rates-change > div > div > div > input[type=tel]{
+        width: 50%;
+        outline: none;
+        padding: 6px 12px;
+        font-size: 12pt;
+        border-radius: 10px;
+        border: 1px solid var(--color-border);
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child{
+        border-left:1px solid #e6e6e6;
+        height: 90%;
+        margin: 0;
+    }
+
+    ::-webkit-scrollbar {
+        display: block;
+    }
+
+    ::-webkit-scrollbar-track-piece {
+        background-color: #f8f8f8;
+    }
+
+    ::-webkit-scrollbar-thumb:vertical,
+    ::-webkit-scrollbar-thumb:horizontal {
+        background-color: var(--color-border);
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .map-route{
+        width: 100%;
+        height: 100%;
+        background-color: #d0d0d0;
+        position: absolute;
+        transition: 0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .map-route.active{
+        height:50%;
+        transition: 0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > div > div {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price{
+        width: 100%;
+        border-top: 1px solid #c9c9c9;
+        position:absolute;
+        background-color:var(--color-bg-surface);
+        height:50%;
+        bottom: -70%;
+        transition: 0.5s;
+        display: flex;
+    }
+
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price.active{
+        bottom:0;
+        transition: 0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div{
+        width: 70%;
+        display: flex;
+        justify-content: unset;
+        flex-direction: column;
+        align-items: unset;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div > .tag-price{
+        background-color: var(--color-primary-hover);
+        color: var(--color-text-inverse);
+        border-radius: 6px;
+        padding: 3px;
+        font-size: 7pt;
+        width: 50%;
+        max-width: 50%;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div > .tag-price:empty:before{
+        content: "-";
+        visibility: hidden;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div > img{
+        width: 100px;
+        height: 100px;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:last-child > img + span{
+        color:#f7a006;
+        font-size:10pt;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:last-child > img + span > span:last-child{
+        font-size:16pt;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .address-simulator{
+        position: absolute;
+        z-index: 5;
+        top: 0;
+        width: calc(100% - 20px);
+        padding: 10px;
+        background-color: var(--color-bg-surface);
+        box-shadow: 0 0 10px #aaa;
+        transition:0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .address-simulator.active{
+        top:-100%;
+        transition:0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > div.address-simulator > div > div {
+        width: 100%;
+
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > div.address-simulator > div > div > input{
+        width:100%;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid var(--color-border);
+        outline: none;
+    }
+
+    .container-add-rate >.container-rates-change > div > div > div > input:focus,
+    .container-add-rate >.container-rates-change > div:last-child > div.address-simulator > div > div > input:focus{
+        border-color: #eaaa37;
+    }
+
+    .container-add-rate > div > div > input[disabled]{
+        background-color: #4381bc;
+        color: var(--color-text-inverse);
+        border-color: #4381bc;
+    }
+
+    .container-add-rate > div > div > input[disabled] + i{
+        display:block;
+    }
+
+    .container-add-rate > div > div > i{
+        position:absolute;
+        top: 30px;
+        right: 5px;
+        padding:10px;
+        display: none;
+        cursor: pointer;
+        color:var(--color-text-inverse);
+    }
+
+    .container-color-tag{
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:last-child{
+        justify-content:center;
+        align-items:center;
+        border-left: 1px solid var(--color-border);
+        width: 30%;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:last-child > i{
+        position:absolute;
+        right:5px;
+        top:5px;
+        cursor:pointer;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.container-payment-form {
+        justify-content: left;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.container-payment-form > input{
+        margin:0 10px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container-option-price{
+        display: none;
+    }
+    .container-add-rate {
+        display: block;
+        float: left;
+        width: calc(100% - 18% - 20px);
+        padding: 8px 10px;
+    }
+
+    .container-add-rate > div {
+        display: flex;
+    }
+
+    .container-add-rate > div.list-prices > ul {
+        width:100%;
+        display:flex;
+        list-style:none;
+        background-color: var(--color-border-subtle);
+        border-bottom: 1px solid #808080cc;
+    }
+
+    .container-add-rate > div.list-prices > ul > li {
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        width: 20%;
+        border-right: 1px solid var(--color-border);
+        cursor: pointer;
+        background-color: var(--color-bg-surface);
+        opacity: 0.5;
+    }
+
+    .container-add-rate > div.list-prices > ul > li.option-trip-type.active {
+        opacity:1;
+        background-color:#d6edc4;
+    }
+
+    .container-add-rate > div.list-prices > ul > li > img{
+        width: 40%;
+    }
+
+    .container-add-rate > div:first-child{
+        border-bottom:1px solid var(--color-border);
+    }
+
+    .container-add-rate > div > div {
+        margin: 0.5rem 0;
+        position: relative;
+        width: 20%;
+        margin-right: 20px;
+    }
+
+    .container-add-rate > div > div > div > input ,
+    .container-add-rate > div > div > label {
+        display: block;
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        width: 100%;
+    }
+
+    .container-add-rate > div > div > div > input ,
+    .container-add-rate > div > div > input {
+        width: 100%;
+        padding: 10px;
+        display: block;
+        margin: auto;
+        border-radius: 5px;
+        border: 1px solid #a4a4a4;
+        outline: none;
+        font-size: 14pt;
+    }
+
+    .container-add-rate > div > div > select {
+        width: 70%;
+        margin: auto;
+        display: block;
+        padding: 0.1em 0.5em;
+        border-radius: 0.5rem;
+    }
+
+    .container-add-rate > button {
+        display: block;
+        margin: 3em auto 0;
+        background-color: #20bb26;
+        padding: 12px 30px;
+        color: var(--color-text-inverse);
+        cursor: pointer;
+        text-transform: uppercase;
+        outline: unset;
+        border-radius: 0.5rem;
+        border: none;
+        font-size: 13pt;
+        box-shadow: 0 0 10px #a9a9a9;
+    }
+
+    .container-add-rate >.container-rates-change{
+        display: flex;
+        justify-content: unset;
+        border-radius: 5px;
+        background-color: var(--color-bg-surface);
+        margin-top: 5px;
+        height: 0;
+        transition: 0.5s;
+    }
+
+    .container-add-rate >.container-rates-change.active{
+        height: 62.5%;
+        border: 1px solid #b6b6b6;
+        transition:0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div{
+        width:50%;
+        height: 100%;
+        margin: 0;
+        overflow-y: auto;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child{
+        overflow-y:hidden;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > summary{
+        outline: none;
+        padding: 10px;
+        border-bottom: 1px solid var(--color-border);
+        cursor: pointer;
+        background-color: #4381bc;
+        color: var(--color-text-inverse);
+    }
+
+    .container-add-rate >.container-rates-change > div > details  > button,
+    .container-add-rate >.container-rates-change > div > button {
+        border: none;
+        padding: 10px 15px;
+        margin: 5px auto;
+        display: block;
+        outline: none;
+        border-radius: 5px;
+        font-size: 12pt;
+        box-shadow: 0 0 2px #6a6a6a;
+        background-color: #4ba066;
+        color: var(--color-text-inverse);
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.container-payment-form {
+        justify-content: left;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.container-payment-form > input{
+        margin:0 10px;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div,
+    .container-add-rate >.container-rates-change > div > div > div {
+        display: flex;
+        width: calc(100% - 20px);
+        padding: 10px;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+    .container-add-rate >.container-rates-change > div > details > div > div[hidden]{
+        display: none;
+    }
+
+
+    .container-add-rate >.container-rates-change > div > details > div > div > label,
+    .container-add-rate >.container-rates-change > div > div > div > label{
+        font-size: 12pt;
+        text-transform: uppercase;
+
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > label{
+        width: 25%;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > input[type=text],
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > input[type=number],
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > input[type=tel]{
+        width: 20%;
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div.input-duplicate > input:nth-child(4){
+        width:40%
+    }
+
+    .container-add-rate >.container-rates-change > div > details:nth-child(3){
+        border-bottom:1px solid var(--color-border);
+        margin-bottom:15px
+    }
+
+    .container-add-rate >.container-rates-change > div > details > div > div > input[type=text],
+    .container-add-rate >.container-rates-change > div > details > div > div > input[type=number],
+    .container-add-rate >.container-rates-change > div > details > div > div > input[type=tel],
+    .container-add-rate >.container-rates-change > div > div > div > input[type=text],
+    .container-add-rate >.container-rates-change > div > div > div > input[type=number],
+    .container-add-rate >.container-rates-change > div > div > div > input[type=tel]{
+        width: 50%;
+        outline: none;
+        padding: 6px 12px;
+        font-size: 12pt;
+        border-radius: 10px;
+        border: 1px solid var(--color-border);
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child{
+        border-left:1px solid #e6e6e6;
+    }
+
+    ::-webkit-scrollbar {
+        display: block;
+    }
+
+    ::-webkit-scrollbar-track-piece {
+        background-color: #f8f8f8;
+    }
+
+    ::-webkit-scrollbar-thumb:vertical,
+    ::-webkit-scrollbar-thumb:horizontal {
+        background-color: var(--color-border);
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .map-route{
+        width: 100%;
+        height: 100%;
+        background-color: #d0d0d0;
+        position: absolute;
+        transition: 0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .map-route.active{
+        height:50%;
+        transition: 0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > div > div {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price{
+        width: 100%;
+        border-top: 1px solid #c9c9c9;
+        position:absolute;
+        background-color:var(--color-bg-surface);
+        height:50%;
+        bottom: -50%;
+        transition: 0.5s;
+        display: flex;
+    }
+
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price.active{
+        bottom:0;
+        transition: 0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div{
+        width: 70%;
+        display: flex;
+        justify-content: unset;
+        flex-direction: column;
+        align-items: unset;
+    }
+
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child{
+        overflow-y:auto;
+        padding: unset;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child > span{
+        padding:5px;
+        font-size: 10pt;
+    }
+
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child > div{
+        width:100%;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child > div > span{
+        width: calc(100% - 30px);
+        background-color: #4381bc;
+        display: block;
+        color: var(--color-text-inverse);
+        padding: 5px 15px;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child > div > ul{
+        list-style:none;
+        padding: 5px;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child > div > ul > li{
+        display:flex;
+        justify-content:space-between;
+        padding: 2px 5px;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child > div > ul > li:last-child{
+        border-top:1px solid var(--color-border);
+        font-size:14pt;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child > div > ul > li > span:first-child{
+        text-transform:uppercase;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child > div > ul > li:last-child > span:last-child{
+        margin-right:1ch;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:first-child > div > ul{}
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div > .tag-price{
+        background-color: var(--color-primary-hover);
+        color: var(--color-text-inverse);
+        border-radius: 6px;
+        padding: 3px;
+        font-size: 7pt;
+        width: 50%;
+        max-width: 50%;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div > .tag-price:empty:before{
+        content: "-";
+        visibility: hidden;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div > img{
+        width: 100px;
+        height: 100px;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:last-child > img + span{
+        color:#f7a006;
+        font-size:10pt;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:last-child > img + span > span:last-child{
+        font-size:16pt;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .address-simulator{
+        position: absolute;
+        z-index: 5;
+        top: 0;
+        width: calc(100% - 20px);
+        padding: 10px;
+        background-color: var(--color-bg-surface);
+        box-shadow: 0 0 10px #aaa;
+        transition:0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .address-simulator.active{
+        top:-100%;
+        transition:0.5s;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > div.address-simulator > div > div {
+        width: 100%;
+
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > div.address-simulator > div > div > input{
+        width:100%;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid var(--color-border);
+        outline: none;
+    }
+
+    .container-add-rate >.container-rates-change > div > div > div > input:focus,
+    .container-add-rate >.container-rates-change > div:last-child > div.address-simulator > div > div > input:focus{
+        border-color: #eaaa37;
+    }
+
+    .container-add-rate > div > div > input[disabled]{
+        background-color: #4381bc;
+        color: var(--color-text-inverse);
+        border-color: #4381bc;
+    }
+
+    .container-add-rate > div > div > input[disabled] + i{
+        display:block;
+    }
+
+    .container-add-rate > div > div > i{
+        position:absolute;
+        top: 18px;
+        right: 5px;
+        padding:10px;
+        display: none;
+        cursor: pointer;
+        color:var(--color-text-inverse);
+    }
+
+    .container-color-tag{
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:last-child{
+        justify-content:center;
+        align-items:center;
+        border-left: 1px solid var(--color-border);
+        width: 30%;
+    }
+
+    .container-add-rate >.container-rates-change > div:last-child > .container-simulator-price > div:last-child > i{
+        position:absolute;
+        right:5px;
+        top:5px;
+        cursor:pointer;
+    }
+}

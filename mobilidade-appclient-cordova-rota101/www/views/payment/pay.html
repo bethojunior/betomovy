@@ -1,0 +1,29 @@
+<div class="container-pay">
+    <nav>
+        <i class="material-icons go-back">
+            arrow_back
+        </i>
+        <span data-i18n="confirm-buy-title-purchase"></span>
+    </nav>
+    <div>
+        <div>
+            <p data-i18n="confirm-buy-p-purchase-amount"></p>
+            <p id="totalPay"></p>
+            <span><span data-i18n="confirm-buy-span-you-will-win"></span> <span id="voucherPay"></span></span>
+        </div>
+        <div id="selectedPaymentForm">
+            <p  data-i18n="confirm-buy-method-payment"></p>
+            <p id="cardSelectedClient">----</p>
+        </div>
+<!--        <a data-i18n="confirm-buy-terms"></a>-->
+        <form method="post" id="payBuyClient">
+            <select id="cardIdSelected" data-checkout='cardId'>
+            </select>
+            <input type="text" id="cvvCardSelect" data-checkout="securityCode" hidden/>
+        </form>
+
+        <footer>
+            <button type="button" id="payBuy" data-i18n="confirm-buy-btn-pay-buy"></button>
+        </footer>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]
+then
+        echo "Está faltando argumentos!"
+        echo "(Execute $0 -h para abrir o menu ajuda)"
+        echo ""
+        exit 0
+fi
+
+while [ -n "$1" ]; do # while loop starts
+    case "$1" in
+        -h)
+            echo "Como usar:"
+            echo "$0 -h "
+            echo "$0 up "
+            echo "$0 down "
+            echo "$0 bash "
+            echo ""
+            echo "   h                ajuda (essa tela)"
+            echo "   up               subir containers"
+            echo "   down             desligar containers"
+            echo "   bash             acessa o bash do container monitorapiv2"
+            exit 0
+            ;;
+
+        up)
+            docker network prune -f
+            docker network create fabrica704-mobilidade
+            docker-compose up -d --build --force-recreate
+            docker-compose exec monitorapiv2 composer install
+            ;;
+
+        down)
+            docker-compose down
+            docker network prune -f
+            ;;
+
+        bash)
+            docker-compose exec monitorapiv2 bash
+            ;;
+
+        *) echo "Opcao $1 nao reconhecida" ;;
+    esac
+	shift
+done

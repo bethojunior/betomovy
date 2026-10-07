@@ -1,0 +1,39 @@
+.well {
+    font-size: 15px;
+}
+
+.well input {
+    height: 35px;
+    font-size: 15px;
+}
+
+.well div.row {
+    margin-top: 4px;
+}
+
+div a.pull-right {
+    margin-top: 10px;
+}
+
+#to-filter {
+    height: 35px;
+    font-size: 15px;
+}
+
+.table-withdraw {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.table-withdraw .btn {
+    margin: -4px;
+}
+
+.table-withdraw .btn-withdraw-confirmation,
+.table-withdraw .withdraw-details {
+    margin-right: 2px;
+}
+
+.table-withdraw .withdraw-pagination {
+    margin-top: 3px;
+}

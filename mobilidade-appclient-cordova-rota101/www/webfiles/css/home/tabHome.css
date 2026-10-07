@@ -1,0 +1,219 @@
+.container-suggestion-travel {
+    padding: 5px;;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
+
+.container-suggestion-travel > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 11px;
+    padding: 10px 5px;
+    background-color: #e8e8e8;
+    margin-left: -5px;
+    margin-right: -5px;
+}
+
+.container-suggestion-travel > div > span {
+    font-weight: 600;
+}
+
+.container-suggestion-travel > div > button {
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #039be5;
+    box-shadow: -1px 1px 10px #c8c8c8;
+    color: #fff;
+}
+
+.container-suggestion-travel > ul {
+    list-style: none;
+}
+
+.container-suggestion-travel > ul:empty {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-top:50px;
+}
+
+.container-suggestion-travel > ul:empty:before {
+    content:"";
+    width:30px;
+    height:30px;
+    border:2.5px solid transparent;
+    border-radius:100%;
+    border-top-color:#000;
+    animation:500ms spin linear infinite;
+}
+
+.container-suggestion-travel > ul.empty:before {
+    animation:unset;
+    border:none;
+    width:unset;
+    height:unset;
+    content:"Nenhuma rota encontrada!"
+}
+.container-suggestion-travel > ul > li {
+    display: flex;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 1px 3px 10px #ccc;
+    margin-bottom: 10px;
+    position:relative;
+}
+
+.container-suggestion-travel > ul > li > .datetime-travel {
+    background-color: var(--main-color);
+    color: var(--text-color-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    justify-content: center;
+}
+
+.container-suggestion-travel > ul > li .datetime-travel > .travel-date {
+    font-size: 10pt;
+}
+
+.container-suggestion-travel > ul > li > .datetime-travel > span:first-child {
+    font-size: 8pt;
+}
+
+.container-suggestion-travel > ul > li > .datetime-travel > span:last-child {
+    font-size: 14pt;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel > div {
+    display: flex;
+    flex: 1;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel > div.container-shipped-travel {
+    border-top: 1px solid #c6c6c6;
+    padding: 2vw;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel > div.container-shipped-travel > img {
+    width: 20px;
+    margin-left: -5px;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel > div.container-shipped-travel > img:first-child {
+    margin: 0;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel > div > .driver-travel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px;
+    /* justify-content:center; */
+    display: none;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel > div > .driver-travel > img {
+    width: 12vw;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel > div > .driver-travel > div {
+    display: flex;
+    margin-top: -9px;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel > div > .driver-travel > div > i {
+    font-size: 7pt;
+}
+
+
+.container-suggestion-travel > ul > li > .detail-travel > div > .driver-travel > span {
+    font-size: 7pt;
+}
+
+.container-suggestion-travel > ul > li > .datetime-travel > .vacancies-travel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+}
+
+.container-suggestion-travel > ul > li > .datetime-travel > .vacancies-travel > span {
+    font-size: 7pt;
+    text-transform: lowercase;
+}
+
+
+.container-suggestion-travel > ul > li > .datetime-travel > .vacancies-travel > div {
+    font-size: 18pt;
+    padding: 2px;
+    text-align: center;
+}
+
+.container-suggestion-travel > ul > li > .detail-travel > div > .description-travel {
+    flex: 1;
+    font-size: 8pt;
+    padding: 2vw 3vw;
+    overflow: hidden;
+}
+
+
+.container-suggestion-travel > ul > li > .detail-travel > div > .description-travel > p:nth-child(2) {
+    font-size: 14pt;
+    font-weight: 400;
+    font-family: sans-serif;
+    margin-bottom: 5px;
+}
+
+.container-suggestion-travel > ul > li > .values-travel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    background-color: #43a047;
+    color: #fff;
+    min-width: 70px;
+    max-width: 70px;
+}
+
+.container-suggestion-travel > ul > li > .values-travel > div:first-child {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.container-suggestion-travel > ul > li > .values-travel > div > span:first-child {
+    font-size: 7pt;
+    text-align: center;
+}
+
+
+.container-suggestion-travel > ul > li > .values-travel > div > span:last-child > span:first-child {
+    font-size: 7pt;
+}
+
+
+.container-suggestion-travel > ul > li > .values-travel > div > span:last-child > span:last-child {
+    font-size: 14pt;
+}
+
+.container-suggestion-travel > ul > li > .values-travel > div.another-values {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #fff;
+    font-size: 7pt;
+    padding: 6px 3px;
+    margin-top: 3px;
+}

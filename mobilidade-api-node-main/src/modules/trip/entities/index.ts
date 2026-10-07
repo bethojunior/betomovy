@@ -1,0 +1,17 @@
+export { Trip } from './trip.entity';
+export { TripPaymentForm } from './tripPaymentForm.entity';
+export { Zone } from './zone.entity';
+export { TripType } from './tripType.entity';
+export { RewardTripType } from './rewardTripType.entity';
+export { RewardTrip } from './rewardTrip.entity';
+export { Origin } from './origin.entity';
+export { Destination } from './destination.entity';
+export { TripWayPoint } from './tripWayPoint.entity';
+export { RoutePitStopType } from './routePitStopType.entity';
+export { DriverCommission } from './driverCommission.entity';
+export { BalanceFlow } from './balanceFlow.entity';
+export { Toll } from './toll.entity';
+export { TollTrip } from './tollTrip.entity';
+export { RiskArea } from './riskArea.entity';
+export { Price } from './price.entity';
+export { TripHistory } from './tripHistory.entity';

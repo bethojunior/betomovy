@@ -1,0 +1,97 @@
+.btn-security-drive{
+    position: absolute;
+    left: 5px;
+    bottom: 32.5vw;
+    z-index: 10;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color:#fff;
+}
+
+.btn-security-drive.show{
+    display: flex;
+}
+
+.btn-security-drive.active > i{
+    opacity:0;
+}
+
+.btn-security-drive > div{
+    width: 0;
+    position:absolute;
+    right: 5vw;
+    background-color: #f5f5f5;
+    font-size: 0;
+    z-index: -1;
+    padding: 1vw 0;
+    box-shadow: 0 0 10px #ccc;
+    border-radius:  0 20px 22px 0;
+    font-weight: 600;
+    transition: all 300ms;
+    max-width: 0;
+    overflow: hidden;
+    height: 12vw;
+    max-height: 12vw;
+    display: flex;
+    align-items: center;
+}
+
+.btn-security-drive.info > div{
+    width: 51vw;
+    max-width:51vw;
+    right: -45vw;
+    padding: 1vw 8vw;
+    font-size: 9pt;
+}
+
+.btn-security-drive.active:before {
+    content:"";
+    width: 10vw;
+    height: 10vw;
+    display:block;
+    border: 3px solid transparent;
+    position: absolute;
+    border-radius: 100%;
+    border-top-color: var(--main-color);
+    animation: spin 500ms linear infinite;
+}
+
+.btn-security-drive > i{
+    font-size:25pt;
+    color:#01579b;
+    width: 100%;
+    height: 100%;
+    padding: 2.5vw;
+    box-shadow: 0 0 10px #ccc;
+    background-color: #fff;
+    border-radius: 100%;
+}
+
+.footer-race.active.minimize + .btn-security-drive{
+    transform: translateY(4vw);
+}
+
+
+.footer-race.active + .btn-security-drive{
+    transform:translateY(-50vw);
+}
+
+.footer-race.active + .btn-security-drive + .apps-route{
+    display:block;
+}
+
+.footer-race.active.minimize + .btn-security-drive  + .apps-route{
+    transform: translateY(-30vw);
+}
+
+.footer-race.active + .btn-security-drive + .apps-route + .center-camera-map-position{
+    transform: translateY(-90vw);
+}
+
+.footer-race.active.minimize + .btn-security-drive + .apps-route + .center-camera-map-position{
+    transform: translateY(-45vw);
+}

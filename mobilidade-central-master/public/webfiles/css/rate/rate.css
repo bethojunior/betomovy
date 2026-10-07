@@ -1,0 +1,126 @@
+@media (max-width: 992px) {
+    .container-rates {
+        display: block;
+        float: left;
+        width: 100%;
+    }
+
+    .container-rates > .local-rates {
+        width: 100%;
+    }
+
+    .container-rates > .local-rates > .get-estate-rates,
+    .container-rates > .local-rates > .get-city-rates {
+        position: relative;
+        display: block;
+        margin-bottom: 5vw;
+        padding: 2vw 5vw;
+    }
+
+    .container-rates > .local-rates > .get-estate-rates > select {
+        width: 100%;
+        font-size: 5vw;
+    }
+
+    .container-rates > .local-rates > .get-estate-rates > label,
+    .container-rates > .local-rates > .get-city-rates > label {
+        display: block;
+        font-size: 5.5vw;
+    }
+
+    .container-rates > .local-rates > .get-city-rates > input {
+        width: 100%;
+        font-size: 5vw;
+        padding: 2vw;
+    }
+
+    .container-rates > table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .container-rates > table > thead {
+        background-color: #e4a03c;
+        color: var(--color-text-inverse);
+    }
+
+    .container-rates > table td,
+    .container-rates > table th {
+        border: 1px solid #8b8b8b;
+        font-size: 2.5vw;
+        padding: 0.5vw;
+        text-align: center;
+    }
+
+    .container-rates > button {
+        display: block;
+        margin: 3em auto 0;
+        background-color: #e4a03c;
+        padding: 0.5em 1em;
+        color: var(--color-text-inverse);
+        border: none;
+        cursor: pointer;
+        text-transform: uppercase;
+        outline: unset;
+        width: 90%;
+        font-size: 5vw;
+        border-radius: 2vw;
+        box-shadow: 0 0 5px #123;
+    }
+}
+
+@media (min-width: 992px) {
+    .container-rates {
+        display: block;
+        float: left;
+        width: calc(100% - 18% - 2vw);
+        padding: 1vw;
+    }
+
+    .container-rates > .local-rates {
+        display: flex;
+    }
+
+    .container-rates > .local-rates > .get-estate-rates,
+    .container-rates > .local-rates > .get-city-rates {
+        margin: 1em 1em;
+        position: relative;
+    }
+
+    .container-rates > .local-rates > .get-estate-rates > label,
+    .container-rates > .local-rates > .get-city-rates > label {
+        display: block;
+    }
+
+    .container-rates > .local-rates > .get-city-rates > input {
+        width: 100%;
+    }
+
+    .container-rates > table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .container-rates > table > thead {
+        background-color: #e4a03c;
+        color: var(--color-text-inverse);
+    }
+
+    .container-rates > table td,
+    .container-rates > table th {
+        border: 1px solid #8b8b8b;
+        padding: 8px;
+    }
+
+    .container-rates > button {
+        display: block;
+        margin: 3em auto 0;
+        background-color: #e4a03c;
+        padding: 0.5em 1em;
+        color: var(--color-text-inverse);
+        border: 1px solid #8b8b8b;
+        cursor: pointer;
+        text-transform: uppercase;
+        outline: unset;
+    }
+}

@@ -1,0 +1,10 @@
+Route.waitView().then(()=>{
+    viewController.elementProperty.addEventInElement(".open-detail-trip-scheduled","onclick",function(){
+        if(this.classList.contains("active")){
+            this.classList.remove("active");
+        }else{
+            viewController.elementProperty.removeClass(".open-detail-trip-scheduled","active");
+            this.classList.add("active");
+        }
+    });
+});

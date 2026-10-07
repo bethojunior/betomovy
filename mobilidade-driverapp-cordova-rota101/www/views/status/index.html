@@ -1,0 +1,62 @@
+<div class="container-status-customer">
+    <nav>
+        <span data-i18n="status-span-status"></span>
+    </nav>
+    <div class="form-data-user">
+        <div class="container-profile-image" id="profileStatusUser">
+            <i class="material-icons" id="editProfileDriverStatus">photo_camera</i>
+        </div>
+        <p id="profileImageStatus"></p>
+        <div>
+            <label data-i18n="status-label-full-name"></label>
+            <p id="nameStatusCustomer"></p>
+        </div>
+        <div>
+            <label data-i18n="status-label-cpf"></label>
+            <p id="documentStatusCustomer"></p>
+        </div>
+        <div>
+            <label data-i18n="status-label-phone"></label>
+            <p id="phoneStatusCustomer"></p>
+        </div>
+        <div>
+            <label data-i18n="status-label-email"></label>
+            <p id="emailStatusCustomer"></p>
+        </div>
+        <div id="showDocumentStatus">
+            <label data-i18n="status-label-documents"></label>
+            <p data-i18n="status-p-see-images"></p>
+            <p class="text-pendency-status" data-i18n="status-p-have-pending-documents"></p>
+            <i class="material-icons">keyboard_arrow_right</i>
+        </div>
+        <div>
+            <label data-i18n="status-label-current-status"></label>
+            <p id="statusCustomerRegisterStatusId"></p>
+        </div>
+    </div>
+    <div class="modal-status-customer">
+        <div>
+            <i class="material-icons go-back-document">arrow_back</i>
+            <h4 data-i18n="status-h4-documents"></h4>
+            <ul id="listDocumentPendency"></ul>
+        </div>
+    </div>
+    <div class="modal-open-photo-document">
+        <nav>
+            <i class="material-icons go-back-document">arrow_back</i>
+            <span id="descriptionDocumentModal"></span>
+        </nav>
+        <div class="content-input-field">
+            <label id="descriptionDocumentText" for="valueDocumentText"></label>
+            <input type="text" id="valueDocumentText"/>
+        </div>
+        <div id="boxPhotoDocument" class="content-image-document">
+            <i class="material-icons" id="btnCaptureDocument">camera_alt</i>
+        </div>
+        <div class="btn-resend-pdf">
+            <label data-i18n="status-label-resend-pdf-document"></label>
+            <input type="file" accept="application/pdf" class="resend-file-pdf"/>
+        </div>
+        <button type="button" id="btnUpdateDocument" data-i18n="status-button-text-resend"></button>
+    </div>
+</div>

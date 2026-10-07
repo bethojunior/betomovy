@@ -1,0 +1,86 @@
+:root {
+    /* ── Marca / ações ── */
+    --color-primary: #111111;
+    --color-primary-hover: #2A2A2A;
+    --color-primary-dark: #000000;
+
+    /* Aliases legados */
+    --color-dark: var(--color-primary);
+    --color-dark-hover: var(--color-primary-hover);
+
+    /* Dark UI (footer, header, drawers) */
+    --color-header-gradient: linear-gradient(105deg, #111111 0%, #000000 100%);
+    --color-drawer-bg: #111111;
+
+    /* Links */
+    --color-link: #2563eb;
+    --color-link-hover: #1d4ed8;
+
+    /* ── Texto ── */
+    --color-text-primary: #111827;
+    --color-text-secondary: #374151;
+    --color-text-muted: #6b7280;
+    --color-text-disabled: #9ca3af;
+    --color-text-inverse: #ffffff;
+
+    /* ── Superfície / fundo ── */
+    --color-bg-page: #ececec;
+    --color-bg-surface: #ffffff;
+    --color-bg-subtle: #fafafa;
+    --color-bg-muted: #f3f4f6;
+    --color-bg-hover: #f9fafb;
+
+    /* ── Borda ── */
+    --color-border: #e5e7eb;
+    --color-border-light: rgba(255, 255, 255, 0.08);
+    --color-border-input: #d1d5db;
+    --color-border-focus: #6b7280;
+    --color-border-subtle: #f0f0f0;
+    --color-border-strong: #eaeaea;
+
+    /* ── Neutros ── */
+    --color-white: #ffffff;
+    --color-surface: rgba(255, 255, 255, 0.06);
+    --color-overlay: rgba(0, 0, 0, 0.45);
+    --color-shadow: rgba(0, 0, 0, 0.06);
+    --color-shadow-md: rgba(0, 0, 0, 0.12);
+    --color-shadow-lg: rgba(0, 0, 0, 0.18);
+
+    /* ── Status — base ── */
+    --color-success: #10b981;
+    --color-success-bg: #ecfdf5;
+    --color-success-text: #059669;
+    --color-success-border: #34d399;
+    --color-success-dark: #065f46;
+
+    --color-warning: #f59e0b;
+    --color-warning-bg: #fffbeb;
+    --color-warning-text: #d97706;
+    --color-warning-border: #fbbf24;
+
+    --color-danger: #ef4444;
+    --color-danger-text: #f87171;
+    --color-danger-bg: #fef2f2;
+    --color-danger-strong: #dc2626;
+
+    --color-info: #3b82f6;
+    --color-info-bg: #eff6ff;
+    --color-info-text: #2563eb;
+
+    --color-scheduled: #7c3aed;
+    --color-scheduled-bg: #f5f3ff;
+    --color-scheduled-text: #7c3aed;
+
+    /* ── WhatsApp ── */
+    --color-whatsapp: #25d366;
+    --color-whatsapp-hover: #1da851;
+
+    /* ── Scrollbar ── */
+    --color-scrollbar-track: #111111;
+    --color-scrollbar-thumb: #374151;
+    --color-scrollbar-thumb-hover: #6b7280;
+
+    /* ── Ícones / utilitários ── */
+    --color-icon-muted: #c4c4c4;
+    --color-icon-subtle: #d1d5db;
+}

@@ -1,0 +1,67 @@
+.menu-setting{
+    background-color: var(--main-color);
+    padding: 2vw;
+    display: flex;
+    justify-content: left;
+    font-size: 9vw;
+    align-items: center;
+    max-height: 10vw;
+    height: 10vw;
+}
+.menu-setting > .material-icons{
+    color: var(--text-color-main);
+    font-size: 9vw;
+}
+.menu-setting > p{
+    color: var(--text-color-main);
+    font-size: 6.5vw;
+    margin-left: 5vw;
+}
+.container-setting-option{
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: calc(100% - 10vw);
+}
+.container-setting-option > ul{
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    list-style: none;
+    overflow-y: auto;
+}
+.container-setting-option > ul > li.option-partner{
+    display: none;
+}
+.container-setting-option > ul > li.option-partner.active{
+    display: block;
+}
+.container-setting-option > ul > li{
+    border-bottom:1px solid #c4c4c4;
+}
+.container-setting-option > ul > li:last-child{
+    border-bottom:unset;
+}
+.container-setting-option > ul > li > div{
+    padding:5vw;
+    width: calc(100% - 10vw);
+}
+.container-setting-option > ul > li > div > span{
+    font-size: 5vw;
+    display: block;
+    width: 100%;
+    font-weight: 600;
+}
+.container-setting-option > ul > li > div > ul{
+    list-style:unset;
+    margin: 2vw 0 0;
+}
+.container-setting-option > ul > li > div > ul > li{
+    margin: 4.5vw 0 0;
+    font-size: 4.5vw;
+}
+.container-setting-option > ul > li > div > ul > li > a{
+    text-decoration:unset;
+    color:#000;
+}

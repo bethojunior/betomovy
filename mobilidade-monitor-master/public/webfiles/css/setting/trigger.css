@@ -1,0 +1,576 @@
+@media (max-width: 991px){
+
+    div.group-selects select {
+        padding: 10px 10px;
+        width: 95%;
+        margin: 3vw;
+        display: block;
+    }
+
+    div.title-form {
+        display: flex;
+        padding: 10px;
+        margin: 1vw;
+        background-color: #535353;
+        color: #fff;
+        border-radius: 5px 5px 0 0;
+        justify-content: space-around;
+        font-size: 10pt;
+    }
+
+
+    div.container-list-modality {
+        display: none;
+        margin: 0 1vw;
+    }
+
+
+    button.delete {
+        background-color: #d64937;
+        color: #FFF;
+        border: 0;
+        padding: 3px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    table.table-filtered {
+        border-collapse: collapse;
+        margin: 1vw 19vw;
+        width: 75%;
+        border-top: 1px dashed #000;
+        border-bottom: 1px dashed #000;
+    }
+
+    table.table-filtered select, input {
+        margin: 10px 10px;
+        padding: 5px 5px;
+    }
+
+    table.table-filtered td {
+        margin: 10px 10px;
+        border-left: 1px dashed #000;
+
+        padding: 10px 10px;
+    }
+
+    table.table-filtered td:last-child {
+        border-right: 1px dashed #000;
+        padding: 10px 10px;
+    }
+
+    #customers {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 60%;
+        margin: 0.5%;
+        margin-left: 19%;
+    }
+
+    #customers td, #customers th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    #customers tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    #customers tr:hover {
+        background-color: #ddd;
+    }
+
+    #customers th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    div.item-form {
+        display: flex;
+        align-items: center;
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+        flex-wrap:wrap;
+    }
+
+
+    div.item-form > div:nth-child(1),
+    div.item-form > div:nth-child(2){
+        width:50%;
+        margin:2.5vw 0;
+    }
+
+    div.item-form > div:nth-child(3){
+        width:100%;
+        margin: 2.5vw 0;
+    }
+
+    div.item-form > div:nth-child(4){
+        width:100%;
+        display: flex;
+        flex-wrap: wrap;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+    }
+
+    div.item-form > div:nth-child(4) input{
+        width:100%;
+        font-size:4vw;
+        text-align:center;
+    }
+
+    div.modalidade {
+        margin: 0 1vw;
+    }
+
+    div.etiqueta {
+        width: 29%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    div.taxa {
+        width: 25%;
+    }
+
+    input.input-width {
+        width: 75%;
+        font-size: 4vw;
+    }
+
+    .container-rate {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+    }
+
+    .container-rate > i {
+        background-color: #c6c6c6;
+        border-radius: 5px 0 0 5px;
+        padding: 5px;
+    }
+
+
+    .container-rate > input {
+        padding: 7px;
+        margin: 0;
+    }
+
+    div.etiqueta > div {
+        display: flex;
+        justify-content: center;
+        width: 85%;
+    }
+
+
+    div.etiqueta > div .tag-not-edit {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ccc;
+        padding: 5px;
+        width: 100%;
+        border: 0.5px solid #7c7c7c;
+    }
+
+    div.etiqueta > div input {
+        margin: 0;
+        width: 100%;
+        display: none;
+        font-size: 14pt;
+    }
+
+    div.etiqueta > i {
+        background-color: #3f3f3f;
+        padding: 5px;
+        margin: 0;
+        border-radius: 5px 0 0 5px;
+        border: 0.5px solid #707070;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    div.etiqueta > div.active input {
+        display: block;
+    }
+
+    div.etiqueta > div.active .tag-not-edit {
+        display: none;
+    }
+
+    #list-trip-city:empty:before {
+        content: 'Essa cidade não possuí nenhum tipo de corrida!';
+        margin: 20px auto 0;
+        display: block;
+        text-align: center;
+        font-size: 18pt;
+    }
+
+    #list-trip-city:empty + button,
+    #list-trip-city:empty + button + h2,
+    #list-trip-city:empty + button + h2 + div,
+    #list-trip-city:empty + button + h2 + div + ul {
+        display: none;
+    }
+
+    #list-trip-city {
+        margin-bottom: 10px;
+    }
+
+    .container-list-modality > ul {
+        display: block;
+        list-style: none;
+        background-color: #fff;
+    }
+
+    .container-list-modality > ul > li {
+        display: flex;
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+        align-items: center;
+        position: relative;
+        flex-wrap: wrap;
+        flex-direction: column;
+    }
+
+    div.container-list-modality > .title-list {
+        display: flex;
+        margin: 10px 0 0;
+        border-radius: 5px 5px 0 0;
+        background-color: #535353;
+        color: #fff;
+        padding: 10px;
+        text-transform: uppercase;
+        display: none;
+    }
+
+
+    div.container-list-modality > .title-list > div:nth-child(1) {
+        width: 30%;
+        max-width: 30%;
+    }
+
+    div.container-list-modality > .title-list > div:nth-child(2) {
+        width: 20%;
+        max-width: 20%;
+    }
+
+    div.container-list-modality > .title-list > div:nth-child(3) {
+        width: 10%;
+        max-width: 10%;
+    }
+
+    .container-list-modality > ul > li > div {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .container-list-modality > ul > li > div {
+        padding: 0 2px;
+    }
+
+    .container-list-modality > ul > li > div:nth-child(1):before {
+        content:"PERÍODO: ";
+        font-weight:600;
+    }
+
+
+    .container-list-modality > ul > li > div:nth-child(2):before {
+        content:"TIPO: ";
+        font-weight:600;
+    }
+
+    .container-list-modality > ul > li > div:nth-child(3):before {
+        content:"DINÂMICA: ";
+        font-weight:600;
+    }
+
+    .container-list-modality > ul > li > div:nth-child(4):before {
+        content:"ETIQUETA: ";
+        font-weight:600;
+    }
+
+    .container-list-modality > ul > li > div:nth-child(4){
+        display:flex;
+    }
+
+    .container-list-modality > ul > li > div:nth-child(4) > div > i {
+        font-size: 5vw !important;
+        left: 0 !important;
+    }
+
+    input[disabled] {
+        background-color: #dedede;
+        border: 1.5px solid #c5c5c5;
+    }
+
+    div.container-list-modality button.send-trigger[disabled] {
+        background-color: #969696;
+    }
+}
+
+@media (min-width: 992px) {
+
+    div.group-selects select {
+        margin-left: 1.5vw;
+        margin-top: 1vw;
+        padding: 10px 10px;
+
+    }
+
+    div.title-form {
+        display: flex;
+        padding: 10px;
+        margin: 20px 20px 0;
+        background-color: #535353;
+        color: #fff;
+        border-radius: 5px 5px 0 0;
+    }
+
+    button.edit {
+        background-color: #0168d9;
+        color: #FFF;
+        border: 0;
+        padding: 3px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button.delete {
+        background-color: #d64937;
+        color: #FFF;
+        border: 0;
+        padding: 3px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    table.table-filtered {
+        border-collapse: collapse;
+        margin: 1vw 19vw;
+        width: 75%;
+        border-top: 1px dashed #000;
+        border-bottom: 1px dashed #000;
+    }
+
+
+    table.table-filtered td {
+        margin: 10px 10px;
+        border-left: 1px dashed #000;
+
+        padding: 10px 10px;
+    }
+
+    table.table-filtered td:last-child {
+        border-right: 1px dashed #000;
+        padding: 10px 10px;
+    }
+
+    #customers {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 60%;
+        margin: 0.5%;
+        margin-left: 19%;
+    }
+
+    #customers td, #customers th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    #customers tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    #customers tr:hover {
+        background-color: #ddd;
+    }
+
+    #customers th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    div.item-form {
+        display: flex;
+        align-items: center;
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+    }
+
+    div.modalidade {
+        width: 19%;
+    }
+
+    div.etiqueta {
+        width: 29%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    div.taxa {
+        width: 9%;
+    }
+
+    input.input-width {
+        width: 5vw;
+    }
+
+    .container-rate {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+    }
+
+    .container-rate > i {
+        background-color: #c6c6c6;
+        border-radius: 5px 0 0 5px;
+        padding: 5px;
+    }
+
+
+    .container-rate > input {
+        padding: 7px;
+        margin: 0;
+    }
+
+    div.etiqueta > div {
+        display: flex;
+        justify-content: center;
+        width: 51%;
+    }
+
+
+    div.etiqueta > div .tag-not-edit {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ccc;
+        padding: 5px;
+        width: 100%;
+        border: 0.5px solid #7c7c7c;
+    }
+
+    div.etiqueta > div input {
+        margin: 0;
+        width: 100%;
+        display: none;
+        font-size: 14pt;
+    }
+
+    div.etiqueta > i {
+        background-color: #3f3f3f;
+        padding: 5px;
+        margin: 0;
+        border-radius: 5px 0 0 5px;
+        border: 0.5px solid #707070;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    div.etiqueta > div.active input {
+        display: block;
+    }
+
+    div.etiqueta > div.active .tag-not-edit {
+        display: none;
+    }
+
+    #list-trip-city:empty:before {
+        content: 'Essa cidade não possuí nenhum tipo de corrida!';
+        margin: 20px auto 0;
+        display: block;
+        text-align: center;
+        font-size: 18pt;
+    }
+
+    #list-trip-city:empty + button,
+    #list-trip-city:empty + button + h2,
+    #list-trip-city:empty + button + h2 + div,
+    #list-trip-city:empty + button + h2 + div + ul {
+        display: none;
+    }
+
+    #list-trip-city {
+        margin-bottom: 10px;
+    }
+
+    .container-list-modality > ul > li {
+        display: flex;
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+        align-items: center;
+        position: relative;
+    }
+
+    div.container-list-modality > .title-list {
+        display: flex;
+        margin: 10px 0 0;
+        border-radius: 5px 5px 0 0;
+        background-color: #535353;
+        color: #fff;
+        text-transform: uppercase;
+    }
+
+
+    div.container-list-modality > .title-list > div:nth-child(1) {
+        width: 30%;
+        max-width: 30%;
+    }
+
+    div.container-list-modality > .title-list > div:nth-child(2) {
+        width: 20%;
+        max-width: 20%;
+    }
+
+    div.container-list-modality > .title-list > div:nth-child(3) {
+        width: 10%;
+        max-width: 10%;
+    }
+
+    .container-list-modality > ul > li > div:nth-child(1) {
+        width: 30%;
+        max-width: 30%;
+    }
+
+    .container-list-modality > ul > li > div:nth-child(2) {
+        width: 20%;
+        max-width: 20%;
+    }
+
+    .container-list-modality > ul > li > div:nth-child(3) {
+        width: 10%;
+        max-width: 10%;
+    }
+
+    .container-list-modality > ul > li > div {
+        padding: 0 2px;
+    }
+
+    .container-list-modality > ul > li > div:nth-child(4) > div > i {
+        font-size: 1vw !important;
+        left: 0 !important;
+    }
+
+    input[disabled] {
+        background-color: #dedede;
+        border: 1.5px solid #c5c5c5;
+
+    }
+
+    div.container-list-modality button.send-trigger[disabled] {
+        background-color: #969696;
+        margin-bottom: 5vw;
+    }
+}

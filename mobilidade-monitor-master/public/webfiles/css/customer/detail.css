@@ -1,0 +1,814 @@
+@media (max-width: 991px) {
+    .container-detail-customer {
+        position: absolute;
+        background-color: rgb(197, 197, 197);
+        height: 100%;
+        width: 100%;
+        display: flex;
+        opacity: 1;
+        flex-wrap: wrap;
+    }
+
+    .container-detail-customer > .info-customer {
+        width: 100%;
+        background-color: #d5d5d5;
+        height: 100%;
+        border-right: 1px solid #bababa;
+    }
+
+    .container-detail-customer > .info-trips-customer {
+        width: 100%;
+        display: block;
+        position: relative;
+        height: 100%;
+        background-color: #fff;
+        border-right: 1px solid #bababa;
+    }
+
+    .container-detail-customer > .info-trips-customer > div {
+        display: flex;
+        justify-content: space-between;
+        width: calc(100% - 1vw);
+        padding: 0.5vw;
+        background-color: #f0f0f0;
+        flex-flow: row wrap;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > div {
+        width: 45%;
+        display: block;
+        position: relative;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > select {
+        width: 100%;
+        margin: 0.5vw;
+        text-transform: uppercase;
+        padding: 3vw;
+        font-size: 6vw;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > select > option {
+        text-transform: uppercase;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > button {
+        display: block;
+        padding: 2vw;
+        font-size: 5vw;
+        border: none;
+        background-color: #efa307;
+        color: #fff;
+        cursor: pointer;
+        width: 90%;
+        margin: 3vw auto;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > div > input {
+        width: 100%;
+        padding: 2vw;
+        font-size: 4.5vw;
+    }
+
+    .container-detail-customer > .info-customer > .profile-driver {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        padding: 1em 0;
+        background-color: #fff;
+    }
+
+    .container-detail-customer > .info-customer > .profile-driver > div {
+        height: 5em;
+        width: 5em;
+        border: 1px solid #ccc;
+        border-radius: 100%;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .container-detail-customer > .info-customer > .data-driver > p {
+        padding: 0 2em;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+    }
+
+    .container-detail-customer > .info-customer > .data-driver > p > span.name-customer {
+        text-transform: uppercase;
+    }
+
+    .container-detail-customer > .info-customer > .data-driver > p > i {
+        margin-right: 5px;
+    }
+
+    .container-detail-customer > .info-customer > .data-driver {
+        border-bottom: 1px solid #bababa;
+        background-color: #fff;
+        padding-bottom: 1em;
+    }
+
+    .container-detail-customer > .info-customer > .document-driver {
+        width: calc(100% - 2em);
+        display: block;
+        border-bottom: 1px solid #bababa;
+        padding: 1em 1em;
+        background-color: #bdbdbd
+
+    }
+
+    .container-detail-customer > .info-customer > .document-driver > ul {
+        display: flex;
+        justify-content: space-between;
+        list-style: none;
+    }
+
+    .container-detail-customer > .info-customer > .document-driver > ul > li {
+        height: 2.5em;
+        width: 2.5em;
+        border: 1px solid #a5a5a5;
+        background-color: #e2e2e2;
+        cursor: pointer;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        position: relative;
+    }
+
+    .container-detail-customer > .info-customer > .info-trips-driver > p {
+        width: 100%;
+        background-color: #5f5f5f;
+        color: #fff;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .container-detail-customer > .info-customer > .info-trips-driver > div > div {
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5em 1em;
+        text-transform: uppercase;
+    }
+
+    .container-detail-customer > .info-customer > .car-driver {
+        text-transform: uppercase;
+        padding: 0.5em 1em;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul {
+        list-style: none;
+        overflow-y: auto;
+        max-height: calc(100% - 11vw - 1px);
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li {
+        border-bottom: 5px solid #ccc;
+        cursor: pointer;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li > p {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        padding: 0 0.5vw;
+        font-size: 0.8em;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li > p:before {
+        content: "";
+        width: 0.4em;
+        height: 0.4em;
+        background-color: #000;
+        display: block;
+        border-radius: 100%;
+        margin-right: 0.5vw;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li > div {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 0.5vw;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li > label {
+        padding: 0 0.5vw;
+        text-transform: uppercase;
+        font-size: 0.8vw;
+        display: block;
+        border-bottom: 1px solid #cfcfcf;
+    }
+
+    .container-detail-customer > .info-trip {
+        width: 100%;
+    }
+
+    .container-detail-customer > .info-trip > div {
+        background-color: #fff;
+        height: calc(23vw - 1px);
+        border-bottom: 1px solid #ccc;
+    }
+
+    .container-detail-customer > .info-trip > div > div:first-child {
+        border-bottom: 1px solid #ccc;
+        padding: 1vw;
+    }
+
+    .container-detail-customer > .info-trip > div > div:first-child > p {
+        border-bottom: 1px solid #ccc;
+        padding: 0.5vw;
+        text-indent: 1.2em;
+    }
+
+    .container-detail-customer > .info-trip > div > div:first-child > p:last-child {
+        border-bottom: none;
+    }
+
+    .container-detail-customer > .info-trip > div > div:nth-child(2) {
+        padding: 1vw;
+        border-bottom: 1px solid #ccc
+
+    }
+
+    .container-detail-customer > .info-trip > div > div:nth-child(2) > div {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #Ccc;
+        padding: 0.5vw 0;
+    }
+
+    .container-detail-customer > .info-trip > div > div:nth-child(2) > div:last-child {
+        border-bottom: none;
+    }
+
+    .container-detail-customer > .info-trip > div > div:last-child {
+        padding: 1vw;
+        border-bottom: 1px solid #aeaeae;
+        display: flex;
+        justify-content: left;
+    }
+
+    .container-detail-customer > .info-trip > div > div:last-child > div.profile-image-driver {
+        width: 4em;
+        height: 4em;
+        border: 1px solid #ccc;
+        border-radius: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-right: 2vw;
+    }
+
+    .container-detail-customer > .info-trip > div > div:last-child > div {
+        display: flex;
+        justify-content: space-between;
+        width: 80%;
+    }
+
+    .container-detail-customer > .info-trip > ul {
+        display: flex;
+        list-style: none;
+        color: #fff;
+        align-items: center;
+        position: relative;
+    }
+
+    .container-detail-customer > .info-trip > ul > li {
+        width: 20%;
+        border-right: 1px solid #fff;
+        text-transform: uppercase;
+        text-align: center;
+        cursor: pointer;
+        padding: 0.5vw;
+    }
+
+    .container-detail-customer > .info-trip > ul > li.close-modal-customer-detail {
+        position: absolute;
+        right: 5px;
+        width: 5%;
+        background-color: #da0303;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border-right: none;
+        border-radius: 0.5vw;
+    }
+
+    .container-detail-customer > .info-trip > ul > li.active {
+        background-color: #efa307;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer {
+        position: relative;
+        display: block;
+        height: calc(100% - 26vw - 1px);
+        background-color: #eee;
+        display: flex;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul {
+        z-index: 100;
+        list-style: none;
+        position: relative;
+        width: 40%;
+        background-color: #fff;
+        border-right: 1px solid #ccc;
+        overflow-y: auto;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul > li {
+        display: flex;
+        padding: 0.5vw;
+        align-items: center;
+        border-bottom: 1px solid #ccc;
+        font-size: 0.7vw;
+        flex-flow: row wrap;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul > li > div {
+        width: 100%;
+        text-align: right;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul > li:last-child {
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul > li > img {
+        width: 1.5vw;
+        margin-right: 1vw;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > .container-map {
+        position: relative;
+        width: 100%;
+        padding: 0;
+        height: 100%;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul {
+        list-style: none;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        background-color: #dbe7f244;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li {
+        width: 100%;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div {
+        position: relative;
+        margin: 0.5vw;
+        border: 1px solid #ccc;
+        width: 40%;
+        max-width: 60%;
+        border-radius: 0.5vw;
+        box-shadow: 0 0 10px #cdcdcd;
+        background-color: #fff;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div.message-driver {
+        float: left;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div.message-client {
+        float: right;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div > div.title-message {
+        width: calc(100% - 1vw);
+        display: flex;
+        justify-content: space-between;
+        padding: 0.1vw 0.5vw;
+        font-size: 0.8vw;
+        border-bottom: 1px solid #dbdbdb;
+        background-color: #fff;
+        border-radius: 0.5vw 0.5vw 0 0;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div > div.container-message {
+        width: calc(100% - 1vw);
+        display: flex;
+        padding: 0.1vw 0.5vw;
+        font-size: 0.9vw;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div > div.container-message > audio {
+        width: 100%;
+    }
+}
+
+@media (min-width: 992px) {
+    .container-detail-customer {
+        position: absolute;
+        background-color: rgb(197, 197, 197);
+        height: 100%;
+        width: 100%;
+        display: flex;
+        opacity: 1;
+    }
+
+    .container-detail-customer > .info-customer {
+        width: 21%;
+        background-color: #d5d5d5;
+        height: 100%;
+        border-right: 1px solid #bababa;
+    }
+
+    .container-detail-customer > .info-trips-customer {
+        width: 20%;
+        display: block;
+        position: relative;
+        height: 100%;
+        background-color: #fff;
+        border-right: 1px solid #bababa;
+    }
+
+    .container-detail-customer > .info-trips-customer > div {
+        display: flex;
+        justify-content: space-between;
+        width: calc(100% - 1vw);
+        padding: 0.5vw;
+        background-color: #f0f0f0;
+        height: 10vw;
+        flex-flow: row wrap;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > div {
+        width: 45%;
+        display: block;
+        position: relative;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > select {
+        width: 100%;
+        margin: 0.5vw;
+        text-transform: uppercase;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > select > option {
+        text-transform: uppercase;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > button {
+        margin: auto;
+        display: block;
+        padding: 0.1vw 1vw;;
+        font-size: 0.9vw;
+        border: none;
+        background-color: #efa307;
+        color: #fff;
+        cursor: pointer;
+        outline: unset;
+    }
+
+    .container-detail-customer > .info-trips-customer > div > div > input {
+        width: 100%;
+    }
+
+    .container-detail-customer > .info-customer > .profile-driver {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        padding: 1em 0;
+        background-color: #fff;
+    }
+
+    .container-detail-customer > .info-customer > .profile-driver > div {
+        height: 5em;
+        width: 5em;
+        border: 1px solid #ccc;
+        border-radius: 100%;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .container-detail-customer > .info-customer > .data-driver > p {
+        padding: 0 2em;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+    }
+
+    .container-detail-customer > .info-customer > .data-driver > p > span.name-customer {
+        text-transform: uppercase;
+    }
+
+    .container-detail-customer > .info-customer > .data-driver > p > i {
+        margin-right: 5px;
+    }
+
+    .container-detail-customer > .info-customer > .data-driver {
+        border-bottom: 1px solid #bababa;
+        background-color: #fff;
+        padding-bottom: 1em;
+    }
+
+    .container-detail-customer > .info-customer > .document-driver {
+        width: calc(100% - 2em);
+        display: block;
+        border-bottom: 1px solid #bababa;
+        padding: 1em 1em;
+        background-color: #bdbdbd
+
+    }
+
+    .container-detail-customer > .info-customer > .document-driver > ul {
+        display: flex;
+        justify-content: space-between;
+        list-style: none;
+    }
+
+    .container-detail-customer > .info-customer > .document-driver > ul > li {
+        height: 2.5em;
+        width: 2.5em;
+        border: 1px solid #a5a5a5;
+        background-color: #e2e2e2;
+        cursor: pointer;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        position: relative;
+    }
+
+    .container-detail-customer > .info-customer > .info-trips-driver > p {
+        width: 100%;
+        background-color: #5f5f5f;
+        color: #fff;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .container-detail-customer > .info-customer > .info-trips-driver > div > div {
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5em 1em;
+        text-transform: uppercase;
+    }
+
+    .container-detail-customer > .info-customer > .car-driver {
+        text-transform: uppercase;
+        padding: 0.5em 1em;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul {
+        list-style: none;
+        overflow-y: auto;
+        max-height: calc(100% - 11vw - 1px);
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li {
+        border-bottom: 5px solid #ccc;
+        cursor: pointer;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li > p {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        padding: 0 0.5vw;
+        font-size: 0.8em;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li > p:before {
+        content: "";
+        width: 0.4em;
+        height: 0.4em;
+        background-color: #000;
+        display: block;
+        border-radius: 100%;
+        margin-right: 0.5vw;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li > div {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 0.5vw;
+    }
+
+    .container-detail-customer > .info-trips-customer > ul > li > label {
+        padding: 0 0.5vw;
+        text-transform: uppercase;
+        font-size: 0.8vw;
+        display: block;
+        border-bottom: 1px solid #cfcfcf;
+    }
+
+    .container-detail-customer > .info-trip {
+        width: 59%;
+    }
+
+    .container-detail-customer > .info-trip > div {
+        background-color: #fff;
+        height: calc(23vw - 1px);
+        border-bottom: 1px solid #ccc;
+    }
+
+    .container-detail-customer > .info-trip > div > div:first-child {
+        border-bottom: 1px solid #ccc;
+        padding: 1vw;
+    }
+
+    .container-detail-customer > .info-trip > div > div:first-child > p {
+        border-bottom: 1px solid #ccc;
+        padding: 0.5vw
+    }
+
+    .container-detail-customer > .info-trip > div > div:first-child > p:last-child {
+        border-bottom: none;
+    }
+
+    .container-detail-customer > .info-trip > div > div:nth-child(2) {
+        padding: 1vw;
+        border-bottom: 1px solid #ccc
+
+    }
+
+    .container-detail-customer > .info-trip > div > div:nth-child(2) > div {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #Ccc;
+        padding: 0.5vw 0;
+    }
+
+    .container-detail-customer > .info-trip > div > div:nth-child(2) > div:last-child {
+        border-bottom: none;
+    }
+
+    .container-detail-customer > .info-trip > div > div:last-child {
+        padding: 1vw;
+        border-bottom: 1px solid #aeaeae;
+        display: flex;
+        justify-content: left;
+    }
+
+    .container-detail-customer > .info-trip > div > div:last-child > div.profile-image-driver {
+        width: 4em;
+        height: 4em;
+        border: 1px solid #ccc;
+        border-radius: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-right: 2vw;
+    }
+
+    .container-detail-customer > .info-trip > div > div:last-child > div {
+        display: flex;
+        justify-content: space-between;
+        width: 80%;
+    }
+
+    .container-detail-customer > .info-trip > ul {
+        display: flex;
+        list-style: none;
+        color: #fff;
+        align-items: center;
+        position: relative;
+    }
+
+    .container-detail-customer > .info-trip > ul > li {
+        width: 20%;
+        border-right: 1px solid #fff;
+        text-transform: uppercase;
+        text-align: center;
+        cursor: pointer;
+        padding: 0.5vw;
+    }
+
+    .container-detail-customer > .info-trip > ul > li.close-modal-customer-detail {
+        position: absolute;
+        right: 5px;
+        width: 5%;
+        background-color: #da0303;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border-right: none;
+        border-radius: 0.5vw;
+    }
+
+    .container-detail-customer > .info-trip > ul > li.active {
+        background-color: #efa307;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer {
+        position: relative;
+        display: block;
+        height: calc(100% - 26vw - 1px);
+        background-color: #eee;
+        display: flex;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul {
+        z-index: 100;
+        list-style: none;
+        position: relative;
+        width: 40%;
+        background-color: #fff;
+        border-right: 1px solid #ccc;
+        overflow-y: auto;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul > li {
+        display: flex;
+        padding: 0.5vw;
+        align-items: center;
+        border-bottom: 1px solid #ccc;
+        font-size: 0.7vw;
+        flex-flow: row wrap;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul > li > div {
+        width: 100%;
+        text-align: right;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul > li:last-child {
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > ul > li > img {
+        width: 1.5vw;
+        margin-right: 1vw;
+    }
+
+    .container-detail-customer > .info-trip > div.map-trip-customer > .container-map {
+        position: relative;
+        width: 100%;
+        padding: 0;
+        height: 100%;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul {
+        list-style: none;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        background-color: #dbe7f244;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li {
+        width: 100%;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div {
+        position: relative;
+        margin: 0.5vw;
+        border: 1px solid #ccc;
+        width: 40%;
+        max-width: 60%;
+        border-radius: 0.5vw;
+        box-shadow: 0 0 10px #cdcdcd;
+        background-color: #fff;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div.message-driver {
+        float: left;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div.message-client {
+        float: right;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div > div.title-message {
+        width: calc(100% - 1vw);
+        display: flex;
+        justify-content: space-between;
+        padding: 0.1vw 0.5vw;
+        font-size: 0.8vw;
+        border-bottom: 1px solid #dbdbdb;
+        background-color: #fff;
+        border-radius: 0.5vw 0.5vw 0 0;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div > div.container-message {
+        width: calc(100% - 1vw);
+        display: flex;
+        padding: 0.1vw 0.5vw;
+        font-size: 0.9vw;
+    }
+
+    .container-detail-customer > .info-trip > div#chatTripCustomer > ul > li > div > div.container-message > audio {
+        width: 100%;
+    }
+
+    .container-detail-customer #settingTripCustomer{
+        width: 100%;
+        height: 320px;
+        float: left;
+        clear: left;
+        overflow-x: scroll;
+        white-space: nowrap;
+        display: flex;
+    }
+}

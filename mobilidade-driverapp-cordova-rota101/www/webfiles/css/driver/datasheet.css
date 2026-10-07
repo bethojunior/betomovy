@@ -1,0 +1,140 @@
+.button-float-datasheet {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000;
+  border-radius: 10px;
+  z-index: 199;
+  background-color: #ff2325;
+  height: 13vw;
+  width: 13vw;
+  box-shadow: 0 0 10px #ccc;
+  flex-direction: column;
+  border-radius: 100%;
+  bottom: 0;
+  right: 4vw;
+  transform: translateY(-90vw);
+  transition:all 300ms;
+}
+
+.footer-race.active.minimize ~ .button-float-datasheet {
+  transform: translateY(-45vw);
+}
+
+.footer-race:not(.in-trip-active) ~ .button-float-datasheet{
+  transform:translateY(-60vw)
+}
+
+.button-float-datasheet.hidden{
+  display: none;
+}
+
+.button-float-datasheet.active {
+  background-color: #91de91;
+}
+
+.button-float-datasheet:after {
+}
+
+.button-float-datasheet > i {
+  font-size: 22pt;
+}
+
+.container-float-datasheet {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  z-index: 505;
+  background-color: #ffff;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  transform: translateY(120%);
+  transition: 300ms all;
+  overflow-y: auto;
+}
+
+.container-float-datasheet.active {
+  transform: translateY(0%);
+}
+
+.container-float-datasheet > h4 {
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+  font-size: 19pt;
+  margin: 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+}
+
+.container-float-datasheet > h4 > i {
+  position:absolute;
+  left:5px;
+  font-size:20pt;
+}
+
+.container-float-datasheet > div {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.container-float-datasheet > div > div {
+  width: 20vw;
+  height: 20vw;
+  border-radius: 100%;
+  background-color: #ccc;
+  margin: 0 auto 20px;
+  border: 1px solid #a5a2a2;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.container-float-datasheet > div > p {
+  font-size: 13pt;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ccc;
+}
+
+.container-float-datasheet > div > p > span:first-child{
+  font-weight:600;
+  margin-right:5px;
+}
+
+.container-float-datasheet > .container-datasheet-trip{
+  display: none;
+}
+
+
+.container-float-datasheet > .container-datasheet-trip.active{
+  display: block;
+}
+
+.container-float-datasheet.active-preload > div{
+  display:none !important;
+}
+
+.container-float-datasheet.active-preload > span{
+  display:flex;
+  flex-direction:column;
+  flex:1;
+  justify-content:center;
+  align-items:center;
+}
+
+.container-float-datasheet.active-preload > span:before{
+  content:"";
+  width:15vw;
+  height:15vw;
+  border-radius:100%;
+  border:5px solid transparent;
+  border-top-color:#000;
+  animation:1s spin linear infinite;
+}

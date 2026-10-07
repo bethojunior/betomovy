@@ -1,0 +1,23 @@
+.btn.btn-primary.settings-app{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 4vw;
+    margin-right: 2vw;
+}
+.row.general-cities{
+    padding: 1vw;
+    overflow-y: scroll;
+    height: 50vw;
+}
+.row.general-cities .row.col-lg-12#mount-bye-cities .col-lg-3.form-group{
+    background-color: white;
+    padding: 0.5vw;
+    margin: 0.2vw;
+}
+.row.general-cities .row.col-lg-12#mount-bye-cities .col-lg-3.form-group .btn.btn-primary.off{
+    display: none;
+}
+.row.general-cities .row.col-lg-12#mount-bye-cities .col-lg-3.form-group .btn.btn-primary.on{
+    display: block;
+}

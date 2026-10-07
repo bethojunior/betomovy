@@ -1,0 +1,18 @@
+node_modules/**/*
+.expo/*
+npm-debug.*
+*.p8
+*.p12
+*.mobileprovision
+*.orig.*
+web-build/
+node_modules
+.idea/*
+
+# macOS
+.DS_Store
+# yarn.lock
+package-lock.json
+
+# ambiente
+.vscode

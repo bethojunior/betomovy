@@ -1,0 +1,19 @@
+.list-report {
+    display: flex;
+    flex-direction: column;
+}
+
+.list-report > details{
+    display:flex;
+    flex-direction:column;
+}
+
+.list-report > details > summary{
+    padding:10px;
+}
+
+.list-report > details > a{
+    display:block;
+    padding:10px;
+    border-bottom:1px solid #ccc;
+}

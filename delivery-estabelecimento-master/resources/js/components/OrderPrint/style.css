@@ -1,0 +1,105 @@
+   .text-center {
+       text-align: justify;
+   }
+
+   .ttu {
+       text-transform: uppercase;
+   }
+
+   .printer-ticket {
+
+       padding: 10px;
+       margin-left: auto;
+       margin-right: auto;
+       background: #ffffe0;
+       display: table !important;
+       width: 100%;
+       max-width: 700px;
+       font-weight: light;
+       line-height: 1.4em;
+   }
+
+   .printer-ticket,
+   .printer-ticket * {
+       font-family: Tahoma, Geneva, sans-serif;
+       font-size: 14px;
+   }
+
+   .printer-ticket th:nth-child(2),
+   .printer-ticket td:nth-child(2) {
+       width: 40px;
+   }
+
+   .printer-ticket th:nth-child(8),
+   .printer-ticket td:nth-child(8) {
+       width: 1px;
+       text-align: right;
+   }
+
+   .printer-ticket th {
+       font-weight: inherit;
+       padding: 10px 0;
+       text-align: center;
+       border-bottom: 2px dashed #000000;
+   }
+
+   .printer-ticket tbody tr:last-child td {
+       padding-bottom: 10px;
+   }
+
+   .printer-ticket tfoot .sup td {
+       padding: 10px 0;
+       border-top: 2px dashed #000000;
+   }
+
+   .printer-ticket tfoot .sup.p--0 td {
+       padding-bottom: 0;
+   }
+
+   .printer-ticket .title {
+       font-size: 1.5em;
+       padding: 15px 0;
+   }
+
+   /* .printer-container {
+       width: 150%;
+   } */
+
+   @media print {
+       .print {
+           display: none !important;
+       }
+
+       .printer-ticket * {
+           font-family: Tahoma, Geneva, sans-serif;
+           font-size: 38px;
+           width: 10px !important;
+           line-height: 1.8em;
+       }
+
+       .printer-ticket th {
+           font-weight: inherit;
+           padding: 15px 0 !important;
+           text-align: center;
+           border-bottom: 4px dashed #000000;
+       }
+
+       .printer-ticket tfoot .sup td {
+           padding: 15px 0 !important;
+           border-top: 4px dashed #000000;
+       }
+
+       .printer-ticket td:nth-child(2) {
+           width: 5px !important;
+
+       }
+
+       @page {
+           size: 11.8in 20.8in;
+
+       }
+
+
+
+
+   }

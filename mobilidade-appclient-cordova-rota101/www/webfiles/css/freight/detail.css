@@ -1,0 +1,307 @@
+.container-detail-freight {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #fff;
+    z-index: 501;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(150%);
+    transition: transform 500ms;
+}
+
+.container-detail-freight.active {
+    transform: translateY(0%);
+    transition: transform 500ms;
+}
+
+.container-detail-freight > .title-detail-freight {
+    font-size: 18pt;
+    text-align: center;
+    background-color: var(--main-color);
+    color: #fff;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    align-items: center;
+}
+
+
+.container-more-detail-freight > div > .title-detail-freight > i,
+.container-detail-freight > .title-detail-freight > i {
+    position: absolute;
+    left: 2.5px;
+    font-size: 10vw;
+}
+
+
+.container-detail-freight.pre-accepted > .title-detail-freight > i {
+    display: none;
+}
+
+.container-detail-freight > .title-detail-freight > span:last-child {
+    display: none;
+}
+
+.container-detail-freight.pre-accepted > .title-detail-freight > span:last-child {
+    display: block;
+    position: absolute;
+    right: 15px;
+}
+
+.container-detail-freight > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.container-more-detail-freight > div > div > .freight-detail-price,
+.container-detail-freight > div > .freight-info,
+.container-detail-freight > div > .freight-detail-trip,
+.container-more-detail-freight > div > div > .freight-info,
+.container-detail-freight > div > .freight-observation {
+    margin: 5px 10px 10px;
+    display: block;
+}
+
+
+.container-more-detail-freight > div > div > .freight-detail-price > p,
+.container-more-detail-freight > div > div > .freight-info > p,
+.container-detail-freight > div > .freight-info > p {
+    font-size: 14pt;
+}
+
+
+.container-more-detail-freight > div > div > .freight-detail-price > p,
+.container-more-detail-freight > div > div > .freight-info > p > span:first-child,
+.container-detail-freight > div > .freight-info > p > span:first-child {
+    font-weight: 600;
+}
+
+.container-detail-freight > div > .freight-detail-trip > p,
+.container-detail-freight > div > .freight-observation {
+    font-weight: 600;
+    font-size: 14pt;
+}
+
+.container-detail-freight > div > .freight-observation > span > p {
+    font-weight: 400;
+}
+
+.container-detail-freight > div > .freight-total-detail {
+    display: flex;
+    align-items: center;
+}
+
+.container-detail-freight > div > .freight-type-payment-form {
+    margin: 5px 10px;
+    font-size: 14pt;
+
+}
+
+.container-more-detail-freight > div > div > .freight-detail-price > .total-freight,
+.container-detail-freight > div > span > .total-freight {
+    margin: 0 10px;
+    font-size: 21pt;
+    color: red;
+    display: flex;
+    align-items: flex-end;
+}
+
+.container-detail-freight > div > span > .show-detail-price-freight {
+    display: flex;
+    align-items: center;
+    font-size: 17pt;
+    color: var(--main-color);
+    margin: 5px;
+    font-weight: 600;
+}
+
+.container-more-detail-freight > div > button,
+.container-detail-freight > button {
+    padding: 10px;
+    font-size: 15pt;
+    text-transform: uppercase;
+    border: none;
+    color: #fff;
+    background-color: var(--main-color);
+    box-shadow: 0 0 10px #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-more-detail-freight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.0);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    z-index: 600;
+    transform: translateY(150%);
+    transition: transform 500ms;
+}
+
+.container-more-detail-freight.active {
+    background-color: rgba(0, 0, 0, 0.5);
+    transform: translateY(0%);
+    transition: background-color 300ms, transform 500ms;
+}
+
+
+.container-more-detail-freight > div {
+    background-color: #fff;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    max-height: 100%;
+}
+
+.container-more-detail-freight > div > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    overflow-y: auto;
+}
+
+.container-more-detail-freight > div > .title-detail-freight {
+    font-size: 18pt;
+    text-align: center;
+    background-color: var(--main-color);
+    color: #fff;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    align-items: center;
+}
+
+
+.container-more-detail-freight > div > div > .freight-detail-price > ul {
+    display: flex;
+    flex-direction: column;
+    background-color: #F3F3F1;
+    padding: 5px;
+    border-radius: 5px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+
+.container-more-detail-freight > div > div > .freight-detail-price > ul > li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+}
+
+.container-more-detail-freight > div > div > .freight-detail-price {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.pre-accepted .btn-cancel-freight {
+    display: none;
+}
+
+.btn-cancel-freight.hidden,
+.btn-accepted-freight.hidden {
+    display: none;
+}
+
+.container-more-detail-freight > div > div > .freight-detail-price > ul.photo-item-selected {
+    display: flex;
+    flex-direction: row;
+    flex: none;
+    overflow-y: auto;
+    background-color: transparent;
+    padding: 5px;
+    flex-wrap: nowrap;
+    border-radius: 5px;
+}
+
+.container-more-detail-freight > div > div > .freight-detail-price > ul.photo-item-selected > li {
+    display: block;
+    padding: 5px;
+    border: 1px solid #ccc;
+    width: 20vw;
+    height: 20vw;
+    border-radius: 5px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.modal-photo-item-delivery {
+    position: absolute;
+    z-index: 650;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+
+.modal-photo-item-delivery.active {
+    display: flex;
+}
+
+.modal-photo-item-delivery > div {
+    width: 90%;
+    height: 90%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    position: relative;
+}
+
+.modal-photo-item-delivery > div > i {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #fff;
+    padding: 5px;
+}
+
+.container-detail-freight > .container-accept-option-freight {
+    display: none;
+    justify-content: space-around;
+    flex-direction: row;
+    flex: none;
+    margin: 0vw 5vw 3vw;
+}
+
+
+.container-detail-freight.pre-accepted > .container-accept-option-freight {
+    display: flex;
+}
+
+.container-detail-freight.pre-accepted > button {
+    display: none;
+}
+
+.container-detail-freight > .container-accept-option-freight > button {
+    width: 45%;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: var(--main-color);
+    font-weight: 600;
+    color: #fff;
+    font-size: 15pt;
+    border: none;
+    box-shadow: 2px 3px 4px 1px #ccc;
+}

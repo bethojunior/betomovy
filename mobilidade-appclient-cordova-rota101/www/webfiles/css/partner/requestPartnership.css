@@ -1,0 +1,96 @@
+.exist-partnership,
+.type-request-partnership {
+    display: none;
+}
+
+.exist-partnership.active,
+.type-request-partnership.active {
+    display: block;
+}
+
+.type-request-partnership > .icon-request {
+    height: 20vw;
+    width: 20vw;
+    display: block;
+    margin: 0 auto 3vw;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-image: url("../../../webfiles/img/svg/agreement.svg");
+}
+
+.type-request-partnership > ul > li > span {
+    font-size: 6vw;
+    display: block;
+    text-align: center;
+}
+
+.type-request-partnership > ul > li > p {
+    font-size: 4vw;
+    padding: 2vw;
+    text-align: justify;
+}
+
+.type-request-partnership > ul {
+    height: 100%;
+    overflow-y: auto;
+}
+
+
+.type-request-partnership > button {
+    width: 80%;
+    border: none;
+    padding: 5vw;
+    font-size: 5vw;
+    margin: 6vw auto 0;
+    display: block;
+    border-radius: 1vw;
+    box-shadow: 0 0 5px #717171;
+    background-color: #3d93d6;
+    color: #fff;
+    font-weight: 600;
+}
+
+.exist-partnership > img {
+    width: 100%;
+    height: 50vw;
+    background-color: #f2f2f2;
+    margin-bottom: 2.5vw;
+}
+
+.exist-partnership > div > span:first-child {
+    font-weight: 600;
+    margin-bottom: 1vw;
+}
+
+.exist-partnership > div {
+    display: flex;
+    margin-bottom: 2.5vw;
+    flex-direction: column;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.preload-data-partner{
+    width: 5vw;
+    height: 5vw;
+    border: 1vw solid #000;
+    border-radius: 100%;
+    border-top: 1vw solid transparent;
+    animation-name: preload-data-partner;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    display: none;
+}
+.preload-data-partner.active{
+    display: block;
+}
+
+@keyframes preload-data-partner {
+    from {transform: rotate(0deg)}
+    to {transform: rotate(360deg)}
+}

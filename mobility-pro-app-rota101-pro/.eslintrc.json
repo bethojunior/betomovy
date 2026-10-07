@@ -1,0 +1,91 @@
+{
+  "env": {
+    "es2021": true
+  },
+  "extends": [
+    "plugin:react/recommended",
+    "airbnb",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "@typescript-eslint", "react-hooks", "prettier"],
+  "globals": {
+    "__DEV__": "readonly"
+  },
+  "rules": {
+    "no-nested-ternary": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "global-require": 0,
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [".tsx", ".js"]
+      }
+    ],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "treatUndefinedAsUnspecified": false,
+    "no-use-before-define": "off",
+    "react/react-in-jsx-scope": "off",
+    "prettier/prettier": ["error"],
+    "array-callback-return": "off",
+    "import/prefer-default-export": "off",
+    "react/state-in-constructor": "off",
+    "react/static-property-placement": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/prop-types": "off",
+    "no-param-reassign": "off",
+    "no-console": "off",
+    "no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "react/require-default-props": "off",
+    "react/function-component-definition": "off",
+    "camelcase": "off",
+    "import/no-extraneous-dependencies": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "react/jsx-no-useless-fragment": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "react/no-array-index-key": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "no-shadow": "off",
+    "react/no-unstable-nested-components": "off",
+    "@typescript-eslint/no-shadow": "off",
+    "no-restricted-syntax": [
+      "error",
+      "FunctionExpression",
+      "WithStatement",
+      "BinaryExpression[operator='in']"
+    ],
+    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "react/jsx-curly-brace-presence": "off",
+    "react/style-prop-object": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "eslint-disable-next-line @typescript-eslint/no-shadow": "off",
+    "default-param-last": "off",
+    "eslint consistent-return: off": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  }
+}

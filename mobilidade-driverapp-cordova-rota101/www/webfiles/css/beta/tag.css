@@ -1,0 +1,22 @@
+html,body{
+    overflow-x: hidden;
+}
+.tag-beta {
+    position: absolute;
+    color: #fff;
+    top:20px;
+    right:-80px;
+    transform: rotate(45deg);
+    z-index:10000000;
+    display: none;
+}
+
+.tag-beta.active{
+    display: block;
+}
+
+.tag-beta:before {
+    content: "Beta";
+    background-color: #f17979a6;
+    padding:10px 100px;
+}

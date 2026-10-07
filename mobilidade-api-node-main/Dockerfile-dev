@@ -1,0 +1,48 @@
+###################
+# BUILD FOR LOCAL DEVELOPMENT
+###################
+
+FROM node:18-alpine As development
+WORKDIR /usr/src/app
+
+COPY .env . 
+COPY package*.json ./
+
+RUN npm install
+
+RUN apk update && apk add --no-cache \
+    htop \
+    busybox-extras
+
+COPY . .
+USER node
+
+EXPOSE 3000
+
+###################
+# BUILD FOR PRODUCTION
+###################
+
+FROM node:18-alpine As build
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+COPY --from=development /usr/src/app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+ENV NODE_ENV production
+USER node
+
+###################
+# PRODUCTION
+###################
+
+FROM node:18-alpine As production
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/dist ./dist
+COPY .env .
+
+CMD [ "node", "dist/main.js" ]

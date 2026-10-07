@@ -1,0 +1,99 @@
+.modal-switch-type-return {
+  position: absolute;
+  z-index: 500;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  background-color: #fff;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+.modal-switch-type-return.active {
+  display: flex;
+}
+.modal-switch-type-return > div {
+  background-color: #fff;
+  width: 100%;
+  padding: 2vw;
+  border-radius: 5px;
+  height: 70%;
+  flex-direction: column;
+  display: flex;
+}
+.modal-switch-type-return > div > i.info-error {
+  font-size: 40vw;
+  text-align: center;
+  width: 100%;
+  color: #dd1515;
+}
+.modal-switch-type-return > div > i.cancel-called {
+  font-size: 10vw;
+  float: right;
+  position: absolute;
+  right: 3vw;
+  top: 4vw;
+}
+.modal-switch-type-return > div > h4 {
+  font-size: 10vw;
+  text-align: center;
+  color: #606060;
+}
+.modal-switch-type-return > div > p {
+  text-align: center;
+  font-size: 5.5vw;
+  color: #737373;
+}
+
+.modal-switch-type-return > div > p.title {
+  color: #000;
+  font-size: 10vw;
+}
+
+.modal-switch-type-return > div > p.sub-title {
+  font-size: 10.5vw;
+  color: var(--main-color);
+  text-transform: uppercase;
+  border-top: 1px solid #ccc;
+  margin-top: 4vw;
+  padding: 3vw;
+}
+
+.modal-switch-type-return > div > button {
+  display: block;
+  margin: 2vw auto;
+  width: 60%;
+  padding: 2.5vw 0;
+  font-size: 5vw;
+  background-color: #e8a43d;
+  border: none;
+  color: #fff;
+}
+.modal-switch-type-return > div > ul {
+  display: flex;
+  justify-content: space-evenly;
+  list-style: none;
+  margin: 2.5vw 0;
+}
+.modal-switch-type-return > div > ul > li > img {
+  width: 55%;
+  display: block;
+  margin: auto;
+}
+.modal-switch-type-return > div > ul > li > p {
+  text-align: center;
+  color: var(--main-color);
+  font-size: 15pt;
+}
+.modal-switch-type-return > div > ul > li > p > span {
+  font-size: 6pt;
+}
+.modal-switch-type-return > div > ul > li {
+  margin: 1vw;
+  border: 1px solid #ccc;
+  border-radius: 3vw;
+  box-shadow: 0 0 5px #cdcdcd;
+  padding: 2vw;
+  width: 20%;
+  overflow: hidden;
+}

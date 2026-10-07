@@ -1,0 +1,969 @@
+.list-documents-driver {
+    display: flex;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.list-documents-driver > li {
+    display: flex;
+    width: 25%;
+    max-width: 25%;
+    flex-direction: column;
+    padding: 5px;
+    font-family: sans-serif;
+}
+
+.list-documents-driver > li > span{
+    font-size:10pt;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.list-documents-driver > li > .container-img-document {
+    width: 100%;
+    height: 300px;
+    margin: 10px 0;
+    border-radius:3px;
+    background-color: #ccc;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.list-documents-driver > li > input {
+    border-radius: 5px;
+    border: none;
+    padding: 10px;
+}
+
+@media (max-width: 991px) {
+    body {
+        overflow-y: auto !important;
+    }
+
+    .modal.fade#modalExemplo .modal-dialog .modal-content #mount-types-user.modal-body .data {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .modal.fade#modalExemplo .modal-dialog .modal-content #mount-types-user.modal-body .data:hover {
+        position: relative;
+        cursor: pointer;
+        background-color: whitesmoke;
+    }
+
+    .modal.fade#modalExemplo .modal-dialog .modal-content #mount-types-user.modal-body .data .right.show {
+        position: absolute;
+        right: 0;
+        color: green;
+    }
+
+    .modal.fade#modalExemplo .modal-dialog .modal-content #mount-types-user.modal-body .data .right.hidden {
+        display: none;
+    }
+
+    .pendencies {
+        display: none;
+    }
+
+    .limitDiv {
+        height: calc(100% - 19vw);
+    }
+
+    .limitDiv .generalThisDriver {
+        display: flex;
+        margin-top: 1vw;
+        flex-direction: column;
+    }
+
+    .limitDiv .generalThisDriver .firstPart {
+        width: 100%;
+        position: relative;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .saveFirst {
+        padding: 2vw;
+        background-color: white;
+        color: #5BCE51;
+        left: 1vw;
+        margin-right: 0;
+        border-radius: 100%;
+        cursor: pointer;
+        border: 1px solid #adadad;
+        position: relative;
+        top: 2vw;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile {
+        width: calc(100% - 4vw);
+        background-color: white;
+        border-radius: 0.5vw;
+        display: flex;
+        flex-direction: column;
+        padding: 2vw;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile #aboutDriver {
+        font-size: 4vw;
+        padding: 0.1vw;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile #aboutDriver .true {
+        background-color: green;
+        color: white;
+        border-radius: 0.3vw;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile #aboutDriver .false {
+        background-color: red;
+        color: white;
+        padding: 0.2vw;
+        width: 100%;
+        border-radius: 0.3vw;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile #imageDriver {
+        width: 30vw;
+        border: solid 0.1vw #F3A41C;
+        display: block;
+        margin: auto;
+        border-radius: 100%;
+        height: 30vw;
+    }
+
+    .limitDiv .generalThisDriver .secondPart {
+        padding: 5vw;
+        background-color: #d9dee2;
+    }
+
+    .limitDiv .generalThisDriver .secondPart .divInputs {
+        width: 100%;
+    }
+
+    .limitDiv .generalThisDriver .secondPart .divInputs .aboutCount {
+        padding-left: 0.5vw;
+    }
+
+    .limitDiv .generalThisDriver .secondPart .divInputs input {
+        /*border: none;*/
+        /*background-color: white;*/
+        /*border-radius: 0.1vw;*/
+        /*display: block;*/
+        /*width: 100%;*/
+        /*padding: 2vw;*/
+        /*font-size: 4vw;*/
+    }
+
+    .limitDiv .generalThisDriver .secondPart input:active {
+        /*border: none;*/
+        /*border-color: transparent;*/
+    }
+
+    .limitDiv .generalDataBank {
+        width: 100%;
+        display: flex;
+    }
+
+    .limitDiv .generalThisDriver .thirdPart {
+
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank {
+
+    }
+
+    .limitDiv .generalDataBank .thirdPart #changeBank {
+        padding: 2vw;
+        background-color: white;
+        color: #5BCE51;
+        left: 1vw;
+        margin-right: 0;
+        border-radius: 100%;
+        cursor: pointer;
+        border: 1px solid #adadad;
+        position: relative;
+        z-index: 99;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .form-group.form-group-bank {
+        padding: 3vw;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .form-group.form-group-bank input {
+        width: 94vw;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input {
+        display: inline;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input#agency {
+        width: 30%;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input#numberAccount {
+        width: 30%;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input#numberAccountDigit {
+        width: 20%;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input#op {
+        width: 20%;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .aboutCount {
+        display: block;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput .aboutCount {
+        display: block;
+        padding-left: 0.5vw;
+    }
+
+    .limitDiv .generalThisDriver .fourthPart .aboutCount {
+        padding-left: 0.5vw;
+    }
+
+    .limitDiv .generalThisDriver .fourthPart input {
+        /*border: none;*/
+        /*background-color: white;*/
+        /*border-radius: 0.1vw;*/
+        /*display: block;*/
+        /*padding-left: 0.3vw;*/
+        /*height: 2vw;*/
+        /*width: 100%;*/
+    }
+
+    .limitDiv .dataCar {
+        width: 100%;
+    }
+
+    .limitDiv .dataCar #saveCar {
+        padding: 2vw;
+        background-color: white;
+        color: #5BCE51;
+        left: 1vw;
+        margin-right: 0;
+        border-radius: 100%;
+        cursor: pointer;
+        border: 1px solid #adadad;
+        top: 2vw;
+        margin: 2vw;
+    }
+
+    .limitDiv .dataCar .first .divInputs {
+        padding: 3vw;
+    }
+
+    .limitDiv .dataCar .first .divInputs #firstCarInput, .limitDiv .dataCar .first .divInputs #secondCarInput {
+        width: calc(100% - 4vw);
+        padding: 0 2vw;
+    }
+
+    .limitDiv .dataCar .first .divInputs #firstCarInput input, .limitDiv .dataCar .first .divInputs #secondCarInput input {
+        background-color: #fff;
+    }
+
+    .limitDiv .dataCar .first .divInputs .aboutCount {
+        display: block;
+    }
+
+    .limitDiv .dataCar .first .divInputs input {
+        /*border: none;*/
+        /*background-color: white;*/
+        /*border-radius: 0.1vw;*/
+        /*margin: 0.5vw;*/
+        /*width: 100%;*/
+        /*padding: 2vw;*/
+        /*font-size: 3vw;*/
+    }
+
+    .limitDiv .dataCar .second .divInputs .aboutCount {
+        padding-left: 0.5vw;
+    }
+
+    .limitDiv .dataCar .second .divInputs input {
+        /*border: none;*/
+        /*background-color: white;*/
+        /*border-radius: 0.1vw;*/
+        /*display: block;*/
+        /*margin: 0.5vw;*/
+        /*padding-left: 0.3vw;*/
+        /*width: 80%;*/
+        /*height: 2vw;*/
+    }
+
+    .limitDiv .fourth {
+        width: 100%;
+        justify-content: space-between;
+        padding: 0 0 3vw;
+        position: relative
+    }
+
+    .limitDiv .fourth .first {
+        position: center;
+        width: 100%;
+    }
+
+    .limitDiv .fourth .second {
+        position: center;
+        width: 100%;
+    }
+
+    .limitDiv .fourth .third {
+        position: center;
+        width: 100%;
+    }
+
+    .limitDiv .fourth .first .divImage img {
+        width: 35vw;
+        height: 35vw;
+        display: block;
+        margin: auto;
+        margin-bottom: 3vw;
+    }
+
+    .limitDiv .fourth .first .divImage button {
+        width: 25vw;
+        height: 25vw;
+        display: block;
+        margin: auto;
+    }
+
+    .limitDiv .fourth .first .divImage .title {
+        display: flex;
+        background-color: white;
+        -webkit-border-radius: 0.2vw;
+        -moz-border-radius: 0.2vw;
+        border-radius: 0.2vw;
+        justify-content: center;
+        margin: 0 0 2vw;
+    }
+
+    .limitDiv .fourth .second .divImage img {
+        width: 35vw;
+        height: 35vw;
+        display: block;
+        margin: auto;
+        margin-bottom: 3vw;
+    }
+
+    .limitDiv .fourth .second .divImage .title {
+        display: flex;
+        background-color: white;
+        -webkit-border-radius: 0.2vw;
+        -moz-border-radius: 0.2vw;
+        border-radius: 0.2vw;
+        justify-content: center;
+        margin: 0 0 2vw;
+    }
+
+    .limitDiv .fourth .third .divImage img {
+        width: 35vw;
+        height: 35vw;
+        display: block;
+        margin: auto;
+    }
+
+    .limitDiv .fourth .third .divImage .title {
+        display: flex;
+        background-color: white;
+        -webkit-border-radius: 0.2vw;
+        -moz-border-radius: 0.2vw;
+        border-radius: 0.2vw;
+        justify-content: center;
+        margin: 0 0 2vw;
+    }
+
+    .limitDiv .fourth .first .divImage .zoom .zoom-img img {
+        margin-top: -3vw;
+        width: 80%;
+        height: 53%;
+    }
+
+    .limitDiv .fourth .second .divImage .zoom .zoom-img img {
+        margin-top: -3vw;
+        width: 80%;
+        height: 53%;
+    }
+
+    .limitDiv .fourth .third .divImage .zoom .zoom-img img {
+        margin-top: -3vw;
+        width: 80%;
+        height: 53%;
+    }
+
+    /*************************************:*/
+    .modal#modalPendecies {
+        display: none;
+    }
+
+    .modal#modalPendecies.show {
+        display: block;
+        transition: 1s;
+        position: fixed;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        display: -ms-flexbox;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 999;
+        background-color: rgba(0, 0, 0, .3);
+    }
+
+    .modal.show#modalPendecies .modalContent {
+        background-color: white;
+    }
+
+    .modal.show#modalPendecies .modalContent button.add {
+        cursor: pointer;
+        margin-top: 0.5vw;
+        border: none;
+        width: 100%;
+        padding: 0.2vw;
+        border-radius: 0.3vw;
+        font-weight: bold;
+        color: white;
+        background-color: var(--orange-default);
+    }
+
+    .zoom {
+        z-index: 3;
+        display: none;
+        padding-top: 100px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .list-documents-driver > li{
+        width:100%;
+        max-width: 100%;
+        padding: 15px 30px;
+    }
+
+}
+
+@media (min-width: 992px) {
+
+    .modal.fade#modalExemplo .modal-dialog .modal-content #mount-types-user.modal-body .data {
+        position: relative;
+    }
+
+    .modal.fade#modalExemplo .modal-dialog .modal-content #mount-types-user.modal-body .data .right.show {
+        position: absolute;
+        right: 0;
+    }
+
+    .modal.fade#modalExemplo .modal-dialog .modal-content #mount-types-user.modal-body .data:hover {
+        position: relative;
+        cursor: pointer;
+        background-color: whitesmoke;
+    }
+
+    .modal.fade#modalExemplo .modal-dialog .modal-content #mount-types-user.modal-body .data .right.hidden {
+        display: none;
+    }
+
+    .pendencies {
+        color: white;
+        background-color: #ca6969;
+        padding: 10px;
+        border-radius: 5px;
+        position: absolute;
+        right: 1px;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-top: 10px;
+        z-index: 99;
+    }
+
+    .limitDiv {
+        overflow: hidden;
+        overflow-y: auto;
+    }
+
+    .limitDiv .generalThisDriver {
+        padding-left: 1vw;
+        display: flex;
+        margin-top: 1vw;
+    }
+
+    .limitDiv .generalThisDriver .firstPart {
+        width: 26%;
+        border-radius: 1vw;
+        -webkit-box-shadow: 0px 0px 18px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 0px 0px 18px 0px rgba(0,0,0,0.75);
+        box-shadow: 0px 0px 18px 0px rgba(0,0,0,0.75);
+    }
+
+    .limitDiv .generalThisDriver .firstPart .saveFirst {
+        border-radius: 2vw;
+        padding: 0.1vw;
+        background-color: white;
+        color: #5BCE51;
+        right: 0;
+        margin-right: 1vw;
+        cursor: pointer;
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile {
+        width: 100%;
+        background-color: white;
+        border-radius: 0.5vw;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile #aboutDriver {
+        font-size: 1vw;
+        padding: 0.5vw;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile #aboutDriver .true {
+        background-color: green;
+        color: white;
+        padding: 0.2vw;
+        width: 100%;
+        border-radius: 0.3vw;
+    }
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile #aboutDriver .false {
+        background-color: red;
+        color: white;
+        padding: 0.2vw;
+        width: 100%;
+        border-radius: 0.3vw;
+    }
+
+    .limitDiv .generalThisDriver .firstPart #edit-type.btn {
+        width: 100%;
+        border-radius: 0 0 1vw 1vw;
+    }
+
+
+    .limitDiv .generalThisDriver .firstPart .imageProfile #imageDriver {
+        width: 100%;
+        height: 250px;
+        border: solid 0.1vw #ffffff;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .limitDiv .generalThisDriver .secondPart {
+        margin-left: 20px;
+        padding-left: 1vw;
+        width: 33%;
+        height: auto;
+    }
+
+    .limitDiv .generalThisDriver .secondPart .divInputs {
+        width: 100%;
+    }
+
+    .limitDiv .generalThisDriver .secondPart .divInputs .aboutCount {
+        padding-left: 0.5vw;
+    }
+
+    .limitDiv .generalThisDriver .secondPart .divInputs input {
+        /*border: none;*/
+        /*background-color: whitesmoke;*/
+        /*border-radius: 0.1vw;*/
+        /*display: block;*/
+        /*margin-left: 0.5vw;*/
+        /*padding-left: 0.3vw;*/
+        /*height: 1.8vw;*/
+        /*width: 100%;*/
+    }
+
+    .limitDiv .generalThisDriver .third-part input:active {
+        border: none;
+        border-color: transparent;
+    }
+
+    .limitDiv .generalThisDriver .third-part {
+        padding-left: 1vw;
+        width: 29%;
+        height: auto;
+    }
+
+    .limitDiv .generalThisDriver .third-part .divInputs {
+        width: 100%;
+    }
+
+    .limitDiv .generalThisDriver .third-part .divInputs .aboutCount {
+        padding-left: 0.5vw;
+    }
+
+    .limitDiv .generalThisDriver .third-part .divInputs input {
+        /*border: none;*/
+        /*background-color: whitesmoke;*/
+        /*border-radius: 0.1vw;*/
+        /*display: block;*/
+        /*margin-left: 0.5vw;*/
+        /*padding-left: 0.3vw;*/
+        /*height: 1.8vw;*/
+        /*width: 100%;*/
+    }
+
+    .limitDiv .generalThisDriver .secondPart input:active {
+        border: none;
+        border-color: transparent;
+    }
+
+    .limitDiv .generalDataBank {
+        width: 100%;
+        display: flex;
+        padding-left: 1vw;
+    }
+
+    .limitDiv .generalThisDriver .thirdPart {
+        width: 50%;
+        margin-left: 2vw;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank {
+        width: 100%;
+    }
+
+    .limitDiv .generalDataBank .thirdPart #changeBank {
+        background-color: white;
+        border-radius: 1vw;
+        cursor: pointer;
+        padding: 0.1vw;
+        position: absolute;
+        right: 0;
+        margin-right: 30vw;
+        color: #5BCE51;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .form-group.form-group-bank input {
+
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input {
+        display: inline;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input#agency {
+        width: 30%;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input#numberAccount {
+        width: 30%;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input#numberAccountDigit {
+        width: 20%;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput input#op {
+        width: 20%;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .aboutCount {
+        padding-left: 2vw;
+    }
+
+    .limitDiv .generalDataBank .thirdPart .dataBank .unionInput .aboutCount {
+        display: block;
+        padding-left: 0.5vw;
+    }
+
+    .limitDiv .generalThisDriver .fourthPart .aboutCount {
+        padding-left: 0.5vw;
+    }
+
+    .limitDiv .generalThisDriver .fourthPart input {
+        /*border: none;*/
+        /*background-color: white;*/
+        /*border-radius: 0.1vw;*/
+        /*display: block;*/
+        /*padding-left: 0.3vw;*/
+        /*height: 2vw;*/
+        /*width: 100%;*/
+    }
+
+    .limitDiv .dataCar {
+        width: 100%;
+    }
+
+    .limitDiv .dataCar #saveCar {
+        background-color: white;
+        color: #5BCE51;
+        padding: 0.1vw;
+        border-radius: 1vw;
+        cursor: pointer;
+        margin: 1rem;
+    }
+
+    .limitDiv .dataCar .first .divInputs {
+        padding: 2vw;
+    }
+
+    .limitDiv .dataCar .first .divInputs #firstCarInput, .limitDiv .dataCar .first .divInputs #secondCarInput {
+        width: 50%;
+    }
+
+    .limitDiv .dataCar .first .divInputs #firstCarInput input, .limitDiv .dataCar .first .divInputs #secondCarInput input {
+        background-color: whitesmoke;
+    }
+
+    .limitDiv .dataCar .first .divInputs .aboutCount {
+        display: block;
+        padding: 0 1rem;
+    }
+
+    .limitDiv .dataCar .first .divInputs input {
+        /*border: none;*/
+        /*background-color: white;*/
+        /*border-radius: 0.1vw;*/
+        /*margin: 0.5vw;*/
+        /*padding-left: 0.3vw;*/
+        /*width: 80%;*/
+        /*height: 2vw;*/
+    }
+
+    .limitDiv .dataCar .second .divInputs .aboutCount {
+        padding-left: 0.5vw;
+    }
+
+    .limitDiv .dataCar .second .divInputs input {
+        /*border: none;*/
+        /*background-color: white;*/
+        /*border-radius: 0.1vw;*/
+        /*display: block;*/
+        /*margin: 0.5vw;*/
+        /*padding-left: 0.3vw;*/
+        /*width: 80%;*/
+        /*height: 2vw;*/
+    }
+
+    .limitDiv .fourth {
+        display: flex;
+        width: 100%;
+        margin-top: 1vw;
+    }
+
+    .limitDiv .fourth .first {
+        width: 30%;
+    }
+
+    .limitDiv .fourth .second {
+        width: 30%;
+        margin-left: 2vw;
+    }
+
+    .limitDiv .fourth .third {
+        width: 30%;
+        margin-left: 2vw;
+    }
+
+    .limitDiv .fourth .first .divImage img {
+        width: 150px;
+        height: 150px;
+        display: block;
+        margin: auto;
+    }
+
+    .limitDiv .fourth .first .divImage .title .material-icons {
+        display: block;
+        padding-left: 9vw;
+
+    }
+
+    .limitDiv .fourth .first .divImage .title {
+        display: flex;
+        background-color: white;
+        -webkit-border-radius: 0.2vw;
+        -moz-border-radius: 0.2vw;
+        border-radius: 0.2vw;
+        padding-left: 10vw;
+    }
+
+    .limitDiv .fourth .second .divImage img {
+        width: 150px;
+        height: 150px;
+        display: block;
+        margin: auto;
+    }
+
+    .limitDiv .fourth .second .divImage .title .material-icons {
+        display: block;
+        padding-left: 8.5vw;
+
+    }
+
+    .limitDiv .fourth .second .divImage .title {
+        display: flex;
+        background-color: white;
+        -webkit-border-radius: 0.2vw;
+        -moz-border-radius: 0.2vw;
+        border-radius: 0.2vw;
+        padding-left: 11vw;
+    }
+
+    .limitDiv .fourth .third .divImage img {
+        width: 150px;
+        height: 150px;
+        display: block;
+        margin: auto;
+    }
+
+    .limitDiv .fourth .third .divImage .title {
+        display: flex;
+        background-color: white;
+        -webkit-border-radius: 0.2vw;
+        -moz-border-radius: 0.2vw;
+        border-radius: 0.2vw;
+        justify-content: center;
+        height: 1.7vw;
+    }
+
+    .limitDiv .fourth .first .divImage .zoom .zoom-img img {
+        width: 45%;
+        height: 92%;
+        margin-top: -5.5vw;
+        margin-left: 26vw;
+    }
+
+    .limitDiv .fourth .second .divImage .zoom .zoom-img img {
+        width: 45%;
+        height: 92%;
+        margin-top: -5.5vw;
+        margin-left: 26vw;
+    }
+
+    .limitDiv .fourth .third .divImage .zoom .zoom-img img {
+        width: 45%;
+        height: 92%;
+        margin-top: -5.5vw;
+        margin-left: 26vw;
+    }
+
+    /*************************************:*/
+    .modal#modalPendecies {
+        display: none;
+    }
+
+    .modal#modalPendecies.show {
+        display: block;
+        transition: 1s;
+        position: fixed;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        display: -ms-flexbox;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 999;
+        background-color: rgba(0, 0, 0, .3);
+    }
+
+    .modal.show#modalPendecies .modalContent {
+        background-color: white;
+    }
+
+    .modal.show#modalPendecies .modalContent button.add {
+        cursor: pointer;
+        margin-top: 0.5vw;
+        border: none;
+        width: 100%;
+        padding: 0.2vw;
+        border-radius: 0.3vw;
+        font-weight: bold;
+        color: white;
+        background-color: var(--orange-default);
+    }
+
+    .zoom {
+        z-index: 3;
+        display: none;
+        padding-top: 100px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .personal-data {
+        padding: 1.5rem;
+    }
+
+    .container-button-edit {
+        width: 100%;
+        display: flex;
+        flex-direction: row-reverse;
+    }
+
+    .container-button-edit-car {
+        width: 100%;
+        display: flex;
+        flex-direction: row-reverse;
+    }
+
+    .btn-edit-driver {
+        margin-right: 8vw;
+        height: 42px;
+        width: 7vw;
+        font-size: 14pt;
+    }
+
+    .btn-edit-car-data {
+        margin-right: 2vw;
+        height: 42px;
+        width: 7vw;
+        font-size: 14pt;
+    }
+
+
+    .inputs-bank-data {
+       width: 50%;
+    }
+}
+
+.list-another-documents{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.list-another-documents > li{
+    width:25%;
+    max-width:25%;
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+}
+
+.list-another-documents > li > span{
+    display:flex;
+    justify-content:space-between;
+}
+
+.list-another-documents > li > img{
+    width:100%;
+}

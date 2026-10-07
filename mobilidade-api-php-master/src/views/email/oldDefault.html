@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		*{
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+		}
+		a{
+			color: #fff;
+			text-decoration: none;		
+		}		
+		body{
+			font-family:'Calibri';
+			background-color: #E4E4E4;
+			color: #50545C;
+		}
+		#cabecalho{
+			height: 100%; 
+			width: 100%;
+		}
+		.logo{
+			width: 10%;
+			height: 5%;
+		}
+		section {
+			margin: 2vw 10vw;
+		}
+		section h1{
+			font-size: 2.7em;
+			margin: 0px 0 25px 0;
+			text-align: center;
+			letter-spacing: 2px;
+		}
+		section p{
+			font-size: 1.1em;
+			text-align: justify;
+
+		}
+		footer{
+			display: flex;
+			width: 100%; 
+			align-items: center;
+			justify-content: center;
+			background-color: #EFA62E;
+			flex-direction: column;
+		}
+		footer div.columns{
+			width: 70%;
+    		display: flex;
+    		justify-content: space-between; 
+    		color: #ffffff;
+    		font-size: 1.3em;
+    		align-items: center;
+    		margin-top: 3vw;
+    		margin-bottom: 3vw;
+		}
+		footer div.img-footer img{
+			width: 100px;
+    		height: auto;
+		}	
+		div.text{
+			color: #fff;
+			font-size: 1.5em;
+		}
+		div.text p span{
+		 	font-size: 2em;
+		}
+		.icon{
+			width: 18px;
+		}
+	</style>
+</head>
+<body>
+	<div>
+
+		<header >
+			<img src="https://s3-sa-east-1.amazonaws.com/{{bucket_name}}/email/default/cabecalho.jpg" alt="Cabeçalho"  id="cabecalho">
+		</header>
+
+		<section>
+			<h1>{{title}}</h1>
+			<p>{{message}}</p>
+		</section>
+
+		<footer>
+			<div class='columns'>
+				<div class="img-footer">
+					<img class="logo" src="https://s3-sa-east-1.amazonaws.com/{{bucket_name}}/email/default/logo_branca.png" alt="logo taxireturn">
+					<p>Rua São Paulo 32 - Centro</p>
+					<p>Fortaleza-CE</p>
+				</div>
+				<div>
+					<p><strong>Contatos:</strong></p>
+					<p><img src="https://s3-sa-east-1.amazonaws.com/{{bucket_name}}/email/default/old-handphone.png" class="icon">   +55 85 3121-8843</p>
+					<p><img src="https://s3-sa-east-1.amazonaws.com/{{bucket_name}}/email/default/whatsapp-logo.png" class="icon">    85 9 9677.7458</p>
+					<p><img src="https://s3-sa-east-1.amazonaws.com/{{bucket_name}}/email/default/mail-black-envelope-symbol.png" class="icon">
+						<a href="https://s3-sa-east-1.amazonaws.com/{{bucket_name}}/email/default/mailto:contanto@taxireturn.com.br"> 		contanto@taxireturn.com.br</p>
+						</a>
+				</div>
+				<div>
+					<p><strong>Redes Sociais:</strong></p>
+					<p><img src="https://s3-sa-east-1.amazonaws.com/{{bucket_name}}/email/default/facebook-logo.png" class="icon">
+					<a href="https://www.facebook.com/taxireturnbr">taxireturnbr</a></p>
+
+					<p><img src="https://s3-sa-east-1.amazonaws.com/{{bucket_name}}/email/default/instagram-symbol.png" class="icon">
+					<a href="https://www.instagram.com/taxireturn/">taxireturn</a></p>
+				</div>
+			</div>
+			<div class="text">
+				<a href="https://www.taxireturn.com.br"><p>www.<span>taxireturn</span>.com.br</p></a>
+			</div>
+		</footer>
+	</div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+.container-observation-delivery{
+    position: absolute;
+    z-index: 1020;
+    background-color: #e8e8e8;
+    padding: 10px;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    display:flex;
+    flex-direction:column;
+    transform: translateY(150%);
+    transition: transform 300ms;
+}
+
+.container-observation-delivery.active{
+    transform: translateY(0%);
+}
+
+.container-observation-delivery > h4{
+    margin:10px 0;
+    display:block;
+    font-size:16pt;
+    text-align:center;
+}
+
+.container-observation-delivery > pre{
+    padding:10px;
+    flex:1;
+    background-color:#fff;
+    margin:20px 0;
+    overflow-y:auto;
+}
+
+.container-observation-delivery > button{
+    padding:10px;
+    font-size:16pt;
+    border:none;
+    background-color:var(--main-color);
+    border-radius:5px;
+    color:#fff;
+    font-weight:600;
+    text-transform:uppercase;
+}

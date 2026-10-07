@@ -1,0 +1,421 @@
+/* ── Modal Motoristas Ativos ── */
+
+.drivers-modal {
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Header */
+.drivers-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-primary);
+    padding: 14px 18px;
+    color: var(--color-text-inverse);
+}
+
+.drivers-modal__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.drivers-modal__title .material-icons {
+    font-size: 18px;
+    opacity: 0.85;
+    font-family: 'Material Icons';
+}
+
+.drivers-modal__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.drivers-modal__close:hover {
+    color: var(--color-text-inverse);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Body */
+.drivers-modal__body {
+    padding: 16px;
+    background: var(--color-bg-surface);
+}
+
+/* Registro */
+.drivers-register__toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-bg-muted);
+    border: 1.5px dashed var(--color-border-input);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.15s, border-color 0.15s;
+    margin-bottom: 10px;
+}
+
+.drivers-register__toggle:hover {
+    background: #f1f3f5;
+    border-color: var(--color-text-disabled);
+}
+
+.drivers-register__toggle .material-icons {
+    font-size: 16px;
+    font-family: 'Material Icons';
+}
+
+.drivers-register__chevron {
+    margin-left: auto;
+    transition: transform 0.25s;
+}
+
+.drivers-register__toggle[aria-expanded="true"] .drivers-register__chevron {
+    transform: rotate(180deg);
+}
+
+.drivers-register__form {
+    background: var(--color-bg-muted);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.drivers-register__input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.drivers-register__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.drivers-register__input-wrap {
+    flex: 1;
+    min-width: 0;
+}
+
+.drivers-register__input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Open Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--color-bg-surface);
+    text-transform: uppercase;
+}
+
+.drivers-register__input:focus {
+    border-color: var(--color-primary);
+}
+
+.drivers-register__hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--color-text-disabled);
+    font-family: 'Open Sans', sans-serif;
+}
+
+.drivers-register__favorite {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-bg-surface);
+    transition: border-color 0.15s, background 0.15s;
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 500;
+}
+
+.drivers-register__favorite input[type="checkbox"] {
+    display: none;
+}
+
+.drivers-register__favorite .material-icons {
+    font-size: 20px;
+    color: var(--color-border-input);
+    font-family: 'Material Icons';
+    transition: color 0.15s;
+}
+
+.drivers-register__favorite:has(input:checked) {
+    border-color: var(--color-warning);
+    background: var(--color-warning-bg);
+}
+
+.drivers-register__favorite:has(input:checked) .material-icons {
+    color: var(--color-warning);
+}
+
+/* Botões de ação */
+.btn-action {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btn-action:hover {
+    background: var(--color-primary-hover);
+}
+
+.btn-action--outline {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+}
+
+.btn-action--outline:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* Footer */
+.drivers-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px 16px;
+    border-top: 1px solid var(--color-border-subtle);
+    background: var(--color-bg-surface);
+}
+
+/* Filtro (favoritos/online/ocupado/offline) */
+.drivers-modal__filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.drivers-filter-toggle-btn {
+    background: var(--color-bg-muted);
+    border: 1.5px solid var(--color-border-input);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.drivers-filter-toggle-btn:hover {
+    background: #f1f3f5;
+}
+
+.drivers-filter-toggle-btn.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+/* Lista de motoristas */
+.scroll-modal {
+    max-height: 320px;
+    overflow-y: auto;
+    position: relative;
+}
+
+.scroll-modal::-webkit-scrollbar {
+    width: 4px;
+}
+
+.scroll-modal::-webkit-scrollbar-track {
+    background: #f1f3f5;
+    border-radius: 4px;
+}
+
+.scroll-modal::-webkit-scrollbar-thumb {
+    background: var(--color-border-input);
+    border-radius: 4px;
+}
+
+.drivers-empty-state {
+    margin: 0;
+    padding: 24px 12px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--color-text-disabled);
+}
+
+.driver-card {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 4px;
+    transition: background 0.12s;
+}
+
+.driver-card.active {
+    background: var(--color-bg-muted);
+    box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+.driver-card:hover:not(.active) {
+    background: var(--color-bg-muted);
+}
+
+/* Offline/em corrida não podem ser selecionados pra chamada personalizada */
+.driver-card:not([status="disponivel"]) {
+    cursor: default;
+}
+
+.driver-card:not([status="disponivel"]):hover {
+    background: transparent;
+}
+
+.driver-card img.rounded-circle {
+    width: 55px;
+    height: 55px;
+    flex-shrink: 0;
+    object-fit: cover;
+    background: var(--color-bg-muted);
+    color: transparent;
+    font-size: 0;
+}
+
+.driver-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55px;
+    height: 55px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--color-bg-muted);
+}
+
+.driver-avatar-fallback .material-icons {
+    font-size: 28px;
+    color: var(--color-text-disabled);
+    font-family: 'Material Icons';
+}
+
+.driver-card > div {
+    margin-left: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.driver-card > div p {
+    margin: 0 0 2px;
+    font-size: 13px;
+    color: var(--color-text-primary);
+}
+
+.driver-card > div p:last-child {
+    margin-bottom: 0;
+}
+
+.driver-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin-top: 2px;
+}
+
+.driver-card__code {
+    font-size: 11px;
+    color: var(--color-text-disabled);
+}
+
+.driver-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.driver-status__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.driver-status--available { color: var(--color-success); }
+.driver-status--available .driver-status__dot { background: var(--color-success); }
+
+.driver-status--in_trip { color: var(--color-danger); }
+.driver-status--in_trip .driver-status__dot { background: var(--color-danger); }
+
+.driver-status--off { color: var(--color-text-disabled); }
+.driver-status--off .driver-status__dot { background: var(--color-text-disabled); }
+
+.scroll-modal > .d-flex {
+    position: relative;
+}
+
+.star-icon {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    padding: 4px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--color-border-input);
+    background: transparent;
+    transition: color 0.15s, background 0.15s;
+    font-family: 'Material Icons';
+}
+
+.star-icon.active {
+    color: var(--color-warning);
+}
+
+.star-icon:hover {
+    color: var(--color-warning);
+    background: var(--color-bg-muted);
+}

@@ -1,0 +1,130 @@
+.nav-heat-map{
+    position: absolute;
+    width: 100%;
+    z-index: 2;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    background-color: var(--main-color);
+}
+
+.nav-heat-map > i.material-icons{margin-left:10px;font-size:22pt;padding: 0 5px;}
+
+.container-heat-map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.button-option-heat-map {
+    width: 75px;
+    height: 75px;
+    box-shadow: 0 0 10px #ccc;
+    border-radius: 100%;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1;
+}
+
+.button-option-heat-map > span {
+    font-size: 22pt;
+}
+
+.container-option-type-dynamic {
+    padding: 20px;
+    z-index: 2;
+    background-color: #ffffff;
+    transition: 300ms all;
+    transform: translateY(150%);
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    box-shadow: 0 0 10px #ccc;
+}
+
+.container-option-type-dynamic.active {
+    transform: translateY(0%);
+}
+
+.container-option-type-dynamic > p {
+    font-weight: 600;
+    font-size: 14pt;
+    margin-bottom: 10px;
+}
+
+.container-option-type-dynamic > ul {
+    display: flex;
+    flex-direction: column;
+}
+
+.container-option-type-dynamic > ul > li {
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 12pt;
+}
+
+
+
+.container-option-type-dynamic > ul > li.item-option-heat-map-selected.active {
+    background-color:#3267f5;
+    color:#fff;
+}
+
+.container-option-type-dynamic > button {
+    border: none;
+    background-color: transparent;
+    margin-bottom: 10px;
+}
+
+.container-option-type-dynamic > button > span {
+    font-size: 22pt;
+}
+
+.preload-heat-map {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.25);
+    width: 100%;
+    height: 100%;
+    transform:translateY(150%);
+    transition:300ms all;
+}
+
+
+.preload-heat-map.active {
+    transform:translateY(0%);
+}
+
+.preload-heat-map:before {
+    content: "";
+    border: 3px solid transparent;
+    border-top-color: #fff;
+    border-radius: 100%;
+    display: block;
+    width: 75px;
+    height: 75px;
+    animation: 1s spin-heat-map linear infinite;
+}
+
+@keyframes spin-heat-map {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,60 @@
+<div class="container-filter-establishment">
+
+    <form class="container-form-filter" id="formThisPage">
+        <b>Cidade</b>
+        <input class="input-shared-establishment" id="autocompleteCity">
+        <b>Bairro</b>
+        <input class="input-shared-establishment" id="autocompleteNeighborhood">
+        <p class="range-field">
+            <b>Preço</b>
+            <input type="range" id="establishmentPrice" class="range-custom" min="0" max="0"/>
+        </p>
+        <p>
+            <span class="min-value-establishment">0</span>
+            <span class="max-value-establishment">0</span>
+        </p>
+
+        <b class="">Estrelas</b>
+        <ul class="establishment-classification">
+            <li><i class="material-icons star-classification" index="0">star</i></li>
+            <li><i class="material-icons star-classification" index="1">star</i></li>
+            <li><i class="material-icons star-classification" index="2">star</i></li>
+            <li><i class="material-icons star-classification" index="3">star</i></li>
+            <li><i class="material-icons star-classification" index="4">star</i></li>
+        </ul>
+        <b>Enviar para o passageiro</b>
+    </form>
+
+    <div class="paddingThis">
+        <ul class="tabs tabs-custom">
+            <li class="tab"><a class="active" href="#numberWhats">Whatsapp</a></li>
+            <li class="tab"><a href="#numberPhone">SMS</a></li>
+            <li class="tab"><a href="#emailClient">Email</a></li>
+        </ul>
+        <div id="numberWhats">
+            <input type="tel" class="input-shared-establishment"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   id="phoneWhats" placeholder="( )">
+        </div>
+        <div id="numberPhone" style="display: none;">
+            <input type="tel" class="input-shared-establishment"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   id="phoneMessage" placeholder="( )"></div>
+        <div id="emailClient" style="display: none;">
+            <input type="email" class="input-shared-establishment"
+                   id="emailClientShared" placeholder="@"></div>
+    </div>
+
+    <div class="col s12 hostelIndication" id="hostelIndication">
+        <div class="col s12 footer-arrow-hostel" id="footer-arrow-hostel">
+           <!-- <img id="arrowHostel" src="webfiles/img/icon/arrow-subir.png">-->
+        </div>
+        <span class="col s12 title" id="titleIndication">Melhores Comissões</span>
+    </div>
+
+    <button type="button" class="btn-filter-establishment" id="btnSendIndication" ><span class="nameBtn">enviar</span></button>
+
+    <div class="row listTop3Hostel" id="listTop3Hostel">
+    </div>
+
+</div>

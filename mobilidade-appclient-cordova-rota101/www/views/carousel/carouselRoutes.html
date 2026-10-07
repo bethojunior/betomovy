@@ -1,0 +1,44 @@
+<div class="carousel-mobile">
+    <div>
+        <div class="owl-carousel owl-theme" id="promotionalBannerRoute"></div>
+    </div>
+</div>
+<style>
+    .carousel-mobile {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .carousel-mobile > div {
+        width: 100%;
+        margin: 4vw 0;
+        position: relative;
+    }
+
+    .photo-item-carousel{
+        display: block;
+        position: relative;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.08);
+        height: 230px;
+        border-radius: 15px;
+        transition:  cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+      /*  animation: skeleton-animation-image 1.5s ease-in-out infinite;*/
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+    }
+
+    @keyframes skeleton-animation-image {
+        0%{
+            opacity: 1;
+        }
+        50%{
+            opacity: 0.4;
+        }
+        100%{
+            opacity: 1;
+        }
+    }
+</style>

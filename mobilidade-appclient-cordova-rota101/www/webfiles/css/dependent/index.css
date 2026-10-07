@@ -1,0 +1,168 @@
+.container-dependent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.container-dependent > nav {
+  padding: 15px 10px;
+  width: calc(100% - 20px);
+  background-color: var(--main-color);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15pt;
+}
+
+.container-dependent > nav > i {
+  font-size: 30pt;
+}
+
+.container-dependent > div {
+  flex: 1;
+  background-color: #ececec;
+  overflow-y: auto;
+}
+
+.container-dependent > div > ul {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.container-dependent > div > ul:empty {
+  display:flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+}
+
+.container-dependent > div > ul:empty:before{
+  content:"";
+  width:5vw;
+  height:5vw;
+  border:2px solid transparent;
+  border-top-color:#000;
+  position:absolute;
+  border-radius:100%;
+  animation:700ms spin linear infinite;
+}
+.container-dependent > div > ul > li {
+  width: calc(100% - 20px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  background-color: #fff;
+}
+
+.container-dependent > div > ul > li > i {
+  position: absolute;
+  right: 10px;
+  font-size: 20pt;
+}
+
+.container-dependent > div > ul > li > .image-profile {
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  background-color: #ccc;
+  margin-right: 15px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-image: url("../../img/svg/user.svg");
+}
+
+.modal-add-dependent {
+  position: absolute;
+  background-color: #fff;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: all 300ms;
+}
+
+.modal-add-dependent.active {
+  transform: translateY(0%);
+}
+
+.modal-add-dependent > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
+  font-size: 16pt;
+  background-color: var(--main-color);
+  color: #fff;
+}
+
+.modal-add-dependent > div > i {
+  font-size: 30pt;
+  padding: 10px;
+  position: absolute;
+  left: 5px;
+}
+
+.modal-add-dependent > form {
+  width: calc(100% - 20px);
+  padding: 10px;
+  flex-direction: column;
+  display: flex;
+  overflow-y: auto;
+}
+
+.modal-add-dependent > form > div {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.modal-add-dependent > form > div > input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 2px;
+  background-color: #fff;
+  color: #000;
+}
+
+.modal-add-dependent > form > button {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: var(--main-color);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13pt;
+  position:relative;
+}
+
+
+.modal-add-dependent > form > button:disabled{
+  background-color:#4c4c4c;
+}
+
+.modal-add-dependent > form > button:disabled:before{
+  content:"";
+  width:5vw;
+  height:5vw;
+  border:2px solid transparent;
+  border-top-color:#fff;
+  position:absolute;
+  left:25px;
+  border-radius:100%;
+  animation:700ms spin linear infinite;
+}
+
+select#genderDependent {
+  background-color: #fff;
+  color: #000;
+}

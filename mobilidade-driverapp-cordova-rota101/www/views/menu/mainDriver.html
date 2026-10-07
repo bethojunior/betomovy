@@ -1,0 +1,90 @@
+<nav class="menu-main menu-home-v1">
+    <div class="menu-close">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <img class="logo-return logo-preview-app" src="webfiles/img/logo/logo.png">
+    <div class="container-image-cooperative"></div>
+    <div class="status-running">
+        <b id="statusDriverTrip">Buscando passageiro</b>
+        <!--<img src="webfiles/img/icon/steering-wheel.png" class="steering-wheel-animation">-->
+    </div>
+    <div class="status-network">
+        <b>Sem conexão</b>
+    </div>
+</nav>
+<div class="preload-request">
+    <ul class="icon-preload">
+        <li>
+            <div class="loader"></div>
+        </li>
+        <li><i class="material-icons">info</i></li>
+        <li><i class="material-icons">done</i></li>
+    </ul>
+    <span class="text-preload"></span>
+</div>
+
+<div class="preload-request lite-map" style="display: none">
+    <ul class="icon-preload">
+        <li>
+            <div class="loader"></div>
+        </li>
+        <li><i class="material-icons">info</i></li>
+        <li><i class="material-icons">done</i></li>
+    </ul>
+    <div class="text-preload"></div>
+</div>
+
+<div class="container-menu-options">
+    <i class="material-icons close-menu-v2">arrow_back</i>
+    <div class="logo-white-return">
+        <span id="typeDriver" class="material-icons">info</span>
+    </div>
+    <div class="row info-user">
+        <div>
+            <img id="imageUser" src="webfiles/img/icon/user.svg">
+            <a class="widthImage" href="index.html?Driver&PerfilDriver">
+                <i class="material-icons editPefil">edit</i>
+            </a>
+        </div>
+        <div class="container-menu-info">
+            <h4 id="nameUser"></h4>
+            <p id="occupation"><span data-i18n="menu-driver-code"></span><span id="codeFavorite"></span></p>
+            <div class="container-menu-indication" style="opacity: 0;">
+                <p data-i18n="menu-level"></p>
+                <span id="labelIndicationType">-</span>
+                <p>(<span id="labelUserIndications"></span><span data-i18n="menu-indications"></span>)</p>
+            </div>
+        </div>
+    </div>
+    <ul id="menuOptionUser">
+        <li><a href="index.html?Driver&PerfilDriver" data-i18n="menu-item-profile"></a></li>
+        <li><a href="index.html?Driver&RacingList" data-i18n="menu-item-trips"></a></li>
+        <li><a id="itemMenuDeliveries" href="index.html?Driver&Deliveries" data-i18n="menu-item-deliveries" style="display: none"></a></li>
+        <li><a href="index.html?Map&Heat" data-i18n="menu-item-heat-map"></a></li>
+        <li id="itemMenuCustomers" style="display: none"><a href="index.html?Driver&Customers" data-i18n="menu-item-customers"></a></li>
+        <li id="itemMenuIndication" style="display: none"><a href="index.html?Driver&Indication" data-i18n="menu-item-indications"></a></li>
+        <li><a href="index.html?Financial&Account" data-i18n="menu-item-account"></a></li>
+        <li id="menuRouteFreight"><a href="index.html?Route&Index" data-i18n="menu-item-freight"></a></li>
+        <li id="menuRouteCorporate" style="display: none"><a href="index.html?Route&Corporate" data-i18n="menu-item-route-corporate"></a></li>
+        <li><a id="openPrepaid" style="display: none" data-i18n="menu-item-prepaid"></a></li>
+        <li><a id="adsMenu" style="display: none"></a></li>
+        <!--<li><a href="index.html?Driver&WebApp">SHOPPING</a></li>-->
+        <!--<li><a href="index.html?Driver&Promotion">Promoções</a></li>-->
+        <li id="shareApp" data-i18n="menu-item-share-app"></li>
+        <li id="shareAppClient" data-i18n="menu-item-share-app-client"></li>
+        <li id="adsLink"></li>
+        <li id="logout" data-i18n="menu-item-logout"></li>
+        <!-- <li><button type="button">pedir um taxi</button></li>-->
+    </ul>
+    <div class="container-image-cooperative"></div>
+    <div class="powered-by">
+        <p>powered by <a id="openProfileInsta">@704apps</a></p>
+        <p id="appVersion" class="app-version"></p>
+    </div>
+</div>
+

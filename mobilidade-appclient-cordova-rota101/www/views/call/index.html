@@ -1,0 +1,215 @@
+<div class="search-driver-in-trip footer-ios-x">
+    <div class="footer-ios-x">
+        <p id="pharseTrip" data-i18n="home-pharse-trip"></p>
+        <div class="icon-find-driver" id="iconFindDriver"></div>
+        <button type="button" class="cancel-search-trip" data-i18n="home-cancel-search"></button>
+    </div>
+</div>
+<div class="container-km-trip"></div>
+<!--<div class="preloader-search-trip">
+    <div>
+        <img class="setas-return" src="webfiles/img/icon/setas-return.png">
+        <img class="car-return" src="webfiles/img/logo/return-1-d.png">
+    </div>
+    <p>Chamando seu transporte</p>
+    <h3 class="time-search-trip"></h3>
+    <i class="fa fa-times-circle cancel-search-trip"></i>
+</div>-->
+<div class="trip-client">
+    <div class="info-trip">
+        <div class="info-option-trip">
+            <p>
+                Alguma informação sobre o ponto seu embarque ou compartilhar sua viagem?
+            </p>
+            <a
+            ><i class="material-icons" id="optionTrip">
+                arrow_drop_down
+            </i></a
+            >
+        </div>
+        <ul class="options-trip">
+            <li>
+                <i class="material-icons">
+                    place
+                </i>
+                <p>Mudar local</p>
+            </li>
+            <li id="shareTripApp" class="share-trip-app-event">
+                <i class="material-icons">
+                    share
+                </i>
+                <p>Compartilhar viagem</p>
+            </li>
+        </ul>
+    </div>
+    <!--<div class="option-trip">
+          <i class="material-icons">
+              more_vert
+          </i>
+          <ul>
+
+          </ul>
+      </div>-->
+    <div id="zoomInRoute" class="option-gps-route">
+        <i class="material-icons">
+            gps_fixed
+        </i>
+    </div>
+    <div class="btn-security-customer">
+        <i class="material-icons">security</i>
+    </div>
+    <footer class="footer-ios-x">
+        <div class="data-trip">
+            <div id="dataTripInfo" class="event-data-trip-info">
+                <div class="image-profile-driver">
+                    <div id="nameDriver" class="name-driver-trip"></div>
+                </div>
+                <div class="info-data-driver">
+                    <div>
+                        <b id="carPlateDriver" class="car-plate-driver"></b>
+                        <p id="carBrandDriver" class="car-brand-driver"></p>
+                    </div>
+                    <div class="description-title">
+                        Fazemos mais, melhor e mais barato.
+                    </div>
+                </div>
+            </div>
+            <div class="contact-with-driver">
+                <i class="fa fa-phone phone-client" style="display: none"></i>
+                <i class="fa fa-comments chat-client"></i>
+                <div id="cancelTrip" class="cancel-trip-event">
+                    <img src="webfiles/img/icon/icon_cancelar_corrida.png"/>
+                </div>
+                <div class="share-trip-customer">
+                    <i class="material-icons">
+                        share
+                    </i>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+<div class="container-knob-trip-driver">
+    <div class="profile-driver-knob" id="profileDriverKnobTrip"></div>
+    <p>
+        <span class="name-driver-knob"></span>
+        <span class="plate-driver-knob"></span>
+    </p>
+    <i class="material-icons remove-drive-knob">close</i>
+</div>
+<div class="footer-container-trip footer-ios-x">
+    <ul class="container-advertising"></ul>
+    <label>
+        <span id="labelTitlePrice">-</span>
+        <i class="material-icons infoReturn" id="openInfoReturn">info_outline</i>
+    </label>
+    <div class="container-box-price">
+        <div class="type-cars"></div>
+        <div class="indication-list-prices"></div>
+        <div class="arrows-indication-list">
+            <div class="prev-container-price">
+                <i class="material-icons">
+                    keyboard_arrow_left
+                </i>
+            </div>
+            <div class="next-container-price">
+                <i class="material-icons">
+                    keyboard_arrow_right
+                </i>
+            </div>
+        </div>
+    </div>
+    <span class="text-cancellation-fee" data-i18n="home-message-cancellation-fee"></span>
+    <div class="edit-price">
+        <button type="button" id="btnEditPrice">
+            <i class="material-icons">edit</i>
+            <span data-i18n="home-span-edit-price"></span>
+        </button>
+    </div>
+    <div class="payment-trip">
+        <div id="choicePaymentTrip">
+            <i id="iconPaymentForm" class="material-icons"></i>
+            <p id="namePaymentForm"></p>
+            <i class="material-icons">expand_more</i>
+        </div>
+        <div id="cardSelectedPayTrip"></div>
+    </div>
+    <div class="switch-type-trip">
+        <button type="button" class="btn-qrcode-driver-trip">
+            <i class="material-icons">fullscreen</i>
+            <span data-i18n="home-btn-trip-knob"></span>
+        </button>
+        <button type="button" id="btnScheduleTrip">
+            <i class="material-icons">timer</i>
+            <span data-i18n="home-btn-scheduled"></span>
+        </button>
+        <button type="button" class="btn-search-trip" data-i18n="home-btn-search-trip"></button>
+    </div>
+    <button type="button" class="btn-confirm-scheduled-trip">
+        <span data-i18n="home-btn-scheduled"></span>
+        <label id="descriptionScheduledTrip"></label>
+    </button>
+</div>
+<div class="footer-payment-form">
+    <div class="title-footer">
+        <p data-i18n="home-title-payment-options"></p>
+        <i class="material-icons close-payment-form">close</i>
+    </div>
+    <p data-i18n="home-p-form-of-payment"></p>
+    <ul class="list-payment-forms"></ul>
+    <!--<a id="addPaymentForm" class="add-payment-form">Adicionar cartão de credito</a>-->
+</div>
+<div class="container-point-local-map footer-ios-x">
+    <span id="namePointUser"></span>
+    <button type="button" id="btnConfirmationPointLocalUser">CONTINUAR</button>
+</div>
+<div class="container-edit-price footer-ios-x">
+    <div class="close-edit-price">
+        <i class="material-icons" id="closeEditPrice">close</i>
+    </div>
+    <p>
+        <i class="material-icons">info</i>
+        <span>Informe o novo valor negociado da viagem</span>
+    </p>
+    <div class="container-info-price">
+        <p id="typeEditPrice"></p>
+        <div class="logo-price-selected"></div>
+        <input type="tel" id="valueNewPrice"/>
+    </div>
+    <button type="button" id="btnConfirmationNewPrice">CONFIRMAR</button>
+</div>
+
+<div class="container-trip-data-v2 event-data-trip-info">
+    <div class="info-trip-arrival">
+        <p class="description-title"></p>
+        <div class="content-time-arrival">
+            <h4 class="label-time-arrival">-</h4>
+            <span>min</span>
+        </div>
+    </div>
+    <div class="update-position-driver">
+        <small data-i18n="home-text-update-driver-location"></small>
+        <span class="material-icons" id="btnRequestUpdateDriverLocation">refresh</span>
+    </div>
+    <div class="info-trip-driver">
+        <div>
+            <div class="img-trip-driver image-profile-driver"></div>
+            <span>5,0 <i class="material-icons">star</i></span>
+        </div>
+        <div>
+            <h4 class="car-plate-driver"></h4>
+            <span class="car-plate-driver car-brand-driver"></span>
+        </div>
+    </div>
+    <p>
+        <i class="material-icons">how_to_reg</i>
+        <span class="name-driver-trip"></span>
+    </p>
+    <div class="option-trip-content">
+        <p class="chat-client">
+            <span>Envie uma mensagem</span>
+        </p>
+        <i class="material-icons share-trip-customer" id="shareTripCustomerV2" style="display: none">share</i>
+        <i class="material-icons cancel-trip-event">close</i>
+    </div>
+</div>

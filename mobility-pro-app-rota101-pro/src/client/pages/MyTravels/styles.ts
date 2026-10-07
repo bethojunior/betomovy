@@ -1,0 +1,47 @@
+import styled from 'styled-components/native';
+
+export const Container = styled.View`
+  background-color: ${({theme}) => theme.colors.background_global};
+  width: 100%;
+  height: 100%;
+`;
+
+export const Header = styled.View`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: ${({theme}) => theme.spacing.large}px
+    ${({theme}) => theme.spacing.medium}px;
+`;
+
+export const Title = styled.Text`
+  color: ${({theme}) => theme.colors.black};
+  font-size: ${({theme}) => theme.fontSizes.xxlarge}px;
+  font-weight: bold;
+`;
+
+export const ContainerContent = styled.ScrollView.attrs(({theme}) => ({
+  contentContainerStyle: {
+    paddingVertical: theme.spacing.medium,
+  },
+}))`
+  height: 100%;
+  width: 100%;
+`;
+
+export const ContainerFooter = styled.View`
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+`;
+
+export const NotTravel = styled.Text`
+  color: ${({theme}) => theme.colors.secondary};
+  font-size: ${({theme}) => theme.fontSizes.large}px;
+  text-align: center;
+  margin-top: ${({theme}) => theme.spacing.xxlarge}px;
+  padding: 0 ${({theme}) => theme.spacing.large}px;
+`;

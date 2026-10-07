@@ -1,0 +1,363 @@
+/* ── Seção: agendamento (mesmo padrão de .payment-trip / #choicePaymentTrip) ── */
+.footer-container-trip>.schedule-trip {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin-top: 0;
+    border-top: 1px solid #efefef;
+}
+
+#choiceScheduleTrip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    cursor: pointer;
+    transition: background 0.1s;
+    width: 100%;
+}
+
+#choiceScheduleTrip:hover { background: var(--color-bg-hover); }
+
+#choiceScheduleTrip .material-icons:first-child {
+    font-size: 20px;
+    color: var(--color-text-disabled);
+    flex-shrink: 0;
+}
+
+#choiceScheduleTrip #nameScheduleTrip {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+#choiceScheduleTrip .material-icons:last-child {
+    font-size: 20px;
+    color: #c0c0c0;
+    flex-shrink: 0;
+}
+
+/* ── Overlay de agendamento (mesmo padrão do .footer-payment-form) ── */
+.footer-schedule-form {
+    background: var(--color-bg-surface);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    transform: translateY(110%);
+    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.footer-schedule-form.active {
+    transform: translateY(0);
+}
+
+.schedule-picker-section-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-disabled);
+    margin: 0;
+}
+
+.footer-schedule-form > .schedule-picker-panel {
+    padding: 14px 16px 16px;
+    overflow-y: auto;
+    flex: 1;
+    gap: 14px;
+}
+
+.schedule-picker-apply {
+    flex-shrink: 0;
+    margin: 0 16px 16px;
+    height: 46px;
+    border: none;
+    border-radius: 10px;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.schedule-picker-apply:hover {
+    background: var(--color-primary-hover);
+}
+
+.schedule-picker-apply:disabled {
+    background: var(--color-text-disabled);
+    cursor: not-allowed;
+}
+
+.schedule-picker-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.schedule-picker-time-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.schedule-picker-time-row input[type="time"] {
+    height: 38px;
+    padding: 0 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-surface);
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.schedule-picker-time-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.schedule-picker-time-chip {
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-surface);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.schedule-picker-time-chip:hover {
+    background: var(--color-bg-hover);
+}
+
+.schedule-picker-time-chip.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+.schedule-picker-time-chip:disabled {
+    color: var(--color-text-disabled);
+    background: var(--color-bg-muted);
+    cursor: not-allowed;
+}
+
+.schedule-picker-calendar {
+    background: var(--color-bg-surface);
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.schedule-picker-calendar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0 20px;
+}
+
+.schedule-picker-calendar__header span {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: capitalize;
+}
+
+.schedule-picker-calendar__nav {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: var(--color-text-disabled);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background 0.12s, color 0.12s;
+}
+
+.schedule-picker-calendar__nav:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-secondary);
+}
+
+.schedule-picker-calendar__weekdays,
+.schedule-picker-calendar__days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.schedule-picker-calendar__weekdays {
+    margin-bottom: 10px;
+}
+
+.schedule-picker-calendar__weekdays span {
+    font-size: 12px;
+    text-align: center;
+    color: var(--color-primary);
+    font-weight: 500;
+    padding: 2px 0;
+}
+
+.schedule-picker-calendar__day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-primary);
+    border: none;
+    background: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+}
+
+.schedule-picker-calendar__day:hover:not(:disabled) {
+    background: var(--color-bg-hover);
+}
+
+.schedule-picker-calendar__day:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.schedule-picker-calendar__day--empty {
+    visibility: hidden;
+    cursor: default;
+}
+
+.schedule-picker-calendar__day--selected {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    font-weight: 700;
+}
+
+.schedule-picker-calendar__day.schedule-picker-calendar__day--selected:hover {
+    background: var(--color-primary-hover);
+}
+
+.schedule-picker-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.schedule-picker-summary span {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+
+.schedule-picker-clear {
+    background: none;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-danger-text);
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.schedule-picker-clear:hover {
+    background: var(--color-danger-bg);
+}
+
+.schedule-picker-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    margin: 0;
+}
+
+.schedule-picker-driver-pool-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: var(--color-bg-surface);
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+    transition: background 0.12s;
+}
+
+.schedule-picker-driver-pool-btn:hover {
+    background: var(--color-bg-hover);
+}
+
+.schedule-picker-driver-pool-btn .material-icons {
+    font-size: 18px;
+    color: var(--color-text-disabled);
+}
+
+/* ── Header do overlay (mesmo padrão do .footer-payment-form > .title-footer) ── */
+.footer-schedule-form > .title-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    flex-shrink: 0;
+}
+
+.footer-schedule-form > .title-footer > p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-inverse);
+}
+
+.footer-schedule-form > .title-footer > i {
+    font-size: 20px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    transition: color 0.12s;
+}
+
+.footer-schedule-form > .title-footer > i:hover {
+    color: var(--color-text-inverse);
+}
+
+/* ── Desktop (mesmo breakpoint que estreita .footer-payment-form) ── */
+@media (min-width: 992px) {
+    .footer-schedule-form {
+        width: 30%;
+    }
+}

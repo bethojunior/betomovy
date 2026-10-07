@@ -1,0 +1,156 @@
+.modal-switch-type-return{
+    position: absolute;
+    z-index: 500;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    background-color: var(--color-bg-surface);
+    justify-content: center;
+    align-items: center;
+    display:none;
+}
+.modal-switch-type-return.active{
+    display: flex;
+}
+.modal-switch-type-return > div{
+    background-color:var(--color-bg-surface);
+    width: 100%;
+    padding:2vw;
+    border-radius:5px;
+    height: 70%;
+    flex-direction: column;
+    display: flex;
+}
+.modal-switch-type-return > div > i.info-error{
+    font-size:40vw;
+    text-align:center;
+    width:100%;
+    color:#dd1515;
+}
+.modal-switch-type-return > div > i.cancel-called {
+    font-size: 10vw;
+    float: right;
+    position: absolute;
+    right: 3vw;
+    top: 4vw;
+}
+.modal-switch-type-return > div > h4{
+    font-size:10vw;
+    text-align:center;
+    color:#606060;
+}
+.modal-switch-type-return > div > p{
+    text-align:center;
+    font-size:5.5vw;
+    color: #737373;
+}
+
+
+.modal-switch-type-return > div > p.title{
+    color:var(--color-primary-hover);
+    font-size: 10vw;
+}
+
+
+.modal-switch-type-return > div > p.sub-title{
+    font-size: 10.5vw;
+    color:#e8a43d;
+    text-transform:uppercase;
+    border-top: 1px solid var(--color-border);
+    margin-top: 4vw;
+    padding: 3vw;
+}
+
+.modal-switch-type-return > div > button{
+    display:block;
+    margin: 2vw auto;
+    width:60%;
+    padding:2.5vw 0;
+    font-size:5vw;
+    background-color:#e8a43d;
+    border:none;
+    color:var(--color-text-inverse);
+}
+.modal-switch-type-return > div > ul{
+    display:flex;
+    justify-content:space-evenly;
+    list-style:none;
+    margin:2.5vw 0;
+}
+.modal-switch-type-return > div > ul > li > img{
+    width: 55%;
+    display:block;
+    margin:auto;
+}
+.modal-switch-type-return > div > ul > li > p{
+    text-align:center;
+    color:#e8a43d;
+    font-size: 8vw;
+}
+.modal-switch-type-return > div > ul > li > p > span{
+    font-size: 4vw;
+}
+.modal-switch-type-return > div > ul > li {
+    margin:1vw;
+    border: 1px solid var(--color-border);
+    border-radius: 3vw;
+    box-shadow: 0 0 5px #cdcdcd;
+    padding: 2vw;
+}
+
+
+@media (min-width: 992px) {
+    .modal-switch-type-return{
+        background-color:rgba(0,0,0,0.5);
+    }
+
+    .modal-switch-type-return > div{
+        width: 25%;
+        padding: 0.5vw;
+        height: unset;
+        position: relative;
+    }
+
+    .modal-switch-type-return > div > p.title{
+        font-size:22pt;
+        margin-bottom: 20px;
+    }
+
+    .modal-switch-type-return > div > p{
+        font-size:14pt
+    }
+
+    .modal-switch-type-return > div > p.sub-title{
+        font-size:12pt;
+        margin: 10px 0;
+        padding: 10px 0 0;
+    }
+
+    .modal-switch-type-return > div > ul{
+        padding:0.5vw 0;
+        margin: 5px;
+    }
+
+    .modal-switch-type-return > div > ul > li{
+        padding:0.5vw;
+        margin:5px;
+        border-radius: 5px;
+    }
+
+    .modal-switch-type-return > div > ul > li > img{
+        width: 7vw;
+    }
+
+    .modal-switch-type-return > div > ul > li > p{
+        font-size:15pt
+    }
+
+    .modal-switch-type-return > div > ul > li > p > span{
+        font-size:10pt;
+    }
+    .modal-switch-type-return > div > i.cancel-called{
+        font-size:30pt;
+        top:0;
+        right:5px;
+    }
+}

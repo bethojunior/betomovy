@@ -1,0 +1,140 @@
+.container-search-car {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #989898;
+    width: max-content;
+    cursor: pointer;
+    margin-left: 35px;
+}
+
+.container-search-car.active {
+    width: 100%;
+    left: -4vw;
+    position: relative;
+    margin-left: 120px;
+}
+
+.container-search-car > span {
+    width: 100%;
+    border-radius: 5px 5px 0 0;
+    text-align: center;
+    background-color: #313131;
+    color: #fff;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    font-size: 10pt;
+}
+
+.container-search-car.active > span {
+    display: block;
+}
+
+.container-search-car > div {
+    padding: 5px 10px;
+}
+
+.container-search-car > div > p {
+    justify-content: left;
+    align-items: center;
+    font-size: 10pt;
+    display: none;
+}
+
+.container-search-car > div > p:last-child,
+.container-search-car.active > div > p {
+    display: flex;
+    margin: 0;
+}
+
+.container-search-car > div > p > i {
+    font-size: 12pt;
+    margin-right: 5px;
+}
+
+.container-question-driver {
+    background-color: #0079b4;
+    box-shadow: 0 0 10px #989898;
+    cursor: pointer;
+    width: 2.5em;
+    height: 2.5em;
+    padding: 0.25em;
+    border-radius: 100%;
+}
+
+.container-question-driver > div {
+    height: 2.5em;
+    width: 2.5em;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 100%;
+}
+
+
+.container-call-customer {
+    height:1.5rem;
+    width:1.5rem;
+    border-radius:100%;
+    background-color:#1ca75d;
+    border:1px solid #1ca75d;
+    overflow:hidden;
+    animation: 5s animation-point-trip infinite;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+@keyframes animation-point-trip {
+    0%{
+        border-color:#1ca75d;
+    }
+
+    50%{
+        border-color: #23ff95;
+    }
+
+    100%{
+        border-color:#1ca75d;
+    }
+}
+
+.container-call-customer.active {
+    background-color: #fff;
+    color:#000;
+    width: 100px;
+    box-shadow: 0 0 10px #777;
+    border-radius: 5px;
+    background-image: unset !important;
+    border: none;
+    height: unset;
+}
+
+.container-call-customer.active > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px
+}
+
+.container-call-customer.active > div > div {
+    height: 40px;
+    width: 40px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 100%;
+    background-color: #ccc;
+}
+
+.container-call-customer > div:last-child {
+    display: none;
+}
+.container-call-customer.active > div:last-child {
+    display: block;
+    background-color: #123;
+    color: #fff;
+    text-align: center;
+}

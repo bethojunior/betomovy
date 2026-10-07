@@ -1,0 +1,60 @@
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    top: 0;
+    width: 80%;
+    height: 20%;
+    overflow: auto;
+    background-color: white;
+    margin-left: 9%;
+    margin-top: 15%;
+}
+
+.modalOpen {
+    transition: 2s;
+    padding: 2vw;
+    display: block;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    top: 0;
+    width: 80%;
+    height: 20%;
+    overflow: auto;
+    background-color: white;
+    margin-left: 9%;
+    margin-top: 15%;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    border-radius: 1vw;
+}
+
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.confirmation-button,
+.cancel-button {
+    background-color: #fff;
+    color: #000;
+    outline: none;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 3px rgba(43, 114, 165, .29);
+}

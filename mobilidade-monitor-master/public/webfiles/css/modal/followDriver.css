@@ -1,0 +1,118 @@
+@media (min-width: 992px) {
+    .container-to-follow-driver {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+    }
+
+    .container-to-follow-driver.active {
+        display: flex;
+    }
+
+    .container-to-follow-driver > div {
+        background-color: #fff;
+        -webkit-border-radius: 0.5em;
+        -moz-border-radius: 0.5em;
+        border-radius: 0.5em;
+        padding: 1rem;
+        width: 20%;
+        position: relative;
+    }
+
+
+    .container-to-follow-driver > div > input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #a6a6a6;
+        border-radius: 5px;
+        outline: none;
+    }
+
+    .container-to-follow-driver > div > input + ul {
+        width: 90%;
+        overflow-x: hidden;
+    }
+
+
+    .container-to-follow-driver > div > button {
+        display: block;
+        margin: auto;
+        border: none;
+        padding: 10px;
+        border-radius: 0.25vw;
+        outline: unset;
+        text-transform: uppercase;
+        cursor: pointer;
+        margin-top: 10px;
+        width: 80%;
+    }
+}
+
+@media (max-width: 991px) {
+    .container-to-follow-driver {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+    }
+
+    .container-to-follow-driver.active {
+        display: flex;
+    }
+
+    .container-to-follow-driver > div {
+        background-color: #fff;
+        -webkit-border-radius: 0.5em;
+        -moz-border-radius: 0.5em;
+        border-radius: 0.5em;
+        padding: 2vw 5vw;
+        width: 80%;
+        position: relative;
+    }
+
+
+    .container-to-follow-driver > div > input {
+        width: 100%;
+        padding: 2vw;
+        border: 1px solid #a6a6a6;
+        border-radius: 2vw;
+        outline: none;
+    }
+
+    .container-to-follow-driver > div > input + ul {
+        top: 20vw;
+        width: 90%;
+        overflow-x: hidden;
+    }
+
+
+    .container-to-follow-driver > div > input + ul li div {
+        width: 10vw;
+        height: 10vw
+    }
+
+
+    .container-to-follow-driver > div > button {
+        display: block;
+        margin: auto;
+        border: none;
+        padding: 2vw 5vw;
+        border-radius: 0.25vw;
+        margin-top: 2vw;
+        outline: unset;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 1.5vw;
+    }
+}

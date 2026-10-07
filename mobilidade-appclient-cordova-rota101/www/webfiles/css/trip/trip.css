@@ -1,0 +1,92 @@
+html,body{
+    height: 100%;
+}
+.list-customer{
+    float: left;
+    width: 100%;
+    border:1px solid #ccc
+}
+.list-customer > .header-list > div{
+    float: left;
+}
+.container-customer{
+    position: relative;
+    width: 80%;
+    display: block;
+    margin: auto;
+}
+.list-customer > tbody > tr > td{
+    padding: 0.5vw;
+}
+.list-customer > tbody > tr > td:nth-child(1){
+    width:15%;
+}
+.list-customer > tbody > tr > td:nth-child(2),
+.list-customer > tbody > tr > td:nth-child(3){
+    width:25%;
+}
+.list-customer > tbody > tr > td:nth-child(4){
+    width:10%;
+}
+.list-customer > tbody > tr > td:nth-child(5){
+    width:10%;
+}
+.list-customer > tbody > tr{
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+}
+.list-customer > tbody > tr > td{
+    font-size:1.2vw;
+}
+.list-customer > tbody > tr > td > .map-trip{
+    width: 20vw;
+    border: 1px solid #ccc;
+    height: 20vw;
+    float: left;
+    background-color: #c7c7c7;
+}
+.list-customer > tbody > tr > td > .container-more-info{
+    width: calc(100% - 20vw);
+    float: left;
+    padding: 1vw;
+}
+.list-customer > tbody > tr > td > .container-more-info > ul{
+    position: relative;
+}
+.list-customer > tbody > tr > td > .container-more-info > ul:before{
+    content: '';
+    height: 50%;
+    border-left: 1px dashed#d3cccc;
+    position: absolute;
+    left: 0.5vw;
+    top: 1.25vw;
+}
+.list-customer > tbody > tr > td > .container-more-info > ul > li:first-child{
+    margin-bottom: 2vw;
+}
+.list-customer > tbody > tr > td > .container-more-info > .info-trip-detalhe{
+    border-top: 1px solid #ccc;
+    padding-top: 1vw;
+
+}
+
+.cicler-customer{
+    width: 1vw;
+    height: 1vw;
+    border: 1px solid #ccc;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    float: left;
+    margin-top: 0.25vw;
+    margin-right: 1vw;
+}
+
+.cicler-customer:before{
+    content:"";
+    width: .5vw;
+    height:.5vw;
+    background-color:#000;
+    border-radius:100%;
+}

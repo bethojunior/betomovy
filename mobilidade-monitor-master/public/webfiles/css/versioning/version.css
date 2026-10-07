@@ -1,0 +1,370 @@
+@media (max-width: 991px) {
+
+    .container-version {
+        width: calc(100% - 8vw);
+        height: calc(100% - 20vw);
+        display: flex;
+        float: left;
+        position:absolute;
+        padding: 4vw;
+
+    }
+
+    .container-version  a {
+        margin-left: 3vw;
+        margin-top: 1.5vw;
+    }
+
+    .container-version  a input{
+        padding: 3vw;
+        font-size: 2.5vw;
+        background-color: #f18502;
+        color: #fff;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 1.5vw;
+        outline: none;
+        border: none;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+        cursor: pointer;
+        font-weight: 600;
+
+    }
+
+    .container-version .tab{
+        background-color: #FFFFFF;
+        text-align: left;
+        margin-top: 14vw;
+        margin-left: 1vw;
+        margin-right: 0;
+        padding-left: 5vw;
+        padding-right: 5vw;
+        width: 80%;
+        height: 95%;
+        overflow-y: scroll;
+        position: absolute;
+    }
+
+    .container-version ul{
+        margin-top:2vw;
+    }
+
+    .container-version ul.menu_tabela
+    {
+        position: absolute;
+        margin-left: 3vw;
+        padding-top: 5vw;
+        float: left;
+        width: 34%;
+        list-style-type: none;
+        display:none;
+    }
+
+    .container-version ul.menu_tabela li
+    {
+        font-weight: bold;
+    }
+
+    .container-version ul.Conteudo
+    {
+        position: absolute;
+        padding-left: 6vw;
+        padding-top: 5vw;
+        float: left;
+        width: 69%;
+        list-style-type: none;
+    }
+
+    .container-version ul.Conteudo li.versao:before {
+        content:"Nº de Versões: ";
+        font-weight: bold;
+    }
+
+    .container-version ul.Conteudo li.plataforma:before {
+        content: "Plataforma: ";
+        font-weight: bold;
+    }
+
+    .container-version ul.Conteudo li.data:before {
+        content: "Data: ";
+        font-weight: bold;
+    }
+
+    .container-version ul.Conteudo li.statu{
+        margin-bottom: 2vw;
+        color: blue;
+    }
+    .container-version ul.Conteudo li.statu:before {
+        content: "Status: ";
+        font-weight: bold;
+        color: black;
+    }
+
+    .container-version ul.Conteudo li .btn
+    {
+        background-color: #4CAF50;
+        font-size: 2.4vw;
+        color: white;
+        border: none;
+        margin-top: -1.9vw;
+        margin-left: 1vw;
+        padding: 1.1vw 1.1vw;
+        border-radius: 1vw;
+        cursor: pointer;
+        width: 20%;
+    }
+
+    .container-version .form-popup:disabled{
+        background-color: #a5a5a5;
+    }
+
+
+
+    .container-version .form-popup {
+        display: none;
+        background-color: rgba(0, 0, 0, 0.5);
+        position: absolute;
+        margin-top: -25vw;
+        margin-left: -4vw;
+        padding-top:36.9vw;
+        height: 100%;
+        width: 100%;
+
+    }
+
+    .container-version .form-popup .form-container {
+        max-width: 300px;
+        padding: 15px;
+        margin-left: -15vw;
+        margin-right: 15vw;
+        border-radius: 0.7vw;
+        background-color: white;
+        position: absolute;
+        left:35vw;
+        top:10vw;
+        justify-content: center;
+    }
+
+    .container-version .form-popup .form-container input[type=text], .form-container input[type=password] {
+        width: 100%;
+        padding: 15px;
+        margin: 5px 0 22px 0;
+        border: none;
+        border-radius: 0.8vw;
+        background: #f1f1f1;
+        align-items: center;
+    }
+
+    .container-version .form-popup .form-container input[type=text]:focus, .form-container input[type=password]:focus {
+        background-color: #ddd;
+        outline: none;
+    }
+
+    .container-version  .form-popup .form-container .btn_save {
+        background-color: #4CAF50;
+        font-size: 3.5vw;
+        color: white;
+        padding: 8px 10px;
+        border: none;
+        border-radius: 1vw;
+        cursor: pointer;
+        width: 100%;
+        left: 20vw;
+        opacity: 0.8;
+    }
+
+    .container-version  .form-popup .form-container .btn_cancel {
+        background-color: #af170a;
+        font-size: 3.5vw;
+        color: white;
+        padding: 8px 10px;
+        margin-top: 1vw;
+        border: none;
+        border-radius: 1vw;
+        cursor: pointer;
+        width: 100%;
+        left: 20vw;
+        opacity: 0.8;
+    }
+}
+
+@media (min-width: 992px) {
+
+    .container-version {
+        width: 100%;
+        height: calc(100% - 20vw);
+        margin-top: 1vw;
+    }
+    .container-version a {
+        margin-left: 1vw;
+    }
+
+    .container-version a input{
+        padding: 1.2vw;
+        background-color: #f18502;
+        color: #fff;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        outline: none;
+        border: none;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .container-version .tab{
+    }
+    .container-version ul.menu_tabela
+    {
+        display: flex;
+        margin-left: 1vw;
+        margin-bottom: 0.5vw;
+        float: left;
+        width: 78%;
+        list-style-type: none;
+    }
+
+    .container-version ul.menu_tabela li
+    {
+        background-color: #313b44;
+        color: #FFFFFF;
+        text-align: center;
+        margin-top:1vw;
+        margin-left: 0;
+        margin-right: 0.9px;
+        padding-top: 1vw;
+        padding-bottom: 0.5vw;
+        display: inline;
+        float: left;
+        width: 200%;
+    }
+
+
+    .container-version ul.Conteudo
+    {
+        margin-left: 1vw;
+        float: left;
+        width: 79%;
+        height: 360px;
+        list-style-type: none;
+        overflow-y: scroll;
+    }
+
+    .container-version ul.Conteudo li
+    {
+        position: relative;
+        background-color: white;
+        color: black;
+        margin-left: 0;
+        margin-right: 0;
+        padding-top: 1.3vw;
+        padding-bottom: 2vw;
+        display: inline;
+        float: left;
+        width:25%;
+    }
+
+    .container-version ul.Conteudo li .btn
+    {
+        background-color: #4CAF50;
+        font-size: 1.1vw;
+        margin-left: 1vw;
+        color: white;
+        border: none;
+        position: relative;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 40%;
+        opacity: 0.8;
+    }
+
+    .container-version ul.Conteudo li.versao {
+        text-align: center;
+    }
+
+    .container-version ul.Conteudo li.plataforma {
+        text-align: center;
+    }
+
+    .container-version ul.Conteudo li.data{
+        text-align: center;
+    }
+
+    .container-version ul.Conteudo li.statu{
+        text-align: center;
+        color: blue;
+    }
+
+    .container-version .form-popup:disabled{
+        background-color: #a5a5a5;
+    }
+
+    .container-version .form-popup {
+        display: none;
+        background-color: rgba(0, 0, 0, 0.5);
+        position: absolute;
+        margin-top: -13.7vw;
+        margin-left:0;
+        padding-top:17.55vw;
+        height: 72.5%;
+        width: 100%;
+
+    }
+
+    .container-version .form-popup .form-container {
+        max-width: 300px;
+        padding: 28px;
+        margin-top: 7vw;
+        border-radius: 0.3vw;
+        background-color: white;
+        position: absolute;
+        left:38vw;
+        top:10vw;
+        justify-content: center;
+
+    }
+
+    .container-version .form-popup .form-container input[type=text], .form-container input[type=password] {
+        width: 100%;
+        padding: 15px;
+        margin: 5px 0 22px 0;
+        border: none;
+        border-radius: 0.8vw;
+        background: #f1f1f1;
+    }
+
+    .container-version .form-popup .form-container input[type=text]:focus, .form-container input[type=password]:focus {
+        background-color: #ddd;
+        outline: none;
+    }
+
+    .container-version  .form-popup .form-container .btn_save {
+        background-color: #4CAF50;
+        font-size: 1.3vw;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 0.5vw;
+        cursor: pointer;
+        width: 49%;
+        left: 20vw;
+        margin-bottom:10px;
+        opacity: 0.8;
+    }
+
+    .container-version  .form-popup .form-container .btn_cancel {
+        background-color: #af170a;
+        font-size: 1.3vw;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 0.5vw;
+        cursor: pointer;
+        width: 49%;
+        left: 20vw;
+        margin-bottom:10px;
+        opacity: 0.8;
+    }
+}

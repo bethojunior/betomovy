@@ -1,0 +1,305 @@
+.container-data-trip {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.container-data-trip > div{
+    opacity: 0;
+    transition: all 500ms;
+}
+
+.container-data-trip > div.active{
+    opacity: 1;
+}
+
+.container-data-trip > div {
+    position: absolute;
+    height: calc(100% - 14vw);
+    overflow-y: auto;
+    width: 100%;
+    background: #fff;
+}
+
+.container-data-trip > div > .head-tip {
+    width: 100%;
+    position: relative;
+}
+
+.container-data-trip > nav {
+    background-color: var(--main-color);
+    padding: 1vw 2vw;
+    display: flex;
+    align-items: center;
+    height: 14vw;
+}
+
+.container-data-trip > nav > i {
+    font-size: 10vw;
+    color: #fff;
+}
+
+.container-data-trip > nav > p {
+    color: #fff;
+    font-size: 6vw;
+    font-weight: 500;
+    margin-left: 2vw;
+}
+
+.container-data-trip > div > .head-tip > img {
+    width: 100%;
+    position: relative;
+    height: 35vw;
+    display: none;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.container-data-trip > div > .head-tip > i {
+    position: absolute;
+    top: 1vw;
+    right: 1vw;
+    z-index: 10;
+    font-size: 10vw;
+    color: #4b4d4e;
+}
+
+.container-data-trip > div > .data-trip {
+    padding: 1vw 2vw 0;
+    width: calc(100% - 4vw);
+    margin-bottom: 2vw;
+}
+
+.container-data-trip > div > .data-trip > div.date-time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 4vw;
+    height: 6vw;
+    font-weight: 600;
+}
+
+.container-data-trip > div > .data-trip > ul {
+    list-style: none;
+    font-size: 5.5vw;
+    margin-top: 2vw;
+    display: block;
+}
+
+.container-data-trip > div > .data-trip > ul > li {
+    margin: 1vw 0;
+    height: 10vw;
+    overflow: hidden;
+    border: unset;
+    display: flex;
+    align-items: center;
+    padding: 1vw 3vw;
+    border-radius: 1vw;
+    position: relative;
+    font-size: 4vw;
+}
+
+.container-data-trip > div > .data-trip > ul > li:before {
+    content: "";
+    float: left;
+    height: 2.5vw;
+    width: 2.5vw;
+    background-color: #a09d9d;
+    margin-right: 3vw;
+    position: absolute;
+    border-radius: 100%;
+    left: 0;
+}
+
+.container-data-trip > div > .data-trip > ul > li:first-child:before {
+    background-color: #30ad52;
+}
+
+.container-data-trip > div > .data-trip > ul > li:last-child:before {
+    background-color: #cc241d;
+}
+
+.container-data-trip > div > .data-trip > ul > li > span {
+    margin-left: 3vw;
+}
+
+.container-data-trip > div > .data-trip > h4 {
+    display: block;
+    text-align: center;
+    font-size: 12vw;
+    font-weight: 600;
+    color: var(--main-seconds-color);
+}
+
+.container-data-trip > div > .data-trip > h4 > span {
+    font-size: 5vw;
+}
+
+.container-data-trip > div > .data-trip > label {
+    display: block;
+    margin-top: 2vw;
+    font-weight: 600;
+}
+
+.container-data-trip > div > .driver-trip {
+    border-top: 1px solid #e3e3e3;
+    padding: 2vw;
+    display: flex;
+    justify-content: left;
+    margin: 0 0;
+    position: relative;
+    flex-wrap: wrap;
+}
+
+.container-data-trip > div > .driver-trip > div:first-child {
+    width: 20%;
+}
+
+.container-data-trip > div > .driver-trip > div:nth-child(2) {
+    width: calc(70% - 4vw);
+    padding: 0 2vw;
+}
+
+.container-data-trip > div > .driver-trip > div:nth-child(3) {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.container-data-trip > div > .driver-trip > div > div#profileDriverTripDetail {
+    width: 15vw;
+    height: 15vw;
+    display: block;
+    margin: auto;
+    border: 1px solid #ccc;
+    border-radius: 100%;
+    position: relative;
+    overflow: hidden;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+.container-data-trip > div > .driver-trip > div {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+}
+
+.container-data-trip > div > .btn-option-trip-driver > button {
+    color: #fff;
+    text-align: center;
+    background-color: var(--main-color);
+    width: 50%;
+    padding: 4vw;
+    border: none;
+    border-right: 1px solid #fff;
+}
+
+.container-data-trip > div > .btn-option-trip-driver > button:last-child {
+    border-right: none;
+}
+
+.container-data-trip > div > .driver-trip > button.favorite {
+    background-color: #27ca37;
+}
+
+.container-data-trip > div > .driver-trip > div > b {
+    font-size: 5vw;
+    font-weight: 600;
+}
+
+.container-data-trip > div > .driver-trip > div > b,
+.container-data-trip > div > .driver-trip > div > p {
+    width: 100%;
+}
+
+.container-data-trip > div > .data-trip-info > ul {
+    position: relative;
+    width: 100%;
+    background-color: #ddd;
+    display: flex;
+    list-style: none;
+}
+
+.container-data-trip > div > .data-trip-info > ul > li {
+    padding: 5vw;
+}
+
+.container-data-trip > div > .data-trip-info > ul > li.active {
+    border-bottom: 1px solid #123;
+}
+
+.container-data-trip > div > .data-trip-info > div > ul {
+    list-style: none;
+}
+
+.container-data-trip > div > .data-trip-info > div > ul > li {
+    padding: 5vw;
+    border-bottom: 1px solid #ccc;
+}
+
+.container-data-trip > div > .data-trip-info > div {
+    display: none;
+}
+
+.container-data-trip > div > .data-trip-info > div.active {
+    display: block;
+}
+
+.btn-option-trip-driver {
+    width: 100%;
+    display: flex;
+}
+
+.container-data-trip > div > .data-trip-info > div > button {
+    width: 80%;
+    padding: 5vw;
+    border: none;
+    background-color: var(--main-color);
+    color: #fff;
+    margin: 20px auto 0;
+    border-radius: 30px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.container-data-trip > div > .data-trip-info > div > button:disabled {
+    background-color: #4f4d4d;
+}
+
+.container-data-trip > div > .data-trip-info > div > button:disabled:before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+    border: 2px solid transparent;
+    border-top-color: #fff;
+    animation: 1s spin linear infinite;
+    position: absolute;
+    left: 10%;
+}
+
+.option-schedule-trip {
+    display: none;
+}
+
+.option-schedule-trip.active {
+    display: block;
+}
+
+.option-schedule-trip > button {
+    width: 100%;
+    display: block;
+    margin: auto;
+    padding: 10px;
+    border: none;
+    background-color: var(--main-color);
+    color: #fff;
+    font-size: 15pt;
+}

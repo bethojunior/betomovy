@@ -1,0 +1,27 @@
+<svg id="Google_Play" data-name="Google Play" xmlns="http://www.w3.org/2000/svg" width="244" height="67.778" viewBox="0 0 244 67.778">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        font-size: 21px;
+        font-family: Roboto-Bold, Roboto;
+        font-weight: 700;
+      }
+
+      .cls-3 {
+        font-size: 17px;
+        font-family: Roboto-Light, Roboto;
+        font-weight: 300;
+      }
+    </style>
+  </defs>
+  <path id="Caminho_7567" data-name="Caminho 7567" class="cls-1" d="M10,0H234a10,10,0,0,1,10,10V57.778a10,10,0,0,1-10,10H10a10,10,0,0,1-10-10V10A10,10,0,0,1,10,0Z"/>
+  <g id="Grupo_21008" data-name="Grupo 21008" transform="translate(18.977 9.489)">
+    <text id="GOOGLE_PLAY-2" data-name="GOOGLE PLAY" class="cls-2" transform="translate(132.058 43.037)"><tspan x="-68.353" y="0">GOOGLE PLAY</tspan></text>
+    <text id="Disponível_na" data-name="Disponível na" class="cls-3" transform="translate(132.036 17.348)"><tspan x="-49.427" y="0">Disponível na</tspan></text>
+    <path id="Icon_awesome-google-play" data-name="Icon awesome-google-play" d="M30.373,22.332,9.337,1.239,36.1,16.6l-5.728,5.728ZM3.847,0A3.7,3.7,0,0,0,1.779,3.365V45.426A3.7,3.7,0,0,0,3.847,48.79L28.3,24.39ZM44.374,21.5l-5.614-3.25L32.5,24.4l6.262,6.148,5.728-3.25A3.823,3.823,0,0,0,44.374,21.5ZM9.337,47.561,36.1,32.2l-5.728-5.728Z" transform="translate(-1.779)"/>
+  </g>
+</svg>

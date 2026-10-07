@@ -1,0 +1,112 @@
+.container-choice-trip-type {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    z-index: 100;
+    bottom: 0;
+    padding: 10px 0;
+    left: 0;
+    box-shadow: 0 0 10px #ccc;
+    background-color: #fff;
+    transform: translateY(0);
+    transition: transform 0.3s;
+}
+
+.container-choice-trip-type.active {
+    transform: translateY(150%);
+    transition: transform 0.3s;
+}
+
+.container-choice-trip-type > i {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    display: none;
+}
+
+.container-choice-trip-type > img {
+    width: 40vw;
+    border-radius: 5px;
+    margin: 0px 0;
+}
+
+.container-choice-trip-type > ul {
+    display: flex;
+    list-style: none;
+    width: 100%;
+    overflow-x: auto;
+    position: relative;
+}
+
+
+.container-choice-trip-type > ul::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.container-choice-trip-type > ul::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+.container-choice-trip-type > ul::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.container-choice-trip-type > ul::-webkit-scrollbar {
+    width: 10px;
+}
+
+.container-choice-trip-type > ul:empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.container-choice-trip-type > ul:empty:before {
+    content: "";
+    width: 15vw;
+    height: 15vw;
+    margin: 0px;
+    border: 5px solid transparent;
+    border-top-color: #000;
+    border-radius: 100%;
+    animation: spin 2s infinite linear;
+}
+
+.container-choice-trip-type > ul.is-loading:empty:before{
+    content:"Nenhum tipo de viagem definido";
+    width:auto;
+    border:none;
+    font-size:16pt;
+    color:#777;
+    animation:none;
+}
+
+.container-choice-trip-type > ul > li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 5px;
+    background-color: #fff;
+    padding: 10px 5px;
+    width: 25vw;
+    margin: 10px;
+    border: 5px solid #ffffff;
+    box-shadow: 0 0 10px #8c8c8c;
+}
+
+.container-choice-trip-type > ul > li:first-child {
+    /* margin: 0; */
+}
+
+.container-choice-trip-type > ul > li > img {
+    width: 20vw;
+    flex: 1;
+}
+
+.container-choice-trip-type > ul > li > span {
+    font-size: 9pt;
+    text-align: center;
+}

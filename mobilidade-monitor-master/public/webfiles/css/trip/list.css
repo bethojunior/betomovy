@@ -1,0 +1,228 @@
+#openFilterTrip {
+    margin: 5px 10px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+#modal-filter .modal-body label{
+   margin: 1vw 0vw 0vw 0vw;
+}
+
+#modal-filter .modal-body #label-header{
+    margin-left: 0.5vw;
+}
+
+.autocomplete-custom.customer-position{
+    width: 100%;
+    max-height: 60vw;
+    overflow-x: hidden;
+}
+
+.date-container {
+    display: flex;
+    width: 100%;
+}
+
+.date-container p{
+    margin: 0.5vw 1vw 0vw 1vw;
+}
+
+.list-trips {
+    background: whitesmoke;
+    list-style: none;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.list-trips > li.detail-trip-header {
+    padding: 0vw;
+    padding-left: 2vw;
+    padding-top: 1vw;
+}
+
+.list-trips > li.detail-trip-header .form-group{
+    margin-right: 3vw;
+}
+
+.list-trips > li {
+    width: 80%;
+    margin: auto;
+    padding: 20px 0 0;
+    background-color: #fff;
+    transition: background-color 0.3s;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.list-trips > li:hover {
+    background-color: #ffe4c9;
+}
+
+.list-trips > li.active:hover {
+    background-color: #fff;
+}
+
+.list-trips > li.active {
+    border: 1px solid #e3e3e3;
+}
+
+.list-trips > li > i {
+    width: 5%;
+    text-align: center;
+}
+
+.list-trips > li > .container-item {
+    width: 95%;
+    padding: 0 20px;
+    position: relative;
+}
+
+.list-trips > li > .container-item > .info-data-local-base {
+    display: flex;
+    justify-content: space-between;
+    color: #000;
+    font-weight: 500;
+}
+
+.list-trips > li > .container-item > .info-base-trip {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.list-trips > li > .container-item > .info-base-trip > .info-payment-form {
+    display: flex;
+    justify-content: space-between;
+}
+
+.list-trips > li > .container-item > .info-base-trip div.status-trip-list {
+    display: flex;
+    justify-content: space-between;
+}
+
+.list-trips > li > .container-item > .info-base-trip div.status-trip-list > p:last-child{
+    color:#de0000;
+}
+
+.list-trips > li > .container-item > .info-base-trip div.name-customer > p {
+    text-transform: capitalize;
+}
+
+.list-trips > li > .container-item > .info-base-trip p {
+    margin: 0;
+    font-weight: 600;
+    font-size: 12pt;
+}
+
+.list-trips > li.active > .container-item > .more-info {
+    display: block;
+}
+
+.list-trips > li > .container-item > .more-info {
+    margin-top: 5px;
+    display: none;
+}
+
+.list-trips > li > .container-item > .more-info > span.reject {
+    color: red;
+}
+
+.list-trips > li > .container-item > .more-info > span {
+    font-weight: 600;
+    font-size: 11pt;
+}
+
+.list-trips > li > .container-item > .more-info > ul {
+    list-style: none;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.list-trips > li > .container-item > .more-info > ul > li {
+    font-size: 11pt;
+    display: flex;
+    position: relative;
+}
+
+.list-trips > li > .container-item > .more-info > ul > li:before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    background-color: #dbdbdb;
+    margin-top: 15px;
+}
+
+.list-trips > li > .container-item > .more-info > ul > li:last-child:after {
+    height: 0;
+}
+
+.list-trips > li > .container-item > .more-info > ul > li:after {
+    content: "";
+    height: 60%;
+    width: 2px;
+    background-color: #dbdbdb;
+    position: absolute;
+    margin-top: 29.5px;
+    margin-left: 4px;
+}
+
+.list-trips > li > .container-item > .more-info > ul > li > div {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.list-trips > li > .container-item > .more-info > ul > li:last-child:before {
+    border-radius: 0;
+}
+
+.list-trips > li.active > footer {
+    display: flex;
+}
+
+.list-trips > li > footer {
+    width: calc(100% + 12vw);
+    border-top: 1px solid #e5e5e5;
+    padding: 15px;
+    display: none;
+    justify-content: flex-end;
+}
+
+.list-trips > li > footer > a {
+    display: flex;
+    align-items: center;
+    color: #ed8900 !important;
+}
+
+.list-trips > li > footer > a > i {
+    margin-left: 5px;
+    font-size: 13pt;
+}
+
+@media (max-width: 991px) {
+    .list-trips > li {
+        width: 95%;
+    }
+
+    .list-trips > li > .container-item {
+        padding: 5px;
+    }
+
+    #modal-filter .modal-body label{
+        margin-top: 2vw
+    }
+
+    .date-container {
+        display: block;
+    }
+
+    #modal-filter .modal-body #label-header{
+        margin-top: 2vw;
+    }
+}

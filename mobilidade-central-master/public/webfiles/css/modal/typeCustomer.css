@@ -1,0 +1,218 @@
+.modal-type-customer{
+    z-index: 150;
+    position: absolute;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    height: 100%;
+    transform: translateY(200%);
+    background-color: transparent;
+    transition: background-color 0.8s, align-items 2s;
+    top: 0;
+}
+
+.modal-type-customer.active {
+    transform: translateY(0);
+    background-color: rgba(0, 0, 0, 0.24);
+}
+
+.modal-type-customer > div{
+    background-color: var(--color-bg-surface);
+    padding: 2vw;
+    width: 100%;
+    transform: translateY(100%);
+    transition-delay: 1.5s;
+    transition: 0.8s transform;
+}
+
+.modal-type-customer.active > div{
+    transform: translateY(0);
+}
+
+.modal-type-customer > div > div > h4{
+    display:block;
+    text-align:center;
+    font-weight:600;
+    font-size:6vw;
+    margin-bottom:5vw;
+}
+
+.modal-type-customer > div > div > ul{
+    list-style:none;
+    display:flex;
+    justify-content:space-around;
+    margin:2vw 1vw;
+}
+
+.modal-type-customer > div > div > ul > li{
+    width:48%;
+    text-align:center;
+    border:1px solid var(--color-border);
+    height:30vw;
+    align-items:center;
+    display:flex;
+    border-radius:2vw;
+    justify-content:center;
+    font-size:5vw;
+    box-shadow:0 0 10px #f7f7f7;
+    background-color: #e39b00;
+    color:var(--color-text-inverse);
+    font-weight:600;
+}
+
+.modal-type-customer.form-customer{
+    align-items:center;
+}
+
+.modal-type-customer.form-customer > div{
+    width:90%;
+    border-radius: 2vw;
+}
+
+.modal-type-customer > div > .form-another-customer{
+    display: none;
+}
+
+.modal-type-customer.form-customer > div > .form-another-customer{
+    display: block;
+    padding:2vw;
+}
+
+.modal-type-customer.form-customer > div > .type-customer-trip{
+    display: none;
+}
+
+
+.modal-type-customer > div > div > form > .container-type-find-customer{
+    display: flex;
+    padding: 20px 5px;
+    justify-content: space-around;
+}
+
+
+.modal-type-customer > div > div > form{
+    display:flex;
+    flex-direction:column;
+    margin:5px 0;
+}
+
+
+.modal-type-customer > div > div > form > input{
+    padding:2vw;
+    margin-bottom:2.5vw;
+    font-size:4.5vw;
+}
+
+
+.modal-type-customer > div > div > button{
+    background-color: var(--main-color);
+    border:5px solid var(--main-color);
+    color:var(--color-text-inverse);
+    padding:2vw;
+    margin:auto;
+    border-radius:2vw;
+    width: 100%;
+    font-size:5vw;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px auto;
+}
+
+.modal-type-customer > div > div > button.active{
+    background-color:var(--color-bg-surface);
+    color: var(--main-color);
+    border:5px solid var(--main-color);
+    box-shadow: 0 0 10px #d6d6d6;
+    font-weight: 600;
+}
+
+
+@media (min-width: 992px) {
+    .modal-type-customer > div{
+        padding:5vw 2vw 2vw;
+    }
+
+    .modal-type-customer{
+        width:30%;
+        display:flex;
+        align-items:flex-start;
+        z-index:30;
+    }
+    .modal-type-customer.form-customer > div{
+        width:100%;
+        border-radius:0;
+        padding: 5vw 1vw 2vw;
+    }
+
+    .modal-type-customer > div > div > h4{
+        font-size:16pt;
+        margin-bottom:1vw;
+        font-weight: 500;
+    }
+
+    .modal-type-customer > div > div > form > input{
+        font-size:14pt;
+        padding: 0.5vw;
+        margin-bottom: 1vw;
+    }
+
+    .modal-type-customer > div > div > button{
+        font-size: 12pt;
+        width: 80%;
+        border-radius:5px;
+        padding: 0.5vw;
+        background-color: var(--main-color);
+        margin: 0 auto 10px;
+        cursor: pointer;
+    }
+
+    .modal-type-customer > div > div > button:disabled{
+        background-color:#123;
+        display:flex;
+        justify-content:space-around;
+        align-items:center;
+    }
+
+
+    .modal-type-customer > div > div > button:disabled:before{
+        content:"";
+        width:10px;
+        height:10px;
+        border:2.5px solid transparent;
+        border-top:2.5px solid #fff;
+        border-radius:100%;
+        animation: spin 2s linear infinite;
+
+    }
+
+    .modal-type-customer.form-customer > div > .form-another-customer{
+        padding:0;
+    }
+
+    .modal-type-customer.active,
+    .modal-type-customer.form-customer{
+        align-items:flex-start;
+        background-color: var(--color-bg-surface);
+    }
+
+    .modal-type-customer > div > div > ul{
+        flex-direction:column;
+    }
+
+
+    .modal-type-customer > div > div > ul > li{
+        width: 70%;
+        height: auto;
+        font-size: 12pt;
+        padding: 0.5vw;
+        border-radius: 5px;
+        background-color: #ea8520;
+        font-weight: 500;
+        cursor: pointer;
+        margin: 0 auto 1vw;
+    }
+}

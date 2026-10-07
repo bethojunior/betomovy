@@ -1,0 +1,71 @@
+version: "3.8"
+
+networks:
+  movy-ecosystem-net:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  mongo-data:
+  redis-data:
+  rethinkdb-data:
+
+services:
+  # ---------------------------------------------
+  # BANCOS DE DADOS E CACHE COMPARTILHADOS
+  # ---------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: movy-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mobilidade_db
+      MYSQL_USER: movy_user
+      MYSQL_PASSWORD: movy_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - movy-ecosystem-net
+
+  mongodb:
+    image: mongo:7.0
+    container_name: movy-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - movy-ecosystem-net
+
+  redis:
+    image: redis:alpine
+    container_name: movy-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - movy-ecosystem-net
+
+  rethinkdb:
+    image: rethinkdb:2.4
+    container_name: movy-rethinkdb
+    restart: unless-stopped
+    ports:
+      - "28015:28015"
+      - "8085:8080" # Web Admin Interface do RethinkDB
+    volumes:
+      - rethinkdb-data:/data
+    networks:
+      - movy-ecosystem-net
+
+  # ---------------------------------------------
+  # SERVIÇOS DE APLICAÇÃO (BUILD LOCAL OPCIONAL)
+  # ---------------------------------------------
+  # Para subir cada microsserviço individualmente, utilize
+  # o docker-compose.yml presente no diretório específico de cada um.

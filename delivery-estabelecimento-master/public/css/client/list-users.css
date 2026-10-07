@@ -1,0 +1,31 @@
+.row.col-lg-12.contain-sales .callout.callout-info.col-lg-12.col-sm-12 .form-group.relative{
+}
+.row.col-lg-12.contain-sales .callout.callout-info.col-lg-6.col-sm-12 .form-group.relative i.absolute{
+    right: 0;
+    top: 0;
+    font-size: 1.3vw;
+    margin-right: 2vw;
+    margin-top: 0.7vw;
+    cursor: pointer;
+}
+.row.col-lg-12.contain-sales .callout.callout-info.col-lg-6.col-sm-12 .form-group.relative .filters{
+    margin-top: 1vw;
+}
+
+.modal .modal-dialog .modal-content .modal-body .hidden{
+    display: none;
+}
+
+.list-sales.col-lg-12.col-sm-12 .table.table-striped tbody tr{
+    cursor: pointer;
+}
+.dropdown-menu.show{
+    position: absolute;
+    will-change: transform;
+    top: 0px;
+    left: 0px;
+    transform: translate3d(-50px, -124px, 0px);
+}
+tr{
+    cursor: pointer!important;
+}

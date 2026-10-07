@@ -1,0 +1,675 @@
+ 
+body{
+    background-color: #FFF;
+}
+
+div.container-home{
+    padding: 3vw 7vw;
+}
+.mt-2{
+    margin-top: 2vw;
+}
+.describ-text{
+    font-size: 1.8vw;
+    text-indent: 2rem;
+    margin-bottom: 5%;
+    margin-top: 9%;
+    text-align: justify;
+    font-weight: 300;
+}
+
+div.detalhes-types{  
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+div.detalhes-item{ 
+    width: 30%;
+}
+
+div.detalhes-item h2{
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 1.4em;
+    padding-bottom: 20px;
+}
+
+div.detalhes-item p{
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.img-item{ 
+    width: 100px;
+    height: 100px;
+    margin-bottom: 2%;
+}
+
+.btn-saiba-mais{
+    background: transparent;
+    border: 2px solid #222;
+    padding:2px 22px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #000;
+}
+
+.btn-center{
+    width: 100%;
+    display: flex;
+    margin-top:5%; 
+    justify-content: center;
+}
+
+.img-preview{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+/* pgae  */
+
+.page-turista{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding:0vw 0vw 0vw 0vw;
+    width: 100%;
+    background-color: rgb(237, 236, 235);
+    margin-top: 4%;
+}
+
+.descript-page-turista{
+    width: 45%;
+    color: rgb(80, 84, 92);
+    margin-top: 8vw;
+} 
+
+img.img-turista{
+    width: 650px;
+    height: 650px;
+}
+
+p.describ-viajantes-turista{
+    margin-bottom: 2vw;
+    font-weight: bold;
+}
+
+h2.title-page-turista{
+    font-weight: 700;
+    /* letter-spacing: 6px; */
+    font-size: 2.9rem;
+    margin-bottom: 6%;
+    /* text-shadow: 1px 1px #000; */
+}
+
+p.describ-bottom-page-turista{
+    font-size: 1.7rem;
+}
+
+a.btn-quero-conhecer{
+    width: 21vw;
+    height: 5vw;
+    font-size: 2vw;
+    margin-top: 13%;
+    border: none;
+    border-radius: 30px;
+    background-color: rgb(255,174,43);
+    color: #FFF;
+    font-weight: 700;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* features*/
+#features.container-home h2.describ-text strong {
+    font-weight: 300;
+}
+
+h2.tile-hoteis-pousadas{
+    letter-spacing: 1px;
+    font-size: 1.6em;
+}
+p.label-title{
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 11%;
+}
+
+.div-hoteis-pousadas{
+    display: flex;
+}
+
+h2.tile-hoteis-pousadas{
+    font-size: 1.7em;
+    text-transform: uppercase;
+}
+
+div.inf-ganhe-mais-gold{
+    width: 25%;
+}
+
+
+img.img-hoteis-pousadas{
+    width: 150px; 
+    padding: 6% 0%;
+    margin-left: 12%;
+}
+
+img.imge-return-img{
+    width: 73%;
+    margin-left: 15%;
+} 
+
+.title-da-img-money{
+    color: rgb(255,174,43);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 2%;
+}
+
+div.convesion-box-flex{
+    display: flex;
+    flex-direction: column;
+    align-self: flex-end;
+}
+
+div.div-flex-box-seja-taxista{
+    display: flex; 
+    padding: 1vw 3vw;
+    background-color: rgb(237, 235, 235);
+}
+
+img.img-lange-seja-taxista{
+    width: 46%;
+    height: 46%;
+}
+
+div.div-flex-text-description{ 
+   position: relative;
+   padding: 7.5vw 0vw;
+   margin-left: 2%;
+   /* color: rgb(237, 235, 235); */
+   color: #444;
+}
+div.div-flex-text-description h1{ 
+    font-size: 2.9em; 
+}  
+
+div.div-flex-text-description h2{ 
+    text-transform: uppercase;
+    padding-bottom: 3vw;
+}   
+
+div.div-flex-text-description p{ 
+    padding-top: 2vw;
+    font-size: 1.6em;
+}  
+
+div.div-flex-text-description a { 
+    width: 21vw;
+    height: 5vw;
+    font-size: 2vw;
+    margin-top: 13%;
+    border: none;
+    border-radius: 30px;
+    background-color: rgb(255,174,43);
+    color: #FFF;
+    font-weight: bold;
+    margin-left: 14%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}  
+
+
+div.btn-baixa-page{
+    position: relative;
+    width: 100%;
+}
+
+
+div.btn-baixa-page img{
+    position: absolute;
+    width: 60px;
+    bottom: -4%;
+    left: calc(50% - 30px);
+    background: #FFF;
+    padding: 10px;
+    border-radius: 100px;
+    box-shadow: 0 3px 12px #a5a4a4;
+}
+
+.main-image-home h1 {
+    font-size: 4.8vw;
+    position: relative;
+    text-transform: uppercase;
+    color: #fff;
+    top: -40vw;
+    left: 8.5vw;
+    max-width: 80%;
+}
+
+#home-bg img {
+    width: 100%;
+}
+/* BTNS */
+a.btn-call-taxi{
+    position: relative;
+    bottom: 39vw;
+    left: 8.5vw;
+    background-color: #FFF;
+    border: none;
+    border-radius: 1.5vw;
+    font-size: 2vw;
+    color: rgb(241, 172, 59);
+    font-weight: 800;
+    width: 18vw;
+    height: 4.2vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+}
+
+
+.btn-pedir-quero-dirigir{
+    padding: 0.2vw 1vw;
+    border: 2px solid #fff;
+    border-radius: 25px
+}
+
+.btn-hoteis {
+    margin-top: 3vw;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-hoteis a {
+    font-size: 2vw;
+    border-radius: 3vw;
+    font-weight: bold;
+    width: 21vw;
+    height: 5vw;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#home-bg {
+    margin-bottom: -30vw;
+}
+.midSite{
+    background-image: linear-gradient(-90deg, #BCEF88 ,  white );
+    display: flex;
+    justify-content: space-between;
+}
+.midSite .bodyMid{
+    padding: 4vw;
+    color: #707f69;
+    font-size: 1.5vw;
+    margin-left: 4vw;
+}
+.midSite .bodyMid .btnKnow{
+    cursor: pointer;
+    font-weight: bold;
+    top: 6vw;
+    left: 2vw;
+    font-size: 2.5vw;
+    position: relative;
+    border: none;
+    padding: 0.5vw;
+    padding-right: 2vw;
+    padding-left: 2vw;
+    -webkit-border-radius: 2vw;
+    -moz-border-radius: 2vw;
+    border-radius: 2vw;
+    background-image: linear-gradient(-90deg, #3DD949, #BCEF88 );
+    color: white;
+}
+.midSite .bodyMid .title{
+    color: #707f69;
+    font-size: 3vw;
+}
+.midSite .imgMid{
+    padding-right: 8vw;
+}
+/* mobile */
+@media (max-width: 798px) {
+
+    .midSite{
+        background-color: #BEEF89;
+    }
+    .midSite .bodyMid{
+        padding: 2VW;
+        color: #707f69;
+        font-size: 3vw;
+        margin-left: 0;
+        width: 100%;
+    }
+    .midSite .bodyMid .btnKnow{
+        cursor: pointer;
+        font-weight: bold;
+        top: 6vw;
+        left: 2vw;
+        font-size: 4vw;
+        position: relative;
+        border: none;
+        padding: 0.5vw;
+        padding-right: 2vw;
+        padding-left: 2vw;
+        -webkit-border-radius: 2vw;
+        -moz-border-radius: 2vw;
+        border-radius: 2vw;
+        background-image: linear-gradient(-90deg, #3DD949 ,#DDF6C1);
+    }
+    .midSite .bodyMid .title{
+        color: #707f69;
+        font-size: 5vw;
+    }
+    .midSite .imgMid{
+        padding-right: 0;
+    }
+    .midSite .imgMid img{
+        width: 100%;
+    }
+    #home-bg {
+        margin-bottom: -50vw;
+    }
+
+    .bg-home-hero {
+        background-image: url('../img/hero/bg-home-mobile.jpg'); 
+    }
+
+    a.btn-call-taxi {
+        bottom: 62.1vw;
+        left: calc(50% - 23.5vw);
+        padding: 0;
+        border-radius: 4vw;
+        font-size: 4.5vw;
+        width: 45vw;
+        height: 12vw;
+    }
+
+    .describ-text {
+        font-size: 5vw;
+        margin-top: 11vw;
+    }
+
+    .detalhes-types {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .detalhes-types .detalhes-item {
+        width: 100%;
+        height: 30vh;
+        position: relative;
+    }
+
+    div.detalhes-item h2 {
+        text-align: left;
+        position: relative;
+        top: 5vw;
+        left: 23vw;
+        font-size: 4vw;
+        margin-left: 10px;
+        width: 40%; 
+        padding: 0
+    }
+
+    div.detalhes-item:last-child h2 {
+        top: 3vw;
+    }
+
+    div.detalhes-item .block-features {
+        margin-top: 3vw;
+        display: flex;
+    }
+
+    div.detalhes-item .img-item {
+        width: 23vw;
+        height: 23vw;
+    }
+    
+    div.detalhes-item .block-features .block-features-content {
+        height: 23vw;
+        display: flex;
+        flex-direction: column;
+        margin-left: 10px;
+        justify-content: center;
+        top: 2vw;
+        position: relative;
+    }
+
+    div.detalhes-item .block-features .block-features-content p {
+        text-align: left;
+        font-size: 3.3vw;
+    }
+
+    div.detalhes-item .block-features .block-features-content .btn-center {
+        display: initial;
+    }
+    
+    .img-preview {
+        display: initial;
+        width: auto;
+    }
+    
+    .page-turista {
+        flex-direction: column;
+        position: relative;
+    }
+
+    .page-turista .descript-page-turista {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .page-turista .brand-image {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .page-turista .brand-image .img-turista {
+        width: 81vw;
+        height: auto;
+        position: absolute;
+        top: 15vw;
+        display: block;
+    }
+
+    .page-turista p.describ-viajantes-turista {
+        text-align: center;
+        font-size: 4vw;
+    }
+
+    .page-turista h2.title-page-turista {
+        margin-top: 80vw;
+        margin-left: 10vw;
+        font-size: 7vw;
+        position: relative;
+    }
+
+    .page-turista p.describ-bottom-page-turista {
+        width: auto;
+        font-size: 5vw;
+    }
+
+    .page-turista button.btn-quero-conhecer {
+        margin: 6vw 0;
+        padding: 0;
+        font-size: 4vw;
+        width: 38vw;
+        height: 10vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .container-home .div-hoteis-pousadas {
+        flex-direction: column;
+    }
+
+    .container-home .div-hoteis-pousadas div.inf-ganhe-mais-gold {
+        width: 100%;
+    }
+
+    .container-home .div-hoteis-pousadas .inf-ganhe-mais-gold .label-title,
+    .container-home .div-hoteis-pousadas .inf-ganhe-mais-gold h2 {
+        text-align: center;
+    }
+
+    .div-hoteis-pousadas p.label-title {
+        margin: 4% 0;
+    }
+
+    .block-hostel {
+        display: flex;
+        height: 43vw;
+        align-items: center;
+    }
+
+    .block-hostel .block-hostel-content {
+        margin-left: 10px;
+    }
+
+    .block-hostel img.img-hoteis-pousadas {
+        padding: 0;
+        margin: 0;
+        width: 30vw;
+        height: auto;
+    }
+
+    .block-hostel .title-da-img-money {
+        font-size: 4vw;
+    }
+
+    .div-hoteis-pousadas .image-return {
+        display: none;
+    }
+
+    .block-hostel:last-child img.img-hoteis-pousadas {
+        width: 27vw;
+    }
+
+    div.div-flex-box-seja-taxista {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    div.div-flex-box-seja-taxista img.img-lange-seja-taxista{
+        width: 81vw;
+        height: auto;
+        top: 6vw;
+        position: relative;
+    }
+
+    div.div-flex-box-seja-taxista h1 {
+        text-align: center;
+        font-size: 8vw;
+    }
+
+    div.div-flex-box-seja-taxista div.div-flex-text-description p {
+        margin-left: 4.5vw;
+        font-size: 4vw;
+        font-weight: 500;
+    }
+
+    div.div-flex-text-description a {
+        width: 62vw;
+        height: 13vw;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        margin-top: 6vw;
+        margin-left: 0;
+        font-size: 5vw;
+    }
+
+    div.div-flex-text-description {
+        position: relative;
+        padding: 7.5vw 0vw;
+        margin-left: 2%;    
+        color: #444;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    div.div-flex-text-description h2 {
+        position: absolute;
+        top: -76vw;
+    }
+
+    a.btn-quero-conhecer{
+        top: -6vw;
+        width: 62vw;
+        height: 13vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 5vw;
+    }
+    
+    .btn-hoteis a {    
+        width: 62vw;
+        height: 13vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 5vw;
+        margin-top: 3vw;
+        margin-bottom: 3vw;
+        position: relative;
+        border-radius: 6vw;
+    }
+
+    #home-bg h1 {
+        top: -66vw;
+        font-size: 8.2vw;
+        text-align: center;
+        left: 9.2vw;
+    }
+
+}
+
+@media(max-width: 398px) {
+    .block-hostel {
+        height: 50vw;
+    }
+
+    div.div-flex-box-seja-taxista div.div-flex-text-description p {
+        margin-left: 4vw;
+    }
+}
+
+@media(max-width: 320px) {
+    .block-hostel {
+        height: 85vw;
+    }
+}
+
+@media(max-width: 431px) {
+    .block-hostel {
+        height: 69vw;
+    }
+}
+

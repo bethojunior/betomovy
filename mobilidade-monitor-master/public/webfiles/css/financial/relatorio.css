@@ -1,0 +1,154 @@
+
+@media (min-width: 992px) {
+    .mobile{
+        display: none;
+    }
+    .modal.fade.modal-result.show{
+        z-index: 999999;
+    }
+    .row.general-relatorio{
+        padding: 1vw;
+    }
+    .row.general-relatorio .col-lg-5.second{
+        background-color: white;
+        padding: 0.5vw;
+    }
+    .row.general-relatorio .col-lg-5.second #mount-users{
+        height: 20vw;
+        overflow-x: scroll;
+    }
+    .row.general-relatorio .col-lg-5.second #mount-users .that-driver{
+        position: relative;
+        background-color: whitesmoke;
+        padding: 0.3vw;
+        margin: 0.3vw;
+    }
+    .row.general-relatorio .col-lg-5.second #mount-users .that-driver .seleceted.hidden{
+        display: none;
+    }
+    .row.general-relatorio .col-lg-5.second #mount-users .that-driver .seleceted.show{
+        position: absolute;
+        right: 0;
+        top: 0;
+        display: block;
+        z-index: 99;
+        color: green;
+    }
+
+
+    .row.general-relatorio .col-lg-5#list-drivers{
+        background-color: white;
+        padding: 0.5vw;
+    }
+    .row.general-relatorio .col-lg-5#list-drivers .input-group.mb-3{
+        position: relative;
+    }
+    .row.general-relatorio .col-lg-5#list-drivers .input-group.mb-3 i{
+        cursor: pointer;
+        margin-top: 0.5vw;
+        margin-left: 0.5vw;
+    }
+    .row.general-relatorio .col-lg-5#list-drivers .div-driver{
+        background-color: whitesmoke;
+        padding: 0.3vw;
+        margin: 0.3vw;
+        cursor: pointer;
+        position: relative;
+    }
+    .row.general-relatorio .col-lg-5#list-drivers .div-driver .selecetedd.hidden{
+        display: none;
+    }
+    .row.general-relatorio .col-lg-5#list-drivers .div-driver .selecetedd.show{
+        position: absolute;
+        right: 0;
+        color: darkgreen;
+    }
+    .row.general-relatorio .col-lg-5#list-drivers #driver-list{
+        height: 20vw;
+        overflow: scroll;
+    }
+
+    .sub-header{
+        background-color: whitesmoke;
+        padding-left: 2vw;
+        font-size: 1.4vw;
+        font-weight: 700;
+    }
+
+    .about-value{
+        margin-left: 1vw;
+        padding: 1vw;
+    }
+    .content-data{
+        background-color: whitesmoke;
+        padding: 0.5vw;
+    }
+    .modal-content{
+        font-size: 1vw;
+    }
+
+    .accordion .card #collapseTwo .row.col-lg-12.card-body{
+        overflow-y: scroll;
+        max-height: 35vw;
+    }
+
+    .accordion .card #collapseTwo #mount-indication.col-lg-12.card-body .col-lg-4.content-user{
+        /*padding: 2vw*/
+    }
+
+}
+
+@media (max-width: 991px) {
+    .mobile{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .accordion.general-relatorio{
+        display: none;
+    }
+    .accordion .card #collapseTwo .row.col-lg-12.card-body{
+        overflow-y: scroll;
+        max-height: 100vw;
+    }
+
+    #load{
+        margin-left: 32vw;
+    }
+    .sub-header{
+        background-color: whitesmoke;
+        padding-left: 5vw;
+        font-size: 3vw;
+        font-weight: 700;
+    }
+    .modal-content{
+        font-size: 3vw;
+    }
+    .row.general-relatorio .col-lg-5.col-sm-12.second #mount-users {
+        height: 20vw;
+        overflow-x: scroll;
+        margin: 4vw;
+    }
+    .col-lg-3.col-sm-12.custom-control.custom-checkbox, .col-lg-3.custom-control.custom-checkbox{
+        margin-left: 5vw!important;
+    }
+    .row.general-relatorio{
+        margin: 1vw;
+    }
+    .row.general-relatorio .col-lg-5.second #mount-users{
+        height: 33vw;
+        overflow-x: scroll;
+        margin: 4vw;
+    }
+    .row.general-relatorio .col-lg-5.second #mount-users .that-driver{
+        position: relative;
+        background-color: whitesmoke;
+        padding: 0.3vw;
+        margin: 0.3vw;
+    }
+    .row.general-relatorio .col-lg-5#list-drivers #driver-list {
+        height: 40vw;
+        overflow: scroll;
+        margin: 1vw;
+    }
+}

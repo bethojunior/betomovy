@@ -1,0 +1,178 @@
+function initTrip(trip) {
+
+    return new Promise((resolve, reject) => {
+        if (!validateTrip(trip))
+            return;
+
+        new CustomerController().actionNew({...trip}).then(resolve).catch(function (message, error) {
+            reject(error, message);
+        });
+    })
+}
+
+/**
+ *
+ * @param trip
+ * @returns {boolean}
+ */
+function validateTrip(trip) {
+    if (trip.userId === null) {
+        SwalCustom.messageDialog("Error ao tentar confirmar corrida", "Atenção", undefined, "warning");
+        return false;
+    }
+    if (trip.tripPaymentFormId === null) {
+        SwalCustom.messageDialog("Informe a forma de pagamento", "Atenção", undefined, "warning");
+        return false;
+    }
+    if (trip.tripTypeId === null) {
+        SwalCustom.messageDialog("Informe o tipo da corrida", "Atenção", undefined, "warning");
+        return false;
+    }
+
+    return true;
+}
+
+function authorizedTravelUser() {
+    const userLogged = Session.get("user");
+    if (userLogged.customerRegisterStatusId === STATUS_BLOCKED) {
+        SwalCustom.messageDialog("", "Atenção, você não tem autorização para solicitar viagem", undefined, "warning");
+        return false;
+    }
+
+    return true;
+}
+
+function toggleCallOrCancel(event) {
+    event.stopPropagation();
+    if (!authorizedTravelUser())
+        return;
+    initCloseTrip();
+    updateBtnCallTripVisibility();
+    getDataCustomerByPartner();
+
+}
+
+function closeTripSearchPanel() {
+    viewController.elementProperty.removeClass(".container-menu", "active");
+    viewController.elementProperty.removeClass("#callRunning", "active");
+    if (typeof Route !== "undefined" && typeof COMPONENT_CREATE_TRIP !== "undefined") {
+        Route.removeGroupComponent(COMPONENT_CREATE_TRIP);
+    }
+    // removeGroupComponent só limpa o controle interno de páginas, não as
+    // classes "active" no DOM — sem isso, fechar o painel com o agendamento
+    // ou o formulário de pagamento aberto deixa o overlay preso, reaparecendo
+    // mal posicionado na próxima viagem.
+    viewController.elementProperty.removeClass(".footer-schedule-form", "active");
+    viewController.elementProperty.removeClass(".footer-payment-form", "active");
+    // Garante que o modo "apontar no mapa" seja encerrado corretamente,
+    // mesmo se o usuário fechar o painel sem confirmar (mesma limpeza feita
+    // no callback de saída em modules/place/address.js > .point-trip-customer).
+    if (typeof mapService !== "undefined" && mapService.pointCenter) {
+        try {
+            mapService.pointCenter.setMap(null);
+        } catch (err) {
+            console.warn("initTrip: pointCenter.setMap(null) error", err);
+        }
+    }
+    viewController.elementProperty.removeClass(".container-point-local-map", "active");
+    viewController.elementProperty.getElement(".container-menu", (element) => {
+        element.style.display = "";
+    });
+    viewController.elementProperty.getElement(".notification-item", (element) => {
+        element.style.display = "";
+    });
+    viewController.elementProperty.getElement(".menu-close", (element) => {
+        element.style.display = "";
+    });
+    viewController.elementProperty.getElement(".pac-container", (element) => {
+        element.style.display = "";
+    });
+    viewController.elementProperty.getElement(".input-custom", (element) => {
+        element.disabled = false;
+    });
+    viewController.elementProperty.removeClass(".menu-close", "black");
+    viewController.elementProperty.removeClass(".list-trips-active-partner", "active");
+    if (typeof managerTripViewCurrent !== "undefined") {
+        managerTripViewCurrent.isVisible = true;
+    }
+    if (typeof updateBtnCallTripVisibility === "function") {
+        updateBtnCallTripVisibility();
+    }
+    if (typeof verifyListTripActivePartner === "function") {
+        verifyListTripActivePartner();
+    }
+}
+
+function bindCloseTripPanelButton() {
+    const btnCloseTripPanel = document.getElementById("btnCloseTripPanel");
+    if (!btnCloseTripPanel) {
+        return;
+    }
+    btnCloseTripPanel.addEventListener("click", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        closeTripSearchPanel();
+    });
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindCloseTripPanelButton);
+} else {
+    bindCloseTripPanelButton();
+}
+
+function getPlaceCustomer() {
+
+    // Só preenche a origem com o endereço padrão da central se o usuário
+    // ainda não tiver escolhido (ou invertido) um endereço de origem —
+    // sem esse guard, reabrir o painel sobrescreve a origem já selecionada.
+    if (!trip.origin) {
+        const centralSelected = Session.get("centralSelected");
+
+        document.querySelector("#originSelected").value = centralSelected.address;
+
+        getPoint({
+            latitude: parseFloat(centralSelected.latitude),
+            longitude: parseFloat(centralSelected.longitude),
+            address: centralSelected.address,
+            neighborhood: "",
+        }, "origin");
+    }
+
+    viewController.elementProperty.removeClass(".menu-close", "black");
+    viewController.elementProperty.getElement("#origin", element => {
+        viewController.elementProperty.getElement(".menu-close", menu => {
+            if (menu.classList.contains("open")) {
+                element.focus();
+            }
+        });
+    });
+
+
+    Route.startClassesInComponent([
+        {component: ".container-menu", class: "active"},
+        {component: "#callRunning", class: "active"},
+    ], () => {
+        initProcessingCallTrip();
+        verifyListTripActivePartner();
+        managerTripViewCurrent.isVisible = true;
+
+        updateBtnCallTripVisibility();
+
+        viewController.elementProperty.getElement(".pac-container", element => {
+            element.style.display = "none";
+        });
+
+        viewController.elementProperty.getElement(".input-custom", element => {
+            element.disabled = true;
+        });
+    }, COMPONENT_CREATE_TRIP);
+
+
+    viewController.elementProperty.getElement(".input-custom", element => {
+        element.disabled = false;
+    });
+
+    viewController.elementProperty.removeClass(".list-trips-active-partner", "active");
+
+}

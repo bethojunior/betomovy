@@ -1,0 +1,132 @@
+.apply-cupom-view {
+    transform: translateY(150%);
+    transition: all 300ms;
+    z-index: 550;
+}
+
+.apply-cupom-view.active {
+    transform: translateY(0%);
+}
+
+.apply-cupom-view > ul {
+    flex: 1;
+    list-style: none;
+    padding: 10px 0;
+    align-items: center;
+    background-color: #f3f3f3;
+    overflow-y: auto;
+}
+
+
+.apply-cupom-view > button {
+    overflow: hidden;
+    max-height: 0;
+    background-color: var(--main-color);
+    border: none;
+    color: #fff;
+    font-size: 15pt;
+    font-weight: 500;
+    padding: 0 10px;
+    transition: 300ms all;
+}
+
+.apply-cupom-view > button.active {
+    padding: 10px;
+    max-height: 100%;
+    margin-bottom: 20px;
+}
+
+.apply-cupom-view > ul > li {
+    width: 85%;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 0 2px #bbb;
+    display: flex;
+    flex-direction: column;
+    /* overflow: hidden; */
+    margin: 0 auto 15px;
+    position: relative;
+    right: -5%;
+    justify-content: center;
+    transition: 300ms all;
+}
+
+
+.apply-cupom-view > ul > li.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.apply-cupom-view > ul > li.active {
+    background-color: #77ea56;
+    opacity: 0.85;
+}
+
+.apply-cupom-view > ul > li > input[type="radio"] {
+    position: absolute;
+    left: -10%;
+}
+
+.apply-cupom-view > ul > li > div {
+    display: flex;
+    margin: 10px;
+    align-items: center;
+    font-size: 12pt;
+    font-family: sans-serif;
+    position: relative;
+}
+
+.apply-cupom-view > ul > li > div > h4 {
+    position: absolute;
+    right: 0;
+    font-size: 30pt;
+    font-weight: 400;
+    display: flex;
+}
+
+.apply-cupom-view > ul > li > div > h4 > span {
+    font-size: 15pt;
+}
+
+.apply-cupom-view > ul > li > div > img {
+    width: 8vw;
+    margin: 0 10px
+}
+
+.apply-cupom-view > ul > li > label {
+    margin: 0px 20px 5px;
+    color: #4a4a4a;
+    font-family: sans-serif;
+    font-size: 10pt;
+}
+
+.apply-cupom-view > ul > li > footer {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    background-color: #e6e6e6;
+    color: #4a4a4a;
+    font-family: sans-serif;
+    font-size: 10pt;
+}
+
+.apply-cupom-view > ul > li > footer > i {
+    font-size: 10pt;
+    margin: 0 10px;
+}
+
+.apply-cupom-view > ul:empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.apply-cupom-view > ul:empty:before {
+    content: "";
+    width: 10vw;
+    height: 10vw;
+    border-radius: 100%;
+    border: 5px solid transparent;
+    border-top-color: var(--main-color);
+    animation: 500ms spin linear infinite;
+}

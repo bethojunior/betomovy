@@ -1,0 +1,2037 @@
+/* Estilos para a tela de gerenciamento do sistema */
+
+.wpp-group-icon {
+    font-size: 18px;
+    font-family: 'Material Icons';
+    color: var(--color-whatsapp);
+}
+
+.management-container {
+    background: var(--color-bg-muted);
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+.management-header {
+    background: var(--color-bg-surface);
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--color-border);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.header-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--color-text-muted);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-icon i {
+    font-size: 2.5rem;
+    color: var(--color-text-inverse);
+}
+
+.header-text {
+    flex: 1;
+    min-width: 300px;
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+.header-stats {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px 20px;
+    background: var(--color-bg-muted);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    min-width: 120px;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.management-tabs {
+    background: var(--color-bg-surface);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--color-border);
+}
+
+.nav-pills .nav-link {
+    border-radius: 8px;
+    padding: 20px 25px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+    margin: 0 5px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 80px;
+    background: var(--color-bg-surface);
+}
+
+.nav-pills .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.nav-pills .nav-link:hover::before {
+    left: 100%;
+}
+
+.nav-pills .nav-link:hover {
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-muted);
+    border-color: var(--color-border);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-pills .nav-link.active {
+    background: var(--color-text-secondary);
+    color: var(--color-text-inverse);
+    border-color: var(--color-text-secondary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.whatsapp-management .nav-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--color-bg-muted);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border: 1px solid var(--color-border);
+}
+
+.whatsapp-management .nav-icon i {
+    font-size: 1.5rem;
+    color: var(--color-text-muted);
+}
+
+.nav-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.nav-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: inherit;
+}
+
+.nav-subtitle {
+    font-size: 0.85rem;
+    color: var(--color-text-disabled);
+    font-weight: 500;
+}
+
+.management-card {
+    background: var(--color-bg-surface);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.management-card:hover {
+    box-shadow: 0 4px 16px var(--color-shadow-md);
+}
+
+.management-card .card-header {
+    background: var(--color-bg-muted);
+    border-bottom: 1px solid var(--color-border);
+    padding: 20px 30px;
+    border-radius: 0;
+}
+
+.management-card .card-header h5 {
+    color: var(--color-text-primary);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.management-card .card-header h5 i {
+    color: var(--color-text-muted);
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.header-info small {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Seções de configuração — sem card próprio (o simple-card já é o container) */
+.config-section {
+    height: auto;
+}
+
+.config-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.config-header h6 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    margin: 0;
+}
+
+.config-header small {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+.config-content {
+    margin-top: 15px;
+}
+
+/* Container de checkboxes */
+.form-check-container {
+    background: var(--color-bg-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.form-check-all {
+    padding: 8px 12px;
+    background: var(--color-bg-surface);
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    margin-bottom: 10px;
+}
+
+.form-check-all .form-check-input {
+    margin-right: 8px;
+}
+
+.form-check-all .form-check-label {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.form-check-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-check-item {
+    padding: 8px 12px;
+    background: var(--color-bg-surface);
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-check-item:hover {
+    background: var(--color-bg-muted);
+    border-color: var(--color-text-muted);
+}
+
+.form-check-item .form-check-input {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.form-check-item .form-check-label {
+    margin: 0;
+    flex: 1;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.form-check-item .trip-type-badge {
+    background: var(--color-text-muted);
+    color: var(--color-text-inverse);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.table-container {
+    background: var(--color-bg-muted);
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid var(--color-border);
+}
+
+.management-card .card-body {
+    padding: 30px;
+}
+
+/* Tabelas */
+.table {
+    margin-bottom: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.table thead th {
+    background: var(--color-text-secondary);
+    color: var(--color-text-inverse);
+    font-weight: 600;
+    border: none;
+    padding: 15px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+    border-color: var(--color-bg-muted);
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background-color: var(--color-bg-muted);
+}
+
+/* Botões */
+.btn {
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    color: var(--color-text-inverse);
+}
+
+.btn-success {
+    background: var(--color-success);
+    color: var(--color-text-inverse);
+    border-color: var(--color-success);
+}
+
+.btn-success:hover {
+    background: var(--color-success-text);
+    border-color: var(--color-success-text);
+    color: var(--color-text-inverse);
+}
+
+.btn-danger {
+    background: var(--color-danger);
+    color: var(--color-text-inverse);
+    border-color: var(--color-danger);
+}
+
+.btn-danger:hover {
+    background: var(--color-danger-strong);
+    border-color: var(--color-danger-strong);
+    color: var(--color-text-inverse);
+}
+
+.btn-secondary {
+    background: var(--color-text-muted);
+    color: var(--color-text-inverse);
+    border-color: var(--color-text-muted);
+}
+
+.btn-secondary:hover {
+    background: var(--color-text-secondary);
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-inverse);
+}
+
+.btn-outline-secondary {
+    border: 1px solid var(--color-text-muted);
+    color: var(--color-text-muted);
+    background: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background: var(--color-text-muted);
+    color: var(--color-text-inverse);
+}
+
+/* Cards de configuração de chaves */
+.key-config-card {
+    background: var(--color-bg-surface);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.key-config-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-text-muted);
+}
+
+.key-config-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.key-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.key-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: var(--color-text-muted);
+}
+
+.google-card .key-icon {
+    background: var(--color-text-muted);
+}
+
+.custom-card .key-icon {
+    background: var(--color-text-muted);
+}
+
+.ifood-card .key-icon {
+    background: var(--color-text-muted);
+}
+
+.whatsapp-card .key-icon {
+    background: var(--color-text-muted);
+}
+
+.key-icon i {
+    font-size: 1.8rem;
+    color: var(--color-text-inverse);
+}
+
+.key-info {
+    flex: 1;
+}
+
+.key-info h6 {
+    color: var(--color-text-primary);
+    font-weight: 700;
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+}
+
+.key-info small {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.key-status {
+    display: flex;
+    align-items: center;
+}
+
+.key-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-control {
+    border: 2px solid var(--color-border);
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.form-control:focus {
+    border-color: var(--color-text-muted);
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+    background: var(--color-bg-surface);
+}
+
+.form-select {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 12px 15px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: var(--color-bg-surface);
+}
+
+.form-select:focus {
+    border-color: var(--color-text-muted);
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+    background: var(--color-bg-surface);
+}
+
+.input-group .btn {
+    border-radius: 0 6px 6px 0;
+    border-left: none;
+}
+
+.input-group .form-control {
+    border-radius: 6px 0 0 6px;
+}
+
+/* Status badges */
+.badge {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.bg-success {
+    background: var(--color-success) !important;
+    color: var(--color-text-inverse);
+}
+
+.badge.bg-danger {
+    background: var(--color-danger) !important;
+    color: var(--color-text-inverse);
+}
+
+.badge.bg-warning {
+    background: var(--color-warning) !important;
+    color: #212529;
+}
+
+/* Ações da tabela */
+.table-actions {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.table-actions .btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+}
+
+/* Modais */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    background: var(--color-text-secondary);
+    color: var(--color-text-inverse);
+    border: none;
+    border-radius: 12px 12px 0 0;
+    padding: 20px 30px;
+}
+
+.modal-title {
+    font-weight: 700;
+    margin: 0;
+}
+
+.btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+.modal-body {
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.modal-footer {
+    border: none;
+    padding: 20px 30px;
+    background: var(--color-bg-muted);
+    border-radius: 0 0 12px 12px;
+}
+
+/* Spinner personalizado */
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+    border-width: 0.2em;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .management-container {
+        padding: 10px 0;
+    }
+
+    .management-header {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .header-title {
+        font-size: 2rem;
+    }
+
+    .management-tabs {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .nav-pills .nav-link {
+        padding: 12px 15px;
+        margin: 5px 2px;
+        font-size: 0.9rem;
+    }
+
+    .management-card .card-body {
+        padding: 20px;
+    }
+
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+
+    .table-actions {
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .table-actions .btn {
+        width: 100%;
+        font-size: 0.75rem;
+    }
+
+    .key-config-card {
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-footer {
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .header-title {
+        font-size: 1.5rem;
+    }
+
+    .header-subtitle {
+        font-size: 1rem;
+    }
+
+    .nav-pills .nav-link {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+    }
+
+    .nav-pills .nav-link i {
+        display: none;
+    }
+
+    .management-card .card-header {
+        padding: 15px 20px;
+    }
+
+    .management-card .card-body {
+        padding: 15px;
+    }
+
+    .table thead th {
+        padding: 10px 8px;
+        font-size: 0.75rem;
+    }
+
+    .table tbody td {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Animações */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.management-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.tab-pane {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.tab-pane:not(.show):not(.active) {
+    display: none !important;
+}
+
+.tab-pane.show.active {
+    display: block !important;
+}
+
+/* Scrollbar personalizada */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: var(--color-bg-muted);
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+/* Estados de loading */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    z-index: 10;
+}
+
+/* Efeitos de hover para cards */
+.key-config-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 15px;
+    pointer-events: none;
+}
+
+.key-config-card:hover::before {
+    opacity: 1;
+}
+
+
+
+.whatsapp-management {
+    background: var(--color-bg-muted);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.simple-tabs {
+    background: var(--color-bg-surface);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.tab-buttons {
+    display: flex;
+    background: var(--color-bg-muted);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 15px 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.tab-btn.active {
+    background: var(--color-bg-surface);
+    color: var(--color-whatsapp);
+    border-bottom: 3px solid var(--color-whatsapp);
+}
+
+.tab-btn:hover {
+    background: var(--color-border);
+    color: var(--color-whatsapp);
+}
+
+.tab-content {
+    padding: 0;
+}
+
+.tab-panel {
+    display: none;
+    padding: 16px;
+    min-height: 0;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+.simple-card {
+    background: var(--color-bg-surface);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.card-header-simple {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    background: var(--color-bg-subtle);
+    border-radius: 12px 12px 0 0;
+}
+
+.card-header-simple h4 {
+    margin: 0;
+    color: #333;
+    font-weight: 600;
+}
+
+.form-group-simple {
+    margin-bottom: 20px;
+}
+
+.form-label-simple {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.form-input-simple {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-input-simple:focus {
+    outline: none;
+    border-color: var(--color-whatsapp);
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+}
+
+.table-simple {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-bg-surface);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-simple th {
+    background: var(--color-bg-muted);
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.table-simple td {
+    padding: 15px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.table-simple tr:hover {
+    background: var(--color-bg-muted);
+}
+
+.qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    min-height: 120px;
+}
+
+.qr-frame {
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    overflow: hidden;
+    display: block;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.spinner-simple {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--color-whatsapp);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Estilos para checkboxes de tipos de viagem */
+.checkbox-container {
+    background: var(--color-bg-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 15px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-item:last-child {
+    border-bottom: none;
+}
+
+.checkbox-item:hover {
+    background-color: var(--color-bg-surface);
+    border-radius: 4px;
+    padding-left: 8px;
+    margin: 0 -8px;
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.checkbox-item label {
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    flex: 1;
+    margin: 0;
+}
+
+.checkbox-item label:hover {
+    color: var(--color-whatsapp);
+}
+
+.loading-checkbox {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-style: italic;
+    padding: 20px;
+}
+
+.whatsapp-management {
+    background: var(--color-bg-muted);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.simple-tabs {
+    background: var(--color-bg-surface);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.tab-buttons {
+    display: flex;
+    background: var(--color-bg-muted);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 15px 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.tab-btn.active {
+    background: var(--color-bg-surface);
+    color: var(--color-whatsapp);
+    border-bottom: 3px solid var(--color-whatsapp);
+}
+
+.tab-btn:hover {
+    background: var(--color-border);
+    color: var(--color-whatsapp);
+}
+
+.tab-content {
+    padding: 0;
+}
+
+.tab-panel {
+    display: none;
+    padding: 16px;
+    min-height: 0;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+.simple-card {
+    background: var(--color-bg-surface);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.card-header-simple {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    background: var(--color-bg-subtle);
+    border-radius: 12px 12px 0 0;
+}
+
+.card-header-simple h4 {
+    margin: 0;
+    color: #333;
+    font-weight: 600;
+}
+
+.form-group-simple {
+    margin-bottom: 20px;
+}
+
+.form-label-simple {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.form-input-simple {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-input-simple:focus {
+    outline: none;
+    border-color: var(--color-whatsapp);
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+}
+
+.table-simple {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-bg-surface);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-simple th {
+    background: var(--color-bg-muted);
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.table-simple td {
+    padding: 15px;
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.table-simple tr:hover {
+    background: var(--color-bg-muted);
+}
+
+.qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    min-height: 120px;
+}
+
+.qr-frame {
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    overflow: hidden;
+    display: block;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.spinner-simple {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--color-whatsapp);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Estilos para checkboxes de tipos de viagem */
+.checkbox-container {
+    background: var(--color-bg-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 15px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-item:last-child {
+    border-bottom: none;
+}
+
+.checkbox-item:hover {
+    background-color: var(--color-bg-surface);
+    border-radius: 4px;
+    padding-left: 8px;
+    margin: 0 -8px;
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.checkbox-item label {
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    flex: 1;
+    margin: 0;
+}
+
+.checkbox-item label:hover {
+    color: var(--color-whatsapp);
+}
+
+.loading-checkbox {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Estilos aprimorados para o formulário de configuração */
+.form-input-simple {
+    transition: all 0.3s ease;
+    font-size: 15px;
+}
+
+.form-input-simple:hover {
+    border-color: var(--color-whatsapp);
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.1);
+}
+
+.form-input-simple:focus,
+.form-input-simple.form-input-simple:focus {
+    outline: none;
+    border-color: var(--color-whatsapp);
+    box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.15);
+}
+
+.form-label-simple {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    color: #333;
+}
+
+.form-group-simple {
+    margin-bottom: 25px;
+    animation: fadeInForm 0.5s ease-in;
+}
+
+@keyframes fadeInForm {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.whatsapp-management .checkbox-container {
+    transition: all 0.3s ease;
+    background: var(--color-bg-subtle);
+}
+
+.whatsapp-management .checkbox-container:hover {
+    border-color: var(--color-whatsapp);
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.08);
+    background: var(--color-bg-surface);
+}
+
+.btn-primary {
+    transition: all 0.3s ease;
+    font-size: 15px;
+    padding: 12px 28px;
+    font-weight: 600;
+}
+
+.card-header-simple h4 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.skeleton-input {
+    height: 45px;
+    background: linear-gradient(90deg, var(--color-border-subtle) 25%, #e0e0e0 50%, var(--color-border-subtle) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    padding-left: 45px;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-container {
+    position: relative;
+}
+
+.skeleton-container .skeleton-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-border);
+    z-index: 1;
+}
+
+.name-input-wrapper {
+    position: relative;
+}
+
+#name-input-container {
+    position: relative;
+    display: none;
+}
+
+#name-input-container .form-input-simple {
+    padding-left: 40px;
+}
+
+#name-input-container .fa-user,
+#name-input-container .fas.fa-user {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-disabled);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+#spinner-preload-groups-wpp {
+    display: none;
+}
+
+#spinner-preload-groups-wpp.active {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 50;
+}
+
+.group-content-card {
+    display: none;
+}
+
+.group-content-card.active {
+    display: block;
+}
+
+.simple-card.group-content-card.active {
+    position: relative;
+}
+
+.wpp-group-session-status {
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.35;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-muted);
+    color: var(--color-text-secondary);
+}
+
+.wpp-group-session-status--success {
+    border-color: rgba(37, 211, 102, 0.35);
+    background: rgba(37, 211, 102, 0.1);
+    color: var(--color-whatsapp);
+}
+
+.wpp-group-session-status--warning {
+    border-color: rgba(245, 158, 11, 0.35);
+    background: rgba(245, 158, 11, 0.1);
+    color: #9a5b00;
+}
+
+.wpp-group-session-status--error {
+    border-color: rgba(220, 53, 69, 0.3);
+    background: rgba(220, 53, 69, 0.08);
+    color: #a61b2b;
+}
+
+.btn-add-new-group-wpp {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--color-whatsapp);
+    color: var(--color-text-inverse);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}
+
+.btn-add-new-group-wpp:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.feature-toggle-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid #e6ecf5;
+    background: var(--color-bg-surface);
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+    margin-top: 10px;
+}
+
+.feature-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.feature-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #1f2937;
+}
+
+.feature-subtitle {
+    font-size: 13px;
+    color: #667085;
+}
+
+.modern-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 26px;
+}
+
+.modern-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.modern-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #d0d5dd;
+    transition: .3s;
+    border-radius: 50px;
+}
+
+.modern-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--color-bg-surface);
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+
+input:checked+.modern-slider {
+    background-color: var(--color-link-hover);
+}
+
+input:checked+.modern-slider:before {
+    transform: translateX(20px);
+}
+
+.container-config {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-group.container-config {
+    padding: 2vw;
+}
+
+
+/* — regra canônica: substituída pela definição em ~1796 — */
+
+.feature-title {
+    font-weight: 600;
+}
+
+.feature-subtitle {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.tab-icon-svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    display: inline-block;
+    vertical-align: middle;
+    color: var(--color-text-muted);
+    transition: color 0.2s;
+}
+
+.tab-btn.active .tab-icon-svg,
+.tab-btn:hover .tab-icon-svg {
+    color: var(--color-whatsapp);
+}
+
+/* ── QR Wrapper — layout da aba de conexão ── */
+.qr-wrapper {
+    padding: 20px;
+}
+
+.qr-instructions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: var(--color-success-bg);
+    border-radius: 10px;
+    border: 1px solid #bbf7d0;
+}
+
+.qr-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #166534;
+    flex: 1;
+    min-width: 160px;
+}
+
+.qr-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: var(--color-whatsapp);
+    color: var(--color-text-inverse);
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ── Header da aba de conexão ── */
+.card-header-wpp h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-icon-wpp {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: var(--color-whatsapp);
+}
+
+/* Ícone de configurações no header da aba */
+.card-icon-wpp {
+    color: var(--color-whatsapp);
+    margin-right: 6px;
+}
+
+/* ── Form hint (subtítulo de campo) ── */
+.form-hint {
+    display: block;
+    margin-top: 6px;
+    margin-bottom: 10px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+/* ── Linha de save do form ── */
+.form-save-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+/* ── Modal WhatsApp customizado ── */
+.wpp-modal {
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px var(--color-shadow-lg);
+}
+
+.wpp-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-primary);
+    padding: 14px 18px;
+    color: var(--color-text-inverse);
+}
+
+.wpp-modal__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.wpp-modal__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+    line-height: 1;
+}
+
+.wpp-modal__close:hover {
+    color: var(--color-text-inverse);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.wpp-modal__body {
+    padding: 20px 18px 14px;
+    background: var(--color-bg-surface);
+}
+
+.wpp-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 18px 16px;
+    background: var(--color-bg-surface);
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.btn-wpp-action--outline {
+    background: transparent !important;
+    color: var(--color-primary) !important;
+    border: 1.5px solid var(--color-primary) !important;
+}
+
+.btn-wpp-action--outline:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ── Toast de sucesso inline ── */
+.wpp-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'Open Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 99999;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+}
+
+.wpp-toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.wpp-toast i {
+    color: var(--color-whatsapp);
+    font-size: 14px;
+}
+
+/* ── Botão de ação dos inputs (substitui btn-success Bootstrap) ── */
+.btn-wpp-action {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-wpp-action:hover {
+    background: var(--color-primary-hover);
+}
+
+/* ── Config form: inline styles removidas ── */
+.configs-form-body {
+    padding: 16px;
+}
+
+.trip-types-container {
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* ── Groups config ── */
+.config-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.config-label-icon {
+    font-size: 16px !important;
+    font-family: 'Material Icons' !important;
+    color: var(--color-whatsapp);
+    line-height: 1;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+/* Esconde qualquer <i> que não seja material icons (evita ponto verde FA) */
+.config-label i:not(.material-icons):not(.config-label-icon) {
+    display: none;
+}
+
+.config-section {
+    margin-bottom: 14px;
+}
+
+.feature-toggle-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--color-bg-muted);
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    margin-top: 4px;
+}
+
+.feature-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.feature-toggle-card input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    border: 1.5px solid var(--color-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: 'Open Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--color-bg-surface);
+}
+
+.feature-toggle-card input[type="text"]:focus {
+    border-color: var(--color-whatsapp);
+}
+
+.group-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Open Sans', sans-serif;
+    background: var(--color-bg-surface);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+    height: auto;
+}
+
+.group-select:focus {
+    border-color: var(--color-whatsapp);
+}
+
+/* FAB botão add grupo */
+.btn-add-new-group-wpp:hover {
+    background: var(--color-whatsapp-hover) !important;
+    transform: scale(1.05);
+}
+
+/* ── Responsividade da página de gestão WhatsApp ── */
+
+/* Página base: padding menor em mobile */
+.whatsapp-management {
+    padding: clamp(10px, 3vw, 20px);
+    min-height: 100vh;
+}
+
+/* Tabs: wrap em mobile para não cortarem */
+.tab-buttons {
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: clamp(10px, 2vw, 15px) clamp(8px, 2.5vw, 20px);
+    font-size: clamp(11px, 2.5vw, 14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+/* Form body: padding responsivo */
+.configs-form-body {
+    padding: clamp(12px, 3vw, 24px);
+}
+
+/* Seções de config */
+.config-section {
+    margin-bottom: clamp(14px, 3vw, 20px);
+}
+
+/* Toggle cards com input: nunca deixa o botão "Salvar" cair abaixo */
+.feature-toggle-card:has(input[type="text"]) {
+    flex-wrap: nowrap;
+    align-items: stretch;
+}
+
+@media (max-width: 420px) {
+    .feature-toggle-card:has(input[type="text"]) {
+        flex-wrap: wrap;
+    }
+    .feature-toggle-card input[type="text"] {
+        min-width: 0;
+    }
+}
+
+/* Instruções QR: empilha em mobile */
+.qr-instructions {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.qr-step {
+    font-size: clamp(12px, 2.5vw, 13px);
+}
+
+/* Card geral */
+.simple-card {
+    border-radius: clamp(8px, 2vw, 12px);
+}
+
+.card-header-simple {
+    padding: clamp(12px, 2.5vw, 14px) clamp(14px, 3vw, 20px);
+}
+
+/* Modal de novo grupo: responsivo */
+@media (max-width: 480px) {
+    .tab-btn span,
+    .tab-btn .tab-label {
+        display: none;
+    }
+
+    .btn-add-new-group-wpp {
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .qr-wrapper {
+        padding: 12px;
+    }
+}

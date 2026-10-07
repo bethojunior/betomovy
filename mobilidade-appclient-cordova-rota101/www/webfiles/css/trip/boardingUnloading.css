@@ -1,0 +1,550 @@
+.container-boarding-unloading {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    z-index: 100;
+    transition: all 1s;
+    position: absolute;
+    transform: translateX(150vw);
+}
+
+.container-boarding-unloading.active {
+    transform: translateX(0vw);
+}
+
+.container-boarding-unloading > div {
+    width: 90%;
+    margin-bottom: 5vw;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #0277bd;
+    box-shadow: 0 4px 10px #bdbdbd;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.container-boarding-unloading > button {
+    background-color: #01579b !important;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > .detail-basic-travel {
+    border: none;
+    margin: 0;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > .detail-basic-travel > div {
+    width: 100%;
+}
+
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child {
+    display: flex;
+    width: 100%;
+}
+
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .animation-images-boarding {
+    width: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    transition: all 300ms;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .animation-images-boarding.hidden {
+    display: none;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .animation-images-boarding.active {
+    flex-direction: row-reverse;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .animation-images-boarding > img:first-child {
+    width: 30%;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .animation-images-boarding > img {
+    width: 50%;
+}
+
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .container-list-option-local {
+    display: flex;
+    flex-direction: column;
+    height: 40vw;
+    align-items: center;
+    max-height: 40vw;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 0;
+    transition: 300ms all;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .container-list-option-local.active {
+    max-width: 100%;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .container-list-option-local > label > span{
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .container-list-option-local > label {
+    padding: 5px;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #01588c;
+    margin-bottom: 5px;
+    border-radius: 15px;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .container-list-option-local > label.another-boarding-place{
+    display: flex;
+    justify-content: center;
+    font-weight: 500;
+    font-family: sans-serif;
+    font-size: 10pt;
+    padding: 10px 5px;
+}
+
+.container-detail-travel > div.container-boarding-unloading > div > div:last-child > .container-list-option-local > label > input {
+    margin-right: 5px;
+}
+
+.container-payment-form-route {
+    display: none;
+    width: 100%;
+}
+
+.container-payment-form-route.active {
+    display: flex;
+}
+
+.container-payment-form-route > ul {
+    list-style: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container-payment-form-route > ul > li {
+    width: 90%;
+    background-color: #01588c;
+    border-radius: 15px;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.container-payment-form-route > ul > li.active {
+    background-color: #fff;
+    color: #01588c;
+}
+
+.container-add-ride,
+.container-list-ride {
+    width: calc(100% - 10px);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    transition: all 300ms;
+    position: absolute;
+    bottom: 0;
+    height: calc(100% - 20px);
+    margin: 10px 5px;
+    background-color: #fff;
+    transform: translateY(150%);
+    border-radius: 15px;
+    box-shadow: 0 0 10px #ccc;
+}
+
+.container-add-ride.active,
+.container-list-ride.active {
+    transform: translateY(0%);
+}
+
+.container-add-ride.minimize,
+.container-list-ride.minimize {
+    transform: translateY(150%);
+}
+
+.container-add-ride > nav,
+.container-list-ride > nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    position: relative;
+    font-family: sans-serif;
+    font-size: 15pt;
+    border-bottom: 1px solid #ececec;
+}
+
+.container-add-ride > nav > i,
+.container-list-ride > nav > i {
+    position: absolute;
+    left: 15px;
+    font-size: 30pt;
+}
+
+.container-add-ride > .content-ride,
+.container-list-ride > .content-list-rides {
+    flex: 1;
+    border-bottom: 1px solid #ececec;
+    overflow-y: auto;
+}
+
+.container-add-ride > .content-ride > div {
+    display: none;
+}
+
+.container-add-ride > .content-ride > div.active {
+    display: flex;
+}
+
+.container-list-ride > .content-list-rides > ul {
+    width: 100%;
+    height: 100%;
+}
+
+.container-add-ride > button[type='button'],
+.container-list-ride > button[type='button'] {
+    width: 95%;
+    display: flex;
+    margin: 10px auto;
+    justify-content: space-between;
+    font-weight: 500;
+    align-items: center;
+    padding: 15px;
+    font-size: 10pt;
+}
+
+.container-list-ride > .content-list-rides > ul > li {
+    width: 90%;
+    margin: 5px auto 10px;
+    display: flex;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #dadada;
+    align-items: center;
+}
+
+.container-list-ride > .content-list-rides > ul > li.active {
+    background-color: #a0d29a;
+}
+
+.container-list-ride > .content-list-rides > ul > li > .picture-image-ride {
+    height: 50px;
+    width: 50px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("../../img/svg/account.svg");
+    border-radius: 100%;
+}
+
+.container-list-ride > .content-list-rides > ul > li > div:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    justify-content: center;
+    flex: 1;
+}
+
+.container-list-ride > .content-list-rides > ul > li:not(.active) > div:nth-child(2) > span:first-child:before {
+    content: "Informe os dados do passageiro";
+    font-size: 12pt;
+    color: #656565;
+}
+
+.container-list-ride > .content-list-rides > ul > li.active > i {
+    display: none;
+}
+
+.container-add-ride > .content-ride > .choice-type-customer {
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.container-add-ride > .content-ride > .choice-type-customer > ul {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+}
+
+.container-add-ride > .content-ride > .choice-type-customer > ul > li {
+    width: 35vw;
+    height: 35vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px;
+    background-color: #ececec;
+    border-radius: 100%;
+    box-shadow: 0 0 10px #c3c3c3;
+}
+
+.container-add-ride > .content-ride > .choice-type-customer > ul > li.active {
+    background-color: #a0d29a;
+}
+
+.container-add-ride > .content-ride > .choice-type-customer > ul > li > img {
+    width: 45%;
+}
+
+.container-add-ride > .content-ride > .choice-type-customer > ul > li > span {
+    text-align: center;
+    width: 90%;
+}
+
+.container-add-ride > .content-ride > .another-name-customer {
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+}
+
+.container-add-ride > .content-ride > .another-name-customer > div {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.container-add-ride > .content-ride > .another-name-customer > div > input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin: 5px 0 0;
+    outline: none;
+}
+
+.container-list-ride > .content-list-rides > ul > li > div:nth-child(2) > span {
+    font-size: 10pt;
+    color: #3a3939;
+    font-family: sans-serif;
+}
+
+.container-list-ride > .content-list-rides > ul > li.active > div:nth-child(2) > span:nth-child(1):before {
+    content: "Passageiro: ";
+    font-weight: 500;
+}
+
+.container-list-ride > .content-list-rides > ul > li.active > div:nth-child(2) > span:nth-child(2):before {
+    content: "Embarque: ";
+    font-weight: 500;
+}
+
+.container-list-ride > .content-list-rides > ul > li.active > div:nth-child(2) > span:nth-child(3):before {
+    content: "Desembarque: ";
+    font-weight: 500;
+}
+
+.container-local-customer-stop {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    z-index: 105;
+    transition: all 300ms;
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    background-color: #fff;
+    transform: translateY(150%);
+    box-shadow: 0 0 10px #ccc;
+}
+
+.container-local-customer-stop.active{
+    transform: translateY(0%);
+}
+
+.container-local-customer-stop > div {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0 0 10px #ccc;
+}
+
+.container-local-customer-stop > div > input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    outline: none;
+    background-color: #f3f3f3;
+}
+
+.container-local-customer-stop > div > i {
+    font-size: 25pt;
+    margin-right: 13px;
+}
+
+.container-local-customer-stop > ul{
+    flex:1;
+    overflow-y:auto;
+}
+
+.container-local-customer-stop > ul > li{
+    display:flex;
+    align-items:center;
+    padding:20px 10px;
+    border-bottom:1px solid#ccc;
+    font-family: sans-serif;
+    overflow-y: hidden;
+}
+
+.container-local-customer-stop > ul > li > img{
+    width:25px;
+    margin:0 10px;
+}
+
+.container-local-customer-stop > ul > li > span{
+    width:100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.modal-location-prior-to-your,
+.modal-another-boarding-place{
+    position: absolute;
+    background-color: #fff;
+    bottom: 0;
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    display:flex;
+    flex-direction:column;
+    transition:500ms;
+    transform: translateY(100%);
+}
+
+.modal-location-prior-to-your.active,
+.modal-another-boarding-place.active{
+    transform: translateY(0%);
+}
+
+.modal-another-boarding-place > div{
+    display:flex;
+    flex-direction:column;
+    padding:10px;
+    margin-top:20px;
+    border-bottom:1px solid #ccc;
+}
+
+.modal-another-boarding-place > div > label{
+    font-weight:400;
+    font-family:sans-serif;
+}
+
+.modal-another-boarding-place > div > input{
+    margin:10px 0;
+    padding:10px;
+    border-radius:5px;
+    border:1px solid #444;
+    outline: none;
+}
+
+.modal-another-boarding-place > ul{
+    flex:1;
+    background-color:#e8e8e8;
+    overflow-y:auto;
+}
+
+
+.modal-another-boarding-place > ul:empty{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-another-boarding-place > ul:empty:before{
+    content:"";
+    display:block;
+    width:50px;
+    height:50px;
+    border-radius:100%;
+    border:4px solid transparent;
+    border-top-color:#000;
+    animation:1s spin linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(0deg);
+    }
+    from{
+        transform:rotate(-360deg);
+    }
+}
+
+.modal-another-boarding-place > ul > li{
+    padding:10px;
+    background-color:#fff;
+    border-bottom:1px solid #ddd;
+}
+
+
+
+.modal-location-prior-to-your{
+    padding: 30px 10px 0;
+    height: calc(100% - 30px);
+    width: calc(100% - 20px);
+    z-index: 101;
+}
+
+
+.modal-location-prior-to-your > i{
+    margin:10px 0 ;
+}
+
+.modal-location-prior-to-your > p{
+    margin:10px 0 20px;
+}
+
+
+.modal-location-prior-to-your > input{
+    padding:10px;
+    border-radius:5px;
+    border:1px solid #ccc;
+    outline:none;
+}
+
+.modal-location-prior-to-your > ul{
+    list-style:none;
+    flex:1;
+    overflow-x: auto;
+}
+
+
+.modal-location-prior-to-your > ul > li{
+    background-color:#f5f5f5;
+    padding:15px;
+    margin:0 0 15px;
+    border-radius:10px;
+    text-transform:uppercase;
+    text-align:center;
+}
+
+.modal-location-prior-to-your > ul > li.active{
+    background-color:#cdf3cd;
+}
+
+.modal-location-prior-to-your > .btn-another-boarding-place-select{
+    display: block;
+    width: 100%;
+}

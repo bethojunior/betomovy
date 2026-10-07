@@ -1,0 +1,236 @@
+@media (max-width: 991px) {
+    .container-list-customer {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: -100;
+        opacity: 0;
+        transition: 0.5s;
+    }
+
+    .container-list-customer.active {
+        z-index: 100;
+        opacity: 1;
+        transition: 0.5s;
+    }
+
+    .container-list-customer > div {
+        background-color: #dcdada;
+        width: 90%;
+        height: 90%;
+        border-radius: 0.5em;
+        position: relative;
+    }
+
+    .container-list-customer > div > ul {
+        position: relative;
+        height: 80%;
+        overflow-y: auto;
+        background-color: #fff;
+        right: 0;
+        left: 0;
+        width: 95%;
+        margin: auto;
+        border-radius: 0.5em;
+    }
+
+    .container-list-customer > div > ul:empty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container-list-customer > div > ul:empty:after {
+        content: "Pesquisando...";
+        color: #949494;
+    }
+
+    .container-list-customer > div > ul.empty:empty:after {
+        content: "Nenhum cliente foi encontrado!";
+        color: #949494;
+    }
+
+    .container-list-customer > div > ul > li {
+        padding: 0.5em;
+        width: calc(95% - 1em);
+        border-bottom: 1px solid #ccc;
+        display: block;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .container-list-customer > div > ul > li > div {
+        height: 2.5em;
+        width: 2.5em;
+        border: 1px solid #ccc;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin-right: 1em;
+        border-radius: 100%;
+    }
+
+    .container-list-customer > div > ul > li:last-child {
+        border: unset;
+    }
+
+    .container-list-customer > div > div {
+        width: 95%;
+        margin: 0.5em auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .container-list-customer > div > div > div{
+        width:100%;
+    }
+
+    .container-list-customer > div > div > div > input {
+        padding: 3vw;
+        border: 1px solid #ccc;
+        outline: unset;
+        width: 100%;
+        border-radius:2vw;
+    }
+
+
+    .container-list-customer > div > ul > li > p {
+        display: flex;
+        flex-flow: row wrap;
+        width: 80%;
+    }
+
+    .container-list-customer > div > ul > li > p > span {
+        width: 100%;
+    }
+
+    .container-list-customer > div > i {
+        float: right;
+        font-size: 2.5em;
+        cursor: pointer;
+    }
+}
+
+@media (min-width: 992px) {
+    .container-list-customer {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: -100;
+        opacity: 0;
+        transition: 0.5s;
+    }
+
+    .container-list-customer.active {
+        z-index: 100;
+        opacity: 1;
+        transition: 0.5s;
+    }
+
+    .container-list-customer > div {
+        background-color: #dcdada;
+        width: 40%;
+        height: 80%;
+        border-radius: 0.5em;
+        position: relative;
+    }
+
+    .container-list-customer > div > ul {
+        position: relative;
+        height: 85%;
+        overflow-y: auto;
+        background-color: #fff;
+        right: 0;
+        left: 0;
+        width: 95%;
+        margin: auto;
+        border-radius: 0.5em;
+    }
+
+    .container-list-customer > div > ul:empty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container-list-customer > div > ul:empty:after {
+        content: "Pesquisando...";
+        color: #949494;
+    }
+
+    .container-list-customer > div > ul.empty:empty:after {
+        content: "Nenhum cliente foi encontrado!";
+        color: #949494;
+    }
+
+    .container-list-customer > div > ul > li {
+        padding: 0.5em;
+        width: calc(95% - 1em);
+        border-bottom: 1px solid #ccc;
+        display: block;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .container-list-customer > div > ul > li > div {
+        height: 2.5em;
+        width: 2.5em;
+        border: 1px solid #ccc;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin-right: 1em;
+        border-radius: 100%;
+    }
+
+    .container-list-customer > div > ul > li:last-child {
+        border: unset;
+    }
+
+    .container-list-customer > div > div {
+        width: 95%;
+        margin: 0.5em auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .container-list-customer > div > div > div > input {
+        padding: 0.5em;
+        border: 1px solid #ccc;
+        outline: unset;
+        width: 100%
+    }
+
+
+    .container-list-customer > div > ul > li > p {
+        display: flex;
+        flex-flow: row wrap;
+        width: 80%;
+    }
+
+    .container-list-customer > div > ul > li > p > span {
+        width: 100%;
+    }
+
+    .container-list-customer > div > i {
+        float: right;
+        font-size: 2.5em;
+        cursor: pointer;
+    }
+}

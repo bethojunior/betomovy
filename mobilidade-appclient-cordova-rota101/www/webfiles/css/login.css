@@ -1,0 +1,128 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Dosis', sans-serif;
+}
+
+.container-login {
+    font-family: Montserrat;
+    position:absolute;
+    width:100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: var(--text-color-main);
+    overflow-y: auto;
+}
+.container-login > a{
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: var(--main-color);
+    margin-top: 15px;
+}
+
+.container-login > div > .logo-company{
+    width: 45%;
+    display: block;
+    margin: 0 auto 2vw;
+}
+.container-login > div {
+    width: 90%;
+    /* height: 70%; */
+}
+
+.container-login > div > form > div{
+    position: relative;
+}
+.container-login > div > form > div > i{
+    position:absolute;
+    color: var(--main-color);
+    top:4vw;
+    left:2vw;
+}
+.container-login > div > form > div > input{
+    border: none;
+    width: calc(100% - 14vw);
+    outline: unset;
+    padding: 2vw 2vw 2vw 8vw;
+    font-size:5vw;
+    margin:2vw;
+    border-bottom: 2px solid var(--main-color);
+    color: var(--main-color);
+    font-weight: 600;
+    background-color:transparent;
+}
+.container-login > div > form > div > input::placeholder{
+    color:var(--main-color);
+    font-weight: 600;
+}
+.container-login > div > form > a{
+    text-decoration:none;
+    color: #6d6d6d;
+    font-weight: 600;
+    font-size: 3.5vw;
+    width: 100%;
+    position: relative;
+    display: block;
+    outline: unset;
+    margin: 1vw 0 4vw 4vw;
+}
+.container-login > div > form > button{
+    display:block;
+    margin: 5vw auto 0;
+    border:none;
+    padding:2vw 5vw;
+    background-color:var(--main-color);
+    color: var(--text-color-main);
+    border-radius:1vw;
+    width:100%;
+    font-size:5vw;
+    font-weight:600;
+    z-index: 10;
+}
+.container-login > div > .sign-up{
+    width:100%;
+    display:block;
+    margin:6vw 0 0;
+}
+.container-login > div > .sign-up > a {
+    width:100%;
+    display:block;
+    margin:auto;
+    text-decoration:none;
+    color: var(--main-color);
+    text-align:center;
+    font-size:4.5vw;
+    text-transform:uppercase;
+}
+
+.container-login > div > .sign-up > span{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin: 2vw 0;
+    color: #6e6868;
+}
+
+.container-login > div > .sign-up > span:before,
+.container-login > div > .sign-up > span:after{
+    content:"";
+    width:45%;
+    background-color:#6e6868;
+    height: 1px;
+}
+
+.container-login > div > .sign-up > .social-list{
+    display:flex;
+    width:100%;
+    justify-content: center;
+}
+.container-login > div > .sign-up > .social-list > img{
+    width:10%;
+    height:10%;
+    margin: 0 3vw;
+}

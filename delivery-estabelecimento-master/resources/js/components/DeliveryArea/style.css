@@ -1,0 +1,28 @@
+.container-address-config {
+    position: absolute;
+    width: calc(100% - 260px);
+    height: calc(100% - 60px);
+    top: 57px;
+    left: 250px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    transition: all 300ms;
+    padding:0 10px;
+}
+
+.sidebar-mini.sidebar-collapse .container-address-config {
+    width: calc(100% - 100px);
+    left: 75px;
+}
+
+.container-address-config > h4{
+    margin:10px 0;
+}
+
+.map-container {
+    display: block;
+    height: 400px;
+    width: 100%;
+    margin:15px 0;
+}

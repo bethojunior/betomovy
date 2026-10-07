@@ -1,0 +1,59 @@
+.my-btn{
+    background-color: var(--main-color)!important;
+}
+@media (max-width: 991px) {
+    #preload-general{
+        display: none;
+    }
+    #preload-general.show{
+        display: block;
+        transition: 1s;
+        position: fixed;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        display: -ms-flexbox;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 99999;
+        background-color: rgba(0,0,0,.3);
+    }
+    #preload-general.show .content{
+        position: fixed;
+        top: 0;
+        margin-top: 50vh;
+        z-index: 99;
+    }
+}
+@media (min-width: 992px) {
+    #preload-general {
+        display: none;
+    }
+    #preload-general.show {
+        display: block;
+        transition: 1s;
+        position: fixed;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        display: -ms-flexbox;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 99999;
+        background-color: rgba(0, 0, 0, .3);
+    }
+    #preload-general.show .content {
+        position: fixed;
+        top: 0;
+        margin-top: 25vw;
+        z-index: 99;
+    }
+}

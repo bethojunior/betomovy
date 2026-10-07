@@ -1,0 +1,24 @@
+<div class="container-home-routes">
+    <div class="container-app">
+        <div class="active container-option-tab" for="#tab-home">
+            <div class="btn-accompany-trip">
+                <p>Viagem em progresso</p>
+                <label>ACOMPANHAR MOTORISTA</label>
+                <i class="material-icons">keyboard_arrow_right</i>
+            </div>
+            <includeTemplate src="carousel/carouselRoutes"></includeTemplate>
+            <includeTemplate src="home/tabHome"></includeTemplate>
+        </div>
+        <div class="container-option-tab" for="#tab-schedule">
+            <ul class="list-route-user" id="listRouteUser"></ul>
+        </div>
+        <div class="container-option-tab" for="#tab-historic">
+            <ul class="list-route-user" id="listRouteHistoric"></ul>
+        </div>
+    </div>
+    <includeTemplate src="tabs/tabRoutes"></includeTemplate>
+</div>
+
+<div class="another-views">
+    <includetemplate src="travel/detail"></includetemplate>
+</div>

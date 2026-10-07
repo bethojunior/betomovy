@@ -1,0 +1,14 @@
+.body-message {
+    color: #0D0A0A;
+}
+
+@media (max-width: 500px) {
+    .message-container {
+        margin-top: 10px;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: flex-end;
+    }
+}

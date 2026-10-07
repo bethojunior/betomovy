@@ -1,0 +1,205 @@
+@media (max-width: 991px) {
+    .modal-filter-financial {
+        position: absolute;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.5);
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        justify-content: center;
+        align-items: center;
+        display: none;
+    }
+
+    .modal-filter-financial.active{
+        display: flex;
+    }
+
+    .modal-filter-financial > div {
+        background-color: #fff;
+        padding: 3.5vw 3vw;
+        border-radius: 2.5vw;
+        width: 88%;
+    }
+
+    .modal-filter-financial > div > div {
+        width: 100%;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        margin-bottom: 1vw;
+        position: relative;
+    }
+
+    .modal-filter-financial > div > div > label {
+        width: 25%;
+    }
+
+    .modal-filter-financial > div > div > input,
+    .modal-filter-financial > div > div > div > input,
+    .modal-filter-financial > div > div > select {
+        width: 80%;
+        border-radius: 0.2vw;
+        border: 1px solid #858585;
+        padding: 0.5vw 1vw;
+        display: block;
+        position: relative;
+    }
+
+    .modal-filter-financial > div > div > div > input[type=date] {
+        width: 47%;
+    }
+    .modal-filter-financial > div > a {
+        float: right;
+        color: #444;
+        cursor: pointer;
+        margin-right: 2vw;
+    }
+
+    .modal-filter-financial > div > button {
+        border: none;
+        padding: 0.5vw 1vw;
+        background-color: #d76f0a;
+        color: #fff;
+        border-radius: 0.25vw;
+        float: right;
+        outline: none;
+        box-shadow: 0 0 10px #4f4f4f;
+        cursor: pointer;
+    }
+
+    .modal-filter-financial > div > span > i{
+        float:right;
+        margin-bottom:1vw;
+        font-size: 9vw;
+        cursor: pointer;
+    }
+
+    .modal-filter-financial > div > span{
+        display: block;
+        text-align: center;
+    }
+
+    .modal-filter-financial > div > span > span{
+        font-size: 6.5vw;
+    }
+
+
+    .modal-filter-financial > div > div > div{
+        display: flex;
+        justify-content: space-between;
+        width: 80%;
+    }
+
+    .autocomplete-custom.customer-position{
+        top: 9vw;
+        width: 97%;
+        right: -1px;
+        max-height: 60vw;
+        overflow-x: hidden;
+    }
+}
+@media (min-width: 992px) {
+
+
+    .modal-filter-financial {
+        position: absolute;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.5);
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        justify-content: center;
+        align-items: center;
+        display: none;
+    }
+
+    .modal-filter-financial.active {
+        display: flex;
+    }
+
+    .modal-filter-financial > div {
+        background-color: #fff;
+        padding: 0.5vw 1vw;
+        border-radius: 0.5vw;
+    }
+
+    .modal-filter-financial > div > div {
+        width: 100%;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        margin-bottom: 1vw;
+        position: relative;
+    }
+
+    .modal-filter-financial > div > div > label {
+        width: 25%;
+    }
+
+    .modal-filter-financial > div > div > input,
+    .modal-filter-financial > div > div > div > input,
+    .modal-filter-financial > div > div > select {
+        width: 80%;
+        border-radius: 0.2vw;
+        border: 1px solid #858585;
+        padding: 0.5vw 1vw;
+        display: block;
+        position: relative;
+    }
+
+    .modal-filter-financial > div > div > div > input[type=date] {
+        width: 47%;
+    }
+
+    .modal-filter-financial > div > a {
+        float: right;
+        color: #444;
+        cursor: pointer;
+        margin-right: 2vw;
+    }
+
+    .modal-filter-financial > div > button {
+        border: none;
+        padding: 0.5vw 1vw;
+        background-color: #d76f0a;
+        color: #fff;
+        border-radius: 0.25vw;
+        float: right;
+        outline: none;
+        box-shadow: 0 0 10px #4f4f4f;
+        cursor: pointer;
+    }
+
+    .modal-filter-financial > div > span > i {
+        float: right;
+        margin-bottom: 1vw;
+        font-size: 2vw;
+        cursor: pointer;
+    }
+
+    .modal-filter-financial > div > span {
+        display: block;
+        text-align: center;
+    }
+
+    .modal-filter-financial > div > span > span {
+        font-size: 1.5vw;
+    }
+
+
+    .modal-filter-financial > div > div > div {
+        display: flex;
+        justify-content: space-between;
+        width: 80%;
+    }
+
+    .autocomplete-custom.customer-position {
+        top: 3vw;
+        width: 75%;
+        right: 1px;
+        max-height: 15vw;
+    }
+}

@@ -1,0 +1,2 @@
+# Laravel Schedule - Executar a cada minuto
+* * * * * cd /var/www/html && /usr/bin/php artisan schedule:run > /tmp/cronjob-schedule-run.log 2>&1

@@ -1,0 +1,34 @@
+/* Popup.css — adaptado para Mapbox GL JS.
+   O Popup agora é um mapboxgl.Marker com elemento DOM customizado.
+   O posicionamento é feito pelo Mapbox (anchor: 'bottom'). */
+
+/* Container externo que o Mapbox recebe como elemento do marker */
+.popup-tip-anchor {
+    display: block;
+    position: relative;
+    cursor: auto;
+}
+
+/* Wrapper interno do conteúdo */
+.popup-bubble-anchor {
+    display: block;
+    position: relative;
+    cursor: auto;
+}
+
+/* Bubble de informação (infoOrigin, infoDestination, etc.)
+   Fica acima do ponto — o Mapbox posiciona a base do elemento no lat/lng */
+.popup-bubble-content {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 5px;
+    border-radius: 5px;
+    font-family: sans-serif;
+    overflow-y: auto;
+    max-height: 60px;
+    box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}

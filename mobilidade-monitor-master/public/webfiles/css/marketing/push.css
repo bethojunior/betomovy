@@ -1,0 +1,262 @@
+@media (max-width: 991px) {
+    .container-massageUser .enviar-massage form.mensagem .form-group{
+        width: 80%;
+    }
+    .container-massageUser {
+        padding: 1vw;
+    }
+
+    .container-massageUser hr{
+        width: 0.2vw;
+        background-color: black;
+    }
+
+    .container-massageUser .info-massage{
+        background-color: whitesmoke;
+        display: flex;
+    }
+    .container-massageUser .info-massage .cidade{
+        padding: 4vw;
+        width: 600px;
+        margin-bottom: 4vw;
+    }
+
+    .container-massageUser .info-massage .cidade span{
+        font-size: 2.5vw;
+    }
+    .container-massageUser .info-massage .cidade .campo-city-select{
+        background-color: white;
+        min-height: 100px;
+        max-height: 500px;
+        width: 35vw;
+        height: 18vw;
+        border-radius: 0.8vw;
+    }
+    .container-massageUser .info-massage .cidade .op-city{
+        font-size: 2.4vw;
+        width: 24vw;
+        height: 4vw;
+    }
+    .container-massageUser .info-massage .cidade  input{
+        margin-left: 2vw;
+        padding: 1vw;
+        background-color: #f18502;
+        color: #fff;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 4px;
+        outline: none;
+        border: none;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-size: 1.8vw;
+        font-weight: 600;
+    }
+
+    .container-massageUser .info-massage .tipo{
+        padding: 4vw;
+        width: 600px;
+        margin: 0 auto;
+    }
+    .container-massageUser .info-massage .tipo  fieldset {
+        border: 2px black solid;
+        margin-bottom: 3vw;
+        padding-left: 3vw;
+        padding-right: 3vw;
+        width:55%;
+    }
+    .container-massageUser .info-massage .tipo fieldset .tipo-user {
+        color: orange;
+        text-align: center;
+        margin-bottom: 2vw;
+        font-size: 2.5vw;
+    }
+
+    .container-massageUser .info-massage .tipo fieldset .op-tipo-cli {
+        text-align: left;
+        font-size: 2.5vw;
+    }
+    .container-massageUser .info-massage .tipo fieldset .op-tipo-mot {
+        text-align: left;
+        font-size: 2.5vw;
+    }
+    .container-massageUser .info-massage .tipo fieldset .op-tipo-par {
+        text-align: left;
+        font-size: 2.5vw;
+        margin-bottom: 1.5vw;
+    }
+    .container-massageUser .enviar-massage{
+        background-color: whitesmoke;
+    }
+
+    .container-massageUser .enviar-massage .mensagem{
+        padding: 5vw;
+        margin-top: 2.5vw;
+        margin-left: 9%;
+        margin-bottom: 2vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .titulo{
+        margin-bottom: 2vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .titulo .mensagem-titulo{
+        font-size: 3vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .titulo .titulo-msm{
+        width: 55vw;
+        height: 4vw;
+        font-size: 2.3vw;
+        border-radius: 0.5vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .conteudo{
+        font-size: 2.3vw;
+        width: 55vw;
+        height: 10vw;
+        margin-bottom: 1vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .btm-enviar{
+        margin-left: 57vw;
+        padding: 1vw;
+        background-color: #f18502;
+        color: #fff;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 2.8px;
+        outline: none;
+        border: none;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1.8vw;
+    }
+}
+
+
+@media (min-width: 992px) {
+    .container-massageUser .enviar-massage form.mensagem .form-group{
+        width: 84%;
+    }
+    .container-massageUser {
+        display: flex;
+        padding: 1vw;
+    }
+
+    .container-massageUser hr{
+        width: 0.2vw;
+        background-color: black;
+    }
+
+    .container-massageUser .info-massage{
+        display: flex;
+        background-color: whitesmoke;
+        width: 50%;
+        height: 39.5vw;
+    }
+    .container-massageUser .info-massage .cidade{
+        padding: 1.8vw;
+        width: 600px;
+        margin-bottom: 4vw;
+    }
+    .container-massageUser .info-massage .cidade .campo-city-select{
+        background-color: white;
+        min-height: 100px;
+        max-height: 500px;
+        width: 20vw;
+        height: 8vw;
+        border-radius: 0.8vw;
+    }
+    .container-massageUser .info-massage .cidade .op-city{
+        font-size: 1.2vw;
+        width: 12vw;
+        height: 2vw;
+    }
+    .container-massageUser .info-massage .cidade  input{
+        margin-left: 0.2vw;
+        padding: 0.5vw;
+        background-color: #f18502;
+        color: #fff;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 4px;
+        outline: none;
+        border: none;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-size: 1.1vw;
+        font-weight: 600;
+    }
+
+    .container-massageUser .info-massage .tipo{
+        padding: 1.8vw;
+        width: 600px;
+        margin: 0 auto;
+    }
+
+    .container-massageUser .info-massage .tipo  fieldset {
+        border: 3px black solid;
+        padding-left: 1vw;
+        padding-right: 1vw;
+        margin-left: -1vw;
+        width:85%;
+    }
+
+    .container-massageUser .info-massage .tipo fieldset .tipo-user {
+        color: orange;
+        text-align: center;
+        margin-bottom: 2vw;
+        font-size: 1.3vw;
+    }
+
+    .container-massageUser .info-massage .tipo fieldset .op-tipo-cli {
+        text-align: left;
+    }
+    .container-massageUser .info-massage .tipo fieldset .op-tipo-mot {
+        text-align: left;
+    }
+    .container-massageUser .info-massage .tipo fieldset .op-tipo-par {
+        text-align: left;
+        margin-bottom: 2vw;
+    }
+    .container-massageUser .enviar-massage{
+        background-color: whitesmoke;
+        width: 50%;
+        height: 39.5vw;
+    }
+
+    .container-massageUser .enviar-massage .mensagem{
+        margin-top: 1.8vw;
+        margin-left: 3vw;
+        margin-bottom: 1.8vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .titulo{
+        margin-bottom: 2vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .titulo .mensagem-titulo{
+        font-size: 1.8vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .titulo .titulo-msm{
+        width: 30vw;
+        height: 2.5vw;
+        font-size: 1.6vw;
+        border-radius: 0.5vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .conteudo{
+        font-size: 1.4vw;
+        width: 30vw;
+        height: 10vw;
+        margin-bottom: 0.8vw;
+    }
+    .container-massageUser .enviar-massage .mensagem .btm-enviar{
+        margin-left: 24.5vw;
+        padding: 0.7vw;
+        background-color: #f18502;
+        color: #fff;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        outline: none;
+        border: none;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-weight: 600;
+    }
+}

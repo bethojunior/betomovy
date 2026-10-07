@@ -1,0 +1,86 @@
+.container-advertising-banner{
+    position: absolute;
+    top: 20%;
+    height: 111px;
+    width: 80%;
+    display: block;
+    margin: 0 10%;
+    background-color: #ccc;
+    box-shadow: 0 0 6px #6a6464;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 5px;
+    transform: translateY(-500%);
+    transition: 300ms all;
+}
+
+.container-advertising-banner.active{
+    transform: translateY(0%);
+}
+
+.container-advertising-modal{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index:500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform:translateY(150%);
+    transition:300ms all;
+}
+
+.container-advertising-modal.active{
+    transform:translateY(0%);
+}
+
+.container-advertising-modal > div{
+    width:90%;
+    background-color:#fff;
+    height:80%;
+    display:flex;
+    flex-direction:column;
+    border-radius:5px
+
+}
+
+.container-advertising-modal > div > .advertising-image{
+    width:100%;
+    height:200px;
+    background-color:#ccc;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.container-advertising-modal > div > .advertising-image > span{
+    font-size:25pt;
+    float:right;
+}
+
+.container-advertising-modal > div > p{
+    flex:1;
+    overflow-y:auto;
+    padding:10px;
+}
+
+.container-advertising-modal > div > ul{
+    display:flex;
+    justify-content:space-evenly;
+    margin:5px 2.5px;
+}
+
+.container-advertising-modal > div > ul > li{
+    padding:10px;
+    border-radius:5px;
+    flex:1;
+    text-align:center;
+    margin:0 5px;
+    color:#fff;
+    font-weight:bold;
+    background-color: #2d67bb;
+}

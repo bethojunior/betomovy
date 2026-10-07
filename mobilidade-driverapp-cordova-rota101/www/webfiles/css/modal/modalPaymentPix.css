@@ -1,0 +1,109 @@
+.container-modal-pix-payment {
+  display: none;
+}
+.container-modal-pix-payment.active {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,.5);
+  z-index: 9999;
+}
+
+.container-modal-pix-payment > div {
+  width: 100%;
+  max-width: 500px;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  position: relative;
+}
+
+.container-modal-pix-payment > div > i {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#type-payment {
+  text-align: center;
+}
+
+.container-modal-pix-payment > div > h4 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.container-pix-payment {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container-pix-payment-info-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.container-pix-payment-info-body-qr-code > img{
+  width: 100%;
+}
+.container-pix-payment-info-body-pix {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.loading-pix {
+  display: none; 
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+.loading-pix.active {
+  display: flex; 
+}
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #09f;
+  animation: spin 1s ease infinite;
+}
+
+#input-pix-key {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.container-pix-payment-info-body-pix-key {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.count-pix-code {
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+echo "► Starting Main Entrypoint..."
+
+# --------------------------------------------------------------------------------------------------------------------
+
+# Run custom ad-hoc pre-run script
+echo "► Running custom pre-run (base) script..."
+pre-run-base
+
+# Execute cronjobs script
+/usr/local/bin/start-cronjob.sh
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# Run Dockerfile's CMD (default: $> php-fpm )
+echo "► Starting... cmd: ${@}"
+exec tini -- "${@}"

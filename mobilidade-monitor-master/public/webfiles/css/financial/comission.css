@@ -1,0 +1,99 @@
+@media (max-width: 991px) {
+    .general-comission{
+        display: none;
+    }
+    .mobile{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+@media (min-width: 992px) {
+
+    .mobile{
+        display: none;
+    }
+    .general-comission{
+        margin: 2vw;
+    }
+    .general-comission .col-lg-9{
+        background-color: white;
+        border-radius: 0 1vw 1vw 0;
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane{
+        margin-top: 1vw;
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane .row.col-lg-12 .col-lg-1.type-value{
+        margin-top: 2.5vw;
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane #mount-types .row.col-lg-12 .col-lg-1.type-value{
+        margin-top: 2.5vw;
+        margin-right: 1.6vw;
+    }
+    .general-comission .col-lg-9 .tab-content .add-new-type-comission{
+        border: none;
+        background-color: #0a90d7;
+        color: white;
+        border-radius: 10vw;
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin: 1vw;
+        transition: 0.3s;
+    }
+    .general-comission .col-lg-9 .tab-content .add-new-type-comission:hover{
+        padding: 0.5vw;
+        transition: 0.5s;
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane .row.col-lg-12 .col-lg-2 .btn-primary{
+        padding: 0.2vw;
+        border-radius: 0.2vw;
+        margin-top: 2.5vw;
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane.fade.show#list-second{
+        margin-top: 3vw;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        height: 70vh;
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane.fade.show#list-second .item-list{
+        background-color: whitesmoke;
+        padding: 0.6vw;
+        margin: 0.3vw;
+        cursor: pointer;
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane.fade.show#list-second .item-list .col-lg-2 button{
+        margin: 0.3vw;
+        padding: 0.3vw;
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane.fade.show#list-second .item-list .col-lg-2 i{
+
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane.fade.show#list-second .item-list .col-lg-2 i.edit{
+
+    }
+    .general-comission .col-lg-9 .tab-content .tab-pane.fade.show#list-second .item-list .col-lg-2 i.delete{
+
+    }
+
+}
+
+@media (min-width: 575px) {
+    .type-value {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
+
+.custom-control-label {
+    font-size: 10pt;
+}
+
+.info-btn {
+    font-size: 20px;
+}
+
+.select-trip-type {
+    width: 230%;
+}

@@ -1,0 +1,36 @@
+name: Build Develop Push
+on: push
+
+env:
+  APPLICATION_NAME: 'mobilidade-site'
+  ACCOUNT_ECR: '471044102763'
+  REGION_ECR: us-east-1
+  MANIFEST_REPO: '704apps/kubernetes-manifest'
+  BRANCH: ${{ github.ref_name }}
+
+jobs:
+  build:
+    runs-on: self-hosted
+    outputs:
+      TAG: ${{ steps.vars.outputs.tag }}    
+    environment: 
+      name: develop
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ env.BRANCH }}
+
+      - name: Set output
+        id: vars
+        run: echo "::set-output name=tag::$(git rev-parse --short $GITHUB_SHA)"    
+              
+      - name: Docker Build and Push
+        run: |               
+          output=$(aws sts assume-role --role-arn "arn:aws:iam::${{ env.ACCOUNT_ECR }}:role/CIDeployAccess" --role-session-name CIDeployAccessSession)
+          export AWS_ACCESS_KEY_ID=$(echo $output | jq -r '.Credentials''.AccessKeyId')
+          export AWS_SECRET_ACCESS_KEY=$(echo $output | jq -r '.Credentials''.SecretAccessKey')
+          export AWS_SESSION_TOKEN=$(echo $output | jq -r '.Credentials''.SessionToken')    
+          docker login -u AWS -p $(aws ecr get-login-password --region ${{ env.REGION_ECR }}) ${{ env.ACCOUNT_ECR }}.dkr.ecr.${{ env.REGION_ECR }}.amazonaws.com          
+          docker build  -t ${{ env.ACCOUNT_ECR }}.dkr.ecr.${{ env.REGION_ECR }}.amazonaws.com/${{ env.APPLICATION_NAME }}:${{ steps.vars.outputs.tag }} .
+          docker push ${{ env.ACCOUNT_ECR }}.dkr.ecr.${{ env.REGION_ECR }}.amazonaws.com/${{ env.APPLICATION_NAME }}:${{ steps.vars.outputs.tag }}

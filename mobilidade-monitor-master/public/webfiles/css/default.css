@@ -1,0 +1,301 @@
+@media (max-width: 991px) {
+    #preload-general{
+        display: none;
+    }
+    #preload-general.show{
+        display: block;
+        transition: 1s;
+        position: fixed;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        display: -ms-flexbox;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 99999;
+        background-color: rgba(0,0,0,.3);
+    }
+    #preload-general.show .content{
+        position: fixed;
+        top: 0;
+        margin-top: 50vh;
+        z-index: 99;
+    }
+    .btn{
+        /*color: white!important;*/
+        /*background-color: #E48800!important;*/
+        /*height: 11vw!important;*/
+        /*font-size: 6vw!important;*/
+        /*font-weight: 800!important;*/
+    }
+    .modal{
+        display: none;
+    }
+    .modal.show{
+        display: block;
+        transition: 1s;
+        position: fixed;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        display: -ms-flexbox;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 999;
+        background-color: rgba(0,0,0,.3);
+    }
+    .modal.show .modalContent{
+        position: relative;
+        z-index: 999;
+        background-color: white;
+        width: auto!important;
+        padding: 7vw;
+        -webkit-border-radius: 0.2vw;
+        -moz-border-radius: 0.2vw;
+        border-radius: 0.2vw;
+        margin: 2vw;
+    }
+    .modal.show .modalContent i.material-icons{
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: red;
+        padding: 0.1vw;
+        color: white;
+        cursor: pointer;
+    }
+    .modal.show .modalContent button{
+        border: none;
+        padding: 0.5vw;
+        background-color: #F3A41D;
+        color: white;
+        margin-top: 1vw;
+        width: 100%;
+    }
+}
+@media (min-width: 992px) {
+    #preload-general{
+        display: none;
+    }
+    #preload-general.show {
+        display: block;
+        transition: 1s;
+        position: fixed;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        display: -ms-flexbox;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 99999;
+        background-color: rgba(0,0,0,.3);
+    }
+    #preload-general.show .content{
+        position: fixed;
+        top: 0;
+        margin-top: 25vw;
+        z-index: 99;
+    }
+    .btn{
+        /*color: white!important;*/
+        /*background-color: #E48800!important;*/
+        /*height: auto!important;*/
+        /*font-weight: 800!important;*/
+    }
+    .modal{
+        display: none;
+    }
+    .modal.show{
+        display: block;
+        transition: 1s;
+        position: fixed;
+        -ms-flex-align: center;
+        align-items: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        display: -ms-flexbox;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 999;
+        background-color: rgba(0,0,0,.3);
+    }
+    .modal.show .modalContent{
+        position: relative;
+        z-index: 999;
+        background-color: white;
+        width: auto!important;
+        padding: 2vw;
+        -webkit-border-radius: 0.2vw;
+        -moz-border-radius: 0.2vw;
+        border-radius: 0.2vw;
+        margin: 2vw;
+    }
+    .modal.show .modalContent button{
+        border: none;
+        padding: 0.5vw;
+        background-color: #F3A41D;
+        color: white;
+        margin-top: 1vw;
+        width: 100%;
+    }
+    .modal.show .modalContent i.material-icons{
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: red;
+        padding: 0.1vw;
+        color: white;
+        cursor: pointer;
+    }
+}
+*{
+    margin:0;
+    padding:0;
+    font-family: 'Niramit', sans-serif;
+}
+body{
+    background-color: #ececec;
+}
+
+
+/* Fundo da barra de rolagem */
+::-webkit-scrollbar-track-piece {
+    background-color: #05395b;
+    border-left: 1px solid #CCC;
+}
+
+/* Cor do indicador de rolagem */
+::-webkit-scrollbar-thumb:vertical,
+::-webkit-scrollbar-thumb:horizontal {
+    background-color: #3490cc;
+}
+
+/* Cor do indicador de rolagem - ao passar o mouse */
+::-webkit-scrollbar-thumb:vertical:hover,
+::-webkit-scrollbar-thumb:horizontal:hover {
+    background-color: #717171;
+}
+.center{
+    display: flex!important;
+    justify-content: center!important;
+    align-items: center!important;
+}
+
+.container-default-monitor{
+    position: relative;
+    width: calc(100% - 20%);
+    float: left;
+    padding-top: 1vw;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.container-default-monitor > .container{
+    background-color: #fff;
+    margin:0.8vw auto;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding-top: 9px;
+    padding-left: 9px;
+    padding-bottom: 9px;
+}
+
+.container-default-monitor .container hr{
+    height:1px;
+}
+
+.container-default-monitor > .container .driver{
+    margin-left: 0;
+    margin-right: 0;
+    display: flex;
+}
+
+.container-default-monitor > .container .driver .mot-row{
+    display: flex;
+}
+
+.container-default-monitor > .container .driver .mot-row .mot{
+    display: flex;
+}
+
+.container-default-monitor > .container .client{
+    margin-left: 0;
+    margin-right: 0;
+    display: flex;
+}
+
+.container-default-monitor > .container .client .cli-row{
+    display: flex;
+}
+
+.container-default-monitor > .container .client .cli-row .cli{
+    display: flex;
+}
+
+
+@media (max-width: 991px) {
+    .container-default-monitor{
+        width: 100%;
+        max-height: calc(100% - 17vw);
+    }
+
+    /* Largura da barra de rolagem */
+    ::-webkit-scrollbar {
+        width: 12px;
+        display: none;
+    }
+}
+
+.item-select2{
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.item-select2 p{
+    margin: 0;
+}
+
+.title-list{
+    background-color: #424242;
+    padding: 1vw;
+    margin-top: 1vw;
+    color: #fff;
+    border-radius: 5px 5px 0 0;
+}
+
+.modal-backdrop{
+    display: none !important;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.close-smtp{
+    border: none;
+    background-color: transparent;
+}
+
+.close-smtp:active{
+    outline: none;
+    border: none;
+    background-color: transparent;
+
+
+}

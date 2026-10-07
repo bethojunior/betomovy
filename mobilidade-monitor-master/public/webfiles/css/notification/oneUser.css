@@ -1,0 +1,195 @@
+@media (max-width: 991px) {
+    .modal-notification-user {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-notification-user.active {
+        display: flex;
+    }
+
+    .modal-notification-user > div {
+        background-color: #fff;
+        padding: 0.5rem;
+        width: 80%;
+        border-radius: 0.5rem;
+    }
+
+    .modal-notification-user > div > i {
+        float: right;
+        cursor: pointer;
+    }
+
+    .modal-notification-user > div > .info-user-notification {
+        width: 100%;
+        float: left;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .modal-notification-user > div > .info-user-notification > div {
+        height: 20vw;
+        width: 20vw;
+        background-color: #000;
+        border-radius: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: 1px solid #c8c8c8;
+    }
+
+    .modal-notification-user > div > .info-user-notification > span {
+        margin: 1rem 0;
+    }
+
+    .modal-notification-user > div > form {
+        float: left;
+        width: 100%;
+    }
+
+    .modal-notification-user > div > form > div {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+    }
+
+    .modal-notification-user > div > form > div > input {
+        padding: 0.5rem 1rem;
+        margin-top: 0.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid #797979;
+        font-size: 12pt;
+    }
+
+    .modal-notification-user > div > form > div > textarea {
+        resize: none;
+        height: 15%;
+        font-size: 12pt;
+        padding: 0.5rem;
+    }
+
+    .modal-notification-user > div > form > button {
+        padding: 1rem 1rem;
+        border-radius: 0.25rem;
+        border: none;
+        right: 0;
+        left: 0;
+        display: block;
+        background-color: #0ebd4e;
+        margin: auto;
+        cursor: pointer;
+        color: #fff;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+}
+@media (min-width: 992px) {
+    .modal-notification-user {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-notification-user.active {
+        display: flex;
+    }
+
+    .modal-notification-user > div {
+        background-color: #fff;
+        padding: 0.5rem;
+        width: 25%;
+        border-radius: 0.5rem;
+    }
+
+    .modal-notification-user > div > i {
+        float: right;
+        cursor: pointer;
+    }
+
+    .modal-notification-user > div > .info-user-notification {
+        width: 100%;
+        float: left;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .modal-notification-user > div > .info-user-notification > div {
+        height: 5vw;
+        width: 5vw;
+        background-color: #000;
+        border-radius: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .modal-notification-user > div > .info-user-notification > span {
+        margin: 1rem 0;
+    }
+
+    .modal-notification-user > div > form {
+        float: left;
+        width: 100%;
+    }
+
+    .modal-notification-user > div > form > div {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+    }
+
+    .modal-notification-user > div > form > div > input {
+        padding: 0.5rem 1rem;
+        margin-top: 0.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid #797979;
+        font-size: 12pt;
+    }
+
+    .modal-notification-user > div > form > div > textarea {
+        resize: none;
+        height: 15%;
+        font-size: 12pt;
+        padding: 0.5rem;
+    }
+
+    .modal-notification-user > div > form > button {
+        padding: 1rem 1rem;
+        border-radius: 0.25rem;
+        border: none;
+        right: 0;
+        left: 0;
+        display: block;
+        background-color: #0ebd4e;
+        margin: auto;
+        cursor: pointer;
+        color: #fff;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+}

@@ -1,0 +1,48 @@
+.footer-camera{
+    position:absolute;
+    width:100%;
+    bottom:0;
+    padding:5vw;
+    display: none;
+}
+
+.footer-camera .row.details button{
+    border: 1px solid #fff;
+    display:block;
+    left: 0;
+    right: 0;
+    bottom: 5vw;
+    margin: 0 auto 2vw;
+    border-radius: 2vw;
+    font-size: 7vw;
+    padding: 5vw;
+    text-align: center;
+    box-shadow: 0 0 10px #6e6c6c;
+    background-color: rgb(255, 174, 43);
+    color: #fff;
+    font-weight: bolder;
+    width:100%;
+    text-transform : uppercase;
+}
+
+.footer-camera .row.details{
+    background-color:rgb(239,239,239);
+    display: none;
+    margin:0;
+}
+
+.footer-camera .options-camera{
+    display: flex;
+    margin-bottom: 5vw;
+}
+
+.footer-camera .options-camera .capture-image{
+    width: 25vw;
+    height: 25vw;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    border-radius: 100%;
+    border: 1vw solid #fff;
+    background-color: rgb(226,226,226);
+    margin: auto;
+}

@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="br.com.client.rota101" version="1.53.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>Route 95</name>
+    <icon density="mdpi" height="57" src="res/icon/android/logo.png" width="57" />
+    <icon density="mdpi" height="57" platform="ios" src="res/icon/ios/logo.png" width="57" />
+     <icon background="@color/background" density="mdpi" foreground="res/icon/android/logo.png" />
+    <description>
+        A sample Apache Cordova application that responds to the deviceready event.
+    </description>
+    <author email="dev@cordova.apache.org" href="http://cordova.io">
+        Apache Cordova Team
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <allow-navigation href="*" />
+    <allow-navigation href="file://*/*" />
+    <platform name="android">
+        <allow-intent href="market:*" />
+        <preference name="AndroidInsecureFileModeEnabled" value="true" />
+        <resource-file src="res/icon/android/logo.png" target="app/src/main/res/mipmap/icon.png" />
+        <resource-file src="google-services.json" target="app/google-services.json" />
+        <resource-file src="res/icon/android/colors.xml" target="app/src/main/res/values/colors.xml" />
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+            <application android:requestLegacyExternalStorage="true" android:usesCleartextTraffic="true" />
+        </edit-config>
+        <config-file parent="/manifest" target="AndroidManifest.xml">
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+        </config-file>
+    </platform>
+    <platform name="ios">
+        <access origin="*" />
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+        <preference name="AllowUntrustedCerts" value="true" />
+        <preference name="InterceptRemoteRequests" value="all" />
+        <preference name="allowFileAccessFromFileURLs" value="true" />
+        <preference name="allowUniversalAccessFromFileURLs" value="true" />
+        <resource-file src="GoogleService-Info.plist" />
+        <edit-config file="*-Info.plist" mode="merge" target="NSMicrophoneUsageDescription">
+            <string>É necessário habilitar o microfone para enviar mensagens de áudio.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="NSCameraUsageDescription">
+            <string>É necessário habilitar a câmera para capturar foto em seu perfil.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="NSPhotoLibraryUsageDescription">
+            <string>Precisa de acesso à biblioteca de fotos para obter imagem do seu perfil.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
+            <string>Precisa de acesso à localização para facilitar que o motorista encontre seu destino.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="NSPhotoLibraryAddUsageDescription">
+            <string>Precisa de acesso à biblioteca de fotos para obter imagem do seu perfil.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
+            <string>Precisa de acesso à localização para facilitar que o motorista encontre seu destino.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
+            <string>Precisa de acesso à localização para facilitar que o motorista encontre seu local.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="NSLocationUsageDescription">
+            <string>Precisa de acesso à localização para facilitar que o motorista encontre seu local.</string>
+        </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="NSLocationAlwaysUsageDescription">
+            <string>Precisa de acesso à localização para facilitar que o motorista encontre seu local.</string>
+        </edit-config>
+        <feature name="CDVWKWebViewEngine">
+            <param name="ios-package" value="CDVWKWebViewEngine" />
+        </feature>
+        <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
+    </platform>
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/icon/android/logo.png" />
+    <preference name="KeyboardResizeMode" value="native" />
+    <preference name="KeyboardResize" value="true" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="loadUrlTimeoutValue" value="700000" />
+    <preference name="StatusBarStyle" value="lightcontent" />
+    <preference name="android-minSdkVersion" value="19" />
+    <preference name="iosPersistentFileLocation" value="Library" />
+    <preference name="iosPersistentFileLocation" value="Compatibility" />
+    <preference name="AndroidLaunchMode" value="singleInstance" />
+    <preference name="SplashScreenDelay" value="0" />
+    <preference name="SplashScreen" value="none" />
+    <preference name="AndroidLaunchMode" value="singleTop" />
+    <preference name="UseSwiftLanguageVersion" value="4.2.0" />
+    <preference name="GOOGLE_MAPS_ANDROID_API_KEY" value="AIzaSyAgipJ5ZnlBpE-pqVsnljRPhF8jRL2RQIg" />
+    <preference name="GOOGLE_MAPS_IOS_API_KEY" value="AIzaSyAgipJ5ZnlBpE-pqVsnljRPhF8jRL2RQIg" />
+    <preference name="GOOGLE_MAPS_PLAY_SERVICES_VERSION" value="15.0.1" />
+    <plugin name="cordova-plugin-ionic-keyboard" spec="^2.1.3" />
+    <plugin name="cordova-plugin-appminimize" spec="^1.0.0" />
+    <plugin name="in.lucasdup.bringtofront" spec="https://github.com/markeeftb/cordova-bring-to-front" />
+    <plugin name="cordova-plugin-googleplus" spec="^5.3.2">
+        <variable name="REVERSED_CLIENT_ID" value="com.googleusercontent.apps.916434253280-uu69islng3bcehilrdoi258mlfk5jsd9" />
+        <variable name="PLAY_SERVICES_VERSION" value="15.0.1" />
+        <variable name="GOOGLE_MAPS_PLAY_SERVICES_VERSION" value="15.0.1" />
+    </plugin>
+    <plugin name="cordova-plugin-call-number" spec="^1.0.1" />
+    <plugin name="cordova-plugin-android-gpsdetect" spec="0.0.3" />
+    <feature name="Camera">
+        <param name="ios-package" value="CDVCamera" />
+    </feature>
+    <plugin name="cordova-plugin-ios-camera-permissions" spec="^1.2.0">
+        <variable name="CAMERA_USAGE_DESCRIPTION" value="É necessário habilitar a câmera para capturar foto em seu perfil." />
+        <variable name="MICROPHONE_USAGE_DESCRIPTION" value="É necessário habilitar o microfone para enviar mensagens de áudio." />
+        <variable name="PHOTOLIBRARY_ADD_USAGE_DESCRIPTION" value="Precisa de acesso à biblioteca de fotos para obter imagem do seu perfil" />
+        <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value="Precisa de acesso à biblioteca de fotos para obter imagem do seu perfil" />
+    </plugin>
+    <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
+    <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
+    <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
+    <preference name="android-minSdkVersion" value="22" />
+    <preference name="android-targetSdkVersion" value="33" />
+    <preference name="deployment-target" value="12.0.0" />
+    <plugin name="cordova-plugin-android-permissions" spec="^1.0.0" />
+    <plugin name="cordova-plugin-dialogs" spec="^2.0.2" />
+    <plugin name="cordova-plugin-qrscanner" spec="^3.0.1" />
+    <plugin name="phonegap-plugin-mobile-accessibility" spec="https://github.com/phonegap/phonegap-mobile-accessibility.git" />
+    <plugin name="cordova-plugin-add-swift-support" spec="^2.0.2" />
+    <engine name="ios" spec="^5.1.1" />
+    <preference name="phonegap-version" value="cli-8.1.1" />
+</widget>

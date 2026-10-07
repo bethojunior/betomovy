@@ -1,0 +1,2 @@
+const STATUS_AUTHORIZED =  "1";
+const STATUS_BLOCKED =  "3";

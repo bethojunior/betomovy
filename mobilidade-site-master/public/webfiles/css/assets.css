@@ -1,0 +1,152 @@
+body {
+    font-family: 'Dosis', sans-serif;
+}
+
+/* Largura da barra de rolagem */
+::-webkit-scrollbar {
+    width: 10px;
+    display: none;
+
+}
+
+/* Fundo da barra de rolagem */
+::-webkit-scrollbar-track-piece {
+    background-color: #05395b;
+    border-left: 1px solid #CCC;
+}
+
+/* Cor do indicador de rolagem */
+::-webkit-scrollbar-thumb:vertical,
+::-webkit-scrollbar-thumb:horizontal {
+    background-color: #3490cc;
+}
+
+/* Cor do indicador de rolagem - ao passar o mouse */
+::-webkit-scrollbar-thumb:vertical:hover,
+::-webkit-scrollbar-thumb:horizontal:hover {
+    background-color: #717171;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 92%;
+}
+
+.bg-grey {
+    background: #edebeb;
+}
+
+.color-yellow {
+    color: #ff9a00;
+}
+
+.bg-dark-yellow {
+    background: #ff9a00;
+}
+
+.gradient-yellow {
+    background: linear-gradient(to right, #ffc73f ,#ff9a00);
+}
+
+.subtitle-section {
+    color: #000;
+    text-transform: uppercase;
+    font-size: 2.5vw;
+    font-weight: 600;
+}
+
+.text-section {
+    padding: 60px 0;
+    text-align: justify;
+    font-size: 19px;
+    font-weight: 100;
+}
+
+.text-section span {
+    margin-left: 20px;  
+}
+
+.text-section strong {
+    font-weight: 300;
+}
+
+.btn-section {
+    text-decoration: none;
+}
+
+.desktop-img {
+    display: block;
+}
+
+.mobile-img {
+    display: none;
+}
+
+.button-big-shadow {
+    box-shadow: 4px 8px 21px rgba(0,0,0,0.2);
+}
+
+section.main-image-home {
+    position: relative;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+input[type=email]:not(.browser-default),
+input[type=text]:not(.browser-default) {
+    background-color: #fff;
+    outline: none;
+    height: 41px;
+    width: inherit;
+    font-size: none;
+    margin: 16px 0;
+    padding: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-box-sizing: none;
+    box-sizing: none;
+    border: 0;
+    width: 227px;
+    border-radius: 20px;
+    padding-left: 25px;
+    color: rgb(255,174,43);
+    margin-right: 5px;
+}
+
+input[type=email]:not(.browser-default):focus:not([readonly]) {
+    border: none;
+    box-shadow: none;
+}
+
+button:focus {
+    outline: none;
+    background-color: #fff;
+}
+
+.button-compact-shadow {
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 798px) {
+    
+    .text-section {
+        font-size: 14px;
+    }
+
+    .text-section span {
+        margin: 0;
+    }
+
+    .desktop-img {
+        display: none;
+    }
+    
+    .mobile-img {
+        display: block;
+    }
+}
+

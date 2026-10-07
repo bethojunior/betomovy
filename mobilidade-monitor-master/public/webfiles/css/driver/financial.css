@@ -1,0 +1,123 @@
+h2.title-financial-driver{
+    font-weight: 400;
+    text-indent: 20px;
+    padding-top: 20px;
+}
+span.none-element {
+    display: none;
+}
+ 
+.main-timeline{
+    position: relative;
+    transition: all 0.4s ease 0s;
+    margin-left: 3vw;
+    list-style: none;
+    height: 70%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 1vw;
+}
+ 
+.main-timeline .timeline{
+    position: relative;
+}
+.main-timeline .timeline:after{
+    content: "";
+    border-left: 2px solid #8a8a8a;
+    height: 100%;
+    position: absolute;
+    top: 23px;
+}
+.main-timeline .timeline-icon{
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #ccc;
+    position: absolute;
+    top: 0;
+    left: -0.7vw; 
+    margin: 0 auto;
+    overflow: hidden;
+}
+div.content{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.main-timeline .timeline-content{
+    width: 45%;
+    padding: 20px;
+    padding-top: 0;
+    border-radius: 5px;
+}
+.main-timeline .date{
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 300;
+    color: #fff;
+    padding: 12px 33px;
+    background: #0a90d7;
+    border-radius: 30px;
+}
+.main-timeline .title{
+    font-size: 24px;
+    font-weight: 500;
+    color: #5c5151;
+    margin-top: 30px;
+}
+.main-timeline .description{
+    font-size: 14px;
+    color: #606060;
+    line-height: 2;
+}
+.main-timeline .timeline-content.right{
+    float: right;
+    text-align: left;
+}
+@media only screen and (max-width: 767px){
+    .main-timeline:before{
+        left: 0;
+    }
+    .main-timeline .timeline-icon{
+        left: -8px;
+        margin: 0;
+    }
+    .main-timeline .timeline-content{
+        width: 90%;
+    }
+    
+    .main-timeline{
+    width: calc(100% - 4vw);
+    padding: 0 2vw;
+    margin: 0;
+    height: 80%;
+    }
+}
+
+/* Btn Filter */
+
+div.list-btns-header {
+    margin-left: 3vw;
+}
+div.list-btns-header button.btn-filter-financial{
+    margin: 15px 0vw;
+    padding: 1vw;
+    background: #FFF;
+    outline: none;
+    color: #444;
+    border: 0;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #929292;
+    cursor: pointer;
+}
+
+h3#nameDriver{
+    padding: 12px 45px;
+}
+
+h3#nameDriver{
+    padding: 12px 45px;
+}
+
+

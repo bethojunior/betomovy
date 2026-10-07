@@ -1,0 +1,252 @@
+/* ─────────────────────────────────────────────────
+   Modal — Cadastro de cliente
+───────────────────────────────────────────────── */
+
+/* ── Overlay ── */
+.modal-create-customer {
+    position: absolute;
+    inset: 0;
+    background: var(--color-overlay);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.modal-create-customer.active {
+    display: flex;
+}
+
+/* ── Card ── */
+.mcc-card {
+    width: 100%;
+    max-width: min(90vw, 520px);
+    background: var(--color-bg-surface);
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+    overflow: hidden;
+    font-family: 'Open Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── Cabeçalho ── */
+.mcc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 16px;
+    border-bottom: 1px solid var(--color-bg-muted);
+}
+
+.mcc-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.mcc-close {
+    background: none;
+    border: none;
+    color: var(--color-text-disabled);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+}
+
+.mcc-close:hover { color: var(--color-text-primary); }
+
+/* ── Tipo de pessoa ── */
+.mcc-type-group {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px 0;
+}
+
+.mcc-type-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-bg-surface);
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+}
+
+.mcc-type-pill input[type="radio"] {
+    display: none;
+}
+
+.mcc-type-pill:has(input:checked) {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+/* Fallback para navegadores sem :has() — JS pode adicionar .active */
+.mcc-type-pill.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+/* ── Toggle internacional ── */
+.mcc-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 20px 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.mcc-toggle__input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.mcc-toggle__track {
+    width: 34px;
+    height: 20px;
+    background: var(--color-border-input);
+    border-radius: 20px;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.mcc-toggle__input:checked ~ .mcc-toggle__track {
+    background: var(--color-primary);
+}
+
+.mcc-toggle__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--color-bg-surface);
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.mcc-toggle__input:checked ~ .mcc-toggle__track .mcc-toggle__thumb {
+    transform: translateX(14px);
+}
+
+.mcc-toggle__text {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+/* ── Corpo do formulário ── */
+.mcc-body {
+    padding: 14px 20px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Linha com dois campos */
+.mcc-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Campo individual */
+.mcc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mcc-field--full {
+    grid-column: 1 / -1;
+}
+
+.mcc-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.mcc-required {
+    color: var(--color-danger-strong);
+}
+
+/* Input */
+.mcc-input,
+.modal-create-customer .form-control {
+    height: 36px !important;
+    padding: 0 10px !important;
+    border: 1px solid var(--color-border-input) !important;
+    border-radius: 7px !important;
+    font-size: 13px !important;
+    color: var(--color-text-primary) !important;
+    background: var(--color-bg-hover) !important;
+    box-shadow: none !important;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+    font-family: 'Open Sans', sans-serif;
+    box-sizing: border-box;
+}
+
+.mcc-input:focus,
+.modal-create-customer .form-control:focus {
+    border-color: var(--color-text-muted) !important;
+    background: var(--color-bg-surface) !important;
+    box-shadow: none !important;
+}
+
+/* ── Rodapé ── */
+.mcc-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 20px 20px;
+    border-top: 1px solid var(--color-bg-muted);
+    margin-top: 8px;
+}
+
+.mcc-btn {
+    height: 36px;
+    padding: 0 18px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.mcc-btn--cancel {
+    background: var(--color-bg-muted);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.mcc-btn--cancel:hover { background: var(--color-border); }
+
+.mcc-btn--save {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+}
+
+.mcc-btn--save:hover { background: var(--color-primary-hover); }

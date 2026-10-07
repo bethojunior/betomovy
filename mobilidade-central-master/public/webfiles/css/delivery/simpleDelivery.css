@@ -1,0 +1,20 @@
+.container-simple-delivery{
+    width: 30%;
+    float: left;
+    z-index: 999;
+    position: absolute;
+    background-color: var(--color-bg-surface);
+    box-shadow: 0 0 10px var(--color-border);
+    transition: 0.5s;
+    bottom:0;
+    height: 100%;
+    transform: translateY(150%);
+}
+
+.container-simple-delivery.active{
+    transform: translateY(0%);
+}
+
+.container-simple-delivery > div{
+    padding: 10px;
+}

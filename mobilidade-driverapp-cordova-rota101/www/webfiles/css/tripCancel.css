@@ -1,0 +1,58 @@
+.container-cancel-trip{
+    position: absolute;
+    z-index: 502;
+    top: 0;
+    height: 100%;
+    background-color: rgb(74,74,76);
+    width: 100%;
+    display: none;
+    flex-direction: column;
+}
+.container-cancel-trip.active {
+    display: flex;
+}
+.container-cancel-trip h4{
+    color: #fff;
+    font-size: 5vw;
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: bolder;
+}
+
+.container-cancel-trip .close-cancel-trip{
+    margin: 2vw;
+    font-size: 10vw;
+    color: rgb(255,154,0);
+}
+.container-cancel-trip .options-cancel-default{
+    flex: 1;
+    padding: 2vw 10vw;
+    overflow-y: auto;
+    background-color: #fff;
+}
+.container-cancel-trip .options-cancel-default li.option-cancel{
+    padding: 2vw 5vw;
+    font-size: 5vw;
+    color: #fff;
+    background-color: rgb(93,93,95);
+    margin: 0 0 5vw;
+}
+.container-cancel-trip .options-cancel-default li.option-cancel.active{
+    background-color: var(--main-color);
+}
+
+.container-cancel-trip .btn-cancel-trip{
+    width: 80%;
+    border: none;
+    padding: 2vw 5vw;
+    border-radius: 15vw;
+    display: block;
+    margin: 5vw auto;
+    color: var(--main-color);
+    font-weight: bolder;
+    font-size: 5vw;
+}
+
+.container-cancel-trip .btn-cancel-trip:focus{
+    background-color: #fff;
+}

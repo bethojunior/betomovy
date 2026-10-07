@@ -1,0 +1,12 @@
+services:
+  mobilidade-delivery-api:
+    platform: linux/amd64
+    build:
+      dockerfile: docker-prod/dockerfile
+    container_name: mobilidade-delivery-api-prod
+    image: mobilidade-delivery-api-prod-local
+    restart: always
+    ports:
+      - 8100:80
+    env_file:
+      - .env

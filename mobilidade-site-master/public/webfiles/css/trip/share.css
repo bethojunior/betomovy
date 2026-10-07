@@ -1,0 +1,341 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+.container-map{
+    position: absolute;
+    background-color: #ccc;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.container-data-driver{
+    position:absolute;
+    background-color:#fff;
+    bottom:0;
+    padding:2vw;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    box-shadow: 0 0 10px #ccc;
+}
+.container-data-driver > div{
+    background-color:#000;
+    width: 15vw;
+    height: 15vw;
+    border-radius: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.container-data-driver > section {
+    width: 80%;
+    margin-bottom: 10px;
+}
+.container-data-driver > section > p:first-child {
+    font-size: 1rem;
+}
+.container-data-driver > section > p:nth-child(2) {
+    font-size: 1rem;
+    font-weight: bold;
+}
+.container-data-driver > section > p {
+    margin-left: 10px;
+    font-size: 0.8rem;
+    text-align: right;
+}
+.container-destination{
+    position:absolute;
+    background-color:#fff;
+    width: 90%;
+    box-shadow: 0 0 10px #b1b1b1;
+    right: 0;
+    left: 0;
+    margin: auto;
+    top: 5vw;
+    padding: 0vw 2vw;
+    border-radius: 2vw;
+    font-size:2.8vw;
+}
+.container-destination > div,
+.container-destination div.waypoint-item {
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin: 2vw 0;
+}
+.container-destination > div > span,
+.container-destination div.waypoint-item > span {
+    color:#000;
+    width: 95%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    align-items: center;
+}
+.container-destination > div > span::before {
+    content: "";
+    display: block;
+    background-color: #123;
+    width: 2vw;
+    height: 2vw;
+    border-radius: 100%;
+    float: left;
+    margin-right: 1vw;
+    margin-top: 0.5vw;
+}
+.container-destination div.waypoint-item > span::before {
+    background-color: #999;
+}
+.container-destination > div:first-child:not(.waypoint-item) > span::before{
+    background-color: #069509;
+}
+.container-destination > div:last-child:not(.waypoint-item) > span::before{
+    background-color: #f30000;
+}
+#waypointsContainer:empty {
+    display: none;
+}
+#waypointsContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.container-destination > div > p{
+    color:var(--color-main);
+    width: 30%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+.container-destination > div > p > span:first-child{
+    width:30%;
+    text-align:center;
+}
+.container-destination > div > p > span:first-child > span{
+    color:#069509;
+}
+.container-destination > div > p > span:first-child:empty:before{
+    content:"--:--";
+}
+.container-advertisement{
+    position: absolute;
+    width: calc(100% - 4vw);
+    background-color: #fff;
+    margin: auto;
+    right: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    padding: 2vw;
+    justify-content: space-between;
+    box-shadow: 0 -5px 10px #d9d9d9;
+    border-bottom: 1px solid #e6e6e6;
+    bottom: 35vw;
+}
+.container-advertisement > img{
+    width: 10%;
+}
+.container-advertisement > span{
+    width: 60%;
+    text-align: justify;
+    font-size: 3.5vw;
+    color: #515151;
+    font-weight: 600;
+}
+.container-advertisement > a{
+    color: var(--color-main);
+    text-transform:uppercase;
+    border: 1px solid var(--color-main);
+    padding:2vw;
+    border-radius:1vw;
+    font-size:3.5vw;
+}
+.modal-finish{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+.modal-finish.active{
+    display: flex;
+}
+.modal-finish > div{
+    background-color: #fff;
+    border-radius: 0.5em;
+    padding: 1em;
+    width: 80%;
+}
+.modal-finish > div > h4{
+    display:block;
+    text-align:center;
+    font-size:1em;
+}
+.modal-finish > div > p{
+    margin:0.5em;
+    text-align:justify;
+}
+
+.modal-finish > div > a{
+    text-decoration:unset;
+    color: var(--color-main);
+    text-transform:uppercase;
+    border: 1px solid var(--color-main);
+    padding:0.5em 1em;
+    display:block;
+    text-align:center;
+    margin: 2em auto 0;
+    border-radius:0.5em;
+}
+.content-star {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.content-star > img {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: -2px;
+    margin-right: 3px;
+}
+@media (min-width: 992px) {
+    .container-destination {
+        width: 30%;
+        right: 0;
+        top: 2em;
+        padding: 0vw 1em;
+        font-size: 1em;
+        margin-left: 1em;
+        border-radius: 0.5em;
+    }
+
+    .container-destination > div,
+    .container-destination div.waypoint-item {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0.5em 0;
+    }
+
+    .container-destination > div > span,
+    .container-destination div.waypoint-item > span {
+        color: #000;
+        width: 70%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        align-items: center;
+    }
+
+    .container-destination > div > span::before {
+        content: "";
+        display: block;
+        background-color: #123;
+        width: 1em;
+        height: 1em;
+        border-radius: 100%;
+        float: left;
+        margin-right: 1em;
+        margin-top: 0.1em;
+    }
+
+    .container-destination > div:first-child:not(.waypoint-item) > span::before {
+        background-color: #069509;
+    }
+
+    .container-destination > div:last-child:not(.waypoint-item) > span::before {
+        background-color: #f30000;
+    }
+
+    .container-destination div.waypoint-item > span::before {
+        background-color: #999;
+    }
+    #waypointsContainer:empty {
+        display: none;
+    }
+
+    .container-destination > div > p {
+        color: #e47300;
+        width: 30%;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+    }
+
+    .container-data-driver {
+        background-color: #fff;
+        top: 1em;
+        right: 1em;
+        bottom: unset;
+        padding: 0.5em 1em;
+        display: flex;
+        width: 20%;
+        align-items: center;
+        box-shadow: 0 0 10px #7c7979;
+        border-radius: 0.2em;
+    }
+    .container-data-driver > div {
+        background-color: #000;
+        width: 4em;
+        height: 4em;
+        border-radius: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .container-data-driver > p {
+        display: flex;
+        flex-direction: column;
+        margin-left: 2em;
+    }
+    .container-advertisement {
+        width: 130%;
+        background-color: #fff;
+        margin: auto;
+        top: 150%;
+        right: 0;
+        left: unset;
+        padding: 0.5em;
+        box-shadow: 0 0 10px #bdb6b6;
+        border-radius: 0.5em;
+        bottom: unset;
+    }
+
+    .container-advertisement > img {
+        width: 15%;
+    }
+
+    .container-advertisement > span {
+        width: 60%;
+        text-align: justify;
+        font-size: 1em;
+        color: #515151;
+        font-weight: 600;
+        margin: 0 15px;
+    }
+
+    .container-advertisement > a {
+        color: var(--color-main);
+        text-transform: uppercase;
+        border: 1px solid;
+        padding: 1em;
+        border-radius: 0.5em;
+        font-size: 1em;
+        text-decoration: unset;
+    }
+    .modal-finish > div{
+        width: 25%;
+    }
+    .modal-finish > div > p{
+        text-align: center;
+    }
+}

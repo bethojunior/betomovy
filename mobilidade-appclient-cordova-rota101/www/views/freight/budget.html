@@ -1,0 +1,56 @@
+<div class="container-budget">
+    <nav>
+        <a class="go-back-form-travel">
+            <i class="material-icons">arrow_back_ios</i>
+        </a>
+        <div class="title-budget">
+            <span>Resumo</span>
+        </div>
+    </nav>
+    <div class="detail-items-freight">
+        <div>
+            <button type="button" id="btnEditItems">VER OU EDITAR ITENS</button>
+        </div>
+    </div>
+    <p class="date-time-freight" id="scheduleDatetime"></p>
+    <ul>
+        <li>
+            <div>
+                <p>Buscar em: <span class="origin-freight"></span></p>
+                <ul></ul>
+            </div>
+        </li>
+        <li>
+            <div>
+                <p>Deixar em: <span class="destination-freight"></span></p>
+                <ul></ul>
+            </div>
+        </li>
+    </ul>
+    <div class="container-footer-freight">
+        <div>
+            <div>
+                <span id="valueFreight">R$0,00</span>
+                <p>Viagem <span id="valueTripFreight"></span></p>
+                <ul id="valuesAdditionalFreight"></ul>
+            </div>
+            <div style="display: none">
+                <span>Peso:</span>
+                <p>Capacidade: <span>840kg</span></p>
+                <p>Carga: <span class="weight-all-objects">0</span></p>
+                <p>Livre: <span class="total-weight-free">840kg</span></p>
+                <p><span>Quantidade:</span><span class="amount-item-selected">0</span></p>
+            </div>
+        </div>
+        <div class="payment-form-freight">
+            <label for="paymentFormFreight">O pagamento é feito diretamente ao motorista</label>
+            <select id="paymentFormFreight"></select>
+        </div>
+        <h5>Os serviço de ajudante e montador não estão incluídos no orçamento.</h5>
+        <a id="supportAlertInfoTravel">
+            <img src="webfiles/img/svg/whatsapp.svg">
+            <span>Para mais informações</span>
+        </a>
+    </div>
+    <button type="button" id="btnConfirmFreight">CONFIRMAR</button>
+</div>

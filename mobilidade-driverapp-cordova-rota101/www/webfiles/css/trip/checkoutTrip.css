@@ -1,0 +1,84 @@
+.container-checkout-trip {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    transform: translateY(150%);
+    transition: all 300ms;
+}
+
+.container-checkout-trip.active {
+    transform: translateY(0%);
+}
+
+.container-checkout-trip > .title-checkout-trip {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 18pt;
+    border-bottom: 1px solid #ccc;
+}
+
+
+.container-checkout-trip > p {
+    padding: 50px 10px;
+    text-align: center;
+    font-size: 14pt;
+}
+
+.container-checkout-trip > .choice-which-price-use {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-checkout-trip > .choice-which-price-use > span {
+    text-align: center;
+    font-size: 14pt;
+}
+
+
+.container-checkout-trip > .choice-which-price-use > div {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+}
+
+
+.container-checkout-trip > .choice-which-price-use > div > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e8e8e8;
+    width: 40%;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #dbdbdb;
+}
+
+.container-checkout-trip > .choice-which-price-use > div > div > h4 {
+    font-size: 25pt;
+    margin: 10px;
+}
+
+
+.container-checkout-trip > .choice-which-price-use > div > div > h4 > span{
+    font-size: 15pt;
+}
+
+.container-checkout-trip > .choice-which-price-use > div > div > label {
+    color: #000;
+}
+
+.container-checkout-trip > span {
+    padding: 10px 0;
+    text-align: center;
+    font-size: 10pt;
+}

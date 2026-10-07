@@ -1,0 +1,198 @@
+@media (max-width: 991px){
+    .container-modal-add-admin {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        left: 0;
+    }
+
+    .container-modal-add-admin.active{
+        display: flex;
+    }
+
+    .container-modal-add-admin > div {
+        background-color: #fff;
+        padding: 2vw;
+        border-radius: 5px;
+        width: 90%;
+    }
+
+
+    .container-modal-add-admin > div > form > div > div,
+    .container-modal-add-admin > div > form > div {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 5px;
+    }
+
+
+    .container-modal-add-admin > div > form > div > div > input,
+    .container-modal-add-admin > div > form > div > input {
+        padding: 0.5rem;
+        font-size: 12pt;
+        border-radius: 5px;
+        border: 1px solid #afafaf;
+        outline: none;
+    }
+
+
+    .container-modal-add-admin > div > form > div > div > input:focus,
+    .container-modal-add-admin > div > form > div > input:focus {
+        background-color: #e3f0f8;
+    }
+
+    .container-modal-add-admin > div > form > div > div > label,
+    .container-modal-add-admin > div > form > div > label {
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .container-modal-add-admin > div > form > input[type=submit] {
+        display: block;
+        margin: auto;
+        border: none;
+        padding: 0.5rem 2rem;
+        font-size: 12pt;
+        text-transform: uppercase;
+        border-radius: 5px;
+        background-color: #30bc10;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .container-modal-add-admin > div > form > input[type=submit]:disabled{
+        background-color: #a5a5a5;
+    }
+
+    .container-modal-add-admin > div > div {
+        display: flex;
+        justify-content: center;
+        padding: 2vw;
+        position: relative;
+    }
+
+    .container-modal-add-admin > div > div > span {
+        font-size: 16pt;
+    }
+
+    .container-modal-add-admin > div > div > i {
+        position: absolute;
+        right: 0;
+        padding: 1vw;
+        font-size: 25pt;
+        cursor: pointer;
+        top: 0;
+    }
+}
+
+@media (min-width: 992px) {
+    .container-modal-add-admin {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        left: 0;
+        z-index: 100;
+    }
+
+    .container-modal-add-admin.active{
+        display: flex;
+    }
+
+    .container-modal-add-admin > div {
+        background-color: #fff;
+        padding: 1rem 2rem;
+        border-radius: 5px;
+        width: 44%;
+    }
+
+
+    .container-modal-add-admin > div > form > div > div,
+    .container-modal-add-admin > div > form > div {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+    }
+
+
+    .container-modal-add-admin > div > form > div.half-field{
+        display:flex;
+        flex-direction:row;
+        justify-content:space-between;
+    }
+
+
+    .container-modal-add-admin > div > form > div.half-field > div{
+        width:45%;
+    }
+
+
+    .container-modal-add-admin > div > form > div > div > input,
+    .container-modal-add-admin > div > form > div > input {
+        padding: 5px;
+        font-size: 12pt;
+        border-radius: 5px;
+        border: 1px solid #afafaf;
+        outline: none;
+    }
+
+
+    .container-modal-add-admin > div > form > div > div > input:focus,
+    .container-modal-add-admin > div > form > div > input:focus {
+        background-color: #e3f0f8;
+    }
+
+    .container-modal-add-admin > div > form > div > div > label,
+    .container-modal-add-admin > div > form > div > label {
+        font-weight: 600;
+        margin-bottom: 2px;
+        font-size: 11pt;
+    }
+
+    .container-modal-add-admin > div > form > input[type=submit] {
+        display: block;
+        margin: auto;
+        border: none;
+        padding: 0.5rem 2rem;
+        font-size: 12pt;
+        text-transform: uppercase;
+        border-radius: 5px;
+        background-color: #30bc10;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .container-modal-add-admin > div > form > input[type=submit]:disabled{
+        background-color: #a5a5a5;
+    }
+
+    .container-modal-add-admin > div > div {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        padding: 1rem;
+        position: relative;
+    }
+
+    .container-modal-add-admin > div > div > span {
+        font-size: 15pt;
+    }
+
+    .container-modal-add-admin > div > div > i {
+        position: absolute;
+        right: 0;
+        padding: 1rem;
+        top: 0rem;
+        font-size: 20pt;
+        cursor: pointer;
+    }
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="viewport" content="initial-scale=1, width=device-width, height=device-height, viewport-fit=cover">
+    <link href="webfiles/css/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="webfiles/css/fonts-google/Encode.css" rel="stylesheet">
+    <meta name="color-scheme" content="light dark"/>
+    <link rel="stylesheet" href="webfiles/css/splash/index.css">
+    <link rel="stylesheet" href="webfiles/css/libs/owl.carousel.min.css">
+    <link rel="stylesheet" href="webfiles/css/libs/slick.css">
+    <link rel="stylesheet" href="webfiles/css/utils/assets.css">
+    <link rel="stylesheet" href="webfiles/css/utils/toastr.css">
+    <link rel="stylesheet" href="webfiles/css/fonts-google/Dosis.css">
+    <link rel="stylesheet" href="webfiles/css/preload.css">
+    <link rel="stylesheet" href="webfiles/css/mapa/Popup.css">
+    <link rel="stylesheet" href="webfiles/css/modalInfoReturn.css">
+    <link rel="stylesheet" href="webfiles/css/vai.css">
+    <link href="webfiles/css/default.css" rel="stylesheet">
+    <link href="webfiles/css/screens/main.css" rel="stylesheet">
+    <link href="webfiles/css/material-icons.css" rel="stylesheet">
+    <link href="webfiles/css/autocompleteCustom.css" rel="stylesheet">
+    <link href="webfiles/css/font/OpenSans.css" rel="stylesheet">
+    <script type="text/javascript" src="webfiles/js/utils/Host.js"></script>
+    <link rel="stylesheet" href="webfiles/css/libs/jquery-ui.css">
+    <script src="https://www.gstatic.com/firebasejs/6.3.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.10.1/firebase-firestore.js"></script>
+    <style id="appConfigStyle"></style>
+</head>
+<body>
+<div id="popUpCustom" style="display: block;position: absolute;top: -100%;z-index: -2;"></div>
+<div class="container-main">
+    <ul id="contentTabHome">
+        <li class="option-item-tab active" id="enableMobilityApp" view="Client" action="Index">
+            <i class="material-icons">directions_car</i>
+            <span data-i18n="tabs-trip"></span>
+        </li>
+        <li class="option-item-tab" id="enableFreightApp" view="Freight" action="Index">
+            <i class="material-icons">local_shipping</i>
+            <span data-i18n="tabs-freight"></span>
+        </li>
+        <li class="option-item-tab" id="enableShareTripApp" view="Ride" action="Index">
+            <i class="material-icons">group</i>
+            <span data-i18n="tabs-ride"></span>
+        </li>
+    </ul>
+    <div>
+        <div id="containerViews"></div>
+    </div>
+</div>
+<div id="containerLanguage" style="display: none"></div>
+<script src="cordova.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/jquery.cookie.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/jquery.mask.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/jquery-ui.min.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/sweetalert.min.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/html2canvas.min.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/owl.carousel.min.js"></script>
+<script src="webfiles/js/libs/socket.io.js"></script>
+<script src="webfiles/js/libs/jquery.inputmask.bundle.js"></script>
+<script type="text/javascript" src="webfiles/js/repositories/ChatRepository.js"></script>
+<script type="text/javascript" src="webfiles/js/repositories/TripRepository.js"></script>
+<script type="text/javascript" src="webfiles/js/repositories/TripRouteRepository.js"></script>
+<script type="text/javascript" src="webfiles/js/components/index.js"></script>
+<script type="text/javascript" src="webfiles/js/service/ElementProperty.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/sweetalert.min.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/slick.min.js"></script>
+<script type="text/javascript" src="webfiles/js/service/PathUrl.js"></script>
+<script type="text/javascript" src="webfiles/js/service/Autocomplete.js"></script>
+<script type="text/javascript" src="webfiles/js/service/ConfigGeneral.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/CodeSecurity.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/controller.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/manager.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/windowResize.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/Popup.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/Log.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/Session.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/translate.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/DateCustom.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/LocalStorage.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/RequestPermission.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/toastr.min.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/OptionElement.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/config.js"></script>
+<script type="text/javascript" src="webfiles/js/service/ConnectionServer.js"></script>
+<script type="text/javascript" src="webfiles/js/service/CityConfig.js"></script>
+<script type="text/javascript" src="webfiles/js/service/Mask.js"></script>
+<script type="text/javascript" src="webfiles/js/service/EventTouche.js"></script>
+<script type="text/javascript" src="webfiles/js/service/Push.js"></script>
+<script type="text/javascript" src="webfiles/js/service/WebSocket.js"></script>
+<script type="text/javascript" src="webfiles/js/service/Progress.js"></script>
+<script type="text/javascript" src="webfiles/js/service/Storaged.js"></script>
+<script type="text/javascript" src="webfiles/js/service/checkNotifications.js"></script>
+<script type="text/javascript" src="webfiles/js/service/MappingSpot.js"></script>
+<script type="text/javascript" src="webfiles/js/service/PaginateService.js"></script>
+<script type="text/javascript" src="webfiles/js/service/Spot.js"></script>
+<script type="text/javascript" src="webfiles/js/service/Position.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/SwalCustom.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/FileUpload.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/statusTrip.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/statusUser.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/CapturePhoto.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/ValidateForm.js"></script>
+<script type="text/javascript" src="webfiles/js/utils/NotificationBackground.js"></script>
+<script type="text/javascript" src="webfiles/js/controllers/SupportController.js"></script>
+<script type="text/javascript" src="webfiles/js/libs/vai.js"></script>
+<script src="webfiles/js/modulos/init/initEvents.js"></script>
+<script src="webfiles/js/views/MainView.js"></script>
+<script src="webfiles/js/views/ClientView.js"></script>
+<script src="webfiles/js/views/TripView.js"></script>
+<script src="webfiles/js/views/SettingView.js"></script>
+<script src="webfiles/js/views/DriverView.js"></script>
+<script src="webfiles/js/views/PaymentView.js"></script>
+<script src="webfiles/js/views/PlaceView.js"></script>
+<script src="webfiles/js/views/PartnerView.js"></script>
+<script src="webfiles/js/views/FinancialView.js"></script>
+<script src="webfiles/js/views/DependentView.js"></script>
+<script src="webfiles/js/views/RideView.js"></script>
+<script src="webfiles/js/views/FreightView.js"></script>
+<script>
+    document.addEventListener("deviceready", function () {
+        document.body.style.display = "none";
+
+        Route.defaultStatusBar();
+
+        navigator.splashscreen.hide();
+
+        Promise.all([
+            checkLayoutByConfig(),
+            verifyPreferredLanguage()
+        ]).then((values) => {
+            setPreferredLanguage(values[1]).then(() => {
+                const route = Route.getClassAndAction();
+                ManagerView[route.classView][route.actionName]();
+            })
+        });
+    });
+</script>
+</body>
+</html>

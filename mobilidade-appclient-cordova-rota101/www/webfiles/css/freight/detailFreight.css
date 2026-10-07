@@ -1,0 +1,283 @@
+.container-detail-freight-trip {
+    position: absolute;
+    transform: translateY(100%);
+    background-color: #87CEFA;
+    width: 100%;
+    box-shadow: 0 0 10px #ccc;
+    transition: 300ms;
+    z-index: 205;
+    overflow-y: auto;
+    bottom: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.container-detail-freight-trip > nav{
+    padding:15px 10px;
+    background-color:var(--main-color);
+    color:#fff;
+    text-align:center;
+    display:flex;
+    align-items:center;
+    font-weight: 600;
+    justify-content:center;
+}
+
+.container-detail-freight-trip > nav > a{
+    top:unset;
+}
+
+
+.container-detail-freight-trip.active {
+    transform: translateY(0);
+}
+
+.container-detail-freight-trip > p {
+    font-size: 6vw;
+    text-align: center;
+    color: #afacac;
+    margin-bottom: 1vw;
+}
+
+.container-detail-freight-trip > label {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 4vw;
+    padding: 0 5vw 1vw;
+    display: block;
+    background-color: #fff;
+    font-weight: 600;
+    color: var(--main-color);
+}
+
+.container-detail-freight-trip > .trip-item-type {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    border-bottom: 1px solid #ccc;
+    padding: 2vw 0;
+    overflow-x: auto;
+}
+
+
+.container-detail-freight-trip > .detail-delivery {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 10vw);
+    padding: 2vw 5vw;
+    background-color: #fff;
+    flex: 1;
+}
+
+
+.container-detail-freight-trip > .detail-delivery > span {
+    text-align: center;
+    margin-bottom: 5px;
+    color: var(--main-color);
+    font-weight: 500;
+}
+
+
+.container-detail-freight-trip > .detail-delivery > textarea {
+    height: 15vw;
+    outline: none;
+    padding: 5px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+}
+
+.container-detail-freight-trip > .trip-item-type:empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-detail-freight-trip > .trip-item-type:empty:before {
+    content: "";
+    height: 20vw;
+    width: 20vw;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid var(--main-seconds-color);
+    border-radius: 100%;
+    animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.container-detail-freight-trip > .trip-item-type > div {
+    padding: 1vw 2vw;
+    border-radius: 100%;
+    opacity: 1;
+    /* border: 1px solid #f0aa3b; */
+    /* margin-top: 2vw; */
+    /* margin-bottom: -3vw; */
+    position: relative;
+    margin: 0 1vw;
+    max-width: 15vw;
+    min-width: 15vw;
+}
+
+.container-detail-freight-trip > .trip-item-type > div.trip-type.active {
+    box-shadow: 0 0 3px #626262;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+
+}
+
+.container-detail-freight-trip > .trip-item-type > div.trip-type.active > p {
+    color: var(--main-seconds-color);
+}
+
+.container-detail-freight-trip > .trip-item-type > div.trip-type > span {
+    /* position: absolute; */
+    top: -1.5vw;
+    font-size: 2.5vw;
+    right: 0;
+    left: 0;
+    margin: auto;
+    text-align: center;
+    width: 80%;
+    background-color: #3a434c;
+    color: #fff;
+    padding: 0.5vw 1vw;
+    border-radius: 1vw;
+    display: block;
+}
+
+.container-detail-freight-trip > .trip-item-type > div > img {
+    display: block;
+    width: 80%;
+    margin: 10% auto;
+    transition: transform 0.3s;
+}
+
+.container-detail-freight-trip > .trip-item-type > div.active > img {
+    transform: scale(1.25);
+}
+
+.container-detail-freight-trip > .trip-item-type > div > p {
+    text-align: center;
+    font-size: 10pt;
+    color: var(--main-seconds-color);
+}
+
+.container-detail-freight-trip > .trip-item-type > div > p > span {
+    font-size: 3vw;
+    margin-right: 0.5vw;
+    position: relative;
+}
+
+
+.container-detail-freight-trip > .switch-type-trip {
+    display: flex;
+    float: left;
+    width: 100%;
+    justify-content: space-between;
+    background-color: var(--main-color);
+    border-top: 1px solid #ccc;
+    padding: 2vw 0;
+}
+
+.container-detail-freight-trip > .switch-type-trip + .btn-confirm-scheduled-trip,
+.container-detail-freight-trip > .switch-type-trip.hide {
+    display: none;
+}
+
+.container-detail-freight-trip > .switch-type-trip.hide + .btn-confirm-scheduled-trip {
+    display: flex;
+}
+
+.btn-confirm-scheduled-trip > label {
+    font-size: 12pt;
+}
+
+.container-detail-freight-trip > .btn-confirm-scheduled-trip {
+    padding: 2vw;
+    border: none;
+    border-radius: 1vw;
+    color: #fff;
+    background-color: var(--main-color);
+    width: 90%;
+    font-size: 15pt;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 60px auto 0;
+}
+
+.container-detail-freight-trip > .switch-type-trip > button {
+    padding: 2vw;
+    border: none;
+    border-radius: 1vw;
+    color: #fff;
+    margin: 0 5px;
+}
+
+.container-detail-freight-trip > .switch-type-trip > button:nth-child(2) {
+    background: linear-gradient(90deg, var(--main-seconds-color) 50%, var(--main-color) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 25%;
+}
+
+.container-detail-freight-trip > .switch-type-trip > button:nth-child(2) > i {
+    font-size: 15pt;
+}
+
+.container-detail-freight-trip > .switch-type-trip > button:nth-child(2) > span {
+    font-size: 7pt;
+}
+
+.container-detail-freight-trip > .switch-type-trip > button:first-child {
+    background-color: var(--main-color);
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    font-size: 6vw;
+    margin: 5px auto;
+    color: #fff;
+}
+
+.container-detail-freight-trip > .switch-type-trip > button:first-child:disabled:before {
+    content: "";
+    width: 5vw;
+    height: 5vw;
+    border: 5px solid transparent;
+    border-top-color: #fff;
+    position: absolute;
+    left: 15vw;
+    border-radius: 100%;
+    animation: spin 2s infinite linear;
+}
+
+.container-detail-freight-trip > .switch-type-trip > button:last-child {
+    /* background-color: var(--main-color); */
+    /* width: 70%; */
+    font-size: 6vw;
+}
+
+.container-detail-freight-trip > .btn-search-trip {
+    border: none;
+    padding: 3vw;
+    font-size: 5vw;
+    width: 100%;
+    display: block;
+    background-color: #e9991a;
+    color: #fff;
+    position: absolute;
+    float: left;
+    height: 12vw;
+    bottom: 0;
+}

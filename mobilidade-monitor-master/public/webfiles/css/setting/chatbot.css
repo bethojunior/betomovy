@@ -1,0 +1,7 @@
+.delete{
+    cursor: pointer;
+}
+.col-lg-10.table.table-striped{
+    margin-top: 2vw;
+    margin-left: 2vw;
+}

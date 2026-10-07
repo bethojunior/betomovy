@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+*{
+    font-family: Montserrat;
+    margin: 0;
+}
+.responsiveImage {
+    width: 100%;
+    max-width: 100%;
+}
+.generalPreRegister.row{
+    padding-top: -3vw;
+    padding: 5vw;
+}
+.generalPreRegister.row .center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.generalPreRegister.row .col.s12.inputData .center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.generalPreRegister.row .col.s12.inputData input{
+    height: 8vw;
+    background-color: #f7f2f2;
+    border: solid 1px gray;
+    width: 95%;
+    padding-left: 2vw;
+    margin: 1vw;
+    border-radius: 1vw;
+}
+.generalPreRegister.row .col.s12.inputData select{
+    height: 8vw;
+    background-color: #f7f2f2;
+    border: solid 1px gray;
+    width: 98%;
+    padding-left: 2vw;
+    margin: 1vw;
+    border-radius: 1vw;
+}
+.generalPreRegister.row button.button{
+    text-align: left;
+    margin: 2vw;
+    padding: 3vw;
+    background-color: #FF9C00;
+    color: white;
+    border: none;
+    border-radius: 1vw;
+    width: 70%;
+    color: white;
+}
+.generalPreRegister.row button.button .material-icons{
+    position: absolute;
+    right: 22vw;
+    margin-top: -1vw;
+}
+.labelTermos{
+    padding: 2vw;
+    font-size: 2.5vw;
+}

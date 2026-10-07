@@ -1,0 +1,57 @@
+<div class="container-data-trip">
+    <nav>
+        <i class="material-icons" id="closeTripDetail">arrow_back</i>
+        <p data-i18n="details-trip-p-title"></p>
+    </nav>
+    <div id="boxDetailTrip">
+        <div class="head-tip">
+            <img id="imgDetailTrip">
+        </div>
+        <div class="data-trip">
+            <div class="date-time">
+                <div id="dateTripDetails"></div>
+                <div id="valueTripDetail"></div>
+            </div>
+            <label><span data-i18n="details-trip-span-payment-in"></span> <span
+                    id="paymentFormTripDetail"></span></label>
+            <ul>
+                <li><span id="originTripDetail"></span></li>
+                <li><span id="destinationTripDetail"></span></li>
+            </ul>
+        </div>
+        <div class="driver-trip">
+            <div>
+                <div id="profileDriverTripDetail">
+                </div>
+            </div>
+            <div>
+                <b id="nameDriverTripDetail"></b>
+                <p id="carModelTripDetail"></p>
+                <p id="plateTripDetail"></p>
+                <p id="distanceTripDetail"></p>
+                <p id="timeTripDetail"></p>
+                <!-- <p id="codeFavoriteDriverDetail"></p>-->
+            </div>
+        </div>
+        <div class="btn-option-trip-driver">
+            <button type="button" id="btnAddFavoriteDetail" data-i18n="details-trip-btn-add-favorite"></button>
+            <button type="button" id="btnBlockedDriver">BLOQUEAR</button>
+        </div>
+        <div class="data-trip-info">
+            <ul>
+                <li class="options-detail active" value="helpCustomerTrip" data-i18n="details-trip-option-help"></li>
+                <li class="options-detail" value="requestReceipt" data-i18n="details-trip-option-receipt">Recibo</li>
+            </ul>
+            <div id="helpCustomerTrip" class="active">
+                <ul id="listTripReportType">
+                </ul>
+            </div>
+            <div id="requestReceipt">
+                <button type="button" id="btnTripReceipt" data-i18n="details-trip-btn-request-receipt"></button>
+            </div>
+        </div>
+        <div class="option-schedule-trip">
+            <button type="button" id="btnCancelScheduleTrip" data-i18n="details-trip-cancel-trip"></button>
+        </div>
+    </div>
+</div>

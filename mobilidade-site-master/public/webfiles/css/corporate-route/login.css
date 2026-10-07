@@ -1,0 +1,34 @@
+.container-login {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #ccc;
+    display: flex;
+    justify-content: center;
+}
+
+.container-login > div {
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 20px 10px 30px;
+    width: 360px;
+    margin: 50px 0 auto;
+}
+
+.container-login > div > h4 {
+    font-size: 14pt;
+    text-align: center;
+}
+
+.container-login > div > a {
+    width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+    .container-login > div {
+        width: 100%;
+        margin: 50px 10px auto;
+    }
+}

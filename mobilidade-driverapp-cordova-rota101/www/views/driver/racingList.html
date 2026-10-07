@@ -1,0 +1,186 @@
+<div class='bodyRacing'>
+    <div class="row haederPage">
+        <div onclick="comeBackIndex()"><a><i class="backIcon material-icons">arrow_back</i></a></div>
+        <span class="col s12 alignCenter titlePage" data-i18n="list-trips-title"></span>
+        <i id="filterList" class="material-icons iconFilter">filter_list</i>
+    </div>
+
+    <div class="geralRacingList">
+        <div class="row" style="background-color: #E8E8E8;">
+            <div id="mountListRacing">
+            </div>
+            <div class="container-btn-show-more">
+                <button type="button" id="btnShowMore" class="btn btn-primary" data-i18n="list-trips-btn-show-more">
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-trip-modal">
+        <nav>
+            <i class="go-back material-icons">arrow_back</i>
+            <span>Detalhamento</span>
+        </nav>
+        <div>
+            <div class="content-customer">
+                <div class="photo-customer" id="customerProfileTripDetail"></div>
+                <span id="customerNameTripDetail"></span>
+            </div>
+            <ul class="list-address-trip"></ul>
+            <ul class="detail-price">
+                <li>
+                    <span>Data/horário</span>
+                    <p id="dateTripDetail"></p>
+                </li>
+                <li>
+                    <span>Status</span>
+                    <p id="statusTripDetail"></p>
+                </li>
+                <li>
+                    <span>Situação</span>
+                    <p id="situationTripDetail"></p>
+                </li>
+                <li>
+                    <span>Tipo de chamado</span>
+                    <p id="tripCallTypeDetail"></p>
+                </li>
+                <li>
+                    <span>Forma de pagamento</span>
+                    <p id="paymentFormTripDetail"></p>
+                </li>
+                <li id="txCanceledContent">
+ 
+                </li>
+                <li class="item-label">Estimativa</li>
+                <li>
+                    <span>Distância</span>
+                    <p id="distanceItemTripDetail"></p>
+                </li>
+                <li>
+                    <span>Duração</span>
+                    <p id="estimatedTripDetail"></p>
+                </li>
+                <li class="item-label">Detalhamento do preço</li>
+                <li>
+                    <span>(Dinâmica/Bandeiras/Gatilhos)</span>
+                    <p id="multiplierDynamicDetail"></p>
+                </li>
+                <li class="hide-element">
+                    <span>Valor minimo</span>
+                    <p id="minPriceDetail"></p>
+                </li>
+                <li class="hide-element">
+                    <span>Preço base</span>
+                    <p id="basePriceDetail"></p>
+                </li>
+                <li class="hide-element">
+                    <span>Preço KM <span id="kmPriceDetail"></span></span>
+                    <p id="valueKmPriceDetail"></p>
+                </li>
+                <li class="hide-element">
+                    <span>Preço minuto <span id="minutePriceDetail"></span></span>
+                    <p id="valueMinutePriceDetail"></p>
+                </li>
+                <li class="hide-element">
+                    <span id="taxPriceDetailLabel"></span>
+                    <p id="taxPriceDetail"></p>
+                </li>
+                <li class="hide-element">
+                    <span id="anotherFeeDetailLabel"></span>
+                    <p id="anotherFeeDetail"></p>
+                </li>
+                <li>
+                    <span>Paradas <span id="wayPointTripDetail"></span></span>
+                    <p id="valueWayPointTripDetail"></p>
+                </li>
+                <li class="hide-element">
+                    <span>Valor por longa distância</span>
+                    <p id="tripLongDistanceValueDetail"></p>
+                </li>
+                <li class="hide-element">
+                    <span>Distância para cobrar valor adicional</span>
+                    <p id="kmToAdditionalValueDetail"></p>
+                </li>
+                <li class="hide-element">
+                    <span>Valor adicional</span>
+                    <p id="additionalValueAfterKmDetail"></p>
+                </li>
+                <li id="txCanceledExit">
+ 
+                </li>
+                <li>
+                    <span>Preço estimado</span>
+                    <p id="priceTripDetail"></p>
+                </li>
+                <li>
+                    <span>Total cobrado</span>
+                    <p id="priceTripTotalDetail"></p>
+                </li>
+            </ul>
+            <button type="button" id="btnRequestRelease" data-i18n="list-trips-btn-request-release"></button>
+        </div>
+    </div>
+
+    <!--<div id="modalDataRunSelect" class="row modal modal-fixed-footer">
+        <div class="modal-content edit-modal">
+            <span class="col s12 alignCenter fs-4" data-i18n="list-trips-detail-modal"></span>
+            <hr>
+            <span class="col s12 alignLeft"><span data-i18n="list-trips-date-detail"></span>   <span
+                    id="dateRun">       </span></span>
+            <span class="col s12 alignLeft"><span data-i18n="list-trips-origin-detail"></span>  <span
+                    id="originAddress"> </span></span>
+            <br>
+            <span class="col s12 alignLeft"><span data-i18n="list-trips-destination-detail"></span> <span
+                    id="destinyAdress"> </span> </span>
+            <br>
+            <span class="col s12 alignLeft"><span data-i18n="list-trips-value-detail"></span> <span
+                    id="valueRunning"></span></span>
+            <br>
+            <span class="col s12 alignLeft"><span data-i18n="list-trips-time-detail"></span>  <span
+                    id="timeTripDetail"></span>min</span>
+            <br>
+            <span class="col s12 alignLeft"><span data-i18n="list-trips-distance-detail"></span> <span
+                    id="distanceTripDetailList"></span>km</span>
+            <br>
+            <span class="col s12 alignLeft">
+                <span data-i18n="list-trips-payment-form-detail"></span>
+                <span id="paymentFormTrip"></span>
+            </span>
+            <br>
+            <span class="colorRed" id="checkIfCodeRed"></span>
+
+        </div>
+
+        <div class="padding4">
+            <div id="detailsRunning" class="detailsRunning"></div>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-action modal-close waves-effect waves-green btn-flat ">OK</a>
+            <button type="button" id="btnRequestRelease" data-i18n="list-trips-btn-request-release"></button>
+        </div>
+    </div>-->
+</div>
+
+<div id="openModalFilter" class="row modal ">
+    <h4>Filtrar por:</h4>
+    <br>
+    <form>
+        <p>
+            <input name="status" type="radio" id="all" value="all"/>
+            <label for="all">Todos</label>
+        </p>
+        <p>
+            <input name="status" type="radio" id="finished" value="finished"/>
+            <label for="finished">Finalizado</label>
+        </p>
+        <p>
+            <input name="status" type="radio" id="canceled" value="canceled"/>
+            <label for="canceled">Cancelado</label>
+        </p>
+    </form>
+
+    <div class="modal-footer">
+        <div class="divider"></div>
+        <a id="makeFilter" class=" waves-effect waves-green btn-flat ">Filtrar</a>
+    </div>
+</div>

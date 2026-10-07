@@ -1,0 +1,94 @@
+.modal-signaling-arrival {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-signaling-arrival.active{
+    display: flex;
+}
+
+.modal-signaling-arrival > div {
+    width: 80%;
+    background-color: #fff;
+    border-radius: 1vw;
+    position: relative;
+}
+
+.modal-signaling-arrival > div > i {
+    display: block;
+    margin: 0;
+    width: 100%;
+    text-align: right;
+    color: #807c7c;
+    font-size: 10vw;
+    position: absolute;
+    right: 0;
+    text-shadow: 0 0 #fff;
+    top: 1vw;
+    z-index: 10;
+}
+
+.modal-signaling-arrival > div >  img {
+    width: 50vw;
+    height: 50vw;
+    display: block;
+    margin: 2vw auto 0;
+    position: relative;
+    border-radius: 100%;
+    background-position: center ;
+    background-size: cover;
+    background-repeat: no-repeat;
+    box-shadow: 0 0 10px #c0b7b7;
+}
+
+.modal-signaling-arrival > div > div > h4 {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 8vw;
+    font-weight: 500;
+    margin-top: 4vw;
+}
+
+.modal-signaling-arrival > div > div > label {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 4vw;
+    color: #6c6262;
+}
+.modal-signaling-arrival > div > div > div {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin: 0.5vw;
+    font-size: 6vw;
+}
+.modal-signaling-arrival > div > .option-message-driver {
+    display: flex;
+    justify-content: space-evenly;
+    font-size: 15vw;
+    margin: 3vw 3vw 0;
+    border-top: 1px solid #ccc;
+    padding: 3vw;
+}
+.modal-signaling-arrival > div > .option-message-driver > i:first-child{
+    color:#40ae07;
+}
+.modal-signaling-arrival > div > .option-message-driver > i:last-child{
+    color:#767779;
+}
+.modal-signaling-arrival > div > h4{
+    text-align:center;
+    font-size: 4.5vw;
+    color: #ee960f;
+    margin: 3vw 0;
+    text-transform: uppercase;
+}

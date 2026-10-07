@@ -1,0 +1,216 @@
+.option-trip-in-wait {
+    position: absolute;
+    width: 50%;
+    top: 35vw;
+    background-color: #fff;
+    padding: 2vw 1.5vw;
+    border-radius: 0 10vw 10vw 0;
+    display: flex;
+    border: 1px solid #f2f2f2;
+    box-shadow: 0 0 5px #828282;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 60;
+    left: -100%;
+    transition: 1s;
+}
+
+.option-trip-in-wait.notification-chat:before{
+    content:"";
+    display:block;
+    width: 25px;
+    height: 25px;
+    background-image: url("../../../webfiles/img/svg/chat.svg");
+    background-size: 85%;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius:100%;
+    margin-right:5px;
+}
+
+.option-trip-in-wait.active {
+    left: 0;
+    transition: 1s;
+}
+
+.option-trip-in-wait > span {
+    font-size: 4vw;
+    font-weight: 600;
+}
+
+.option-trip-in-wait > i {
+    color: var(--main-color);
+    font-size: 9vw;
+}
+
+.container-trip-in-wait {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-trip-in-wait > nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ff9b1c;
+    font-weight: 600;
+    font-family: sans-serif;
+}
+
+.container-trip-in-wait > nav > i {
+    font-size: 10vw;
+    padding: 0 10px;
+    left: 0;
+    position: absolute;
+}
+
+.container-trip-in-wait > nav > span {
+    font-size: 15pt;
+    font-family: sans-serif;
+    font-weight: 500;
+}
+
+.container-trip-in-wait > .container-info-chat-client {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+    border-bottom: 1px solid #d7d7d7;
+}
+
+.container-trip-in-wait > .container-info-chat-client > h4 {
+    font-size: 7vw;
+    width: 60%;
+    max-width: 60%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.container-trip-in-wait > .container-info-chat-client > i {
+    font-size: 9vw;
+    color: #e68a16;
+    width: 50%;
+    text-align: center;
+    padding: 2vw 0;
+}
+
+.container-trip-in-wait > .container-info-chat-client > i:first-child {
+    border-right:1px solid #ccc;
+}
+
+.container-trip-in-wait > .container-message-trip {
+    height: 62%;
+    overflow-y: auto;
+    max-height: 62%;
+    position: relative;
+}
+footer {
+    width: 100%;
+    background-color: #272727;
+    box-shadow: 0 5px 5px #e6e6e6;
+    position: relative;
+    padding: 2vw 0;
+}
+
+.container-trip-in-wait > footer > div {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container-trip-in-wait > footer > div > div {
+    width: 50%;
+}
+
+.container-trip-in-wait > footer > div > .container-photo-client > div {
+    height: 20vw;
+    width: 20vw;
+    display: block;
+    margin: 2vw auto;
+    border-radius: 100%;
+    background-size: cover;
+    border: 0.5vw solid #fff;
+    background: #606060 no-repeat center;
+    box-shadow: 0 0 10px #494949;
+    background-size: cover;
+}
+
+.container-trip-in-wait > footer > div > .container-photo-client > span {
+    text-align: center;
+    width: 100%;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #fff;
+}
+
+.container-trip-in-wait > footer > div > div:last-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    color: #fff;
+    width: 100%;
+    overflow: hidden;
+    margin-top: 1vw;
+}
+
+.container-trip-in-wait > footer > div > div:last-child > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 400;
+    font-family: sans-serif;
+    padding: 0 5px;
+}
+
+.container-trip-in-wait > footer > i {
+    position: absolute;
+    bottom: 2.5vw;
+    background-color: #ff3636;
+    color: #fff;
+    border: 0.5vw solid #fff;
+    box-shadow: 0 0 10px #6a6a6a;
+    border-radius: 100%;
+    padding: 1vw;
+    right: 3vw;
+}
+
+.container-trip-in-wait > ul{
+    flex:1;
+    background-color: #dedede;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-trip-in-wait > ul > li{
+    padding:10px;
+    width:100%;
+    border-bottom: 1px solid #d8d8d8;
+    font-weight: 400;
+    text-align: center;
+    background-color: #fff;
+    font-family: sans-serif;
+    font-size: 13pt;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+
+.container-trip-in-wait > ul > li.notification-chat:before{
+    display:block;
+    width:15px;
+    height:15px;
+    content:"";
+    background-color:red;
+    border-radius:100%;
+    position:absolute;
+    left:10px;
+}

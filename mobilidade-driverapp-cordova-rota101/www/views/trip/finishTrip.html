@@ -1,0 +1,102 @@
+<div class="modal-finish">
+    <img src="webfiles/img/icon/finishedTrip.svg">
+    <div class="data-trip-finished">
+        <i class="material-icons close-trip-finish">close</i>
+    </div>
+    <div class="data-trip-finished" id="typeTripPriceNormal">
+        <p class="info-trip center">
+            <span data-i18n="finish-trip-name-customer"></span> <span id="nameClientFinish"></span>
+        </p>
+        
+        <div class="trip-card">
+            <div class="trip-card-header">
+                <span class="trip-card-label" data-i18n="finish-trip-origin">Origem</span>
+            </div>
+            <div class="trip-card-body">
+                <p class="trip-card-address match-finished"></p>
+                <div class="trip-card-info">
+                    <span class="trip-card-info-label" data-i18n="finish-trip-boarding-label">Deslocamento</span>
+                    <p class="trip-card-distance" id="boardingDistanceTime">-- km | -- min</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="trip-card waypoints-finish-card" id="waypointsFinishCard">
+            <div class="trip-card-header">
+                <span class="trip-card-label">Paradas</span>
+            </div>
+            <div class="trip-card-body">
+                <p class="trip-card-address first-waypoint-finish"></p>
+                <div class="waypoints-finish-more-btn" id="waypointsFinishMoreBtn">
+                    <span class="waypoints-finish-more-text" id="waypointsFinishMoreText"></span>
+                    <i class="material-icons waypoints-finish-toggle" id="waypointsFinishToggle">expand_more</i>
+                </div>
+                <ul class="waypoints-finish-list" id="waypointsFinishList"></ul>
+            </div>
+        </div>
+        
+        <div class="trip-card">
+            <div class="trip-card-header">
+                <span class="trip-card-label" data-i18n="finish-trip-destination">Destino</span>
+            </div>
+            <div class="trip-card-body">
+                <p class="trip-card-address destiny-finished"></p>
+                <div class="trip-card-info">
+                    <span class="trip-card-info-label" data-i18n="finish-trip-trip-label">Trajeto da viagem</span>
+                    <p class="trip-card-distance" id="tripDistanceTime">-- km | -- min</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-trip-finished" id="typeTripPriceRange">
+        <p class="info-trip center" id="descriptionFinishedTrip"></p>
+    </div>
+
+    <div class="payment-trip">
+        <p data-i18n="finish-trip-p-description"></p>
+        <p class="value-trip"></p>
+        <p class="info-payment">
+            <span data-i18n="finish-trip-p-payment"></span> <span id="tripPaymentForm"></span>
+        </p>
+        <p class="bonus-trip">
+            <span data-i18n="finish-trip-bonus-trip"></span>
+            <span class="value-bonus"></span>
+            <label id="infoTripFinishBonus">
+                <span data-i18n="finish-trip-value-pay-by"></span>
+                <nameapp></nameapp>
+            </label>
+        </p>
+    </div>
+
+    <div style="text-align: center; margin: 10px 0;">
+        <button id="generateQRCodeBtn"
+            style="padding: 10px 20px; background: #fff; color: #008CBA; border: none; border-radius: 8px; cursor: pointer;">
+            Gerar QR Code
+        </button>
+    </div>
+
+    <div id="qrCodeContainer" style="display: flex; justify-content: center; margin: 10px 0;">
+        <img id="qrcodeImage" src="" alt="QR Code" style="width: 180px; height: 180px; display: none;">
+    </div>
+
+    <div id="paymentStatusMessage" style="width: 100%; display: none; justify-content: center; align-items: center; padding: 10px; margin: 10px 0; background-color: #d4edda; border-radius: 8px; color: #155724;">
+        <div style="width: 20px; height: 20px; background-color: green; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 12px; height: 12px; fill: white;" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+        </div>
+        <span>Pagamento recebido com sucesso!</span>
+    </div>
+
+    <div id="pixErrorMessage" style="width: 100%; display: flex; justify-content: center; align-items: center; padding: 10px; margin: 10px 0; background-color: #f8d7da; border-radius: 8px; color: #721c24; border: 1px solid #f5c6cb; visibility: hidden;">
+        <div style="width: 20px; height: 20px; background-color: #dc3545; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 12px; height: 12px; fill: white;" viewBox="0 0 24 24">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+        </div>
+        <span id="pixErrorText">Erro ao processar pagamento PIX</span>
+    </div>
+
+    <p class="obs-trip-finished"></p>
+</div>

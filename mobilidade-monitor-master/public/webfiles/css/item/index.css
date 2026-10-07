@@ -1,0 +1,28 @@
+.general-item {
+     padding: 1vw;
+}
+.general-item .row .col-lg-5 .input-group{
+    margin: 0.3vw;
+}
+.general-item .row .col-lg-5 .col-lg-12.div-image img{
+    max-width: 100%;
+}
+
+@media (max-width: 992px) {
+    .general-item {
+        padding: 2vw;
+        padding-left: 0vw;
+    }
+    .general-item .row .col-lg-5 .input-group{
+        margin: 1vw;
+    }
+    .general-item .row .col-lg-7.row{
+        margin-top: 4vw;
+    }
+    .general-item .row .col-lg-7 img{
+        padding: 1vw;
+    }
+    .general-item .row .col-lg-7{
+        margin: 4vw;
+    }
+}

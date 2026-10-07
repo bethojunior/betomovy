@@ -1,0 +1,78 @@
+.row.generalDocument{
+    margin: 0;
+    padding: 0;
+}
+.row.generalDocument .col.s12 .titlePage{
+    font-size: 6vw;
+    text-align: center;
+    display: block;
+}
+.row.generalDocument #reasonsDriver{
+    padding: 4vw;
+}
+.row.generalDocument .divImage.col.s12{
+    text-align: center;
+}
+.row.generalDocument  .col.s12 .responsive-img.imgReturn{
+    width: 40vw;
+}
+.row.generalDocument #reasonsDriver .divReason {
+    border: solid 1px transparent;
+    border-radius: 2vw;
+    padding: 2vw;
+    box-shadow: 1px 1px 20px 0px rgba(0,0,0,0.26);
+    margin: 1vw;
+}
+input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default), input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default), input[type=tel]:not(.browser-default), input[type=number]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea{
+    border-bottom: 1px solid transparent;
+}
+.file-field.input-field{
+    margin-bottom: -4vw
+}
+.descriptionLabel{
+    font-size: 3vw;
+    font-weight: bold;
+}
+.mt2{
+    margin-top: 2vw;
+}
+.pd-8{
+    padding: 8vw;
+}
+.btnYellow{
+    background-color: #ffae2b;
+}
+#preloadDriver{
+    margin-left: 40vw;
+    position: absolute;
+    display: none;
+}
+.row.generalDocument #reasonsDriver #mountReasons .divReason.col.s12 .collapsible-body ul.ulList{
+    margin-top: 5vw;
+}
+.row.generalDocument #reasonsDriver #mountReasons .divReason.col.s12 .collapsible-body ul.ulList li{
+    list-style-type: circle;
+}
+.row.generalDocument #reasonsDriver #mountReasons.collapsible{
+    border-top  : 0px solid transparent;
+    border-right: 1px solid #ddd;
+    border-left : 1px solid #ddd;
+    margin      : .5rem 0 1rem 0;
+}
+.row.generalDocument #reasonsDriver #mountReasons .divReason.col.s12 .material-icons{
+    position: absolute;
+    right: 3vw;
+    font-size: 9vw;
+}
+.colorGray{
+    background-color: gray;
+}
+.left3{
+    left: 3vw;
+}
+.height15{
+    height: 15vw;
+}
+.fs-8{
+    font-size: 8vw;
+}

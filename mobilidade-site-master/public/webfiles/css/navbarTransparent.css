@@ -1,0 +1,68 @@
+.menu-transparent {
+    background-color: transparent;
+    transition: 0.3s;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 50px;
+    z-index: 1; 
+}
+
+header.menu-transparent #brand-menu {
+    width: 60px;
+    left: auto;
+    position: relative;
+    left: 3.8vw;
+}
+
+header.menu-transparent li {
+    width: 10vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header.menu-transparent li a {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+header.menu-transparent li:last-child {
+    width: 11.7vw;
+    height: 3vw;
+}
+
+header.navbar-bg-white {
+    background: #fff;
+    transition: 0.3s;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+}
+
+header.navbar-bg-white li a {
+    color: #000;
+}
+
+header.navbar-bg-white .btn-pedir-quero-dirigir {
+    font-weight: 800;
+    border: 1.5px solid rgb(234, 157,27);
+    text-shadow: 0.5px 0.5px #000;
+    border-radius: 20px;
+}
+
+@media(max-width: 797px) {
+    .menu-transparent {
+        background: transparent;
+        display: none;
+    }
+}
+
+@media(min-width: 798px) and (max-width: 1023px) {
+    header.menu-transparent li a {
+        font-size: 1.5vw;
+    }
+} 

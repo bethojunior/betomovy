@@ -1,0 +1,85 @@
+<div class="container-app-setting">
+    <div>
+        <div>
+            <i class="material-icons">settings</i>
+            <p data-i18n="setting-app-mode-accepted"></p>
+        </div>
+        <div>
+            <ul>
+                <li>
+                    <div data-i18n="setting-app-text-change-mode-accept-click"></div>
+                    <div class="switch">
+                        <label>
+                            <input type="checkbox" class="change-mode-accept" id="enableClick" checked>
+                            <span class="lever"></span>
+                        </label>
+                    </div>
+                </li>
+                <li>
+                    <div data-i18n="setting-app-text-change-mode-accept-touch"></div>
+                    <div class="switch">
+                        <label>
+                            <input type="checkbox" class="change-mode-accept" id="enableTouch" checked>
+                            <span class="lever"></span>
+                        </label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div>
+        <div>
+            <i class="material-icons">settings</i>
+            <p data-i18n="setting-app-background-location"></p>
+        </div>
+        <div>
+            <div>
+                <p id="textLocationBackground"></p>
+                <button type="button" id="btnPermissionLocalBackground" data-i18n="setting-app-btn-background-location"></button>
+            </div>
+            <div>
+                <p data-i18n="setting-app-permission-request-access-to-photos"></p>
+            </div>
+            <div id="containerStatusGPSApp">
+                <p data-i18n="setting-app-request-status-gps"></p>
+                <p id="statusGPSApp"></p>
+            </div>
+            <div id="containerStatusOverlayScreenApp">
+                <p data-i18n="setting-app-request-overlay-screen"></p>
+                <p id="statusOverlayScreenApp"></p>
+            </div>
+            <div id="containerStatusRequestIgnoreBatteryOptimization">
+                <p data-i18n="setting-app-request-battery-optimization"></p>
+                <p id="statusRequestIgnoreBatteryOptimization"></p>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div>
+            <i class="material-icons">settings</i>
+            <p data-i18n="setting-app-navigation"></p>
+        </div>
+        <div>
+            <div>
+                <p id="navigationBySelected">-</p>
+                <button type="button" id="btnClearNavigationBy" data-i18n="setting-app-btn-clear-navigation"></button>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div>
+            <i class="material-icons">settings</i>
+            <p data-i18n="setting-app-choice-payment-form"></p>
+            <i class="material-icons" id="btnFilterPayment">info</i>
+        </div>
+        <div>
+            <div>
+                <div class="container-choice-payment-form">
+                    <div id="listTripPaymentFormDriver"></div>
+                    <button type="button" class="waves-effect waves-light btn" id="btnSaveChoicePaymentForm"
+                            data-i18n="setting-app-btn-save-choice-payment-form"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+@media (min-width: 992px) {
+    .autocomplete-custom {
+        position: absolute;
+        width: 90%;
+        background-color: #fff;
+        z-index: 100;
+        overflow-y: auto;
+        max-height: 50vw;
+        border: 1px solid #cccc;
+    }
+
+    .autocomplete-custom li {
+        padding: 0.5vw;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .autocomplete-custom li div {
+        width: 3vw;
+        height: 3vw;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 100%;
+        margin-right: 0.5em
+    }
+}
+
+@media (max-width: 992px) {
+    .autocomplete-custom {
+        position: absolute;
+        width: 96%;
+        background-color: #fff;
+        z-index: 100;
+        overflow-y: auto;
+        max-height: 50vw;
+        border: 1px solid #cccc;
+    }
+
+    .autocomplete-custom li {
+        padding: 3vw;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .autocomplete-custom li div {
+        width: 3vw;
+        height: 3vw;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 100%;
+        margin-right: 0.5em
+    }
+}

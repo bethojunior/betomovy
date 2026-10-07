@@ -1,0 +1,19 @@
+.container-detail-trip{
+    background-color: #E8E8E8;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.container-detail-trip > .header-detail{
+    margin-bottom: 0;
+    background-color: #fff;
+    width: calc(100% - 4vw);
+    display: flex;
+    border: 1px solid #ccc;
+    padding: 2vw;
+    justify-content: space-between;
+    align-items: center;
+    color: #ec8d27;
+    height: 14vw;
+}

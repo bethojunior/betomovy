@@ -1,0 +1,39 @@
+.container-update-profile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+}
+
+.container-update-profile.active {
+    display: flex;
+}
+
+.container-update-profile > div {
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+.container-update-profile > div > p {
+    font-size: 14pt;
+    text-align: center;
+}
+
+.container-update-profile > div > button {
+    border: none;
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+    background-color: var(--main-color);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 5px;
+}

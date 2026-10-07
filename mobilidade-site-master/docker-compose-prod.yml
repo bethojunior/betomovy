@@ -1,0 +1,13 @@
+services:
+      
+  mobilidade-site:
+    platform: linux/amd64
+    build:
+      dockerfile: docker-prod/dockerfile 
+    container_name: mobilidade-site-prod
+    image: mobilidade-site-prod-local
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - .env:/var/www/html/.env

@@ -1,0 +1,431 @@
+import { AxiosError } from "axios";
+import swal from "sweetalert";
+import { Button, Input, Modal, Select } from "antd";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { FC, useEffect, useState } from "react";
+import api from "../../../../../../services/api";
+import Mask from "../../../../../../services/Mask";
+import {
+  Title,
+  Section,
+  SideBySide,
+  FooterModal,
+  MessageError,
+} from "../Modal/styles";
+import { Spin } from "antd";
+import apiSpeedmob from "../../../../../../services/apiSpeedmob";
+import Session from "../../../../../../utils/Session";
+import Utils from "../../../../../../utils/Utils";
+
+const { Option } = Select;
+
+interface ListProfileArray extends Array<ListProfile> {}
+
+interface ListProfile {
+  cities: [];
+  created_at: string;
+  id: number;
+  isRoot: boolean;
+  name: string;
+  statusId: number;
+  support: boolean;
+  updated_at: string;
+}
+
+interface UserData {
+  idUser: number;
+  name: string;
+  nickname: string;
+  email: string;
+  phone: string;
+  document: string;
+  roleId: number;
+}
+
+interface EditModalProps {
+  visible: boolean;
+  setVisible(value: boolean): void;
+  loadUsers: () => void;
+  userData: UserData | null;
+}
+
+const schemaForm = yup
+  .object({
+    name: yup.string().required("Campo obrigatório"),
+    nickname: yup.string().required("Campo obrigatório"),
+    email: yup
+      .string()
+      .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Este campo é do tipo email")
+      .required("Campo obrigatório"),
+    phone: yup
+      .string()
+      .min(11, "Telefone deve ter 11 caracteres")
+      .required("Campo obrigatório"),
+    document: yup
+      .string()
+      .min(11, "CPF deve ter 11 dígitos")
+      .required("Campo obrigatório"),
+    password: yup.string().optional(),
+    confirm_password: yup.string().optional(),
+    type_account: yup.number().required("Campo obrigatório"),
+  })
+  .required();
+
+type SchemaFormType = yup.InferType<typeof schemaForm>;
+
+const EditUserModal: FC<EditModalProps> = ({ 
+  visible, 
+  setVisible, 
+  loadUsers, 
+  userData 
+}) => {
+  const { control, setValue, handleSubmit, reset } =
+    useForm<SchemaFormType>({
+      resolver: yupResolver(schemaForm),
+    });
+
+  const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
+  const [listTypeProfile, setListTypeProfile] = useState<ListProfileArray>([]);
+
+  const { checkCpfIsValue } = Utils;
+
+  useEffect(() => {
+    api("role").then((result) => {
+      const { response } = result.request;
+      if (!JSON.parse(response).status || !result.data.status) {
+        return "";
+      }
+
+      return setListTypeProfile(result.data.response);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (visible) {
+      if (userData) {
+        setValue("name", userData.name);
+        setValue("nickname", userData.nickname);
+        setValue("email", userData.email);
+        setValue("phone", userData.phone);
+        setValue("document", userData.document);
+        setValue("type_account", userData.roleId);
+        setLoadingData(false);
+      } else {
+        setLoadingData(true);
+      }
+    }
+  }, [userData, visible, setValue]);
+
+  const handleCloseModal = () => {
+    setVisible(false);
+    setLoadingData(false);
+    reset();
+  };
+
+  const updateUser = async (datas: SchemaFormType) => {
+    const {
+      name,
+      nickname,
+      email,
+      document,
+      password,
+      confirm_password,
+      phone,
+      type_account,
+    } = datas;
+
+    if (password && confirm_password && password !== confirm_password) {
+      swal({
+        title: "Aviso",
+        text: "O campo confirmação de senha não é igual ao campo senha.",
+        icon: "warning",
+      });
+      return;
+    }
+
+    if (!checkCpfIsValue(document)) {
+      swal({
+        title: "Alerta",
+        text: "O CPF inserido é inválido",
+        icon: "warning",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const updateData: any = {
+        name,
+        nickname,
+        email,
+        phone,
+        document,
+        roleId: type_account,
+      };
+
+      if (password) {
+        updateData.password = password;
+        updateData.confirmationPassword = confirm_password;
+      }
+
+      const responseUpdateUser = await api.put(`admin/${userData?.idUser}`, updateData);
+
+      if (responseUpdateUser.status) {
+        swal({
+          title: "Sucesso",
+          text: "Usuário atualizado com sucesso",
+          icon: "success",
+        }).then((isAccept) => {
+          if (isAccept) {
+            handleCloseModal();
+            loadUsers();
+          }
+        });
+      }
+    } catch (error) {
+      const responseError = error as AxiosError;
+      swal({
+        title: "Error",
+        text: responseError.response?.data.message,
+        icon: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateUserSpeedmob = async (datas: SchemaFormType) => {
+    const { name, nickname, email, phone } = datas;
+
+    try {
+      const responseUserSpeedmob = await apiSpeedmob.put(`login/Register/${userData?.idUser}`, {
+        franchise_id: Session.getLocal("franchise_id"),
+        user_type_id: 1,
+        is_owner: 1,
+        name,
+        nickname,
+        email,
+        phone,
+        gender: "outros",
+      });
+
+      if (responseUserSpeedmob.status) {
+        updateUser(datas);
+      }
+    } catch (error) {
+      const responseError = error as AxiosError;
+      swal({
+        title: "Error",
+        text: responseError.response?.data.message,
+        icon: "error",
+      });
+    }
+  };
+
+  return (
+    <Modal
+      title="Editar usuário"
+      open={visible}
+      onCancel={handleCloseModal}
+      footer={[]}
+    >
+      {loadingData ? (
+        <div style={{ textAlign: "center", padding: "40px" }}>
+          <Spin size="large" />
+        </div>
+      ) : (
+        <form
+        onSubmit={handleSubmit(
+          import.meta.env.ISSPEEDMOB == "true"
+            ? updateUserSpeedmob
+            : updateUser
+        )}
+      >
+        <Controller
+          control={control}
+          name="name"
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <>
+              <Title>Nome</Title>
+              <Input
+                value={value}
+                onChange={onChange}
+                status={Boolean(error) ? "error" : ""}
+              />
+              {error && <MessageError>{error.message}</MessageError>}
+            </>
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="nickname"
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <>
+              <Title>Apelido</Title>
+              <Input
+                value={value}
+                onChange={onChange}
+                status={Boolean(error) ? "error" : ""}
+              />
+              {error && <MessageError>{error.message}</MessageError>}
+            </>
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <>
+              <Title>E-mail</Title>
+              <Input
+                value={value}
+                onChange={onChange}
+                status={Boolean(error) ? "error" : ""}
+              />
+              {error && <MessageError>{error.message}</MessageError>}
+            </>
+          )}
+        />
+
+        <SideBySide>
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field: { value }, fieldState: { error } }) => (
+              <Section>
+                <Title>Telefone</Title>
+                <Input
+                  value={value}
+                  onChange={(event) =>
+                    setValue(
+                      "phone",
+                      Mask.setMaskPhoneValue(event.target.value)
+                    )
+                  }
+                  status={Boolean(error) ? "error" : ""}
+                />
+                {error && <MessageError>{error.message}</MessageError>}
+              </Section>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="document"
+            render={({ field: { value }, fieldState: { error } }) => (
+              <Section>
+                <Title>CPF</Title>
+                <Input
+                  value={value}
+                  maxLength={14}
+                  onChange={(event) => {
+                    setValue(
+                      "document",
+                      Mask.setMaskCPFCNPJ(event.target.value)
+                    );
+                  }}
+                  status={Boolean(error) ? "error" : ""}
+                />
+                {error && <MessageError>{error.message}</MessageError>}
+              </Section>
+            )}
+          />
+        </SideBySide>
+        
+        <SideBySide>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <Section>
+                <Title>Nova Senha (opcional)</Title>
+                <Input
+                  type="password"
+                  value={value}
+                  onChange={onChange}
+                  status={Boolean(error) ? "error" : ""}
+                  placeholder="Deixe em branco para manter a atual"
+                />
+                {error && <MessageError>{error.message}</MessageError>}
+              </Section>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="confirm_password"
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <Section>
+                <Title>Confirmar Nova Senha</Title>
+                <Input
+                  type="password"
+                  value={value}
+                  onChange={onChange}
+                  status={Boolean(error) ? "error" : ""}
+                  placeholder="Confirme a nova senha"
+                />
+                {error && <MessageError>{error.message}</MessageError>}
+              </Section>
+            )}
+          />
+        </SideBySide>
+
+        <Controller
+          control={control}
+          name="type_account"
+          render={({ field: { value, onChange }, fieldState: { error } }) => (
+            <>
+              <Title>Perfil</Title>
+              <Select
+                value={value}
+                onChange={onChange}
+                style={{ width: "100%" }}
+                status={Boolean(error) ? "error" : ""}
+                placeholder="Perfil"
+              >
+                {listTypeProfile.map((item) => {
+                  return (
+                    <Option key={item.id} value={item.id}>
+                      {item.name}
+                    </Option>
+                  );
+                })}
+              </Select>
+              {error && <MessageError>{error.message}</MessageError>}
+            </>
+          )}
+        />
+
+        <FooterModal>
+          <Button
+            style={{
+              width: "100px",
+            }}
+            onClick={handleCloseModal}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            style={{
+              width: "100px",
+            }}
+            htmlType="submit"
+            type="primary"
+            loading={loading}
+          >
+            Salvar
+          </Button>
+        </FooterModal>
+        </form>
+      )}
+    </Modal>
+  );
+};
+
+export default EditUserModal;

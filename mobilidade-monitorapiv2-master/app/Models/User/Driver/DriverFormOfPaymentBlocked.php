@@ -1,0 +1,30 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Eduardo Roseo
+ * Date: 30/07/2020
+ * Time: 15:38
+ */
+
+namespace App\Models\User\Driver;
+
+
+use App\Models\Trip\TripPaymentForm;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class DriverFormOfPaymentBlocked extends Model
+{
+    use SoftDeletes;
+
+    protected $hidden = [
+        'deleted_at'
+    ];
+
+    protected $table = 'driverFormOfPaymentBlocked';
+
+    public function tripPaymentForm()
+    {
+        return $this->belongsTo(TripPaymentForm::class, 'tripPaymentFormId');
+    }
+}

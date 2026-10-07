@@ -1,0 +1,23 @@
+modificar o arquivo platforms/android/project.properties
+
+linhas :
+    isso
+
+    cordova.system.library.2=com.google.android.gms:play-services-auth:11.0.8
+    cordova.system.library.3=com.google.android.gms:play-services-identity:11.0.8
+
+    para
+
+    cordova.system.library.2=com.google.android.gms:play-services-auth:11.6.2
+    cordova.system.library.3=com.google.android.gms:play-services-identity:11.6.2
+
+
+error:
+
+<projectroot>/platforms/android/cordova-support-google-services/<project>-build.gradle
+
+mudar
+ classpath 'com.android.tools.build:gradle:+'
+para
+ classpath 'com.android.tools.build:gradle:3.5.1'
+
