@@ -17,41 +17,51 @@ export class EventRedisAdapterService {
   async initialize(server: Server): Promise<void> {
     const isEnabled = this.configService.get<string>(
       'ENABLE_SOCKET_REDIS_ADAPTER',
-      'true',
+      'false',
     );
 
-    if (isEnabled === 'false') {
-      this.logger.log('Redis adapter desabilitado');
+    const redisHost = this.configService.get<string>('REDIS_HOST');
+    if (!redisHost || isEnabled === 'false') {
+      this.logger.log('Redis socket adapter desabilitado ou REDIS_HOST não configurado. Usando adapter padrão em memória.');
       return;
     }
 
-    const host = this.configService.get<string>('REDIS_HOST', 'localhost');
+    const host = redisHost;
     const port = Number(this.configService.get<string>('REDIS_PORT', '6379'));
+    const password = this.configService.get<string>('REDIS_PASSWORD');
 
     const rawPrefix = this.configService.get<string>('REDIS_PREFIX', 'mobilidade');
     const basePrefix = EventsHelper.removeTrailingColon(rawPrefix);
     const socketPrefix = `${basePrefix}:socketio:events`;
 
-    this.pubClient = createClient({
-      socket: { host, port },
-      disableClientInfo: true,
-    });
-
-    this.subClient = this.pubClient.duplicate();
-
     try {
+      this.pubClient = createClient({
+        socket: { host, port },
+        password: password || undefined,
+        disableClientInfo: true,
+      });
+
+      this.pubClient.on('error', (err) => {
+        this.logger.warn(`[pubClient] Redis error (non-fatal): ${err.message}`);
+      });
+
+      this.subClient = this.pubClient.duplicate();
+
+      this.subClient.on('error', (err) => {
+        this.logger.warn(`[subClient] Redis error (non-fatal): ${err.message}`);
+      });
+
       await Promise.all([this.pubClient.connect(), this.subClient.connect()]);
-    } catch (err) {
-      this.logger.error('Erro ao conectar no Redis (socket adapter)', err);
-      throw err;
+
+      server.adapter(
+        createAdapter(this.pubClient, this.subClient, {
+          key: socketPrefix,
+        }),
+      );
+
+      this.logger.log(`Redis adapter configurado com sucesso (prefix: ${socketPrefix})`);
+    } catch (err: any) {
+      this.logger.warn(`Erro ao conectar no Redis (socket adapter), continuando com adapter em memória: ${err.message}`);
     }
-
-    server.adapter(
-      createAdapter(this.pubClient, this.subClient, {
-        key: socketPrefix,
-      }),
-    );
-
-    this.logger.log(`Redis adapter configurado com sucesso (prefix: ${socketPrefix})`);
   }
 }

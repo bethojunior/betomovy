@@ -14,6 +14,7 @@ export class RedisService implements IState {
       db: 0,
       keyPrefix: process.env.REDIS_PREFIX || '',
       lazyConnect: true,
+      enableOfflineQueue: false,
       maxRetriesPerRequest: 3,
       retryStrategy: (times: number) => {
         if (times > 5) return null; // stop retrying
