@@ -58,5 +58,8 @@ FROM node:18-alpine As production
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 
+# Port exposure for DigitalOcean App Platform & local
+EXPOSE 8080 3000
+
 # Start the server using the production build
 CMD [ "node", "dist/main.js" ]

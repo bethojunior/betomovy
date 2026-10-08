@@ -5,6 +5,8 @@ start() {
   mkdir -p /var/log/php-fpm
   mkdir -p /var/lib/php/session
   mkdir -p /var/lib/php/wsdlcache
+  mkdir -p /var/log/nginx
+  chown -R nginx:nginx /var/log/nginx 2>/dev/null || true
   chown -R nginx:nginx /run/php-fpm 2>/dev/null || true
   chmod 777 /run/php-fpm 2>/dev/null || true
   chown -R nginx:nginx /var/lib/php/session 2>/dev/null || true

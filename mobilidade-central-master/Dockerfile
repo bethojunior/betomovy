@@ -69,4 +69,7 @@ RUN mkdir -p /var/lib/php/session && \
     chown -R nginx:nginx /var/lib/php/session && \
     chmod 1733 /var/lib/php/session
 
+# Port exposure for DigitalOcean App Platform & local
+EXPOSE 8080 80 92
+
 ENTRYPOINT [ "/runner.sh", "start" ]

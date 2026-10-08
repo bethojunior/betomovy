@@ -16,7 +16,7 @@ services:
   - name: central-web
     source_dir: mobilidade-central-master
     dockerfile_path: Dockerfile
-    http_port: 92
+    http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xs
     routes:
@@ -26,7 +26,7 @@ services:
   - name: monitor-web
     source_dir: mobilidade-monitor-new-main
     dockerfile_path: Dockerfile
-    http_port: 80
+    http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xxs
     routes:
@@ -36,7 +36,7 @@ services:
   - name: api-php
     source_dir: mobilidade-api-php-master
     dockerfile_path: Dockerfile
-    http_port: 81
+    http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xs
     routes:

@@ -22,7 +22,7 @@ COPY docker/nginx /etc/nginx
 COPY --from=builder /app/build /usr/share/nginx/html/
 
 # Default port exposure
-EXPOSE 8080
+EXPOSE 8080 80
 
 # Copy .env file and shell script to container
 WORKDIR /usr/share/nginx/html

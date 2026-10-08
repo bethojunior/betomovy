@@ -9,6 +9,13 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+$uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+if ($uriPath === '/health') {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['status' => true, 'message' => 'Central Online']);
+    exit;
+}
+
 define('PROJECT_PUBLIC_DIR', realpath('./'));
 define('ROOT_DIR', realpath('../'));
 

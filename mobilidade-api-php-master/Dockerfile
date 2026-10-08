@@ -84,5 +84,8 @@ RUN mkdir -p /var/www/html/storage/temp \
     && chmod -R 755 /var/www/html \
     && chmod -R 775 /var/www/html/storage
 
+# Port exposure for DigitalOcean App Platform & local
+EXPOSE 8080 80 81
+
 # ENTRYPOINT
 ENTRYPOINT ["/runner.sh", "start"]

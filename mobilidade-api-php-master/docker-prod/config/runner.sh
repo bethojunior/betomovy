@@ -1,16 +1,18 @@
 #!/bin/bash
-set -eo pipefail
+# Runner robusto para DigitalOcean App Platform
 
 start() {
   echo "[INFO] Preparando diretórios..."
   mkdir -p /run/php-fpm
   mkdir -p /var/log/php-fpm
+  mkdir -p /var/log/nginx
   mkdir -p /var/lib/php/session
   mkdir -p /var/lib/php/wsdlcache
   mkdir -p /var/www/html/storage/temp
 
   chown -R nginx:nginx /run/php-fpm 2>/dev/null || true
   chmod 777 /run/php-fpm 2>/dev/null || true
+  chown -R nginx:nginx /var/log/nginx 2>/dev/null || true
 
   # Ajustar permissões nos diretórios da aplicação
   if [ -d /var/www/html/storage ]; then
