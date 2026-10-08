@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { CountryCode, DEFAULT_COUNTRY, findCountryByIso2 } from "../utils/countryCodes";
+import { isBrazilActive } from "../utils/languageConfig";
 
-// Detecta o país do usuário pelo IP (geolocalização de rede, não GPS) pra
-// pré-selecionar o DDI no cadastro. Qualquer falha (rede, rate limit,
-// resposta inesperada) cai no Brasil, nunca trava o formulário.
+// Detecta o país do usuário pelo IP pra pré-selecionar o DDI no cadastro.
 export function useDetectCountry(): { country: CountryCode; detecting: boolean } {
   const [country, setCountry] = useState<CountryCode>(DEFAULT_COUNTRY);
   const [detecting, setDetecting] = useState(true);
@@ -15,10 +14,14 @@ export function useDetectCountry(): { country: CountryCode; detecting: boolean }
       .then(response => response.json())
       .then(data => {
         if (cancelled || !data?.country_code) return;
+        if (data.country_code === "BR" && !isBrazilActive()) {
+          setCountry(DEFAULT_COUNTRY);
+          return;
+        }
         setCountry(findCountryByIso2(data.country_code));
       })
       .catch(() => {
-        // fica no Brasil (default)
+        // Fallback seguro para DEFAULT_COUNTRY (US)
       })
       .finally(() => {
         if (!cancelled) setDetecting(false);
