@@ -19,7 +19,7 @@ import { CharLimited } from "../../utils/CharLimited";
 
 import { getTrips } from "../../collections/firebase/TripRealtime";
 
-import { getPathImageDefault } from "../../config/configApp";
+import { getPathImageDefault, LogoMovyDefault } from "../../config/configApp";
 
 import { ShareTripDriverCard } from "./share-trip-driver-card";
 import { ShareTripOverlay } from "./share-trip-overlay";
@@ -184,6 +184,9 @@ export const TravelTracking = ({
                   <img
                     src={getPathImageDefault()}
                     alt={`logo-${process.env.REACT_APP_PROJECT_NAME}`}
+                    onError={(e) => {
+                      e.currentTarget.src = LogoMovyDefault;
+                    }}
                   />
                 </div>
                 <section className="content-travel">

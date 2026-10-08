@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Container } from "./styles";
-import { getPathImageDefault } from "../../config/configApp";
+import { getPathImageDefault, LogoMovyDefault } from "../../config/configApp";
 import api from "../../api/apiAxios";
 import swal from "sweetalert";
 
@@ -66,7 +66,13 @@ const DriverExemptionRequest = () => {
   return (
     <Container>
       <div className="content-box">
-        <img src={getPathImageDefault()} alt="Logo" />
+        <img
+          src={getPathImageDefault()}
+          alt="Logo"
+          onError={(e) => {
+            e.currentTarget.src = LogoMovyDefault;
+          }}
+        />
         <h4 className="title-exemption">
           <span className="title-exemption-line">Solicitar isenção de</span>
           <span className="title-exemption-line">taxa por</span>

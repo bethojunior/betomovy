@@ -16,7 +16,7 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { useStorage } from "../../../utils/Storage";
 import { useAuthStore } from "../../../store/authStore";
 import Menu from "../../DropDown";
-import { getPathImageDefault } from "../../../config/configApp";
+import { getPathImageDefault, LogoMovyDefault } from "../../../config/configApp";
 import { Container } from "./styles";
 
 export const Header = () => {
@@ -72,6 +72,9 @@ export const Header = () => {
             alt="Perfil"
             width={65}
             height={65}
+            onError={(e) => {
+              e.currentTarget.src = LogoMovyDefault;
+            }}
           />
         </div>
         <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
@@ -103,6 +106,9 @@ export const Header = () => {
             height={65}
             src={getPathImageDefault()}
             alt="logo"
+            onError={(e) => {
+              e.currentTarget.src = LogoMovyDefault;
+            }}
           />
         </div>
         <div className="menu-container">

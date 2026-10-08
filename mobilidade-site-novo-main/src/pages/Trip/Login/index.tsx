@@ -4,7 +4,7 @@ import { IoIosEyeOff, IoMdEye } from "react-icons/io";
 import api from "../../../api/apiAxios";
 import { AxiosError } from "axios";
 import pathBackgroundImage from "../../../assets/img/Banner2_1366x768.png";
-import { getPathImageDefault } from "../../../config/configApp";
+import { getPathImageDefault, LogoMovyDefault } from "../../../config/configApp";
 
 import { schema } from "./schema_validations";
 import { Controller, useForm } from "react-hook-form";
@@ -75,7 +75,14 @@ export const Login = () => {
     >
       <LoadingBackdrop loading={loading} />
       <div className="login-container">
-        <img src={getPathImageDefault()} alt="logo" className="logo"></img>
+        <img
+          src={getPathImageDefault()}
+          alt="logo"
+          className="logo"
+          onError={(e) => {
+            e.currentTarget.src = LogoMovyDefault;
+          }}
+        />
         <div>
           <form onSubmit={handleSubmit(sigIn)}>
             <Controller

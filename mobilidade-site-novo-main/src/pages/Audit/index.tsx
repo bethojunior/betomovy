@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Container } from './styles';
 import motoristaAgenteImg from '../../assets/img/motoristaAgente.jpeg';
 import { Spinner } from '../../components/Spinner';
-import { getPathImageDefault, getNameApplication } from '../../config/configApp';
+import { getPathImageDefault, getNameApplication, LogoMovyDefault } from '../../config/configApp';
 
 const Audit = () => {
   const [searchParams] = useSearchParams();
@@ -61,7 +61,14 @@ const Audit = () => {
           <div className="container">
             <div className='brand-icon'>
               <a href="/">
-                <img src={getPathImageDefault()} className='brand-logo left'/>
+                <img
+                  src={getPathImageDefault()}
+                  className='brand-logo left'
+                  alt="Logo"
+                  onError={(e) => {
+                    e.currentTarget.src = LogoMovyDefault;
+                  }}
+                />
                 <span className="project-name-nav">{getNameApplication()}</span>
               </a>
             </div>
@@ -131,7 +138,15 @@ const Audit = () => {
       <footer className="footer bg-dark-yellow">
         <div className='footer-container'>
           <div className='collun-container'>
-            <img src={getPathImageDefault()} width='70px' alt="Logo" style={{marginBottom: '1vw'}} />
+            <img
+              src={getPathImageDefault()}
+              width='70px'
+              alt="Logo"
+              style={{marginBottom: '1vw'}}
+              onError={(e) => {
+                e.currentTarget.src = LogoMovyDefault;
+              }}
+            />
           </div>
         </div>
         <div className='copy'>
