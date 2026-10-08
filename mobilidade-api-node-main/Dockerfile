@@ -59,4 +59,4 @@ COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 
 # Start the server using the production build
-CMD [ "node", "-r", "dd-trace/init", "dist/main.js" ]
+CMD [ "node", "dist/main.js" ]
