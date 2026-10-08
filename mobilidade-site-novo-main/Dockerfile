@@ -3,11 +3,11 @@ FROM node:20-alpine AS builder
 ENV CI=false
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps i18next @mui/system geojson
 COPY . .
 # Garante que .env.build exista mesmo se faltar
 RUN if [ ! -f .env.build ]; then cp .env.build.example .env.build 2>/dev/null || touch .env.build; fi
-RUN npm run build
+RUN CI=false npm run build
 
 # => Run container
 FROM nginx:1.24.0-alpine
