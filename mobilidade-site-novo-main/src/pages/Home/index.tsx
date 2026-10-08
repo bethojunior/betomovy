@@ -18,6 +18,7 @@ import pathBanner from "../../assets/img/Banner_1366x688.png";
 import {
   getPathImageDefault,
   getNameApplication,
+  LogoMovyDefault,
 } from "../../config/configApp";
 import api from "../../api/apiAxios";
 
@@ -152,7 +153,13 @@ const Home = () => {
       </section>
       <section id="sobre-nos" className="content-description-website">
         <div className="content-img">
-          <img src={getPathImageDefault()} alt="logo-app" />
+          <img
+            src={getPathImageDefault()}
+            alt="logo-app"
+            onError={(e) => {
+              e.currentTarget.src = LogoMovyDefault;
+            }}
+          />
         </div>
         <div className="description">
           <p>{`${getNameApplication()} ${t("paragraph-one-merchant")}`}</p>

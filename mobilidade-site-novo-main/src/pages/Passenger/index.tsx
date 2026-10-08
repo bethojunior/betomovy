@@ -17,6 +17,7 @@ import pathBackgroundImage from "../../assets/img/Banner2_1366x768.png";
 import {
   getPathImageDefault,
   getNameApplication,
+  LogoMovyDefault,
 } from "../../config/configApp";
 import api from "../../api/apiAxios";
 
@@ -468,14 +469,21 @@ const Passenger = () => {
           style={{ backgroundImage: `url(${pathBackgroundImage})` }}
         >
           <div className="column-1">
-            <h1 className="passenger-title">{t("register-passenger-text")}</h1>
-            <span>{t("register-passenger-description")}</span>
-            <Link to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}>
+            <Link
+              to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}
+              className="brand-header-link"
+            >
               <img
                 src={getPathImageDefault()}
                 alt={`logo-${getNameApplication()}`}
+                onError={(e) => {
+                  e.currentTarget.src = LogoMovyDefault;
+                }}
               />
+              <span className="brand-name">{getNameApplication()}</span>
             </Link>
+            <h1 className="passenger-title">{t("register-passenger-text")}</h1>
+            <span className="passenger-description">{t("register-passenger-description")}</span>
           </div>
           <div className="column-2">
             {preRegisterSuccess ? (
@@ -625,14 +633,21 @@ const Passenger = () => {
         style={{ backgroundImage: `url(${pathBackgroundImage})` }}
       >
         <div className="column-1">
-          <h1 className="passenger-title">{t("register-passenger-text")}</h1>
-          <span>{t("register-passenger-description")}</span>
-          <Link to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}>
+          <Link
+            to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}
+            className="brand-header-link"
+          >
             <img
               src={getPathImageDefault()}
               alt={`logo-${getNameApplication()}`}
+              onError={(e) => {
+                e.currentTarget.src = LogoMovyDefault;
+              }}
             />
+            <span className="brand-name">{getNameApplication()}</span>
           </Link>
+          <h1 className="passenger-title">{t("register-passenger-text")}</h1>
+          <span className="passenger-description">{t("register-passenger-description")}</span>
         </div>
         <div className="column-2">
           <form onSubmit={handleSubmit(handleRegisterPassenger)}>
@@ -1036,7 +1051,10 @@ const Passenger = () => {
                         <div className="container-input">
                           <input
                             type="password"
-                            placeholder="Confirmar senha"
+                            placeholder={
+                              (t("register-driver-step-1-confirm-password") as string) ||
+                              "Confirm password"
+                            }
                             onChange={(event) => {
                               setValue("confirmPassword", event.target.value);
                               handleCheckPasswordMatch();

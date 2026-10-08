@@ -10,6 +10,7 @@ import ModalTranslations from "../ModalTranslations";
 import {
   getPathImageDefault,
   getNameApplication,
+  LogoMovyDefault,
 } from "../../config/configApp";
 
 import { useTranslation } from "react-i18next";
@@ -50,6 +51,9 @@ const Header = () => {
           <img
             src={getPathImageDefault()}
             alt={`logo-${getNameApplication()}`}
+            onError={(e) => {
+              e.currentTarget.src = LogoMovyDefault;
+            }}
           />
           <span className="project-name">{getNameApplication()}</span>
         </div>

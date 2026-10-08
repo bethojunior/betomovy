@@ -63,6 +63,8 @@ export const getNameApplication = () => {
     : NAME_APPLICATION;
 };
 
+export { LogoMovyDefault };
+
 export const getPathImageDefault = () => {
   const logoAppPartner = localStorage.getItem("logoAppPartner");
 
@@ -76,8 +78,22 @@ export const getPathImageDefault = () => {
     } catch {}
   }
 
-  if (window.env.REACT_APP_BUCKET_URL && window.env.REACT_APP_BUCKET_URL !== "undefined") {
-    const logoDefault = `${window.env.REACT_APP_BUCKET_URL}default.jpg`;
+  if (
+    (window as any).env?.REACT_APP_LOGO_URL &&
+    (window as any).env?.REACT_APP_LOGO_URL !== "undefined"
+  ) {
+    changeFavicon((window as any).env.REACT_APP_LOGO_URL);
+    return (window as any).env.REACT_APP_LOGO_URL;
+  }
+
+  const bucketUrl = window.env?.REACT_APP_BUCKET_URL?.trim();
+  if (
+    bucketUrl &&
+    bucketUrl !== "undefined" &&
+    !bucketUrl.endsWith("s3.amazonaws.com/") &&
+    bucketUrl !== "https://s3.amazonaws.com"
+  ) {
+    const logoDefault = `${bucketUrl}default.jpg`;
     changeFavicon(logoDefault);
     return logoDefault;
   }

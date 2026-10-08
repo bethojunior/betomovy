@@ -21,6 +21,7 @@ import DocumentsRequisited from "./StepsSignUp/DocumentsRequisited";
 import {
   getNameApplication,
   getPathImageDefault,
+  LogoMovyDefault,
 } from "../../config/configApp";
 
 import { useTranslation } from "react-i18next";
@@ -328,6 +329,9 @@ const Driver = () => {
             <img
               src={getPathImageDefault()}
               alt={`logo-${getNameApplication()}`}
+              onError={(e) => {
+                e.currentTarget.src = LogoMovyDefault;
+              }}
             />
           </Link>
         </div>

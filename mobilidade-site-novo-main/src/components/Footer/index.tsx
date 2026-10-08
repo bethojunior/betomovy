@@ -3,13 +3,13 @@ import { CaretUp } from "phosphor-react";
 
 import { Container } from "./styles";
 
-import { getPathImageDefault, getNameApplication } from "../../config/configApp";
+import { getPathImageDefault, getNameApplication, LogoMovyDefault } from "../../config/configApp";
 
 import { useTranslation } from "react-i18next";
 
 const Footer = () => {
     const handleUpPage = () => {
-        window.scroll(0, 0);
+        window.scroll({ top: 0, behavior: "smooth" });
     }
 
     const { t } = useTranslation();
@@ -24,12 +24,18 @@ const Footer = () => {
             <div className="content">
                 <div className="content-logo">
                     <Link to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}>
-                        <img src={getPathImageDefault()} alt={`logo-${getNameApplication()}`} />
+                        <img
+                          src={getPathImageDefault()}
+                          alt={`logo-${getNameApplication()}`}
+                          onError={(e) => {
+                            e.currentTarget.src = LogoMovyDefault;
+                          }}
+                        />
                         <span className="project-name">{getNameApplication()}</span>
                     </Link>
                 </div>
                 <div className="content-description">
-                    <span>{`${t('text-footer-1')} - ${getNameApplication()} - ${t('text-footer-2')}`}</span>
+                    <span>{`Copyright © ${new Date().getFullYear()} - ${getNameApplication()} - ${t('text-footer-2')}`}</span>
                     <Link
                       to={nameAppPartner ? `/privacidade?name_app=${nameAppPartner}` : "/privacidade"}
                       className="footer-link-privacy"
