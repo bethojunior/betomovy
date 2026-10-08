@@ -10,7 +10,7 @@ export const schema = yup.object({
       const words = value.trim().split(/\s+/); // Divide por espaços múltiplos
       return words.length > 1; // Verifica se há pelo menos duas palavras
     }),
-  document: yup.string().required("Este campo é obrigatório"),
+  document: yup.string().optional(),
   dateOfBirth: yup
     .string()
     .required("Este campo é obrigatório")

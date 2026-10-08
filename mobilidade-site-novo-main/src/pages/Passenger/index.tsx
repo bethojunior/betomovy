@@ -34,6 +34,7 @@ import CountryCodeSelect from "../../components/CountryCodeSelect";
 import Mask from "../../utils/Masks";
 import { validatorCpf } from "../../utils/CheckCpfValid";
 import { isValidDateOfBirth, toIsoDateOfBirth } from "../../utils/CheckDateOfBirth";
+import { isLanguageEnabled } from "../../utils/languageConfig";
 
 declare global {
   interface Window {
@@ -54,7 +55,8 @@ interface FormDataProps {
 }
 
 const Passenger = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isBrazil = (i18n.language || "en").startsWith("pt") && isLanguageEnabled("pt");
   const location = useLocation();
   const { userId: userIdParam } = useParams<{ userId?: string }>();
   const isPreRegister = location.pathname.includes("/preregister");
@@ -138,6 +140,7 @@ const Passenger = () => {
     setLoading(true);
     const payload = {
       ...data,
+      document: isBrazil ? data.document : "",
       phone: toDialablePhone(data.phone),
       dateOfBirth: toIsoDateOfBirth(data.dateOfBirth),
       nickname: data.name.split(" ")[0] ? data.name.split(" ")[0] : null,
@@ -238,6 +241,7 @@ const Passenger = () => {
   };
 
   const handleCheckDocument = async () => {
+    if (!isBrazil) return;
     const document = getValues("document");
     if (document) {
       setLoading(true);
@@ -343,7 +347,7 @@ const Passenger = () => {
   };
 
   const handlePreRegisterDocumentBlur = () => {
-    if (!preRegisterForm.document) return;
+    if (!isBrazil || !preRegisterForm.document) return;
     if (!validatorCpf(preRegisterForm.document)) {
       setErrorDocument(true);
       setNameErrorDocument(t("register-passenger-document-error"));
@@ -368,7 +372,7 @@ const Passenger = () => {
     e.preventDefault();
     if (
       !preRegisterForm.name.trim() ||
-      !preRegisterForm.document.trim() ||
+      (isBrazil && !preRegisterForm.document.trim()) ||
       !preRegisterForm.dateOfBirth.trim() ||
       !preRegisterForm.email.trim() ||
       !preRegisterForm.phone.trim()
@@ -376,7 +380,7 @@ const Passenger = () => {
       swal("", "Preencha todos os campos!", "info");
       return;
     }
-    if (!validatorCpf(preRegisterForm.document)) {
+    if (isBrazil && !validatorCpf(preRegisterForm.document)) {
       setErrorDocument(true);
       setNameErrorDocument(t("register-passenger-document-error"));
       return;
@@ -399,7 +403,7 @@ const Passenger = () => {
       const payload = {
         name: preRegisterForm.name.trim(),
         nickname: preRegisterForm.name.trim().split(" ")[0],
-        document: preRegisterForm.document,
+        document: isBrazil ? preRegisterForm.document : "",
         dateOfBirth: toIsoDateOfBirth(preRegisterForm.dateOfBirth),
         email: preRegisterForm.email.trim(),
         password: preRegisterForm.password.trim(),
@@ -491,31 +495,33 @@ const Passenger = () => {
                     onChange={handlePreRegisterChange("name")}
                   />
                 </div>
-                <div className="cpf-container">
-                  <div className="container-input">
-                    <input
-                      type="text"
-                      placeholder={t("register-passenger-placeholder-document") as string}
-                      value={preRegisterForm.document}
-                      onChange={handlePreRegisterChange("document")}
-                      onBlur={handlePreRegisterDocumentBlur}
-                      maxLength={14}
-                    />
-                    {errorDocument && (
-                      <span className="cpf-icon">
-                        <FaTimesCircle color="red" />
-                      </span>
-                    )}
-                    {!errorDocument && preRegisterForm.document && (
-                      <span className="cpf-icon">
-                        <FaCheckCircle color="green" />
-                      </span>
+                {isBrazil && (
+                  <div className="cpf-container">
+                    <div className="container-input">
+                      <input
+                        type="text"
+                        placeholder={t("register-passenger-placeholder-document") as string}
+                        value={preRegisterForm.document}
+                        onChange={handlePreRegisterChange("document")}
+                        onBlur={handlePreRegisterDocumentBlur}
+                        maxLength={14}
+                      />
+                      {errorDocument && (
+                        <span className="cpf-icon">
+                          <FaTimesCircle color="red" />
+                        </span>
+                      )}
+                      {!errorDocument && preRegisterForm.document && (
+                        <span className="cpf-icon">
+                          <FaCheckCircle color="green" />
+                        </span>
+                      )}
+                    </div>
+                    {errorDocument && nameErrorDocument && (
+                      <span className="errors-input">{nameErrorDocument}</span>
                     )}
                   </div>
-                  {errorDocument && nameErrorDocument && (
-                    <span className="errors-input">{nameErrorDocument}</span>
-                  )}
-                </div>
+                )}
                 <div className="cpf-container">
                   <div className="container-input">
                     <input
@@ -668,67 +674,69 @@ const Passenger = () => {
                     )}
                   />
 
-                  <Controller
-                    control={control}
-                    name="document"
-                    render={({
-                      field: { value = "", name },
-                      fieldState: { error },
-                    }) => (
-                      <div className="cpf-container">
-                        <div className="container-input">
-                          <input
-                            type="text"
-                            placeholder={
-                              t(
-                                "register-passenger-placeholder-document"
-                              ) as string
-                            }
-                            onChange={(event) => {
-                              const masked = Mask.setMaskCpf(event.target.value);
-                              setValue("document", masked);
-                            }}
-                            value={value}
-                            onBlur={() => {
-                              const document = getValues("document") || "";
-                              if (!validatorCpf(document)) {
-                                setErrorDocument(true);
-                                setNameErrorDocument(
-                                  t("register-passenger-document-error")
-                                );
-                                return;
+                  {isBrazil && (
+                    <Controller
+                      control={control}
+                      name="document"
+                      render={({
+                        field: { value = "", name },
+                        fieldState: { error },
+                      }) => (
+                        <div className="cpf-container">
+                          <div className="container-input">
+                            <input
+                              type="text"
+                              placeholder={
+                                t(
+                                  "register-passenger-placeholder-document"
+                                ) as string
                               }
-                              setErrorDocument(false);
-                              setNameErrorDocument("");
-                              handleCheckDocument();
-                            }}
-                            name={name}
-                          />
-                          {errorDocument && (
-                            <span className="cpf-icon">
-                              <FaTimesCircle color="red" />
+                              onChange={(event) => {
+                                const masked = Mask.setMaskCpf(event.target.value);
+                                setValue("document", masked);
+                              }}
+                              value={value}
+                              onBlur={() => {
+                                const document = getValues("document") || "";
+                                if (!validatorCpf(document)) {
+                                  setErrorDocument(true);
+                                  setNameErrorDocument(
+                                    t("register-passenger-document-error")
+                                  );
+                                  return;
+                                }
+                                setErrorDocument(false);
+                                setNameErrorDocument("");
+                                handleCheckDocument();
+                              }}
+                              name={name}
+                            />
+                            {errorDocument && (
+                              <span className="cpf-icon">
+                                <FaTimesCircle color="red" />
+                              </span>
+                            )}
+                            {!errorDocument && value && (
+                              <span className="cpf-icon">
+                                <FaCheckCircle color="green" />
+                              </span>
+                            )}
+                          </div>
+                          {errorDocument && nameErrorDocument && (
+                            <span className="errors-input">
+                              {nameErrorDocument}
                             </span>
                           )}
-                          {!errorDocument && value && (
-                            <span className="cpf-icon">
-                              <FaCheckCircle color="green" />
-                            </span>
+                          {error && (
+                            <p className="erros-input">
+                              {" "}
+                              {TranslationErrors(error.message as string)}{" "}
+                            </p>
                           )}
                         </div>
-                        {errorDocument && nameErrorDocument && (
-                          <span className="errors-input">
-                            {nameErrorDocument}
-                          </span>
-                        )}
-                        {error && (
-                          <p className="erros-input">
-                            {" "}
-                            {TranslationErrors(error.message as string)}{" "}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  />
+                      )}
+                    />
+                  )}
 
                   <Controller
                     control={control}

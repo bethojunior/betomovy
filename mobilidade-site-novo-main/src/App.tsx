@@ -13,6 +13,7 @@ import { fetchUrlRedirects, getColorsDefaults } from "./config/configApp";
 import api from "./api/apiAxios";
 import { useStorage } from "./utils/Storage";
 import { useAuthStore } from "./store/authStore";
+import { getDefaultLanguageCode, isLanguageEnabled } from "./utils/languageConfig";
 
 const App = () => {
   const [informationsCustomer, setInformationsCustomer] =
@@ -98,21 +99,14 @@ const App = () => {
     fetchUrlRedirects().catch((error) => console.error(error));
   }, []);
 
-  const switchLanguageDefault = (languageBrowser: string) => {
-    const language = languageBrowser.split("-")[0];
-
-    switch (language) {
-      case "pt":
-        return i18n.changeLanguage("pt");
-      case "en":
-        return i18n.changeLanguage("en");
-      case "fr":
-        return i18n.changeLanguage("fr");
-      case "es":
-        return i18n.changeLanguage("es");
-      default:
-        return i18n.changeLanguage("en");
+  const switchLanguageDefault = (browserLang: string) => {
+    const saved = localStorage.getItem("languageApplication");
+    if (saved && isLanguageEnabled(saved)) {
+      return i18n.changeLanguage(saved);
     }
+    // O padrão oficial é o idioma habilitado (Inglês / US quando Brasil estiver desativado)
+    const defaultLang = getDefaultLanguageCode();
+    return i18n.changeLanguage(defaultLang);
   };
 
   const isAuthenticated = () => {
@@ -136,8 +130,11 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (languageBrowser !== null) {
+    if (languageBrowser !== null && isLanguageEnabled(languageBrowser)) {
       i18n.changeLanguage(languageBrowser);
+    } else {
+      const defaultLang = getDefaultLanguageCode();
+      i18n.changeLanguage(defaultLang);
     }
   }, [languageBrowser, i18n]);
 

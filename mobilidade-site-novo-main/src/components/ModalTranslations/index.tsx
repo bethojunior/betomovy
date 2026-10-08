@@ -6,6 +6,8 @@ import { Container } from './styles';
 
 import CardLanguage from '../CardLanguage';
 
+import { isLanguageEnabled } from '../../utils/languageConfig';
+
 interface ModalProps{
     openModal: boolean;
     setOpenModal: (data: boolean) => void;
@@ -34,10 +36,18 @@ export default function ModalTranslations({ openModal, setOpenModal }:ModalProps
 
                 <h1>{t('modal-language-title')}</h1>
                 <div className='content-cards-translation'>
-                    <CardLanguage codeLanguage='pt' nameLanguage={t('modal-language-pt')} />
-                    <CardLanguage codeLanguage='en' nameLanguage={t('modal-language-en')} />
-                    <CardLanguage codeLanguage='fr' nameLanguage={t('modal-language-fr')} />
-                    <CardLanguage codeLanguage='es' nameLanguage={t('modal-language-es')} />
+                    {isLanguageEnabled('en') && (
+                      <CardLanguage codeLanguage='en' nameLanguage={t('modal-language-en')} />
+                    )}
+                    {isLanguageEnabled('pt') && (
+                      <CardLanguage codeLanguage='pt' nameLanguage={t('modal-language-pt')} />
+                    )}
+                    {isLanguageEnabled('es') && (
+                      <CardLanguage codeLanguage='es' nameLanguage={t('modal-language-es')} />
+                    )}
+                    {isLanguageEnabled('fr') && (
+                      <CardLanguage codeLanguage='fr' nameLanguage={t('modal-language-fr')} />
+                    )}
                 </div>
             </div>
         </Container>

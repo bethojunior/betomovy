@@ -127,6 +127,14 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
                     </a>
                 </div>
             </li>
+            <li>
+                <div>
+                    <a href="<?php echo Host::getLocal() ?>language/management">
+                        <i class="material-icons nav-icon">language</i>
+                        Idiomas da Plataforma
+                    </a>
+                </div>
+            </li>
             <li id="cleanCache">
                 <div>
                     <a onclick="modal()">

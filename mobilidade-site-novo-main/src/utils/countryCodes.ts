@@ -29,18 +29,18 @@ function buildCountry(iso2: LibIso2): CountryCode {
   };
 }
 
-const BRAZIL_ISO2: LibIso2 = "BR";
+const US_ISO2: LibIso2 = "US";
+export const US_COUNTRY = buildCountry(US_ISO2);
+export const BR_COUNTRY = buildCountry(BRAZIL_ISO2);
 
-// Brasil primeiro (país padrão), resto em ordem alfabética — DDI, formato e
-// tamanho de cada país vêm do libphonenumber-js, não são mantidos aqui.
-const otherCountries = getCountries()
-  .filter((iso2) => iso2 !== BRAZIL_ISO2)
-  .map(buildCountry)
-  .sort((a, b) => a.name.localeCompare(b.name, "pt"));
+// Estados Unidos (+1) como país padrão para a plataforma internacional
+export const COUNTRY_CODES: CountryCode[] = [
+  US_COUNTRY,
+  BR_COUNTRY,
+  ...otherCountries.filter((c) => c.iso2 !== "US" && c.iso2 !== "BR"),
+];
 
-export const COUNTRY_CODES: CountryCode[] = [buildCountry(BRAZIL_ISO2), ...otherCountries];
-
-export const DEFAULT_COUNTRY = COUNTRY_CODES[0]; // Brasil
+export const DEFAULT_COUNTRY = US_COUNTRY;
 
 export function findCountryByIso2(iso2?: string | null): CountryCode {
   return COUNTRY_CODES.find(c => c.iso2 === iso2?.toUpperCase()) ?? DEFAULT_COUNTRY;

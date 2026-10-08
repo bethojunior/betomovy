@@ -1,5 +1,6 @@
 import { changeFavicon } from "../../utils/ChangeFavicon";
 import api from "../../api/apiAxios";
+import LogoMovyDefault from "../../assets/img/Logo_100x100.png";
 
 //const HOME = "home";
 const NAME_APPLICATION = "Demo";
@@ -66,15 +67,23 @@ export const getPathImageDefault = () => {
   const logoAppPartner = localStorage.getItem("logoAppPartner");
 
   if (logoAppPartner) {
-    changeFavicon(JSON.parse(logoAppPartner));
-    return JSON.parse(logoAppPartner);
+    try {
+      const parsed = JSON.parse(logoAppPartner);
+      if (parsed) {
+        changeFavicon(parsed);
+        return parsed;
+      }
+    } catch {}
   }
 
-  const logoDefault = `${window.env.REACT_APP_BUCKET_URL}default.jpg`;
+  if (window.env.REACT_APP_BUCKET_URL && window.env.REACT_APP_BUCKET_URL !== "undefined") {
+    const logoDefault = `${window.env.REACT_APP_BUCKET_URL}default.jpg`;
+    changeFavicon(logoDefault);
+    return logoDefault;
+  }
 
-  changeFavicon(logoDefault);
-
-  return logoDefault;
+  changeFavicon(LogoMovyDefault);
+  return LogoMovyDefault;
 };
 
 export const getLinkAppClient = () => {
