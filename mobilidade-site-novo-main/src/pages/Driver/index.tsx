@@ -323,9 +323,10 @@ const Driver = () => {
         style={{ backgroundImage: `url(${pathBackgroundImage})` }}
       >
         <div className="column-1">
-          <h1 className="driver-title">{t("register-driver-text")}</h1>
-          <span>{descriptionRegistration}</span>
-          <Link to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}>
+          <Link
+            to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}
+            className="brand-header-link"
+          >
             <img
               src={getPathImageDefault()}
               alt={`logo-${getNameApplication()}`}
@@ -333,7 +334,10 @@ const Driver = () => {
                 e.currentTarget.src = LogoMovyDefault;
               }}
             />
+            <span className="brand-name">{getNameApplication()}</span>
           </Link>
+          <h1 className="driver-title">{t("register-driver-text")}</h1>
+          <span>{descriptionRegistration}</span>
         </div>
         <div className="column-2">
           <LinearLoading loading={loading} />

@@ -48,14 +48,16 @@ const Header = () => {
     <Container>
       <nav className="content-nav">
         <div className="content-logo">
-          <img
-            src={getPathImageDefault()}
-            alt={`logo-${getNameApplication()}`}
-            onError={(e) => {
-              e.currentTarget.src = LogoMovyDefault;
-            }}
-          />
-          <span className="project-name">{getNameApplication()}</span>
+          <Link to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}>
+            <img
+              src={getPathImageDefault()}
+              alt={`logo-${getNameApplication()}`}
+              onError={(e) => {
+                e.currentTarget.src = LogoMovyDefault;
+              }}
+            />
+            <span className="project-name">{getNameApplication()}</span>
+          </Link>
         </div>
         <ul className="content-links">
           <li>
