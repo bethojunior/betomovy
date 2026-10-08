@@ -3,15 +3,20 @@ set -euo pipefail
 
 start() {
   echo "[INFO] Preparando diretórios..."
-  mkdir -p /run/php-fpm
-  
-  # Ajustar permissões apenas nos diretórios que precisam (excluindo .env montado como read-only)
+  mkdir -p /var/log/php-fpm
+  mkdir -p /var/lib/php/session
+  mkdir -p /var/www/html/storage/temp
+
+  # Ajustar permissões nos diretórios da aplicação
   if [ -d /var/www/html/storage ]; then
-    chown -R nginx:nginx /var/www/html/storage
+    chown -R nginx:nginx /var/www/html/storage 2>/dev/null || true
   fi
   if [ -d /var/www/html/bootstrap/cache ]; then
-    chown -R nginx:nginx /var/www/html/bootstrap/cache
+    chown -R nginx:nginx /var/www/html/bootstrap/cache 2>/dev/null || true
   fi
+
+  chown -R nginx:nginx /var/lib/php/session 2>/dev/null || true
+  chmod 1733 /var/lib/php/session 2>/dev/null || true
 
   echo "[INFO] Iniciando supervisor..."
   exec /usr/bin/supervisord -c /etc/supervisord.conf
