@@ -398,8 +398,10 @@ const CategoriesDriver = ({
       const responseCategoriesDriverPartners = await api.get(
         `usertype/driversbyapppartners?app_partner=${appPartnerKey}`
       );
-      setCategoryDriver(responseCategoriesDriverPartners.data.data);
+      const cats = responseCategoriesDriverPartners?.data?.data;
+      setCategoryDriver(Array.isArray(cats) ? cats : []);
     } catch (error) {
+      setCategoryDriver([]);
       swal({
         title: t("message-error-api-getCategories") as string,
         icon: "error",
@@ -414,8 +416,10 @@ const CategoriesDriver = ({
     setLoading(true);
     try {
       const responseCategoriesDriver = await api.get("usertype/drivers");
-      setCategoryDriver(responseCategoriesDriver.data.data);
+      const cats = responseCategoriesDriver?.data?.data;
+      setCategoryDriver(Array.isArray(cats) ? cats : []);
     } catch (error) {
+      setCategoryDriver([]);
       swal({
         title: t("message-error-api-getCategories") as string,
         icon: "error",

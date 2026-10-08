@@ -431,10 +431,11 @@ const Passenger = () => {
   };
 
   useEffect(() => {
+    const list = Array.isArray(activeCities) ? activeCities : [];
     setFilteredCities(
-      activeCities
+      list
         .filter((city) =>
-          city.nome.toLowerCase().includes(searchQuery.toLowerCase())
+          city?.nome?.toLowerCase()?.includes(searchQuery.toLowerCase())
         )
         .slice(0, 6)
     );
@@ -445,8 +446,10 @@ const Passenger = () => {
       setLoading(true);
       try {
         const responseActiveCities = await api.get("City/getActives");
-        setActiveCities(responseActiveCities.data.data);
+        const cities = responseActiveCities?.data?.data;
+        setActiveCities(Array.isArray(cities) ? cities : []);
       } catch (error) {
+        setActiveCities([]);
         swal({
           title: t("message-error-api-getCities") as string,
           icon: "error",

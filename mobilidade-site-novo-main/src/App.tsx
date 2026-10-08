@@ -172,11 +172,9 @@ const App = () => {
         backgroundColorPrimary={backgroundColorPrimary}
         backgroundColorSecondary={backgroundColorSecondary}
       />
-      {!loading && (
-        <DriverDatasContextProvider>
-          <RoutesApplication />
-        </DriverDatasContextProvider>
-      )}
+      <DriverDatasContextProvider>
+        <RoutesApplication />
+      </DriverDatasContextProvider>
     </BrowserRouter>
   );
 };
