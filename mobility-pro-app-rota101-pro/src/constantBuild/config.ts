@@ -64,12 +64,12 @@ export const buildApp = () => {
   }
   if (appProccess === 'aws') {
     const HOST_API_DELIVERY = `https://delivery-api-${nameApp}.prod.704apps.com.br/`;
-    const HOST_API_APP = `https://mobilidade-api-php-${nameApp}.prod.704apps.com.br/`;
-    const HOST_SOCKET = `https://mobilidade-api-node-${nameApp}.prod.704apps.com.br/`;
-    const HOST_SOCKETV2 = `https://delivery-realtimeapi-${nameApp}.prod.704apps.com.br`;
-    const HOST_SITE = `https://${nameApp}-mobilidade.prod.704apps.com.br/`;
+    const HOST_API_APP = `https://api.movymob.com/`;
+    const HOST_SOCKET = `https://socket.movymob.com/`;
+    const HOST_SOCKETV2 = `https://socket.movymob.com/`;
+    const HOST_SITE = `https://movymob.com/`;
     const HOST_API_IFOOD = 'https://api-ifood.704app.com.br/ifood/';
-    const HOST_API_CENTRAL = `https://central-${nameApp}-api.prod.704apps.com.br/`;
+    const HOST_API_CENTRAL = `https://movycentral.com/`;
 
     let HOST_AUDIO_MESSAGE = `https://minio.704app.com.br/rota101fb704/chat/trip/`;
     let HOST_IMAGE_DRIVER = `https://minio.704app.com.br/rota101fb704/driver/profile/compressed/`;
