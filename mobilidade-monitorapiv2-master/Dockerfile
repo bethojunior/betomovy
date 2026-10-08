@@ -32,6 +32,7 @@ RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
     && rm -f composer-setup.php composer.sig
 
 # Configs nginx / php-fpm / php.ini
+RUN rm -f /etc/php-fpm.d/www.conf
 COPY docker-prod/config/nginx.conf /etc/nginx/nginx.conf
 COPY docker-prod/config/www.conf   /etc/php-fpm.d/www.conf
 COPY docker-prod/config/local.ini  /etc/php.d/zz-local.ini

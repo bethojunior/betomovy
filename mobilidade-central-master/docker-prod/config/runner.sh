@@ -1,27 +1,31 @@
 #!/bin/bash
 
 start() {
-mkdir -p /run/php-fpm
-chown -R nginx:nginx /var/www/html
-rm -rf /var/www/html/public/webfiles/js/utils/Host.js
-rm -rf /var/www/html/public/config/host.css
-rm -rf /var/www/html/public/config/host.js
-nginx -g 'daemon on; master_process on;'
-/usr/sbin/php-fpm -F -c /etc/php.ini -y /etc/php-fpm.conf --nodaemonize
+  mkdir -p /var/log/php-fpm
+  mkdir -p /var/lib/php/session
+  mkdir -p /var/lib/php/wsdlcache
+  chown -R nginx:nginx /var/lib/php/session 2>/dev/null || true
+  chmod 1733 /var/lib/php/session 2>/dev/null || true
+  chown -R nginx:nginx /var/www/html 2>/dev/null || true
+  rm -rf /var/www/html/public/webfiles/js/utils/Host.js 2>/dev/null || true
+  rm -rf /var/www/html/public/config/host.css 2>/dev/null || true
+  rm -rf /var/www/html/public/config/host.js 2>/dev/null || true
+  nginx -g 'daemon on; master_process on;'
+  exec /usr/sbin/php-fpm -F -c /etc/php.ini -y /etc/php-fpm.conf --nodaemonize
 }
 
 stop() {
-    pkill nginx
-    pkill php-fpm
-    pkill -f nginx -9
-    pkill -f php-fpm -9
+  pkill nginx 2>/dev/null || true
+  pkill php-fpm 2>/dev/null || true
+  pkill -f nginx -9 2>/dev/null || true
+  pkill -f php-fpm -9 2>/dev/null || true
 }
 
 restart() {
   stop
   start
-}      
-                                                                                                                                                                                                                                                                                                                                  
+}
+
 case "$1" in
   start)
     start
@@ -33,7 +37,7 @@ case "$1" in
     restart
     ;;
   *)
-    echo $"Usage: $0 {start|stop|restart}"
+    echo "Usage: $0 {start|stop|restart}"
     exit 1
 esac
 

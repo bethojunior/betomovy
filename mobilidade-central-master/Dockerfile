@@ -48,11 +48,13 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
-# Ajustes Nginx
+# Ajustes Nginx e PHP-FPM
+RUN rm -f /etc/php-fpm.d/www.conf \
+    && mkdir -p /var/log/php-fpm \
+    && mkdir -p /var/lib/php/session \
+    && mkdir -p /var/lib/php/wsdlcache
 COPY docker-prod/config/nginx.conf /etc/nginx/nginx.conf
-# Ajustes php-fpm
 COPY docker-prod/config/www.conf /etc/php-fpm.d/www.conf
-# Ajustes PHP
 COPY docker-prod/config/local.ini /etc/php.d/local.ini
 
 # Roda os serviços
