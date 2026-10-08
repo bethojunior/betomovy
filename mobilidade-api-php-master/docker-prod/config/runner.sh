@@ -3,9 +3,12 @@ set -euo pipefail
 
 start() {
   echo "[INFO] Preparando diretórios..."
+  mkdir -p /run/php-fpm
   mkdir -p /var/log/php-fpm
   mkdir -p /var/lib/php/session
   mkdir -p /var/www/html/storage/temp
+  chown -R nginx:nginx /run/php-fpm 2>/dev/null || true
+  chmod 777 /run/php-fpm 2>/dev/null || true
 
   # Ajustar permissões nos diretórios da aplicação
   if [ -d /var/www/html/storage ]; then

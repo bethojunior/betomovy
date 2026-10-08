@@ -1,9 +1,12 @@
 #!/bin/bash
 
 start() {
+  mkdir -p /run/php-fpm
   mkdir -p /var/log/php-fpm
   mkdir -p /var/lib/php/session
   mkdir -p /var/lib/php/wsdlcache
+  chown -R nginx:nginx /run/php-fpm 2>/dev/null || true
+  chmod 777 /run/php-fpm 2>/dev/null || true
   chown -R nginx:nginx /var/lib/php/session 2>/dev/null || true
   chmod 1733 /var/lib/php/session 2>/dev/null || true
   chown -R nginx:nginx /var/www/html 2>/dev/null || true
