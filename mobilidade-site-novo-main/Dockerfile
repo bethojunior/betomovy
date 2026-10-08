@@ -1,5 +1,6 @@
 # => Build container
 FROM node:20-alpine AS builder
+ENV CI=false
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --legacy-peer-deps

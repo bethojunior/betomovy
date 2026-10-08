@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
-import { IState } from 'src/modules/state/StateInterface';
+import { IState } from '../../state/StateInterface';
 
 @Injectable()
 export class RedisService implements IState {

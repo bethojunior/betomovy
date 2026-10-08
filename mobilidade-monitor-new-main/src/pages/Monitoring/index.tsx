@@ -41,7 +41,7 @@ import Session from "../../utils/Session";
 import Utils from "../../utils/Utils";
 import { shouldShowDriverByOfflineRecency } from "../../utils/driverPosition";
 import SelectAndButtonNotification from "../../components/Notification/CitiesAndNotifications";
-import { SelectedMonitoringArea } from "src/@types";
+import { SelectedMonitoringArea } from "../../@types";
 import { MOBILE_BREAKPOINT } from "../../styles/layout-tokens";
 
 const DEFAULT_ACTIVE_TRIPS_POLLING_INTERVAL_MS = 15000;

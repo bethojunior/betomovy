@@ -8,6 +8,7 @@
     "types": ["cypress", "node"],
     "baseUrl": "./",
     "paths": {
+      "@/*": ["src/*"],
       "@/utils/*": ["src/utils/*"]
     },
     /* Bundler mode */

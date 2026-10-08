@@ -1,5 +1,4 @@
-import { SocketOptions } from "dgram";
-import { io, ManagerOptions, Socket } from "socket.io-client";
+import { io, ManagerOptions, Socket, SocketOptions } from "socket.io-client";
 
 let socketInstance: AppSocket | null = null;
 let socketInstanceKey: string | null = null;
