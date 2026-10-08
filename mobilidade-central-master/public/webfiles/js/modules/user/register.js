@@ -456,8 +456,8 @@ document.addEventListener("DOMContentLoaded", function () {
             return lastPart;
         }
         
-        console.log('CentralId não encontrado na URL');
-        return null;
+        console.log('CentralId não encontrado na URL, usando default 1');
+        return '1';
     }
 
     function handleCancel() {
@@ -465,16 +465,14 @@ document.addEventListener("DOMContentLoaded", function () {
         
         Swal.fire({
             title: 'Cancelar Cadastro',
-            text: 'Tem certeza que deseja cancelar o cadastro? Todas as informações serão perdidas.',
+            text: 'Tem certeza que deseja cancelar o cadastro? Você voltará para a página de login.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sim, cancelar',
             cancelButtonText: 'Não, continuar'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Resetar formulário
-                document.getElementById('userRegisterForm').reset();
-                clearAllFieldErrors();
+                window.location.href = '/';
             }
         });
     }

@@ -21,12 +21,16 @@ define('ROOT_DIR', realpath('../'));
 
 session_start();
 startIncludes('../src/const');
+
+if (file_exists(ROOT_DIR . '/src/utils/DotEnv.php')) {
+    require_once ROOT_DIR . '/src/utils/DotEnv.php';
+    if (file_exists(ROOT_DIR . '/.env')) {
+        (new DotEnv(ROOT_DIR . '/.env'))->load();
+    }
+}
+
 startIncludes('../src/utils');
 startIncludes('../src/controller');
-
-if (file_exists(ROOT_DIR . '/.env')) {
-    (new DotEnv(ROOT_DIR . '/.env'))->load();
-}
 
 $route = new Route();
 

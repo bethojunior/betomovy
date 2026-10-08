@@ -18,6 +18,9 @@
         <div class="register-card">
             <!-- Header -->
             <div class="card-header">
+                <a href="/" style="display: inline-block; margin-bottom: 1rem;">
+                    <img src="/webfiles/img/logo/logo.png" alt="MOVY Logo" style="height: 52px; width: auto; object-fit: contain;">
+                </a>
                 <div class="header-content">
                     <h1>Crie sua conta</h1>
                     <p>Junte-se à nossa plataforma de mobilidade urbana</p>
@@ -73,7 +76,7 @@
             <div class="card-footer">
                 <p class="footer-text">
                     Já tem uma conta? 
-                    <a href="#" class="login-link">Faça login</a>
+                    <a href="/" class="login-link">Faça login</a>
                 </p>
             </div>
         </div>

@@ -15,6 +15,7 @@ start() {
   rm -rf /var/www/html/public/webfiles/js/utils/Host.js 2>/dev/null || true
   rm -rf /var/www/html/public/config/host.css 2>/dev/null || true
   rm -rf /var/www/html/public/config/host.js 2>/dev/null || true
+  rm -rf /var/www/html/public/webfiles/js/config/host.js 2>/dev/null || true
   nginx -g 'daemon on; master_process on;'
   exec /usr/sbin/php-fpm -F -c /etc/php.ini -y /etc/php-fpm.conf --nodaemonize
 }

@@ -21,6 +21,7 @@
         <div class="login-card">
 
             <img src="<?php echo Host::getCentral(); ?>default.jpg"
+                 onerror="this.onerror=null; this.src='/webfiles/img/logo/logo.png';"
                  alt="Logo da central"
                  class="logo-company">
 

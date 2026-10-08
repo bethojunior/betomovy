@@ -151,16 +151,22 @@ class Route extends Controller
 
     public function publicRoute()
     {
-        $publics = ['Usuario/Cadastro', 'Usuario/Register'];
+        $publics = ['Usuario/Cadastro', 'Usuario/Register', 'cadastro', 'register'];
 
-        if(!isset($_GET['url']))
-            return false;
-
-        $url = $_GET['url'];
-
+        $uri = strtolower(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '');
         foreach ($publics as $public) {
-            if (strpos(strtolower($url), strtolower($public)) !== false)
+            if (strpos($uri, strtolower($public)) !== false) {
                 return true;
+            }
+        }
+
+        if (isset($_GET['url'])) {
+            $url = strtolower($_GET['url']);
+            foreach ($publics as $public) {
+                if (strpos($url, strtolower($public)) !== false) {
+                    return true;
+                }
+            }
         }
 
         return false;

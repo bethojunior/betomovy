@@ -52,14 +52,22 @@ class Controller
         $region = getenv('S3_BUCKET_REGION') ?: 'sa-east-1';
         $region = $region == 'us-east-1' ? '' : "-{$region}";
         $hostUtils = file_get_contents(ROOT_DIR . "/config/host.example.js");
-        $hostUtils = str_replace("<APIAPP_HOST>", getenv('APIAPP_HOST'), $hostUtils);
-        $hostUtils = str_replace("<API_SOCKET_HOST>", getenv('API_SOCKET_HOST'), $hostUtils);
-        $hostUtils = str_replace("<API_HOST>", getenv('API_HOST'), $hostUtils);
-        $hostUtils = str_replace("<APP_PARTNER>", getenv('APP_PARTNER'), $hostUtils);
-        $hostUtils = str_replace("<BUCKET_NAME>", getenv('BUCKET_NAME'), $hostUtils);
+
+        $apiAppHost = getenv('APIAPP_HOST') ?: 'https://api.movymob.com/';
+        $apiSocketHost = getenv('API_SOCKET_HOST') ?: 'https://movymob.com/ws/';
+        $apiHost = getenv('API_HOST') ?: 'https://api.movymob.com/';
+        $appPartner = getenv('APP_PARTNER') ?: 'true';
+        $bucketName = getenv('BUCKET_NAME') ?: 'voutehomologar';
+        $storageHost = getenv('STORAGE_PRIMARY_HOST') ?: 'https://s3-sa-east-1.amazonaws.com';
+
+        $hostUtils = str_replace("<APIAPP_HOST>", $apiAppHost, $hostUtils);
+        $hostUtils = str_replace("<API_SOCKET_HOST>", $apiSocketHost, $hostUtils);
+        $hostUtils = str_replace("<API_HOST>", $apiHost, $hostUtils);
+        $hostUtils = str_replace("<APP_PARTNER>", $appPartner, $hostUtils);
+        $hostUtils = str_replace("<BUCKET_NAME>", $bucketName, $hostUtils);
         $hostUtils = str_replace("<S3_BUCKET_REGION>", $region, $hostUtils);
-        $storageHost = getenv('STORAGE_PRIMARY_HOST');
         $hostUtils = str_replace("<STORAGE_PRIMARY_HOST>", $storageHost, $hostUtils);
+
         $socketUrl = getenv('ROUTE_HOST_TRIP_SHARE_URL');
         $socketUrl = ($socketUrl && $socketUrl !== false && trim($socketUrl) !== '') 
             ? trim($socketUrl) 

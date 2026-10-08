@@ -21,6 +21,19 @@ services:
     instance_size_slug: basic-xs
     routes:
       - path: /central
+    envs:
+      - key: API_HOST
+        value: https://api.movymob.com/
+      - key: APIAPP_HOST
+        value: https://api.movymob.com/
+      - key: API_SOCKET_HOST
+        value: https://movymob.com/ws/
+      - key: APP_PARTNER
+        value: "true"
+      - key: BUCKET_NAME
+        value: voutehomologar
+      - key: STORAGE_PRIMARY_HOST
+        value: https://s3-sa-east-1.amazonaws.com
 
   # 3. Monitor (Painel Web Administrativo React + Vite)
   - name: monitor-web

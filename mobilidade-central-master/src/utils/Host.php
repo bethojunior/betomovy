@@ -18,14 +18,20 @@ class Host
     {
         $bucketName = getenv('BUCKET_NAME');
         $storageHost = getenv('STORAGE_PRIMARY_HOST');
-        return "{$storageHost}/{$bucketName}/";
+        if ($storageHost && $bucketName) {
+            return rtrim($storageHost, '/') . '/' . trim($bucketName, '/') . '/';
+        }
+        return '/webfiles/img/logo/';
     }
 
     public static function getCentral()
     {
         $bucketName = getenv('BUCKET_NAME');
         $storageHost = getenv('STORAGE_PRIMARY_HOST');
-        return "{$storageHost}/{$bucketName}/";
+        if ($storageHost && $bucketName) {
+            return rtrim($storageHost, '/') . '/' . trim($bucketName, '/') . '/';
+        }
+        return '/webfiles/img/logo/';
     }
 
     public static function getVersion($file = null)

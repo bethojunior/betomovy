@@ -10,6 +10,7 @@
         <div class="reg-banner__overlay">
             <div class="reg-banner__content">
                 <img src="<?php echo Host::getCentral(); ?>default.jpg"
+                     onerror="this.onerror=null; this.src='/webfiles/img/logo/logo.png';"
                      alt="Logo da central"
                      class="reg-banner__logo">
                 <h2 class="reg-banner__title">Comece agora</h2>
