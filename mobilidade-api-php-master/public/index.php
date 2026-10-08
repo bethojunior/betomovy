@@ -22,6 +22,18 @@ $dotenv->safeLoad();
 require 'env.php';
 
 try {
+    $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+    if ($uriPath === '/' || $uriPath === '/health') {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'status' => true,
+            'message' => 'MOVY API Online',
+            'version' => '1.0',
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
+        exit;
+    }
+
     $route = new RouteListener;
 
     if (!isset($_SERVER['REQUEST_URI'])) {
