@@ -10,10 +10,28 @@ export class RedisService implements IState {
     this.redisClient = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
       port: Number(process.env.REDIS_PORT) || 6379,
-      password: process.env.REDIS_PASSWORD || null,
+      password: process.env.REDIS_PASSWORD || undefined,
       db: 0,
       keyPrefix: process.env.REDIS_PREFIX || '',
+      lazyConnect: true,
+      maxRetriesPerRequest: 3,
+      retryStrategy: (times: number) => {
+        if (times > 5) return null; // stop retrying
+        return Math.min(times * 1000, 5000);
+      },
+      reconnectOnError: () => false,
     });
+
+    this.redisClient.on('error', (err) => {
+      console.warn('[RedisService] Connection error (non-fatal):', err.message);
+    });
+
+    // Only connect if REDIS_HOST is set
+    if (process.env.REDIS_HOST) {
+      this.redisClient.connect().catch((err) => {
+        console.warn('[RedisService] Could not connect to Redis:', err.message);
+      });
+    }
   }
 
   async set(key: string, value: string, ttl: number): Promise<void> {
