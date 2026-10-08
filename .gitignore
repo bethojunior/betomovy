@@ -12,7 +12,8 @@
 .env.prod
 !*.env.example
 !*.env.example.*
-.env.build
+!mobilidade-site-novo-main/.env.build
+!mobilidade-monitor-new-main/.env.build
 !*.env.build.example
 configs/env/env.json
 configs/env/push.json

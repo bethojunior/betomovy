@@ -3,8 +3,10 @@ FROM node:20.5-alpine3.17 AS builder
 ENV GENERATE_SOURCEMAP=false
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY . .
+# Garante que .env.build exista
+RUN if [ ! -f .env.build ]; then cp .env.build.example .env.build 2>/dev/null || touch .env.build; fi
 RUN npm run prd-build
 
 # => Run container
@@ -23,7 +25,7 @@ EXPOSE 80
 # Copy .env file and shell script to container
 WORKDIR /usr/share/nginx/html
 COPY ./env.sh .
-COPY .env.build ./.env
+COPY --from=builder /app/.env.build ./.env
 
 # Make our shell script executable
 RUN chmod +x env.sh

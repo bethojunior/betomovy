@@ -1,10 +1,11 @@
 # => Build container
-FROM node:18.16-alpine3.17 as builder
+FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package.json .
-COPY package-lock.json .
-RUN npm install
+COPY package*.json ./
+RUN npm install --legacy-peer-deps
 COPY . .
+# Garante que .env.build exista mesmo se faltar
+RUN if [ ! -f .env.build ]; then cp .env.build.example .env.build 2>/dev/null || touch .env.build; fi
 RUN npm run build
 
 # => Run container
@@ -23,7 +24,7 @@ EXPOSE 8080
 # Copy .env file and shell script to container
 WORKDIR /usr/share/nginx/html
 COPY ./env.sh .
-COPY .env.build ./.env
+COPY --from=builder /app/.env.build ./.env
 
 # Make our shell script executable
 RUN chmod +x env.sh
