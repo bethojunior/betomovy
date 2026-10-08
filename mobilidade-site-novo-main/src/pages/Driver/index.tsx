@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Container } from "./styles";
 import { useState, useEffect, ReactNode } from "react";
 
+import Header from "../../components/Header";
 import MerchantDownload from "../../components/MerchantDownload";
 import Footer from "../../components/Footer";
 import LinearLoading from "../../components/LinearLoading";
@@ -318,6 +319,7 @@ const Driver = () => {
 
   return (
     <Container>
+      <Header />
       <div
         className="content-driver"
         style={{ backgroundImage: `url(${pathBackgroundImage})` }}

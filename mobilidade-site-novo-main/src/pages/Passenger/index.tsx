@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Container, ContainerButton } from "./styles";
 
 import Button from "../../components/Button";
+import Header from "../../components/Header";
 import MerchantDownload from "../../components/MerchantDownload";
 import Footer from "../../components/Footer";
 import ScreenSuccess from "../../components/ScreenSuccess";
@@ -463,6 +464,7 @@ const Passenger = () => {
   if (isPreRegister) {
     return (
       <Container>
+        <Header />
         <LoadingBackdrop loading={loading} />
         <div
           className="content-passenger"
@@ -627,6 +629,7 @@ const Passenger = () => {
 
   return (
     <Container>
+      <Header />
       <LoadingBackdrop loading={loading} />
       <div
         className="content-passenger"
