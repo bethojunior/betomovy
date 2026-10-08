@@ -1,41 +1,70 @@
-#FROM 471044102763.dkr.ecr.us-east-1.amazonaws.com/mobilidade-php-base-image:2b27fd2
-FROM us-central1-docker.pkg.dev/services-704/images/mobilidade-php-base-image:php7.4-4208b1a
-# FROM mobilidade-central-api:v1
+# Set master image
+FROM rockylinux:8
 
-ENV ACCEPT_EULA=Y
+
+LABEL maintainer="704apps" \
+      description="Mobilidade Central" \
+      version="1.0"
+
 # Set working directory
-WORKDIR /var/www
-# Fix debconf warnings upon build
-ARG DEBIAN_FRONTEND=noninteractive
+WORKDIR /var/www/html
 
-# Install selected extensions and other stuff
-# RUN apt-get update \
-#     && apt-get -y --no-install-recommends install apt-utils nginx supervisor libxml2-dev gnupg apt-transport-https zlib1g-dev libicu-dev g++ libpng-dev libjpeg-dev libzip-dev zip unzip libpq-dev curl git libsodium-dev libcurl4-openssl-dev libssl-dev\
-#     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+RUN dnf update -y && dnf install -y \
+    epel-release
 
-# Get latest Composer
-# COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+RUN dnf install dnf-plugins-core -y
+# PHP 7.4
+RUN dnf module install php:remi-7.4 -y
 
-# Add user for laravel application
-# RUN groupadd -g 1001 www
-# RUN useradd -u 1001 -ms /bin/bash -g www www
+# Install Additional dependencies
+RUN dnf install -y vim curl \
+    php \
+    php-fpm \
+    php-common \
+    php-pdo \
+    php-pdo_mysql \
+    php-mysqli \
+    php-mcrypt \
+    php-mbstring \
+    php-xml \
+    php-openssl \
+    php-json \
+    php-phar \
+    php-zip \
+    php-gd \
+    php-dom \
+    php-session \
+    php-zlib \
+    php-pecl-mongodb \
+    php-pecl-grpc \
+    nginx \
+    wget unzip \
+    procps iproute
 
-COPY --chown=www:www-data . /var/www
+# Install composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && HASH="$(wget -q -O - https://composer.github.io/installer.sig)" \
+    && php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
-RUN chmod -R 775 .
+# Ajustes Nginx
+COPY docker-prod/config/nginx.conf /etc/nginx/nginx.conf
+# Ajustes php-fpm
+COPY docker-prod/config/www.conf /etc/php-fpm.d/www.conf
+# Ajustes PHP
+COPY docker-prod/config/local.ini /etc/php.d/local.ini
 
-# Copy nginx/php/supervisor configs
-RUN cp docker/supervisor.conf /etc/supervisord.conf
-RUN cp docker/php.ini /usr/local/etc/php/conf.d/app.ini
-RUN cp docker/nginx.conf /etc/nginx/sites-enabled/default
+# Roda os serviços
+COPY docker-prod/config/runner.sh /runner.sh
+RUN chmod +x /runner.sh
 
-# PHP Error Log Files
-RUN mkdir -p /var/log/php
-RUN touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
+# Copia o conteúdo do projeto (deve ser depois de todas as instalações)
+COPY . /var/www/html
 
-# Deployment steps
-# RUN composer install --optimize-autoloader --no-dev
-RUN chmod +x /var/www/docker/run.sh
+RUN mkdir -p /var/lib/php/session && \
+    chown -R nginx:nginx /var/www/html && \
+    chown -R nginx:nginx /var/lib/php/session && \
+    chmod 1733 /var/lib/php/session
 
-EXPOSE 80
-ENTRYPOINT ["/var/www/docker/run.sh"]
+ENTRYPOINT [ "/runner.sh", "start" ]
