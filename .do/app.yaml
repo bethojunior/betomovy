@@ -54,6 +54,31 @@ services:
     instance_size_slug: basic-xs
     routes:
       - path: /api
+    envs:
+      - key: ENV
+        value: production
+      - key: HOST
+        value: /
+      - key: MYSQL_HOST
+        value: movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com
+      - key: MYSQL_PORT
+        value: "25060"
+      - key: MYSQL_USER
+        value: doadmin
+      - key: MYSQL_PASS
+        value: AVNS_ODYdIYW4rvg6gfvKYO0
+      - key: MYSQL_NAME
+        value: defaultdb
+      - key: S3_BUCKET_NAME
+        value: voutehomologar
+      - key: S3_REGION
+        value: sa-east-1
+      - key: S3_URL
+        value: https://s3-sa-east-1.amazonaws.com/
+      - key: API_SOCKET_URL
+        value: https://movymob.com/ws/
+      - key: APP_NAME
+        value: Movy
 
   # 5. WebSocket & Realtime Node.js
   - name: api-node-ws
