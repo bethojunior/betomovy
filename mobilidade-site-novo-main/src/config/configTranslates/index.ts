@@ -681,4 +681,10 @@ i18n.use(initReactI18next).init({
   },
 });
 
+declare module "i18next" {
+  interface CustomTypeOptions {
+    returnNull: false;
+  }
+}
+
 export default i18n;

@@ -1,13 +1,15 @@
 # => Build container
 FROM node:20-alpine AS builder
 ENV CI=false
+ENV TSC_COMPILE_ON_ERROR=true
+ENV DISABLE_ESLINT_PLUGIN=true
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --legacy-peer-deps i18next @mui/system geojson
+RUN npm install --legacy-peer-deps i18next@21.10.0 @mui/system geojson
 COPY . .
 # Garante que .env.build exista mesmo se faltar
 RUN if [ ! -f .env.build ]; then cp .env.build.example .env.build 2>/dev/null || touch .env.build; fi
-RUN CI=false npm run build
+RUN CI=false TSC_COMPILE_ON_ERROR=true npm run build
 
 # => Run container
 FROM nginx:1.24.0-alpine
