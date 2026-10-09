@@ -33,7 +33,7 @@ import Dropdown from '../../components/DropDown';
 
 export interface FormData {
   name: string;
-  document: string;
+  document?: string;
   date: string;
   email: string;
   phone: string;
@@ -125,7 +125,7 @@ export default function DataUserSignUp({ route }) {
         'stdObject',
         JSON.stringify({
           name: form.name,
-          document: form.document,
+          document: form.document || '',
           email: form.email,
           phone: form.phone,
           dateOfBirth: date,
@@ -139,7 +139,7 @@ export default function DataUserSignUp({ route }) {
       const object = {
         name: form.name,
         email: form.email,
-        document: form.document,
+        document: form.document || '',
         dateOfBirth: date,
         nickname: form.name?.split(' ')[0],
         registered_in: 'mobilidade',
@@ -289,19 +289,6 @@ export default function DataUserSignUp({ route }) {
             placeholder={translate(
               'dataUserSignUp.text_placeholder_enter_your_full_name',
             )}
-          />
-        </InputContainer>
-        <InputContainer
-          label={
-            generalSettings.find(item => item?.key === 'tittle_document_name')
-              ?.value || translate('dataUserSignUp.text_document')
-          }
-        >
-          <Input
-            name="document"
-            control={control}
-            placeholder={translate('dataUserSignUp.text_placeholder_document')}
-            error={errors.document && errors.document.message}
           />
         </InputContainer>
 

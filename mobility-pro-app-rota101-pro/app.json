@@ -73,6 +73,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
+      "buildNumber": "80100",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSCameraUsageDescription": "A câmera é usada durante o cadastro para tirar sua foto de perfil e fotografar os documentos necessários para o cadastro. Ela também é usada quando você troca sua foto de perfil no aplicativo.",
