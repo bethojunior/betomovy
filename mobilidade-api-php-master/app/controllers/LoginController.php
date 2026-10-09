@@ -31,14 +31,14 @@ class LoginController extends ApiController
         try {
             $pdo = Connection::open(Connection::DB_MYSQL);
 
-            $stmt = $pdo->prepare("SELECT * FROM user WHERE email = :email AND statusId = 1 LIMIT 1");
-            $stmt->execute([':email' => trim($email)]);
+            $stmt = $pdo->prepare("SELECT * FROM user WHERE LOWER(TRIM(email)) = :email AND statusId = 1 LIMIT 1");
+            $stmt->execute([':email' => strtolower(trim($email))]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
                 // Also check if user exists regardless of statusId
-                $stmt = $pdo->prepare("SELECT * FROM user WHERE email = :email LIMIT 1");
-                $stmt->execute([':email' => trim($email)]);
+                $stmt = $pdo->prepare("SELECT * FROM user WHERE LOWER(TRIM(email)) = :email LIMIT 1");
+                $stmt->execute([':email' => strtolower(trim($email))]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
             }
 
@@ -65,6 +65,8 @@ class LoginController extends ApiController
             } elseif ($password === $dbPass) {
                 $passValid = true;
             } elseif (md5($password) === $dbPass) {
+                $passValid = true;
+            } elseif (base64_encode(md5($password)) === $dbPass) {
                 $passValid = true;
             }
 
@@ -96,7 +98,7 @@ class LoginController extends ApiController
                 $updP = $pdo->prepare("UPDATE partner SET api_token = :token, statusId = 1, partnerRegisterStatusId = 1 WHERE idPartner = :idPartner");
                 $updP->execute([':token' => $apiToken, ':idPartner' => $partner['idPartner']]);
             } else {
-                $insP = $pdo->prepare("INSERT INTO partner (userId, partnerRegisterStatusId, api_token, created_at, updated_at) VALUES (:userId, 1, :token, NOW(), NOW())");
+                $insP = $pdo->prepare("INSERT INTO partner (userId, partnerRegisterStatusId, statusId, api_token, created_at, updated_at) VALUES (:userId, 1, 1, :token, NOW(), NOW())");
                 $insP->execute([':userId' => $user['idUser'], ':token' => $apiToken]);
             }
 
@@ -109,6 +111,19 @@ class LoginController extends ApiController
             ");
             $stmtC->execute([':userId' => $user['idUser']]);
             $centralsRaw = $stmtC->fetchAll(PDO::FETCH_ASSOC);
+
+            if (empty($centralsRaw)) {
+                $centralName = 'Central ' . (!empty($user['nickname']) ? $user['nickname'] : $user['name']);
+                $insC = $pdo->prepare("INSERT INTO central (name, latitude, longitude, address, logo, responsibleId, statusId, created_at, updated_at) VALUES (:name, -3.7319, -38.5267, 'Principal', 'default.jpg', :userId, 1, NOW(), NOW())");
+                $insC->execute([':name' => $centralName, ':userId' => $user['idUser']]);
+                $newCId = (int)$pdo->lastInsertId();
+
+                $insCU = $pdo->prepare("INSERT INTO centralUser (centralId, userId, isAdmin, statusId, created_at, updated_at) VALUES (:cId, :uId, 1, 1, NOW(), NOW())");
+                $insCU->execute([':cId' => $newCId, ':uId' => $user['idUser']]);
+
+                $stmtC->execute([':userId' => $user['idUser']]);
+                $centralsRaw = $stmtC->fetchAll(PDO::FETCH_ASSOC);
+            }
 
             $centralUserList = [];
             $seenCentral = [];
