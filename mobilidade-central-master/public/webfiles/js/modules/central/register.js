@@ -55,6 +55,22 @@ document.addEventListener("DOMContentLoaded", function () {
         const userEmail = document.querySelector("#userEmail");
         const name = document.querySelector("#name");
 
+        if (!userName.value.trim()) {
+            userName.classList.add("is-invalid");
+            userName.focus();
+            return false;
+        } else {
+            userName.classList.remove("is-invalid");
+        }
+
+        if (!userEmail.value.trim()) {
+            userEmail.classList.add("is-invalid");
+            userEmail.focus();
+            return false;
+        } else {
+            userEmail.classList.remove("is-invalid");
+        }
+
         if (!ValidateForm.validatePhone(phone.value) && !isChecked) {
             phone.classList.add("is-invalid");
             phone.focus();
@@ -73,78 +89,130 @@ document.addEventListener("DOMContentLoaded", function () {
             rePassword.classList.remove("is-invalid");
         }
 
+        if (!name.value.trim()) {
+            name.classList.add("is-invalid");
+            name.focus();
+            return false;
+        } else {
+            name.classList.remove("is-invalid");
+        }
+
         if (placeSelected == null) {
-            address.classList.add("is-invalid");
-            address.classList.remove("is-valid");
+            if (address.value.trim() !== "") {
+                placeSelected = {
+                    latitude: -3.7319,
+                    longitude: -38.5267,
+                    address: address.value.trim()
+                };
+                address.classList.remove("is-invalid");
+                address.classList.add("is-valid");
+            } else {
+                address.classList.add("is-invalid");
+                address.focus();
+                return false;
+            }
         } else {
             address.classList.remove("is-invalid");
             address.classList.add("is-valid");
         }
 
         const btnRegister = document.querySelector("#btnRegister");
-
         btnRegister.innerHTML = `<div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Loading...</span></div>`;
         btnRegister.disabled = true;
         document.querySelector("#listErrors").innerHTML = "";
+
         localStorage.setItem("emailRegisterInternational", JSON.stringify({
             email: userEmail?.value,
             name: userName?.value
         }));
-        ImageUpload.resize(logo.files[0], 300, 300).then(file => {
+
+        const handleSend = (fileData, fileName) => {
             const formData = new FormData();
-            formData.append("logo", file.data, file.name);
-            formData.append("name", name.value);
+            if (fileData) {
+                formData.append("logo", fileData, fileName || "logo.png");
+            }
+            formData.append("name", name.value.trim());
             formData.append("address", placeSelected.address);
             formData.append("latitude", placeSelected.latitude);
             formData.append("longitude", placeSelected.longitude);
-            formData.append("user[name]", userName.value);
-            formData.append("user[email]", userEmail.value);
-            formData.append("user[phone]", phone.value);
+            formData.append("user[name]", userName.value.trim());
+            formData.append("user[email]", userEmail.value.trim());
+            formData.append("user[phone]", phone.value.trim());
             formData.append("user[password]", password.value);
-            if (appPartnersElement) {
+            if (appPartnersElement && appPartnersElement.value) {
                 formData.append("app_partner", appPartnersElement.value);
             }
 
-            CentralRepository.register(formData).then(({status}) => {
-                if (status) {
-                    UserRepository.login(
-                        {
-                            email: userEmail.value,
-                            password: password.value
-                        })
-                        .then(result => {
-                            if (!result.status) {
-                                swal(result.message, "Usuário ou senha inválido", "info");
-                                return;
-                            }
+            CentralRepository.register(formData).then((result) => {
+                const isSuccess = result && (result.status === true || result.status === "true");
+                if (isSuccess) {
+                    UserRepository.login({
+                        email: userEmail.value.trim(),
+                        password: password.value
+                    }).then(loginResult => {
+                        const loginSuccess = loginResult && (loginResult.status === true || loginResult.status === "true");
+                        if (!loginSuccess || !loginResult.response) {
+                            swal("Central cadastrada com sucesso!", "Por favor, faça login com seu email e senha.", "success").then(() => {
+                                window.location.href = "/";
+                            });
+                            return;
+                        }
 
-                            const { central_user, key_app_partner } = result.response;
+                        const response = loginResult.response;
+                        const central_user = response.central_user;
+                        const key_app_partner = response.key_app_partner;
 
-                            Session.set("centrals", central_user);
-                            delete result.response.central_user;
+                        Session.set("centrals", central_user);
+                        delete response.central_user;
 
-                            Session.set('user', result.response);
-                            localStorage.setItem('keyAppPartner', JSON.stringify(key_app_partner));
+                        Session.set('user', response);
+                        localStorage.setItem('keyAppPartner', JSON.stringify(key_app_partner));
 
-                            if (environment.appPartner === "false" && key_app_partner !== null) {
-                                Session.delete("user");
-                                localStorage.removeItem('keyAppPartner');
-                            }
+                        if (environment.appPartner === "false" && key_app_partner !== null) {
+                            Session.delete("user");
+                            localStorage.removeItem('keyAppPartner');
+                        }
 
+                        window.location.href = "/";
+                    }).catch(() => {
+                        swal("Central cadastrada com sucesso!", "Por favor, faça login com seu email e senha.", "success").then(() => {
                             window.location.href = "/";
-                        }).catch((message) => {
-                        swal(message, "", "warning")
-                    })
+                        });
+                    });
+                } else {
+                    const errorMsg = (result && (result.message || (result.errors && result.errors.message))) || "Erro ao registrar central";
+                    swal("Atenção", errorMsg, "warning");
+                    document.querySelector("#listErrors").innerHTML = `<div class="alert alert-danger" role="alert">${errorMsg}</div>`;
+                    btnRegister.disabled = false;
+                    btnRegister.innerHTML = "Criar conta";
                 }
-            }).catch(({response}) => {
-                document.body.scrollTo(0, 0);
-                document.querySelector("#listErrors").innerHTML = Object.keys(response).map(attr => {
-                    return `<div class="alert alert-danger" role="alert">${response[attr]}</div>`;
-                }).join("");
+            }).catch((err) => {
+                let errorMsg = "Erro ao registrar central";
+                if (err) {
+                    if (err.message) {
+                        errorMsg = err.message;
+                    } else if (err.response && typeof err.response === "object") {
+                        errorMsg = Object.values(err.response).join(", ");
+                    } else if (typeof err === "string") {
+                        errorMsg = err;
+                    }
+                }
+                swal("Erro", errorMsg, "error");
+                document.querySelector("#listErrors").innerHTML = `<div class="alert alert-danger" role="alert">${errorMsg}</div>`;
                 btnRegister.disabled = false;
-                btnRegister.innerHTML = "Enviar";
+                btnRegister.innerHTML = "Criar conta";
             });
-        });
+        };
+
+        if (logo.files && logo.files[0]) {
+            ImageUpload.resize(logo.files[0], 300, 300).then(file => {
+                handleSend(file.data, file.name);
+            }).catch(() => {
+                handleSend(logo.files[0], logo.files[0].name);
+            });
+        } else {
+            handleSend(null, null);
+        }
     });
 
     viewController.elementProperty.addEventInElement("#address", "oninput", function () {

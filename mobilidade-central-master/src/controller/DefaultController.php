@@ -12,6 +12,19 @@ class DefaultController extends View
     public function actionIndex()
     {
         if (Session::get('user')) {
+            $centralSelected = Session::get('centralSelected');
+            if (!$centralSelected) {
+                $centrals = Session::get('centrals');
+                if (is_array($centrals) && count($centrals) === 1) {
+                    $selected = $centrals[0]->central ?? $centrals[0];
+                    Session::add('centralSelected', $selected);
+                    $this->actionHome();
+                    return;
+                } elseif (is_array($centrals) && count($centrals) > 1) {
+                    $this->actionSelectCentral();
+                    return;
+                }
+            }
             $this->actionHome();
             return;
         }

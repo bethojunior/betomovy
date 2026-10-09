@@ -54,9 +54,18 @@ class RouteListener extends ApiController
     private function isBlockedRoute($url)
     {
         $routes = require '../configs/route/route.php';
+        $lowerUrl = strtolower($url);
 
-        if (in_array(strtolower($url), $routes['unlockRoutes']))
+        if (in_array($lowerUrl, $routes['unlockRoutes'])) {
             return false;
+        }
+
+        foreach ($routes['unlockRoutes'] as $unlock) {
+            $trimmed = rtrim($unlock, '/');
+            if ($trimmed !== '' && strpos($lowerUrl, $trimmed . '/') === 0) {
+                return false;
+            }
+        }
 
         return true;
     }
@@ -107,6 +116,9 @@ class RouteListener extends ApiController
         }
 
         if (!method_exists($class, $action)) {
+            if (method_exists($class, 'actionIndex')) {
+                return 'actionIndex';
+            }
             return false;
         }
 

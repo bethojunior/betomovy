@@ -184,7 +184,7 @@ class CentralRepository {
   }
 
   static register(formData) {
-    return ConnectionServer.sendRequestWithFilesCentral('central', 'POST', formData)
+    return ConnectionServer.sendRequestWithFilesCentral('central/register', 'POST', formData)
   }
 
   static calculatePriceNoDistance(origin, centralId = null, neighborhoodId = null) {
