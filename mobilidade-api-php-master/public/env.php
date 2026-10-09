@@ -3,10 +3,21 @@
 function env($key)
 {
     if (file_exists("../configs/env/env.json")) {
-        $key = strtoupper($key);
+        $keyUpper = strtoupper($key);
         $data = json_decode(file_get_contents("../configs/env/env.json"));
-        return $data->$key ?? null;
+        if (isset($data->$keyUpper)) {
+            return $data->$keyUpper;
+        }
     }
 
-    return $_ENV[$key] ?? null;
+    if (isset($_ENV[$key])) {
+        return $_ENV[$key];
+    }
+
+    if (isset($_SERVER[$key])) {
+        return $_SERVER[$key];
+    }
+
+    $val = getenv($key);
+    return ($val !== false) ? $val : null;
 }
