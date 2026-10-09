@@ -13,8 +13,8 @@ class ListContactsService
     public function __construct()
     {
         $this->client = new Client();
-        $this->baseUrl = env('URL_MONITOR_APIV2');
-        $this->internalToken = ltrim(env('INTERNAL_TOKEN'), '^');
+        $this->baseUrl = (string)(env('URL_MONITOR_APIV2') ?: '');
+        $this->internalToken = (string)(ltrim((string)(env('INTERNAL_TOKEN') ?: ''), '^'));
     }
 
     public function insertContacts(string $endpoint, array $payload)

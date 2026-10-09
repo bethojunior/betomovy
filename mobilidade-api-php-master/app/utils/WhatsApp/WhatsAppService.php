@@ -6,13 +6,13 @@ use app\model\Config;
 
 class WhatsAppService
 {
-    private string $sessionName;
+    private string $sessionName = 'Movy';
     private string $endPoint;
     private string $endPointGroup;
 
     public function __construct()
     {
-        $this->sessionName = env("APP_NAME");
+        $this->sessionName = (string)(env("APP_NAME") ?: (Config::get('app_title') ?: 'Movy'));
         $this->endPoint = 'https://api-notifier.704app.com.br/whatsapp/send-message';
         $this->endPointGroup = 'https://api-notifier.704app.com.br/whatsapp/send-message-group';
     }
