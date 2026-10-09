@@ -44,7 +44,18 @@ class UserController extends ApiController
     public function actionRegister()
     {
         try {
-            $data = !empty($_POST) ? (object)$_POST : $this->request();
+            if (!empty($_POST)) {
+                $data = (object)$_POST;
+            } else {
+                $raw = file_get_contents('php://input');
+                $json = json_decode($raw);
+                if (isset($json->stdObject)) {
+                    $data = is_array($json->stdObject) ? $json->stdObject[0] : $json->stdObject;
+                } else {
+                    $data = $json ?: (object)[];
+                }
+            }
+
             if (empty($data->nickname) && !empty($data->name)) {
                 $parts = explode(' ', trim($data->name));
                 $data->nickname = $parts[0];
