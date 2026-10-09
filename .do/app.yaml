@@ -44,6 +44,17 @@ services:
     instance_size_slug: basic-xxs
     routes:
       - path: /monitor
+    envs:
+      - key: SEU_MILTO_V2
+        value: https://api.movymob.com/
+      - key: SEU_MILTO_V1
+        value: https://api.movymob.com/
+      - key: API_APP
+        value: https://api.movymob.com/
+      - key: HOST_SOCKET
+        value: https://socket.movymob.com/
+      - key: PROJECT_NAME
+        value: movy
 
   # 4. API PHP Principal (Mobilidade Urbana Core)
   - name: api-php
