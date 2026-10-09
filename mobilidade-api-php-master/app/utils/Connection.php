@@ -72,12 +72,14 @@ final class Connection
     /**
      * @param $type
      * @param $dsn
-     * @param string $user
-     * @param string $pass
+     * @param string|null $user
+     * @param string|null $pass
      * @return Manager|PDO
      */
-    private static function &getConn($type, $dsn, string $user = '', string $pass = '')
+    private static function &getConn($type, $dsn, ?string $user = '', ?string $pass = '')
     {
+        $user = (string)($user ?? '');
+        $pass = (string)($pass ?? '');
         if ($type == self::DB_MYSQL) {
             static $conn;
 
