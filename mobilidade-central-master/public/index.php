@@ -56,7 +56,7 @@ function startIncludes($path)
         $file = $path . '/' . $filename;
         $extension = explode('.', $file);
         if (is_file($file) && end($extension) == "php") {
-            require $file;
+            require_once $file;
         }
     }
 }
