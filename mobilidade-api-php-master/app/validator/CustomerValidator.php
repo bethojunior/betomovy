@@ -23,31 +23,48 @@ class CustomerValidator
      */
     public function validateInsertCustomer($request, bool $requireDocumentAndDateOfBirth = true)
     {
-        if (!$request || count(get_object_vars($request)) < 1)
+        if (!$request || (is_object($request) && count(get_object_vars($request)) < 1))
             throw new InvalidFieldCustomerException("Nenhum dado foi enviado para criacao do cliente");
 
-        $this->nameIsValid($request->name ?? '');
-        $this->nicknameIsValid($request->nickname ?? '');
+        $data = (isset($request->user) && (is_object($request->user) || is_array($request->user)))
+            ? (object)$request->user
+            : $request;
+
+        $name = $data->name ?? ($request->name ?? '');
+        $nickname = $data->nickname ?? ($request->nickname ?? '');
+        if (empty($nickname) && !empty($name)) {
+            $parts = explode(' ', trim($name));
+            $nickname = $parts[0];
+            $data->nickname = $nickname;
+            $request->nickname = $nickname;
+        }
+
+        $this->nameIsValid($name);
+        $this->nicknameIsValid($nickname);
+
+        $doc = $data->document ?? ($request->document ?? '');
+        $dob = $data->dateOfBirth ?? ($request->dateOfBirth ?? '');
 
         if ($requireDocumentAndDateOfBirth) {
-            $this->documentIsValid($request->document ?? '');
-            $this->dateOfBirthIsValid($request->dateOfBirth ?? '');
+            $this->documentIsValid($doc);
+            $this->dateOfBirthIsValid($dob);
         } else {
-            if (isset($request->document) && !empty($request->document)) {
-                $this->documentIsValid($request->document);
+            if (!empty($doc)) {
+                $this->documentIsValid($doc);
             }
-            if (isset($request->dateOfBirth) && !empty($request->dateOfBirth)) {
-                $this->dateOfBirthIsValid($request->dateOfBirth);
+            if (!empty($dob)) {
+                $this->dateOfBirthIsValid($dob);
             }
         }
 
-        $this->emailIsValid($request->email ?? '');
-        $this->phoneIsValid($request->phone ?? '');
-        if (isset($request->password))
-            $this->passwordIsValid($request->password ?? '');
-        if (isset($request->driverId))
-            $this->driverIdIsValid($request->driverId ?? '');
-        if (isset($request->registered_in) && !in_array($request->registered_in, [CustomerConst::REGISTERED_IN_MOBILITY, CustomerConst::REGISTERED_IN_DELIVERY]))
+        $this->emailIsValid($data->email ?? ($request->email ?? ''));
+        $this->phoneIsValid($data->phone ?? ($request->phone ?? ''));
+        if (isset($data->password) || isset($request->password))
+            $this->passwordIsValid($data->password ?? $request->password);
+        if (isset($data->driverId) || isset($request->driverId))
+            $this->driverIdIsValid($data->driverId ?? $request->driverId);
+        $regIn = $data->registered_in ?? ($request->registered_in ?? null);
+        if (isset($regIn) && !in_array($regIn, [CustomerConst::REGISTERED_IN_MOBILITY, CustomerConst::REGISTERED_IN_DELIVERY]))
             throw new InvalidFieldCustomerException('Valor de registro inválido');
 
         return true;
