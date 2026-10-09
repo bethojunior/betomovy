@@ -28,16 +28,7 @@ class UsuarioController extends View
 
     public function actionRegister()
     {
-        $this->setTemplate(Template::defaultView());
-
-        $this->layoutBuilder(
-            [
-                'user/register'
-            ],
-            [
-                'modules/user/register'
-            ]
-        );
+        $this->actionCadastro();
     }
 
 }

@@ -377,9 +377,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 icon: 'success',
                 confirmButtonText: 'OK'
             }).then(() => {
-                // Resetar formulário
+                // Resetar formulário e redirecionar para tela de login
                 document.getElementById('userRegisterForm').reset();
                 clearAllFieldErrors();
+                window.location.href = '/';
             });
         }).catch(error => {
             console.error('Erro no registro:', error);

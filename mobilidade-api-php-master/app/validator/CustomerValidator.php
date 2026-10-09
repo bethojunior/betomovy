@@ -32,8 +32,13 @@ class CustomerValidator
         if ($requireDocumentAndDateOfBirth) {
             $this->documentIsValid($request->document ?? '');
             $this->dateOfBirthIsValid($request->dateOfBirth ?? '');
-        } elseif (isset($request->document)) {
-            $this->documentIsValid($request->document ?? '');
+        } else {
+            if (isset($request->document) && !empty($request->document)) {
+                $this->documentIsValid($request->document);
+            }
+            if (isset($request->dateOfBirth) && !empty($request->dateOfBirth)) {
+                $this->dateOfBirthIsValid($request->dateOfBirth);
+            }
         }
 
         $this->emailIsValid($request->email ?? '');

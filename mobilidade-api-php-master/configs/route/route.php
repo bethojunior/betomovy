@@ -29,6 +29,7 @@ return [
         '/customer/updatesociallogin',
         '/customer/register',
         '/customer/registerpartner',
+        '/user/register',
         '/user/authenticate',
         '/login',
         '/login/index',

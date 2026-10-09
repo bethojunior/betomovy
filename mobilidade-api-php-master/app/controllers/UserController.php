@@ -41,6 +41,31 @@ class UserController extends ApiController
         $this->actionAuthenticate();
     }
 
+    public function actionRegister()
+    {
+        try {
+            $data = !empty($_POST) ? (object)$_POST : $this->request();
+            if (empty($data->nickname) && !empty($data->name)) {
+                $parts = explode(' ', trim($data->name));
+                $data->nickname = $parts[0];
+            }
+            if (empty($data->password)) {
+                $data->password = 'Movy@' . rand(1000, 9999);
+            }
+            if (empty($data->registered_in)) {
+                $data->registered_in = \app\constant\CustomerConst::REGISTERED_IN_MOBILITY;
+            }
+
+            $user = (new \app\dao\CustomerDao)->register($data, $_FILES ?? null);
+
+            echo $this->returnSuccess("Cadastrado com sucesso", [
+                'user' => $user ? (is_object($user) && method_exists($user, 'toStdClass') ? $user->toStdClass() : $user) : true
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
     public function actionCheckAccountAppPartner()
     {
         try {

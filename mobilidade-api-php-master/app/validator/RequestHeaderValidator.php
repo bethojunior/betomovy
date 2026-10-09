@@ -65,7 +65,7 @@ class RequestHeaderValidator
      */
     private function tokenIsValid($token)
     {
-        if (strlen($token) < 1)
+        if (empty($token) || $token === 'undefined' || $token === 'null')
             throw new ApiTokenException("Token não enviado", $token);
 
         if (password_get_info($token)['algo'] != PASSWORD_BCRYPT)
@@ -78,7 +78,7 @@ class RequestHeaderValidator
      */
     private function userIdIsValid($userId)
     {
-        if (strlen($userId) < 1)
+        if (empty($userId) || $userId === 'undefined' || $userId === 'null')
             throw new ApiTokenException("Usuário inválido");
     }
 }

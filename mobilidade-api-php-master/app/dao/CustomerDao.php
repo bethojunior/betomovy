@@ -735,7 +735,12 @@ class CustomerDao extends BaseDao
     public function register($request, $FILES = null, $isDependent = false)
     {
         try {
-            $this->validator->validateInsertCustomer($request);
+            if (empty($request->nickname) && !empty($request->name)) {
+                $parts = explode(' ', trim($request->name));
+                $request->nickname = $parts[0];
+            }
+            $requireDoc = !empty($request->document);
+            $this->validator->validateInsertCustomer($request, $requireDoc);
 
             $this->beginTransaction();
 

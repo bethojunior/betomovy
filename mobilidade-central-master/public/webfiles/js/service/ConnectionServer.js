@@ -3,6 +3,30 @@ class ConnectionServer {
     return environment.hosts.hostRequest;
   }
 
+  static setAuthHeaders(request, headers = {}) {
+    request.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+
+    const token = Session.getValueInSession("user", "api_token");
+    const userId = Session.getValueInSession("user", "idUser");
+    const cityId = Session.getValueInSessionLocal("citySelected", "cityId");
+
+    if (token && token !== "undefined" && token !== "null") {
+      request.setRequestHeader("token", token);
+    }
+    if (userId && userId !== "undefined" && userId !== "null") {
+      request.setRequestHeader("userid", userId);
+    }
+    if (cityId && cityId !== "undefined" && cityId !== "null") {
+      request.setRequestHeader("cityid", cityId);
+    }
+
+    if (headers && typeof headers === "object") {
+      Object.keys(headers).forEach((key) => {
+        request.setRequestHeader(key, headers[key]);
+      });
+    }
+  }
+
   /**
    *
    * @param url
@@ -62,8 +86,12 @@ class ConnectionServer {
       console.log('Token:', token);
       console.log('User ID:', userId);
       
-      request.setRequestHeader("token", token);
-      request.setRequestHeader("userid", userId);
+      if (token && token !== "undefined" && token !== "null") {
+        request.setRequestHeader("token", token);
+      }
+      if (userId && userId !== "undefined" && userId !== "null") {
+        request.setRequestHeader("userid", userId);
+      }
       request.send(formData);
     });
   }
@@ -85,14 +113,14 @@ class ConnectionServer {
         }
       };
       request.open(method, environment.hosts.hostRequestApi + url, true);
-      request.setRequestHeader(
-        "token",
-        Session.getValueInSession("user", "api_token"),
-      );
-      request.setRequestHeader(
-        "userid",
-        Session.getValueInSession("user", "idUser"),
-      );
+      const token = Session.getValueInSession("user", "api_token");
+      const userId = Session.getValueInSession("user", "idUser");
+      if (token && token !== "undefined" && token !== "null") {
+        request.setRequestHeader("token", token);
+      }
+      if (userId && userId !== "undefined" && userId !== "null") {
+        request.setRequestHeader("userid", userId);
+      }
       request.send(formData);
     });
   }
@@ -159,25 +187,7 @@ class ConnectionServer {
 
     request.open(method, environment.hosts.hostRequestApi + url);
 
-    request.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-    request.setRequestHeader(
-      "token",
-      Session.getValueInSession("user", "api_token"),
-    );
-    request.setRequestHeader(
-      "userid",
-      Session.getValueInSession("user", "idUser"),
-    );
-    request.setRequestHeader(
-      "cityid",
-      Session.getValueInSessionLocal("citySelected", "cityId"),
-    );
-    
-    if (headers && typeof headers === 'object') {
-        Object.keys(headers).forEach(key => {
-            request.setRequestHeader(key, headers[key]);
-        });
-    }
+    ConnectionServer.setAuthHeaders(request, headers);
 
     request.send(ConnectionServer.prepareRequest(params, isStdObject));
   }
@@ -202,25 +212,7 @@ class ConnectionServer {
 
     request.open(method, ConnectionServer.Host() + url);
 
-    request.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-    request.setRequestHeader(
-      "token",
-      Session.getValueInSession("user", "api_token"),
-    );
-    request.setRequestHeader(
-      "userid",
-      Session.getValueInSession("user", "idUser"),
-    );
-    request.setRequestHeader(
-      "cityid",
-      Session.getValueInSessionLocal("citySelected", "cityId"),
-    );
-
-    if (headers && typeof headers === 'object') {
-        Object.keys(headers).forEach(key => {
-            request.setRequestHeader(key, headers[key]);
-        });
-    }
+    ConnectionServer.setAuthHeaders(request, headers);
 
     request.send(ConnectionServer.prepareRequest(params, false));
   }
@@ -249,19 +241,7 @@ class ConnectionServer {
 
     request.open(method, ConnectionServer.Host() + url);
 
-    request.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-    request.setRequestHeader(
-      "token",
-      Session.getValueInSession("user", "api_token"),
-    );
-    request.setRequestHeader(
-      "userid",
-      Session.getValueInSession("user", "idUser"),
-    );
-    request.setRequestHeader(
-      "cityid",
-      Session.getValueInSessionLocal("citySelected", "cityId"),
-    );
+    ConnectionServer.setAuthHeaders(request);
 
     request.send(ConnectionServer.prepareRequest(params, false));
   }
@@ -285,19 +265,8 @@ class ConnectionServer {
 
     request.open(method, url);
 
-    request.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-    request.setRequestHeader(
-      "token",
-      Session.getValueInSession("user", "api_token"),
-    );
-    request.setRequestHeader(
-      "userid",
-      Session.getValueInSession("user", "idUser"),
-    );
-    request.setRequestHeader(
-      "cityid",
-      Session.getValueInSessionLocal("citySelected", "cityId"),
-    );
+    ConnectionServer.setAuthHeaders(request);
+
     request.send(ConnectionServer.prepareRequest(params, false));
   }
 
@@ -352,15 +321,8 @@ class ConnectionServer {
     };
     request.open(method, url);
 
-    request.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-    request.setRequestHeader(
-      "token",
-      Session.getValueInSession("user", "api_token"),
-    );
-    request.setRequestHeader(
-      "userid",
-      Session.getValueInSession("user", "idUser"),
-    );
+    ConnectionServer.setAuthHeaders(request);
+
     request.send(ConnectionServer.prepareRequest(params, false));
   }
 
