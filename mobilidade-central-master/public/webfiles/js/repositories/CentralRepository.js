@@ -321,4 +321,8 @@ class CentralRepository {
 
     return await response.json()
   }
+
+  static register(data) {
+    return ConnectionServer.sendRequestWithFilesCentral('central/register', 'POST', data)
+  }
 }
