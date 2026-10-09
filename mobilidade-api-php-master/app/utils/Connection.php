@@ -66,7 +66,8 @@ final class Connection
 
     public static function getDatabaseName($sql = self::SQL)
     {
-        return $sql == self::SQL ? env('MYSQL_NAME') : env('MONGODB_NAME');
+        $db = ($sql == self::SQL || $sql == self::DB_MYSQL) ? (env('MYSQL_NAME') ?: 'defaultdb') : (env('MONGODB_NAME') ?: 'defaultdb');
+        return (string)($db ?: 'defaultdb');
     }
 
     /**
