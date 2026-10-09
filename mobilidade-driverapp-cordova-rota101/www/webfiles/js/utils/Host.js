@@ -25,14 +25,14 @@ const CONTACT_SUPPORT = '+5585996777458';
 
 //----------------------------------------------------
 
-const API_HOST_PRODUCTION = `https://mobilidade-api-php-rota101.prod.704apps.com.br/`;
+const API_HOST_PRODUCTION = `https://api.movymob.com/`;
 const API_HOST_TEST = `https://apiteste.${NAME_PROJECT}.com.br/`;
 
 const API_HOST = (IS_HOST_ENVIRONMENT_TEST) ? API_HOST_TEST : API_HOST_PRODUCTION;
 
 //----------------------------------------------------
 
-const API_HOST_LOCATION_PRODUCTION = `https://mobilidade-api-node-rota101.prod.704apps.com.br`;
+const API_HOST_LOCATION_PRODUCTION = `https://socket.movymob.com`;
 const API_HOST_LOCATION_TEST = `http://apiteste.${NAME_PROJECT}.com.br`;
 
 const API_HOST_LOCATION = (IS_HOST_ENVIRONMENT_TEST) ? API_HOST_LOCATION_TEST : API_HOST_LOCATION_PRODUCTION;
@@ -40,13 +40,13 @@ const API_HOST_LOCATION = (IS_HOST_ENVIRONMENT_TEST) ? API_HOST_LOCATION_TEST : 
 //---------------------------------------------------
 
 const PWA_HOST_TEST = `https://pwatest.${NAME_PROJECT}.com.br/`;
-const PWA_HOST_PRODUCTION = `https://pwa.${NAME_PROJECT}.com.br/`;
+const PWA_HOST_PRODUCTION = `https://movymob.com/`;
 
 const CURRENT_HOST_PWA = (IS_HOST_ENVIRONMENT_TEST) ? PWA_HOST_TEST : PWA_HOST_PRODUCTION;
 
 //---------------------------------------------------
 
-const SOCKET_HOST_PRODUCTION = `https://mobilidade-api-node-rota101.prod.704apps.com.br`;
+const SOCKET_HOST_PRODUCTION = `https://socket.movymob.com`;
 const SOCKET_HOST_TEST = `http://apiteste.${NAME_PROJECT}.com.br:3704`;
 
 const SOCKET_IO_HOST = (IS_HOST_ENVIRONMENT_TEST) ? SOCKET_HOST_TEST : SOCKET_HOST_PRODUCTION;

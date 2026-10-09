@@ -2,7 +2,7 @@ export const nameApp = 'rota101';
 const linkApp = 'fb704';
 export let appProccess = 'aws';
 export let soundCall = null;
-const HOST_API_GOOGLE_MAPS = 'AIzaSyAcFWVx8ZaWp-jtaH8Zq3M_z5ubFJhLbfo';
+const HOST_API_GOOGLE_MAPS = 'AIzaSyBr4fzCxEeEl__R0h_snwRyuHvy48qJxQ';
 const isMigrated = true;
 const nameBucket = isMigrated ? 'rota101fb704' : 'rota101';
 export const isBeta = false;
@@ -46,10 +46,10 @@ export const buildApp = () => {
   }
   if (appProccess === 'aws') {
     const HOST_API_DELIVERY = `https://delivery-api-${nameApp}.prod.704apps.com.br/`;
-    const HOST_API_APP = `https://mobilidade-api-php-${nameApp}.prod.704apps.com.br/`;
-    const HOST_SOCKET = `https://mobilidade-api-node-${nameApp}.prod.704apps.com.br/`;
-    const HOST_SOCKETV2 = `https://delivery-realtimeapi-${nameApp}.prod.704apps.com.br`;
-    const HOST_SITE = `https://${nameApp}.prod.704apps.com.br/`;
+    const HOST_API_APP = `https://api.movymob.com/`;
+    const HOST_SOCKET = `https://socket.movymob.com/`;
+    const HOST_SOCKETV2 = `https://socket.movymob.com/`;
+    const HOST_SITE = `https://movymob.com/`;
 
     let HOST_AUDIO_MESSAGE = `https://s3.amazonaws.com/nodes-${nameBucket}-prod/chat/trip/`;
     let HOST_IMAGE_DRIVER = `https://s3.amazonaws.com/nodes-${nameBucket}-prod/driver/profile/compressed/`;

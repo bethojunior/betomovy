@@ -59,16 +59,16 @@ function getEnvironment(production){
             name  : "production",
             hosts : {
                 local: "",
-                hostPwa : "https://pwa.taxireturn.com.br/",
-                hostRequest: "https://mobilidade-api-php-rota101.prod.704apps.com.br/",
-                hostSite: "https://rota101.prod.704apps.com.br/",
+                hostPwa : "https://movymob.com/",
+                hostRequest: "https://api.movymob.com/",
+                hostSite: "https://movymob.com/",
                 idFacebook : "559943727752617",
                 hostImage : "https://storage.704apps.com.br:9000/rota101fb704/establishment/compressed/",
                 hostImageDefault: "https://storage.704apps.com.br:9000/rota101fb704/default.jpg",
                 hostProfileDriver: "https://storage.704apps.com.br:9000/rota101fb704/driver/profile/compressed/",
                 profileImage : "https://storage.704apps.com.br:9000/rota101fb704/customer/profile/compressed/",
                 hostAudioMessage: "https://storage.704apps.com.br:9000/rota101fb704/chat/trip/",
-                hostSocket: "https://mobilidade-api-node-rota101.prod.704apps.com.br/"
+                hostSocket: "https://socket.movymob.com/"
             },
             socket : {
                 test    : false,
