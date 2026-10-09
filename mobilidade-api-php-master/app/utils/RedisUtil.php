@@ -13,11 +13,11 @@ use Predis\Client;
 class RedisUtil
 {
     private ?Client $redis = null;
-    private string $prefix;
+    private string $prefix = 'movy';
 
     public function __construct()
     {
-        $this->prefix = env('REDIS_PREFIX');
+        $this->prefix = (string)(env('REDIS_PREFIX') ?: 'movy');
     }
 
     public function returnIstance()
@@ -95,9 +95,15 @@ class RedisUtil
         }
 
         try {
+            $host = env('REDIS_HOST');
+            if (empty($host)) {
+                $this->redis = null;
+                return;
+            }
+
             $this->redis = new Client([
                 'scheme'   => 'tcp',
-                'host'     => env('REDIS_HOST', '127.0.0.1'),
+                'host'     => $host,
                 'port'     => (int) env('REDIS_PORT', 6379),
                 'password' => env('REDIS_PASSWORD') ?: null,
             ]);

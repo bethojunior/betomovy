@@ -85,6 +85,8 @@ services:
         value: movy-app
       - key: ADMIN704APPS_API_SECRET
         value: movy-secret-token
+      - key: REDIS_PREFIX
+        value: movy
 
   # 5. WebSocket & Realtime Node.js
   - name: api-node-ws
