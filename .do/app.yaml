@@ -79,6 +79,12 @@ services:
         value: https://movymob.com/ws/
       - key: APP_NAME
         value: Movy
+      - key: ADMIN704APPS_API_URL
+        value: https://admin.704apps.com.br
+      - key: ADMIN704APPS_API_ID
+        value: movy-app
+      - key: ADMIN704APPS_API_SECRET
+        value: movy-secret-token
 
   # 5. WebSocket & Realtime Node.js
   - name: api-node-ws
