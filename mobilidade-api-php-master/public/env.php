@@ -2,12 +2,9 @@
 
 function env($key)
 {
-    if (file_exists("../configs/env/env.json")) {
-        $keyUpper = strtoupper($key);
-        $data = json_decode(file_get_contents("../configs/env/env.json"));
-        if (isset($data->$keyUpper)) {
-            return $data->$keyUpper;
-        }
+    $val = getenv($key);
+    if ($val !== false && $val !== null && $val !== '') {
+        return $val;
     }
 
     if (isset($_ENV[$key])) {
@@ -18,6 +15,13 @@ function env($key)
         return $_SERVER[$key];
     }
 
-    $val = getenv($key);
-    return ($val !== false) ? $val : null;
+    if (file_exists("../configs/env/env.json")) {
+        $keyUpper = strtoupper($key);
+        $data = json_decode(file_get_contents("../configs/env/env.json"));
+        if (isset($data->$keyUpper)) {
+            return $data->$keyUpper;
+        }
+    }
+
+    return null;
 }
