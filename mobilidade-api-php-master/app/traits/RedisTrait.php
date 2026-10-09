@@ -15,7 +15,7 @@ use Exception;
 trait RedisTrait
 {
     protected ?Client $redis = null;
-    protected string $databaseName;
+    protected string $databaseName = 'defaultdb';
 
     protected function checkRedisConn(): void
     {
