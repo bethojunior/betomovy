@@ -33,19 +33,19 @@ final class Connection
         switch ($dbType) {
             case self::DB_MYSQL:
                 $type = self::DB_MYSQL;
-                $host = env('MYSQL_HOST');
-                $name = env('MYSQL_NAME');
-                $user = env('MYSQL_USER');
-                $pass = env('MYSQL_PASS');
-                $port = env('MYSQL_PORT');
+                $host = env('MYSQL_HOST') ?: getenv('MYSQL_HOST') ?: 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com';
+                $name = env('MYSQL_NAME') ?: getenv('MYSQL_NAME') ?: 'defaultdb';
+                $user = env('MYSQL_USER') ?: getenv('MYSQL_USER') ?: 'doadmin';
+                $pass = env('MYSQL_PASS') ?: getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
+                $port = env('MYSQL_PORT') ?: getenv('MYSQL_PORT') ?: '25060';
                 break;
             case self::DB_MYSQL_RO:
                 $type = self::DB_MYSQL_RO;
-                $host = env('MYSQL_HOST_RO') ? env('MYSQL_HOST_RO') : env('MYSQL_HOST');
-                $name = env('MYSQL_NAME_RO') ? env('MYSQL_NAME_RO') : env('MYSQL_NAME');
-                $user = env('MYSQL_USER_RO') ? env('MYSQL_USER_RO') : env('MYSQL_USER');
-                $pass = env('MYSQL_PASS_RO') ? env('MYSQL_PASS_RO') : env('MYSQL_PASS');
-                $port = env('MYSQL_PORT_RO') ? env('MYSQL_PORT_RO') : env('MYSQL_PORT');
+                $host = env('MYSQL_HOST_RO') ?: env('MYSQL_HOST') ?: getenv('MYSQL_HOST') ?: 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com';
+                $name = env('MYSQL_NAME_RO') ?: env('MYSQL_NAME') ?: getenv('MYSQL_NAME') ?: 'defaultdb';
+                $user = env('MYSQL_USER_RO') ?: env('MYSQL_USER') ?: getenv('MYSQL_USER') ?: 'doadmin';
+                $pass = env('MYSQL_PASS_RO') ?: env('MYSQL_PASS') ?: getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
+                $port = env('MYSQL_PORT_RO') ?: env('MYSQL_PORT') ?: getenv('MYSQL_PORT') ?: '25060';
                 break;
             default:
                 return null;
