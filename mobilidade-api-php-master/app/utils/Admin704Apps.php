@@ -20,9 +20,7 @@ class Admin704Apps
     $this->secret       = env('ADMIN704APPS_API_SECRET') ?: '';
     $this->customerName = env('ADMIN704APPS_CUSTOMER_NAME') ?? $this->appName;
 
-    if (!$this->apiUrl || !$this->secret || !$this->id) {
-      throw new Admin704AppsException('Admin704Apps environment variables not configured.');
-    }
+    // Non-fatal if unset, only check when making actual requests
   }
 
   public function getCustomerAcquirer($paymentType = 'card'): array
