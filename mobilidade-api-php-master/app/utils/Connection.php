@@ -88,9 +88,16 @@ final class Connection
                 return $conn;
             }
 
-            $conn = new PDO($dsn, $user, $pass, [
+            $options = [
                 PDO::MYSQL_ATTR_FOUND_ROWS => true
-            ]);
+            ];
+            if (defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT')) {
+                $options[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = false;
+            } elseif (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
+                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+            }
+
+            $conn = new PDO($dsn, $user, $pass, $options);
             $conn->exec(
                 "SET NAMES 'utf8mb4_unicode_ci';
                     SET character_set_connection=utf8mb4_unicode_ci;

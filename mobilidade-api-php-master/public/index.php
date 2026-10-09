@@ -23,13 +23,33 @@ require 'env.php';
 
 try {
     $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-    if ($uriPath === '/' || $uriPath === '/health') {
+    if ($uriPath === '/' || $uriPath === '/health' || $uriPath === '/test-db') {
         header('Content-Type: application/json; charset=utf-8');
+        $dbStatus = 'not_tested';
+        $dbError = null;
+        if ($uriPath === '/test-db' || $uriPath === '/health') {
+            try {
+                $conn = \app\utils\Connection::open();
+                $stmt = $conn->query("SELECT 1 as alive");
+                $dbStatus = 'connected (' . $stmt->fetchColumn() . ')';
+            } catch (\Throwable $e) {
+                $dbStatus = 'failed';
+                $dbError = [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ];
+            }
+        }
+
         echo json_encode([
             'status' => true,
             'message' => 'MOVY API Online',
-            'version' => '1.0',
-            'timestamp' => date('Y-m-d H:i:s')
+            'version' => '1.0.2',
+            'timestamp' => date('Y-m-d H:i:s'),
+            'database' => $dbStatus,
+            'db_error' => $dbError
         ]);
         exit;
     }
