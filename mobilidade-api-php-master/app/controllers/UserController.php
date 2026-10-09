@@ -36,6 +36,11 @@ class UserController extends ApiController
         }
     }
 
+    public function actionLogin()
+    {
+        $this->actionAuthenticate();
+    }
+
     public function actionCheckAccountAppPartner()
     {
         try {
