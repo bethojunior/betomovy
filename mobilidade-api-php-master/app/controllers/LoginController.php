@@ -153,14 +153,66 @@ class LoginController extends ApiController
                 ];
             }
 
+            // Fetch levelAccess / userType
+            $stmtRole = $pdo->prepare("SELECT userTypeId FROM levelAccess WHERE userId = :userId LIMIT 1");
+            $stmtRole->execute([':userId' => $user['idUser']]);
+            $userRoleRow = $stmtRole->fetch(PDO::FETCH_ASSOC);
+            $roleId = (int)($userRoleRow['userTypeId'] ?? 1);
+
             $userPayload = [
                 'idUser' => (int)$user['idUser'],
                 'name' => $user['name'],
                 'nickname' => $user['nickname'] ?? $user['name'],
                 'email' => $user['email'],
-                'phone' => $user['phone'],
+                'phone' => $user['phone'] ?? '',
+                'document' => $user['document'] ?? '',
                 'api_token' => $apiToken,
                 'token' => $apiToken,
+                'blocked' => (int)($user['blocked'] ?? 0),
+                'statusId' => (int)($user['statusId'] ?? 1),
+                'roleId' => $roleId,
+                'role' => [
+                    'name' => ($roleId === 1 ? 'Administrador' : 'Gestor'),
+                    'isRoot' => ($roleId === 1),
+                    'groups' => [
+                        [
+                            'name' => 'Geral',
+                            'permissions' => ['*']
+                        ],
+                        [
+                            'name' => 'Dashboard',
+                            'permissions' => ['*']
+                        ],
+                        [
+                            'name' => 'Motoristas',
+                            'permissions' => ['*']
+                        ],
+                        [
+                            'name' => 'Passageiros',
+                            'permissions' => ['*']
+                        ],
+                        [
+                            'name' => 'Corridas',
+                            'permissions' => ['*']
+                        ],
+                        [
+                            'name' => 'Financeiro',
+                            'permissions' => ['*']
+                        ],
+                        [
+                            'name' => 'Configurações',
+                            'permissions' => ['*']
+                        ]
+                    ]
+                ],
+                'statusPay' => [
+                    'id' => 1,
+                    'status' => 'Adimplente',
+                    'message' => null
+                ],
+                'updated_at' => date('Y-m-d H:i:s'),
+                'support' => 0,
+                'allowedCities' => [],
                 'central_user' => $centralUserList,
                 'key_app_partner' => $user['key_app_partner'] ?? null
             ];

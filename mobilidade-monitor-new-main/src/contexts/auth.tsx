@@ -76,7 +76,10 @@ export const AuthProvider = ({ children }: ChildrenTypeProps) => {
       if (!user) {
         return false;
       }
-      const group = user.role.groups.find((item) => {
+      if (user.role?.isRoot || user.role?.name === "Administrador" || user.roleId === 1) {
+        return true;
+      }
+      const group = user.role?.groups?.find((item) => {
         return item.name === nameGroup;
       });
       if (!group) {
@@ -85,7 +88,7 @@ export const AuthProvider = ({ children }: ChildrenTypeProps) => {
       if (namePermission === null) {
         return true;
       }
-      return group.permissions.includes(namePermission);
+      return group.permissions?.includes(namePermission) || group.permissions?.includes("*");
     },
     [responseDataUser]
   );
@@ -189,9 +192,9 @@ export const AuthProvider = ({ children }: ChildrenTypeProps) => {
         }
 
         const { data: { response: data } } = response;
-        const { statusPay } = data;
+        const statusPay = data?.statusPay || { id: 1, status: "Adimplente", message: null };
 
-        if (statusPay.id === 2) {
+        if (statusPay && statusPay.id === 2) {
           await showOverdueModal(() => {
             localStorage.setItem("@App:user", JSON.stringify(data));
             setUserData(data, password);
@@ -201,6 +204,7 @@ export const AuthProvider = ({ children }: ChildrenTypeProps) => {
 
         setUserData(data, password);
       } catch (error) {
+        console.error("Monitor Login Error:", error);
         const axiosError = error as AxiosError<any>;
         const errorMessage = axiosError.response?.data?.message;
 
