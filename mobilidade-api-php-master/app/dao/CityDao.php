@@ -38,32 +38,63 @@ class CityDao extends BaseDao
 
     public function findByCoordinate($latitude, $longitude)
     {
-        $sql = /** @lang sql */ "
-            SELECT
-                c.*
-            FROM {$this->table} c
-              INNER JOIN cityArea ca ON c.id = ca.cityId
-              WHERE
-                ca.statusId = 1 AND
-                ST_CONTAINS(ca.polygon, ST_GeomFromText('POINT({$latitude} {$longitude})'))
-            LIMIT 1
-        ";
+        try {
+            $sql = /** @lang sql */ "
+                SELECT
+                    c.*
+                FROM {$this->table} c
+                  INNER JOIN cityArea ca ON c.id = ca.cityId
+                  WHERE
+                    ca.statusId = 1 AND
+                    ST_CONTAINS(ca.polygon, ST_GeomFromText('POINT({$latitude} {$longitude})'))
+                LIMIT 1
+            ";
 
-        return $this->sqlRawSelect($sql)
-            ->get(false);
+            $res = $this->sqlRawSelect($sql)
+                ->get(false);
+            if (!empty($res)) {
+                return $res;
+            }
+        } catch (\Throwable $e) {
+        }
+
+        try {
+            return $this->sqlSelect([], [['active', '=', 1]], ['id', 'ASC'])->first();
+        } catch (\Throwable $e) {
+            return $this->sqlSelect([], [], ['id', 'ASC'])->first();
+        }
     }
 
     public function findActives()
     {
-        $sql = /** @lang sql */ "
-            SELECT
-                city.*
-            FROM {$this->table} city
-              INNER JOIN cityArea ca ON (city.id = ca.cityId AND ca.statusId = 1)
-            ORDER BY city.nome;
-        ";
+        try {
+            $sql = /** @lang sql */ "
+                SELECT
+                    city.*
+                FROM {$this->table} city
+                  INNER JOIN cityArea ca ON (city.id = ca.cityId AND ca.statusId = 1)
+                ORDER BY city.nome;
+            ";
 
-        return $this->sqlRawSelect($sql)
-            ->get();
+            $res = $this->sqlRawSelect($sql)->get();
+            if (!empty($res)) {
+                return $res;
+            }
+        } catch (\Throwable $e) {
+        }
+
+        try {
+            $res = $this->sqlSelect([], [['active', '=', 1]], ['nome', 'ASC'])->get();
+            if (!empty($res)) {
+                return $res;
+            }
+        } catch (\Throwable $e) {
+        }
+
+        try {
+            return $this->sqlSelect([], [], ['nome', 'ASC'])->get();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 }

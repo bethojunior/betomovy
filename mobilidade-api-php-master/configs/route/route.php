@@ -100,6 +100,8 @@ return [
         '/config/general',
         '/config/getapppartner',
         '/configmenuapp/search',
+        '/city/actives',
+        '/city/actives/fully',
         '/city/getactives',
         '/city/getconfig',
         '/driver/datasheet',

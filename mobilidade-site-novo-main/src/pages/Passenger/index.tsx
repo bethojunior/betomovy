@@ -456,7 +456,7 @@ const Passenger = () => {
       setLoading(true);
       try {
         const responseActiveCities = await api.get("City/getActives");
-        const cities = responseActiveCities?.data?.data;
+        const cities = responseActiveCities?.data?.data ?? responseActiveCities?.data?.response;
         setActiveCities(Array.isArray(cities) ? cities : []);
       } catch (error) {
         setActiveCities([]);

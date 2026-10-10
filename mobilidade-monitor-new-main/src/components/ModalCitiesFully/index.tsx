@@ -34,7 +34,9 @@ export const ModalCitiesFully = () => {
       const responseCitiesFully = await api.get("city/actives/fully");
 
       if (responseCitiesFully) {
-        const citiesFormated = responseCitiesFully.data.response.map(
+        const rawList = responseCitiesFully?.data?.response ?? responseCitiesFully?.data?.data ?? [];
+        const list = Array.isArray(rawList) ? rawList : [];
+        const citiesFormated = list.map(
           (value: CityProps) => {
             return {
               value: JSON.stringify(value),
