@@ -21,3 +21,9 @@ export interface ServiceTestProps {
   place: string | boolean;
   type: string;
 }
+
+export interface ErrorKeysMapsProps {
+  type: string;
+  [key: string]: any;
+}
+
