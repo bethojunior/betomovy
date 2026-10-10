@@ -57,10 +57,17 @@ class ErrorBoundaryClass extends React.Component<
 
     if (error?.message?.includes('not valid JSON') || error?.message?.includes('undefined')) {
       try {
-        ['citySelected', 'pointsCity', 'userGroup', 'fully', 'keysApp', 'driverUserTypes'].forEach((k) => {
-          const val = localStorage.getItem(k);
-          if (!val || val === 'undefined' || val === 'null') localStorage.removeItem(k);
-        });
+        const toRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key) {
+            const val = localStorage.getItem(key);
+            if (!val || val === 'undefined' || val === 'null') {
+              toRemove.push(key);
+            }
+          }
+        }
+        toRemove.forEach((k) => localStorage.removeItem(k));
       } catch {}
     }
   }
@@ -89,10 +96,17 @@ class ErrorBoundaryClass extends React.Component<
           <ReloadButton
             onClick={() => {
               try {
-                ['citySelected', 'pointsCity', 'userGroup', 'fully', 'keysApp', 'driverUserTypes'].forEach((k) => {
-                  const val = localStorage.getItem(k);
-                  if (!val || val === 'undefined' || val === 'null') localStorage.removeItem(k);
-                });
+                const toRemove: string[] = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                  const key = localStorage.key(i);
+                  if (key) {
+                    const val = localStorage.getItem(key);
+                    if (!val || val === 'undefined' || val === 'null') {
+                      toRemove.push(key);
+                    }
+                  }
+                }
+                toRemove.forEach((k) => localStorage.removeItem(k));
               } catch {}
               window.location.reload();
             }}

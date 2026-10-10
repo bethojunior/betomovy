@@ -283,7 +283,13 @@ const DriverProduction: FC = () => {
   const [loadingSelectDriver, setLoadingSelectDriver] =
     useState<boolean>(false);
 
-    const userSession = JSON.parse(localStorage.getItem("@App:user") || "{}");
+    let userSession: any = {};
+    try {
+      const rawUser = localStorage.getItem("@App:user");
+      if (rawUser && rawUser !== "undefined" && rawUser !== "null") {
+        userSession = JSON.parse(rawUser);
+      }
+    } catch {}
 
 
     const isSupport = userSession?.support === 1;

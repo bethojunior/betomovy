@@ -7,9 +7,18 @@ export const CheckFormatVersionApp = (versionApp: string | null) => {
 };
 
 export const getKeyLocalStorage = (key: string) => {
-  const response = localStorage.getItem(key);
-
-  return response ? JSON.parse(response) : null;
+  try {
+    const response = localStorage.getItem(key);
+    if (!response || response === "undefined" || response === "null" || response.trim() === "") {
+      return null;
+    }
+    return JSON.parse(response);
+  } catch {
+    try {
+      localStorage.removeItem(key);
+    } catch {}
+    return null;
+  }
 };
 
 export const formatTextWithoutCharacters = (text: string) => {

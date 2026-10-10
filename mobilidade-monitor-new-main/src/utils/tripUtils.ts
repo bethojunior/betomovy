@@ -13,7 +13,7 @@ export const openTripSharingLink = async (tripReference: string) => {
 
   try {
     const keysApp = localStorage.getItem("keysApp");
-    if (keysApp) {
+    if (keysApp && keysApp !== "undefined" && keysApp !== "null") {
       const keys = JSON.parse(keysApp);
       const linkTemplate = findTripSharingLinkInKeys(keys);
       if (linkTemplate) {

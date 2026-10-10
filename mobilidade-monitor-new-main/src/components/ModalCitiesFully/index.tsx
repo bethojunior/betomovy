@@ -89,7 +89,13 @@ export const ModalCitiesFully = () => {
             width: "100%",
           }}
           placeholder="Escolha a cidade"
-          onChange={(city) => setCitySelected(JSON.parse(city))}
+          onChange={(city) => {
+            try {
+              setCitySelected(typeof city === "string" ? JSON.parse(city) : city);
+            } catch {
+              setCitySelected(city);
+            }
+          }}
           options={cities}
           loading={loading}
         />

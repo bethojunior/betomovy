@@ -168,7 +168,11 @@ const LoggedRoutes: FC = () => {
     try {
       const responseUrlNodeBase = await api.get("config/link_storage_pictures");
 
-      if (responseUrlNodeBase.status) {
+      if (
+        responseUrlNodeBase.status &&
+        responseUrlNodeBase.data?.response !== undefined &&
+        responseUrlNodeBase.data?.response !== null
+      ) {
         localStorage.setItem(
           `@MonitorPRO-${appEnv.projectName}:base_url_nodes`,
           JSON.stringify(responseUrlNodeBase.data.response)
