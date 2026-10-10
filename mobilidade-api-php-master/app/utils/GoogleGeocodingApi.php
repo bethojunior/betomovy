@@ -32,12 +32,33 @@ class GoogleGeocodingApi implements GeocodingInterface
 
     private function loadConfigs()
     {
+        $keys = [];
         if ($this->cityId) {
-            $this->keys = $this->getKeyByCity('google_api_key_backend', $this->cityId);
-        } else {
-            $this->keys[] = Config::get('google_api_key_backend', null, true);
+            $cityKeysBackend = $this->getKeyByCity('google_api_key_backend', $this->cityId);
+            $cityKeys = $this->getKeyByCity('google_api_key', $this->cityId);
+            $keys = array_merge($keys, is_array($cityKeysBackend) ? $cityKeysBackend : [], is_array($cityKeys) ? $cityKeys : []);
         }
 
+        $globalCandidates = [
+            Config::get('google_api_key_backend', null, true),
+            Config::get('google_api_key', null, true),
+            Config::get('key_google_maps', null, true),
+            Config::get('key_google', null, true),
+            Config::get('google_api_key_web', null, true),
+            env('GOOGLE_API_KEY_API'),
+            env('GOOGLE_API_KEY'),
+        ];
+
+        foreach ($globalCandidates as $cand) {
+            if (!empty($cand) && is_string($cand) && trim($cand) !== '') {
+                $cand = trim($cand);
+                if (!in_array($cand, $keys)) {
+                    $keys[] = $cand;
+                }
+            }
+        }
+
+        $this->keys = $keys;
         $this->apiKey = $this->getKey();
     }
     /**

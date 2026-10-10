@@ -1,8 +1,9 @@
 import { AxiosError } from "axios";
 import swal from "sweetalert";
-import { Button, Select, Tag, Popover } from "antd";
+import { Button, Select, Tag, Popover, Input, Alert } from "antd";
 import { BiSolidHelpCircle } from "react-icons/bi";
 import { useState, useEffect } from "react";
+import { AiOutlineKey, AiOutlineCheckCircle, AiOutlineReload } from "react-icons/ai";
 
 import {
   Container,
@@ -14,29 +15,42 @@ import {
   TextPopover,
 } from "./styles";
 
+import api from "../../../../services/api";
 import apiApp from "../../../../services/apiApp";
-
-      
-
-import { ServiceTestProps } from "./types";
-
+import { ServiceTestProps, ErrorKeysMapsProps } from "./types";
 import { theme_colors } from "../../../../theme/theme";
 import { Loader } from "../../../../components/Loader";
+import { useLanguage } from "../../../../contexts/language";
 
 export const TestServiceMaps = () => {
-  const [valueSelect, setValueSelect] = useState<string>("");
+  const { t } = useLanguage();
+  const [valueSelect, setValueSelect] = useState<string>("google");
   const [loading, setLoading] = useState<boolean>(false);
   const [servicesTests, setServicesTests] = useState<ServiceTestProps>();
+  const [googleKeyInput, setGoogleKeyInput] = useState<string>("");
+  const [savingKey, setSavingKey] = useState<boolean>(false);
 
   const [showPopoverPlaces, setShowPopoverPlaces] = useState<boolean>(false);
-  const [showPopoverGeocoding, setShowPopoverGeocoding] =
-    useState<boolean>(false);
-  const [showPopoverDirections, setShowPopoverDirections] =
-    useState<boolean>(false);
+  const [showPopoverGeocoding, setShowPopoverGeocoding] = useState<boolean>(false);
+  const [showPopoverDirections, setShowPopoverDirections] = useState<boolean>(false);
 
-  const [errorMapKey, setErrorMapKey] = useState<ErrorKeysMapsProps | null>(
-    null
-  );
+  const [errorMapKey, setErrorMapKey] = useState<ErrorKeysMapsProps | null>(null);
+
+  const getCurrentGoogleKey = async () => {
+    try {
+      const response = await api.get("config/type/13");
+      if (response?.status && Array.isArray(response.data?.response)) {
+        const found = response.data.response.find(
+          (item: any) => item.key === "google_api_key" || item.key === "google_api_key_backend"
+        );
+        if (found?.value) {
+          setGoogleKeyInput(found.value);
+        }
+      }
+    } catch (e) {
+      console.warn("Erro ao buscar chave atual:", e);
+    }
+  };
 
   const getErrorsKeysMaps = async () => {
     try {
@@ -47,23 +61,18 @@ export const TestServiceMaps = () => {
       }
     } catch (error) {
       const responseError = error as AxiosError;
-
       if (responseError.message === "Não autorizado") {
         return;
       }
-
-      swal({
-        title: responseError.response?.data?.message || "Erro ao carregar dados",
-        icon: "error",
-      });
     }
   };
 
   const handleTests = async (nameServiceMap?: string | undefined) => {
     try {
       setLoading(true);
+      const serviceType = nameServiceMap ? nameServiceMap : valueSelect;
       const responseTests = await apiApp.post("map/serviceTest", {
-        type: nameServiceMap ? nameServiceMap : valueSelect,
+        type: serviceType,
       });
 
       if (responseTests.status && responseTests.data?.data) {
@@ -72,7 +81,7 @@ export const TestServiceMaps = () => {
     } catch (error) {
       const responseError = error as AxiosError;
       swal({
-        title: responseError.response?.data?.message || "Erro ao executar teste",
+        title: responseError.response?.data?.message || t("Erro ao executar teste"),
         icon: "error",
       });
     } finally {
@@ -80,83 +89,178 @@ export const TestServiceMaps = () => {
     }
   };
 
+  const handleSaveAndTestGoogleKey = async () => {
+    const trimmed = googleKeyInput.trim();
+    if (!trimmed) {
+      swal({
+        title: t("Atenção"),
+        text: t("Por favor, informe a chave da API do Google."),
+        icon: "warning",
+      });
+      return;
+    }
+
+    try {
+      setSavingKey(true);
+      await api.put("config", {
+        google_api_key: trimmed,
+        google_api_key_backend: trimmed,
+        google_api_key_web: trimmed,
+        key_google: trimmed,
+        key_google_maps: trimmed,
+      });
+
+      swal({
+        title: t("Sucesso"),
+        text: t("Chave salva com sucesso! Executando teste..."),
+        icon: "success",
+        timer: 2000,
+      });
+
+      setValueSelect("google");
+      await handleTests("google");
+    } catch (error) {
+      swal({
+        title: t("Erro"),
+        text: t("Não foi possível salvar a chave da API."),
+        icon: "error",
+      });
+    } finally {
+      setSavingKey(false);
+    }
+  };
+
   useEffect(() => {
+    getCurrentGoogleKey();
     getErrorsKeysMaps();
+    handleTests("google");
   }, []);
 
   useEffect(() => {
-    if (errorMapKey) {
+    if (errorMapKey?.type) {
       setValueSelect(errorMapKey.type);
       handleTests(errorMapKey.type);
     }
   }, [errorMapKey]);
 
-
-
+  const hasKeyError =
+    typeof servicesTests?.place === "string" &&
+    (servicesTests.place.includes("invalid") ||
+      servicesTests.place.includes("not activated") ||
+      servicesTests.place.includes("Billing") ||
+      servicesTests.place.includes("expired"));
 
   return (
-    <Loader spinning={loading}>
-      <Container> 
+    <Loader spinning={loading || savingKey}>
+      <Container>
         <Header>
-          <div>
-            <Select
-              style={{
-                width: "100%",
-              }}
-              value={valueSelect}
-              onChange={(value) => setValueSelect(value)}
-            >
-              <Select.Option value="google">Google</Select.Option>
-              <Select.Option value="here">Here</Select.Option>
-              <Select.Option value="mapbox">Mapbox</Select.Option>
-              <Select.Option value="seumilto">SeuMilto Maps</Select.Option>
-            </Select>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", width: "100%", flexWrap: "wrap" }}>
+            <div style={{ minWidth: 200 }}>
+              <Select
+                style={{ width: "100%" }}
+                value={valueSelect}
+                onChange={(value) => {
+                  setValueSelect(value);
+                  handleTests(value);
+                }}
+              >
+                <Select.Option value="google">Google Maps</Select.Option>
+                <Select.Option value="here">Here Maps</Select.Option>
+                <Select.Option value="mapbox">Mapbox</Select.Option>
+                <Select.Option value="seumilto">SeuMilto Maps</Select.Option>
+              </Select>
+            </div>
             <Button
               type="primary"
               onClick={() => handleTests()}
               disabled={valueSelect.length === 0}
+              icon={<AiOutlineReload />}
             >
-              CLIQUE AQUI AÇÃO DE EMERGÊNCIA
+              {t("CLIQUE AQUI AÇÃO DE EMERGÊNCIA")}
             </Button>
           </div>
+        </Header>
 
-          {/* {errorMapKey && (
-            <div>
+        {valueSelect === "google" && (
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 8,
+              padding: "16px 20px",
+              marginBottom: 20,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+              border: "1px solid #e8e8e8",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <AiOutlineKey size={20} color="#1890ff" />
+              <strong style={{ fontSize: 16 }}>{t("Configurar Chave Google Maps API")}</strong>
+            </div>
+
+            <p style={{ color: "#666", marginBottom: 12, fontSize: 13 }}>
+              {t(
+                "A chave do Google Maps precisa ter faturamento (Billing) ativo e as seguintes APIs ativadas no Google Cloud Console: Geocoding API, Places API e Directions API."
+              )}
+            </p>
+
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <Input
+                placeholder="Insira a chave da API (ex: AIzaSy...)"
+                value={googleKeyInput}
+                onChange={(e) => setGoogleKeyInput(e.target.value)}
+                style={{ flex: 1, minWidth: 320 }}
+                prefix={<AiOutlineKey style={{ color: "#bfbfbf" }} />}
+              />
               <Button
                 type="primary"
-                danger
-                onClick={() =>
-                  AskChatBot(`${errorMapKey.type} indisponível, como resolver?`)
-                }
+                onClick={handleSaveAndTestGoogleKey}
+                loading={savingKey}
+                icon={<AiOutlineCheckCircle />}
+                style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
               >
-                CLIQUE AQUI AÇÃO DE EMERGÊNCIA
+                {t("Salvar e Testar Chave")}
               </Button>
             </div>
-          )} */}
-        </Header>
+
+            {hasKeyError && (
+              <Alert
+                style={{ marginTop: 14 }}
+                message={t("Atenção com a Chave Google")}
+                description={
+                  <div>
+                    {t(
+                      "A chave atual retornou erro. Se a chave for recente, certifique-se de que no Google Cloud Console você ativou: (1) Directions API, (2) Places API e (3) Geocoding API, e que não há restrições de IP que bloqueiem a API no servidor."
+                    )}
+                  </div>
+                }
+                type="warning"
+                showIcon
+              />
+            )}
+          </div>
+        )}
+
         {servicesTests && (
           <Content>
             <ContentInformations>
-              <LabelsInformations>Tipo:</LabelsInformations>
+              <LabelsInformations>{t("Tipo:")}</LabelsInformations>
               <ValueInformations>
                 {servicesTests?.type.toLocaleUpperCase()}
               </ValueInformations>
             </ContentInformations>
 
             <ContentInformations>
-              <LabelsInformations>Locais (Searching)</LabelsInformations>
+              <LabelsInformations>{t("Locais (Searching)")}</LabelsInformations>
               <ValueInformations>
                 <div>
                   {typeof servicesTests?.place === "boolean" ? (
-                    <Tag color={theme_colors.green}>Disponível</Tag>
+                    <Tag color={theme_colors.green}>{t("Disponível")}</Tag>
                   ) : (
-                    <Tag color={theme_colors.red_crismon}>Indisponível</Tag>
+                    <Tag color={theme_colors.red_crismon}>{t("Indisponível")}</Tag>
                   )}
                   {typeof servicesTests?.place === "string" && (
                     <Popover
-                      overlayStyle={{
-                        width: 300,
-                      }}
+                      overlayStyle={{ width: 340 }}
                       placement="leftTop"
                       open={showPopoverPlaces}
                       content={<TextPopover>{servicesTests?.place}</TextPopover>}
@@ -173,20 +277,18 @@ export const TestServiceMaps = () => {
             </ContentInformations>
 
             <ContentInformations>
-              <LabelsInformations>Rotas (Directions)</LabelsInformations>
+              <LabelsInformations>{t("Rotas (Directions)")}</LabelsInformations>
               <ValueInformations>
                 <div>
                   {typeof servicesTests?.direction === "boolean" ? (
-                    <Tag color={theme_colors.green}>Disponível</Tag>
+                    <Tag color={theme_colors.green}>{t("Disponível")}</Tag>
                   ) : (
-                    <Tag color={theme_colors.red_crismon}>Indisponível</Tag>
+                    <Tag color={theme_colors.red_crismon}>{t("Indisponível")}</Tag>
                   )}
 
                   {typeof servicesTests?.direction === "string" && (
                     <Popover
-                      overlayStyle={{
-                        width: 300,
-                      }}
+                      overlayStyle={{ width: 340 }}
                       placement="leftTop"
                       open={showPopoverDirections}
                       content={
@@ -205,20 +307,18 @@ export const TestServiceMaps = () => {
             </ContentInformations>
 
             <ContentInformations>
-              <LabelsInformations>Detalhe locais (Geocoding)</LabelsInformations>
+              <LabelsInformations>{t("Detalhe locais (Geocoding)")}</LabelsInformations>
               <ValueInformations>
                 <div>
                   {typeof servicesTests?.geocoding === "boolean" ? (
-                    <Tag color={theme_colors.green}>Disponível</Tag>
+                    <Tag color={theme_colors.green}>{t("Disponível")}</Tag>
                   ) : (
-                    <Tag color={theme_colors.red_crismon}>Indisponível</Tag>
+                    <Tag color={theme_colors.red_crismon}>{t("Indisponível")}</Tag>
                   )}
 
                   {typeof servicesTests?.geocoding === "string" && (
                     <Popover
-                      overlayStyle={{
-                        width: 300,
-                      }}
+                      overlayStyle={{ width: 340 }}
                       placement="leftTop"
                       open={showPopoverGeocoding}
                       content={
@@ -237,8 +337,9 @@ export const TestServiceMaps = () => {
             </ContentInformations>
           </Content>
         )}
-        
       </Container>
     </Loader>
   );
 };
+
+export default TestServiceMaps;

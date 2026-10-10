@@ -32,8 +32,9 @@ class MapController extends ApiController
     public function actionServiceTest()
     {
         try {
+            $cityId = $_SERVER['HTTP_CITYID'] ?? ($this->request(false)->cityId ?? null);
             $result = (new MapService)
-                ->serviceTest($this->request(false));
+                ->serviceTest($this->request(false), $cityId);
             echo $this->returnSuccess("Resultado do teste de serviço", $result);
         } catch (Exception $e) {
             echo $this->returnError($e);

@@ -77,11 +77,12 @@ class MapService
         ];
     }
 
-    public function serviceTest($request)
+    public function serviceTest($request, $cityId = null)
     {
         $logDao = new LogDao;
         try {
-            $result = $this->getServiceByType($request->type);
+            $effectiveCityId = $cityId ?? ($request->cityId ?? null);
+            $result = $this->getServiceByType($request->type, $effectiveCityId);
             try {
                 $result->place->search("Centro", "-3.7263684626356084,-38.52706632770688");
                 $place = true;
@@ -199,28 +200,28 @@ class MapService
     }
 
 
-    private function getServiceByType($type)
+    private function getServiceByType($type, $cityId = null)
     {
         switch ($type) {
             case 'google':
                 return (object)[
-                    'place'     => new GooglePlacesApi(),
-                    'direction' => new GoogleMapsApi(),
-                    'geocoding' => new GoogleGeocodingApi(),
+                    'place'     => new GooglePlacesApi($cityId),
+                    'direction' => new GoogleMapsApi($cityId),
+                    'geocoding' => new GoogleGeocodingApi($cityId),
                     'keys' => ['google_api_key_backend', 'google_api_key']
                 ];
             case 'here':
                 return (object)[
-                    'place'     => new HerePlacesApi(),
-                    'direction' => new HereDistanceApi(),
-                    'geocoding' => new HereGeocodingApi(),
+                    'place'     => new HerePlacesApi($cityId),
+                    'direction' => new HereDistanceApi($cityId),
+                    'geocoding' => new HereGeocodingApi($cityId),
                     'keys' => ['here_api_key']
                 ];
             case 'mapbox':
                 return (object)[
-                    'place'     => new MapBoxPlacesApi(),
-                    'direction' => new MapBoxApi(),
-                    'geocoding' => new MapBoxGeocodingApi(),
+                    'place'     => new MapBoxPlacesApi($cityId),
+                    'direction' => new MapBoxApi($cityId),
+                    'geocoding' => new MapBoxGeocodingApi($cityId),
                     'keys' => ['mapbox_access_token']
                 ];
             case 'seumilto':
