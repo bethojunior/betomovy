@@ -36,15 +36,12 @@
                 <input type="text" class="mcc-input form-control" id="nameCustomer">
             </div>
 
-            <div class="mcc-row">
-                <div class="mcc-field">
-                    <label class="mcc-label" id="descriptionDocument" for="documentCustomer">CPF</label>
-                    <input type="text" class="mcc-input form-control" id="documentCustomer">
-                </div>
-                <div class="mcc-field">
-                    <label class="mcc-label" for="phoneCustomer">Telefone</label>
-                    <input type="text" class="mcc-input form-control" id="phoneCustomer">
-                </div>
+            <input type="hidden" id="documentCustomer" value="">
+            <span id="descriptionDocument" style="display: none;"></span>
+
+            <div class="mcc-field mcc-field--full">
+                <label class="mcc-label" for="phoneCustomer">Telefone</label>
+                <input type="text" class="mcc-input form-control" id="phoneCustomer">
             </div>
 
             <div class="mcc-field mcc-field--full">

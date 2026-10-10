@@ -1,32 +1,47 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    Mask.setMaskCpf("#documentCustomer");
+    const docCust = document.getElementById("documentCustomer");
+    if (docCust && docCust.type !== "hidden") {
+        Mask.setMaskCpf("#documentCustomer");
+    }
     Mask.setMaskPhone("#phoneCustomer");
 
     const elementProperty = new ElementProperty();
 
     elementProperty.addEventInElement("#isCompanyCustomerPf", "onclick", function () {
-        document.getElementById("descriptionName").innerHTML = "Nome do cliente";
-        document.getElementById("descriptionDocument").innerHTML = "CPF";
-        document.getElementById("descriptionDate").innerHTML = "Data de Nascimento";
-        Mask.setMaskCpf("#documentCustomer");
+        const descName = document.getElementById("descriptionName");
+        if (descName) descName.innerHTML = "Nome do cliente";
+        const descDoc = document.getElementById("descriptionDocument");
+        if (descDoc) descDoc.innerHTML = "CPF";
+        const descDate = document.getElementById("descriptionDate");
+        if (descDate) descDate.innerHTML = "Data de Nascimento";
+        const docInput = document.getElementById("documentCustomer");
+        if (docInput && docInput.type !== "hidden") {
+            Mask.setMaskCpf("#documentCustomer");
+        }
     });
 
     elementProperty.addEventInElement("#isCompanyCustomerPj", "onclick", function () {
-        document.getElementById("descriptionName").innerHTML = "Nome da empresa";
-        document.getElementById("descriptionDocument").innerHTML = "CNPJ";
-        document.getElementById("descriptionDate").innerHTML = "Data de inscrição";
-        Mask.setMaskCnpj("#documentCustomer");
+        const descName = document.getElementById("descriptionName");
+        if (descName) descName.innerHTML = "Nome da empresa";
+        const descDoc = document.getElementById("descriptionDocument");
+        if (descDoc) descDoc.innerHTML = "CNPJ";
+        const descDate = document.getElementById("descriptionDate");
+        if (descDate) descDate.innerHTML = "Data de inscrição";
+        const docInput = document.getElementById("documentCustomer");
+        if (docInput && docInput.type !== "hidden") {
+            Mask.setMaskCnpj("#documentCustomer");
+        }
     });
 
     elementProperty.addEventInElement("#saveCustomer", "onclick", function () {
         const customer = {
-            name: document.getElementById("nameCustomer").value,
-            phone: document.getElementById("phoneCustomer").value,
-            email: document.getElementById("emailCustomer").value,
-            document: document.getElementById("documentCustomer").value,
-            dateOfBirth: document.getElementById("dateOfBirthCustomer").value,
-            isCompany: document.getElementById("isCompanyCustomerPj").checked,
+            name: document.getElementById("nameCustomer") ? document.getElementById("nameCustomer").value : "",
+            phone: document.getElementById("phoneCustomer") ? document.getElementById("phoneCustomer").value : "",
+            email: document.getElementById("emailCustomer") ? document.getElementById("emailCustomer").value : "",
+            document: document.getElementById("documentCustomer") ? document.getElementById("documentCustomer").value.trim() : "",
+            dateOfBirth: document.getElementById("dateOfBirthCustomer") ? document.getElementById("dateOfBirthCustomer").value : "",
+            isCompany: document.getElementById("isCompanyCustomerPj") ? document.getElementById("isCompanyCustomerPj").checked : false,
         };
 
         if (customer.name.length === 0) {

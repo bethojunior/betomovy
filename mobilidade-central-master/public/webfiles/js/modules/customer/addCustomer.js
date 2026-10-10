@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-    Mask.setMaskCpf("#documentCustomer");
+    const docCust = document.getElementById("documentCustomer");
+    if (docCust && docCust.type !== "hidden") {
+        Mask.setMaskCpf("#documentCustomer");
+    }
     Mask.setMaskPhone("#phoneCustomer");
 
 
@@ -10,37 +13,55 @@ document.addEventListener("DOMContentLoaded", function () {
         .addEventInElement("#btnCancelModalCreateCustomer", "onclick", closeModal);
 
     viewController.elementProperty.addEventInElement("#isCompanyCustomerPf", "onclick", function () {     
-        document.getElementById("descriptionName").innerHTML = "Nome do cliente";
-        document.getElementById("descriptionDocument").innerHTML = "CPF";
-        document.getElementById("descriptionDate").innerHTML = "Data de Nascimento";
+        const descName = document.getElementById("descriptionName");
+        if (descName) descName.innerHTML = "Nome do cliente";
+        const descDoc = document.getElementById("descriptionDocument");
+        if (descDoc) descDoc.innerHTML = "CPF";
+        const descDate = document.getElementById("descriptionDate");
+        if (descDate) descDate.innerHTML = "Data de Nascimento";
         const isChecked = document.getElementById("register-international")?.checked;
-        if (!isChecked) {
+        const docInput = document.getElementById("documentCustomer");
+        if (!isChecked && docInput && docInput.type !== "hidden") {
             Mask.setMaskCpf("#documentCustomer");
         }
     })
 
     viewController.elementProperty.addEventInElement("#isCompanyCustomerPj", "onclick", function () {
-        document.getElementById("descriptionName").innerHTML = "Nome da empresa";
-        document.getElementById("descriptionDocument").innerHTML = "CNPJ";
-        document.getElementById("descriptionDate").innerHTML = "Data de incrição";
+        const descName = document.getElementById("descriptionName");
+        if (descName) descName.innerHTML = "Nome da empresa";
+        const descDoc = document.getElementById("descriptionDocument");
+        if (descDoc) descDoc.innerHTML = "CNPJ";
+        const descDate = document.getElementById("descriptionDate");
+        if (descDate) descDate.innerHTML = "Data de incrição";
         const isChecked = document.getElementById("register-international")?.checked;
-        if (!isChecked) {
+        const docInput = document.getElementById("documentCustomer");
+        if (!isChecked && docInput && docInput.type !== "hidden") {
             Mask.setMaskCnpj("#documentCustomer");
         }
     })
 
     viewController.elementProperty.addEventInElement("#register-international", "onchange", function () {
         const isChecked = document.getElementById("register-international")?.checked;
+        const docInput = document.getElementById("documentCustomer");
         if (isChecked) {
-            Mask.removeMask("#documentCustomer");
+            if (docInput && docInput.type !== "hidden") {
+                Mask.removeMask("#documentCustomer");
+            }
             Mask.removeMask("#phoneCustomer");
         } else {
-            document.getElementById("isCompanyCustomerPf").checked = true;
-            document.getElementById("isCompanyCustomerPj").checked = false;
-            document.getElementById("descriptionName").innerHTML = "Nome do cliente";
-            document.getElementById("descriptionDocument").innerHTML = "CPF";
-            document.getElementById("descriptionDate").innerHTML = "Data de Nascimento";
-            Mask.setMaskCpf("#documentCustomer");
+            const pfRadio = document.getElementById("isCompanyCustomerPf");
+            if (pfRadio) pfRadio.checked = true;
+            const pjRadio = document.getElementById("isCompanyCustomerPj");
+            if (pjRadio) pjRadio.checked = false;
+            const descName = document.getElementById("descriptionName");
+            if (descName) descName.innerHTML = "Nome do cliente";
+            const descDoc = document.getElementById("descriptionDocument");
+            if (descDoc) descDoc.innerHTML = "CPF";
+            const descDate = document.getElementById("descriptionDate");
+            if (descDate) descDate.innerHTML = "Data de Nascimento";
+            if (docInput && docInput.type !== "hidden") {
+                Mask.setMaskCpf("#documentCustomer");
+            }
             Mask.setMaskPhone("#phoneCustomer");
         }
     });
@@ -62,12 +83,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const customer = {
-            name: document.getElementById("nameCustomer").value,
-            phone: document.getElementById("phoneCustomer").value,
+            name: document.getElementById("nameCustomer") ? document.getElementById("nameCustomer").value : "",
+            phone: document.getElementById("phoneCustomer") ? document.getElementById("phoneCustomer").value : "",
             email: document.getElementById("emailCustomer")?.value?.trim() || "",
-            document: document.getElementById("documentCustomer").value,
-            dateOfBirth: document.getElementById("dateOfBirthCustomer").value,
-            isCompany: document.getElementById("isCompanyCustomerPj").checked,
+            document: document.getElementById("documentCustomer") ? document.getElementById("documentCustomer").value.trim() : "",
+            dateOfBirth: document.getElementById("dateOfBirthCustomer") ? document.getElementById("dateOfBirthCustomer").value : "",
+            isCompany: document.getElementById("isCompanyCustomerPj") ? document.getElementById("isCompanyCustomerPj").checked : false,
             key_app_partner: responseKeyAppPartnerParsed ?? null
         };
 
@@ -90,14 +111,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const isChecked = document.getElementById("register-international")?.checked;
 
-        if(customer.document.length > 0 && customer.isCompany === false){
+        if (customer.document.length > 0 && customer.isCompany === false) {
             if (!ValidateForm.validateCpf(customer.document) && !isChecked) {
                 SwalCustom.messageDialog("", "CPF inválido", undefined, "info");
                 return false;
             }
         }
 
-        if(customer.document.length > 0 && customer.isCompany){
+        if (customer.document.length > 0 && customer.isCompany) {
             if (!ValidateForm.validateCnpj(customer.document) && !isChecked) {
                 SwalCustom.messageDialog("", "CNPJ inválido", undefined, "info");
                 return false;
@@ -136,11 +157,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                document.getElementById("nameCustomer").value = "";
-                document.getElementById("phoneCustomer").value = "";
+                document.getElementById("nameCustomer") && (document.getElementById("nameCustomer").value = "");
+                document.getElementById("phoneCustomer") && (document.getElementById("phoneCustomer").value = "");
                 emailInput && (emailInput.value = "");
-                document.getElementById("documentCustomer").value = "";
-                document.getElementById("dateOfBirthCustomer").value = "";
+                document.getElementById("documentCustomer") && (document.getElementById("documentCustomer").value = "");
+                document.getElementById("dateOfBirthCustomer") && (document.getElementById("dateOfBirthCustomer").value = "");
 
                 viewController.elementProperty.removeClass(".modal-create-customer", "active");
 

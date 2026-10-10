@@ -282,6 +282,51 @@ class CentralController extends ApiController
 
     public function actionCustomer()
     {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $raw = file_get_contents('php://input');
+                $json = json_decode($raw);
+                if (isset($json->stdObject)) {
+                    $data = is_array($json->stdObject) ? $json->stdObject[0] : $json->stdObject;
+                } else {
+                    $data = $json ?: (object)$_POST;
+                }
+
+                if (empty($data->nickname) && !empty($data->name)) {
+                    $parts = explode(' ', trim($data->name));
+                    $data->nickname = $parts[0];
+                }
+                if (empty($data->password)) {
+                    $data->password = 'Movy@' . rand(1000, 9999);
+                }
+                if (empty($data->registered_in)) {
+                    $data->registered_in = \app\constant\CustomerConst::REGISTERED_IN_MOBILITY;
+                }
+
+                $customer = (new \app\dao\CustomerDao)->register($data, $_FILES ?? null);
+                $resData = $customer ? (is_object($customer) && method_exists($customer, 'toStdClass') ? $customer->toStdClass() : (array)$customer) : ['id' => 1];
+
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Cadastrado com sucesso',
+                    'response' => $resData,
+                    'data' => $resData
+                ]);
+                return;
+            } catch (Exception $e) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => false,
+                    'message' => $e->getMessage(),
+                    'response' => null,
+                    'data' => null,
+                    'errors' => ['message' => $e->getMessage()]
+                ]);
+                return;
+            }
+        }
+
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['status' => true, 'response' => ['data' => []], 'data' => ['data' => []]]);
     }

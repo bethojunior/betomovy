@@ -17,10 +17,10 @@
                 <input type="text" class="form-control" id="nameCustomer">
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="display: none;">
             <div class="form-group col-sm-4">
                 <label id="descriptionDocument" for="documentCustomer" class="mb-0">CPF</label>
-                <input type="text" class="form-control" id="documentCustomer">
+                <input type="hidden" class="form-control" id="documentCustomer" value="">
             </div>
         </div>
         <div class="row">
