@@ -30,7 +30,7 @@ export const ModalAddEstablishmentsCharge = ({
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [loadingSelect, setLoadingSelect] = useState<boolean>(false);
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const handleCloseModal = () => {
     setVisible(false);

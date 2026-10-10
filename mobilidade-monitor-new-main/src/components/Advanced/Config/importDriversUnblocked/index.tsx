@@ -74,7 +74,7 @@ const ImportDriverUnblocked: FC = () => {
       return Promise.reject();
     }
 
-    const cityId = Session.getLocal("citySelected").cityId;
+    const cityId = Session.getLocal("citySelected")?.cityId;
     if (!cityId) {
       message.error('Selecione uma cidade no painel antes de importar');
       return Promise.reject();

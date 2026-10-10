@@ -48,7 +48,7 @@ export const ModalEditTariffFlag = ({
     const [timeInit, setTimeInit] = useState<string>("");
     const [timeFinal, setTimeFinal] = useState<string>("");
 
-    const cityId = Session.getLocal("citySelected").cityId;
+    const cityId = Session.getLocal("citySelected")?.cityId;
 
     useEffect(() => {
         if (editingItem) {

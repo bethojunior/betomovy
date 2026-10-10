@@ -47,7 +47,7 @@ const RegisterEstablishments = () => {
   const [companyId, setCompanyId] = useState(0);
   const [isDefault, setIsDefault] = useState(false);
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const sendAlert = (message: string, type: AlertType) => {
     setMessageAlert(message);

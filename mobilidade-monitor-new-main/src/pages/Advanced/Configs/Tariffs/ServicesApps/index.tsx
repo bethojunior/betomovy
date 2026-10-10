@@ -153,7 +153,7 @@ export const ServicesApps = () => {
 
   const [inputValues, setInputValues] = useState<{ [key: string]: string }>({});
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const getTypesTravels = async () => {
     setLoading(true);

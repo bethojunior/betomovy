@@ -12,7 +12,7 @@ const DriversByManager: FC = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false); 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const fetchManagers = useCallback(async () => {
     setLoading(true);

@@ -95,7 +95,7 @@ export const ModalEditTariffTrigger = ({
     const endDateUTC = new Date(endDate).toISOString();
 
     const objectSend = {
-      cityId: Session.getLocal("citySelected").cityId,
+      cityId: Session.getLocal("citySelected")?.cityId,
       tripTypeId: idTripType,
       multiplierValue: Utils.BrlToNumber(valueTax, "positive"),
       startDate,

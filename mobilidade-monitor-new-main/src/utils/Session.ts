@@ -3,14 +3,18 @@ class Session {
 		try {
 			const local = localStorage.getItem(name);
 			if (!local || local === "undefined" || local === "null" || local.trim() === "") {
-				return null;
+				return name === "citySelected" ? ({} as any) : null;
 			}
-			return JSON.parse(local);
+			const parsed = JSON.parse(local);
+			if (!parsed && name === "citySelected") {
+				return {} as any;
+			}
+			return parsed ?? (name === "citySelected" ? ({} as any) : null);
 		} catch {
 			try {
 				localStorage.removeItem(name);
 			} catch {}
-			return null;
+			return name === "citySelected" ? ({} as any) : null;
 		}
 	}
 

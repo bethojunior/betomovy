@@ -117,7 +117,7 @@ const AcquirerByCity: FC = () => {
 					})),
 				);
 				setSearchResponse(values.data.response);
-				setCityId(Session.getLocal('citySelected').cityId);
+				setCityId(Session.getLocal('citySelected')?.cityId);
 			}
 		});
 	}, []);

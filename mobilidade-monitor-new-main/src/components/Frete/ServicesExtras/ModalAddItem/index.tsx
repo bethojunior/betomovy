@@ -51,7 +51,7 @@ export const ModalAddItem = ({
   const [itemsHelpers, setItemsHelpers] = useState<DefaultOptionsProps[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
   const { setMaskMoney, setRemoveMaskMoney } = Mask;
 
   const handleCloseModal = () => {

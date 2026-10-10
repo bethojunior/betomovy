@@ -33,7 +33,7 @@ export const LoadAccessibility = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingTable, setLoadingTable] = useState<boolean>(false);
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const { setMaskMoneyNumber } = Mask;
 

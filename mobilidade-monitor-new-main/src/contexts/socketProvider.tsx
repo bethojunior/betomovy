@@ -17,7 +17,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
   const [activeDrivers, setDrivers] = useState<any[]>([]);
   const socket = useMemo(() => new AppSocket({
     query: {
-      cityId: Session.getLocal("citySelected").cityId,
+      cityId: Session.getLocal("citySelected")?.cityId,
     },
   }), []);
 

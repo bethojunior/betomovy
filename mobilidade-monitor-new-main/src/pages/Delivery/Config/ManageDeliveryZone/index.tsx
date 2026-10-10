@@ -26,7 +26,7 @@ export const ManageDeliveryZone = () => {
     useState<DeliveryNeighborhoodProps | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const getDeliveryNeighborhood = async () => {
     try {

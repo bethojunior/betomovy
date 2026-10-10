@@ -38,7 +38,7 @@ export const EstablishmentsCharges = () => {
   const [listCompanies, setListCompanies] = useState<CompanyProps[]>([]);
   const [loadingSelect, setLoadingSelect] = useState<boolean>(false);
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const getEstablishments = async (
     page: number = 1,

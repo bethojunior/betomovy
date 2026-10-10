@@ -34,7 +34,7 @@ export const TariffTrigger = () => {
   const [modalAddNewTariffTrigger, setModalAddNewTariffTrigger] =
     useState<boolean>(false);
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const getPricesDynamicScheduled = async () => {
     setLoadingTable(true);

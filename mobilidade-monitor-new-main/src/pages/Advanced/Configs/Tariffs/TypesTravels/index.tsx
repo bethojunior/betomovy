@@ -86,7 +86,7 @@ export const TypesTravels = () => {
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const canManageFloatingLimits = hasPermission(TARIFAS, "limite_flutuante");
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const { customOrderConfig, getCustomOrderConfig } = useCustomOrderConfig();
 

@@ -31,7 +31,7 @@ import { AiFillDelete } from "react-icons/ai";
 import swal from "sweetalert";
 import Session from "../../../utils/Session";
 
-const citySelected = Session.getLocal("citySelected").cityId;
+const citySelected = Session.getLocal("citySelected")?.cityId;
 
 export const Config = () => {
   const [loading, setLoading] = useState(false);

@@ -28,7 +28,7 @@ export const ServicesExternalByCity = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { formatStringToKeyObject } = Utils;
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const getExternalServices = async () => {
     setLoading(true);

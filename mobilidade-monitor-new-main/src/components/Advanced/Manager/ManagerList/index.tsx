@@ -33,7 +33,7 @@ const ManagerList: FC = () => {
   const [allManagers, setAllManagers] = useState<User[]>([]);
   const history = useHistory();
   const [form] = Form.useForm();
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const fetchManagers = useCallback(async () => {
     setLoading(true);

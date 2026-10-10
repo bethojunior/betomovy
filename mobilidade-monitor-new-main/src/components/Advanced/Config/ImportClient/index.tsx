@@ -86,7 +86,7 @@ const ImportClient: FC = () => {
       return Promise.reject();
     }
 
-    const cityId = Session.getLocal("citySelected").cityId;
+    const cityId = Session.getLocal("citySelected")?.cityId;
 
     const formData = new FormData();
     formData.append('file', selectedFile, selectedFile.name);

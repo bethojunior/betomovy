@@ -32,7 +32,7 @@ export const TariffFlag = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const getTariffFlag = async () => {
     setLoadingTable(true);

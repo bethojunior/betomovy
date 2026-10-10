@@ -26,7 +26,7 @@ export const DobbyReturnsFee = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const getPayMachineReturns = async () => {
     try {

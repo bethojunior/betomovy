@@ -47,7 +47,7 @@ const RouteList: FC = () => {
   const [form] = Form.useForm();
   const history = useHistory();
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const fetchRoutes = useCallback(async () => {
     setLoading(true);

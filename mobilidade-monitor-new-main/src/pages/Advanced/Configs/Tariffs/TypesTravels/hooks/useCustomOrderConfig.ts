@@ -10,7 +10,7 @@ export const useCustomOrderConfig = () => {
 
   const getCustomOrderConfig = async () => {
     try {
-      const city = Session.getLocal("citySelected").cityId;
+      const city = Session.getLocal("citySelected")?.cityId;
       const response = await api.get<CityConfigResponse>(
         `city/${city}/config`
       );

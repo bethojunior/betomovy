@@ -35,7 +35,7 @@ export const ManageToll = () => {
 
   const { setMaskMoneyNumber } = Mask;
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const getTolls = async () => {
     try {

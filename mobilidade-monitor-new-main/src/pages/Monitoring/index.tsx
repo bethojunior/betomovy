@@ -682,14 +682,14 @@ const Monitoring: FC = () => {
   useEffect(() => {
     const socket = AppSocket.getInstance({
       query: {
-        cityId: Session.getLocal("citySelected").cityId,
+        cityId: Session.getLocal("citySelected")?.cityId,
       },
       transports: [realTimeSocket ? 'websocket' : 'polling'],
     });
 
     socket.on('connect', () => {
       socket.emit('join-room', {
-        cityId: Session.getLocal("citySelected").cityId,
+        cityId: Session.getLocal("citySelected")?.cityId,
       });
     });
 

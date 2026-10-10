@@ -35,7 +35,7 @@ const ConfigByCities: FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    const city = Session.getLocal("citySelected").cityId;
+    const city = Session.getLocal("citySelected")?.cityId;
     setDefaultCity(city);
     setShowData(false);
     loadConfigData();

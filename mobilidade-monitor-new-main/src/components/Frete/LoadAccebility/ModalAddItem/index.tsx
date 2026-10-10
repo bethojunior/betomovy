@@ -54,7 +54,7 @@ export const ModalAddObstacle = ({
 
   const { setMaskMoney, setRemoveMaskMoney } = Mask;
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
 
   const handleClose = () => {
     setVisible(false);

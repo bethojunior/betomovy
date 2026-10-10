@@ -24,7 +24,7 @@ export const ServicesExtras = () => {
   const [loadingTable, setLoadingTable] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
   const { setMaskMoneyNumber } = Mask;
 
   const getHelps = async () => {

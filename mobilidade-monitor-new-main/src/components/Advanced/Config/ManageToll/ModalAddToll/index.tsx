@@ -66,7 +66,7 @@ export const ModalAddToll = ({
   const [loading, setLoading] = useState<boolean>(false);
 
   const coordinates = Session.getLocal("pointsCity");
-  const cityId = Session.getLocal("citySelected").cityId;
+  const cityId = Session.getLocal("citySelected")?.cityId;
   const lat = getCenterCoordinates(coordinates).lat;
   const lng = getCenterCoordinates(coordinates).lng;
 

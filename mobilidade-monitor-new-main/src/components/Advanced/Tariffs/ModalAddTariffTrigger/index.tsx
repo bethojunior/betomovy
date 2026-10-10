@@ -77,7 +77,7 @@ export const ModalAddTariffTrigger = ({
     setLoading(true);
     try {
       const objectSend = {
-        cityId: Session.getLocal("citySelected").cityId,
+        cityId: Session.getLocal("citySelected")?.cityId,
         endDate: Utils.transformDate(dateFinal as string),
         endDateUTC: new Date(
           Utils.transformDate(dateFinal as string) as any
