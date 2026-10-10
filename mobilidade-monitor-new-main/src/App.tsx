@@ -11,9 +11,9 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const App = () => {
   return (
-    <AuthProvider>
-      <LanguageProvider>
-        <ErrorBoundary>
+    <ErrorBoundary>
+      <AuthProvider>
+        <LanguageProvider>
           <FullyProvider>
             <UserGroupProvider>
               <UserTypeProvider>
@@ -26,9 +26,9 @@ const App = () => {
               </UserTypeProvider>
             </UserGroupProvider>
           </FullyProvider>
-        </ErrorBoundary>
-      </LanguageProvider>
-    </AuthProvider>
+        </LanguageProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 

@@ -327,7 +327,7 @@ export const AuthProvider = ({ children }: ChildrenTypeProps) => {
       try {
         updateHeaderCredential();
         setupSessionInterceptors();
-        await getRequestPosition();
+        getRequestPosition().catch(() => {});
 
         const storagedUser = localStorage.getItem("@App:user");
 
