@@ -93,8 +93,13 @@ export default function DriverFinancial() {
   // Busca os movimentos financeiros
   useEffect(() => {
     if (!id) return
-    const user = localStorage.getItem('@App:user')
-    const userData = user ? JSON.parse(user) : null
+    let userData: any = null
+    try {
+      const user = localStorage.getItem('@App:user')
+      if (user && user !== 'undefined' && user !== 'null') {
+        userData = JSON.parse(user)
+      }
+    } catch {}
 
     setLoading(true)
     let url = `/driver/${id}/financial-report?page=${page}`

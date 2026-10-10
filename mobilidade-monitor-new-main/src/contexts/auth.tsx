@@ -41,18 +41,26 @@ export const AuthProvider = ({ children }: ChildrenTypeProps) => {
   const updateHeaderCredential = (token?: string, idUser?: string) => {
     const responseDatasUser = localStorage.getItem("@App:user");
 
-    if (responseDatasUser) {
-      const datasUserFormated: userData = JSON.parse(responseDatasUser);
+    if (responseDatasUser && responseDatasUser !== "undefined" && responseDatasUser !== "null") {
+      try {
+        const datasUserFormated: userData = JSON.parse(responseDatasUser);
 
-      api.defaults.headers.token = datasUserFormated.api_token;
-      apiv1.defaults.headers.token = datasUserFormated.api_token;
-      apiApp.defaults.headers.token = datasUserFormated.api_token;
-      apiMobility.defaults.headers.token = datasUserFormated.api_token;
+        if (datasUserFormated?.api_token) {
+          api.defaults.headers.token = datasUserFormated.api_token;
+          apiv1.defaults.headers.token = datasUserFormated.api_token;
+          apiApp.defaults.headers.token = datasUserFormated.api_token;
+          apiMobility.defaults.headers.token = datasUserFormated.api_token;
+        }
 
-      api.defaults.headers.userid = datasUserFormated.idUser;
-      apiv1.defaults.headers.userid = datasUserFormated.idUser;
-      apiApp.defaults.headers.userid = datasUserFormated.idUser;
-      apiMobility.defaults.headers.userid = datasUserFormated.idUser;
+        if (datasUserFormated?.idUser) {
+          api.defaults.headers.userid = datasUserFormated.idUser;
+          apiv1.defaults.headers.userid = datasUserFormated.idUser;
+          apiApp.defaults.headers.userid = datasUserFormated.idUser;
+          apiMobility.defaults.headers.userid = datasUserFormated.idUser;
+        }
+      } catch {
+        localStorage.removeItem("@App:user");
+      }
     }
 
     if (token) {
@@ -151,12 +159,19 @@ export const AuthProvider = ({ children }: ChildrenTypeProps) => {
   const validateSession = async (): Promise<boolean> => {
     try {
       const storagedUser = localStorage.getItem("@App:user");
-      if (!storagedUser) {
+      if (!storagedUser || storagedUser === "undefined" || storagedUser === "null") {
         return false;
       }
 
-      const userData = JSON.parse(storagedUser);
-      if (!userData.api_token) {
+      let userData: any;
+      try {
+        userData = JSON.parse(storagedUser);
+      } catch {
+        localStorage.removeItem("@App:user");
+        return false;
+      }
+
+      if (!userData?.api_token) {
         return false;
       }
 
@@ -316,19 +331,25 @@ export const AuthProvider = ({ children }: ChildrenTypeProps) => {
 
         const storagedUser = localStorage.getItem("@App:user");
 
-        if (storagedUser) {
-          const data = JSON.parse(storagedUser);
-          setResponseDataUser(data);
+        if (storagedUser && storagedUser !== "undefined" && storagedUser !== "null") {
+          try {
+            const data = JSON.parse(storagedUser);
+            if (data && typeof data === "object") {
+              setResponseDataUser(data);
 
-          if (data.api_token) {
-            try {
-              const isSessionValid = await validateSession();
-              if (!isSessionValid) {
-                handleSessionExpired();
+              if (data.api_token) {
+                try {
+                  const isSessionValid = await validateSession();
+                  if (!isSessionValid) {
+                    handleSessionExpired();
+                  }
+                } catch {
+                  // sessão inválida — usuário vai para login
+                }
               }
-            } catch {
-              // sessão inválida — usuário vai para login
             }
+          } catch {
+            localStorage.removeItem("@App:user");
           }
         }
       } finally {

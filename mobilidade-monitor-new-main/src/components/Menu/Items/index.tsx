@@ -22,6 +22,7 @@ import {
 } from "react-icons/ai";
 import { MdGroups2 } from "react-icons/md";
 import AuthContext from "../../../contexts/auth";
+import { useLanguage } from "../../../contexts/language";
 import {
   CLIENTE,
   CONFIGURACAO,
@@ -107,6 +108,7 @@ const resolveCrispWebsiteId = (): string => {
 };
 const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
   const { signOut, hasPermission } = useContext(AuthContext);
+  const { t } = useLanguage();
   const history = useHistory();
   const location = useLocation();
   const canImportClients = hasPermission(CONFIGURACAO, "importar_cliente");
@@ -1635,7 +1637,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
           .map((item) => {
             if (item.children) {
               return (
-                <SubMenuStyle key={item.key} icon={item.icon} title={item.name}>
+                <SubMenuStyle key={item.key} icon={item.icon} title={t(item.name)}>
                   {item.children
                     .filter((children: any) => {
                       if (item?.speedmob == "true") {
@@ -1648,7 +1650,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
                         return (
                           <SubMenuStyle
                             key={children.key}
-                            title={children.name}
+                            title={t(children.name)}
                           >
                             {children.children
                               .filter((subChildren) => subChildren.permission)
@@ -1660,7 +1662,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
                                   return (
                                     <SubMenuStyle
                                       key={subChildren.key}
-                                      title={subChildren.name}
+                                      title={t(subChildren.name)}
                                     >
                                       {subChildren.children
                                         .filter(
@@ -1676,7 +1678,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
                                             }
                                           >
                                             <Link to={sub2Children.to}>
-                                              {sub2Children.name}
+                                              {t(sub2Children.name)}
                                             </Link>
                                           </MenuAnt.Item>
                                         ))}
@@ -1692,7 +1694,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
                                     }
                                   >
                                     <Link to={subChildren.to}>
-                                      {subChildren.name}
+                                      {t(subChildren.name)}
                                     </Link>
                                   </MenuAnt.Item>
                                 );
@@ -1705,7 +1707,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
                           key={children.key}
                           onClick={children.onClick ?? handleCloseMenuIfMobile}
                         >
-                          <Link to={children.to}>{children.name}</Link>
+                          <Link to={children.to}>{t(children.name)}</Link>
                         </MenuAnt.Item>
                       );
                     })}
@@ -1718,7 +1720,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
                 icon={item.icon}
                 onClick={handleCloseMenuIfMobile}
               >
-                <Link to={item.to}>{item.name}</Link>
+                <Link to={item.to}>{t(item.name)}</Link>
               </MenuAnt.Item>
             );
           })}
@@ -1729,7 +1731,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
             onClick={() => setIsModalVisible(true)}
             icon={<AiOutlineLock />}
           >
-            Alterar senha
+            {t("Alterar senha")}
           </MenuAnt.Item>
         )}
         <MenuAnt.Item
@@ -1737,7 +1739,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
           onClick={handleClearCache}
           icon={<AiOutlineClear />}
         >
-          Limpar Cache
+          {t("Limpar Cache")}
         </MenuAnt.Item>
         <MenuAnt.Item
           key="logout"
@@ -1747,7 +1749,7 @@ const ListMenu: FC<ListProps> = ({ isMobile, setCollapsed }) => {
           }}
           icon={<AiOutlineLogout />}
         >
-          Sair
+          {t("Sair")}
         </MenuAnt.Item>
       </MenuAnt>
       {hasPermission(CONTATO, "access_crisp") &&

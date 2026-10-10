@@ -42,7 +42,11 @@ export const DriverPopover = ({ driver, driverDetails, children }: any) => {
 
     setSendingNotification(true);
     try {
-      const loggedUser = JSON.parse(localStorage.getItem('@App:user') || '{}');
+      let loggedUser: any = {};
+      try {
+        const raw = localStorage.getItem('@App:user');
+        if (raw && raw !== 'undefined' && raw !== 'null') loggedUser = JSON.parse(raw);
+      } catch {}
 
       await api.post('/notification/', {
         action: 'message',

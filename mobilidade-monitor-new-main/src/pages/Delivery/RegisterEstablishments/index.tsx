@@ -108,11 +108,16 @@ const RegisterEstablishments = () => {
       const axiosError = error as AxiosError;
       console.error(axiosError.request);
       setLoading(false);
-      sendAlert(
-        JSON.parse(axiosError.request.responseText).response[0] ??
-          "Erro ao criar estabelecimento",
-        "warning"
-      );
+      let errorMsg = "Erro ao criar estabelecimento";
+      try {
+        if (axiosError?.response?.data?.message) {
+          errorMsg = axiosError.response.data.message;
+        } else if (axiosError?.request?.responseText) {
+          const parsed = JSON.parse(axiosError.request.responseText);
+          if (parsed?.response?.[0]) errorMsg = parsed.response[0];
+        }
+      } catch {}
+      sendAlert(errorMsg, "warning");
     }
   };
 
@@ -151,11 +156,16 @@ const RegisterEstablishments = () => {
     } catch (error) {
       const axiosError = error as AxiosError;
       console.error(axiosError.request);
-      sendAlert(
-        JSON.parse(axiosError.request.responseText).response[0] ??
-          "Erro ao tentar editar o stabalecimento",
-        "warning"
-      );
+      let errorMsg = "Erro ao tentar editar o estabelecimento";
+      try {
+        if (axiosError?.response?.data?.message) {
+          errorMsg = axiosError.response.data.message;
+        } else if (axiosError?.request?.responseText) {
+          const parsed = JSON.parse(axiosError.request.responseText);
+          if (parsed?.response?.[0]) errorMsg = parsed.response[0];
+        }
+      } catch {}
+      sendAlert(errorMsg, "warning");
       setLoading(false);
     }
   };

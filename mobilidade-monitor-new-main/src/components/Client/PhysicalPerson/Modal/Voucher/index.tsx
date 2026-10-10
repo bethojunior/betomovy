@@ -54,7 +54,16 @@ const Voucher: FC<VoucherProps> = ({
 				setShowAlert(true);
 				return setTypeAlert('success');
 			}
-			setMessageAlert(JSON.parse(values.request.response).response[0]);
+			let errorMsg = 'Erro ao efetuar ação.';
+			try {
+				if (values?.data?.message) {
+					errorMsg = values.data.message;
+				} else if (values?.request?.response) {
+					const parsed = JSON.parse(values.request.response);
+					if (parsed?.response?.[0]) errorMsg = parsed.response[0];
+				}
+			} catch {}
+			setMessageAlert(errorMsg);
 			setShowAlert(true);
 			return setTypeAlert('error');
 		});

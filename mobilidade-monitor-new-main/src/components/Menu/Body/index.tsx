@@ -28,6 +28,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import { setDocumentTitle } from "../../../utils/documentTitle";
 import { useLocation } from "react-router-dom";
 import { breadCrumble } from "../../../utils/translation/breadCrumble";
+import { useLanguage } from "../../../contexts/language";
 
 const { Content } = Layout;
 
@@ -48,6 +49,7 @@ interface GroupKeysProps {
 }
 
 const Menu = ({ children, titlePage }: MenuProps) => {
+  const { language, setLanguage, t } = useLanguage();
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -169,16 +171,30 @@ const Menu = ({ children, titlePage }: MenuProps) => {
       setLoading(true);
 
       const storedKeys = localStorage.getItem("keysApp");
-      let keys: GroupKeysProps[];
+      let keys: GroupKeysProps[] = [];
 
-      if (storedKeys) {
-        keys = JSON.parse(storedKeys);
-      } else {
-        const responseConfigs = await api.get("config");
-        if (!responseConfigs.status) return;
-        keys = responseConfigs.data.response;
-        localStorage.setItem("keysApp", JSON.stringify(keys));
+      if (storedKeys && storedKeys !== "undefined" && storedKeys !== "null") {
+        try {
+          const parsed = JSON.parse(storedKeys);
+          if (Array.isArray(parsed)) {
+            keys = parsed;
+          }
+        } catch {
+          localStorage.removeItem("keysApp");
+        }
       }
+
+      if (keys.length === 0) {
+        const responseConfigs = await api.get("config");
+        if (!responseConfigs?.data?.status && !responseConfigs?.status) return;
+        const resList = responseConfigs.data?.response ?? responseConfigs.data?.data ?? [];
+        if (Array.isArray(resList)) {
+          keys = resList;
+          localStorage.setItem("keysApp", JSON.stringify(keys));
+        }
+      }
+
+      if (!Array.isArray(keys)) return;
 
       const manager = keys.find((res) => res.type === "GESTOR");
       if (!manager) return;
@@ -248,8 +264,8 @@ const Menu = ({ children, titlePage }: MenuProps) => {
             }}
           />
           <User className="user-data">
-            <div>Usuário: {responseDataUser?.name}</div>
-            <div>Perfil: {responseDataUser?.role.name}</div>
+            <div>{t("Usuário:")} {responseDataUser?.name}</div>
+            <div>{t("Perfil:")} {responseDataUser?.role?.name}</div>
             <div>{new Date().toLocaleString()}</div>
           </User>
           <PaymentButton
@@ -259,7 +275,7 @@ const Menu = ({ children, titlePage }: MenuProps) => {
               backgroundColor: buttonPay.color,
             }}
           >
-            {collapsed ? <TbPigMoney size={20} /> : buttonPay.text.charAt(0).toUpperCase() + buttonPay.text.slice(1)}
+            {collapsed ? <TbPigMoney size={20} /> : t(buttonPay.text)}
           </PaymentButton>
         </HeadSider>
         <ListMenu isMobile={isMobile} setCollapsed={setCollapsed} />
@@ -276,9 +292,72 @@ const Menu = ({ children, titlePage }: MenuProps) => {
                 },
               }
             )}
-            <TitleMenu level={4}>{titlePage}</TitleMenu>
+            <TitleMenu level={4}>{t(titlePage)}</TitleMenu>
           </HeaderSection>
-          <SelectAndButtonNotification />
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                backgroundColor: "#f5f5f5",
+                borderRadius: 20,
+                padding: "2px 4px",
+                border: "1px solid #d9d9d9",
+                gap: 4,
+                fontSize: 12,
+                fontWeight: 600,
+                userSelect: "none",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setLanguage("pt")}
+                style={{
+                  border: "none",
+                  background: language === "pt" ? "#1890ff" : "transparent",
+                  color: language === "pt" ? "#fff" : "#595959",
+                  borderRadius: 16,
+                  padding: "3px 8px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontWeight: 600,
+                  fontSize: 12,
+                  transition: "all 0.2s ease-in-out",
+                  boxShadow: language === "pt" ? "0 2px 4px rgba(24,144,255,0.3)" : "none",
+                }}
+                title="Português (Brasil)"
+              >
+                <span>🇧🇷</span>
+                <span>PT</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                style={{
+                  border: "none",
+                  background: language === "en" ? "#1890ff" : "transparent",
+                  color: language === "en" ? "#fff" : "#595959",
+                  borderRadius: 16,
+                  padding: "3px 8px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontWeight: 600,
+                  fontSize: 12,
+                  transition: "all 0.2s ease-in-out",
+                  boxShadow: language === "en" ? "0 2px 4px rgba(24,144,255,0.3)" : "none",
+                }}
+                title="English (United States)"
+              >
+                <span>🇺🇸</span>
+                <span>EN</span>
+              </button>
+            </div>
+            <SelectAndButtonNotification />
+          </div>
         </HeaderLayout>
         <Content
           style={{

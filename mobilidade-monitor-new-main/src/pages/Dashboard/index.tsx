@@ -172,11 +172,16 @@ const DashBoard: FC = () => {
       const storedKeys = localStorage.getItem("keysApp");
       let keys;
 
-      if (storedKeys) {
-        keys = JSON.parse(storedKeys);
-        return keys
-      } else {
-        const responseConfigModalAdvertsings = await api.get("config");
+      if (storedKeys && storedKeys !== "undefined" && storedKeys !== "null") {
+        try {
+          keys = JSON.parse(storedKeys);
+          return keys;
+        } catch {
+          localStorage.removeItem("keysApp");
+        }
+      }
+      
+      const responseConfigModalAdvertsings = await api.get("config");
 
         if (responseConfigModalAdvertsings.status) {
           const configsGestor = responseConfigModalAdvertsings.data.response.find(
@@ -338,10 +343,17 @@ const DashBoard: FC = () => {
   const listCustomers = separateIntoContainers<CurrentQuantitiesProps>(driversRequest?.customers);
 
   const onFinishChange = () => {
+    let parsedUserId: string | null = null;
+    try {
+      const userStr = localStorage.getItem("@App:user");
+      if (userStr && userStr !== "undefined" && userStr !== "null") {
+        parsedUserId = JSON.parse(userStr)?.idUser ?? null;
+      }
+    } catch {}
+
     const values = {
       currentPassword: localStorage.getItem("@App:password"),
-      userId: (JSON?.parse(localStorage.getItem("@App:user") || "")?.idUser ||
-        null) as string,
+      userId: parsedUserId as string,
       newPassword: inputRefPassword?.current?.input?.value || "",
     };
     setLoader("loadingPassword", true);
@@ -454,11 +466,15 @@ const DashBoard: FC = () => {
       unifiedDataDashboard(),
       getConfigsModalAdvertsings(),
       getErrorsKeysMaps(),
-      getPublicities()
-      const nameRoleUser = JSON.parse(
-        localStorage.getItem("@App:user") as string
-      ).role.name.toLowerCase();
-      roleUser = nameRoleUser;
+      try {
+        const userStr = localStorage.getItem("@App:user");
+        if (userStr && userStr !== "undefined" && userStr !== "null") {
+          const parsed = JSON.parse(userStr);
+          if (parsed?.role?.name) {
+            roleUser = parsed.role.name.toLowerCase();
+          }
+        }
+      } catch {}
     }
   }, []);
 

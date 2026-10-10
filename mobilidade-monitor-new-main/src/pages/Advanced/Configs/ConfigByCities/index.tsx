@@ -141,16 +141,17 @@ const ConfigByCities: FC = () => {
   };
 
   const loadConfigData = () => {
-    const city = Session.getLocal("citySelected").cityId;
+    const selected = Session.getLocal("citySelected");
+    const city = selected?.cityId ?? selected?.id;
+    if (!city) return Promise.resolve();
     return api.get(`city/${city}/config`).then((values) => {
-      const { response } = values.request;
-      if (!JSON.parse(response).status) {
+      if (!values?.data?.status && values?.status !== 200) {
         return "";
       }
       if (values.status !== 200) {
         return setShowData(true);
       }
-      setConfigCitiesList(values.data.response);
+      setConfigCitiesList(values.data.response || values.data.data || []);
       setRenderKey(prev => prev + 1);
     }).catch(() => {
       setShowData(true);

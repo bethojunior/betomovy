@@ -116,15 +116,15 @@ export const usePrepaidCreditTypes = (
   };
 
   useEffect(() => {
-    const userConfig = localStorage.getItem("@App:user");
-
-    if (userConfig !== null) {
-      const roleId = JSON.parse(userConfig).roleId;
-
-      if (roleId === typesOfRoleId.admin || roleId === typesOfRoleId.manager) {
-        setHavePermission(true);
+    try {
+      const userConfig = localStorage.getItem("@App:user");
+      if (userConfig && userConfig !== "undefined" && userConfig !== "null") {
+        const roleId = JSON.parse(userConfig)?.roleId;
+        if (roleId === typesOfRoleId.admin || roleId === typesOfRoleId.manager) {
+          setHavePermission(true);
+        }
       }
-    }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -132,16 +132,18 @@ export const usePrepaidCreditTypes = (
   }, []);
 
   useEffect(() => {
-    const citySelected = localStorage.getItem("citySelected");
-
-    if (citySelected && showListPrepaid === "city") {
-      const prepaidAllByCity = prepaidAll.filter(
-        (data) =>
-          data.cityId === JSON.parse(citySelected).cityId ||
-          data.cityId === null
-      );
-      setPrepaidByCity(prepaidAllByCity);
-    }
+    try {
+      const citySelected = localStorage.getItem("citySelected");
+      if (citySelected && citySelected !== "undefined" && citySelected !== "null" && showListPrepaid === "city") {
+        const parsedCity = JSON.parse(citySelected);
+        const prepaidAllByCity = prepaidAll.filter(
+          (data) =>
+            data.cityId === parsedCity?.cityId ||
+            data.cityId === null
+        );
+        setPrepaidByCity(prepaidAllByCity);
+      }
+    } catch {}
   }, [prepaidAll, showListPrepaid]);
 
   const changeListPrepaid = async () => {

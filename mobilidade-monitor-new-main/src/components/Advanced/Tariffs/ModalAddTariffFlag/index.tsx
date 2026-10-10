@@ -116,10 +116,18 @@ export const ModalAddTariffFlag = ({
 
       const responseNewTrigger = await api.post("price/dynamic", objectSend);
 
-      if (!responseNewTrigger.status) {
-        const responseError = JSON.parse(responseNewTrigger.request.response);
+      if (!responseNewTrigger?.data?.status && !responseNewTrigger?.status) {
+        let errorMsg = "Já existe um gatilho para essa data e horário";
+        try {
+          if (responseNewTrigger?.data?.message) {
+            errorMsg = responseNewTrigger.data.message;
+          } else if (responseNewTrigger?.request?.response) {
+            const parsed = JSON.parse(responseNewTrigger.request.response);
+            if (parsed?.response?.[0]) errorMsg = parsed.response[0];
+          }
+        } catch {}
         swal({
-          title: responseError.response[0],
+          title: errorMsg,
           text: "Já existe um gatilho para essa data e horário",
           icon: "info",
         });

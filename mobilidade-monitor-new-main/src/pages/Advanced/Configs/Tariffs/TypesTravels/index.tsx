@@ -411,10 +411,18 @@ export const TypesTravels = () => {
         Promise.all([responseDriverComission, responseUpdatePrices])
           .then((response) => {
             setLoading(false);
-            if (!response[1].status) {
-              const responseError = JSON.parse(response[1].request.response);
+            if (!response[1]?.data?.status && !response[1]?.status) {
+              let errorMsg = "Não foi possível atualizar o preço.";
+              try {
+                if (response[1]?.data?.message) {
+                  errorMsg = response[1].data.message;
+                } else if (response[1]?.request?.response) {
+                  const parsed = JSON.parse(response[1].request.response);
+                  if (parsed?.response) errorMsg = parsed.response;
+                }
+              } catch {}
               swal({
-                title: responseError.response,
+                title: errorMsg,
                 icon: "warning",
               });
               return;

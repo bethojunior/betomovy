@@ -57,11 +57,7 @@ const CreateReport = () => {
     setLoading(true);
     api("report?withType=1").then((result) => {
       setLoading(false);
-      const { response } = result.request;
-      if (!JSON.parse(response).status) {
-        return "";
-      }
-      if (!result.data.status) {
+      if (!result?.data?.status) {
         setMessageAlert(
           "Não foi possível carregar os relatórios, tente novamente"
         );
@@ -69,10 +65,13 @@ const CreateReport = () => {
         return setShowAlert(true);
       }
       return setTypeReport(
-        result.data.response.map((item: ReportName) => {
+        (result.data.response || []).map((item: ReportName) => {
           return item;
         })
       );
+    }).catch(() => {
+      setLoading(false);
+    });
     });
   }, []);
 

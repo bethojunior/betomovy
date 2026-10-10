@@ -65,8 +65,7 @@ const NewProfileModal: FC<ModalProps> = ({
 	const handleLoadDataProfile = () => {
 		setLoading(true);
 		api(`role/${idModal}`).then((result) => {
-			const { response } = result.request;
-			if (!JSON.parse(response).status || !result.data.status) {
+			if (!result?.data?.status) {
 				setLoading(false);
 				return '';
 			}
@@ -95,6 +94,8 @@ const NewProfileModal: FC<ModalProps> = ({
 			});
 			setPermissionsSelected(activePermissions);
 			return setLoading(false);
+		}).catch(() => {
+			setLoading(false);
 		});
 	};
 
@@ -111,18 +112,20 @@ const NewProfileModal: FC<ModalProps> = ({
 
 		Promise.all([citiesRequest, permissionsRequest]).then((result) => {
 			setLoading(false);
-			const { response } = result[0].request;
-			if (!JSON.parse(response).status || !result[0].data.status) {
+			if (!result[0]?.data?.status || !result[1]?.data?.status) {
 				return '';
 			}
-			setListCities(result[0].data.response);
-			setListPermissions(result[1].data.response);
+			setListCities(result[0].data.response || result[0].data.data || []);
+			setListPermissions(result[1].data.response || result[1].data.data || []);
 
 			if (idModal !== 0) {
 				handleLoadDataProfile();
 			} else {
 				setLoading(false);
 			}
+		}).catch(() => {
+			setLoading(false);
+		});
 		});
 	}, [idModal]);
 

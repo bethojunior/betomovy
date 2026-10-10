@@ -32,6 +32,7 @@ import {
 } from "./types";
 import { useFullyContext } from "../../../hooks/useFullyContext";
 import { useContextAuth } from "../../../contexts/auth";
+import { useLanguage } from "../../../contexts/language";
 import { AlertPanicModal } from "../../AlertPanicModal";
 import swal from "sweetalert";
 
@@ -48,6 +49,7 @@ const SelectAndButtonNotification: FC<SelectAndButtonNotificationProps> = ({
   onClearArea,
   monitoringMobileNavGrid = false,
 }) => {
+  const { t, language } = useLanguage();
   const [citiesActives, setCitiesActives] = useState<CityProps[]>([]);
   const [defaultCity, setDefaultCity] = useState("");
   const [twinkleButton, setTwinkleButton] = useState(false);
@@ -187,18 +189,21 @@ const SelectAndButtonNotification: FC<SelectAndButtonNotificationProps> = ({
 
   const changeCity = (value: number) => {
     const cityActive = citiesActives?.find((el) => el.cityId === value);
+    if (!cityActive) return;
     Session.setLocal("citySelected", JSON.stringify(cityActive));
-    Session.setLocal(
-      "pointsCity",
-      JSON.stringify(getPathByPolygon(cityActive!.polygon))
-    );
+    if (cityActive.polygon) {
+      Session.setLocal(
+        "pointsCity",
+        JSON.stringify(getPathByPolygon(cityActive.polygon))
+      );
+    }
     setIsSearching(false);
     window.location.reload();
   };
 
   useEffect(() => {
     const selectedCity = Session.getLocal("citySelected");
-    if (selectedCity.length !== 0) {
+    if (selectedCity && typeof selectedCity === "object" && selectedCity.nome) {
       setDefaultCity(selectedCity.nome);
     }
   }, []);
@@ -224,7 +229,7 @@ const SelectAndButtonNotification: FC<SelectAndButtonNotificationProps> = ({
               <Spin size="small" />
             </SelectNotFoundLoadingWrap>
           ) : (
-            "Cidade não encontrada"
+            t("Cidade não encontrada")
           )
         }
         popupMatchSelectWidth={false}
@@ -232,11 +237,19 @@ const SelectAndButtonNotification: FC<SelectAndButtonNotificationProps> = ({
         onBlur={() => setIsSearching(false)}
         dropdownStyle={citySelectDropdownStyle}
       >
-        {citiesActives?.map((cityActive) => (
-          <Option key={cityActive.cityId} value={cityActive.cityId}>
-            {cityActive.nome}
-          </Option>
-        ))}
+        {citiesActives?.map((cityActive) => {
+          const isUS =
+            (cityActive as any).country === "US" ||
+            ["miami", "orlando", "new york", "los angeles"].includes(
+              (cityActive.nome || "").toLowerCase()
+            );
+          const flag = isUS ? "🇺🇸" : "🇧🇷";
+          return (
+            <Option key={cityActive.cityId} value={cityActive.cityId}>
+              {`${flag} ${cityActive.nome}`}
+            </Option>
+          );
+        })}
       </CitySelectComponent>
     ) : null;
 

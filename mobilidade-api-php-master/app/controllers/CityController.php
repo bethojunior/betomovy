@@ -101,26 +101,50 @@ class CityController extends ApiController
 
     private function formatCities($cities, bool $withPolygon = false)
     {
-        $defaultCoords = [
-            '1' => ['lat' => -23.5505, 'lng' => -46.6333, 'nome' => 'São Paulo'],
-            '2' => ['lat' => -22.9068, 'lng' => -43.1729, 'nome' => 'Rio de Janeiro'],
-            '3' => ['lat' => -3.7319,  'lng' => -38.5267, 'nome' => 'Fortaleza'],
-            '4' => ['lat' => -12.9777, 'lng' => -38.5016, 'nome' => 'Salvador'],
+        $defaultCities = [
+            '1' => ['id' => 1, 'lat' => -23.5505, 'lng' => -46.6333, 'nome' => 'São Paulo', 'country' => 'BR', 'estado' => 'SP'],
+            '2' => ['id' => 2, 'lat' => -22.9068, 'lng' => -43.1729, 'nome' => 'Rio de Janeiro', 'country' => 'BR', 'estado' => 'RJ'],
+            '3' => ['id' => 3, 'lat' => -3.7319,  'lng' => -38.5267, 'nome' => 'Fortaleza', 'country' => 'BR', 'estado' => 'CE'],
+            '4' => ['id' => 4, 'lat' => -12.9777, 'lng' => -38.5016, 'nome' => 'Salvador', 'country' => 'BR', 'estado' => 'BA'],
+            '101' => ['id' => 101, 'lat' => 25.7617, 'lng' => -80.1918, 'nome' => 'Miami', 'country' => 'US', 'estado' => 'FL'],
+            '102' => ['id' => 102, 'lat' => 28.5383, 'lng' => -81.3792, 'nome' => 'Orlando', 'country' => 'US', 'estado' => 'FL'],
+            '103' => ['id' => 103, 'lat' => 40.7128, 'lng' => -74.0060, 'nome' => 'New York', 'country' => 'US', 'estado' => 'NY'],
+            '104' => ['id' => 104, 'lat' => 34.0522, 'lng' => -118.2437, 'nome' => 'Los Angeles', 'country' => 'US', 'estado' => 'CA'],
         ];
 
-        return array_values(array_map(function ($item) use ($defaultCoords, $withPolygon) {
+        $rawList = is_array($cities) ? $cities : [];
+        $existingNames = [];
+        foreach ($rawList as $item) {
+            $c = is_object($item) ? get_object_vars($item) : (array)$item;
+            $name = strtolower(trim($c['nome'] ?? $c['name'] ?? ''));
+            if ($name !== '') {
+                $existingNames[$name] = true;
+            }
+        }
+
+        // Include default US cities if not already present
+        foreach ($defaultCities as $key => $def) {
+            if ($def['country'] === 'US') {
+                $lowerName = strtolower($def['nome']);
+                if (!isset($existingNames[$lowerName])) {
+                    $rawList[] = $def;
+                    $existingNames[$lowerName] = true;
+                }
+            }
+        }
+
+        return array_values(array_map(function ($item) use ($defaultCities, $withPolygon) {
             $c = is_object($item) ? get_object_vars($item) : (array)$item;
             $id = $c['id'] ?? $c['idCity'] ?? 1;
             $name = $c['nome'] ?? $c['name'] ?? 'Cidade';
             $cityId = (int)$id;
 
-            $coords = $defaultCoords[(string)$id] ?? [
-                'lat' => -3.7319,
-                'lng' => -38.5267
-            ];
+            $def = $defaultCities[(string)$id] ?? null;
+            $isUS = in_array(strtolower($name), ['miami', 'orlando', 'new york', 'los angeles']);
+            $country = $c['country'] ?? ($def['country'] ?? ($isUS ? 'US' : 'BR'));
 
-            $lat = isset($c['latitude']) && is_numeric($c['latitude']) ? (float)$c['latitude'] : $coords['lat'];
-            $lng = isset($c['longitude']) && is_numeric($c['longitude']) ? (float)$c['longitude'] : $coords['lng'];
+            $lat = isset($c['latitude']) && is_numeric($c['latitude']) ? (float)$c['latitude'] : ($def['lat'] ?? ($isUS ? 25.7617 : -3.7319));
+            $lng = isset($c['longitude']) && is_numeric($c['longitude']) ? (float)$c['longitude'] : ($def['lng'] ?? ($isUS ? -80.1918 : -38.5267));
 
             $dLat = 0.12;
             $dLng = 0.12;
@@ -136,7 +160,8 @@ class CityController extends ApiController
             $c['nome'] = $name;
             $c['name'] = $name;
             $c['shortName'] = $name;
-            $c['estado'] = (string)($c['estado'] ?? $c['estateId'] ?? '1');
+            $c['country'] = $country;
+            $c['estado'] = (string)($c['estado'] ?? $c['estateId'] ?? ($def['estado'] ?? '1'));
             $c['estateId'] = $c['estado'];
             $c['statusId'] = (string)($c['statusId'] ?? $c['active'] ?? '1');
             $c['active'] = $c['statusId'];
@@ -148,6 +173,6 @@ class CityController extends ApiController
             }
 
             return (object)$c;
-        }, (array)$cities));
+        }, (array)$rawList));
     }
 }

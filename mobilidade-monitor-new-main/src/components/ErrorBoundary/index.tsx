@@ -46,13 +46,22 @@ class ErrorBoundaryClass extends React.Component<
     }
   }
 
-  componentDidCatch() {
+  componentDidCatch(error: Error) {
     if (this.state.isAuthError) {
       if (this.props.handleSessionExpired) {
         this.props.handleSessionExpired()
       } else {
         showSessionExpiredModal()
       }
+    }
+
+    if (error?.message?.includes('not valid JSON') || error?.message?.includes('undefined')) {
+      try {
+        ['citySelected', 'pointsCity', 'userGroup', 'fully', 'keysApp', 'driverUserTypes'].forEach((k) => {
+          const val = localStorage.getItem(k);
+          if (!val || val === 'undefined' || val === 'null') localStorage.removeItem(k);
+        });
+      } catch {}
     }
   }
 
@@ -77,7 +86,19 @@ class ErrorBoundaryClass extends React.Component<
         <ErrorContainer>
           <h1>Algo deu errado.</h1>
           <p>Erro: {this.state.errorInfo}</p>
-          <ReloadButton onClick={() => window.location.reload()}>Recarregar Página</ReloadButton>
+          <ReloadButton
+            onClick={() => {
+              try {
+                ['citySelected', 'pointsCity', 'userGroup', 'fully', 'keysApp', 'driverUserTypes'].forEach((k) => {
+                  const val = localStorage.getItem(k);
+                  if (!val || val === 'undefined' || val === 'null') localStorage.removeItem(k);
+                });
+              } catch {}
+              window.location.reload();
+            }}
+          >
+            Recarregar Página
+          </ReloadButton>
         </ErrorContainer>
       )
     }

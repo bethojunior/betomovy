@@ -11,32 +11,52 @@ interface UserGroupProviderProps {
 
 export const UserGroupProvider = ({ children }: UserGroupProviderProps) => {
   const [userGroupList, setUserGroupList] = useState<UserGroupItem[]>([]);
-  const user = localStorage.getItem('@App:user')
-  const userData = user ? JSON.parse(user) : null;
   const { signed } = useContextAuth();
+
+  const getUserData = () => {
+    try {
+      const user = localStorage.getItem("@App:user");
+      if (user && user !== "undefined" && user !== "null") {
+        return JSON.parse(user);
+      }
+    } catch {}
+    return null;
+  };
 
   useEffect(() => {
     const fetchUserGroup = async () => {
       const cachedUserGroup = localStorage.getItem("userGroup");
 
-      if (cachedUserGroup) {
-        setUserGroupList(JSON.parse(cachedUserGroup));
-      } else {
+      if (cachedUserGroup && cachedUserGroup !== "undefined" && cachedUserGroup !== "null") {
         try {
-          const response = await api.get("/userGroup", {
-            headers: {
-              userid: userData.idUser,
-              token: userData.api_token,
-            },
-          });
-          const data = response.data.response;
-          setUserGroupList(data);
-          localStorage.setItem("userGroup", JSON.stringify(data));
-        } catch (error: any) {
-          console.error("Erro ao buscar cities:", error);
+          const parsed = JSON.parse(cachedUserGroup);
+          if (Array.isArray(parsed)) {
+            setUserGroupList(parsed);
+            return;
+          }
+        } catch {
+          localStorage.removeItem("userGroup");
         }
       }
+
+      try {
+        const userData = getUserData();
+        const response = await api.get("/userGroup", {
+          headers: {
+            userid: userData?.idUser,
+            token: userData?.api_token,
+          },
+        });
+        const data = response.data?.response ?? response.data?.data ?? [];
+        if (Array.isArray(data)) {
+          setUserGroupList(data);
+          localStorage.setItem("userGroup", JSON.stringify(data));
+        }
+      } catch (error: any) {
+        console.error("Erro ao buscar userGroup:", error);
+      }
     };
+
     if (signed) {
       fetchUserGroup();
     }

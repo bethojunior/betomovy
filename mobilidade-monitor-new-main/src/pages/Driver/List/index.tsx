@@ -641,14 +641,13 @@ const ListDrivers = () => {
 
     Promise.all([requestMessageWhatsapp, requestDriverStatus]).then(
       (result) => {
-        const { response } = result[0].request;
-        if (!JSON.parse(response).status) {
+        if (!result[0]?.data?.status) {
           return "";
         }
 
-        setWhatsppMessage(result[0].data.response);
+        setWhatsppMessage(result[0].data.response || result[0].data.data || []);
       }
-    );
+    ).catch(() => {});
     getTripTypeList();
   }, []);
 

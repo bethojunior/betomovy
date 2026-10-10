@@ -131,29 +131,30 @@ export const Voucher = () => {
   const get = async (page: number | null = 1) => {
     setLoadingTable(true);
     api(`voucherPromotion?page=${page}`).then((result) => {
-      const { response } = result.request;
-
       setLoadingTable(false);
-      if (!JSON.parse(response).status || !result.data.status) {
-        setMessageAlert(JSON.parse(response).response[0]);
+      if (!result?.data?.status) {
+        const errorMsg = result?.data?.message || result?.data?.response?.[0] || "Erro ao carregar vouchers";
+        setMessageAlert(errorMsg);
         setTypeAlert("error");
         setShowAlert(true);
         return;
       }
 
-      setVoucher(result.data.response.data);
+      setVoucher(result.data?.response?.data || result.data?.data || []);
 
-      if (result.data.response.next_page_url !== null && page !== null) {
+      if (result.data?.response?.next_page_url !== null && page !== null) {
         setNextPage(page + 1);
       } else {
         setNextPage(null);
       }
 
-      if (result.data.response.prev_page_url !== null && page !== null) {
+      if (result.data?.response?.prev_page_url !== null && page !== null) {
         setLastPage(page - 1);
       } else {
         setLastPage(null);
       }
+    }).catch(() => {
+      setLoadingTable(false);
     });
   };
 
@@ -162,17 +163,12 @@ export const Voucher = () => {
     get();
 
     api("city/actives/fully").then((result) => {
-      const { response } = result.request;
-
       setLoadingTable(false);
-      if (!JSON.parse(response).status || !result.data.status) {
-        setMessageAlert(JSON.parse(response).response[0]);
-        setTypeAlert("error");
-        setShowAlert(true);
+      if (!result?.data?.status) {
         return;
       }
 
-      setCity(result.data.response);
+      setCity(result.data?.response || result.data?.data || []);
     });
   }, []);
 

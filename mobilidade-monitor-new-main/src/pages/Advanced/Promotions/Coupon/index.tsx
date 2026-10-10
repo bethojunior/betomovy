@@ -295,11 +295,10 @@ export const Coupon = () => {
           valueType: typeDiscount || "%",
         })
         .then((result) => {
-          const { response } = result.request;
-
           setLoadingTable(false);
-          if (!JSON.parse(response).status || !result.data.status) {
-            setMessageAlert(JSON.parse(response).response[0]);
+          if (!result?.data?.status) {
+            const errorMsg = result?.data?.message || result?.data?.response?.[0] || "Erro ao criar cupom";
+            setMessageAlert(errorMsg);
             setTypeAlert("error");
             setShowAlert(true);
             return;

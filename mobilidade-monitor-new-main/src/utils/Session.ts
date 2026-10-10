@@ -1,23 +1,38 @@
 class Session {
 	static getLocal(name: string) {
-		const local = localStorage.getItem(name);
-
-		if (local) {
-			try {
-				return JSON.parse(local);
-			} catch {
-				return [];
+		try {
+			const local = localStorage.getItem(name);
+			if (!local || local === "undefined" || local === "null" || local.trim() === "") {
+				return null;
 			}
+			return JSON.parse(local);
+		} catch {
+			try {
+				localStorage.removeItem(name);
+			} catch {}
+			return null;
 		}
-		return [];
 	}
 
-	static setLocal(name: string, value: string): void {
-		return localStorage.setItem(name, value);
+	static setLocal(name: string, value: any): void {
+		try {
+			if (value === undefined || value === null || value === "undefined" || value === "null") {
+				localStorage.removeItem(name);
+				return;
+			}
+			const stringVal = typeof value === "string" ? value : JSON.stringify(value);
+			if (stringVal === "undefined" || stringVal === "null") {
+				localStorage.removeItem(name);
+				return;
+			}
+			localStorage.setItem(name, stringVal);
+		} catch {}
 	}
 
 	static deleteLocal(name: string): void {
-		return localStorage.removeItem(name);
+		try {
+			localStorage.removeItem(name);
+		} catch {}
 	}
 
 	static getValueInSessionLocal(
@@ -34,12 +49,15 @@ class Session {
 				return item[attribute];
 			});
 		}
-		return session[attribute];
+		return session[attribute] ?? null;
 	}
 
 	static hasCitySelected(): boolean {
 		const citySelected = Session.getLocal("citySelected");
-		return !Array.isArray(citySelected) && citySelected !== null && typeof citySelected === 'object' && Object.keys(citySelected).length > 0;
+		if (!citySelected || typeof citySelected !== "object" || Array.isArray(citySelected)) {
+			return false;
+		}
+		return !!(citySelected.cityId || citySelected.id || citySelected.nome);
 	}
 }
 

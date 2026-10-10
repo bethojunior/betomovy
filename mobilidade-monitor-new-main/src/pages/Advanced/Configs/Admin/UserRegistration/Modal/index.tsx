@@ -83,13 +83,12 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
 
   useEffect(() => {
     api("role").then((result) => {
-      const { response } = result.request;
-      if (!JSON.parse(response).status || !result.data.status) {
+      if (!result?.data?.status) {
         return "";
       }
 
-      return setListTypeProfile(result.data.response);
-    });
+      return setListTypeProfile(result.data.response || result.data.data || []);
+    }).catch(() => {});
   }, []);
 
   const handleCloseModal = () => {

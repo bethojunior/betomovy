@@ -14,8 +14,6 @@ import type { TableProps } from "antd";
 import Utils from "../../../utils/Utils";
 //import { Loader } from '../../../components/Loader';
 
-let user = localStorage.getItem("@App:user");
-const citySelected = localStorage.getItem("citySelected");
 let showButtonAll = false;
 
 interface PrepaidProps {
@@ -276,28 +274,27 @@ const loadCities = async () => {
 const loadData = async (changeMode = true) => {
   setLoading(true);
 
-  let cityId;
+  let cityId = "";
   let endpoint = "creditPrepaidPurchase";
 
-  if (citySelected !== null) {
-    cityId = JSON.parse(citySelected).cityId;
-  }
+  try {
+    const rawCity = localStorage.getItem("citySelected");
+    if (rawCity && rawCity !== "undefined" && rawCity !== "null") {
+      cityId = JSON.parse(rawCity)?.cityId ?? "";
+    }
+  } catch {}
 
-  
   if (changeMode) {
     if (showButtonAll && modeList === "Listar todos") {
-  
       endpoint = "creditPrepaidPurchase";
     } else {
-      
-      endpoint = `creditPrepaidPurchase/${cityId}`;
+      endpoint = cityId ? `creditPrepaidPurchase/${cityId}` : "creditPrepaidPurchase";
     }
   } else {
-  
     if (modeList === "Listar todos") {
       endpoint = "creditPrepaidPurchase";
     } else {
-      endpoint = `creditPrepaidPurchase/${cityId}`;
+      endpoint = cityId ? `creditPrepaidPurchase/${cityId}` : "creditPrepaidPurchase";
     }
   }
 
@@ -325,20 +322,22 @@ const loadData = async (changeMode = true) => {
   }
 };
 
-
   const getPermission = async () => {
-    if (user !== null) {
-      const roleId = await JSON.parse(user).roleId;
-      const isSupport = await JSON.parse(user).support;
+    try {
+      const rawUser = localStorage.getItem("@App:user");
+      if (rawUser && rawUser !== "undefined" && rawUser !== "null") {
+        const parsedUser = JSON.parse(rawUser);
+        const roleId = Number(parsedUser?.roleId ?? 99);
+        const isSupport = Number(parsedUser?.support ?? 0);
 
-      if (roleId < 2 && isSupport === 1) {
-        console.log("entrou if");
-        showButtonAll = true;
+        if (roleId < 2 && isSupport === 1) {
+          showButtonAll = true;
+        }
+
+        await loadCities();
+        loadData();
       }
-
-      await loadCities();
-      loadData();
-    }
+    } catch {}
   };
 
   useEffect(() => {

@@ -87,13 +87,12 @@ const ListReport: FC = () => {
 
   useEffect(() => {
     api("report?withType=0").then((result) => {
-      const { response } = result.request;
-      if (!JSON.parse(response).status || !result.data.status) {
+      if (!result?.data?.status) {
         return "";
       }
 
-      return setListTypeReport(result.data.response);
-    });
+      return setListTypeReport(result.data.response || result.data.data || []);
+    }).catch(() => {});
   }, []);
 
   const onSearch = (page = 1) => {

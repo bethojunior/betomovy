@@ -58,7 +58,12 @@ const KeysWhatsapp: React.FC = () => {
   useEffect(() => {
     const fetchClientData = async () => {
       const userData = localStorage.getItem('@App:user');
-      const parsedUser = userData ? JSON.parse(userData) : null;
+      let parsedUser: any = null;
+      try {
+        if (userData && userData !== 'undefined' && userData !== 'null') {
+          parsedUser = JSON.parse(userData);
+        }
+      } catch {}
       setEmail(parsedUser?.email || '');
       setAppNameAlias(sessionName || '');
       setAppName(sessionName || '');

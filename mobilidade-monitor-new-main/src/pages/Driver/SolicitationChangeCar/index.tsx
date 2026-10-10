@@ -34,9 +34,14 @@ const SolicitationChangeCar = () => {
 	const [typeAlert, setTypeAlert] = useState<AlertType>('success');
 	const [previewDocument, setPreviewDocument] = useState<string | null>(null);
 
-	const dataUserLogged = localStorage.getItem('@App:user') as string;
-	const dataUserLoggedJson = JSON.parse(dataUserLogged);
-	const idRole = dataUserLoggedJson.roleId;
+	let idRole = 0;
+	try {
+		const dataUserLogged = localStorage.getItem('@App:user');
+		if (dataUserLogged && dataUserLogged !== 'undefined' && dataUserLogged !== 'null') {
+			const dataUserLoggedJson = JSON.parse(dataUserLogged);
+			idRole = Number(dataUserLoggedJson?.roleId ?? 0);
+		}
+	} catch {}
 
 	const renderAlert = (alertType: AlertType, message: string) => {
 		setTypeAlert(alertType);
