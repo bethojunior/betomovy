@@ -65,8 +65,8 @@
       [
         "react-native-maps",
         {
-          "iosGoogleMapsApiKey": "AIzaSyAgipJ5ZnlBpE-pqVsnljRPhF8jRL2RQIg",
-          "androidGoogleMapsApiKey": "AIzaSyAi8KBHM6dO6tpF7apf8B5qnftv_wfpytg"
+          "iosGoogleMapsApiKey": "AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I",
+          "androidGoogleMapsApiKey": "AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I"
         }
       ]
     ],
@@ -86,7 +86,7 @@
       },
       "bundleIdentifier": "br.com.client.rota101",
       "config": {
-        "googleMapsApiKey": "AIzaSyAgipJ5ZnlBpE-pqVsnljRPhF8jRL2RQIg"
+        "googleMapsApiKey": "AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I"
       }
     },
     "android": {
@@ -96,7 +96,7 @@
       "edgeToEdgeEnabled": true,
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyAi8KBHM6dO6tpF7apf8B5qnftv_wfpytg"
+          "apiKey": "AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I"
         }
       },
       "permissions": [

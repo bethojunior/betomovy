@@ -72,7 +72,7 @@
     <plugin name="cordova-plugin-request-location-accuracy" spec="^2.2.3" />
     <plugin name="cordova-plugin-local-notification-12" spec="^0.1.4" />
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.1.3" />
-    <preference name="GOOGLE_MAPS_ANDROID_API_KEY" value="AIzaSyBr4fzCxEeEl__R0h_snwRyuHvy48qJxQ" />
+    <preference name="GOOGLE_MAPS_ANDROID_API_KEY" value="AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I" />
     <preference name="GOOGLE_MAPS_PLAY_SERVICES_VERSION" value="18.2.0" />
     <preference name="GOOGLE_MAPS_PLAY_SERVICES_LOCATION_VERSION" value="21.0.1" />
     <preference name="android-minSdkVersion" value="22" />

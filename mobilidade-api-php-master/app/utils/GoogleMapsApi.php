@@ -34,6 +34,7 @@ class GoogleMapsApi implements DirectionsApiInterface
         }
 
         $globalCandidates = [
+            'AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I',
             Config::get('google_api_key_backend', null, true),
             Config::get('google_api_key', null, true),
             Config::get('key_google_maps', null, true),
