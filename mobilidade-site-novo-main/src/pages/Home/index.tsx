@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import swal from "sweetalert";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "./styles";
 
 import Header from "../../components/Header";
@@ -45,6 +45,25 @@ const Home = () => {
 
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const handleHashScroll = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const id = hash.replace("#", "");
+        const element = document.getElementById(id);
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 200);
+        }
+      }
+    };
+
+    handleHashScroll();
+    window.addEventListener("hashchange", handleHashScroll);
+    return () => window.removeEventListener("hashchange", handleHashScroll);
+  }, []);
 
   const query = window.location.search;
   const urlParams = new URLSearchParams(query);

@@ -1,6 +1,6 @@
 import api from "../../api/apiAxios";
 import swal from "sweetalert";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Container } from "./styles";
 import { useState, useEffect, ReactNode } from "react";
 
@@ -88,6 +88,16 @@ interface FormStep {
 }
 
 const Driver = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (window.location.hash === "#sobre-nos" || window.location.hash === "#contato") {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      navigate(`/${search}${hash}`);
+    }
+  }, [navigate]);
+
   const [idCategory, setIdCategory] = useState<string | null>(null);
   const [step, setStep] = useState<number>(1);
   const [stepRendered, setStepRendered] = useState<ReactNode | null>(null);

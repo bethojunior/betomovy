@@ -1,6 +1,6 @@
 import { List, X, Translate } from "phosphor-react";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
 
 import { Container } from "./styles";
 import Button from "../Button";
@@ -21,6 +21,8 @@ const Header = () => {
   const [openModalTranslation, setOpenModalTranslation] =
     useState<boolean>(false);
 
+  const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
 
   const handleOpenNavMobile = () => {
@@ -44,6 +46,25 @@ const Header = () => {
 
   const nameAppPartner = urlParams.get("name_app");
 
+  const handleScrollOrNavigate = (sectionId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname === "/") {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.history.pushState(null, "", `#${sectionId}`);
+      }
+    } else {
+      const targetUrl = nameAppPartner
+        ? `/?name_app=${nameAppPartner}#${sectionId}`
+        : `/#${sectionId}`;
+      navigate(targetUrl);
+    }
+    if (isMobileLink) {
+      setIsMobileLink(false);
+    }
+  };
+
   return (
     <Container>
       <nav className="content-nav">
@@ -61,7 +82,12 @@ const Header = () => {
         </div>
         <ul className="content-links">
           <li>
-            <a href="#sobre-nos">{t("nav-about-us")}</a>
+            <a
+              href={nameAppPartner ? `/?name_app=${nameAppPartner}#sobre-nos` : "/#sobre-nos"}
+              onClick={(e) => handleScrollOrNavigate("sobre-nos", e)}
+            >
+              {t("nav-about-us")}
+            </a>
           </li>
           <li>
             <Link
@@ -86,7 +112,12 @@ const Header = () => {
             </Link>
           </li>
           <li>
-            <a href="#contato">{t("nav-contact")}</a>
+            <a
+              href={nameAppPartner ? `/?name_app=${nameAppPartner}#contato` : "/#contato"}
+              onClick={(e) => handleScrollOrNavigate("contato", e)}
+            >
+              {t("nav-contact")}
+            </a>
           </li>
 
           <div className="content-button-links">
@@ -114,16 +145,44 @@ const Header = () => {
 
               <ul>
                 <li>
-                  <a href="#sobre-nos">{t("nav-about-us")}</a>
+                  <a
+                    href={nameAppPartner ? `/?name_app=${nameAppPartner}#sobre-nos` : "/#sobre-nos"}
+                    onClick={(e) => handleScrollOrNavigate("sobre-nos", e)}
+                  >
+                    {t("nav-about-us")}
+                  </a>
                 </li>
                 <li>
-                  <Link to="/passageiro">{t("nav-passenger")}</Link>
+                  <Link
+                    to={
+                      nameAppPartner
+                        ? `/passageiro?name_app=${nameAppPartner}`
+                        : "/passageiro"
+                    }
+                    onClick={() => setIsMobileLink(false)}
+                  >
+                    {t("nav-passenger")}
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/motorista">{t("nav-driver")}</Link>
+                  <Link
+                    to={
+                      nameAppPartner
+                        ? `/motorista?name_app=${nameAppPartner}`
+                        : "/motorista"
+                    }
+                    onClick={() => setIsMobileLink(false)}
+                  >
+                    {t("nav-driver")}
+                  </Link>
                 </li>
                 <li>
-                  <a href="#contato">{t("nav-contact")}</a>
+                  <a
+                    href={nameAppPartner ? `/?name_app=${nameAppPartner}#contato` : "/#contato"}
+                    onClick={(e) => handleScrollOrNavigate("contato", e)}
+                  >
+                    {t("nav-contact")}
+                  </a>
                 </li>
                 <li onClick={handleAppModalLink}>
                   <button>{t("nav-button")}</button>

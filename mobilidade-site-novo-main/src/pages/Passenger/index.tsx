@@ -1,4 +1,4 @@
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import swal from "sweetalert";
@@ -60,6 +60,16 @@ const Passenger = () => {
   const { t, i18n } = useTranslation();
   const isBrazil = (i18n.language || "en").startsWith("pt") && isLanguageEnabled("pt");
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (window.location.hash === "#sobre-nos" || window.location.hash === "#contato") {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      navigate(`/${search}${hash}`);
+    }
+  }, [navigate]);
+
   const { userId: userIdParam } = useParams<{ userId?: string }>();
   const isPreRegister = location.pathname.includes("/preregister");
   const userId = userIdParam ? decodeBase64(userIdParam) : null;
