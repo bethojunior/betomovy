@@ -11,6 +11,15 @@ services:
     instance_size_slug: basic-xxs
     routes:
       - path: /
+    envs:
+      - key: REACT_APP_PROJECT_NAME
+        value: Movy
+      - key: REACT_APP_API_APP_HOST
+        value: https://api.movymob.com/
+      - key: REACT_APP_BUCKET_NAME
+        value: movy-storage
+      - key: REACT_APP_BUCKET_URL
+        value: https://s3.amazonaws.com/
 
   # 2. Central Administrativa (PHP)
   - name: central-web

@@ -369,23 +369,42 @@ const Driver = () => {
 
 export default Driver;
 
+const DEFAULT_CATEGORIES: CategoryDriverProps[] = [
+  {
+    idUserType: "3",
+    name: "Movy Carro",
+    description: "Transporte particular de passageiros",
+    picture: "https://s3-sa-east-1.amazonaws.com/nodes-voutehomologar-dev/default.jpg",
+    isActive: "1",
+    isDriver: "1",
+    isDeliveryMan: "0",
+    statusId: "1",
+    iconMapDriverId: null,
+  },
+  {
+    idUserType: "5",
+    name: "Movy Moto",
+    description: "Transporte rápido e entregas por moto",
+    picture: "https://s3-sa-east-1.amazonaws.com/nodes-voutehomologar-dev/default.jpg",
+    isActive: "1",
+    isDriver: "1",
+    isDeliveryMan: "1",
+    statusId: "1",
+    iconMapDriverId: null,
+  },
+];
+
 const CategoriesDriver = ({
   setIdCategory,
   setLoading,
 }: CategoriesDriverProps) => {
   const [categoryDriver, setCategoryDriver] = useState<CategoryDriverProps[]>(
-    []
+    DEFAULT_CATEGORIES
   );
   const { t } = useTranslation();
 
-  // const handleVisible = async (idCategory: string) => {
-  //   const response = await api.get(`formstep/getbyusertype?userTypeId=${idCategory}`);
-  //   console.log(response.data.data);
-  // };
-
   const handleChangeIdCategory = (idCategory: string) => {
     setIdCategory(idCategory);
-    // handleVisible(idCategory);
   };
 
   const query = window.location.search;
@@ -399,13 +418,10 @@ const CategoriesDriver = ({
         `usertype/driversbyapppartners?app_partner=${appPartnerKey}`
       );
       const cats = responseCategoriesDriverPartners?.data?.data;
-      setCategoryDriver(Array.isArray(cats) ? cats : []);
+      if (Array.isArray(cats) && cats.length > 0) {
+        setCategoryDriver(cats);
+      }
     } catch (error) {
-      setCategoryDriver([]);
-      swal({
-        title: t("message-error-api-getCategories") as string,
-        icon: "error",
-      });
       console.log(error);
     } finally {
       setLoading(false);
@@ -417,16 +433,14 @@ const CategoriesDriver = ({
     try {
       const responseCategoriesDriver = await api.get("usertype/drivers");
       const cats = responseCategoriesDriver?.data?.data;
-      setCategoryDriver(Array.isArray(cats) ? cats : []);
+      if (Array.isArray(cats) && cats.length > 0) {
+        setCategoryDriver(cats);
+      }
     } catch (error) {
-      setCategoryDriver([]);
-      swal({
-        title: t("message-error-api-getCategories") as string,
-        icon: "error",
-      });
       console.log(error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -436,21 +450,33 @@ const CategoriesDriver = ({
     }
     
     handleGetCategoryDrivers();
-  }, [t, setLoading]);
-
-  
+  }, [appPartnerKey]);
 
   return (
     <div className="content-category">
+      <h2 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#0f172a", marginBottom: "0.5rem", textAlign: "center", width: "100%" }}>
+        Selecione sua Categoria
+      </h2>
       {categoryDriver?.map((value, index) => {
         return (
           <div
-            key={index}
+            key={value.idUserType || index}
             onClick={() => handleChangeIdCategory(value.idUserType)}
           >
             <div className="content-description-category">
-              <img src={value.picture} alt="icon-car" />
-              <h3>{value.name}</h3>
+              <img
+                src={value.picture || LogoMovyDefault}
+                alt={value.name}
+                onError={(e) => {
+                  e.currentTarget.src = LogoMovyDefault;
+                }}
+              />
+              <div>
+                <h3>{value.name}</h3>
+                {value.description && (
+                  <p style={{ margin: 0, fontSize: "0.85rem", color: "#64748b" }}>{value.description}</p>
+                )}
+              </div>
             </div>
 
             <div className="content-icon-arrow">
