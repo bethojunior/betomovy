@@ -126,7 +126,6 @@ const NewProfileModal: FC<ModalProps> = ({
 		}).catch(() => {
 			setLoading(false);
 		});
-		});
 	}, [idModal]);
 
 	const handleMountCities = (id: string | undefined, checked: boolean) => {

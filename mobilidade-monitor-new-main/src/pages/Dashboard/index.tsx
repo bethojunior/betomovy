@@ -192,7 +192,6 @@ const DashBoard: FC = () => {
             (data: ConfigsKeyAppsProps) => data.key === "enable_publicity"
           ).value;
         }
-      }
     } catch (error) {
       console.error(error);
     }
@@ -463,9 +462,9 @@ const DashBoard: FC = () => {
   useEffect(() => {
     verifyHasFirstLogin();
     if (Session.hasCitySelected()) {
-      unifiedDataDashboard(),
-      getConfigsModalAdvertsings(),
-      getErrorsKeysMaps(),
+      unifiedDataDashboard();
+      getConfigsModalAdvertsings();
+      getErrorsKeysMaps();
       try {
         const userStr = localStorage.getItem("@App:user");
         if (userStr && userStr !== "undefined" && userStr !== "null") {

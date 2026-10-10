@@ -72,7 +72,6 @@ const CreateReport = () => {
     }).catch(() => {
       setLoading(false);
     });
-    });
   }, []);
 
   const handleShowModal = (result: Reports) => {
