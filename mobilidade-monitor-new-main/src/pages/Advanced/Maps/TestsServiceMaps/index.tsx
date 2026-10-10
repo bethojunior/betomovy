@@ -138,8 +138,17 @@ export const TestServiceMaps = () => {
 
   useEffect(() => {
     if (errorMapKey?.type) {
-      setValueSelect(errorMapKey.type);
-      handleTests(errorMapKey.type);
+      let cleanType = errorMapKey.type;
+      try {
+        if (typeof cleanType === "string" && (cleanType.startsWith("[") || cleanType.startsWith("{"))) {
+          const parsed = JSON.parse(cleanType);
+          cleanType = Array.isArray(parsed) ? parsed[0] : parsed;
+        }
+      } catch (e) {}
+      if (cleanType && typeof cleanType === "string") {
+        setValueSelect(cleanType);
+        handleTests(cleanType);
+      }
     }
   }, [errorMapKey]);
 

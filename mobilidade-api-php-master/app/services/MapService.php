@@ -123,8 +123,11 @@ class MapService
 
     private function returnServiceTest($type, $place, $direction, $geocoding)
     {
+        if (is_array($type)) {
+            $type = $type[0] ?? 'google';
+        }
         return (object)[
-            'type' => is_array($type) ? json_encode($type) : $type,
+            'type' => (string)$type,
             'place' => $place,
             'direction' => $direction,
             'geocoding' => $geocoding
@@ -157,12 +160,27 @@ class MapService
 
     public function serviceAllTest()
     {
-        $typeServices = ['google', 'here', 'mapbox', 'seumilto'];
-        $mapsServices = $this->validateMapServiceKeys($typeServices);
+        $defaultMap = Config::get('default_maps_api') ?: 'google';
+
+        $prioritySearching = json_decode(Config::get('service_priority_searching') ?: '[]', true) ?: [];
+        $priorityDirection = json_decode(Config::get('service_priority_direction') ?: '[]', true) ?: [];
+        $priorityGeocoding = json_decode(Config::get('service_priority_geocoding') ?: '[]', true) ?: [];
+
+        $activeServices = array_unique(array_filter(array_merge([$defaultMap], $prioritySearching, $priorityDirection, $priorityGeocoding)));
+        $mapsServices = $this->validateMapServiceKeys($activeServices);
+        if (empty($mapsServices)) {
+            $mapsServices = ['google'];
+        }
 
         $logDao = new LogDao;
+        $place = true;
+        $direction = true;
+        $geocoding = true;
+        $lastTestedService = is_array($mapsServices) ? ($mapsServices[0] ?? 'google') : $mapsServices;
+
         try {
             foreach ($mapsServices as $service) {
+                $lastTestedService = $service;
                 $result = $this->getServiceByType($service);
                 try {
                     $result->place->search("Centro", "-3.7263684626356084,-38.52706632770688");
@@ -196,12 +214,23 @@ class MapService
             throw $e;
         }
 
-        return $this->returnServiceTest($mapsServices, $place, $direction, $geocoding);
+        return $this->returnServiceTest($lastTestedService, $place, $direction, $geocoding);
     }
 
 
     private function getServiceByType($type, $cityId = null)
     {
+        if (is_array($type)) {
+            $type = $type[0] ?? 'google';
+        }
+        if (is_string($type) && (strpos($type, '[') === 0 || strpos($type, '{') === 0)) {
+            $decoded = json_decode($type, true);
+            if (is_array($decoded)) {
+                $type = $decoded[0] ?? 'google';
+            }
+        }
+        $type = strtolower(trim((string)$type));
+
         switch ($type) {
             case 'google':
                 return (object)[
