@@ -33,8 +33,13 @@ class RequestListener
      */
     public function headersListener(array $headers)
     {
-        $token = $headers['token'] ?? ($headers['Token'] ?? '');
-        $userId = $headers['userid'] ?? ($headers['Userid'] ?? '');
+        $normalized = [];
+        foreach ($headers as $k => $v) {
+            $normalized[strtolower((string)$k)] = $v;
+        }
+
+        $token = $normalized['token'] ?? ($_SERVER['HTTP_TOKEN'] ?? '');
+        $userId = $normalized['userid'] ?? ($_SERVER['HTTP_USERID'] ?? '');
 
         $this->validator->validateRequestHeader([
             'token' => $token,
@@ -49,16 +54,18 @@ class RequestListener
         $redis->delete("user-{$userId}-verified");
 
         $user = (new UserRoDao)
-            ->find($userId, ['api_token', 'blocked']);
+            ->find($userId, ['api_token', 'blocked', 'statusId']);
 
-        if ($user) {
-            $partner = (new PartnerRoDao)->findSimpleByUser($userId);
+        if (!$user) {
+            throw new ApiTokenException("Usuário não encontrado");
         }
+
+        $partner = (new PartnerRoDao)->findSimpleByUser($userId);
 
         $this->validator->verifyUserToken(
             new User($user),
             $token,
-            isset($partner) ? new Partner($partner) : null
+            !empty($partner) ? new Partner($partner) : null
         );
 
         $redis->set("user-{$userId}-verified", $token);

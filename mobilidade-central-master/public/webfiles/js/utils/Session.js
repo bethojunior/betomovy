@@ -3,12 +3,34 @@ class Session {
         const result = $.cookie(name);
         if (!result) return null;
 
-        return JSON.parse(atob(result));
+        try {
+            return JSON.parse(decodeURIComponent(escape(atob(result))));
+        } catch (e) {
+            try {
+                return JSON.parse(atob(result));
+            } catch (err) {
+                try {
+                    return JSON.parse(result);
+                } catch (e3) {
+                    return null;
+                }
+            }
+        }
     }
 
     static set(name, value) {
-        const valueB64 = btoa(JSON.stringify(value));
-        $.cookie(name, valueB64, {path: '/'});
+        try {
+            const str = JSON.stringify(value);
+            const valueB64 = btoa(unescape(encodeURIComponent(str)));
+            $.cookie(name, valueB64, {path: '/', expires: 30});
+        } catch (e) {
+            try {
+                const valueB64 = btoa(JSON.stringify(value));
+                $.cookie(name, valueB64, {path: '/', expires: 30});
+            } catch (err) {
+                $.cookie(name, JSON.stringify(value), {path: '/', expires: 30});
+            }
+        }
     }
 
     static delete(name) {

@@ -22,11 +22,21 @@ class UserRoDao extends BaseDao
      */
     public function find($idUser, array $fields = [])
     {
-        return $this->sqlSelect($fields, [
+        $res = $this->sqlSelect($fields, [
             ['idUser', '=', ':idUser', 'AND'],
             ['statusId', '=', ':statusId']
         ])
             ->bind([':idUser' => $idUser, ':statusId' => User::STATUS_ATIVO])
             ->get(false);
+
+        if (!$res) {
+            $res = $this->sqlSelect($fields, [
+                ['idUser', '=', ':idUser']
+            ])
+                ->bind([':idUser' => $idUser])
+                ->get(false);
+        }
+
+        return $res;
     }
 }

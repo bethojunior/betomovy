@@ -279,12 +279,18 @@ class ConnectionServer {
     return JSON.stringify({ stdObject: params });
   }
 
+  static _isSessionExpiring = false;
   static sessionExpired() {
+    if (ConnectionServer._isSessionExpiring) return;
+    ConnectionServer._isSessionExpiring = true;
+    console.warn("Session expired triggered.");
     SwalCustom.messageDialog(
       "Sessão expirada",
       "Ops",
       () => {
         Session.delete("user");
+        Session.delete("centralSelected");
+        Session.delete("centrals");
         localStorage.removeItem("keyAppPartner");
         location.href = "/";
       },

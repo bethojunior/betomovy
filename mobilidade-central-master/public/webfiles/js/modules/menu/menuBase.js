@@ -391,21 +391,29 @@ document.addEventListener("DOMContentLoaded", function () {
         event.stopPropagation();
     }
 
-    CentralRepository.get(Session.get("centralSelected").id)
-        .then(({message, status, response}) => {
-            if (!status)
-                return;
+    const currCentral = Session.get("centralSelected");
+    if (currCentral && currCentral.id) {
+        CentralRepository.get(currCentral.id)
+            .then(({message, status, response}) => {
+                if (!status || !response)
+                    return;
 
-            Session.set("centralSelected", response);
+                Session.set("centralSelected", response);
 
-            if (response.centralCallDriver !== "only_app") {
-                document.querySelector("#menuItemDriver").innerHTML = `
-                    <div><a href="/driver/list"><i class="material-icons nav-icon">person</i>Motoristas</a></div>
-                `;
-                if (document.querySelector('.container-menu-options')?.classList.contains('active')) {
-                    applyMenuItemStagger();
+                if (response.centralCallDriver !== "only_app") {
+                    const menuItemDriver = document.querySelector("#menuItemDriver");
+                    if (menuItemDriver) {
+                        menuItemDriver.innerHTML = `
+                            <div><a href="/driver/list"><i class="material-icons nav-icon">person</i>Motoristas</a></div>
+                        `;
+                    }
+                    if (document.querySelector('.container-menu-options')?.classList.contains('active')) {
+                        applyMenuItemStagger();
+                    }
                 }
-            }
 
-        });
+            }).catch(e => {
+                console.warn("Could not fetch central details", e);
+            });
+    }
 });

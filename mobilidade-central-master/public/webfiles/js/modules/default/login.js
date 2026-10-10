@@ -30,6 +30,11 @@ document.addEventListener("DOMContentLoaded", function () {
             Session.set('user', result.response);
             localStorage.setItem('keyAppPartner', JSON.stringify(key_app_partner));
 
+            if (Array.isArray(central_user) && central_user.length > 0) {
+                const firstCentral = central_user[0].central || central_user[0];
+                Session.set("centralSelected", firstCentral);
+            }
+
             if(environment.appPartner === "false" && key_app_partner !== null) {
                 Session.delete("user");
                 localStorage.removeItem('keyAppPartner');

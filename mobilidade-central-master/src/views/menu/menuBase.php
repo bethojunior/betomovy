@@ -1,11 +1,23 @@
 <?php
 $central = Session::get("centralSelected");
-if (!$central) {
+if (is_array($central)) {
+    $central = (object) $central;
+}
+if (!is_object($central)) {
     $central = (object) [
         'id' => null,
         'name' => 'Central',
         'logo' => 'default.jpg',
     ];
+}
+if (!isset($central->name) || empty($central->name)) {
+    $central->name = 'Central';
+}
+if (!isset($central->logo) || empty($central->logo)) {
+    $central->logo = 'default.jpg';
+}
+if (!isset($central->id)) {
+    $central->id = null;
 }
 $currentUri = $_SERVER['REQUEST_URI'] ?? '';
 $isOnWhatsappRoute = strpos($currentUri, 'whatsapp') !== false;
@@ -20,7 +32,7 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
     </div>
 
     <a class="app-header__brand" href="<?php echo Host::getLocal(); ?>">
-        <img src="<?php echo Host::getCentral() . htmlspecialchars($central->logo ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+        <img src="<?php echo Host::getCentral() . htmlspecialchars($central->logo ?? 'default.jpg', ENT_QUOTES, 'UTF-8'); ?>"
              alt="Logo da central"
              class="app-header__logo">
         <span class="app-header__name"><?php echo htmlspecialchars($central->name, ENT_QUOTES, 'UTF-8'); ?></span>
@@ -29,11 +41,25 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
     <select class="app-header__select" id="selectCentralChange">
         <?php
         $centrals_user = Session::get("centrals");
-        foreach ($centrals_user as $item) {
-            $selected = $central->id == $item->central->id ? "selected" : "";
-            $value = htmlspecialchars(json_encode($item->central), ENT_QUOTES, 'UTF-8');
-            $name  = htmlspecialchars($item->central->name, ENT_QUOTES, 'UTF-8');
-            echo "<option value='{$value}' {$selected}>{$name}</option>";
+        if (is_array($centrals_user)) {
+            foreach ($centrals_user as $item) {
+                if (is_array($item)) {
+                    $item = (object) $item;
+                }
+                $c = null;
+                if (isset($item->central)) {
+                    $c = is_array($item->central) ? (object)$item->central : $item->central;
+                } else {
+                    $c = $item;
+                }
+                if (!is_object($c)) continue;
+                $cId = $c->id ?? null;
+                $cName = $c->name ?? 'Central';
+                $selected = ($central->id !== null && $central->id == $cId) ? "selected" : "";
+                $value = htmlspecialchars(json_encode($c), ENT_QUOTES, 'UTF-8');
+                $name  = htmlspecialchars($cName, ENT_QUOTES, 'UTF-8');
+                echo "<option value='{$value}' {$selected}>{$name}</option>";
+            }
         }
         ?>
     </select>

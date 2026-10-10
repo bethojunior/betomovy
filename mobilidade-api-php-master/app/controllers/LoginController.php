@@ -83,11 +83,13 @@ class LoginController extends ApiController
             }
 
             // Generate API token
-            $apiToken = password_hash($user['idUser'] . '_' . time(), PASSWORD_BCRYPT);
+            $tokenApi = new \app\utils\TokenApi();
+            $plainToken = $tokenApi->generate($user['idUser']);
+            $apiToken = $tokenApi->encrypt($plainToken);
 
-            // Update user with api_token
-            $upd = $pdo->prepare("UPDATE user SET api_token = :token WHERE idUser = :userId");
-            $upd->execute([':token' => $apiToken, ':userId' => $user['idUser']]);
+            // Update user with api_token and ensure status is active
+            $upd = $pdo->prepare("UPDATE user SET api_token = :token, statusId = 1, blocked = 0 WHERE idUser = :userId");
+            $upd->execute([':token' => $plainToken, ':userId' => $user['idUser']]);
 
             // Ensure partner record exists and has api_token
             $stmtP = $pdo->prepare("SELECT idPartner FROM partner WHERE userId = :userId LIMIT 1");
@@ -96,10 +98,10 @@ class LoginController extends ApiController
 
             if ($partner) {
                 $updP = $pdo->prepare("UPDATE partner SET api_token = :token, statusId = 1, partnerRegisterStatusId = 1 WHERE idPartner = :idPartner");
-                $updP->execute([':token' => $apiToken, ':idPartner' => $partner['idPartner']]);
+                $updP->execute([':token' => $plainToken, ':idPartner' => $partner['idPartner']]);
             } else {
                 $insP = $pdo->prepare("INSERT INTO partner (userId, partnerRegisterStatusId, statusId, api_token, created_at, updated_at) VALUES (:userId, 1, 1, :token, NOW(), NOW())");
-                $insP->execute([':userId' => $user['idUser'], ':token' => $apiToken]);
+                $insP->execute([':userId' => $user['idUser'], ':token' => $plainToken]);
             }
 
             // Fetch centrals for this user

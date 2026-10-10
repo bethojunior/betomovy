@@ -41,13 +41,26 @@ class RequestHeaderValidator
         if ($user->getStatusId() == Status::EXCLUIDO || $user->isBlocked())
             throw new ApiTokenException("Usuário não autorizado");
 
-        $tokenIsValid = true;
+        $tokenIsValid = false;
 
-        if (!password_verify($user->getApiToken(), $token))
-            $tokenIsValid = false;
+        $dbUserToken = (string)$user->getApiToken();
+        $dbPartnerToken = $partnerToken ? (string)$partnerToken->getApiToken() : '';
 
-        if (!$tokenIsValid && $partnerToken && password_verify($partnerToken->getApiToken(), $token))
+        // 1. Direct match (raw equality)
+        if (($dbUserToken !== '' && hash_equals($dbUserToken, $token)) ||
+            ($dbPartnerToken !== '' && hash_equals($dbPartnerToken, $token))) {
             $tokenIsValid = true;
+        }
+        // 2. Standard: DB has plain token, client sends bcrypt hash
+        elseif (($dbUserToken !== '' && @password_verify($dbUserToken, $token)) ||
+                ($dbPartnerToken !== '' && @password_verify($dbPartnerToken, $token))) {
+            $tokenIsValid = true;
+        }
+        // 3. Reverse: DB has bcrypt hash, client sends plain token
+        elseif (($dbUserToken !== '' && @password_verify($token, $dbUserToken)) ||
+                ($dbPartnerToken !== '' && @password_verify($token, $dbPartnerToken))) {
+            $tokenIsValid = true;
+        }
 
         if (!$tokenIsValid)
             throw new ApiTokenException("Token inválido", [
@@ -67,9 +80,6 @@ class RequestHeaderValidator
     {
         if (empty($token) || $token === 'undefined' || $token === 'null')
             throw new ApiTokenException("Token não enviado", $token);
-
-        if (password_get_info($token)['algo'] != PASSWORD_BCRYPT)
-            throw new ApiTokenException("Token não possui o formato válido", $token);
     }
 
     /**
