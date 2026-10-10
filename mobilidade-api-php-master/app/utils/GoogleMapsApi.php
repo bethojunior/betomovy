@@ -140,6 +140,16 @@ class GoogleMapsApi implements DirectionsApiInterface
 
             return (object)$data;
         } catch (Exception $exception) {
+            // Se a Directions API legada falhar (ex: LegacyApiNotActivatedMapError), tenta a nova Routes API
+            try {
+                $routeRes = $this->requestRoutesApi($start_latitude, $start_longitude, $end_latitude, $end_longitude, $waypoints);
+                if ($routeRes) {
+                    return $routeRes;
+                }
+            } catch (Exception $routesEx) {
+                // Falhou na Routes API também, tenta próxima chave
+            }
+
             $this->api_key = $this->getKey();
 
             if (is_null($this->api_key)) {
@@ -178,6 +188,26 @@ class GoogleMapsApi implements DirectionsApiInterface
 
             return $data;
         } catch (Exception $exception) {
+            // Se a Distance Matrix API legada falhar, tenta a nova Routes API
+            try {
+                $routeRes = $this->requestRoutesApi($start_latitude, $start_longitude, $end_latitude, $end_longitude);
+                if ($routeRes) {
+                    $data = new stdClass;
+                    $data->destination = '';
+                    $data->origin = '';
+                    $data->distance = (object)[
+                        'value' => $routeRes->distance,
+                        'text' => round($routeRes->distance / 1000, 1) . ' km'
+                    ];
+                    $data->duration = (object)[
+                        'value' => $routeRes->duration,
+                        'text' => round($routeRes->duration / 60) . ' mins'
+                    ];
+                    return $data;
+                }
+            } catch (Exception $routesEx) {
+            }
+
             $this->api_key = $this->getKey();
 
             if (is_null($this->api_key))
@@ -252,6 +282,88 @@ class GoogleMapsApi implements DirectionsApiInterface
         return $this->api_url_distance_matrix .
             "json?origins={$start_latitude},{$start_longitude}&destinations={$end_latitude},{$end_longitude}&key="
             . $this->api_key;
+    }
+
+    private function requestRoutesApi($start_latitude, $start_longitude, $end_latitude, $end_longitude, array $waypoints = null)
+    {
+        $payload = [
+            'origin' => [
+                'location' => [
+                    'latLng' => [
+                        'latitude' => (float)$start_latitude,
+                        'longitude' => (float)$start_longitude
+                    ]
+                ]
+            ],
+            'destination' => [
+                'location' => [
+                    'latLng' => [
+                        'latitude' => (float)$end_latitude,
+                        'longitude' => (float)$end_longitude
+                    ]
+                ]
+            ],
+            'travelMode' => 'DRIVE'
+        ];
+
+        if (!empty($waypoints)) {
+            $intermediates = [];
+            foreach ($waypoints as $wp) {
+                $wpLat = is_array($wp) ? ($wp['latitude'] ?? null) : ($wp->latitude ?? null);
+                $wpLng = is_array($wp) ? ($wp['longitude'] ?? null) : ($wp->longitude ?? null);
+                if ($wpLat !== null && $wpLng !== null) {
+                    $intermediates[] = [
+                        'location' => [
+                            'latLng' => [
+                                'latitude' => (float)$wpLat,
+                                'longitude' => (float)$wpLng
+                            ]
+                        ]
+                    ];
+                }
+            }
+            if (!empty($intermediates)) {
+                $payload['intermediates'] = $intermediates;
+            }
+        }
+
+        $ch = curl_init('https://routes.googleapis.com/directions/v2:computeRoutes');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-Goog-Api-Key: ' . $this->api_key,
+            'X-Goog-FieldMask: routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline'
+        ]);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $response = curl_exec($ch);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            throw new Exception("Erro cURL Routes API: {$curlError}");
+        }
+
+        $result = json_decode($response);
+        if (!$result || empty($result->routes)) {
+            $msg = $result->error->message ?? 'Nenhuma rota retornada pela Routes API';
+            throw new Exception("Erro Routes API: {$msg}");
+        }
+
+        $route = $result->routes[0];
+        $distance = $route->distanceMeters ?? 0;
+        $durationStr = $route->duration ?? '0s';
+        $duration = (int)rtrim($durationStr, 's');
+        $polyline = $route->polyline->encodedPolyline ?? '';
+
+        return (object)[
+            'distance' => (int)$distance,
+            'duration' => (int)$duration,
+            'overview_polyline' => (object)['points' => $polyline],
+            'type' => self::TYPE
+        ];
     }
 
     /**

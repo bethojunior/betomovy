@@ -118,6 +118,16 @@ class GooglePlacesApi implements PlacesApiInterface
 
             return $predictions;
         } catch (Exception $exception) {
+            // Se a API legada falhar (ex: LegacyApiNotActivatedMapError), tenta a nova Places API com a mesma chave
+            try {
+                $newPredictions = $this->requestNewPlacesApi($query, $proximity_string);
+                if (!empty($newPredictions)) {
+                    return $newPredictions;
+                }
+            } catch (Exception $newApiEx) {
+                // Falhou também na Places API New, prossegue para próxima chave
+            }
+
             $this->apiKey = $this->getKey();
 
             if (is_null($this->apiKey))
@@ -202,6 +212,77 @@ class GooglePlacesApi implements PlacesApiInterface
         }
 
         return true;
+    }
+
+    private function requestNewPlacesApi($query, $proximity_string = null): array
+    {
+        $payload = [
+            'input' => $query,
+            'languageCode' => 'pt-BR'
+        ];
+
+        if ($proximity_string) {
+            $coords = explode(',', str_replace(' ', '', $proximity_string));
+            if (count($coords) >= 2 && is_numeric($coords[0]) && is_numeric($coords[1])) {
+                $payload['locationBias'] = [
+                    'circle' => [
+                        'center' => [
+                            'latitude' => (float)$coords[0],
+                            'longitude' => (float)$coords[1]
+                        ],
+                        'radius' => 10000.0
+                    ]
+                ];
+            }
+        }
+
+        $ch = curl_init('https://places.googleapis.com/v1/places:autocomplete');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-Goog-Api-Key: ' . $this->apiKey,
+        ]);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $response = curl_exec($ch);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            throw new Exception("Erro cURL Places New: {$curlError}");
+        }
+
+        $data = json_decode($response);
+        if (!$data || isset($data->error)) {
+            $msg = $data->error->message ?? 'Erro desconhecido Places New';
+            throw new Exception("Erro Google Places New: {$msg}");
+        }
+
+        $predictions = [];
+        foreach ($data->suggestions ?? [] as $s) {
+            $pred = $s->placePrediction ?? null;
+            if (!$pred) continue;
+
+            $fullText = $pred->text->text ?? '';
+            $secondary = $pred->structuredFormat->secondaryText->text ?? '';
+            $parts = array_map('trim', explode(',', $secondary));
+            $city = count($parts) >= 2 ? $parts[count($parts) - 2] : null;
+            $state = count($parts) >= 1 ? $parts[count($parts) - 1] : null;
+
+            $predictions[] = (object)[
+                'address' => $fullText,
+                'latitude' => null,
+                'longitude' => null,
+                'neighborhood' => null,
+                'city' => $city,
+                'state' => $state,
+                'type' => self::TYPE
+            ];
+        }
+
+        return $predictions;
     }
 
     public function getApiKey(): string
