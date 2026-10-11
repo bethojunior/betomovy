@@ -160,7 +160,10 @@ export const UsersList = () => {
       );
 
       if (responseUsers.status) {
-        const customersFilteredFormated = responseUsers.data.response.data.map(
+        const rawUsers = Array.isArray(responseUsers.data?.response?.data)
+          ? responseUsers.data.response.data
+          : (Array.isArray(responseUsers.data?.response) ? responseUsers.data.response : []);
+        const customersFilteredFormated = rawUsers.map(
           (value: UsersType) => {
             return {
               value: value.name,

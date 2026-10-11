@@ -159,15 +159,17 @@ export const Config = () => {
           return;
         }
 
-        setFee(result[0].data.response);
-        setConfigFinish(result[1].data.response);
-        setPaymentForm(result[2].data.response);
-        setCallTypes(result[3].data.response);
-        setTripType(result[4].data.response);
-        setListCentral(result[5].data.response);
-        setListPrices(result[6].data.response);
+        setFee(result[0]?.data?.response);
+        setConfigFinish(result[1]?.data?.response);
+        const payments = Array.isArray(result[2]?.data?.response) ? result[2].data.response : [];
+        const calls = Array.isArray(result[3]?.data?.response) ? result[3].data.response : [];
+        setPaymentForm(payments);
+        setCallTypes(calls);
+        setTripType(Array.isArray(result[4]?.data?.response) ? result[4].data.response : []);
+        setListCentral(Array.isArray(result[5]?.data?.response) ? result[5].data.response : []);
+        setListPrices(Array.isArray(result[6]?.data?.response) ? result[6].data.response : []);
 
-        result[2].data.response.map((el: PaymentType) => {
+        payments.forEach((el: PaymentType) => {
           if (el.paymentFormId === 1) {
             setCard(el.isActive);
           }
@@ -178,7 +180,7 @@ export const Config = () => {
 
         let aux: { centralCallTypeId: number; isActive: number }[] = [];
 
-        result[3].data.response.map((item: CallType) => {
+        calls.forEach((item: CallType) => {
           aux.push({
             centralCallTypeId: item.centralCallTypeId,
             isActive: item.isActive,

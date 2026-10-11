@@ -45,17 +45,19 @@ const TalkToUsClient: FC = () => {
 			if (result.status === 200) {
 				setShowMessage(false);
 				setShowPagination(false);
-				if (result.data.response.data.length === 0) {
+				const respData = Array.isArray(result.data?.response?.data) ? result.data.response.data : [];
+				const lastPage = result.data?.response?.last_page || 1;
+				if (respData.length === 0) {
 					setShowMessage(true);
 				}
-				if (page !== result.data.response.last_page) {
+				if (page !== lastPage) {
 					setShowPagination(true);
 				}
 				if (page !== 1) {
-					setList((state) => state.concat(...result.data.response.data));
+					setList((state) => (state || []).concat(...respData));
 					return;
 				}
-				setList(result.data.response.data);
+				setList(respData);
 			}
 		});
 	};
@@ -83,7 +85,7 @@ const TalkToUsClient: FC = () => {
 				<Body>
 					<Preload visible={loading} />
 					<Content>
-						{list.map((item) => {
+						{(list || []).map((item) => {
 							return (
 								<Comment
 									key={item.idContactUs}

@@ -79,7 +79,7 @@ const RequestDocuments = () => {
       buttons: ["Não", "Sim"],
     });
 
-    const driverIds = selectedUsers.map((user) => user.id);
+    const driverIds = (selectedUsers || []).map((user) => user.id);
 
     const data = {
       users: driverIds,
@@ -154,7 +154,7 @@ const RequestDocuments = () => {
               style={{ width: "100%" }}
               onChange={handleSelectUserType}
             >
-              {userTypes.map((userType) => (
+              {(userTypes || []).map((userType) => (
                 <Select.Option key={userType.id} value={userType.id}>
                   {userType.name}
                 </Select.Option>
@@ -276,7 +276,7 @@ const DriverSelect = ({ onSelect }: any) => {
       }}
       style={{ width: "100%" }}
     >
-      {drivers.map((driver: any) => (
+      {(drivers || []).map((driver: any) => (
         <Option key={driver.idDriver} value={driver.idDriver}>
           {driver.name} - {driver.phone}
         </Option>

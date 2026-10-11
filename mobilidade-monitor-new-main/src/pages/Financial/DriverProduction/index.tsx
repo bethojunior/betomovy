@@ -320,7 +320,10 @@ const DriverProduction: FC = () => {
 
 
       if (responseDriverName.status) {
-        const driversNameFormated = responseDriverName.data.response.data.map(
+        const rawDrivers = Array.isArray(responseDriverName.data?.response?.data)
+          ? responseDriverName.data.response.data
+          : (Array.isArray(responseDriverName.data?.response) ? responseDriverName.data.response : []);
+        const driversNameFormated = rawDrivers.map(
           (item: UserDataProps) => ({
             value: JSON.stringify(item),
             label: item.name,
@@ -383,13 +386,15 @@ const DriverProduction: FC = () => {
         `trip/report/valuesByDriver?cityId=${cityId}&driverId=${driverSelected.idDriver}&dateStart=${dateStartFilter}&dateEnd=${dateEndFilter}`
       )
       .then((values) => {
-        if (values.data.response === null) {
+        const resp = values.data?.response;
+        const list = Array.isArray(resp) ? resp : (resp ? [resp] : []);
+        if (list.length === 0) {
           setHideWhiteLine(false);
           return setNoRace(true);
         }
         setNoRace(false);
         setHideWhiteLine(true);
-        return setProductionList(values.data.response);
+        return setProductionList(list);
       })
       .catch((error) => {
         const responseError = error as AxiosError;
@@ -443,8 +448,9 @@ const DriverProduction: FC = () => {
         `trip/report/valuesByDriver?cityId=${cityDriver}&driverId=${id}&dateStart=${dateStart}&dateEnd=${dateEnd}`
       )
       .then((values) => {
-        
-        if (values.data.response === null) {
+        const resp = values.data?.response;
+        const list = Array.isArray(resp) ? resp : (resp ? [resp] : []);
+        if (list.length === 0) {
           console.warn("[DriverProduction] Nenhum dado de produção encontrado");
           setHideWhiteLine(false);
           return setNoRace(true);
@@ -452,7 +458,7 @@ const DriverProduction: FC = () => {
 
         setNoRace(false);
         setHideWhiteLine(true);
-        setProductionList(values.data.response);
+        setProductionList(list);
       })
       .catch((error) => {
         const responseError = error as AxiosError;
@@ -539,12 +545,12 @@ const DriverProduction: FC = () => {
         <ItemsContainer>
           <SearchLabel>Cidade</SearchLabel>
 
-         <SelectCity
+          <SelectCity
             value={cityId}
-            disabled={cities.length === 1}
+            disabled={(cities || []).length === 1}
             onChange={(value) => setCityId(value as string | number)}
           >
-            {cities.map((item) => {
+            {(cities || []).map((item) => {
               return (
                 <Option key={item.cityId} value={item.cityId}>
                   {item.nome}
@@ -585,7 +591,7 @@ const DriverProduction: FC = () => {
         ""
       ) : (
         <DataInformationContainer>
-          {productionList.map((item: ProductionListData) => {
+          {(productionList || []).map((item: ProductionListData) => {
             return (
               <div key={item.driverId}>
                 <ProductionDataContainer>

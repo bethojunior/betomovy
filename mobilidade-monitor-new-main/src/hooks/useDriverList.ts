@@ -45,14 +45,21 @@ export function useDriverList(): UseDriverListReturn {
     pageRef.current = 1;
     api.get(buildUrl(1, debouncedValueSearch))
       .then((response) => {
-        if (response.data?.status) {
-          const { data, last_page, current_page } = response.data.response;
+        if (response.data?.status && response.data?.response) {
+          const resp = response.data.response;
+          const data = Array.isArray(resp) ? resp : (Array.isArray(resp.data) ? resp.data : []);
+          const last_page = resp.last_page || 1;
+          const current_page = resp.current_page || 1;
           setListDrivers(data);
           setHasMore(current_page < last_page);
+        } else {
+          setListDrivers([]);
+          setHasMore(false);
         }
       })
       .catch(() => {
         swal({ title: "Erro ao pesquisar dados dos motoristas", icon: "error" });
+        setListDrivers([]);
       })
       .finally(() => setFilterLoading(false));
   }, [debouncedValueSearch, buildUrl]);
@@ -62,9 +69,12 @@ export function useDriverList(): UseDriverListReturn {
     pageRef.current += 1;
     api.get(buildUrl(pageRef.current, debouncedValueSearch))
       .then((response) => {
-        if (response.data?.status) {
-          const { data, last_page, current_page } = response.data.response;
-          setListDrivers((prev) => [...prev, ...data]);
+        if (response.data?.status && response.data?.response) {
+          const resp = response.data.response;
+          const data = Array.isArray(resp) ? resp : (Array.isArray(resp.data) ? resp.data : []);
+          const last_page = resp.last_page || 1;
+          const current_page = resp.current_page || 1;
+          setListDrivers((prev) => [...(Array.isArray(prev) ? prev : []), ...data]);
           setHasMore(current_page < last_page);
         }
       })

@@ -186,7 +186,7 @@ const ListDrivers = () => {
         "report/select/driverRegisterStatus"
       );
       if (responseOptionsStatus.status) {
-        setListOptions(responseOptionsStatus.data.response);
+        setListOptions(Array.isArray(responseOptionsStatus.data?.response) ? responseOptionsStatus.data.response : []);
       }
     } catch (error) {
       console.error(error);
@@ -751,7 +751,7 @@ const ListDrivers = () => {
                 onChange={(value) => setDriverType(value)}
               >
                 <Select.Option value={0}>TODOS</Select.Option>
-                {tripTypeData?.map((value: any) => {
+                {(tripTypeData || []).map((value: any) => {
                   return (
                     <Select.Option
                       key={value.idUserType}
@@ -771,7 +771,7 @@ const ListDrivers = () => {
                 onChange={(value) => setIdStatusSearch(value)}
               >
                 <Select.Option value={0}>TODOS</Select.Option>
-                {listOptions.map((value) => {
+                {(listOptions || []).map((value) => {
                   return (
                     <Select.Option key={value.id} value={value.id}>
                       {value.text}
@@ -797,7 +797,7 @@ const ListDrivers = () => {
           </ContentTypesSearch>
         </ContentHeader>
         <Loader spinning={loading || filterLoading}>
-          {listDrivers.length <= 0 && !isRedirecting && (
+          {(listDrivers || []).length <= 0 && !isRedirecting && (
             <div>
               <ContentIconSearch>
                 <SearchLottieWrapper>
@@ -832,7 +832,7 @@ const ListDrivers = () => {
             </div>
           )}
           <ContentDrivers>
-            {listDrivers.filter(Boolean).map((value) => {
+            {(listDrivers || []).filter(Boolean).map((value) => {
               return (
                 <CardDriver
                   baseImageLink={baseImageLink}
@@ -846,7 +846,7 @@ const ListDrivers = () => {
               );
             })}
             {hasMore ? (
-              listDrivers.length > 0 ? (
+              (listDrivers || []).length > 0 ? (
                 <Button
                   style={{ marginTop: 10, marginBottom: 5, alignSelf: "center" }}
                   type="primary"

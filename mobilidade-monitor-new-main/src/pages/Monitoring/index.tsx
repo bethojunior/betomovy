@@ -854,7 +854,7 @@ const Monitoring: FC = () => {
                 <Spin size="small" style={{ color: "red" }} />
               </LoadingTripContainer>
             )}
-            {trips.length > 0 && trips.map(trip => (
+            {(trips || []).length > 0 && (trips || []).map(trip => (
               <TripCardWrapper
                 key={trip.tripReference}
                 $removing={removingTripReferences.has(trip.tripReference)}

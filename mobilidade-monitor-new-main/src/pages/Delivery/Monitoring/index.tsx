@@ -128,8 +128,9 @@ export const DeliveryMonitoring: FC = () => {
     try {
       const response = await api.get('driver/delivery');
 
-      if (response.data.status && response.data.response) {
-        setDeliveryDrivers(response.data.response);
+      if (response.data.status) {
+        const resp = response.data.response;
+        setDeliveryDrivers(Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []));
       }
     } catch (error) {
       console.error('Erro ao buscar motoristas:', error);
@@ -143,7 +144,8 @@ export const DeliveryMonitoring: FC = () => {
     try {
       const response = await api.get(`deliveryOrder/${cityId}/actives`);
       if (response.data.status) {
-        const ordersData = response.data.response || [];
+        const resp = response.data.response;
+        const ordersData = Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []);
         setOrders(ordersData);
         if (ordersData.length > 0 && !ordersVisible) {
           setOrdersVisible(true);
@@ -214,8 +216,8 @@ export const DeliveryMonitoring: FC = () => {
             <LoadingContainer>
               <LoadingSpinner />
             </LoadingContainer>
-          ) : orders.length > 0 ? (
-            orders.map(order => (
+          ) : (orders || []).length > 0 ? (
+            (orders || []).map(order => (
               <OrderCard key={order.id} onClick={() => showOrderDetails(order)}>
                 <OrderCardContent>
                   <CompanyLogo 
@@ -271,7 +273,7 @@ export const DeliveryMonitoring: FC = () => {
             {citySelected?.pointsCity && (
               <CityDelimiter coordinates={citySelected.pointsCity} />
             )}
-            {deliveryDrivers.length > 0 && deliveryDrivers.map((driver) => (
+            {(deliveryDrivers || []).length > 0 && (deliveryDrivers || []).map((driver) => (
               <DeliveryDriverMarker key={driver.idDriver} driver={driver} />
             ))}
           </Map>

@@ -29,17 +29,21 @@ const Notification = () => {
     api.get(`notification?page=${page}`).then((res) => {
       setLoading(false);
       if (res.status === 200) {
-        setNotificationList(res.data.response.data);
-        setCurrentPage(res.data.response.current_page);
-        setLastPage(res.data.response.last_page);
+        const notifs = Array.isArray(res.data?.response?.data)
+          ? res.data.response.data
+          : (Array.isArray(res.data?.response) ? res.data.response : []);
+        setNotificationList(notifs);
+        setCurrentPage(res.data?.response?.current_page || 1);
+        setLastPage(res.data?.response?.last_page || 1);
       }
     });
   };
 
   const getTypesDriver = () => {
     api.get("userType/actives").then(({ data }) => {
+      const resp = Array.isArray(data?.response) ? data.response : [];
       setDriverTypeList(
-        data.response.map((response: TypesDriversProps) => {
+        resp.map((response: TypesDriversProps) => {
           return {
             id: response.idUserType,
             name: response.name,

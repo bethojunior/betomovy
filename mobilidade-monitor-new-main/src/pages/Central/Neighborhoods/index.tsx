@@ -224,7 +224,7 @@ export const Neighborhoods = () => {
       });
     } else {
       const coords = coordinatesCaptured.length === 1 ? coordinatesCaptured[0] : coordinatesCaptured;
-      areaFormated = coords.map((value: any) => {
+      areaFormated = (Array.isArray(coords) ? coords : []).map((value: any) => {
         return {
           lat: value[1],
           lng: value[0],

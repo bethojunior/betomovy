@@ -231,7 +231,7 @@ export const ListPublicity = () => {
 
     setLoadingTable(true);
     try {
-      const orders = publicities.map((item, index) => ({
+      const orders = (publicities || []).map((item, index) => ({
         id: item.id,
         order: index + 1,
       }));
@@ -376,7 +376,7 @@ export const ListPublicity = () => {
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={publicities.map((item) => item.id)}
+            items={(publicities || []).map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
             <Table

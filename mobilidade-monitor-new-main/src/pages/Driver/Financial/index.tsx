@@ -114,8 +114,9 @@ export default function DriverFinancial() {
         }
       })
       .then((res) => {
-        setMovements(res.data.response.data)
-        setTotalPages(res.data.response.last_page)
+        const d = res.data?.response?.data;
+        setMovements(Array.isArray(d) ? d : (Array.isArray(res.data?.response) ? res.data.response : []));
+        setTotalPages(res.data?.response?.last_page || 1);
       })
       .catch(() => setMovements([]))
       .finally(() => setLoading(false))
@@ -237,10 +238,10 @@ export default function DriverFinancial() {
             </Box>
           ) : (
             <Box>
-              {movements.length === 0 && (
+              {(!movements || movements.length === 0) && (
                 <Typography color="text.secondary">Nenhuma movimentação encontrada.</Typography>
               )}
-              {movements.map((item, idx) => (
+              {(movements || []).map((item, idx) => (
                 <Box
                   key={idx}
                   sx={{

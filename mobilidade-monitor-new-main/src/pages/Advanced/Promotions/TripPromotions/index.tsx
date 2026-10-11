@@ -164,7 +164,8 @@ const TripPromotions = () => {
         return;
       }
 
-      const promotionsWithCityName = data.response.map((promotion: PromotionTypes) => {
+      const rawPromotions = Array.isArray(data.response) ? data.response : (Array.isArray(data.response?.data) ? data.response.data : []);
+      const promotionsWithCityName = rawPromotions.map((promotion: PromotionTypes) => {
         const cityId = (promotion.cityId as any)?.id ?? promotion.cityId;
         const city = citiesData.find((city) => city.cityId === cityId);
         return {

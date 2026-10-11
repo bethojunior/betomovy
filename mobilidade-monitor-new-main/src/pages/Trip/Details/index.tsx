@@ -288,7 +288,7 @@ const DetailsTrip: FC = () => {
           date: null,
           position: [parseFloat(tripDetails.originLongitude), parseFloat(tripDetails.originLatitude)]
         },
-        ...tripDetails.events.map((item, index) => {
+        ...((tripDetails.events || []).map((item, index) => {
           const { lng, lat, timestampIso } = normalizeTripEvent(item)
           return {
             description: item.message,
@@ -296,7 +296,7 @@ const DetailsTrip: FC = () => {
             date: timestampIso ? new Date(timestampIso).toLocaleString() : 'Data não disponível',
             position: [lng, lat]
           }
-        }),
+        })),
         {
           description: tripDetails.destinationAddress,
           icon: RedMarker,
@@ -460,7 +460,7 @@ const DetailsTrip: FC = () => {
                   </ComparisonTable>
                 </DisplacementInfoContainer>
                 <TrajetContent>
-                  {events.map((item) => {
+                  {(events || []).map((item) => {
                     return (
                       <RouteTripContent>
                         <Section>

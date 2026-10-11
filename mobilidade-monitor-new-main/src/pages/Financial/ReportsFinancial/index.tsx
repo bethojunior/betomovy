@@ -123,7 +123,7 @@ export const ReportsFinancial = () => {
       const responseCities = await api.get("city/actives/fully");
 
       if (responseCities.status) {
-        setListCities(responseCities.data.response);
+        setListCities(Array.isArray(responseCities.data?.response) ? responseCities.data.response : []);
       }
     } catch (error) {
       console.error(error);
@@ -143,7 +143,8 @@ export const ReportsFinancial = () => {
       );
 
       if (responseSearchDriver.status) {
-        setListDrivers(responseSearchDriver.data.response.data);
+        const d = responseSearchDriver.data?.response?.data;
+        setListDrivers(Array.isArray(d) ? d : (Array.isArray(responseSearchDriver.data?.response) ? responseSearchDriver.data.response : []));
       }
     } catch (error) {
       console.error(error);
@@ -163,7 +164,7 @@ export const ReportsFinancial = () => {
     const isChecked = event.target.checked;
 
     if (isChecked) {
-      const citiesIds = listCities.map((value) => {
+      const citiesIds = (listCities || []).map((value) => {
         return value.cityId;
       });
 
@@ -183,7 +184,7 @@ export const ReportsFinancial = () => {
       );
 
       if (responseReferralMonetization.status) {
-        setReferralMonetizations(responseReferralMonetization.data.response);
+        setReferralMonetizations(Array.isArray(responseReferralMonetization.data?.response) ? responseReferralMonetization.data.response : []);
       }
     } catch (error) {
       console.error(error);
@@ -270,14 +271,14 @@ export const ReportsFinancial = () => {
     getReferrealMonetization();
   }, []);
 
-  const optionsCities = listCities.map((value) => {
+  const optionsCities = (listCities || []).map((value) => {
     return {
       label: value.nome,
       value: value.cityId,
     };
   });
 
-  const listIndicationsFormated = listIndications.map((value) => {
+  const listIndicationsFormated = (listIndications || []).map((value) => {
     return {
       label: `${value.name} - ${value.type}`,
       value: value.idUser,
@@ -531,7 +532,7 @@ export const ReportsFinancial = () => {
                 onChange={(value) => setIdReferralMonetizations(value)}
               >
                 <Select.Option value={0}>TODOS</Select.Option>
-                {referralMonetizations.map((value) => {
+                {(referralMonetizations || []).map((value) => {
                   return (
                     <Select.Option key={value.id} value={value.id}>
                       {value.label}

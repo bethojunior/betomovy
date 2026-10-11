@@ -133,7 +133,10 @@ const CancellationFee: FC = () => {
       const responseDrivers = await api.get(`driver?name=${nameClient}`);
 
       if (responseDrivers.status) {
-        const driversFormated = responseDrivers.data.response.data.map(
+        const rawList = Array.isArray(responseDrivers.data?.response?.data)
+          ? responseDrivers.data.response.data
+          : (Array.isArray(responseDrivers.data?.response) ? responseDrivers.data.response : []);
+        const driversFormated = rawList.map(
           (item: UserAndDrivers) => ({
             value: JSON.stringify(item),
             label: item.name,
@@ -156,7 +159,10 @@ const CancellationFee: FC = () => {
       const responseClients = await api.get(`customer?name=${nameClient}`);
 
       if (responseClients.status) {
-        const clientsFormated = responseClients.data.response.data.map(
+        const rawList = Array.isArray(responseClients.data?.response?.data)
+          ? responseClients.data.response.data
+          : (Array.isArray(responseClients.data?.response) ? responseClients.data.response : []);
+        const clientsFormated = rawList.map(
           (item: UserAndDrivers) => ({
             value: JSON.stringify(item),
             label: item.name,

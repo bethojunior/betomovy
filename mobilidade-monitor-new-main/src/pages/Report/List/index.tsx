@@ -107,7 +107,11 @@ const ListReport: FC = () => {
         return setShowAlert(true);
       }
 
-      if (result.data.response.data.length === 0) {
+      const reportItems = Array.isArray(result.data?.response?.data)
+        ? result.data.response.data
+        : (Array.isArray(result.data?.response) ? result.data.response : []);
+
+      if (reportItems.length === 0) {
         setMessageAlert(
           "Não existem relatórios correspondentes a sua pesquisa"
         );
@@ -117,7 +121,7 @@ const ListReport: FC = () => {
       }
 
       setListReport(
-        result.data.response.data.map((item: ListReport) => {
+        reportItems.map((item: ListReport) => {
           return {
             name: item.reportName,
             created_at: new Date(item.created_at).toLocaleString(),
@@ -127,8 +131,8 @@ const ListReport: FC = () => {
           };
         })
       );
-      setCurrentPage(result.data.response.current_page);
-      setNextPage(result.data.response.next_page_url);
+      setCurrentPage(result.data?.response?.current_page || 1);
+      setNextPage(result.data?.response?.next_page_url);
       return setVisibilityTable(true);
     });
   };
@@ -205,7 +209,7 @@ const ListReport: FC = () => {
             onChange={(e) => setTypeReportSelected(e as string)}
           >
             <Option value="">Todos</Option>
-            {listTypeReport.map((item) => {
+            {(listTypeReport || []).map((item) => {
               return (
                 <Option value={item.id} key={item.id}>
                   {item.name}

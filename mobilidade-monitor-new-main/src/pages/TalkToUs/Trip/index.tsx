@@ -49,17 +49,19 @@ const TalkToUsTrip: FC = () => {
 			if (result.status === 200) {
 				setLoadingTable(false);
 				setShowPagination(false);
-				if (result.data.response.data.length === 0) {
-					setLoadingTable(true);
+				const respData = Array.isArray(result.data?.response?.data) ? result.data.response.data : [];
+				const lastPage = result.data?.response?.last_page || 1;
+				if (respData.length === 0) {
+					setShowPagination(false);
 				}
-				if (page !== result.data.response.last_page) {
+				if (page !== lastPage) {
 					setShowPagination(true);
 				}
 				if (page !== 1) {
-					setList((state) => state.concat(...result.data.response.data));
+					setList((state) => (state || []).concat(...respData));
 					return;
 				}
-				setList(result.data.response.data);
+				setList(respData);
 			}
 		});
 	};

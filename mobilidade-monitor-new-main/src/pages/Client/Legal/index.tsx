@@ -338,7 +338,7 @@ const LegalPerson: FC = () => {
               </ContentInstructionsSearch>
             </div>
           ) : (
-            listLegalPerson.map((data) => {
+            (listLegalPerson || []).map((data) => {
               return (
                 <CardLegalPerson
                   data={data}
@@ -348,7 +348,7 @@ const LegalPerson: FC = () => {
               );
             })
           )}
-          {hasMore && listLegalPerson.length > 0 && (
+          {hasMore && (listLegalPerson || []).length > 0 && (
             <ShowMoreButton type="primary" onClick={fetchMore}>
               Mostrar Mais
             </ShowMoreButton>

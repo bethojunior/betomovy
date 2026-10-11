@@ -114,7 +114,7 @@ export const InsertPublicity = () => {
                   <ContentInput>
                     <SubTitle>Público</SubTitle>
                     <Radio.Group name={name} value={value} onChange={onChange}>
-                      {listGender.map((item) => (
+                      {(listGender || []).map((item) => (
                         <Radio key={item.id} value={item.id}>
                           {item.name.toLocaleUpperCase()}
                         </Radio>
@@ -132,7 +132,7 @@ export const InsertPublicity = () => {
                   <ContentInput>
                     <SubTitle>Onde</SubTitle>
                     <Radio.Group name={name} value={value} onChange={onChange}>
-                      {listAdvertising.map((item) => (
+                      {(listAdvertising || []).map((item) => (
                         <Radio key={item.id} value={item.id}>
                           {item.name.toLocaleUpperCase()}
                         </Radio>
@@ -150,7 +150,7 @@ export const InsertPublicity = () => {
                   <ContentInput>
                     <SubTitle>App</SubTitle>
                     <Radio.Group name={name} value={value} onChange={onChange}>
-                      {listApps.map((item) => (
+                      {(listApps || []).map((item) => (
                         <Radio key={item.idApp} value={item.idApp}>
                           {item.name}
                         </Radio>
@@ -326,7 +326,7 @@ export const InsertPublicity = () => {
                     status={error ? "error" : ""}
                     placeholder="Escolha uma empresa"
                   >
-                    {listCompanies.map((item) => (
+                    {(listCompanies || []).map((item) => (
                       <FullWidthSelect.Option key={item.id} value={item.id}>
                         {item.fantasyName}
                       </FullWidthSelect.Option>

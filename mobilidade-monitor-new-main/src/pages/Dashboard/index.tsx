@@ -183,14 +183,16 @@ const DashBoard: FC = () => {
       
       const responseConfigModalAdvertsings = await api.get("config");
 
-        if (responseConfigModalAdvertsings.status) {
+        if (responseConfigModalAdvertsings.status && Array.isArray(responseConfigModalAdvertsings.data?.response)) {
           const configsGestor = responseConfigModalAdvertsings.data.response.find(
-            (data: KeysAppProps) => data.type === "GESTOR"
+            (data: KeysAppProps) => data?.type === "GESTOR"
           );
 
-          keyEnableShowPublicity = configsGestor.config.find(
-            (data: ConfigsKeyAppsProps) => data.key === "enable_publicity"
-          ).value;
+          if (configsGestor?.config && Array.isArray(configsGestor.config)) {
+            keyEnableShowPublicity = configsGestor.config.find(
+              (data: ConfigsKeyAppsProps) => data?.key === "enable_publicity"
+            )?.value;
+          }
         }
     } catch (error) {
       console.error(error);
@@ -643,15 +645,16 @@ const DashBoard: FC = () => {
           setHasMoreDrivers(false);
         } else {
           setDriverRank(prev => {
-            const existingIds = new Set(prev.map((d: DriversRankingDataProps) => d.idDriver));
+            const safePrev = Array.isArray(prev) ? prev : [];
+            const existingIds = new Set(safePrev.map((d: DriversRankingDataProps) => d.idDriver));
             const newDrivers = parsedDriverRank.filter((d: DriversRankingDataProps) => !existingIds.has(d.idDriver));
             
             if (newDrivers.length === 0) {
               setHasMoreDrivers(false);
-              return prev;
+              return safePrev;
             }
             
-            const newList = [...prev, ...newDrivers];
+            const newList = [...safePrev, ...newDrivers];
             return newList;
           });
           setCurrentDriverPage(nextPage);
@@ -693,15 +696,16 @@ const DashBoard: FC = () => {
           setHasMoreClients(false);
         } else {
           setClientRank(prev => {
-            const existingIds = new Set(prev.map((c: ClientRankingDataProps) => c.idUser));
+            const safePrev = Array.isArray(prev) ? prev : [];
+            const existingIds = new Set(safePrev.map((c: ClientRankingDataProps) => c.idUser));
             const newClients = parsedClientRank.filter((c: ClientRankingDataProps) => !existingIds.has(c.idUser));
             
             if (newClients.length === 0) {
               setHasMoreClients(false);
-              return prev;
+              return safePrev;
             }
             
-            const newList = [...prev, ...newClients];
+            const newList = [...safePrev, ...newClients];
             return newList;
           });
           setCurrentClientPage(nextPage);
@@ -760,12 +764,12 @@ Clique para ver a versão mais recente agora.">
             <DriverCardSkeleton />
           ) : (
             <TypeDriversCarousel>
-              {list.map((content, index) => (
+              {(list || []).map((content, index) => (
                 <CardContainerMap key={index}>
-                  {content.length === 0
+                  {(!content || content.length === 0)
                     ? "não tem motorista cadastrado para essa cidade"
                     : ""}
-                  {content.map((item: CurrentQuantitiesProps, index) => (
+                  {(content || []).map((item: CurrentQuantitiesProps, index) => (
                     <TypeDriversCard key={Number(index)}>
                       <TypeDriverImageContainer>
                         <TypeDriverImage preview={false} src={item.picture} />
@@ -1094,7 +1098,7 @@ Clique para ver a versão mais recente agora.">
                     </LoadingMoreSpinner>
                   ) : (
                   <>
-                  {driverRank.map((item) => {
+                  {(driverRank || []).map((item) => {
                     const ticketMedio = calculateTicketMedio(item.totalValue, item.quantityTrips);
                     return (
                       <TopItemContainer key={`driver-${item.idDriver}`}>
@@ -1140,7 +1144,7 @@ Clique para ver a versão mais recente agora.">
                       <LoadingMoreText style={{ marginLeft: '10px' }}>Carregando mais motoristas...</LoadingMoreText>
                     </LoadingMoreSpinner>
                   )}
-                  {!hasMoreDrivers && driverRank.length > 0 && !loadingMoreDrivers && (
+                  {!hasMoreDrivers && (driverRank || []).length > 0 && !loadingMoreDrivers && (
                     <LoadingMoreText>Não há mais motoristas para carregar</LoadingMoreText>
                   )}
                   </>
@@ -1150,7 +1154,7 @@ Clique para ver a versão mais recente agora.">
             )}
           </CardOfInformations>
           <CardOfInformations>
-            {clientRank.length == 0 && loadingFetchDataDashBoard == true ? (
+            {(!clientRank || clientRank.length == 0) && loadingFetchDataDashBoard == true ? (
               <SkeletonContainer>
                 <Skeleton active={true} />
               </SkeletonContainer>
@@ -1191,7 +1195,7 @@ Clique para ver a versão mais recente agora.">
                     </LoadingMoreSpinner>
                   ) : (
                   <>
-                  {clientRank.map((item) => {
+                  {(clientRank || []).map((item) => {
                     const ticketMedio = calculateTicketMedio(item.totalValue, item.quantityTrips);
                     return (
                       <TopItemContainer key={`client-${item.idUser}`}>

@@ -28,7 +28,7 @@ const ConfigCall = () => {
       setLoading(false);
       const { data } = result;
       if (data?.status) {
-        setListConfig(data.response);
+        setListConfig(Array.isArray(data.response) ? data.response : []);
       }
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -54,7 +54,7 @@ const ConfigCall = () => {
         setVisibility={setShowAlert}
       />
       <div>
-        {listConfig.map((item) => {
+        {(listConfig || []).map((item) => {
           return (
             <ConfigCard
               key={item.id}
