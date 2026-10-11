@@ -114,12 +114,17 @@ export const StatisticRealTime = styled.div`
 export const CardOfInformations = styled.div`
   width: 49%;
   background-color: #fff;
-  border-radius: 5px;
-  box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px,
-    rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+  border-radius: 10px;
+  border: 1px solid #f0f2f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
+  }
 
   @media (max-width: 800px) {
     margin-top: 10px;
@@ -129,7 +134,7 @@ export const CardOfInformations = styled.div`
 
 export const ContentCardInformations = styled.div`
   width: 100%;
-  padding: 10px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -146,27 +151,30 @@ export const CardHeaderRow = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 10px 10px 6px 10px;
+  padding: 12px 14px 6px 14px;
+  border-bottom: 1px solid #fafafa;
 `;
 
 export const ContentFilteredMonthAndDay = styled.div`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 `;
 
 export const ButtonsFiltered = styled.button<ButtonsFilteredProps>`
-  background-color: ${(props) => (props.selected ? "#e6f7ff" : "#fff")};
-  border: 1px solid ${(props) => (props.selected ? "#40a9ff" : "#d9d9d9")};
-  padding: 2px 10px;
+  background-color: ${(props) => (props.selected ? "#1890ff" : "#fff")};
+  border: 1px solid ${(props) => (props.selected ? "#1890ff" : "#d9d9d9")};
+  padding: 3px 12px;
   font-size: 12px;
-  color: ${(props) => (props.selected ? "#40a9ff" : "#595959")};
-  border-radius: 4px;
+  font-weight: 500;
+  color: ${(props) => (props.selected ? "#fff" : "#595959")};
+  border-radius: 6px;
   cursor: pointer;
+  transition: all 0.2s ease;
 
   &:hover {
-    color: #40a9ff;
-    border-color: #40a9ff;
+    color: ${(props) => (props.selected ? "#fff" : "#1890ff")};
+    border-color: #1890ff;
   }
 `;
 
@@ -186,25 +194,35 @@ export const TopDriversAndClients = styled.div`
 export const TripAndTicketOfToday = styled.div`
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 12px 16px;
   background-color: #fff;
-  margin-bottom: 2.5px;
-  border-radius: 5px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  border: 1px solid #f0f2f5;
   height: 50%;
-  box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px,
-    rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
 `;
 
 export const ClientsAndDriversRealTime = styled.div`
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 12px 16px;
   background-color: #fff;
-  margin-top: 2.5px;
-  border-radius: 5px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: 1px solid #f0f2f5;
   height: 50%;
-  box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px,
-    rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
 `;
 
 export const TripAndTicketContainer = styled.div`
@@ -235,10 +253,17 @@ export const TypeDriversCard = styled(Card)`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  border-radius: 5px;
+  border-radius: 10px;
+  border: 1px solid #f0f2f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   margin-right: 10px;
   width: 100%;
   height: auto;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
 
   .ant-card-body {
     padding-bottom: 14px;

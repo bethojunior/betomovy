@@ -456,8 +456,17 @@ const Passenger = () => {
       setLoading(true);
       try {
         const responseActiveCities = await api.get("City/getActives");
-        const cities = responseActiveCities?.data?.data ?? responseActiveCities?.data?.response;
-        setActiveCities(Array.isArray(cities) ? cities : []);
+        const rawCities = responseActiveCities?.data?.data ?? responseActiveCities?.data?.response;
+        if (Array.isArray(rawCities)) {
+          const uniqueCities = Array.from(
+            new Map(rawCities.map((c: any) => [c.id || c.cityId, c])).values()
+          ).sort((a: any, b: any) =>
+            (a.nome || a.name || "").localeCompare(b.nome || b.name || "", "pt", { sensitivity: "base" })
+          );
+          setActiveCities(uniqueCities as ActiveCitiesProps[]);
+        } else {
+          setActiveCities([]);
+        }
       } catch (error) {
         setActiveCities([]);
         swal({

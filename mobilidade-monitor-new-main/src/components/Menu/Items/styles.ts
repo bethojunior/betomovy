@@ -68,12 +68,32 @@ const styles = `
     cursor: pointer;
   }
   .menu-mobile {
-      padding: 20px 0 !important;
-    @media (max-width: 768px) {
+    padding: 10px 0 40px 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+  }
+  .menu-mobile::-webkit-scrollbar {
+    width: 6px;
+  }
+  .menu-mobile::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .menu-mobile::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+  }
+  .menu-mobile::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.45);
+  }
+  @media (max-width: 768px) {
+    .menu-mobile {
       display: flex !important;
       flex-direction: column !important;
-      padding: 70px 0 !important;
+      padding: 60px 0 40px 0 !important;
     }
+  }
 `;
 
 const styleSheet = document.createElement("style");

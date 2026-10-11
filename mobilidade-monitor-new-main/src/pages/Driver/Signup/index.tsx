@@ -27,46 +27,20 @@ import { Container, Iframe } from "./style";
 // };
 
 const SignupDriver: FC = () => {
-  // const [allCategories, setAllCategories] = useState<categoriesProps[]>();
-  // const [loading, setLoading] = useState<boolean>(false);
-  // const [messageAlert, setMessageAlert] = useState<string>("");
-  // const [showMessageAlert, setShowMessageAlert] = useState<boolean>(false);
-  // const [typeAlert, setTypeAlert] = useState<TypeMessageAlertProps>("success");
-
-  // const query = useQuerySearch();
-  // const searchQuery = query.get("form");
-
-  // const handleCallMessageAlert = (
-  //   message: string,
-  //   type: TypeMessageAlertProps
-  // ) => {
-  //   setMessageAlert(message);
-  //   setTypeAlert(type);
-  //   setShowMessageAlert(true);
-  // };
-
-  // const getAllCategories = async () => {
-  //   setLoading(true);
-  //   api
-  //     .get(`userType/drivers`)
-  //     .then((response) => {
-  //       setLoading(false);
-  //       setAllCategories(response.data.response);
-  //     })
-  //     .catch((error) => {
-  //       setLoading(false);
-  //       handleCallMessageAlert("Erro na requisição", "error");
-  //       console.log(error);
-  //     });
-  // };
-
-  // useEffect(() => {
-  //   getAllCategories();
-  // }, []);
+  const getDriverUrl = (): string => {
+    let siteUrl = (import.meta.env.LINK_SITE_WEB || "").trim();
+    if (!siteUrl || siteUrl.includes("xxxx") || siteUrl.includes("localhost")) {
+      siteUrl = "https://movymob.com/";
+    }
+    if (!siteUrl.endsWith("/")) {
+      siteUrl += "/";
+    }
+    return `${siteUrl}motorista`;
+  };
 
   return (
     <Container>
-      <Iframe src={`${import.meta.env.LINK_SITE_WEB}motorista`} />
+      <Iframe src={getDriverUrl()} title="Cadastro de Motorista" />
     </Container>
   );
 };

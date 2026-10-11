@@ -49,14 +49,41 @@ export const TitleMenu = styled(Title)`
   }
 `;
 
-export const SiderMenu = styled(Sider) <SiderProps>`
+export const SiderMenu = styled(Sider)<SiderProps>`
+  height: 100vh;
+  position: relative;
+
+  .ant-layout-sider-children {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.15);
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.45);
+    }
+  }
+
   @media (max-width: 768px) {
     height: 100vh;
     position: absolute;
     z-index: 10000000;
     width: 100% !important;
     max-width: ${({ collapsed }) =>
-    collapsed ? "0px !important" : "100% !important"};
+      collapsed ? "0px !important" : "100% !important"};
     width: 100%;
     min-width: 0px !important;
   }
@@ -140,13 +167,18 @@ export const HeadSider = styled.div<HeadSideProps>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 14px 10px 10px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
 
   .profile-user {
-    width: ${(props) => (props.collapsed ? "50px" : "100px")};
-    height: ${(props) => (props.collapsed ? "50px" : "100px")};
+    width: ${(props) => (props.collapsed ? "42px" : "80px")};
+    height: ${(props) => (props.collapsed ? "42px" : "80px")};
     border-radius: 50%;
-    margin: 10px 0;
+    margin: 6px 0 10px 0;
     transition: 300ms;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   }
 
   .user-data {
@@ -154,6 +186,15 @@ export const HeadSider = styled.div<HeadSideProps>`
     overflow: hidden;
     max-height: ${(props) => (props.collapsed ? "0px" : "200px")};
     transition: 300ms;
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+
+    > div:first-child {
+      font-weight: 600;
+      color: #ffffff;
+      font-size: 14px;
+    }
   }
 `;
 
