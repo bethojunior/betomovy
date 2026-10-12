@@ -43,26 +43,30 @@ class InternalAuditMiddleware
 
     private function saveInternalAudit(\Illuminate\Http\Request $request)
     {
-        $internalAudit = new InternalAudit;
-        $internalAudit->userId = $request->user()->idUser ?? null;
-        $internalAudit->browser = $_SERVER['HTTP_USER_AGENT'] ?? 'N/A';
-        $internalAudit->method = $request->method();
-        $internalAudit->url_path = $request->getRequestUri();
-        $internalAudit->post_fields = json_encode($request->request->all());
-        $internalAudit->query_params = json_encode($request->query->all());
-        $internalAudit->ip = $request->ip();
-        $internalAudit->content = null;
+        try {
+            $internalAudit = new InternalAudit;
+            $internalAudit->userId = $request->user()->idUser ?? null;
+            $internalAudit->browser = $_SERVER['HTTP_USER_AGENT'] ?? 'N/A';
+            $internalAudit->method = $request->method();
+            $internalAudit->url_path = $request->getRequestUri();
+            $internalAudit->post_fields = json_encode($request->request->all());
+            $internalAudit->query_params = json_encode($request->query->all());
+            $internalAudit->ip = $request->ip();
+            $internalAudit->content = null;
 
-        if ($request->getContent()) {
-            $contentArray = json_encode(['content' => $request->getContent()]);
-            $content = json_decode($request->getContent());
-            $internalAudit->content = $content ? json_encode($content) : null;
+            if ($request->getContent()) {
+                $contentArray = json_encode(['content' => $request->getContent()]);
+                $content = json_decode($request->getContent());
+                $internalAudit->content = $content ? json_encode($content) : null;
 
-            if (!$content && $contentArray) {
-                $internalAudit->content = $contentArray;
+                if (!$content && $contentArray) {
+                    $internalAudit->content = $contentArray;
+                }
             }
-        }
 
-        $internalAudit->save();
+            $internalAudit->save();
+        } catch (\Throwable $e) {
+            \Log::warning('InternalAuditMiddleware falhou ao registrar log: ' . $e->getMessage());
+        }
     }
 }

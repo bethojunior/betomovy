@@ -63,7 +63,10 @@ class AdminRepository extends AbstractRepository
         return $this->getQuery()
             ->join('levelAccess', 'levelAccess.userId', '=', 'user.idUser')
             ->where('email', $email)
-            ->where('statusId', StatusConst::ACTIVE)
+            ->where(function ($query) {
+                $query->where('user.statusId', StatusConst::ACTIVE)
+                      ->orWhereNull('user.statusId');
+            })
             ->where('levelAccess.userTypeId', UserTypeConst::ADMIN)
             ->first();
     }
@@ -100,7 +103,10 @@ class AdminRepository extends AbstractRepository
             ->join('levelAccess', 'levelAccess.userId', '=', 'user.idUser')
             ->where('email', $email)
             ->where('user.idUser', '!=', $id)
-            ->where('statusId', StatusConst::ACTIVE)
+            ->where(function ($query) {
+                $query->where('user.statusId', StatusConst::ACTIVE)
+                      ->orWhereNull('user.statusId');
+            })
             ->where('levelAccess.userTypeId', UserTypeConst::ADMIN)
             ->first();
     }
