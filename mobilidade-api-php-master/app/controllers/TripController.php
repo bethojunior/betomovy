@@ -265,21 +265,16 @@ class TripController extends ApiController
 
             // Ensure tables exist to prevent join failures
             try {
-                $pdo->exec("
-                    CREATE TABLE IF NOT EXISTS tripAudit (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        situation VARCHAR(255) NULL,
-                        created_at DATETIME NULL
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-                    CREATE TABLE IF NOT EXISTS tripCallType (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(255) NULL
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-                    CREATE TABLE IF NOT EXISTS tripPaymentForm (
-                        idTripPaymentForm INT AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(255) NULL
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-                ");
+                $pdo->exec("CREATE TABLE IF NOT EXISTS tripAudit (id INT AUTO_INCREMENT PRIMARY KEY, situation VARCHAR(255) NULL, created_at DATETIME NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            } catch (\Throwable $tEx) {}
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS tripCallType (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            } catch (\Throwable $tEx) {}
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS tripPaymentForm (idTripPaymentForm INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            } catch (\Throwable $tEx) {}
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS tripWayPoints (id INT AUTO_INCREMENT PRIMARY KEY, tripReference VARCHAR(255) NULL, latitude VARCHAR(50) NULL, longitude VARCHAR(50) NULL, address VARCHAR(255) NULL, confirmed TINYINT(1) DEFAULT 0, created_at DATETIME NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
             } catch (\Throwable $tEx) {}
 
             // Total count
@@ -287,43 +282,79 @@ class TripController extends ApiController
             $stmtCount->execute($params);
             $total = (int)$stmtCount->fetchColumn();
 
-            // Trips list with joins
-            $sql = "
-                SELECT 
-                    trip.idTrip,
-                    trip.tripReference,
-                    trip.date,
-                    trip.price,
-                    trip.driverId,
-                    trip.userId,
-                    trip.customerId,
-                    trip.tripCallTypeId,
-                    trip.flow,
-                    trip.status,
-                    trip.canceledBy,
-                    COALESCE(tct.name, 'Normal') AS callType,
-                    COALESCE(tpf.name, 'Dinheiro') AS paymentForm,
-                    COALESCE(ta.situation, '') AS situation,
-                    COALESCE(uc.name, '') AS customerName,
-                    COALESCE(uc.phone, '') AS phone
-                FROM trip
-                LEFT JOIN tripAudit ta ON trip.tripAuditId = ta.id
-                LEFT JOIN tripCallType tct ON trip.tripCallTypeId = tct.id
-                LEFT JOIN tripPaymentForm tpf ON trip.tripPaymentFormId = tpf.idTripPaymentForm
-                LEFT JOIN `user` uc ON trip.userId = uc.idUser
-                WHERE {$whereSql}
-                ORDER BY trip.date DESC
-                LIMIT :limit OFFSET :offset
-            ";
+            // Trips list with joins (or fallback if joins fail)
+            $data = [];
+            try {
+                $sql = "
+                    SELECT 
+                        trip.idTrip,
+                        trip.tripReference,
+                        trip.date,
+                        trip.price,
+                        trip.driverId,
+                        trip.userId,
+                        trip.customerId,
+                        trip.tripCallTypeId,
+                        trip.flow,
+                        trip.status,
+                        trip.canceledBy,
+                        COALESCE(tct.name, 'Normal') AS callType,
+                        COALESCE(tpf.name, 'Dinheiro') AS paymentForm,
+                        COALESCE(ta.situation, '') AS situation,
+                        COALESCE(uc.name, '') AS customerName,
+                        COALESCE(uc.phone, '') AS phone
+                    FROM trip
+                    LEFT JOIN tripAudit ta ON trip.tripAuditId = ta.id
+                    LEFT JOIN tripCallType tct ON trip.tripCallTypeId = tct.id
+                    LEFT JOIN tripPaymentForm tpf ON trip.tripPaymentFormId = tpf.idTripPaymentForm
+                    LEFT JOIN `user` uc ON trip.userId = uc.idUser
+                    WHERE {$whereSql}
+                    ORDER BY trip.date DESC
+                    LIMIT :limit OFFSET :offset
+                ";
 
-            $stmt = $pdo->prepare($sql);
-            foreach ($params as $k => $v) {
-                $stmt->bindValue($k, $v);
+                $stmt = $pdo->prepare($sql);
+                foreach ($params as $k => $v) {
+                    $stmt->bindValue($k, $v);
+                }
+                $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+                $stmt->execute();
+                $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            } catch (\Throwable $qEx) {
+                // Fallback query without joins if any joined table does not exist
+                $sqlFallback = "
+                    SELECT 
+                        trip.idTrip,
+                        trip.tripReference,
+                        trip.date,
+                        trip.price,
+                        trip.driverId,
+                        trip.userId,
+                        trip.customerId,
+                        trip.tripCallTypeId,
+                        trip.flow,
+                        trip.status,
+                        trip.canceledBy,
+                        'Normal' AS callType,
+                        'Dinheiro' AS paymentForm,
+                        '' AS situation,
+                        '' AS customerName,
+                        '' AS phone
+                    FROM trip
+                    WHERE {$whereSql}
+                    ORDER BY trip.date DESC
+                    LIMIT :limit OFFSET :offset
+                ";
+                $stmt = $pdo->prepare($sqlFallback);
+                foreach ($params as $k => $v) {
+                    $stmt->bindValue($k, $v);
+                }
+                $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+                $stmt->execute();
+                $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             }
-            $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
-            $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
-            $stmt->execute();
-            $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Fetch waypoints for each trip if tripWayPoints table exists
             if (!empty($data)) {
