@@ -254,25 +254,29 @@ class AdminController extends ApiController
                 $stmt->execute([':id' => $id]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
             } catch (\Throwable $t) {
-                $stmt = $pdo->prepare("
-                    SELECT 
-                        u.idUser,
-                        u.email,
-                        u.name,
-                        COALESCE(u.nickname, u.name) as nickname,
-                        COALESCE(u.phone, '') as phone,
-                        COALESCE(u.document, '') as document,
-                        COALESCE(u.blocked, 0) as blocked,
-                        COALESCE(u.statusId, 1) as statusId,
-                        COALESCE(u.roleId, 1) as roleId,
-                        IF(COALESCE(u.roleId, 1) = 1, 1, 0) as isRoot,
-                        'Administrador' as roleName
-                    FROM user u
-                    WHERE u.idUser = :id
-                    LIMIT 1
-                ");
-                $stmt->execute([':id' => $id]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                try {
+                    $stmt = $pdo->prepare("
+                        SELECT 
+                            u.idUser,
+                            u.email,
+                            u.name,
+                            COALESCE(u.nickname, u.name) as nickname,
+                            COALESCE(u.phone, '') as phone,
+                            COALESCE(u.document, '') as document,
+                            0 as blocked,
+                            COALESCE(u.statusId, 1) as statusId,
+                            1 as roleId,
+                            1 as isRoot,
+                            'Administrador' as roleName
+                        FROM user u
+                        WHERE u.idUser = :id
+                        LIMIT 1
+                    ");
+                    $stmt->execute([':id' => $id]);
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                } catch (\Throwable $t2) {
+                    $user = null;
+                }
             }
 
             if (!$user) {
