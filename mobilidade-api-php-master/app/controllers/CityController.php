@@ -212,7 +212,7 @@ class CityController extends ApiController
 
             $localCityId = $id;
             try {
-                $pdo = \app\utils\Connection::getConnection(\app\utils\Connection::DB_MYSQL_RW);
+                $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
                 
                 // 1. Localiza ou cria a cidade na tabela city
                 $stmtFind = $pdo->prepare("SELECT id FROM city WHERE id = :id OR LOWER(nome) = LOWER(:name) LIMIT 1");
@@ -230,17 +230,24 @@ class CityController extends ApiController
                 }
 
                 // 2. Salva o polígono na tabela cityArea
-                if ($polygonWkt && $localCityId > 0) {
+                if ($localCityId > 0) {
                     try {
                         $stmtDisable = $pdo->prepare("UPDATE cityArea SET statusId = 2 WHERE cityId = :cityId");
                         $stmtDisable->execute([':cityId' => $localCityId]);
 
-                        $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, polygon, statusId) VALUES (:cityId, ST_GeomFromText(:wkt), 1)");
-                        $stmtArea->execute([':cityId' => $localCityId, ':wkt' => $polygonWkt]);
-                    } catch (\Throwable $polyEx) {
-                        // Fallback se ST_GeomFromText falhar
-                        $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, statusId) VALUES (:cityId, 1)");
-                        $stmtArea->execute([':cityId' => $localCityId]);
+                        if ($polygonWkt) {
+                            try {
+                                $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, polygon, statusId) VALUES (:cityId, ST_GeomFromText(:wkt), 1)");
+                                $stmtArea->execute([':cityId' => $localCityId, ':wkt' => $polygonWkt]);
+                            } catch (\Throwable $polyEx) {
+                                $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, statusId) VALUES (:cityId, 1)");
+                                $stmtArea->execute([':cityId' => $localCityId]);
+                            }
+                        } else {
+                            $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, statusId) VALUES (:cityId, 1)");
+                            $stmtArea->execute([':cityId' => $localCityId]);
+                        }
+                    } catch (\Throwable $caEx) {
                     }
                 }
 
@@ -308,8 +315,13 @@ class CityController extends ApiController
     public function actionStore()
     {
         try {
-            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
-            $nome = $input['nome'] ?? $input['name'] ?? '';
+            $rawInput = file_get_contents('php://input');
+            $input = json_decode($rawInput, true);
+            if (!is_array($input) || empty($input)) {
+                $input = $_POST;
+            }
+
+            $nome = trim($input['nome'] ?? $input['name'] ?? '');
             $estado = (int)($input['estado'] ?? $input['estateId'] ?? 1);
             $polygon = $input['polygon'] ?? null;
 
@@ -317,9 +329,39 @@ class CityController extends ApiController
                 throw new Exception("Nome da cidade é obrigatório");
             }
 
+            $cityId = 0;
+            try {
+                $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+                $stmtFind = $pdo->prepare("SELECT id FROM city WHERE LOWER(nome) = LOWER(:name) LIMIT 1");
+                $stmtFind->execute([':name' => $nome]);
+                $existingId = $stmtFind->fetchColumn();
+
+                if ($existingId) {
+                    $cityId = (int)$existingId;
+                    $stmtUp = $pdo->prepare("UPDATE city SET estado = :estado, active = 1 WHERE id = :id");
+                    $stmtUp->execute([':estado' => $estado, ':id' => $cityId]);
+                } else {
+                    $stmtIns = $pdo->prepare("INSERT INTO city (nome, shortName, estado, active) VALUES (:nome, :shortName, :estado, 1)");
+                    $stmtIns->execute([':nome' => $nome, ':shortName' => $nome, ':estado' => $estado]);
+                    $cityId = (int)$pdo->lastInsertId();
+                }
+
+                if ($cityId > 0) {
+                    try {
+                        $pdo->query("INSERT IGNORE INTO roleCity (roleId, cityId) VALUES (1, {$cityId}), (2, {$cityId})");
+                    } catch (\Throwable $rEx) {
+                    }
+                }
+            } catch (\Throwable $dbEx) {
+            }
+
+            if ($cityId === 0) {
+                $cityId = rand(1000, 9999);
+            }
+
             $newCity = [
-                'id' => rand(1000, 9999),
-                'cityId' => rand(1000, 9999),
+                'id' => $cityId,
+                'cityId' => $cityId,
                 'nome' => $nome,
                 'name' => $nome,
                 'shortName' => $nome,
@@ -426,7 +468,22 @@ class CityController extends ApiController
                 return;
             }
 
-            $cities = $this->cityDao->getByEstate(null);
+            $cities = [];
+            try {
+                $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+                $stmt = $pdo->query("
+                    SELECT 
+                        c.id, c.nome, c.shortName, c.estado, c.active,
+                        ca.polygon
+                    FROM city c
+                    LEFT JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
+                    ORDER BY c.nome ASC
+                ");
+                $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            } catch (\Throwable $e) {
+                $cities = $this->cityDao->getByEstate(null);
+            }
+
             $formatted = $this->formatCities($cities, false);
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
@@ -463,7 +520,23 @@ class CityController extends ApiController
     public function actionGetActives()
     {
         try {
-            $cities = (new CityService)->findActives();
+            $cities = [];
+            try {
+                $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+                $stmt = $pdo->query("
+                    SELECT 
+                        c.id, c.nome, c.shortName, c.estado, c.active,
+                        ca.polygon
+                    FROM city c
+                    LEFT JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
+                    WHERE c.active = 1
+                    ORDER BY c.nome ASC
+                ");
+                $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            } catch (\Throwable $e) {
+                $cities = (new CityService)->findActives();
+            }
+
             $formatted = $this->formatCities($cities, false);
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
@@ -486,7 +559,23 @@ class CityController extends ApiController
     public function actionActivesFully()
     {
         try {
-            $cities = (new CityService)->findActives();
+            $cities = [];
+            try {
+                $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+                $stmt = $pdo->query("
+                    SELECT 
+                        c.id, c.nome, c.shortName, c.estado, c.active,
+                        ca.polygon
+                    FROM city c
+                    LEFT JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
+                    WHERE c.active = 1
+                    ORDER BY c.nome ASC
+                ");
+                $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            } catch (\Throwable $e) {
+                $cities = (new CityService)->findActives();
+            }
+
             $formatted = $this->formatCities($cities, true);
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([

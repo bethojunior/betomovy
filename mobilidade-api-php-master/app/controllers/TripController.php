@@ -220,6 +220,262 @@ class TripController extends ApiController
         }
     }
 
+    public function actionIndex()
+    {
+        try {
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $perPage = max(1, (int)($_GET['per_page'] ?? 10));
+            $offset = ($page - 1) * $perPage;
+
+            $dateParam = $_GET['date'] ?? null;
+            $driverId = $_GET['driverId'] ?? null;
+            $status = $_GET['status'] ?? null;
+            $cityId = $_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? null);
+
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            $where = ["1=1"];
+            $params = [];
+
+            if (!empty($dateParam)) {
+                $dates = explode(',', $dateParam);
+                if (count($dates) >= 2) {
+                    $where[] = "trip.date >= :startDate AND trip.date <= :endDate";
+                    $params[':startDate'] = trim($dates[0]) . ' 00:00:00';
+                    $params[':endDate'] = trim($dates[1]) . ' 23:59:59';
+                }
+            }
+
+            if (!empty($driverId) && $driverId !== '0') {
+                $where[] = "trip.driverId = :driverId";
+                $params[':driverId'] = $driverId;
+            }
+
+            if (!empty($status)) {
+                $where[] = "trip.status = :status";
+                $params[':status'] = $status;
+            }
+
+            if (!empty($cityId)) {
+                $where[] = "trip.cityId = :cityId";
+                $params[':cityId'] = $cityId;
+            }
+
+            $whereSql = implode(" AND ", $where);
+
+            // Total count
+            $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM trip WHERE {$whereSql}");
+            $stmtCount->execute($params);
+            $total = (int)$stmtCount->fetchColumn();
+
+            // Trips list with joins
+            $sql = "
+                SELECT 
+                    trip.idTrip,
+                    trip.tripReference,
+                    trip.date,
+                    trip.price,
+                    trip.driverId,
+                    trip.userId,
+                    trip.customerId,
+                    trip.tripCallTypeId,
+                    trip.flow,
+                    trip.status,
+                    trip.canceledBy,
+                    COALESCE(tct.name, 'Normal') AS callType,
+                    COALESCE(tpf.name, 'Dinheiro') AS paymentForm,
+                    COALESCE(ta.situation, '') AS situation,
+                    COALESCE(uc.name, '') AS customerName,
+                    COALESCE(uc.phone, '') AS phone
+                FROM trip
+                LEFT JOIN tripAudit ta ON trip.tripAuditId = ta.id
+                LEFT JOIN tripCallType tct ON trip.tripCallTypeId = tct.id
+                LEFT JOIN tripPaymentForm tpf ON trip.tripPaymentFormId = tpf.idTripPaymentForm
+                LEFT JOIN `user` uc ON trip.userId = uc.idUser
+                WHERE {$whereSql}
+                ORDER BY trip.date DESC
+                LIMIT :limit OFFSET :offset
+            ";
+
+            $stmt = $pdo->prepare($sql);
+            foreach ($params as $k => $v) {
+                $stmt->bindValue($k, $v);
+            }
+            $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+            $stmt->execute();
+            $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            // Fetch waypoints for each trip if tripWayPoints table exists
+            if (!empty($data)) {
+                $refs = array_column($data, 'tripReference');
+                $placeholders = implode(',', array_fill(0, count($refs), '?'));
+                try {
+                    $stmtWay = $pdo->prepare("
+                        SELECT tripReference, latitude, longitude, address, confirmed, created_at
+                        FROM tripWayPoints
+                        WHERE tripReference IN ({$placeholders})
+                        ORDER BY id ASC
+                    ");
+                    $stmtWay->execute($refs);
+                    $allWay = $stmtWay->fetchAll(\PDO::FETCH_ASSOC);
+                    $wayGroup = [];
+                    foreach ($allWay as $way) {
+                        $wayGroup[$way['tripReference']][] = $way;
+                    }
+                    foreach ($data as &$t) {
+                        $t['tripWayPoints'] = $wayGroup[$t['tripReference']] ?? [];
+                    }
+                } catch (\Throwable $wEx) {
+                    foreach ($data as &$t) {
+                        $t['tripWayPoints'] = [];
+                    }
+                }
+            }
+
+            $lastPage = $total > 0 ? (int)ceil($total / $perPage) : 1;
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Listagem de viagens encontradas',
+                'data' => [
+                    'trips' => [
+                        'current_page' => $page,
+                        'data' => $data,
+                        'first_page_url' => null,
+                        'from' => $total > 0 ? $offset + 1 : null,
+                        'last_page' => $lastPage,
+                        'last_page_url' => null,
+                        'next_page_url' => $page < $lastPage ? true : null,
+                        'path' => null,
+                        'per_page' => $perPage,
+                        'prev_page_url' => $page > 1 ? true : null,
+                        'to' => min($offset + $perPage, $total),
+                        'total' => $total
+                    ]
+                ],
+                'response' => [
+                    'trips' => [
+                        'current_page' => $page,
+                        'data' => $data,
+                        'first_page_url' => null,
+                        'from' => $total > 0 ? $offset + 1 : null,
+                        'last_page' => $lastPage,
+                        'last_page_url' => null,
+                        'next_page_url' => $page < $lastPage ? true : null,
+                        'path' => null,
+                        'per_page' => $perPage,
+                        'prev_page_url' => $page > 1 ? true : null,
+                        'to' => min($offset + $perPage, $total),
+                        'total' => $total
+                    ]
+                ],
+                'errors' => null
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    public function actionFinancialMirror()
+    {
+        try {
+            $startDate = $_GET['startDate'] ?? null;
+            $endDate = $_GET['endDate'] ?? null;
+            $driverId = $_GET['driverId'] ?? null;
+            $cityId = $_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? null);
+
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            $where = ["1=1"];
+            $params = [];
+
+            if (!empty($startDate) && !empty($endDate)) {
+                $where[] = "trip.date >= :startDate AND trip.date <= :endDate";
+                $params[':startDate'] = trim($startDate) . ' 00:00:00';
+                $params[':endDate'] = trim($endDate) . ' 23:59:59';
+            }
+
+            if (!empty($driverId) && $driverId !== '0') {
+                $where[] = "trip.driverId = :driverId";
+                $params[':driverId'] = $driverId;
+            }
+
+            if (!empty($cityId)) {
+                $where[] = "trip.cityId = :cityId";
+                $params[':cityId'] = $cityId;
+            }
+
+            $whereSql = implode(" AND ", $where);
+
+            $sql = "
+                SELECT 
+                    COUNT(*) as totalTrips,
+                    SUM(CASE WHEN trip.status = 'finished' THEN 1 ELSE 0 END) as finishedTrips,
+                    SUM(CASE WHEN trip.status = 'finished' THEN COALESCE(trip.price, 0) ELSE 0 END) as totalPrice,
+                    SUM(CASE WHEN trip.canceledBy = 'customer' THEN 1 ELSE 0 END) as canceledByCustomer,
+                    SUM(CASE WHEN trip.canceledBy = 'driver' THEN 1 ELSE 0 END) as canceledByDriver,
+                    SUM(CASE WHEN trip.status = 'payment_refused' THEN 1 ELSE 0 END) as cardRefused,
+                    COUNT(DISTINCT trip.userId) as numUniqueCustomer,
+                    COUNT(DISTINCT trip.driverId) as uniqueDriverIds
+                FROM trip
+                WHERE {$whereSql}
+            ";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $stats = $stmt->fetch(\PDO::FETCH_ASSOC) ?: [];
+
+            $totalPrice = number_format((float)($stats['totalPrice'] ?? 0), 2, '.', '');
+
+            $result = [
+                'totalTrips' => (int)($stats['totalTrips'] ?? 0),
+                'finishedTrips' => (int)($stats['finishedTrips'] ?? 0),
+                'totalPrice' => $totalPrice,
+                'canceledByCustomer' => (int)($stats['canceledByCustomer'] ?? 0),
+                'canceledByDriver' => (int)($stats['canceledByDriver'] ?? 0),
+                'cardRefused' => (int)($stats['cardRefused'] ?? 0),
+                'numUniqueCustomer' => (int)($stats['numUniqueCustomer'] ?? 0),
+                'uniqueDriverIds' => (int)($stats['uniqueDriverIds'] ?? 0),
+                'firstTrip' => 0,
+                'allTrips' => (int)($stats['totalTrips'] ?? 0),
+                'totalTripsValue' => (float)$totalPrice,
+                'driverValue' => 0.0,
+                'companyValue' => 0.0,
+                'discount' => 0.0,
+                'voucher' => 0.0
+            ];
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Espelho financeiro',
+                'data' => $result,
+                'response' => $result,
+                'errors' => null
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    public function actionAnalysis()
+    {
+        try {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Viagens em análise',
+                'data' => [],
+                'response' => [],
+                'errors' => null
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
     public function actionActives()
     {
         try {
