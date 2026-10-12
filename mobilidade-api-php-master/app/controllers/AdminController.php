@@ -41,53 +41,121 @@ class AdminController extends ApiController
         try {
             $pdo = Connection::open(Connection::DB_MYSQL);
 
-            $sql = "
-                SELECT DISTINCT
-                    u.idUser,
-                    u.email,
-                    u.name,
-                    COALESCE(u.nickname, u.name) as nickname,
-                    COALESCE(u.phone, '') as phone,
-                    COALESCE(u.document, '') as document,
-                    COALESCE(u.blocked, 0) as blocked,
-                    COALESCE(u.statusId, 1) as statusId,
-                    COALESCE(u.roleId, 1) as roleId,
-                    COALESCE(r.isRoot, 0) as isRoot,
-                    COALESCE(r.name, 'Administrador') as roleName
-                FROM user u
-                LEFT JOIN role r ON u.roleId = r.id
-                LEFT JOIN levelAccess la ON u.idUser = la.userId
-                WHERE (u.statusId = 1 OR u.statusId IS NULL)
-                  AND (u.roleId IS NOT NULL OR la.userTypeId = 4)
-                ORDER BY u.idUser DESC
-            ";
+            // Ensure role table exists
+            try {
+                $pdo->exec("
+                    CREATE TABLE IF NOT EXISTS role (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        name VARCHAR(255) NOT NULL,
+                        support TINYINT(1) DEFAULT 0,
+                        isRoot TINYINT(1) DEFAULT 0,
+                        statusId INT DEFAULT 1,
+                        active TINYINT(1) DEFAULT 1,
+                        created_at DATETIME NULL,
+                        updated_at DATETIME NULL
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                ");
+                $pdo->exec("
+                    INSERT IGNORE INTO role (id, name, support, isRoot, statusId, active) VALUES 
+                    (1, 'Super Administrador', 0, 1, 1, 1),
+                    (2, 'Administrador', 0, 0, 1, 1),
+                    (3, 'Suporte / Atendimento', 1, 0, 1, 1),
+                    (4, 'Operador Financeiro', 0, 0, 1, 1);
+                ");
+            } catch (\Throwable $t) {
+            }
 
-            $stmt = $pdo->query($sql);
-            $users = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            // Ensure levelAccess table exists
+            try {
+                $pdo->exec("
+                    CREATE TABLE IF NOT EXISTS levelAccess (
+                        idLevelAccess INT AUTO_INCREMENT PRIMARY KEY,
+                        userId INT NOT NULL,
+                        userTypeId INT NOT NULL,
+                        created_at DATETIME NULL,
+                        INDEX(userId),
+                        INDEX(userTypeId)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                ");
+            } catch (\Throwable $t) {
+            }
 
-            // If empty, fetch any users with roleId or levelAccess = 4, or superadmins
-            if (empty($users)) {
-                $sqlFallback = "
-                    SELECT 
+            $users = [];
+            try {
+                $sql = "
+                    SELECT DISTINCT
                         u.idUser,
                         u.email,
                         u.name,
-                        u.nickname,
-                        u.phone,
-                        u.document,
+                        COALESCE(u.nickname, u.name) as nickname,
+                        COALESCE(u.phone, '') as phone,
+                        COALESCE(u.document, '') as document,
                         COALESCE(u.blocked, 0) as blocked,
-                        u.statusId,
-                        u.roleId,
+                        COALESCE(u.statusId, 1) as statusId,
+                        COALESCE(u.roleId, 1) as roleId,
                         COALESCE(r.isRoot, 0) as isRoot,
                         COALESCE(r.name, 'Administrador') as roleName
                     FROM user u
                     LEFT JOIN role r ON u.roleId = r.id
-                    WHERE u.statusId = 1
+                    LEFT JOIN levelAccess la ON u.idUser = la.userId
+                    WHERE (u.statusId = 1 OR u.statusId IS NULL)
+                      AND (u.roleId IS NOT NULL OR la.userTypeId = 4)
                     ORDER BY u.idUser DESC
-                    LIMIT 50
                 ";
-                $stmt = $pdo->query($sqlFallback);
+                $stmt = $pdo->query($sql);
                 $users = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            } catch (\Throwable $t) {
+                // Resilient fallback query without joining role
+                try {
+                    $sqlFallback = "
+                        SELECT 
+                            u.idUser,
+                            u.email,
+                            u.name,
+                            COALESCE(u.nickname, u.name) as nickname,
+                            COALESCE(u.phone, '') as phone,
+                            COALESCE(u.document, '') as document,
+                            COALESCE(u.blocked, 0) as blocked,
+                            COALESCE(u.statusId, 1) as statusId,
+                            COALESCE(u.roleId, 1) as roleId,
+                            IF(COALESCE(u.roleId, 1) = 1, 1, 0) as isRoot,
+                            'Administrador' as roleName
+                        FROM user u
+                        WHERE u.statusId = 1 OR u.statusId IS NULL
+                        ORDER BY u.idUser DESC
+                        LIMIT 50
+                    ";
+                    $stmt = $pdo->query($sqlFallback);
+                    $users = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+                } catch (\Throwable $t2) {
+                }
+            }
+
+            // If empty, fetch any users with statusId active
+            if (empty($users)) {
+                try {
+                    $sqlFallback = "
+                        SELECT 
+                            u.idUser,
+                            u.email,
+                            u.name,
+                            COALESCE(u.nickname, u.name) as nickname,
+                            COALESCE(u.phone, '') as phone,
+                            COALESCE(u.document, '') as document,
+                            COALESCE(u.blocked, 0) as blocked,
+                            COALESCE(u.statusId, 1) as statusId,
+                            COALESCE(u.roleId, 1) as roleId,
+                            IF(COALESCE(u.roleId, 1) = 1, 1, 0) as isRoot,
+                            'Administrador' as roleName
+                        FROM user u
+                        WHERE u.statusId = 1 OR u.statusId IS NULL
+                        ORDER BY u.idUser DESC
+                        LIMIT 50
+                    ";
+                    $stmt = $pdo->query($sqlFallback);
+                    $users = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+                } catch (\Throwable $t3) {
+                }
             }
 
             $formatted = array_map(function ($u) {
@@ -128,26 +196,49 @@ class AdminController extends ApiController
             }
 
             $pdo = Connection::open(Connection::DB_MYSQL);
-            $stmt = $pdo->prepare("
-                SELECT 
-                    u.idUser,
-                    u.email,
-                    u.name,
-                    u.nickname,
-                    u.phone,
-                    u.document,
-                    COALESCE(u.blocked, 0) as blocked,
-                    u.statusId,
-                    u.roleId,
-                    COALESCE(r.isRoot, 0) as isRoot,
-                    COALESCE(r.name, 'Administrador') as roleName
-                FROM user u
-                LEFT JOIN role r ON u.roleId = r.id
-                WHERE u.idUser = :id
-                LIMIT 1
-            ");
-            $stmt->execute([':id' => $id]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $user = null;
+            try {
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        u.idUser,
+                        u.email,
+                        u.name,
+                        COALESCE(u.nickname, u.name) as nickname,
+                        COALESCE(u.phone, '') as phone,
+                        COALESCE(u.document, '') as document,
+                        COALESCE(u.blocked, 0) as blocked,
+                        COALESCE(u.statusId, 1) as statusId,
+                        COALESCE(u.roleId, 1) as roleId,
+                        COALESCE(r.isRoot, 0) as isRoot,
+                        COALESCE(r.name, 'Administrador') as roleName
+                    FROM user u
+                    LEFT JOIN role r ON u.roleId = r.id
+                    WHERE u.idUser = :id
+                    LIMIT 1
+                ");
+                $stmt->execute([':id' => $id]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            } catch (\Throwable $t) {
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        u.idUser,
+                        u.email,
+                        u.name,
+                        COALESCE(u.nickname, u.name) as nickname,
+                        COALESCE(u.phone, '') as phone,
+                        COALESCE(u.document, '') as document,
+                        COALESCE(u.blocked, 0) as blocked,
+                        COALESCE(u.statusId, 1) as statusId,
+                        COALESCE(u.roleId, 1) as roleId,
+                        IF(COALESCE(u.roleId, 1) = 1, 1, 0) as isRoot,
+                        'Administrador' as roleName
+                    FROM user u
+                    WHERE u.idUser = :id
+                    LIMIT 1
+                ");
+                $stmt->execute([':id' => $id]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
 
             if (!$user) {
                 throw new Exception("Usuário não encontrado");
