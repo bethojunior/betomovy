@@ -102,13 +102,50 @@ export const TestServiceMaps = () => {
 
     try {
       setSavingKey(true);
-      await api.put("config", {
-        google_api_key: trimmed,
-        google_api_key_backend: trimmed,
-        google_api_key_web: trimmed,
-        key_google: trimmed,
-        key_google_maps: trimmed,
-      });
+
+      // Obter quais chaves de configuração do Google existem na base (tipo 13)
+      let keysToUpdate = ["google_api_key", "google_api_key_backend"];
+      try {
+        const confResp = await api.get("config/type/13");
+        if (confResp?.status && Array.isArray(confResp.data?.response)) {
+          const dbKeys = confResp.data.response
+            .map((item: any) => item.key)
+            .filter((k: string) => k === "google_api_key" || k === "google_api_key_backend");
+          if (dbKeys.length > 0) {
+            keysToUpdate = dbKeys;
+          }
+        }
+      } catch (e) {
+        console.warn("Aviso ao buscar chaves existentes:", e);
+      }
+
+      let savedCount = 0;
+      let lastErrorMessage = "";
+
+      for (const keyName of keysToUpdate) {
+        try {
+          await api.put("config", { [keyName]: trimmed });
+          savedCount++;
+        } catch (err: any) {
+          lastErrorMessage =
+            err?.response?.data?.message ||
+            err?.response?.data?.response ||
+            err?.message ||
+            "";
+          console.warn(`Erro ao salvar chave ${keyName}:`, lastErrorMessage);
+        }
+      }
+
+      // Também registra na tabela de chaves web (webMapKey) se aplicável
+      try {
+        await api.post("webMapKey", { key: trimmed });
+      } catch (e) {
+        // Se já existir ou falhar, continua
+      }
+
+      if (savedCount === 0) {
+        throw new Error(lastErrorMessage || t("Não foi possível salvar a chave da API."));
+      }
 
       swal({
         title: t("Sucesso"),
@@ -119,10 +156,10 @@ export const TestServiceMaps = () => {
 
       setValueSelect("google");
       await handleTests("google");
-    } catch (error) {
+    } catch (error: any) {
       swal({
         title: t("Erro"),
-        text: t("Não foi possível salvar a chave da API."),
+        text: error?.message || t("Não foi possível salvar a chave da API."),
         icon: "error",
       });
     } finally {

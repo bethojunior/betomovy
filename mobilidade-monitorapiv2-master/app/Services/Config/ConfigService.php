@@ -196,13 +196,14 @@ class ConfigService
             $request = get_object_vars($request);
         }
 
+        $updatedAny = false;
         foreach ($request as $key => $value) {
             /** @var Config $config */
             $config = $this->repository
                 ->findByKey($key);
 
             if (!$config) {
-                throw new ConfigException("A configuração $key não foi encontrada");
+                continue;
             }
 
             // Validar URLs de áudio
@@ -216,6 +217,12 @@ class ConfigService
 
             $config->value = blank($value) ? null : $value;
             $config->save();
+            $updatedAny = true;
+        }
+
+        if (!$updatedAny && count($request) === 1) {
+            $singleKey = array_key_first($request);
+            throw new ConfigException("A configuração $singleKey não foi encontrada");
         }
 
         Cache::forget(CacheHelper::processKey(CacheKeyConst::GENERAL_CONFIG));
