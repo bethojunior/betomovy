@@ -12,6 +12,11 @@ import {
   StateProps,
 } from "../../../../../../pages/Advanced/Configs/AreasCity/AddCity/types";
 import { CityProps } from "../../../../../../pages/Advanced/Configs/AreasCity/AddCity/types";
+import {
+  mergeCountries,
+  getStatesByCountry,
+  getCitiesByStateId,
+} from "../../../../../../data/locationData";
 
 interface ModalRemoveCityNameProps {
   visibleModal: boolean;
@@ -60,9 +65,12 @@ export const ModalRemoveCityName = ({
               });
             }
           })
-          .catch((error: AxiosError) => {
+          .catch((error: AxiosError<any>) => {
+            const errMsg = Array.isArray(error.response?.data?.response)
+              ? error.response?.data?.response[0]
+              : (error.response?.data?.message || "Erro ao remover cidade");
             swal({
-              title: error.response?.data.response[0],
+              title: errMsg,
               icon: "error",
             });
           })
@@ -78,15 +86,12 @@ export const ModalRemoveCityName = ({
       setLoading(true);
       const responseState = await api.get(`estate/country/${idCountry}`);
 
-      if (responseState.status) {
-        setStates(responseState.data.response);
-      }
+      const apiList = responseState.status && Array.isArray(responseState.data?.response)
+        ? responseState.data.response
+        : [];
+      setStates(getStatesByCountry(idCountry, apiList) as any);
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: responseError.response?.data.message,
-        icon: "error",
-      });
+      setStates(getStatesByCountry(idCountry, []) as any);
     } finally {
       setLoading(false);
     }
@@ -96,15 +101,12 @@ export const ModalRemoveCityName = ({
     try {
       setLoading(true);
       const responseCity = await api.get(`city?estateId=${idState}`);
-      if (responseCity.status) {
-        setCities(responseCity.data.response);
-      }
+      const apiList = responseCity.status && Array.isArray(responseCity.data?.response)
+        ? responseCity.data.response
+        : [];
+      setCities(getCitiesByStateId(idState, undefined, undefined, apiList) as any);
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: responseError.response?.data.message,
-        icon: "error",
-      });
+      setCities(getCitiesByStateId(idState, undefined, undefined, []) as any);
     } finally {
       setLoading(false);
     }
@@ -112,8 +114,17 @@ export const ModalRemoveCityName = ({
 
   const filterOption = (
     input: string,
-    option?: { label: string; value: string }
-  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+    option?: { label: string; value: string | number }
+  ) =>
+    String(option?.label ?? "")
+      .toLowerCase()
+      .includes(input.toLowerCase());
+
+  const countriesOptions: DeafaultOptionsAntd[] = (
+    Array.isArray(listCountries) && listCountries.length > 0
+      ? listCountries
+      : mergeCountries([]).map((c) => ({ value: c.id, label: c.name }))
+  );
 
   const statesFormated: DeafaultOptionsAntd[] = states.map((value) => {
     return {
@@ -155,7 +166,7 @@ export const ModalRemoveCityName = ({
             optionFilterProp="children"
             onChange={(idCountry) => getState(Number(idCountry))}
             filterOption={filterOption}
-            options={listCountries}
+            options={countriesOptions}
           />
         </ContentInput>
 

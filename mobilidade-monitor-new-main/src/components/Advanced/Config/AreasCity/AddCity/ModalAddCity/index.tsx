@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { Button, Input, Modal, Select } from "antd";
+import { Button, Modal, Select, AutoComplete } from "antd";
 
 import { Container, ContentInput, LabelText } from "./styles";
 
@@ -13,6 +13,11 @@ import {
 } from "../../../../../../pages/Advanced/Configs/AreasCity/AddCity/types";
 
 import api from "../../../../../../services/api";
+import {
+  mergeCountries,
+  getStatesByCountry,
+  getCitiesByStateId,
+} from "../../../../../../data/locationData";
 
 interface ModalAddCityProps {
   visibleModal: boolean;
@@ -32,9 +37,10 @@ export const ModalAddCity = ({
   const [states, setStates] = useState<StateProps[]>([]);
   const [idState, setIdState] = useState<number | null>(null);
   const [nameCity, setNameCity] = useState<string>("");
+  const [cityOptions, setCityOptions] = useState<{ value: string; label: string }[]>([]);
 
   const handleAddCity = async () => {
-    if (!idState || nameCity.length <= 0) {
+    if (!idState || nameCity.trim().length <= 0) {
       swal({
         title: "Preencha os campos!",
         icon: "warning",
@@ -46,7 +52,7 @@ export const ModalAddCity = ({
       setLoading(true);
       const responseAddCity = await api.post("city", {
         estado: String(idState),
-        nome: nameCity,
+        nome: nameCity.trim(),
         polygon: null,
         statusId: 0,
       });
@@ -61,11 +67,15 @@ export const ModalAddCity = ({
         setNameCity("");
         setStates([]);
         setIdState(null);
+        setCityOptions([]);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao adicionar cidade");
       swal({
-        title: responseError.response?.data.response[0],
+        title: errMsg,
         icon: "error",
       });
     } finally {
@@ -78,24 +88,49 @@ export const ModalAddCity = ({
       setLoading(true);
       const responseState = await api.get(`estate/country/${idCountry}`);
 
-      if (responseState.status) {
-        setStates(responseState.data.response);
-      }
+      const apiList = responseState.status && Array.isArray(responseState.data?.response)
+        ? responseState.data.response
+        : [];
+      const mergedStates = getStatesByCountry(idCountry, apiList);
+      setStates(mergedStates as any);
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: responseError.response?.data.response[0],
-        icon: "error",
-      });
+      setStates(getStatesByCountry(idCountry, []) as any);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSelectState = (selectedStateId: number) => {
+    const sId = Number(selectedStateId);
+    setIdState(sId);
+    const st = states.find((s) => Number(s.id) === sId);
+    const citiesList = getCitiesByStateId(
+      sId,
+      st?.name,
+      (st as any)?.sigla,
+      []
+    );
+    setCityOptions(
+      citiesList.map((c) => ({
+        value: c.name,
+        label: c.name,
+      }))
+    );
+  };
+
   const filterOption = (
     input: string,
-    option?: { label: string; value: string }
-  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+    option?: { label: string; value: string | number }
+  ) =>
+    String(option?.label ?? "")
+      .toLowerCase()
+      .includes(input.toLowerCase());
+
+  const countriesOptions: DeafaultOptionsAntd[] = (
+    Array.isArray(listCountries) && listCountries.length > 0
+      ? listCountries
+      : mergeCountries([]).map((c) => ({ value: c.id, label: c.name }))
+  );
 
   const statesFormated: DeafaultOptionsAntd[] = states.map((value) => {
     return {
@@ -130,7 +165,7 @@ export const ModalAddCity = ({
             optionFilterProp="children"
             onChange={(idCountry) => getState(Number(idCountry))}
             filterOption={filterOption}
-            options={listCountries}
+            options={countriesOptions}
           />
         </ContentInput>
         <ContentInput>
@@ -142,16 +177,24 @@ export const ModalAddCity = ({
             showSearch
             placeholder="Escolha um estado"
             optionFilterProp="children"
-            onChange={(idState) => setIdState(Number(idState))}
+            onChange={(idState) => handleSelectState(Number(idState))}
             filterOption={filterOption}
             options={statesFormated}
           />
         </ContentInput>
         <ContentInput>
           <LabelText>Cidade:</LabelText>
-          <Input
+          <AutoComplete
+            style={{
+              width: "100%",
+            }}
+            placeholder="Escolha ou digite uma cidade"
             value={nameCity}
-            onChange={(event) => setNameCity(event.target.value)}
+            onChange={(val) => setNameCity(val)}
+            options={cityOptions}
+            filterOption={(input, option) =>
+              (option?.value ?? "").toLowerCase().includes(input.toLowerCase())
+            }
           />
         </ContentInput>
       </Container>

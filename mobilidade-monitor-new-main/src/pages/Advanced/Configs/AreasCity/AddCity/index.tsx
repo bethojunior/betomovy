@@ -36,6 +36,11 @@ import {
 } from "./types";
 
 import api from "../../../../../services/api";
+import {
+  mergeCountries,
+  getStatesByCountry,
+  getCitiesByStateId,
+} from "../../../../../data/locationData";
 
 import Utils from "../../../../../utils/Utils";
 import Session from "../../../../../utils/Session";
@@ -90,20 +95,12 @@ export const AddCity = () => {
     try {
       setLoading(true);
       const responseCountries = await api.get("country");
-
-      if (responseCountries.status) {
-        setCountries(Array.isArray(responseCountries.data?.response) ? responseCountries.data.response : []);
-      }
+      const apiList = responseCountries?.status && Array.isArray(responseCountries.data?.response)
+        ? responseCountries.data.response
+        : [];
+      setCountries(mergeCountries(apiList) as any);
     } catch (error) {
-      setCountries([]);
-      const responseError = error as AxiosError<any>;
-      const errMsg = Array.isArray(responseError.response?.data?.response)
-        ? responseError.response?.data?.response[0]
-        : (responseError.response?.data?.message || "Erro ao buscar países");
-      swal({
-        title: errMsg,
-        icon: "error",
-      });
+      setCountries(mergeCountries([]) as any);
     } finally {
       setLoading(false);
     }
@@ -113,20 +110,12 @@ export const AddCity = () => {
     try {
       setLoadingState(true);
       const responseState = await api.get(`estate/country/${idCountry}`);
-
-      if (responseState.status) {
-        setStates(Array.isArray(responseState.data?.response) ? responseState.data.response : []);
-      }
+      const apiList = responseState?.status && Array.isArray(responseState.data?.response)
+        ? responseState.data.response
+        : [];
+      setStates(getStatesByCountry(idCountry, apiList) as any);
     } catch (error) {
-      setStates([]);
-      const responseError = error as AxiosError<any>;
-      const errMsg = Array.isArray(responseError.response?.data?.response)
-        ? responseError.response?.data?.response[0]
-        : (responseError.response?.data?.message || "Erro ao buscar estados");
-      swal({
-        title: errMsg,
-        icon: "error",
-      });
+      setStates(getStatesByCountry(idCountry, []) as any);
     } finally {
       setLoadingState(false);
     }
@@ -139,20 +128,12 @@ export const AddCity = () => {
       const responseGetCities = await api.get(
         `city?estateId=${datasStates.id}`
       );
-
-      if (responseGetCities.status) {
-        setCities(Array.isArray(responseGetCities.data?.response) ? responseGetCities.data.response : []);
-      }
+      const apiList = responseGetCities?.status && Array.isArray(responseGetCities.data?.response)
+        ? responseGetCities.data.response
+        : [];
+      setCities(getCitiesByStateId(datasStates.id, datasStates.name, (datasStates as any).sigla, apiList) as any);
     } catch (error) {
-      setCities([]);
-      const responseError = error as AxiosError<any>;
-      const errMsg = Array.isArray(responseError.response?.data?.response)
-        ? responseError.response?.data?.response[0]
-        : (responseError.response?.data?.message || "Erro ao buscar informações da cidade");
-      swal({
-        title: errMsg,
-        icon: "error",
-      });
+      setCities(getCitiesByStateId(datasStates.id, datasStates.name, (datasStates as any).sigla, []) as any);
     } finally {
       setLoadingCity(false);
     }
@@ -162,19 +143,12 @@ export const AddCity = () => {
     try {
       setLoading(true);
       const responseCity = await api.get(`city?estateId=${idState}`);
-      if (responseCity.status) {
-        setCities(Array.isArray(responseCity.data?.response) ? responseCity.data.response : []);
-      }
+      const apiList = responseCity?.status && Array.isArray(responseCity.data?.response)
+        ? responseCity.data.response
+        : [];
+      setCities(getCitiesByStateId(idState, undefined, undefined, apiList) as any);
     } catch (error) {
-      setCities([]);
-      const responseError = error as AxiosError<any>;
-      const errMsg = Array.isArray(responseError.response?.data?.response)
-        ? responseError.response?.data?.response[0]
-        : (responseError.response?.data?.message || "Erro ao buscar cidades");
-      swal({
-        title: errMsg,
-        icon: "error",
-      });
+      setCities(getCitiesByStateId(idState, undefined, undefined, []) as any);
     } finally {
       setLoading(false);
     }

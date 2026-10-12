@@ -60,7 +60,7 @@ export const EditCity = () => {
       const responseCitiesFully = await api.get("city/actives/fully");
 
       if (responseCitiesFully.status) {
-        setCitiesFully(responseCitiesFully.data.response);
+        setCitiesFully(Array.isArray(responseCitiesFully.data?.response) ? responseCitiesFully.data.response : []);
       }
     } catch (error) {
       console.error(error);
@@ -76,12 +76,26 @@ export const EditCity = () => {
   const getInformationsCity = async (idCity: number) => {
     try {
       setLoading(true);
+      setCoordinatesCaptured(undefined);
 
       const responseInformationsCity = await api.get(`city/${idCity}`);
 
-      if (responseInformationsCity.status) {
-        setInfomationCity(responseInformationsCity.data.response);
-        setNameCity(responseInformationsCity.data.response.nome);
+      if (responseInformationsCity?.status) {
+        const cityData =
+          responseInformationsCity.data?.response ??
+          responseInformationsCity.data?.data;
+        if (cityData) {
+          setInfomationCity(cityData);
+          setNameCity(cityData.nome || "");
+
+          if (!cityData.polygon) {
+            swal({
+              title: "Aviso",
+              text: "Esta cidade ainda não possui área delimitada cadastrada. Você pode desenhar a área no mapa e clicar em Atualizar.",
+              icon: "info",
+            });
+          }
+        }
       }
     } catch (error) {
       console.error(error);
@@ -101,30 +115,40 @@ export const EditCity = () => {
       buttons: ["Não", "Sim"],
     }).then((isAccept) => {
       if (isAccept) {
-        const coordinatesCityInverse = coordinatesCityFormated?.map((value) => {
-          return {
-            lat: value[1],
-            lng: value[0],
-          };
-        });
-
-        const coordinatesCityCapturedFormated = coordinatesCaptured?.map(
-          (value: [number, number]) => {
-            return {
+        const coordinatesCityInverse = Array.isArray(coordinatesCityFormated)
+          ? coordinatesCityFormated.map((value: any) => ({
               lat: value[1],
               lng: value[0],
-            };
-          }
-        );
+            }))
+          : undefined;
+
+        const coordinatesCityCapturedFormated = Array.isArray(coordinatesCaptured)
+          ? coordinatesCaptured.map((value: [number, number]) => ({
+              lat: value[1],
+              lng: value[0],
+            }))
+          : undefined;
+
+        const finalPolygon =
+          coordinatesCityCapturedFormated && coordinatesCityCapturedFormated.length > 0
+            ? coordinatesCityCapturedFormated
+            : coordinatesCityInverse;
+
+        if (!finalPolygon || finalPolygon.length === 0) {
+          swal({
+            title: "Atenção",
+            text: "Por favor, desenhe uma área no mapa antes de salvar.",
+            icon: "warning",
+          });
+          return;
+        }
 
         setLoading(true);
         api
           .put(`city/${informationsCity?.id}/area`, {
             estate_id: informationsCity?.estado,
             name: nameCity,
-            polygon: coordinatesCityCapturedFormated
-              ? coordinatesCityCapturedFormated
-              : coordinatesCityInverse,
+            polygon: finalPolygon,
             short_name: informationsCity?.shortName,
             old_name: informationsCity?.nome,
           })
@@ -137,14 +161,14 @@ export const EditCity = () => {
               getCitiesFully();
             } else {
               swal({
-                title: "Ocorreu um erro tentar atualizar area",
+                title: "Ocorreu um erro ao tentar atualizar área",
                 icon: "error",
               });
             }
           })
           .catch((error: AxiosError) => {
             swal({
-              title: error.response?.data.message,
+              title: error.response?.data?.message || "Erro ao atualizar área da cidade",
               icon: "error",
             });
           })
@@ -171,8 +195,8 @@ export const EditCity = () => {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v11",
-      center: [0, 0],
-      zoom: 8,
+      center: [-49.27, -16.68],
+      zoom: 4,
     });
 
     draw.current = new MapboxDraw({
@@ -186,41 +210,78 @@ export const EditCity = () => {
     map.current.addControl(draw.current as any);
 
     map.current.on("load", () => {
-      const defaultPolygon = {
-        type: "Feature",
-        geometry: {
-          type: "Polygon",
-          coordinates: [placeRef.current],
-        },
-      };
-      draw.current!.add(defaultPolygon as any);
+      if (placeRef.current && placeRef.current.length > 0) {
+        const defaultPolygon = {
+          type: "Feature",
+          geometry: {
+            type: "Polygon",
+            coordinates: [placeRef.current],
+          },
+        };
+        draw.current?.add(defaultPolygon as any);
+      }
+    });
+
+    map.current.on("draw.create", (event: any) => {
+      const feature = event?.features?.[0];
+      if (feature?.geometry?.coordinates?.[0]) {
+        const currentCoordinatesId = feature.id;
+        const allFeatures = draw.current?.getAll()?.features || [];
+        const oldCoordinatesId = allFeatures.find((f: any) => f.id !== currentCoordinatesId)?.id;
+
+        setCoordinatesCaptured(feature.geometry.coordinates[0]);
+
+        if (oldCoordinatesId) {
+          draw.current?.delete(oldCoordinatesId as string);
+        }
+      }
+    });
+
+    map.current.on("draw.update", (event: any) => {
+      const feature = event?.features?.[0];
+      if (feature?.geometry?.coordinates?.[0]) {
+        setCoordinatesCaptured(feature.geometry.coordinates[0]);
+      }
+    });
+
+    map.current.on("draw.delete", () => {
+      setCoordinatesCaptured(undefined);
     });
   }, [mapboxToken]);
 
   useEffect(() => {
     if (informationsCity) {
-      const coordinatesCitySelected = Utils.TransformCoordinates(
-        informationsCity.polygon
-      );
-      const centerCoordinates = Utils.CenterCoordinates(
-        coordinatesCitySelected
-      );
-      const centerMap = [centerCoordinates[1], centerCoordinates[0]];
+      const coordinatesCitySelected = informationsCity.polygon
+        ? Utils.TransformCoordinates(informationsCity.polygon)
+        : [];
+
       setCoordinatesCity(coordinatesCitySelected);
+      setCoordinatesCaptured(undefined);
 
-      if (map.current) {
-        map.current.flyTo({
-          center: centerMap as any,
-          zoom: 9,
-        });
+      const hasCoordinates =
+        Array.isArray(coordinatesCitySelected) &&
+        coordinatesCitySelected.length > 0;
 
-        if (draw.current) {
-          const coordinatesCityFormated = coordinatesCitySelected?.map(
-            (value: any) => {
-              return [value[1], value[0]];
-            }
+      if (hasCoordinates) {
+        const centerCoordinates = Utils.CenterCoordinates(
+          coordinatesCitySelected
+        );
+        if (centerCoordinates && map.current) {
+          const centerMap = [centerCoordinates[1], centerCoordinates[0]];
+          map.current.flyTo({
+            center: centerMap as any,
+            zoom: 9,
+          });
+        }
+      }
+
+      if (draw.current) {
+        draw.current.deleteAll();
+
+        if (hasCoordinates) {
+          const coordinatesCityFormated = coordinatesCitySelected.map(
+            (value: any) => [value[1], value[0]]
           );
-          draw.current.deleteAll();
 
           const defaultPolygon = {
             type: "Feature",
@@ -231,33 +292,12 @@ export const EditCity = () => {
           };
 
           draw.current.add(defaultPolygon as any);
-
-          map.current!.on("draw.create", (event: any) => {
-            const feature = event.features[0] as any;
-            const currentCoordinatesId = feature.id;
-            const oldCoordinatesId = draw.current?.getAll().features[0].id;
-
-            setCoordinatesCaptured(feature.geometry.coordinates[0] as any);
-
-            if (currentCoordinatesId !== oldCoordinatesId) {
-              draw.current?.delete(oldCoordinatesId as string);
-            }
-          });
-
-          map.current!.on("draw.update", (event) => {
-            const feature = event.features[0] as any;
-            setCoordinatesCaptured(feature.geometry.coordinates[0] as any);
-          });
-
-          map.current!.on("draw.delete", (_) => {
-            setInfomationCity(null);
-          });
         }
       }
     }
   }, [informationsCity]);
 
-  const citiesFullyFormated = citiesFully.map((value) => {
+  const citiesFullyFormated = (Array.isArray(citiesFully) ? citiesFully : []).map((value) => {
     return {
       label: value.nome,
       value: value.cityId,

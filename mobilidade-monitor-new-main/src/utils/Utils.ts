@@ -245,24 +245,40 @@ class Utils {
   }
 
   static CenterCoordinates(coordinates: any) {
-    if (coordinates.length === 0) {
+    if (!coordinates || !Array.isArray(coordinates) || coordinates.length === 0) {
       return null;
     }
 
     if (coordinates.length === 1) {
-      return coordinates;
+      return Array.isArray(coordinates[0]) ? coordinates[0] : coordinates;
     }
 
     let totalLatitude = 0;
     let totalLongitude = 0;
+    let validPointsCount = 0;
 
-    for (const [latitude, longitude] of coordinates) {
+    for (const item of coordinates) {
+      if (!Array.isArray(item) || item.length < 2) continue;
+      const [latitude, longitude] = item;
+      if (
+        typeof latitude !== "number" ||
+        typeof longitude !== "number" ||
+        isNaN(latitude) ||
+        isNaN(longitude)
+      ) {
+        continue;
+      }
       totalLatitude += latitude;
       totalLongitude += longitude;
+      validPointsCount++;
     }
 
-    const centerLatitude = totalLatitude / coordinates.length;
-    const centerLongitude = totalLongitude / coordinates.length;
+    if (validPointsCount === 0) {
+      return null;
+    }
+
+    const centerLatitude = totalLatitude / validPointsCount;
+    const centerLongitude = totalLongitude / validPointsCount;
 
     return [centerLatitude, centerLongitude];
   }
@@ -332,22 +348,37 @@ class Utils {
   };
 
   static TransformCoordinates(coordinates: any, inverted: boolean = false) {
+    if (!coordinates || typeof coordinates !== "string") {
+      return [];
+    }
+
     const wktString = coordinates;
     const coordinatesString = wktString
       .replace("POLYGON((", "")
-      .replace("))", "");
+      .replace("))", "")
+      .trim();
+
+    if (!coordinatesString) {
+      return [];
+    }
 
     const coordinatePairs = coordinatesString.split(",");
 
-    const coordinateArray = coordinatePairs.map((pair: any) => {
-      const [latitude, longitude] = pair.split(" ").map(Number);
+    const coordinateArray = coordinatePairs
+      .map((pair: any) => {
+        const parts = pair.trim().split(" ").filter(Boolean).map(Number);
+        if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) {
+          return null;
+        }
+        const [latitude, longitude] = parts;
 
-      if (inverted) {
-        return [longitude, latitude];
-      }
+        if (inverted) {
+          return [longitude, latitude];
+        }
 
-      return [latitude, longitude];
-    });
+        return [latitude, longitude];
+      })
+      .filter((item): item is [number, number] => item !== null);
 
     return coordinateArray;
   }

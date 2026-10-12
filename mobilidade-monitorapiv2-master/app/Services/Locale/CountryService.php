@@ -30,7 +30,31 @@ class CountryService
      */
     public function findAll($query = null)
     {
-        return $this->admin704Apps->getCountries($query);
+        try {
+            $data = $this->admin704Apps->getCountries($query);
+            if (!empty($data)) {
+                return $data;
+            }
+        } catch (\Throwable $e) {}
+
+        return [
+            ['id' => 1, 'name' => 'Brasil', 'nome' => 'Brasil', 'shortName' => 'BR'],
+            ['id' => 2, 'name' => 'Estados Unidos', 'nome' => 'Estados Unidos', 'shortName' => 'US'],
+            ['id' => 12, 'name' => 'Argentina', 'nome' => 'Argentina', 'shortName' => 'AR'],
+            ['id' => 36, 'name' => 'Canadá', 'nome' => 'Canadá', 'shortName' => 'CA'],
+            ['id' => 113, 'name' => 'Portugal', 'nome' => 'Portugal', 'shortName' => 'PT'],
+            ['id' => 62, 'name' => 'Espanha', 'nome' => 'Espanha', 'shortName' => 'ES'],
+            ['id' => 114, 'name' => 'Reino Unido', 'nome' => 'Reino Unido', 'shortName' => 'GB'],
+            ['id' => 69, 'name' => 'França', 'nome' => 'França', 'shortName' => 'FR'],
+            ['id' => 6, 'name' => 'Alemanha', 'nome' => 'Alemanha', 'shortName' => 'DE'],
+            ['id' => 95, 'name' => 'Itália', 'nome' => 'Itália', 'shortName' => 'IT'],
+            ['id' => 102, 'name' => 'México', 'nome' => 'México', 'shortName' => 'MX'],
+            ['id' => 97, 'name' => 'Japão', 'nome' => 'Japão', 'shortName' => 'JP'],
+            ['id' => 120, 'name' => 'Uruguai', 'nome' => 'Uruguai', 'shortName' => 'UY'],
+            ['id' => 110, 'name' => 'Paraguai', 'nome' => 'Paraguai', 'shortName' => 'PY'],
+            ['id' => 40, 'name' => 'Chile', 'nome' => 'Chile', 'shortName' => 'CL'],
+            ['id' => 43, 'name' => 'Colômbia', 'nome' => 'Colômbia', 'shortName' => 'CO'],
+        ];
     }
 
     /**

@@ -46,7 +46,14 @@ class CityService
                 ->all($query, $estateId);
         }
 
-        return $this->admin704Apps->getCities($query, $estateId);
+        try {
+            $cities = $this->admin704Apps->getCities($query, $estateId);
+            if (!empty($cities)) {
+                return $cities;
+            }
+        } catch (\Throwable $e) {}
+
+        return $this->repository->all($query, $estateId);
     }
 
     /**

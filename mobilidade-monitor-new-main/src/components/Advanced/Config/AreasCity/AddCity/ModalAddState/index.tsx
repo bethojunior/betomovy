@@ -9,6 +9,7 @@ import api from "../../../../../../services/api";
 
 import { DeafaultOptionsAntd } from "../../../../../../pages/Advanced/Configs/AreasCity/AddCity/types";
 import { AxiosError } from "axios";
+import { mergeCountries } from "../../../../../../data/locationData";
 
 interface ModalAddStateProps {
   visibleModal: boolean;
@@ -29,7 +30,7 @@ export const ModalAddState = ({
   const [nameState, setNameState] = useState<string>("");
 
   const handleAddState = async () => {
-    if (!idCountry || nameState.length <= 0) {
+    if (!idCountry || nameState.trim().length <= 0) {
       swal({
         title: "Preencha os campos!",
         icon: "warning",
@@ -42,13 +43,13 @@ export const ModalAddState = ({
 
       const responseAddState = await api.post("estate", {
         countryId: String(idCountry),
-        nome: nameState,
+        nome: nameState.trim(),
         sigla: "--",
       });
 
       if (responseAddState.status) {
         swal({
-          title: "Estado adicionada com sucesso!",
+          title: "Estado adicionado com sucesso!",
           icon: "success",
         });
         getState(idCountry);
@@ -57,9 +58,12 @@ export const ModalAddState = ({
         setIdCountry(null);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao adicionar estado");
       swal({
-        title: responseError.response?.data.response[0],
+        title: errMsg,
         icon: "error",
       });
     } finally {
@@ -69,8 +73,17 @@ export const ModalAddState = ({
 
   const filterOption = (
     input: string,
-    option?: { label: string; value: string }
-  ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+    option?: { label: string; value: string | number }
+  ) =>
+    String(option?.label ?? "")
+      .toLowerCase()
+      .includes(input.toLowerCase());
+
+  const countriesOptions: DeafaultOptionsAntd[] = (
+    Array.isArray(listCountries) && listCountries.length > 0
+      ? listCountries
+      : mergeCountries([]).map((c) => ({ value: c.id, label: c.name }))
+  );
 
   return (
     <Modal
@@ -98,7 +111,7 @@ export const ModalAddState = ({
             optionFilterProp="children"
             onChange={(idCountry) => setIdCountry(Number(idCountry))}
             filterOption={filterOption}
-            options={listCountries}
+            options={countriesOptions}
           />
         </ContentInput>
 
@@ -107,6 +120,7 @@ export const ModalAddState = ({
           <Input
             onChange={(event) => setNameState(event.target.value)}
             value={nameState}
+            placeholder="Digite o nome do estado"
           />
         </ContentInput>
       </Container>
