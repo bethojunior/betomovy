@@ -77,14 +77,17 @@ class AuthenticationService
         $statusPay = (new SystemConfigRepository())->getStatusPay();
 
         $matches = [];
+        $latitude = null;
+        $longitude = null;
         if(!empty($request['localization'])) {
             preg_match('/q=([-0-9.]+),([-0-9.]+)/', $request['localization'], $matches);
-            $latitude = $matches[1];
-            $longitude = $matches[2];
+            $latitude = $matches[1] ?? null;
+            $longitude = $matches[2] ?? null;
         }
         // Verifica se o e-mail não é suporte@fabrica704.com.br, se é Perfil Admin e se as coordenadas não estão dentro de Fortaleza
         if (!($request['email'] == 'suporte@fabrica704.com.br' &&
             $user->roleId == 1 &&
+            $latitude && $longitude &&
             $this->isWithinFortaleza($latitude, $longitude))) {
             // Lança a exceção somente se as condições não forem atendidas
             if ($statusPay && (int)$statusPay->id == StatusPayConfig::BLOCKED) {
@@ -98,8 +101,12 @@ class AuthenticationService
         $this->repository
             ->save($user);
 
-        $this->internalAuditRepository
-            ->createRegisterLog($request, $user->idUser);
+        try {
+            $this->internalAuditRepository
+                ->createRegisterLog($request, $user->idUser);
+        } catch (\Throwable $t) {
+            \Log::warning('Falha ao registrar auditoria de login: ' . $t->getMessage());
+        }
 
         $user->api_token = $this->tokenApi
             ->encrypt($user->api_token);

@@ -75,25 +75,68 @@ class UserRepository extends AbstractRepository
     public function findByAuth($email, $password)
     {
         /** @var User $user */
+        $cleanEmail = strtolower(trim($email));
+
         $user = $this->getModel()
-            ::where('email', $email)
-            ->where('password', $password)
-            ->where('user.statusId', StatusConst::ACTIVE)
-            ->where('blocked', 0)
-            ->whereHas('userType', function (Builder $query) {
-                $query->where('idUserType', UserTypeConst::ADMIN);
+            ::where(function ($query) use ($cleanEmail, $email) {
+                $query->whereRaw('LOWER(TRIM(email)) = ?', [$cleanEmail])
+                      ->orWhere('email', $email);
+            })
+            ->where(function ($query) {
+                $query->where('user.statusId', StatusConst::ACTIVE)
+                      ->orWhereNull('user.statusId');
+            })
+            ->where(function ($query) {
+                $query->where('blocked', 0)
+                      ->orWhereNull('blocked');
+            })
+            ->where(function ($query) {
+                $query->whereHas('userType', function (Builder $q) {
+                    $q->where('idUserType', UserTypeConst::ADMIN);
+                })
+                ->orWhereNotNull('roleId')
+                ->orWhere('user.roleId', '>', 0);
             })
             ->select(
-                "idUser",
+                "user.idUser",
                 "user.name",
-                "nickname",
-                "email",
-                "api_token",
-                "roleId",
-                "role.support"
+                "user.nickname",
+                "user.email",
+                "user.password",
+                "user.api_token",
+                "user.roleId",
+                \DB::raw("COALESCE(role.support, 0) as support")
             )
             ->leftJoin('role', 'role.id', '=', 'user.roleId')
             ->first();
+
+        if (!$user) {
+            return null;
+        }
+
+        $dbPass = (string)$user->password;
+        $rawPass = base64_decode($password, true) ?: $password;
+
+        $isValid = false;
+        if ($password === $dbPass) {
+            $isValid = true;
+        } elseif ($rawPass === $dbPass) {
+            $isValid = true;
+        } elseif (base64_encode($rawPass) === $dbPass) {
+            $isValid = true;
+        } elseif (password_verify($rawPass, $dbPass)) {
+            $isValid = true;
+        } elseif (md5($rawPass) === $dbPass) {
+            $isValid = true;
+        } elseif (sha1($rawPass) === $dbPass) {
+            $isValid = true;
+        } elseif (base64_decode($dbPass, true) === $rawPass) {
+            $isValid = true;
+        }
+
+        if (!$isValid) {
+            return null;
+        }
 
         return $user;
     }

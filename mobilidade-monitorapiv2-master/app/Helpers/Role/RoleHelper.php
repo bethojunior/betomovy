@@ -35,21 +35,28 @@ class RoleHelper
 
     public function findFully($id)
     {
-        /** @var Role $role */
-        $role = $this->repository->find($id);
+        /** @var Role|null $role */
+        $role = $id ? $this->repository->find($id) : null;
+
+        if (!$role) {
+            return [
+                'name' => 'Administrador',
+                'groups' => collect([])
+            ];
+        }
 
         $groups = $this->roleUserPermissionRepository
             ->findGroupedByRole($role->id);
 
         return [
             'name' => $role->name,
-            'groups' => $groups->map(function (RoleUserPermission $roleUserPermission){
+            'groups' => $groups ? $groups->map(function (RoleUserPermission $roleUserPermission){
                 $permissions = array_values(array_unique(explode(',', $roleUserPermission->permissions)));
                 return [
                     'name' => $roleUserPermission->groupPermission,
                     'permissions' => $permissions
                 ];
-            })
+            }) : collect([])
         ];
     }
 }

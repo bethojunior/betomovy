@@ -188,12 +188,13 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
       });
 
       if (responseRegisterUser.status === 200 || responseRegisterUser.status === 201 || responseRegisterUser.data?.status) {
+        handleCloseModal();
+        loadUsers();
         swal({
           title: "Sucesso",
           text: "Usuário criado com sucesso",
           icon: "success",
-        }).then((isAccept) => {
-          handleCloseModal();
+        }).then(() => {
           loadUsers();
         });
       }

@@ -259,6 +259,23 @@ class AdminController extends ApiController
                 $userId = (int)$pdo->lastInsertId();
             }
 
+            // Ensure role exists in table
+            try {
+                $stmtR = $pdo->prepare("SELECT id FROM role WHERE id = :roleId LIMIT 1");
+                $stmtR->execute([':roleId' => $roleId]);
+                if (!$stmtR->fetch()) {
+                    if ($roleId == 2) {
+                        $pdo->exec("INSERT INTO role (id, name, statusId, isRoot, created_at, updated_at) VALUES (2, 'Gestor', 1, 0, NOW(), NOW())");
+                    } elseif ($roleId == 3) {
+                        $pdo->exec("INSERT INTO role (id, name, statusId, isRoot, created_at, updated_at) VALUES (3, 'Suporte', 1, 0, NOW(), NOW())");
+                    } else {
+                        $roleId = 1;
+                    }
+                }
+            } catch (\Throwable $t) {
+                $roleId = 1;
+            }
+
             // Ensure levelAccess record with userTypeId = 4 (ADMIN)
             try {
                 $stmtLA = $pdo->prepare("SELECT idLevelAccess FROM levelAccess WHERE userId = :userId AND userTypeId = 4 LIMIT 1");
@@ -270,13 +287,17 @@ class AdminController extends ApiController
             } catch (\Throwable $t) {
             }
 
-            // Ensure partner record exists
+            // Ensure user api_token and partner record exist
             try {
+                $tokenApi = new \app\utils\TokenApi();
+                $plainToken = $tokenApi->generate($userId);
+
+                $stmtTok = $pdo->prepare("UPDATE user SET api_token = :token WHERE idUser = :userId AND (api_token IS NULL OR api_token = '')");
+                $stmtTok->execute([':token' => $plainToken, ':userId' => $userId]);
+
                 $stmtP = $pdo->prepare("SELECT idPartner FROM partner WHERE userId = :userId LIMIT 1");
                 $stmtP->execute([':userId' => $userId]);
                 if (!$stmtP->fetch()) {
-                    $tokenApi = new \app\utils\TokenApi();
-                    $plainToken = $tokenApi->generate($userId);
                     $stmtInsP = $pdo->prepare("INSERT INTO partner (userId, partnerRegisterStatusId, statusId, api_token, created_at, updated_at) VALUES (:userId, 1, 1, :token, NOW(), NOW())");
                     $stmtInsP->execute([':userId' => $userId, ':token' => $plainToken]);
                 }

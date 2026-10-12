@@ -30,13 +30,17 @@ class AdminRepository extends AbstractRepository
         }
 
         return $this->getQuery()
-            ->join('levelAccess', 'levelAccess.userId', '=', 'user.idUser')
+            ->leftJoin('levelAccess', 'levelAccess.userId', '=', 'user.idUser')
             ->leftJoin('role', 'user.roleId', '=', 'role.id')
             ->where(function ($query) {
                 $query->where('user.statusId', StatusConst::ACTIVE)
                       ->orWhereNull('user.statusId');
             })
-            ->where('levelAccess.userTypeId', UserTypeConst::ADMIN)
+            ->where(function ($query) {
+                $query->where('levelAccess.userTypeId', UserTypeConst::ADMIN)
+                      ->orWhereNotNull('user.roleId')
+                      ->orWhere('user.roleId', '>', 0);
+            })
             ->when(!$isRoot, function ($query) {
                 return $query->where(function ($q) {
                     $q->where('role.isRoot', false)
@@ -47,13 +51,15 @@ class AdminRepository extends AbstractRepository
                 'user.idUser',
                 'user.email',
                 'user.name',
-                'user.nickname',
+                \DB::raw('COALESCE(user.nickname, user.name) as nickname'),
                 'user.phone',
+                'user.document',
                 'user.blocked',
                 'user.roleId',
                 \DB::raw('COALESCE(role.isRoot, 0) as isRoot'),
                 \DB::raw('COALESCE(role.name, "Administrador") as roleName')
             )
+            ->groupBy('user.idUser')
             ->orderBy('user.idUser', 'desc')
             ->get();
     }

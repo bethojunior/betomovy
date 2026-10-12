@@ -29,7 +29,7 @@ class AdminRequest extends FormRequest
             'nickname' => 'required|string',
             'document' => 'required|string',
             'phone'    => 'required|string',
-            'roleId'   => 'required|integer|exists:role,id',
+            'roleId'   => 'nullable|integer',
         ];
 
         if ($this->isMethod('post')) {

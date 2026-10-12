@@ -152,21 +152,24 @@ const UserRegistration: FC = () => {
       dataIndex: "name",
       key: "name",
       width: 200,
-      render: (text: string, record: any) => text || record?.name || "-",
+      render: (text: string, record: any) =>
+        text || record?.name || record?.userName || record?.user_name || record?.nome || (record?.idUser ? `Usuário #${record.idUser}` : "-"),
     },
     {
       title: "Apelido",
       dataIndex: "nickname",
       key: "nickname",
       width: 200,
-      render: (text: string, record: any) => text || record?.nickname || "-",
+      render: (text: string, record: any) =>
+        text || record?.nickname || record?.apelido || record?.name || record?.userName || "-",
     },
     {
       title: "Telefone",
       dataIndex: "phone",
       key: "phone",
       width: 200,
-      render: (text: string, record: any) => text || record?.phone || "-",
+      render: (text: string, record: any) =>
+        text || record?.phone || record?.telefone || record?.celular || "-",
     },
     {
       title: "Perfil",
@@ -184,7 +187,8 @@ const UserRegistration: FC = () => {
       dataIndex: "email",
       key: "email",
       width: 200,
-      render: (text: string, record: any) => text || record?.email || "-",
+      render: (text: string, record: any) =>
+        text || record?.email || record?.userEmail || "-",
     },
     {
       title: "Ações",
