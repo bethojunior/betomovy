@@ -1,5 +1,5 @@
 const elementProperty = new ElementProperty();
-let central = Session.get("centralSelected");
+let central = Session.get("centralSelected") || {};
 
 // Campos de texto da API são escapados antes de ir ao innerHTML para evitar XSS
 const escapeHtml = (str) => str
@@ -7,37 +7,62 @@ const escapeHtml = (str) => str
     : '';
 
 Mask.setMoneyField(".input-value-price");
-listFeeByNeighborhood();
-listNeighborhood();
-listTypeTrip()
+
+if (!central || !central.id) {
+    const tableEl = document.querySelector("#resultTable");
+    if (tableEl) {
+        tableEl.innerHTML = '<tr><td colspan="4" class="text-center p-4">Selecione uma central para visualizar as taxas.</td></tr>';
+    }
+} else {
+    listFeeByNeighborhood();
+    listNeighborhood();
+    listTypeTrip();
+}
 
 function listNeighborhood () {
+    if (!central.latitude || !central.longitude) return;
     NeighborhoodController.listNeighborhood(central.latitude, central.longitude).then((response) => {
-        const html = response.response.map((item) =>
+        const items = response?.response || response?.data || [];
+        if (!Array.isArray(items)) return;
+        const html = items.map((item) =>
             `<option value="${item.id}">${escapeHtml(item.name)}</option>`
         ).join('');
-        document.getElementById("neighborhood").innerHTML += html;
-    })
+        const select = document.getElementById("neighborhood");
+        if (select) select.innerHTML += html;
+    }).catch(console.error);
 }
 
 function listTypeTrip () {
     NeighborhoodController.listTypeTrip().then((response) => {
-        const html = response.response.map((item) =>
+        const items = response?.response || response?.data || [];
+        if (!Array.isArray(items)) return;
+        const html = items.map((item) =>
             `<option value="${item.idTripType}">${escapeHtml(item.type)}</option>`
         ).join('');
-        document.getElementById("typeOfCall").innerHTML += html;
-    })
+        const select = document.getElementById("typeOfCall");
+        if (select) select.innerHTML += html;
+    }).catch(console.error);
 }
 
 function listFeeByNeighborhood () {
-    preload(true);
-    NeighborhoodController.listFeeByNeighborhood(central.id).then((response) => {     
-        document.querySelector("#resultTable").innerHTML = response.response.map((item) => {
+    if (typeof preload === "function") preload(true);
+    NeighborhoodController.listFeeByNeighborhood(central.id).then((response) => {
+        if (typeof preload === "function") preload(false);
+        const items = response?.response || response?.data || [];
+        const resultTable = document.querySelector("#resultTable");
+        if (!resultTable) return;
+
+        if (!Array.isArray(items) || items.length === 0) {
+            resultTable.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-muted">Nenhuma taxa cadastrada por bairro.</td></tr>';
+            return;
+        }
+
+        resultTable.innerHTML = items.map((item) => {
             const money = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney ?? "R$";
             return `
             <tr>
-                <td>${escapeHtml(item.neighborhood?.name)}</td>
-                <td>${escapeHtml(item.trip_type?.type)}</td>
+                <td>${escapeHtml(item.neighborhood?.name || "-")}</td>
+                <td>${escapeHtml(item.trip_type?.type || "-")}</td>
                 <td>${money} ${Mask.maskMoney(item.value)}</td>
                 <td>
                     <button class="dt-action-btn dt-action-btn--danger delete-neighborhood" value="${item.id}">Excluir</button>
@@ -45,7 +70,7 @@ function listFeeByNeighborhood () {
             </tr>
         `;
         }).join('');
-        preload(false)
+
         elementProperty.addEventInElement(".delete-neighborhood","onclick",function(el){
             const id = el.target.value;
             SwalCustom.dialogConfirm("Deseja excluir esse bairro?").then(() => {
@@ -54,7 +79,14 @@ function listFeeByNeighborhood () {
                     return SwalCustom.messageDialog("", "Excluido com sucesso", null, "success");
                 });
             });
-        })
+        });
+    }).catch((err) => {
+        console.error("Erro ao listar taxas de bairro:", err);
+        if (typeof preload === "function") preload(false);
+        const resultTable = document.querySelector("#resultTable");
+        if (resultTable) {
+            resultTable.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-danger">Não foi possível carregar as taxas de bairro.</td></tr>';
+        }
     });
 }
 

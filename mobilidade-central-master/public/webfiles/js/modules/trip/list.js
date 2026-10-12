@@ -8,20 +8,26 @@ document.addEventListener("DOMContentLoaded", function () {
     showSkeletons();
 
     CentralRepository.getTrips(centralId)
-        .then(({status, response}) => {
-            createPagination(response);
-            showListTrip(response);
+        .then((result) => {
+            const data = result?.response ?? result;
+            createPagination(data);
+            showListTrip(data);
+        }).catch((err) => {
+            console.error("Erro ao carregar viagens:", err);
+            createPagination(null);
+            showListTrip({ data: [] });
         });
 
-    DriverRepository.list(centralId).then(({status, response}) => {
-        if (!response.data) return;
+    DriverRepository.list(centralId).then((result) => {
+        const drivers = result?.response?.data ?? result?.response ?? result?.data;
+        if (!Array.isArray(drivers)) return;
 
         elementProperty.getElement("#filterDriverId", element => {
-            element.innerHTML += response.data.map(driver =>
+            element.innerHTML += drivers.map(driver =>
                 `<option value="${driver.idDriver}">${escapeHtml(driver.user?.name)}</option>`
             ).join("");
         });
-    });
+    }).catch(console.error);
 
 
     function getFilter() {
@@ -69,31 +75,48 @@ document.addEventListener("DOMContentLoaded", function () {
         const centralId = Session.getValueInSession("centralSelected", "id");
 
         elementProperty.getElement(".container-pagination", element => {
+            if (!response || (!response.data && response.total === undefined)) {
+                element.innerHTML = "";
+                return;
+            }
 
-            const hasPrev = response.prev_page_url != null;
-            const hasNext = response.next_page_url != null;
+            const currentPage = response.current_page ?? (response.page ?? 1);
+            const lastPage = response.last_page ?? (response.total ? Math.ceil(response.total / (response.per_page || 10)) : 1);
+            const hasPrev = !!response.prev_page_url || currentPage > 1;
+            const hasNext = !!response.next_page_url || currentPage < lastPage;
+
+            if (lastPage <= 1 && (!response.data || response.data.length === 0)) {
+                element.innerHTML = "";
+                return;
+            }
 
             element.innerHTML = `<div class="tl-pager">
                 <button class="tl-pager-btn ${hasPrev ? "prev-page" : ""}" ${hasPrev ? "" : "disabled"} aria-label="Página anterior">
                     <i class="material-icons">chevron_left</i>
                     <span>Anterior</span>
                 </button>
-                <span class="tl-pager-count">${response.current_page} / ${response.last_page}</span>
+                <span class="tl-pager-count">${currentPage} / ${lastPage}</span>
                 <button class="tl-pager-btn ${hasNext ? "next-page" : ""}" ${hasNext ? "" : "disabled"} aria-label="Próxima página">
                     <span>Próxima</span>
                     <i class="material-icons">chevron_right</i>
                 </button>
             </div>`;
 
-            elementProperty.addEventInElement(".prev-page", "onclick", function () {
-                getNewPage(`${ConnectionServer.Host()}central/${centralId}/trip?page=${response.current_page - 1}${filter}`);
-                document.querySelector(".container-main").scrollTop = 0;
-            });
+            if (hasPrev) {
+                elementProperty.addEventInElement(".prev-page", "onclick", function () {
+                    const prevUrl = response.prev_page_url || `${ConnectionServer.Host()}central/${centralId}/trip?page=${currentPage - 1}${filter}`;
+                    getNewPage(prevUrl);
+                    document.querySelector(".container-main").scrollTop = 0;
+                });
+            }
 
-            elementProperty.addEventInElement(".next-page", "onclick", function () {
-                getNewPage(`${ConnectionServer.Host()}central/${centralId}/trip?page=${response.current_page + 1}${filter}`);
-                document.querySelector(".container-main").scrollTop = 0;
-            });
+            if (hasNext) {
+                elementProperty.addEventInElement(".next-page", "onclick", function () {
+                    const nextUrl = response.next_page_url || `${ConnectionServer.Host()}central/${centralId}/trip?page=${currentPage + 1}${filter}`;
+                    getNewPage(nextUrl);
+                    document.querySelector(".container-main").scrollTop = 0;
+                });
+            }
         });
     }
 
@@ -141,9 +164,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const dataCentral = Session.get("centralSelected");
         const money = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney ?? "R$";
 
+        const trips = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : []);
+
         elementProperty.getElement(".list-trips", element => {
             element.innerHTML = '';
-            element.innerHTML = response.data.map(trip => {
+
+            if (trips.length === 0) {
+                element.innerHTML = '<li class="text-center p-4 text-muted" style="list-style:none;">Nenhuma viagem encontrada.</li>';
+                return;
+            }
+
+            element.innerHTML = trips.map(trip => {
                 const cfg         = getStatusConfig(trip.status);
                 const statusLabel = STATUS_LABELS[trip.status] || trip.status;
                 const customerName = trip.centralCustomer != null
@@ -278,9 +309,15 @@ document.addEventListener("DOMContentLoaded", function () {
     function getNewPage(url) {
         showSkeletons();
         CentralRepository.getTripsByUrl(url)
-            .then(({response}) => {
-                createPagination(response);
-                showListTrip(response);
+            .then((result) => {
+                const data = result?.response ?? result;
+                createPagination(data);
+                showListTrip(data);
+            })
+            .catch((err) => {
+                console.error("Erro ao carregar página de viagens:", err);
+                createPagination(null);
+                showListTrip({ data: [] });
             });
     }
 });
