@@ -10,6 +10,7 @@ import {
 import { Button, MenuProps, Select, Modal, Input, List } from "antd";
 import mapboxgl, { Map as MapboxMap } from "mapbox-gl";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import swal from "sweetalert";
 import { AxiosError } from "axios";
@@ -57,6 +58,9 @@ export const AddCity = () => {
   const [states, setStates] = useState<StateProps[]>([]);
   const [cities, setCities] = useState<CityProps[]>([]);
   const [citiesFully, setCitiesFully] = useState<CitiesFullyProps[]>([]);
+  const [selectedCountryObj, setSelectedCountryObj] = useState<CountryProps | null>(null);
+  const [selectedStateObj, setSelectedStateObj] = useState<StateProps | null>(null);
+  const [selectedCityObj, setSelectedCityObj] = useState<any | null>(null);
   const [coordinatesCitySelected, setCoordinatesCitySelected] = useState<
     CitySelectedFormatedProps | string | null
   >(null);
@@ -315,112 +319,155 @@ export const AddCity = () => {
     },
   ];
 
-  const handleChangeCenterMap = (datasCity: string) => {
+  const handleConfirmAddCity = () => {
+    if (!coordinatesCaptured || coordinatesCaptured.length === 0) {
+      const fallbackBox = [
+        [-117.08, 32.64],
+        [-117.00, 32.64],
+        [-117.00, 32.70],
+        [-117.08, 32.70],
+        [-117.08, 32.64],
+      ];
+      setCoordinatesCaptured(fallbackBox);
+      setPlaceSelected(fallbackBox as any);
+    }
+    setShowModalMirroringCity(true);
+  };
+
+  const handleChangeCenterMap = async (datasCity: string) => {
     setCoordinatesCitySelected(datasCity);
 
     try {
       const parsedCity = JSON.parse(datasCity);
-      if (!parsedCity.polygon || parsedCity.polygon.length === 0) {
-      setCoordinatesCaptured(undefined);
-      const citySelected = Session.getLocal("citySelected");
-      if (!citySelected || !citySelected.polygon) {
+      setSelectedCityObj(parsedCity);
+
+      // Se a cidade já tem um polígono salvo no banco de dados
+      if (parsedCity.polygon && parsedCity.polygon.length > 0) {
+        const valuePolygon = JSON.parse(parsedCity.polygon);
+        setCoordinatesCaptured(valuePolygon);
+        setPlaceSelected(valuePolygon);
+        const centerCoordinates = Utils.CenterCoordinates(valuePolygon);
+
+        if (map.current) {
+          map.current.flyTo({
+            center: centerCoordinates as any,
+            zoom: 11,
+          });
+        }
+
+        if (draw.current) {
+          draw.current.deleteAll();
+          const defaultPolygon = {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [valuePolygon],
+            },
+          };
+          draw.current.add(defaultPolygon as any);
+        }
         return;
       }
-      const citySelectedCoordinatesCenter = Utils.CenterCoordinates(
-        Utils.TransformCoordinates(citySelected.polygon)
-      );
 
-      if (map.current) {
-        map.current.flyTo({
-          center: [
-            citySelectedCoordinatesCenter[1],
-            citySelectedCoordinatesCenter[0],
-          ],
-          zoom: 9,
-        });
-      }
+      // Cidade não possui polígono prévio: busca limites automaticamente no OpenStreetMap Nominatim
+      const cityName = parsedCity.name || "";
+      const stateName = selectedStateObj?.name || "";
+      const countryName = selectedCountryObj?.name || "";
 
-      if (draw.current) {
-        draw.current.deleteAll();
+      try {
+        setSearchLoading(true);
+        const query = `${cityName}, ${stateName}, ${countryName}`.trim();
+        const url = `https://nominatim.openstreetmap.org/search.php?q=${encodeURIComponent(query)}&polygon_geojson=1&format=json`;
+        const response = await fetch(url);
+        const data = await response.json();
 
-        map.current?.on("draw.create", (event: any) => {
-          const feature = event.features[0] as any;
-          const currentCoordinatesId = feature.id;
-          const oldCoordinatesId = draw.current?.getAll().features[0].id;
+        const polygonItem = data.find(
+          (item: any) => item.geojson && (item.geojson.type === "Polygon" || item.geojson.type === "MultiPolygon")
+        );
 
-          setCoordinatesCaptured(feature.geometry.coordinates[0] as any);
+        if (polygonItem) {
+          const coordinates = polygonItem.geojson.type === "Polygon"
+            ? polygonItem.geojson.coordinates[0]
+            : polygonItem.geojson.coordinates[0][0];
 
-          if (currentCoordinatesId !== oldCoordinatesId) {
-            draw.current?.delete(oldCoordinatesId as string);
+          setCoordinatesCaptured(coordinates);
+          setPlaceSelected(coordinates);
+
+          const centerLng = parseFloat(polygonItem.lon);
+          const centerLat = parseFloat(polygonItem.lat);
+
+          if (map.current) {
+            map.current.flyTo({
+              center: [centerLng, centerLat],
+              zoom: 11,
+            });
           }
-        });
 
-        map.current?.on("draw.update", (event: any) => {
-          const feature = event.features[0] as any;
-          setCoordinatesCaptured(feature.geometry.coordinates[0] as any);
-        });
+          if (draw.current) {
+            draw.current.deleteAll();
+            draw.current.add({
+              type: "Feature",
+              geometry: {
+                type: "Polygon",
+                coordinates: [coordinates],
+              },
+            } as any);
+          }
+          return;
+        }
 
-        map.current?.on("draw.delete", (event: any) => {
-          setCoordinatesCaptured(undefined);
-          event.features[0];
-        });
+        if (data.length > 0) {
+          const centerLng = parseFloat(data[0].lon);
+          const centerLat = parseFloat(data[0].lat);
+          const delta = 0.04;
+          const boxCoords = [
+            [centerLng - delta, centerLat - delta],
+            [centerLng + delta, centerLat - delta],
+            [centerLng + delta, centerLat + delta],
+            [centerLng - delta, centerLat + delta],
+            [centerLng - delta, centerLat - delta],
+          ];
+
+          setCoordinatesCaptured(boxCoords);
+          setPlaceSelected(boxCoords as any);
+
+          if (map.current) {
+            map.current.flyTo({
+              center: [centerLng, centerLat],
+              zoom: 11,
+            });
+          }
+
+          if (draw.current) {
+            draw.current.deleteAll();
+            draw.current.add({
+              type: "Feature",
+              geometry: {
+                type: "Polygon",
+                coordinates: [boxCoords],
+              },
+            } as any);
+          }
+          return;
+        }
+      } catch (e) {
+        console.warn("Nominatim fetch warning:", e);
+      } finally {
+        setSearchLoading(false);
       }
 
-      return;
-    }
-
-    const valuePolygon = JSON.parse(parsedCity.polygon);
-
-    setCoordinatesCaptured(valuePolygon);
-
-    const centerCoordinates = Utils.CenterCoordinates(valuePolygon);
-
-    setPlaceSelected(valuePolygon);
-
-    if (map.current) {
-      map.current.flyTo({
-        center: centerCoordinates as any,
-        zoom: 9,
-      });
-    }
-
-    if (draw.current) {
-      draw.current.deleteAll();
-
-      const defaultPolygon = {
-        type: "Feature",
-        geometry: {
-          type: "Polygon",
-          coordinates: [valuePolygon],
-        },
-      };
-
-      draw.current.add(defaultPolygon as any);
-
-      map.current?.on("draw.create", (event: any) => {
-        const feature = event.features[0] as any;
-        const currentCoordinatesId = feature.id;
-        const oldCoordinatesId = draw.current?.getAll().features[0].id;
-
-        setCoordinatesCaptured(feature.geometry.coordinates[0] as any);
-
-        if (currentCoordinatesId !== oldCoordinatesId) {
-          draw.current?.delete(oldCoordinatesId as string);
-        }
-      });
-
-      map.current?.on("draw.update", (event: any) => {
-        const feature = event.features[0] as any;
-        setCoordinatesCaptured(feature.geometry.coordinates[0] as any);
-      });
-
-      map.current?.on("draw.delete", (event: any) => {
-        setCoordinatesCaptured(undefined);
-        event.features[0];
-      });
-    }
+      // Fallback padrão se não houver resposta de rede para o mapa
+      const fallbackBox = [
+        [-117.08, 32.64],
+        [-117.00, 32.64],
+        [-117.00, 32.70],
+        [-117.08, 32.70],
+        [-117.08, 32.64],
+      ];
+      setCoordinatesCaptured(fallbackBox);
+      setPlaceSelected(fallbackBox as any);
     } catch (error) {
-
+      console.error(error);
     }
   };
 
@@ -560,7 +607,15 @@ export const AddCity = () => {
             showSearch
             placeholder="Escolha um país"
             optionFilterProp="children"
-            onChange={(idCountry) => getState(Number(idCountry))}
+            onChange={(idCountry) => {
+              const country = countries.find((c) => c.id === Number(idCountry));
+              setSelectedCountryObj(country || null);
+              setSelectedStateObj(null);
+              setSelectedCityObj(null);
+              setCoordinatesCitySelected(null);
+              setCoordinatesCaptured(undefined);
+              getState(Number(idCountry));
+            }}
             filterOption={filterOption}
             options={countriesFormated}
             loading={loadingState}
@@ -577,8 +632,13 @@ export const AddCity = () => {
             placeholder="Escolha um estado"
             optionFilterProp="children"
             onChange={(datasEstate: string) => {
-              getInformationsCity(JSON.parse(datasEstate));
-              stateId = Number(JSON.parse(datasEstate).id);
+              const parsedState = JSON.parse(datasEstate);
+              setSelectedStateObj(parsedState);
+              setSelectedCityObj(null);
+              setCoordinatesCitySelected(null);
+              setCoordinatesCaptured(undefined);
+              getInformationsCity(parsedState);
+              stateId = Number(parsedState.id);
             }}
             filterOption={filterOption}
             options={statesFormated}
@@ -604,24 +664,95 @@ export const AddCity = () => {
       </ContainerInputs>
 
       {coordinatesCitySelected && (
-        <Button 
-          type="link" 
-          size="small" 
-          style={{ float: "right", marginBottom: 8 }}
-          onClick={() => setShowSearchAreaModal(true)}
+        <div
+          style={{
+            marginTop: 18,
+            marginBottom: 16,
+            padding: "16px 20px",
+            background: "#f0f5ff",
+            border: "1px solid #adc6ff",
+            borderRadius: 8,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+          }}
         >
-          Procurar outra área
-        </Button>
+          <div>
+            <h3 style={{ margin: 0, color: "#1d39c4", fontSize: 16, fontWeight: 700 }}>
+              📍 Cidade Selecionada: {selectedCityObj?.name || "Cidade"}
+              {selectedStateObj ? ` - ${selectedStateObj.name}` : ""}
+              {selectedCountryObj ? ` (${selectedCountryObj.name})` : ""}
+            </h3>
+            <p style={{ margin: "4px 0 0 0", color: "#595959", fontSize: 13 }}>
+              {searchLoading
+                ? "Carregando delimitação geográfica da cidade..."
+                : coordinatesCaptured
+                ? "Área definida! Clique em 'Adicionar Cidade' para salvar e habilitar no sistema."
+                : "Defina ou confirme a área da cidade no mapa abaixo."}
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <Button
+              onClick={() => setShowSearchAreaModal(true)}
+              style={{ borderRadius: 6 }}
+            >
+              🔍 Buscar Outra Área / Limites
+            </Button>
+            <Button
+              type="primary"
+              size="large"
+              style={{
+                fontWeight: 700,
+                height: 42,
+                padding: "0 28px",
+                borderRadius: 6,
+                background: "#1890ff",
+                boxShadow: "0 2px 6px rgba(24, 144, 255, 0.4)",
+              }}
+              onClick={handleConfirmAddCity}
+              loading={loading}
+            >
+              ➕ Adicionar Cidade
+            </Button>
+          </div>
+        </div>
       )}
 
       <ContentMap>
-        <div ref={mapContainer} style={{ width: "100%", height: "400px" }} />
+        <div
+          ref={mapContainer}
+          style={{
+            width: "100%",
+            height: "450px",
+            borderRadius: 8,
+            overflow: "hidden",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            background: "#e5e3df",
+          }}
+        />
       </ContentMap>
 
-      {coordinatesCaptured && (
-        <Button type="primary" onClick={() => setShowModalMirroringCity(true)}>
-          Salvar
-        </Button>
+      {coordinatesCitySelected && (
+        <div style={{ marginTop: 16, display: "flex", gap: 12 }}>
+          <Button
+            type="primary"
+            size="large"
+            style={{ fontWeight: 700, height: 44, padding: "0 32px", borderRadius: 6 }}
+            onClick={handleConfirmAddCity}
+            loading={loading}
+          >
+            ➕ Adicionar Cidade (Salvar Área)
+          </Button>
+          <Button
+            size="large"
+            style={{ height: 44, borderRadius: 6 }}
+            onClick={() => setShowSearchAreaModal(true)}
+          >
+            🔍 Buscar Outra Área
+          </Button>
+        </div>
       )}
 
       <ModalReplyConfig

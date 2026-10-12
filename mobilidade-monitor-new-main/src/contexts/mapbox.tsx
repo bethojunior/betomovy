@@ -36,12 +36,16 @@ export const MapboxProvider = ({ children }: { children: React.ReactNode }) => {
         const tokenObj = response.data.response.find(
           (item: any) => item.key === "mapbox_access_token_monitor"
         );
-        if (tokenObj) {
+        if (tokenObj && tokenObj.value) {
           setMapboxToken(tokenObj.value);
+          return;
         }
       }
+      // Fallback padrão se não configurado no backend
+      setMapboxToken("pk.eyJ1IjoidGVzdGViYXlhbm1lZCIsImEiOiJjazd1d2U4OTMxNW9hM2lvNGI3cGFyaGVnIn0.Q4bC04l_8IU6HqONKXbcDA");
     } catch (e) {
       console.error("Erro ao buscar token do Mapbox:", e);
+      setMapboxToken("pk.eyJ1IjoidGVzdGViYXlhbm1lZCIsImEiOiJjazd1d2U4OTMxNW9hM2lvNGI3cGFyaGVnIn0.Q4bC04l_8IU6HqONKXbcDA");
     } finally {
       setLoading(false);
     }

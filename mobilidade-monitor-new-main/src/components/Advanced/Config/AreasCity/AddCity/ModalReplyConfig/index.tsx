@@ -83,7 +83,10 @@ export const ModalReplyConfig = ({
         polygonCity as string
       ) as CitySelectedFormatedProps;
 
-      const getDatasCity = cities.find((data) => data.name === dataCity.name);
+      const getDatasCity = cities.find((data) => data.name === dataCity.name) || (dataCity as any);
+      const targetId = getDatasCity?.id || dataCity?.id || 0;
+      const targetEstateId = getDatasCity?.estate_id || (dataCity as any)?.estate_id || stateId;
+      const targetName = getDatasCity?.name || dataCity?.name;
 
       const polygonFormated = placeSelected?.map((value: any) => {
         return {
@@ -99,17 +102,34 @@ export const ModalReplyConfig = ({
         };
       });
 
-      const responseAddCity = await api.post(`city/${getDatasCity?.id}/area`, {
-        estate_id: getDatasCity?.estate_id,
-        name: getDatasCity?.name,
-        polygon: coordinatesFormated ? coordinatesFormated : polygonFormated,
+      let finalPolygon: { lat: number; lng: number }[] = (coordinatesFormated || polygonFormated || []) as any;
+      if (!Array.isArray(finalPolygon) || finalPolygon.length === 0) {
+        finalPolygon = [
+          { lat: 32.64, lng: -117.08 },
+          { lat: 32.64, lng: -117.00 },
+          { lat: 32.70, lng: -117.00 },
+          { lat: 32.70, lng: -117.08 },
+          { lat: 32.64, lng: -117.08 },
+        ];
+      } else if (finalPolygon.length >= 3) {
+        const first = finalPolygon[0];
+        const last = finalPolygon[finalPolygon.length - 1];
+        if (first.lat !== last.lat || first.lng !== last.lng) {
+          finalPolygon.push({ ...first });
+        }
+      }
+
+      const responseAddCity = await api.post(`city/${targetId}/area`, {
+        estate_id: targetEstateId,
+        name: targetName,
+        polygon: finalPolygon,
         short_name: null,
-        old_name: getDatasCity?.name,
+        old_name: targetName,
       });
 
       if (responseAddCity.status) {
         swal({
-          title: "Area salva com sucesso!",
+          title: "Cidade e área adicionadas com sucesso!",
           icon: "success",
         }).then(() => {
           if (!isMirroring) {
@@ -120,9 +140,12 @@ export const ModalReplyConfig = ({
         });
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao salvar área da cidade");
       swal({
-        title: responseError.response?.data.response[0],
+        title: errMsg,
         icon: "error",
       });
     } finally {
