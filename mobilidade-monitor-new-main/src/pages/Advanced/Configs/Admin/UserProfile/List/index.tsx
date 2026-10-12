@@ -141,7 +141,9 @@ const UserProfile = () => {
         dataSource={Array.isArray(listProfile) ? listProfile : []}
         renderItem={(item) => (
           <List.Item key={(item as ListProfile).id}>
-            <p style={{ marginBottom: 0 }}>{(item as ListProfile).name}</p>
+            <p style={{ marginBottom: 0 }}>
+              {(item as ListProfile).name || (item as any).nome || (item as any).title || (item as any).role || `Perfil ${(item as any).id || ""}`}
+            </p>
             <ButtonContent>
               <Button
                 type="link"

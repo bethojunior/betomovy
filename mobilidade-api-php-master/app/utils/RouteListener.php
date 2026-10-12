@@ -133,6 +133,9 @@ class RouteListener extends ApiController
 
         if (isset($path[1])) {
             if (!empty($path[1])) {
+                if (is_numeric($path[1])) {
+                    $_GET['id'] = $path[1];
+                }
                 $action = "action" . ucfirst($path[1]);
             }
         }

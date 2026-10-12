@@ -110,13 +110,20 @@ const NewProfileModal: FC<ModalProps> = ({
 		const citiesRequest = api('city/actives/fully');
 		const permissionsRequest = api('role/permissions');
 
-		Promise.all([citiesRequest, permissionsRequest]).then((result) => {
+		Promise.allSettled([citiesRequest, permissionsRequest]).then((results) => {
 			setLoading(false);
-			if (!result[0]?.data?.status || !result[1]?.data?.status) {
-				return '';
+			const citiesRes = results[0].status === 'fulfilled' ? results[0].value : null;
+			const permsRes = results[1].status === 'fulfilled' ? results[1].value : null;
+
+			const rawCities = citiesRes?.data?.response || citiesRes?.data?.data || (Array.isArray(citiesRes?.data) ? citiesRes.data : []);
+			const rawPerms = permsRes?.data?.response || permsRes?.data?.data || (Array.isArray(permsRes?.data) ? permsRes.data : []);
+
+			if (Array.isArray(rawCities) && rawCities.length > 0) {
+				setListCities(rawCities);
 			}
-			setListCities(result[0].data.response || result[0].data.data || []);
-			setListPermissions(result[1].data.response || result[1].data.data || []);
+			if (Array.isArray(rawPerms) && rawPerms.length > 0) {
+				setListPermissions(rawPerms);
+			}
 
 			if (idModal !== 0) {
 				handleLoadDataProfile();

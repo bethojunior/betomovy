@@ -160,6 +160,11 @@ return [
         '/car/getpendingcars',
         '/car/acceptcar',
         '/car/rejectcar',
-        '/user/removeaccountsrequest'
+        '/user/removeaccountsrequest',
+        '/acquirer',
+        '/role',
+        '/role/permissions',
+        '/city/area',
+        '/city/mirroring'
     ]
 ];

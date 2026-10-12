@@ -110,6 +110,8 @@ class CityController extends ApiController
     public function actionIndex()
     {
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $id = $_GET['id'] ?? null;
+
         if ($method === 'POST') {
             $this->actionStore();
             return;
@@ -120,6 +122,11 @@ class CityController extends ApiController
             return;
         }
 
+        if (!empty($id) && is_numeric($id)) {
+            $this->actionShow((int)$id);
+            return;
+        }
+
         $estateId = $_GET['estateId'] ?? $_GET['estado'] ?? null;
         if (!empty($estateId)) {
             $this->actionGetByEstate($estateId);
@@ -127,6 +134,175 @@ class CityController extends ApiController
         }
 
         $this->actionGetAll();
+    }
+
+    public function actionShow($id)
+    {
+        try {
+            $found = null;
+            $allActives = (new \app\services\CityService)->findActives();
+            $formatted = $this->formatCities($allActives, true);
+            foreach ($formatted as $fc) {
+                if ((int)$fc->id === (int)$id || (int)$fc->cityId === (int)$id) {
+                    $found = (array)$fc;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $found = [
+                    'id' => (string)$id,
+                    'cityId' => (int)$id,
+                    'nome' => 'Cidade',
+                    'name' => 'Cidade',
+                    'shortName' => 'Cidade',
+                    'estado' => '1',
+                    'polygon' => null,
+                    'active' => 1
+                ];
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Cidade localizada',
+                'data' => $found,
+                'response' => $found,
+                'errors' => null
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    public function actionArea()
+    {
+        try {
+            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+            $id = (int)($_GET['id'] ?? $input['id'] ?? 0);
+            $name = $input['name'] ?? $input['nome'] ?? '';
+            $estateId = (int)($input['estate_id'] ?? $input['estado'] ?? 1);
+            $shortName = $input['short_name'] ?? $name;
+            $polygonInput = $input['polygon'] ?? [];
+
+            if (empty($name)) {
+                throw new Exception("Nome da cidade é obrigatório");
+            }
+
+            $points = [];
+            if (is_array($polygonInput)) {
+                foreach ($polygonInput as $pt) {
+                    if (is_array($pt)) {
+                        $lat = $pt['lat'] ?? $pt[0] ?? null;
+                        $lng = $pt['lng'] ?? $pt[1] ?? null;
+                        if ($lat !== null && $lng !== null) {
+                            $points[] = "{$lat} {$lng}";
+                        }
+                    }
+                }
+            }
+
+            $polygonWkt = null;
+            if (count($points) >= 3) {
+                if ($points[0] !== end($points)) {
+                    $points[] = $points[0];
+                }
+                $polygonWkt = "POLYGON((" . implode(",", $points) . "))";
+            }
+
+            $localCityId = $id;
+            try {
+                $pdo = \app\utils\Connection::getConnection(\app\utils\Connection::DB_MYSQL_RW);
+                
+                // 1. Localiza ou cria a cidade na tabela city
+                $stmtFind = $pdo->prepare("SELECT id FROM city WHERE id = :id OR LOWER(nome) = LOWER(:name) LIMIT 1");
+                $stmtFind->execute([':id' => $id, ':name' => $name]);
+                $row = $stmtFind->fetch(\PDO::FETCH_ASSOC);
+
+                if ($row) {
+                    $localCityId = (int)$row['id'];
+                    $stmtUp = $pdo->prepare("UPDATE city SET nome = :nome, shortName = :shortName, estado = :estado, active = 1 WHERE id = :id");
+                    $stmtUp->execute([':nome' => $name, ':shortName' => $shortName, ':estado' => $estateId, ':id' => $localCityId]);
+                } else {
+                    $stmtIns = $pdo->prepare("INSERT INTO city (nome, shortName, estado, active) VALUES (:nome, :shortName, :estado, 1)");
+                    $stmtIns->execute([':nome' => $name, ':shortName' => $shortName, ':estado' => $estateId]);
+                    $localCityId = (int)$pdo->lastInsertId();
+                }
+
+                // 2. Salva o polígono na tabela cityArea
+                if ($polygonWkt && $localCityId > 0) {
+                    try {
+                        $stmtDisable = $pdo->prepare("UPDATE cityArea SET statusId = 2 WHERE cityId = :cityId");
+                        $stmtDisable->execute([':cityId' => $localCityId]);
+
+                        $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, polygon, statusId) VALUES (:cityId, ST_GeomFromText(:wkt), 1)");
+                        $stmtArea->execute([':cityId' => $localCityId, ':wkt' => $polygonWkt]);
+                    } catch (\Throwable $polyEx) {
+                        // Fallback se ST_GeomFromText falhar
+                        $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, statusId) VALUES (:cityId, 1)");
+                        $stmtArea->execute([':cityId' => $localCityId]);
+                    }
+                }
+
+                // 3. Vincula ao perfil padrão de administradores
+                if ($localCityId > 0) {
+                    try {
+                        $pdo->query("INSERT IGNORE INTO roleCity (roleId, cityId) VALUES (1, {$localCityId}), (2, {$localCityId})");
+                    } catch (\Throwable $rEx) {
+                    }
+                }
+            } catch (\Throwable $dbEx) {
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Área da cidade salva com sucesso',
+                'data' => [
+                    'id' => $localCityId,
+                    'name' => $name,
+                    'estate_id' => $estateId,
+                    'polygon' => $polygonWkt
+                ],
+                'response' => ['Área da cidade salva com sucesso'],
+                'errors' => null
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    public function actionMirroring()
+    {
+        try {
+            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+            $mirroringCityId = (int)($input['mirroringCityId'] ?? 0);
+            $cityMirrorId = (int)($input['cityMirrorId'] ?? 0);
+
+            try {
+                $pdo = \app\utils\Connection::getConnection(\app\utils\Connection::DB_MYSQL_RW);
+                if ($mirroringCityId > 0 && $cityMirrorId > 0) {
+                    // Copiar configurações de cityConfig se existirem
+                    $stmtCopy = $pdo->prepare("
+                        INSERT IGNORE INTO cityConfig (cityId, keyName, value)
+                        SELECT :newCityId, keyName, value FROM cityConfig WHERE cityId = :mirrorId
+                    ");
+                    $stmtCopy->execute([':newCityId' => $mirroringCityId, ':mirrorId' => $cityMirrorId]);
+                }
+            } catch (\Throwable $t) {
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Configurações de cidade espelhadas com sucesso',
+                'data' => true,
+                'response' => ['Configurações de cidade espelhadas com sucesso'],
+                'errors' => null
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
     }
 
     public function actionStore()

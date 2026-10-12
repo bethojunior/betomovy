@@ -299,8 +299,8 @@ export const EditCity = () => {
 
   const citiesFullyFormated = (Array.isArray(citiesFully) ? citiesFully : []).map((value) => {
     return {
-      label: value.nome,
-      value: value.cityId,
+      label: value.nome || (value as any).name || "Cidade",
+      value: Number(value.cityId ?? (value as any).id),
     };
   });
 
@@ -322,10 +322,16 @@ export const EditCity = () => {
         <ContentInput>
           <LabelText>Escolha sua cidade</LabelText>
           <Select
+            showSearch
+            placeholder="Escolha sua cidade"
+            optionFilterProp="label"
+            filterOption={(input, option) =>
+              (String(option?.label ?? "")).toLowerCase().includes(input.toLowerCase())
+            }
             style={{
               width: "100%",
             }}
-            onChange={(idCity) => getInformationsCity(idCity)}
+            onChange={(idCity) => getInformationsCity(Number(idCity))}
             options={citiesFullyFormated}
           />
         </ContentInput>
