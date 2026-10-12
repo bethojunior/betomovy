@@ -119,3 +119,24 @@ services:
     instance_size_slug: basic-xs
     routes:
       - path: /ws
+    envs:
+      - key: APP_PORT
+        value: "8080"
+      - key: MYSQL_DB_HOST
+        value: movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com
+      - key: MYSQL_DB_PORT
+        value: "25060"
+      - key: MYSQL_DB_USERNAME
+        value: doadmin
+      - key: MYSQL_DB_PASSWORD
+        value: AVNS_ODYdiYw4rvg6gfvKYOO
+      - key: MYSQL_DB_NAME
+        value: defaultdb
+      - key: ENABLE_SOCKET_REDIS_ADAPTER
+        value: "false"
+
+databases:
+  - name: movy-mongo
+    engine: MONGODB
+    version: "8.0"
+    production: true
