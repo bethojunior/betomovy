@@ -513,7 +513,7 @@ const LoggedRoutes: FC = () => {
                 <AddressIrregular />
               </Menu>
             </Route>
-            <Route path="/setting/cacheaddress">
+            <Route path={["/setting/cacheaddress", "/setting/cacheAddress"]}>
               <Menu titlePage="Endereços em cache">
                 <AddressCache />
               </Menu>
@@ -883,7 +883,7 @@ const LoggedRoutes: FC = () => {
                 <UserProfile />
               </Menu>
             </Route>
-            <Route path="/config/admin/createUser">
+            <Route path={["/config/admin/createUser", "/config/admin/createUser/"]}>
               <Menu titlePage="Usuários">
                 <UserRegistration />
               </Menu>

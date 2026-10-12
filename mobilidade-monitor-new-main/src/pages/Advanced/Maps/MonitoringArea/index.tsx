@@ -35,10 +35,12 @@ export const MonitoringArea = () => {
       const responseDynamicArea = await api.get("monitoringArea");
       console.log(responseDynamicArea)
       if (responseDynamicArea.status) {
-        setDynamicsAreas(responseDynamicArea.data.response);
+        const raw = responseDynamicArea?.data?.response?.data ?? responseDynamicArea?.data?.response;
+        setDynamicsAreas(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
       console.error(error);
+      setDynamicsAreas([]);
     }
     setLoadingTable(false);
   };
@@ -175,7 +177,7 @@ export const MonitoringArea = () => {
         <ContentTable>
           <Table
             columns={columns}
-            dataSource={dynamicsAreas}
+            dataSource={Array.isArray(dynamicsAreas) ? dynamicsAreas : []}
             pagination={false}
             loading={loadingTable}
           />

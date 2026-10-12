@@ -37,11 +37,13 @@ export const RegisterLocal = () => {
       );
 
       if (responseAddress.status) {
-        last_page = responseAddress.data.response.last_page;
-        setAddress(responseAddress.data.response.data);
+        last_page = responseAddress.data?.response?.last_page;
+        const raw = responseAddress.data?.response?.data ?? responseAddress.data?.response;
+        setAddress(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
       console.error(error);
+      setAddress([]);
     } finally {
       setLoading(false);
     }
@@ -148,7 +150,7 @@ export const RegisterLocal = () => {
         </ContentSearch>
       </ContentHeader>
       <ContentTable>
-        <Table columns={columns} loading={loading} dataSource={address} pagination={false} />
+        <Table columns={columns} loading={loading} dataSource={Array.isArray(address) ? address : []} pagination={false} />
       </ContentTable>
       {last_page && (
         <ContentPagination>

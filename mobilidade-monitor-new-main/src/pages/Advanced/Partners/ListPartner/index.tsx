@@ -101,10 +101,11 @@ const ListPartner = () => {
             const response = await api.get("/partner", {
                 params: searchParams
             });
-            if (response.data.status) {
-                setPartners(response.data.response.data);
+            if (response.data?.status) {
+                const raw = response.data?.response?.data ?? response.data?.response;
+                setPartners(Array.isArray(raw) ? raw : []);
             } else {
-                setMessageAlert(response.data.message);
+                setMessageAlert(response.data?.message || "Erro ao carregar parceiros");
                 setTypeAlert("error");
                 setShowAlert(true);
             }
@@ -112,6 +113,7 @@ const ListPartner = () => {
             setMessageAlert("Erro ao carregar parceiros");
             setTypeAlert("error");
             setShowAlert(true);
+            setPartners([]);
         } finally {
             setLoadingTable(false);
         }
@@ -248,7 +250,7 @@ const ListPartner = () => {
                 </Form>
             </FilterSection>
             <ContentTable>
-                <Table columns={columns} dataSource={partners} pagination={false} loading={loadingTable} rowKey="idPartner" />
+                <Table columns={columns} dataSource={Array.isArray(partners) ? partners : []} pagination={false} loading={loadingTable} rowKey="idPartner" />
             </ContentTable>
             <CustomModal
                 visible={!!selectedImage}

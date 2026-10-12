@@ -28,22 +28,28 @@ export const ConfigMaps = () => {
 
     Promise.all([responseCredencies, responseServices])
       .then((response) => {
-        if (response[0].status) {
-          const filtered = response[0].data.response.filter(
-            (item: ConfigMapsProps) => ALLOWED_CREDENCIES_KEYS.includes(item.key)
-          );
+        if (response[0]?.status) {
+          const raw0 = response[0]?.data?.response;
+          const filtered = Array.isArray(raw0)
+            ? raw0.filter((item: ConfigMapsProps) => ALLOWED_CREDENCIES_KEYS.includes(item.key))
+            : [];
           setCredencies(filtered);
         }
 
-        if (response[1].status) {
-          const filtered = response[1].data.response.filter(
-            (item: any) => !BLOCKED_CREDENCIES_KEYS.includes(item.key)
-          );
+        if (response[1]?.status) {
+          const raw1 = response[1]?.data?.response;
+          const filtered = Array.isArray(raw1)
+            ? raw1.filter((item: any) => !BLOCKED_CREDENCIES_KEYS.includes(item.key))
+            : [];
 
           setServices(filtered);
         }
       })
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        setCredencies([]);
+        setServices([]);
+      })
       .finally(() => setLoading(false));
   };
 

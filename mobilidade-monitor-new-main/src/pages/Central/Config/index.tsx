@@ -70,20 +70,23 @@ export const Config = () => {
       key: "centrals",
       width: 150,
       render: (centrals: CentralType[]) => {
-        if (centrals.length === 1) {
-          return <label>{centrals[0].name}</label>;
-        } else {
+        const safeCentrals = Array.isArray(centrals) ? centrals : [];
+        if (safeCentrals.length === 1) {
+          return <label>{safeCentrals[0]?.name || "-"}</label>;
+        } else if (safeCentrals.length > 1) {
           return (
             <Button
               type="primary"
               onClick={() => {
-                setHowCentralShow(centrals);
+                setHowCentralShow(safeCentrals);
                 setShowModalCentral(true);
               }}
             >
               ver
             </Button>
           );
+        } else {
+          return <label>-</label>;
         }
       },
     },
@@ -145,12 +148,13 @@ export const Config = () => {
     const call = api("central/centralCallTypes/findAll");
     const trip = api("tripType");
     const central = api("central");
-    const prices = api(`central/priceRange?cityId=${citySelected}`);
+    const dynamicCityId = Session.getLocal("citySelected")?.cityId;
+    const prices = api(`central/priceRange?cityId=${dynamicCityId ?? ""}`);
 
     Promise.all([getFee, finish, payment, call, trip, central, prices]).then(
       (result) => {
         setLoading(false);
-        if (!result[0].data.status) {
+        if (!result[0]?.data?.status) {
           setMessageAlert(
             "Ocorreu um erro ao carregar as informações, tente novamente"
           );
@@ -159,8 +163,8 @@ export const Config = () => {
           return;
         }
 
-        setFee(result[0]?.data?.response);
-        setConfigFinish(result[1]?.data?.response);
+        setFee(result[0]?.data?.response || {});
+        setConfigFinish(result[1]?.data?.response ?? "0");
         const payments = Array.isArray(result[2]?.data?.response) ? result[2].data.response : [];
         const calls = Array.isArray(result[3]?.data?.response) ? result[3].data.response : [];
         setPaymentForm(payments);
@@ -189,7 +193,12 @@ export const Config = () => {
 
         setChangeCallType(aux);
       }
-    );
+    ).catch(() => {
+      setLoading(false);
+      setMessageAlert("Ocorreu um erro ao carregar as configurações.");
+      setTypeAlert("error");
+      setShowAlert(true);
+    });
   }, []);
 
   const updateFee = async () => {
@@ -586,7 +595,7 @@ export const Config = () => {
               </Button>
 
               <ContentTable>
-                <Table dataSource={listPrices} loading={loading} columns={columns} />
+                <Table dataSource={Array.isArray(listPrices) ? listPrices : []} loading={loading} columns={columns} />
               </ContentTable>
             </div>
           </Panel>

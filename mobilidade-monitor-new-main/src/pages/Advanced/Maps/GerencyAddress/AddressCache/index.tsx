@@ -29,10 +29,12 @@ export const AddressCache = () => {
       });
 
       if (responseAddressCache.status) {
-        setListAddressCache(responseAddressCache.data.response);
+        const raw = responseAddressCache?.data?.response?.data ?? responseAddressCache?.data?.response;
+        setListAddressCache(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
       console.error(error);
+      setListAddressCache([]);
     } finally {
       setLoadingTable(false);
     }
@@ -135,7 +137,7 @@ export const AddressCache = () => {
             width: "100%",
           }}
           columns={columns}
-          dataSource={listAddressCache}
+          dataSource={Array.isArray(listAddressCache) ? listAddressCache : []}
           loading={loadingTable}
         />
       </ContentTable>

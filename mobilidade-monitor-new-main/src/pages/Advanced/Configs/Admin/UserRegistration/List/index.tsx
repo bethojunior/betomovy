@@ -55,10 +55,12 @@ const UserRegistration: FC = () => {
           setTypeAlert("error");
           return setShowAlert(true);
         }
-        return setListUsers(result.data.response);
+        const raw = result?.data?.response;
+        return setListUsers(Array.isArray(raw) ? raw : []);
       })
       .catch((error) => {
         console.log(error);
+        setListUsers([]);
         setLoadingTable(false);
       })
       .finally(() => {
@@ -210,7 +212,7 @@ const UserRegistration: FC = () => {
       <ContentTable>
         <TableUsers
           pagination={{ pageSize: 9 }}
-          dataSource={listUsers}
+          dataSource={Array.isArray(listUsers) ? listUsers : []}
           columns={columns}
           loading={loadingTable}
 

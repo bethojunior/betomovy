@@ -84,20 +84,25 @@ export const Neighborhoods = () => {
   ];
 
   const get = async () => {
-    setLoadingTable(true);
-    const { data } = await api("central/neighborhood");
+    try {
+      setLoadingTable(true);
+      const { data } = await api("central/neighborhood");
 
-    setLoadingTable(false);
-    if (!data.status) {
-      setMessageAlert(
-        "Ocorreu um erro ao carregar as informações, tente novamente"
-      );
-      setTypeAlert("error");
-      setShowAlert(true);
-      return;
+      setLoadingTable(false);
+      if (!data?.status) {
+        setMessageAlert(
+          "Ocorreu um erro ao carregar as informações, tente novamente"
+        );
+        setTypeAlert("error");
+        setShowAlert(true);
+        return;
+      }
+
+      setList(Array.isArray(data.response) ? data.response : []);
+    } catch (error) {
+      setLoadingTable(false);
+      setList([]);
     }
-
-    setList(data.response);
   };
 
   const remove = async (id: number) => {
@@ -142,16 +147,18 @@ export const Neighborhoods = () => {
 
     try {
       setLoadingSearch(true);
-      const host = `https://nominatim.openstreetmap.org/search.php?q=${searchValue} ${citySelected.nome}&polygon_geojson=1&format=jsonv2`;
+      const currentCity = Session.getLocal("citySelected");
+      const cityName = currentCity?.nome || "";
+      const host = `https://nominatim.openstreetmap.org/search.php?q=${searchValue} ${cityName}&polygon_geojson=1&format=jsonv2`;
       const response = await fetch(host, {
         headers: {
           'User-Agent': 'MobilidadeMonitor/1.0'
         }
       });
       const result = await response.json();
-      const neighborhoodFormated = result.filter(
-        (data: any) => data.geojson.type === "Polygon"
-      );
+      const neighborhoodFormated = Array.isArray(result)
+        ? result.filter((data: any) => data?.geojson?.type === "Polygon")
+        : [];
       if (neighborhoodFormated.length <= 0) {
         swal({
           title: "Nenhum bairro encontrado.",
@@ -182,23 +189,25 @@ export const Neighborhoods = () => {
 
   const handleSelectPlace = (value: any) => {
     setPlaceSelected(value);
-    setCoordinatesCaptured(value.geojson.coordinates);
-    const centerMap = Utils.CenterCoordinates(value.geojson.coordinates[0]);
-    if (map.current) {
-      map.current.flyTo({
-        center: centerMap,
-        zoom: 13,
-      });
-      if (draw.current) {
-        draw.current.deleteAll();
-        const defaultPolygon = {
-          type: "Feature",
-          geometry: {
-            type: "Polygon",
-            coordinates: value.geojson.coordinates,
-          },
-        };
-        draw.current.add(defaultPolygon as any);
+    setCoordinatesCaptured(value?.geojson?.coordinates);
+    if (value?.geojson?.coordinates?.[0]) {
+      const centerMap = Utils.CenterCoordinates(value.geojson.coordinates[0]);
+      if (map.current) {
+        map.current.flyTo({
+          center: centerMap,
+          zoom: 13,
+        });
+        if (draw.current) {
+          draw.current.deleteAll();
+          const defaultPolygon = {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: value.geojson.coordinates,
+            },
+          };
+          draw.current.add(defaultPolygon as any);
+        }
       }
     }
   };
@@ -216,7 +225,7 @@ export const Neighborhoods = () => {
     let areaFormated: any = [];
 
     if (coordinatesCaptured === undefined) {
-      areaFormated = placeSelected?.geojson.coordinates[0].map((value: any) => {
+      areaFormated = (placeSelected?.geojson?.coordinates?.[0] || []).map((value: any) => {
         return {
           lat: value[1],
           lng: value[0],
@@ -233,9 +242,10 @@ export const Neighborhoods = () => {
     }
 
     try {
+      const currentCity = Session.getLocal("citySelected");
       const result = await api.post(`central/neighborhood`, {
         area: areaFormated,
-        cityId: citySelected.cityId,
+        cityId: currentCity?.cityId,
         name: searchValue,
       });
       if (!result.data.status) {
@@ -275,13 +285,24 @@ export const Neighborhoods = () => {
 
     mapboxgl.accessToken = mapboxToken;
 
-    const datasCityCoordinates = Utils.CenterCoordinates(
-      Utils.TransformCoordinates(citySelected.polygon)
-    );
+    const currentCity = Session.getLocal("citySelected");
+    let centerCoord: [number, number] = [-46.6333, -23.5505];
+    if (currentCity?.polygon) {
+      try {
+        const datasCityCoordinates = Utils.CenterCoordinates(
+          Utils.TransformCoordinates(currentCity.polygon)
+        );
+        if (datasCityCoordinates && datasCityCoordinates.length >= 2) {
+          centerCoord = [datasCityCoordinates[1], datasCityCoordinates[0]];
+        }
+      } catch (e) {
+        console.warn("Erro ao calcular centro da cidade:", e);
+      }
+    }
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v11",
-      center: [datasCityCoordinates[1], datasCityCoordinates[0]],
+      center: centerCoord,
       zoom: 9,
     });
 
@@ -428,7 +449,7 @@ export const Neighborhoods = () => {
       </Button>
 
       <ContentTable>
-        <Table dataSource={list} columns={columns} loading={loadingTable}/>
+        <Table dataSource={Array.isArray(list) ? list : []} columns={columns} loading={loadingTable}/>
       </ContentTable>
 
       <Modal

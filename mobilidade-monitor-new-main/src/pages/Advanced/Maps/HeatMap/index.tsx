@@ -36,7 +36,8 @@ export const HeatMap = () => {
     mode: "normal" | "exotic"
   ) => {
     if (map.current) {
-      const locationsFormated = datas.map((value) => {
+      const safeDatas = Array.isArray(datas) ? datas : [];
+      const locationsFormated = safeDatas.map((value) => {
         return {
           type: "Feature",
           properties: {
@@ -289,19 +290,30 @@ export const HeatMap = () => {
       return;
     }
 
-    const lng = Utils.CenterCoordinates(
-      Utils.TransformCoordinates(citySelected.polygon)
-    )[1];
+    const city = Session.getLocal("citySelected");
+    let lng = -46.6333;
+    let lat = -23.5505;
 
-    const lat = Utils.CenterCoordinates(
-      Utils.TransformCoordinates(citySelected.polygon)
-    )[0];
+    if (city?.polygon) {
+      try {
+        const center = Utils.CenterCoordinates(
+          Utils.TransformCoordinates(city.polygon)
+        );
+        if (center && center.length >= 2) {
+          lat = center[0];
+          lng = center[1];
+        }
+      } catch (e) {
+        console.warn("Erro ao calcular centro no HeatMap:", e);
+      }
+    }
 
     mapboxgl.accessToken = mapboxToken;
 
+    const pointsCity = Session.getLocal("pointsCity");
     const coordinatesLine = [
-      Session.getLocal("pointsCity").map((value: any) => {
-        return [value.lng, value.lat];
+      (Array.isArray(pointsCity) ? pointsCity : []).map((value: any) => {
+        return [value?.lng, value?.lat];
       }),
     ];
 

@@ -81,32 +81,38 @@ export const UsersList = () => {
   ];
 
   const getCustomersCentral = async (page: number | null = 1, name = "") => {
-    setLoading(true);
-    const { data } = await api(`customer/central?page=${page}&name=${name}`);
+    try {
+      setLoading(true);
+      const { data } = await api(`customer/central?page=${page}&name=${name}`);
 
-    setLoading(false);
-    if (!data.status) {
-      setMessageAlert(
-        "Ocorreu um erro ao carregar as informações, tente novamente"
-      );
-      setTypeAlert("error");
-      setShowAlert(true);
-      return;
+      setLoading(false);
+      if (!data?.status) {
+        setMessageAlert(
+          "Ocorreu um erro ao carregar as informações, tente novamente"
+        );
+        setTypeAlert("error");
+        setShowAlert(true);
+        return;
+      }
+
+      if (data?.response?.next_page_url !== null && page !== null) {
+        setNextPage(page + 1);
+      } else {
+        setNextPage(null);
+      }
+
+      if (data?.response?.prev_page_url !== null && page !== null) {
+        setLastPage(page - 1);
+      } else {
+        setLastPage(null);
+      }
+
+      const raw = data?.response?.data ?? data?.response;
+      setList(Array.isArray(raw) ? raw : []);
+    } catch (error) {
+      setLoading(false);
+      setList([]);
     }
-
-    if (data.response.next_page_url !== null && page !== null) {
-      setNextPage(page + 1);
-    } else {
-      setNextPage(null);
-    }
-
-    if (data.response.prev_page_url !== null && page !== null) {
-      setLastPage(page - 1);
-    } else {
-      setLastPage(null);
-    }
-
-    setList(data.response.data);
   };
 
   const remove = async (id: number) => {
@@ -232,7 +238,7 @@ export const UsersList = () => {
         <Table
           pagination={false}
           columns={columns}
-          dataSource={list}
+          dataSource={Array.isArray(list) ? list : []}
           loading={loading}
         />
       </ContentTable>

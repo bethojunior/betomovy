@@ -26,10 +26,12 @@ export const AddressIrregular = () => {
     try {
       const responseAddressBlackList = await api.get("addressBlacklist");
       if (responseAddressBlackList.status) {
-        setAddressBlackList(responseAddressBlackList.data.response);
+        const raw = responseAddressBlackList?.data?.response?.data ?? responseAddressBlackList?.data?.response;
+        setAddressBlackList(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
       console.error(error);
+      setAddressBlackList([]);
     } finally {
       setLoadingTable(false);
     }
@@ -203,7 +205,7 @@ export const AddressIrregular = () => {
     <Container>
        
       <ContentTable>
-        <Table columns={columns} dataSource={addressBlackList} loading={loadingTable} />
+        <Table columns={columns} dataSource={Array.isArray(addressBlackList) ? addressBlackList : []} loading={loadingTable} />
       </ContentTable>
     </Container>
   );

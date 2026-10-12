@@ -301,7 +301,7 @@ export const TestServiceMaps = () => {
             <ContentInformations>
               <LabelsInformations>{t("Tipo:")}</LabelsInformations>
               <ValueInformations>
-                {servicesTests?.type.toLocaleUpperCase()}
+                {servicesTests?.type ? servicesTests.type.toLocaleUpperCase() : "-"}
               </ValueInformations>
             </ContentInformations>
 

@@ -31,10 +31,12 @@ export const WebmapKeyManagment = () => {
       const responseWebmapKeys = await api.get("webMapKey");
 
       if (responseWebmapKeys.status) {
-        setWebmapKeys(responseWebmapKeys.data.response);
+        const raw = responseWebmapKeys?.data?.response?.data ?? responseWebmapKeys?.data?.response;
+        setWebmapKeys(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
       console.error(error);
+      setWebmapKeys([]);
     } finally {
       setLoadingTable(false);
     }
@@ -127,7 +129,7 @@ export const WebmapKeyManagment = () => {
         </ContentButton>
       )}
       <ContentTable>
-        <Table dataSource={webmapKeys} columns={columns} loading={loadingTable}/>
+        <Table dataSource={Array.isArray(webmapKeys) ? webmapKeys : []} columns={columns} loading={loadingTable}/>
       </ContentTable>
 
       <ModalAddKey

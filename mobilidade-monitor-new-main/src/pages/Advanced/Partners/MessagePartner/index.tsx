@@ -45,10 +45,11 @@ const MessagePartner = () => {
             const response = await api.get("/audit", {
                 params: searchParams,
             });
-            if (response.data.status) {
-                setAudits(response.data.response);
+            if (response.data?.status) {
+                const raw = response.data?.response?.data ?? response.data?.response;
+                setAudits(Array.isArray(raw) ? raw : []);
             } else {
-                setMessageAlert(response.data.message);
+                setMessageAlert(response.data?.message || "Erro ao carregar auditorias");
                 setTypeAlert("error");
                 setShowAlert(true);
             }
@@ -56,6 +57,7 @@ const MessagePartner = () => {
             setMessageAlert("Erro ao carregar auditorias");
             setTypeAlert("error");
             setShowAlert(true);
+            setAudits([]);
         } finally {
             setLoadingTable(false);
         }
@@ -106,7 +108,7 @@ const MessagePartner = () => {
                 </Form>
             </FilterSection>
             <ContentTable>
-                <Table columns={columns} dataSource={audits} pagination={false} rowKey="idAudit" loading={loadingTable} />
+                <Table columns={columns} dataSource={Array.isArray(audits) ? audits : []} pagination={false} rowKey="idAudit" loading={loadingTable} />
             </ContentTable>
         </Container>
     );

@@ -38,14 +38,14 @@ export const RiskArea = () => {
 
     Promise.all([responseRiskArea, responseWebMapKey])
       .then((response) => {
-        if (response[0].status) {
-          setListRiskArea(response[0].data.response.data);
-        }
-        if (response[1].status) {
+        if (response[0]?.status) {
+          const raw = response[0]?.data?.response?.data ?? response[0]?.data?.response;
+          setListRiskArea(Array.isArray(raw) ? raw : []);
         }
       })
       .catch((error) => {
         console.error(error);
+        setListRiskArea([]);
       })
       .finally(() => {
         setLoadingTable(false);
@@ -115,7 +115,7 @@ export const RiskArea = () => {
       title: "Usuário",
       key: "user",
       width: 150,
-      render: (_, data) => data.user.name,
+      render: (_, data) => data?.user?.name || "-",
     },
     {
       title: "Endereço",
@@ -125,10 +125,11 @@ export const RiskArea = () => {
       render: (_, data) => {
         return (
           <a
-            href={`https://www.google.com/maps?q=${data.latitude},${data.longitude}`}
+            href={`https://www.google.com/maps?q=${data?.latitude},${data?.longitude}`}
             target="_blank"
+            rel="noreferrer"
           >
-            {data.address}
+            {data?.address || "-"}
           </a>
         );
       },
@@ -138,9 +139,10 @@ export const RiskArea = () => {
       key: "status",
       width: 150,
       render: (_, data) => {
+        const info = switchStatus(data?.status);
         return (
-          <Tag color={switchStatus(data.status).color}>
-            {switchStatus(data.status).status}
+          <Tag color={info.color}>
+            {info.status}
           </Tag>
         );
       },
@@ -173,7 +175,7 @@ export const RiskArea = () => {
               />
             )}
 
-            {hasPermission(MAPA, "areas_riscos_compartilhar") && (
+            {hasPermission(MAPA, "areas_riscos_compartilhar") && data?.user?.phone && (
               <Button
                 style={{
                   color: theme_colors.green,
@@ -198,7 +200,7 @@ export const RiskArea = () => {
     <Container>
       <Preload visible={loading} />
       <ContentTable>
-        <Table dataSource={listRiskArea} columns={columns} loading={loadingTable}/>
+        <Table dataSource={Array.isArray(listRiskArea) ? listRiskArea : []} columns={columns} loading={loadingTable}/>
       </ContentTable>
 
       <ModalSetAreaRisk

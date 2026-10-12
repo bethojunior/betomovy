@@ -854,8 +854,12 @@ export const ListCentral = () => {
                     api(`central?page=1&name=${nameSearched}`).then(({ data }) => {
                       setLoading(false);
                       if (data.status) {
-                        setListCentral(data.response.data);
+                        const raw = data.response?.data ?? data.response;
+                        setListCentral(Array.isArray(raw) ? raw : []);
                       }
+                    }).catch(() => {
+                      setLoading(false);
+                      setListCentral([]);
                     });
                   } else {
                     setModeList("Listar todos");
@@ -884,7 +888,7 @@ export const ListCentral = () => {
         <ContentTable>
           <Table
             columns={columns}
-            dataSource={listCentral}
+            dataSource={Array.isArray(listCentral) ? listCentral : []}
             loading={loading}
             pagination={false}
           />

@@ -55,22 +55,29 @@ export const Coupon = () => {
     const cities = api("city/actives/fully");
     const gender = api("gender");
 
-    Promise.all([coupon, paymentForm, cities, gender]).then((result) => {
-      setLoadingTable(false);
-      if (!result[0].data.status) {
-        setMessageAlert(
-          "Ocorreu um erro ao carregar as informações, tente novamente"
-        );
-        setTypeAlert("error");
-        setShowAlert(true);
-        return;
-      }
+    Promise.all([coupon, paymentForm, cities, gender])
+      .then((result) => {
+        setLoadingTable(false);
+        if (!result[0]?.data?.status) {
+          setMessageAlert(
+            "Ocorreu um erro ao carregar as informações, tente novamente"
+          );
+          setTypeAlert("error");
+          setShowAlert(true);
+          return;
+        }
 
-      setListCoupon(result[0].data.response);
-      setPayment(result[1].data.response);
-      setCities(result[2].data.response);
-      setGenre(result[3].data.response);
-    });
+        const rawCoupons = result[0]?.data?.response?.data ?? result[0]?.data?.response;
+        setListCoupon(Array.isArray(rawCoupons) ? rawCoupons : []);
+        setPayment(Array.isArray(result[1]?.data?.response) ? result[1].data.response : []);
+        setCities(Array.isArray(result[2]?.data?.response) ? result[2].data.response : []);
+        setGenre(Array.isArray(result[3]?.data?.response) ? result[3].data.response : []);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoadingTable(false);
+        setListCoupon([]);
+      });
   }, []);
 
   const columns = [
@@ -332,7 +339,7 @@ export const Coupon = () => {
         Novo cupom
       </Button>
       <ContentTable>
-        <Table pagination={false} columns={columns} dataSource={listCoupon} loading={loadingTable}/>
+        <Table pagination={false} columns={columns} dataSource={Array.isArray(listCoupon) ? listCoupon : []} loading={loadingTable}/>
       </ContentTable>
       <Modal
         title="Novo cupom"

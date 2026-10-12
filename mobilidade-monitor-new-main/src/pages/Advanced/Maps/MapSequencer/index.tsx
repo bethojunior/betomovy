@@ -119,7 +119,7 @@ export const MapSequencer = () => {
         <BodyServiceMaps>
           <RowService>
             <span>Api de serviço global ativo</span>
-            <span>{services?.service_global_active.toLocaleUpperCase()}</span>
+            <span>{services?.service_global_active ? services.service_global_active.toLocaleUpperCase() : "-"}</span>
           </RowService>
           <RowService>
             <span>Customização de serviços de mapa</span>
@@ -130,20 +130,20 @@ export const MapSequencer = () => {
           </RowService>
           <RowService>
             <span>Serviço de buscar locais (Searching)</span>
-            <span>{services?.service_place.toLocaleUpperCase()}</span>
+            <span>{services?.service_place ? services.service_place.toLocaleUpperCase() : "-"}</span>
           </RowService>
           <RowService>
             <span>Serviço de detalhamento do local (Geocoding)</span>
-            <span>{services?.service_geocode.toLocaleUpperCase()}</span>
+            <span>{services?.service_geocode ? services.service_geocode.toLocaleUpperCase() : "-"}</span>
           </RowService>
           <RowService>
             <span>Serviço de rota (Direction)</span>
-            <span>{services?.service_direction.toLocaleUpperCase()}</span>
+            <span>{services?.service_direction ? services.service_direction.toLocaleUpperCase() : "-"}</span>
           </RowService>
           <RowService>
             <span>Serviço de detalhamento da rota (Direction)</span>
             <span>
-              {services?.service_direction_estimate.toLocaleUpperCase()}
+              {services?.service_direction_estimate ? services.service_direction_estimate.toLocaleUpperCase() : "-"}
             </span>
           </RowService>
         </BodyServiceMaps>

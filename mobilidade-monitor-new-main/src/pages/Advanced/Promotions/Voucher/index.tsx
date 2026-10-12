@@ -140,7 +140,8 @@ export const Voucher = () => {
         return;
       }
 
-      setVoucher(result.data?.response?.data || result.data?.data || []);
+      const raw = result.data?.response?.data || result.data?.data || result.data?.response || [];
+      setVoucher(Array.isArray(raw) ? raw : []);
 
       if (result.data?.response?.next_page_url !== null && page !== null) {
         setNextPage(page + 1);
@@ -314,7 +315,7 @@ export const Voucher = () => {
       </Button>
 
       <ContentTable>
-        <Table columns={columns} dataSource={voucher} pagination={false} loading={loadingTable}/>
+        <Table columns={columns} dataSource={Array.isArray(voucher) ? voucher : []} pagination={false} loading={loadingTable}/>
       </ContentTable>
 
       <ContentPagination>

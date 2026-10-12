@@ -34,15 +34,15 @@ export const RouteOptimization = () => {
       responsePriorityMapbox,
     ])
       .then((response) => {
-        if (response[0].status) {
+        if (response[0]?.status && response[0]?.data?.response) {
           setPriorityGoogle(response[0].data.response);
         }
 
-        if (response[1].status) {
+        if (response[1]?.status && response[1]?.data?.response) {
           setPriorityHere(response[1].data.response);
         }
 
-        if (response[2].status) {
+        if (response[2]?.status && response[2]?.data?.response) {
           setPriorityMapbox(response[2].data.response);
         }
       })
