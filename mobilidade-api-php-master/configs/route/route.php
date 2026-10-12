@@ -97,6 +97,7 @@ return [
         '/requiredfield/get',
         '/direction/search',
         '/usertype/drivers',
+        '/config',
         '/config/general',
         '/config/getapppartner',
         '/configmenuapp/search',

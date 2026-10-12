@@ -103,47 +103,52 @@ export const TestServiceMaps = () => {
     try {
       setSavingKey(true);
 
-      // Obter quais chaves de configuração do Google existem na base (tipo 13)
-      let keysToUpdate = ["google_api_key", "google_api_key_backend"];
-      try {
-        const confResp = await api.get("config/type/13");
-        if (confResp?.status && Array.isArray(confResp.data?.response)) {
-          const dbKeys = confResp.data.response
-            .map((item: any) => item.key)
-            .filter((k: string) => k === "google_api_key" || k === "google_api_key_backend");
-          if (dbKeys.length > 0) {
-            keysToUpdate = dbKeys;
-          }
-        }
-      } catch (e) {
-        console.warn("Aviso ao buscar chaves existentes:", e);
-      }
+      const payload = {
+        google_api_key: trimmed,
+        google_api_key_backend: trimmed,
+      };
 
-      let savedCount = 0;
+      let saved = false;
       let lastErrorMessage = "";
 
-      for (const keyName of keysToUpdate) {
+      // 1. Tenta PUT /config
+      try {
+        const resp = await api.put("config", payload);
+        if (resp && (resp.status === 200 || resp.status === 201)) {
+          saved = true;
+        }
+      } catch (e: any) {
+        lastErrorMessage = e?.response?.data?.message || e?.message || "";
+      }
+
+      // 2. Se falhar, tenta POST /config
+      if (!saved) {
         try {
-          await api.put("config", { [keyName]: trimmed });
-          savedCount++;
-        } catch (err: any) {
-          lastErrorMessage =
-            err?.response?.data?.message ||
-            err?.response?.data?.response ||
-            err?.message ||
-            "";
-          console.warn(`Erro ao salvar chave ${keyName}:`, lastErrorMessage);
+          const resp = await api.post("config", payload);
+          if (resp && (resp.status === 200 || resp.status === 201)) {
+            saved = true;
+          }
+        } catch (e: any) {
+          lastErrorMessage = e?.response?.data?.message || e?.message || lastErrorMessage;
         }
       }
 
-      // Também registra na tabela de chaves web (webMapKey) se aplicável
-      try {
-        await api.post("webMapKey", { key: trimmed });
-      } catch (e) {
-        // Se já existir ou falhar, continua
+      // 3. Se ainda não salvou, tenta salvar as chaves individualmente (PUT e POST)
+      if (!saved) {
+        for (const k of ["google_api_key", "google_api_key_backend"]) {
+          try {
+            await api.put("config", { [k]: trimmed });
+            saved = true;
+          } catch (e: any) {
+            try {
+              await api.post("config", { [k]: trimmed });
+              saved = true;
+            } catch (e2: any) {}
+          }
+        }
       }
 
-      if (savedCount === 0) {
+      if (!saved) {
         throw new Error(lastErrorMessage || t("Não foi possível salvar a chave da API."));
       }
 
@@ -155,7 +160,9 @@ export const TestServiceMaps = () => {
       });
 
       setValueSelect("google");
-      await handleTests("google");
+      setTimeout(() => {
+        handleTests("google");
+      }, 400);
     } catch (error: any) {
       swal({
         title: t("Erro"),

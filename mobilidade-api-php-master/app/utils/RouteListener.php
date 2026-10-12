@@ -122,6 +122,14 @@ class RouteListener extends ApiController
                     return $subAction;
                 }
             }
+
+            if (is_numeric($path[2])) {
+                $_GET['id'] = $path[2];
+                $subAction = "action" . ucfirst($path[1]);
+                if (method_exists($class, $subAction)) {
+                    return $subAction;
+                }
+            }
         }
 
         if (isset($path[1])) {

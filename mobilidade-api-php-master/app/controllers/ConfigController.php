@@ -48,4 +48,87 @@ class ConfigController extends ApiController
             echo $this->returnError($e, "Erro ao buscar configurações de apps parceiros");
         }
     }
+
+    public function actionIndex()
+    {
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        if ($method === 'PUT' || $method === 'POST') {
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
+            if (!is_array($data) || empty($data)) {
+                $data = $_POST;
+            }
+
+            if (empty($data)) {
+                echo $this->returnSuccess("Nenhum dado enviado para atualização.", []);
+                return;
+            }
+
+            try {
+                $conn = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+                $updated = [];
+                foreach ($data as $k => $v) {
+                    $keyStr = (string)$k;
+                    $valStr = (string)$v;
+
+                    // Verifica se a chave já existe
+                    $checkStmt = $conn->prepare("SELECT idConfig FROM config WHERE `key` = :k LIMIT 1");
+                    $checkStmt->execute([':k' => $keyStr]);
+                    $exists = $checkStmt->fetchColumn();
+
+                    if ($exists) {
+                        $updateStmt = $conn->prepare("UPDATE config SET value = :val WHERE `key` = :k");
+                        $updateStmt->execute([':val' => $valStr, ':k' => $keyStr]);
+                    } else {
+                        $insertStmt = $conn->prepare("INSERT INTO config (configTypeId, `key`, value, description) VALUES (13, :k, :val, :desc)");
+                        $insertStmt->execute([
+                            ':k' => $keyStr,
+                            ':val' => $valStr,
+                            ':desc' => $keyStr
+                        ]);
+                    }
+                    $updated[$keyStr] = $valStr;
+
+                    try {
+                        $cache = new \app\utils\CacheUtils();
+                        $cache->delete('config_' . $keyStr);
+                    } catch (\Throwable $t) {}
+                }
+
+                echo $this->returnSuccess("Configurações atualizadas com sucesso", $updated);
+            } catch (\Throwable $e) {
+                echo $this->returnError($e, "Erro ao atualizar configurações");
+            }
+            return;
+        }
+
+        // GET /config
+        try {
+            $conn = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+            $stmt = $conn->query("SELECT `key`, value, description FROM config");
+            $configs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            echo $this->returnSuccess("Configurações encontradas", $configs);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, "Erro ao buscar configurações");
+        }
+    }
+
+    public function actionType()
+    {
+        $typeId = $_GET['id'] ?? null;
+        if (!$typeId && isset($_SERVER['REQUEST_URI'])) {
+            $parts = explode('/', trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'));
+            $typeId = end($parts);
+        }
+
+        try {
+            $conn = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+            $stmt = $conn->prepare("SELECT `key`, value, description, inputTypePro FROM config WHERE configTypeId = :type");
+            $stmt->execute([':type' => (int)$typeId]);
+            $configs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            echo $this->returnSuccess("Configurações do tipo {$typeId} encontradas", $configs);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, "Erro ao buscar configurações por tipo");
+        }
+    }
 }

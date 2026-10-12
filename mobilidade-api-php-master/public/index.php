@@ -9,7 +9,14 @@ ini_set('display_errors', 0);
 ini_set('session.gc_probality', 0);
 date_default_timezone_set('America/Fortaleza');
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: token, userid, version, platform, Content-Type, accept, cityid, placesSearchRadius, enableCustomRadiusCentral, centralId");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH");
+header("Access-Control-Allow-Headers: Authorization, token, userid, userId, version, platform, Content-Type, accept, cityid, placesSearchRadius, enableCustomRadiusCentral, centralId, Origin, X-Requested-With");
+header("Access-Control-Max-Age: 86400");
+
+if (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) === 'OPTIONS') {
+    http_response_code(200);
+    exit(0);
+}
 
 session_start();
 
