@@ -68,6 +68,12 @@ class LoginController extends ApiController
                 $passValid = true;
             } elseif (base64_encode(md5($password)) === $dbPass) {
                 $passValid = true;
+            } elseif (sha1($password) === $dbPass) {
+                $passValid = true;
+            } elseif (base64_encode(sha1($password)) === $dbPass) {
+                $passValid = true;
+            } elseif (base64_decode($dbPass, true) === $password) {
+                $passValid = true;
             }
 
             if (!$passValid) {
@@ -155,11 +161,28 @@ class LoginController extends ApiController
                 ];
             }
 
-            // Fetch levelAccess / userType
-            $stmtRole = $pdo->prepare("SELECT userTypeId FROM levelAccess WHERE userId = :userId LIMIT 1");
-            $stmtRole->execute([':userId' => $user['idUser']]);
-            $userRoleRow = $stmtRole->fetch(PDO::FETCH_ASSOC);
-            $roleId = (int)($userRoleRow['userTypeId'] ?? 1);
+            // Fetch levelAccess / userType and role
+            $roleId = (int)($user['roleId'] ?? 0);
+            if ($roleId <= 0) {
+                $stmtRole = $pdo->prepare("SELECT userTypeId FROM levelAccess WHERE userId = :userId LIMIT 1");
+                $stmtRole->execute([':userId' => $user['idUser']]);
+                $userRoleRow = $stmtRole->fetch(PDO::FETCH_ASSOC);
+                $roleId = (int)($userRoleRow['userTypeId'] ?? 1);
+            }
+
+            // Fetch actual role name and isRoot from role table
+            $roleName = 'Administrador';
+            $isRoot = true;
+            try {
+                $stmtRoleTable = $pdo->prepare("SELECT name, isRoot FROM role WHERE id = :roleId LIMIT 1");
+                $stmtRoleTable->execute([':roleId' => $roleId]);
+                $roleData = $stmtRoleTable->fetch(PDO::FETCH_ASSOC);
+                if ($roleData) {
+                    $roleName = $roleData['name'] ?: 'Administrador';
+                    $isRoot = !empty($roleData['isRoot']) || $roleId === 1;
+                }
+            } catch (\Throwable $t) {
+            }
 
             $userPayload = [
                 'idUser' => (int)$user['idUser'],
@@ -174,8 +197,8 @@ class LoginController extends ApiController
                 'statusId' => (int)($user['statusId'] ?? 1),
                 'roleId' => $roleId,
                 'role' => [
-                    'name' => ($roleId === 1 ? 'Administrador' : 'Gestor'),
-                    'isRoot' => ($roleId === 1),
+                    'name' => $roleName,
+                    'isRoot' => $isRoot,
                     'groups' => [
                         [
                             'name' => 'Geral',

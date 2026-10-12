@@ -173,6 +173,7 @@ return [
         '/mongologs',
         '/mongologs/logsapplication',
         '/mongologs/logstransaction',
-        '/eventnotification'
+        '/eventnotification',
+        '/admin'
     ]
 ];

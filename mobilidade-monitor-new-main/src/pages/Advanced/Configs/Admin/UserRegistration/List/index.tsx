@@ -99,8 +99,9 @@ const UserRegistration: FC = () => {
           return "";
         }
         setLoadingTable(true);
-        api.delete(`user/${userId}`).then((result) => {
-          if (!result.data.status) {
+        const deleteEndpoint = `admin/${userId}`;
+        api.delete(deleteEndpoint).catch(() => api.delete(`user/${userId}`)).then((result: any) => {
+          if (!result?.data?.status && result?.status !== 200) {
             setMessageAlert(
               "Não foi possível excluir esse usuário. Tente novamente"
             );
