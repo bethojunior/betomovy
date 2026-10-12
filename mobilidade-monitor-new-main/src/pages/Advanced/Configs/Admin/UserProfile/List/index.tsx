@@ -44,20 +44,42 @@ const UserProfile = () => {
   const [listProfile, setListProfile] = useState<ListProfileArray>([]);
 
   const handleLoadProfile = () => {
-    api("role").then((result) => {
-      setLoading(false);
-      if (!result?.data?.status) {
-        setMessageAlert("Não foi possível carregar os perfis. Tente novamente");
-        setTypeAlert("error");
-        setListProfile([]);
-        return setShowAlert(true);
-      }
+    const userStorage = localStorage.getItem("@App:user");
+    const headers: Record<string, string> = {};
+    if (userStorage && userStorage !== "undefined" && userStorage !== "null") {
+      try {
+        const u = JSON.parse(userStorage);
+        if (u?.api_token) headers.token = u.api_token;
+        if (u?.idUser) {
+          headers.userid = String(u.idUser);
+          headers.userId = String(u.idUser);
+        }
+      } catch (e) {}
+    }
 
-      return setListProfile(Array.isArray(result.data.response) ? result.data.response : []);
-    }).catch(() => {
-      setLoading(false);
-      setListProfile([]);
-    });
+    api
+      .get("role", { headers })
+      .then((result) => {
+        setLoading(false);
+        const raw = result?.data?.response ?? result?.data?.data ?? result?.data;
+        if (Array.isArray(raw)) {
+          return setListProfile(raw);
+        }
+        if (Array.isArray(raw?.data)) {
+          return setListProfile(raw.data);
+        }
+        if (!result?.data?.status) {
+          setMessageAlert("Não foi possível carregar os perfis. Tente novamente");
+          setTypeAlert("error");
+          setListProfile([]);
+          return setShowAlert(true);
+        }
+        return setListProfile([]);
+      })
+      .catch(() => {
+        setLoading(false);
+        setListProfile([]);
+      });
   };
 
   useEffect(() => {

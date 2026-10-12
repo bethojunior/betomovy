@@ -88,18 +88,49 @@ const EditUserModal: FC<EditModalProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+  const [loadingRoles, setLoadingRoles] = useState(false);
   const [listTypeProfile, setListTypeProfile] = useState<ListProfileArray>([]);
 
   const { checkCpfIsValue } = Utils;
 
-  useEffect(() => {
-    api("role").then((result) => {
-      if (!result?.data?.status) {
-        return "";
+  const loadRoles = async () => {
+    try {
+      setLoadingRoles(true);
+      const userStorage = localStorage.getItem("@App:user");
+      const headers: Record<string, string> = {};
+      if (userStorage && userStorage !== "undefined" && userStorage !== "null") {
+        try {
+          const u = JSON.parse(userStorage);
+          if (u?.api_token) headers.token = u.api_token;
+          if (u?.idUser) {
+            headers.userid = String(u.idUser);
+            headers.userId = String(u.idUser);
+          }
+        } catch (e) {}
       }
 
-      return setListTypeProfile(result.data.response || result.data.data || []);
-    }).catch(() => {});
+      const result = await api.get("role", { headers });
+      const raw = result?.data?.response ?? result?.data?.data ?? result?.data;
+      if (Array.isArray(raw)) {
+        setListTypeProfile(raw);
+      } else if (Array.isArray(raw?.data)) {
+        setListTypeProfile(raw.data);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar perfis:", error);
+    } finally {
+      setLoadingRoles(false);
+    }
+  };
+
+  useEffect(() => {
+    if (visible) {
+      loadRoles();
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    loadRoles();
   }, []);
 
   useEffect(() => {
@@ -386,6 +417,17 @@ const EditUserModal: FC<EditModalProps> = ({
                 style={{ width: "100%" }}
                 status={Boolean(error) ? "error" : ""}
                 placeholder="Perfil"
+                loading={loadingRoles}
+                options={listTypeProfile.map((item) => ({
+                  label: item.name,
+                  value: item.id,
+                }))}
+                onDropdownVisibleChange={(open) => {
+                  if (open && listTypeProfile.length === 0) {
+                    loadRoles();
+                  }
+                }}
+                notFoundContent={loadingRoles ? "Carregando perfis..." : "Nenhum perfil encontrado"}
               >
                 {listTypeProfile.map((item) => {
                   return (

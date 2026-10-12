@@ -175,7 +175,7 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
         document,
         password,
         confirmationPassword: confirm_password,
-        roleId: type_account,
+        roleId: Number(type_account),
       });
 
       if (responseRegisterUser.status) {
@@ -385,6 +385,17 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
                 style={{ width: "100%" }}
                 status={Boolean(error) ? "error" : ""}
                 placeholder="Perfil"
+                loading={loadingRoles}
+                options={listTypeProfile.map((item) => ({
+                  label: item.name,
+                  value: item.id,
+                }))}
+                onDropdownVisibleChange={(open) => {
+                  if (open && listTypeProfile.length === 0) {
+                    loadRoles();
+                  }
+                }}
+                notFoundContent={loadingRoles ? "Carregando perfis..." : "Nenhum perfil encontrado"}
               >
                 {listTypeProfile.map((item) => {
                   return (
