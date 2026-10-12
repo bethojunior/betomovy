@@ -122,6 +122,12 @@ class CityController extends ApiController
             return;
         }
 
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        if (stripos($uri, 'tripTypes') !== false || stripos($uri, 'triptypes') !== false) {
+            $this->actionTripTypes();
+            return;
+        }
+
         if (!empty($id) && is_numeric($id)) {
             $this->actionShow((int)$id);
             return;
