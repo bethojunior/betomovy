@@ -39,7 +39,7 @@ class AdminController extends ApiController
     public function actionList()
     {
         try {
-            $pdo = Connection::getConnection(Connection::DB_MYSQL_RO);
+            $pdo = Connection::open(Connection::DB_MYSQL);
 
             $sql = "
                 SELECT DISTINCT
@@ -127,7 +127,7 @@ class AdminController extends ApiController
                 throw new Exception("ID do usuário inválido");
             }
 
-            $pdo = Connection::getConnection(Connection::DB_MYSQL_RO);
+            $pdo = Connection::open(Connection::DB_MYSQL);
             $stmt = $pdo->prepare("
                 SELECT 
                     u.idUser,
@@ -203,7 +203,7 @@ class AdminController extends ApiController
                 $nickname = $parts[0];
             }
 
-            $pdo = Connection::getConnection(Connection::DB_MYSQL_RW);
+            $pdo = Connection::open(Connection::DB_MYSQL);
 
             // Check if email already exists
             $stmtCheck = $pdo->prepare("SELECT idUser FROM user WHERE LOWER(TRIM(email)) = :email LIMIT 1");
@@ -353,7 +353,7 @@ class AdminController extends ApiController
             $password = $input['password'] ?? null;
             $roleId = isset($input['roleId']) ? (int)$input['roleId'] : null;
 
-            $pdo = Connection::getConnection(Connection::DB_MYSQL_RW);
+            $pdo = Connection::open(Connection::DB_MYSQL);
 
             $fields = ["updated_at = NOW()"];
             $params = [':id' => $id];
@@ -423,7 +423,7 @@ class AdminController extends ApiController
                 throw new Exception("ID do usuário inválido");
             }
 
-            $pdo = Connection::getConnection(Connection::DB_MYSQL_RW);
+            $pdo = Connection::open(Connection::DB_MYSQL);
             $stmt = $pdo->prepare("UPDATE user SET statusId = 2, blocked = 1, updated_at = NOW() WHERE idUser = :id");
             $stmt->execute([':id' => $id]);
 
