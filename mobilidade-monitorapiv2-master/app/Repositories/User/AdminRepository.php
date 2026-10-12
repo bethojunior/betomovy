@@ -51,7 +51,7 @@ class AdminRepository extends AbstractRepository
                 'user.idUser',
                 'user.email',
                 'user.name',
-                \DB::raw('COALESCE(user.nickname, user.name) as nickname'),
+                'user.nickname',
                 'user.phone',
                 'user.document',
                 'user.blocked',
@@ -59,7 +59,7 @@ class AdminRepository extends AbstractRepository
                 \DB::raw('COALESCE(role.isRoot, 0) as isRoot'),
                 \DB::raw('COALESCE(role.name, "Administrador") as roleName')
             )
-            ->groupBy('user.idUser')
+            ->distinct()
             ->orderBy('user.idUser', 'desc')
             ->get();
     }

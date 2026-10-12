@@ -14,10 +14,21 @@ final class Connection
 
     const DB_MYSQL    = 'mysql';
     const DB_MYSQL_RO = 'mysql_ro';
+    const DB_MYSQL_RW = 'mysql';
     const DB_MONGO    = 'mongodb';
 
     const SQL = 'sql';
     const NOSQL = 'nosql';
+
+    /**
+     * Alias for open()
+     * @param string $dbType
+     * @return PDO
+     */
+    public static function getConnection(string $dbType = self::DB_MYSQL)
+    {
+        return self::open($dbType);
+    }
 
     /**
      * @param string $dbType

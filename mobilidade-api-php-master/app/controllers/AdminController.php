@@ -42,16 +42,16 @@ class AdminController extends ApiController
             $pdo = Connection::getConnection(Connection::DB_MYSQL_RO);
 
             $sql = "
-                SELECT 
+                SELECT DISTINCT
                     u.idUser,
                     u.email,
                     u.name,
-                    u.nickname,
-                    u.phone,
-                    u.document,
+                    COALESCE(u.nickname, u.name) as nickname,
+                    COALESCE(u.phone, '') as phone,
+                    COALESCE(u.document, '') as document,
                     COALESCE(u.blocked, 0) as blocked,
-                    u.statusId,
-                    u.roleId,
+                    COALESCE(u.statusId, 1) as statusId,
+                    COALESCE(u.roleId, 1) as roleId,
                     COALESCE(r.isRoot, 0) as isRoot,
                     COALESCE(r.name, 'Administrador') as roleName
                 FROM user u
