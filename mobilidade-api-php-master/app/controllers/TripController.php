@@ -263,6 +263,25 @@ class TripController extends ApiController
 
             $whereSql = implode(" AND ", $where);
 
+            // Ensure tables exist to prevent join failures
+            try {
+                $pdo->exec("
+                    CREATE TABLE IF NOT EXISTS tripAudit (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        situation VARCHAR(255) NULL,
+                        created_at DATETIME NULL
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                    CREATE TABLE IF NOT EXISTS tripCallType (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        name VARCHAR(255) NULL
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                    CREATE TABLE IF NOT EXISTS tripPaymentForm (
+                        idTripPaymentForm INT AUTO_INCREMENT PRIMARY KEY,
+                        name VARCHAR(255) NULL
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                ");
+            } catch (\Throwable $tEx) {}
+
             // Total count
             $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM trip WHERE {$whereSql}");
             $stmtCount->execute($params);
