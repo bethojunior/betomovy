@@ -23,15 +23,21 @@ const { Option } = Select;
 interface ListProfileArray extends Array<ListProfile> {}
 
 interface ListProfile {
-  cities: [];
-  created_at: string;
+  cities?: [];
+  created_at?: string;
   id: number;
-  isRoot: boolean;
+  isRoot?: boolean;
   name: string;
-  statusId: number;
-  support: boolean;
-  updated_at: string;
+  statusId?: number;
+  support?: boolean;
+  updated_at?: string;
 }
+
+const DEFAULT_ROLES: ListProfile[] = [
+  { id: 1, name: "Administrador" },
+  { id: 2, name: "Gestor" },
+  { id: 3, name: "Suporte" },
+];
 
 interface ModalProps {
   visible: boolean;
@@ -78,7 +84,7 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
   const [loading, setLoading] = useState(false);
   const [loadingRoles, setLoadingRoles] = useState(false);
 
-  const [listTypeProfile, setListTypeProfile] = useState<ListProfileArray>([]);
+  const [listTypeProfile, setListTypeProfile] = useState<ListProfile[]>(DEFAULT_ROLES);
 
   const { checkCpfIsValue } = Utils;
 
@@ -100,13 +106,16 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
 
       const result = await api.get("role", { headers });
       const raw = result?.data?.response ?? result?.data?.data ?? result?.data;
-      if (Array.isArray(raw)) {
+      if (Array.isArray(raw) && raw.length > 0) {
         setListTypeProfile(raw);
-      } else if (Array.isArray(raw?.data)) {
+      } else if (Array.isArray(raw?.data) && raw.data.length > 0) {
         setListTypeProfile(raw.data);
+      } else {
+        setListTypeProfile(DEFAULT_ROLES);
       }
     } catch (error) {
-      console.error("Erro ao carregar perfis:", error);
+      console.error("Erro ao carregar perfis, usando perfis padrao:", error);
+      setListTypeProfile(DEFAULT_ROLES);
     } finally {
       setLoadingRoles(false);
     }
@@ -379,32 +388,37 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
           render={({ field: { value, onChange }, fieldState: { error } }) => (
             <>
               <Title>Perfil</Title>
-              <Select
-                value={value}
-                onChange={onChange}
-                style={{ width: "100%" }}
-                status={Boolean(error) ? "error" : ""}
-                placeholder="Perfil"
-                loading={loadingRoles}
-                options={listTypeProfile.map((item) => ({
-                  label: item.name,
-                  value: item.id,
-                }))}
-                onDropdownVisibleChange={(open) => {
-                  if (open && listTypeProfile.length === 0) {
-                    loadRoles();
-                  }
-                }}
-                notFoundContent={loadingRoles ? "Carregando perfis..." : "Nenhum perfil encontrado"}
-              >
-                {listTypeProfile.map((item) => {
-                  return (
-                    <Option key={item.id} value={item.id}>
-                      {item.name}
-                    </Option>
-                  );
-                })}
-              </Select>
+              {(() => {
+                const rolesToRender = (listTypeProfile && listTypeProfile.length > 0) ? listTypeProfile : DEFAULT_ROLES;
+                return (
+                  <Select
+                    value={value}
+                    onChange={onChange}
+                    style={{ width: "100%" }}
+                    status={Boolean(error) ? "error" : ""}
+                    placeholder="Selecione o perfil"
+                    loading={loadingRoles}
+                    options={rolesToRender.map((item) => ({
+                      label: item.name,
+                      value: item.id,
+                    }))}
+                    onDropdownVisibleChange={(open) => {
+                      if (open && listTypeProfile.length === 0) {
+                        loadRoles();
+                      }
+                    }}
+                    notFoundContent={loadingRoles ? "Carregando perfis..." : "Nenhum perfil encontrado"}
+                  >
+                    {rolesToRender.map((item) => {
+                      return (
+                        <Option key={item.id} value={item.id}>
+                          {item.name}
+                        </Option>
+                      );
+                    })}
+                  </Select>
+                );
+              })()}
               {error && <MessageError>{error.message}</MessageError>}
             </>
           )}
