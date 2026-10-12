@@ -9,8 +9,24 @@ export const Container = styled.div`
 export const ContentTable = styled.div`
   overflow: auto;
 
+  table {
+    background-color: #ffffff;
+  }
+
+  th {
+    background-color: #fafafa !important;
+    color: #1f2937 !important;
+    font-weight: 600 !important;
+  }
+
   td {
-    background-color: ${theme_colors.white};
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    font-size: 14px !important;
+  }
+
+  .ant-table-cell {
+    color: #111827 !important;
   }
 
   ::-webkit-scrollbar {
@@ -26,6 +42,24 @@ export const ContentTable = styled.div`
 `;
 
 export const TableUsers = styled(Table)`
+  background-color: #ffffff;
+
+  .ant-table {
+    background-color: #ffffff;
+    color: #111827;
+  }
+
+  .ant-table-thead > tr > th {
+    background: #fafafa;
+    color: #1f2937;
+    font-weight: 600;
+  }
+
+  .ant-table-tbody > tr > td {
+    background: #ffffff;
+    color: #111827;
+  }
+
   .ant-pagination-options {
     display: none;
   }

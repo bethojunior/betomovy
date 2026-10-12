@@ -151,37 +151,47 @@ const UserRegistration: FC = () => {
       dataIndex: "name",
       key: "name",
       width: 200,
+      render: (text: string, record: any) => text || record?.name || "-",
     },
     {
       title: "Apelido",
       dataIndex: "nickname",
       key: "nickname",
       width: 200,
+      render: (text: string, record: any) => text || record?.nickname || "-",
     },
     {
       title: "Telefone",
       dataIndex: "phone",
       key: "phone",
       width: 200,
+      render: (text: string, record: any) => text || record?.phone || "-",
     },
     {
       title: "Perfil",
       dataIndex: "roleName",
       key: "role",
       width: 200,
+      render: (text: string, record: any) =>
+        text ||
+        record?.roleName ||
+        record?.role?.name ||
+        (record?.roleId === 1 ? "Administrador" : record?.roleId === 2 ? "Gestor" : record?.roleId === 3 ? "Suporte" : "Administrador"),
     },
     {
       title: "E-mail",
       dataIndex: "email",
       key: "email",
       width: 200,
+      render: (text: string, record: any) => text || record?.email || "-",
     },
     {
       title: "Ações",
       key: "actions",
       width: 150,
-      render: (item: ListUsers) => {
+      render: (_: any, item: ListUsers) => {
         const isRoot = responseDataUser?.roleId === 1;
+        const targetUserId = item?.idUser ?? (item as any)?.id;
         
         return (
           <div style={{ display: "flex", gap: "8px" }}>
@@ -189,14 +199,14 @@ const UserRegistration: FC = () => {
               <Button
                 type="text"
                 icon={<FaEdit style={{ color: "blue" }} />}
-                onClick={() => handleEditUser(item.idUser)}
+                onClick={() => handleEditUser(targetUserId)}
                 title="Editar usuário"
               />
             )}
             <Button
               type="text"
               icon={<FaTrash style={{ color: "red" }} />}
-              onClick={() => handleDeleteUser(item.idUser)}
+              onClick={() => handleDeleteUser(targetUserId)}
               title="Excluir usuário"
             />
           </div>
@@ -226,11 +236,11 @@ const UserRegistration: FC = () => {
 
       <ContentTable>
         <TableUsers
+          rowKey={(record: any) => record?.idUser || record?.id || Math.random()}
           pagination={{ pageSize: 9 }}
           dataSource={Array.isArray(listUsers) ? listUsers : []}
           columns={columns}
           loading={loadingTable}
-
         />
       </ContentTable>
 
