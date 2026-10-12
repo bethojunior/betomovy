@@ -174,7 +174,7 @@ const SolicitationChangeCar = () => {
 			/>
 
 			<ContentHeader>
-				{pagination && <span>{pagination.total} pendente(s)</span>}
+				{pagination && <span>{pagination.total ?? 0} pendente(s)</span>}
 				{idRole <= 2 && (
 					<ButtonTypeList type="button" onClick={toggleListAll}>
 						{listAll ? 'Por Cidade' : 'Listar Todos'}
@@ -183,9 +183,9 @@ const SolicitationChangeCar = () => {
 			</ContentHeader>
 
 			<ContentTable>
-				{loading || data.length > 0 ? (
+				{loading || (Array.isArray(data) && data.length > 0) ? (
 					<Table
-						dataSource={data}
+						dataSource={Array.isArray(data) ? data : []}
 						columns={columns}
 						rowKey="idCar"
 						pagination={false}
@@ -199,11 +199,11 @@ const SolicitationChangeCar = () => {
 				)}
 			</ContentTable>
 
-			{pagination && pagination.last_page > 1 && (
+			{pagination && (pagination.last_page ?? 1) > 1 && (
 				<ContentPagination>
 					<Pagination
-						total={pagination.total}
-						pageSize={pagination.per_page}
+						total={pagination.total ?? 0}
+						pageSize={pagination.per_page ?? 10}
 						showSizeChanger={false}
 						current={page}
 						onChange={goToPage}

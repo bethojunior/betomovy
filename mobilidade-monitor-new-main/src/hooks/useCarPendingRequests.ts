@@ -20,16 +20,30 @@ export function useCarPendingRequests(): UseCarPendingRequestsReturn {
 	const fetchList = useCallback(async () => {
 		setLoading(true);
 		try {
-			const cityPath = listAll ? '' : `/${city.cityId}`;
+			const cityId = city?.cityId;
+			const cityPath = listAll || !cityId ? '' : `/${cityId}`;
 			const { data: responseData } = await api.get(
 				`car/getPendingCars${cityPath}?page=${page}`,
 			);
-			setPagination(responseData.response);
-			setData(responseData.response.data);
+			const meta = responseData?.response || responseData?.data;
+			if (meta && typeof meta === 'object' && Array.isArray(meta.data)) {
+				setPagination(meta);
+				setData(meta.data);
+			} else if (Array.isArray(meta)) {
+				setPagination(undefined);
+				setData(meta);
+			} else {
+				setPagination(undefined);
+				setData([]);
+			}
+		} catch (error) {
+			console.error("Erro ao buscar carros pendentes:", error);
+			setData([]);
+			setPagination(undefined);
 		} finally {
 			setLoading(false);
 		}
-	}, [listAll, page]);
+	}, [city?.cityId, listAll, page]);
 
 	useEffect(() => {
 		fetchList();

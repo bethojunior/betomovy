@@ -108,7 +108,12 @@ const RequestDocuments = () => {
   const fetchUserTypes = async () => {
     try {
       const response = await api.get("/userType/drivers");
-      const mappedDrivers = response.data.response
+      const list = Array.isArray(response?.data?.response)
+        ? response.data.response
+        : Array.isArray(response?.data?.data)
+        ? response.data.data
+        : [];
+      const mappedDrivers = list
         .filter((userType: any) => userType.isDriver == 1)
         .map((userType: any) => ({
           id: userType.idUserType,
@@ -117,7 +122,8 @@ const RequestDocuments = () => {
 
       setUserTypes(mappedDrivers);
     } catch (error) {
-      message.error("Erro ao buscar tipos de usuário");
+      console.error("Erro ao buscar tipos de usuário:", error);
+      setUserTypes([]);
     }
   };
 
@@ -248,11 +254,13 @@ const DriverSelect = ({ onSelect }: any) => {
         },
       });
 
-      const data = response?.data?.response?.data ?? [];
+      const raw = response?.data?.response?.data ?? response?.data?.response ?? response?.data?.data ?? [];
+      const data = Array.isArray(raw) ? raw : [];
 
       setDrivers(data);
     } catch (err) {
       console.error("Erro ao buscar motoristas", err);
+      setDrivers([]);
     }
     setFetching(false);
   };

@@ -330,7 +330,13 @@ const ListDrivers = () => {
         );
       }
 
-      if (result.data.response.data.length === 0) {
+      const debugData = Array.isArray(result?.data?.response?.data)
+        ? result.data.response.data
+        : Array.isArray(result?.data?.response)
+        ? result.data.response
+        : [];
+
+      if (debugData.length === 0) {
         if (page === 1) {
           setDataModalDebugApp([]);
           setNextPageDebugApp("");
@@ -450,17 +456,25 @@ const ListDrivers = () => {
     setCurrentPageAvaliation(page);
     api.get(`tripRating?driverId=${idDriver}&page=${page}`).then((values) => {
       setLoading(false);
-      if (values.data.response.data.length !== 0) {
+      const ratingData = Array.isArray(values?.data?.response?.data)
+        ? values.data.response.data
+        : Array.isArray(values?.data?.response)
+        ? values.data.response
+        : [];
+      if (ratingData.length !== 0) {
         if (page !== 1) {
-          setRaceHistory((state) => state.concat(...values.data.response.data));
-          setNextPageAvaliation(values.data.response.next_page_url);
+          setRaceHistory((state) => state.concat(...ratingData));
+          setNextPageAvaliation(values.data?.response?.next_page_url);
           return;
         }
-        setRaceHistory(values.data.response.data);
-        setNextPageAvaliation(values.data.response.next_page_url);
+        setRaceHistory(ratingData);
+        setNextPageAvaliation(values.data?.response?.next_page_url);
         setRaceHistoryModal(true);
         return;
       }
+      swal("Esse motorista não possui avaliações!", "", "info");
+    }).catch(() => {
+      setLoading(false);
       swal("Esse motorista não possui avaliações!", "", "info");
     });
   };
@@ -675,8 +689,11 @@ const ListDrivers = () => {
             `driver?page=1&driverRegisterStatusId=${idStatusSearch > 0 ? idStatusSearch : ""}&driverType=${driverType > 0 ? driverType : ""}`
           );
 
-          if (responseListDrivers.data.status && responseListDrivers.data.response.data.length > 0) {
-            const filteredDrivers = responseListDrivers.data.response.data.filter(
+          const rawDrivers = responseListDrivers?.data?.response?.data ?? responseListDrivers?.data?.response;
+          const driversArray = Array.isArray(rawDrivers) ? rawDrivers : [];
+
+          if (responseListDrivers?.data?.status && driversArray.length > 0) {
+            const filteredDrivers = driversArray.filter(
               (driver: any) => driver.idUser === parseInt(editDriverId)
             );
 

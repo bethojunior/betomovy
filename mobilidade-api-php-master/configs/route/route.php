@@ -151,6 +151,11 @@ return [
         '/callgroup/linkdriver',
         '/callgroup/unlinkdriver',
         '/callgroup/searchdriver',
-        '/withdraw'
+        '/withdraw',
+        '/car',
+        '/car/getpendingcars',
+        '/car/acceptcar',
+        '/car/rejectcar',
+        '/user/removeaccountsrequest'
     ]
 ];

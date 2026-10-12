@@ -22,8 +22,21 @@ export function useAccountDeletionRequests(
       const { data: responseData } = await api.get(
         `user/removeAccountsRequest?type=${type}&page=${page}`
       );
-      setPagination(responseData.response);
-      setData(responseData.response.data);
+      const meta = responseData?.response || responseData?.data;
+      if (meta && typeof meta === "object" && Array.isArray(meta.data)) {
+        setPagination(meta);
+        setData(meta.data);
+      } else if (Array.isArray(meta)) {
+        setPagination(undefined);
+        setData(meta);
+      } else {
+        setPagination(undefined);
+        setData([]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar solicitações de exclusão:", error);
+      setData([]);
+      setPagination(undefined);
     } finally {
       setLoading(false);
     }

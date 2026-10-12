@@ -50,17 +50,20 @@ const FormRegisterDriver: FC = () => {
 		setLoading(true);
 		try {
 			const responseFormStep = await api.get(
-				`https://apiteste.taxireturn.com.br/FormStep/GetByUserType?userTypeId=${searchQuery}`,
+				`formStep/getByUserType?userTypeId=${searchQuery}`,
 			);
 			const responseDocUserType = await api.get(
-				`https://apiteste.taxireturn.com.br/DocUserType/FindByUserType?userTypeId=${searchQuery}`,
+				`docUserType/findByUserType?userTypeId=${searchQuery}`,
 			);
 
-			if (responseFormStep.data?.data) {
-				setFormsStep(responseFormStep.data.data);
+			const forms = responseFormStep.data?.data ?? responseFormStep.data?.response?.data ?? responseFormStep.data?.response;
+			const docs = responseDocUserType.data?.data ?? responseDocUserType.data?.response?.data ?? responseDocUserType.data?.response;
+
+			if (Array.isArray(forms)) {
+				setFormsStep(forms);
 			}
-			if (responseDocUserType.data?.data) {
-				setDocUserType(responseDocUserType.data.data);
+			if (Array.isArray(docs)) {
+				setDocUserType(docs);
 			}
 		} catch (error) {
 			console.error("Erro ao carregar dados:", error);
@@ -165,10 +168,10 @@ const FormRegisterDriver: FC = () => {
 						<DocumentRequisited
 							datasUser={datasUser}
 							setDatasUser={setDatasUser}
-							saveDatas={indexDocuments === docUserType.length - 1}
+							saveDatas={indexDocuments === (docUserType?.length || 0) - 1}
 							indexDocument={indexDocuments}
 							setIndexDocument={setIndexDocuments}
-							dataOnylDocument={docUserType[indexDocuments]}
+							dataOnylDocument={docUserType ? docUserType[indexDocuments] : undefined}
 						/>,
 					);
 				} else {
