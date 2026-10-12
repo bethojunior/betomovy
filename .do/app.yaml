@@ -109,6 +109,20 @@ services:
         value: movy-secret-token
       - key: REDIS_PREFIX
         value: movy
+      - key: MONGODB_HOST
+        value: movy-mongodb-79fd3aab.mongo.ondigitalocean.com
+      - key: MONGODB_PORT
+        value: "27017"
+      - key: MONGODB_USER
+        value: doadmin
+      - key: MONGODB_PASS
+        value: 1dQ782TVG36Bc09A
+      - key: MONGODB_NAME
+        value: admin
+      - key: MONGODB_TLS
+        value: "true"
+      - key: MONGODB_URI
+        value: "mongodb+srv://doadmin:1dQ782TVG36Bc09A@movy-mongodb-79fd3aab.mongo.ondigitalocean.com/admin?tls=true&authSource=admin"
 
   # 5. WebSocket & Realtime Node.js
   - name: api-node-ws
@@ -132,11 +146,19 @@ services:
         value: AVNS_ODYdiYw4rvg6gfvKYOO
       - key: MYSQL_DB_NAME
         value: defaultdb
+      - key: MONGO_DB_HOST
+        value: movy-mongodb-79fd3aab.mongo.ondigitalocean.com
+      - key: MONGO_DB_PORT
+        value: "27017"
+      - key: MONGO_DB_USERNAME
+        value: doadmin
+      - key: MONGO_DB_PASSWORD
+        value: 1dQ782TVG36Bc09A
+      - key: MONGO_DB_NAME
+        value: admin
+      - key: MONGO_USE_SSL
+        value: "true"
+      - key: MONGO_URL
+        value: "mongodb+srv://doadmin:1dQ782TVG36Bc09A@movy-mongodb-79fd3aab.mongo.ondigitalocean.com/admin?tls=true&authSource=admin"
       - key: ENABLE_SOCKET_REDIS_ADAPTER
         value: "false"
-
-databases:
-  - name: movy-mongo
-    engine: MONGODB
-    version: "8.0"
-    production: true
