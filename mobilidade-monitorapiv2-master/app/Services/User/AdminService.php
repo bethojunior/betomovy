@@ -53,6 +53,7 @@ class AdminService
             $admin->document = onlyCharacters($request['document']);
             $admin->nickname = $request['nickname'];
             $admin->blocked  = false;
+            $admin->statusId = \App\Constants\StatusConst::ACTIVE;
             $admin->phone    = onlyCharacters($request['phone']);
             $admin->roleId   = $request['roleId'];
 

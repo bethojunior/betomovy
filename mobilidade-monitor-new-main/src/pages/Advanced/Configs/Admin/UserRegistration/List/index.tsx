@@ -48,20 +48,35 @@ const UserRegistration: FC = () => {
       .get("admin")
       .then((result) => {
         setLoadingTable(false);
-        if (!result.data.status) {
-          setMessageAlert(
-            "Não foi possível carregar os perfis, tente novamente"
-          );
-          setTypeAlert("error");
-          return setShowAlert(true);
+        const data = result?.data;
+        if (data && (data.status === true || data.status === "true" || data.status === 200 || data.code === 200)) {
+          const raw = data.response ?? data.data;
+          return setListUsers(Array.isArray(raw) ? raw : []);
         }
-        const raw = result?.data?.response;
-        return setListUsers(Array.isArray(raw) ? raw : []);
+        if (Array.isArray(data)) {
+          return setListUsers(data);
+        }
+        if (data?.response && Array.isArray(data.response)) {
+          return setListUsers(data.response);
+        }
+        if (data?.data && Array.isArray(data.data)) {
+          return setListUsers(data.data);
+        }
+        setMessageAlert(
+          data?.message || "Não foi possível carregar os usuários, tente novamente"
+        );
+        setTypeAlert("error");
+        return setShowAlert(true);
       })
       .catch((error) => {
-        console.log(error);
+        console.error("Erro ao carregar usuarios:", error);
         setListUsers([]);
         setLoadingTable(false);
+        setMessageAlert(
+          error?.response?.data?.message || "Erro de conexão ao carregar usuários"
+        );
+        setTypeAlert("error");
+        setShowAlert(true);
       })
       .finally(() => {
         setLoadingTable(false);

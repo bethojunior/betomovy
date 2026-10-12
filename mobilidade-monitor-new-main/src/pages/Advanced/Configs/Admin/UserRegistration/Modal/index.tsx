@@ -176,7 +176,7 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
 
     try {
       setLoading(true);
-      const responseRegisterUser = await api.post("admin/", {
+      const responseRegisterUser = await api.post("admin", {
         name,
         nickname,
         email,
@@ -187,23 +187,21 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
         roleId: Number(type_account),
       });
 
-      if (responseRegisterUser.status) {
+      if (responseRegisterUser.status === 200 || responseRegisterUser.status === 201 || responseRegisterUser.data?.status) {
         swal({
           title: "Sucesso",
           text: "Usuário criado com sucesso",
           icon: "success",
         }).then((isAccept) => {
-          if (isAccept) {
-            handleCloseModal();
-            loadUsers();
-          }
+          handleCloseModal();
+          loadUsers();
         });
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<{ message?: string }>;
       swal({
-        title: "Error",
-        text: responseError.response?.data.message,
+        title: "Erro",
+        text: responseError.response?.data?.message || "Erro ao criar usuário.",
         icon: "error",
       });
     } finally {
