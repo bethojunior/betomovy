@@ -165,6 +165,14 @@ return [
         '/role',
         '/role/permissions',
         '/city/area',
-        '/city/mirroring'
+        '/city/mirroring',
+        '/notification',
+        '/notification/store',
+        '/address',
+        '/address/cache',
+        '/mongologs',
+        '/mongologs/logsapplication',
+        '/mongologs/logstransaction',
+        '/eventnotification'
     ]
 ];

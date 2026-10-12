@@ -59,12 +59,15 @@ export function useClientPhysicalSearch(): UseClientPhysicalSearchReturn {
           setThisPage(page);
           if (!values.data.status) return;
 
+          const raw = values.data?.response?.data ?? values.data?.response ?? values.data?.data;
+          const list = Array.isArray(raw) ? raw : [];
+
           if (page !== 1) {
-            setInfosListClient((prev) => [...(prev ?? []), ...values.data.response.data]);
+            setInfosListClient((prev) => [...(prev ?? []), ...list]);
             return;
           }
-          setInfosListClient(values.data.response.data);
-          setPagination(values.data.response.next_page_url);
+          setInfosListClient(list);
+          setPagination(values.data?.response?.next_page_url || "");
         })
         .catch(() => {
           swal({ title: "Erro ao pesquisar clientes", icon: "error" });

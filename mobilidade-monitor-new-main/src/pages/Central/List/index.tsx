@@ -311,15 +311,18 @@ export const ListCentral = () => {
       const isFilteringByCity = true;
 
       if (isFilteringByCity && citySelected && citySelected.cityId) {
-        filteredCentrals = filteredCentrals.filter((central: any) => {
-          if (central.cityId !== undefined) {
-            return central.cityId === citySelected.cityId;
+        const byCity = filteredCentrals.filter((central: any) => {
+          if (central.cityId !== undefined && central.cityId !== null) {
+            return Number(central.cityId) === Number(citySelected.cityId);
           }
           if (central.address && citySelected.nome) {
             return central.address.toLowerCase().includes(citySelected.nome.toLowerCase());
           }
           return false;
         });
+        if (byCity.length > 0) {
+          filteredCentrals = byCity;
+        }
       }
       
       setListCentral(filteredCentrals);

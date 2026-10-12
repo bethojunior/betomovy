@@ -52,7 +52,11 @@ const BirthdayNotification = () => {
     setLoadingTable(true);
     api.get(`eventNotification`).then((result) => {
       setLoadingTable(false);
-      setNotificationList(result.data.response);
+      const raw = result?.data?.response ?? result?.data?.data ?? result?.data;
+      setNotificationList(Array.isArray(raw) ? raw : []);
+    }).catch(() => {
+      setLoadingTable(false);
+      setNotificationList([]);
     });
   };
 
@@ -92,13 +96,13 @@ const BirthdayNotification = () => {
       key: "event_notification_type.name",
       width: 200,
       ellipsis: true,
-      render: (item: MessageProps) => (
+      render: (item?: MessageProps) => (
         <p
           style={{
             margin: 0,
           }}
         >
-          {item.name}
+          {item?.name || "Aniversário"}
         </p>
       ),
     },

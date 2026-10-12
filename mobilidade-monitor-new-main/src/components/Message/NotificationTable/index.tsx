@@ -23,10 +23,12 @@ const NotificationTable = ({
 
   useEffect(() => {
     const fetchCityNames = async () => {
+      const rawList = Array.isArray(notificationList) ? notificationList : [];
       const cityIds = Array.from(
         new Set(
-          notificationList
-            .map((notification) => notification.cityId?.toString().split(","))
+          rawList
+            .map((notification) => notification?.cityId?.toString()?.split(","))
+            .filter(Boolean)
             .flat()
         )
       ).filter(Boolean);
@@ -34,8 +36,12 @@ const NotificationTable = ({
       if (cityIds.length > 0) {
         try {
           const { data } = await api.get(`city/actives/fully`);
-          const cityMap = data.response.reduce((acc: any, city: any) => {
-            acc[city.cityId] = city.nome;
+          const cityArr = Array.isArray(data?.response) ? data.response : (Array.isArray(data?.data) ? data.data : []);
+          const cityMap = cityArr.reduce((acc: any, city: any) => {
+            if (city) {
+              const id = city.cityId || city.id;
+              acc[id] = city.nome || city.name || "Cidade";
+            }
             return acc;
           }, {});
           setCityNames(cityMap);
@@ -55,16 +61,15 @@ const NotificationTable = ({
     return names.join(", ");
   };
 
-  const renderTooltip = (item: NotificationUserTypesProps[]) => {
-    return (
-      item
-        .map((res: NotificationUserTypesProps) => {
-          return `${res.userType}<br />`;
-        })
-        .toString()
-        //@ts-ignore
-        .replaceAll(",", " ")
-    );
+  const renderTooltip = (item?: NotificationUserTypesProps[]) => {
+    if (!Array.isArray(item) || item.length === 0) {
+      return "Todos os usuários";
+    }
+    return item
+      .map((res: NotificationUserTypesProps) => {
+        return `${res?.userType || "Usuário"}<br />`;
+      })
+      .join(" ");
   };
 
   const deleteNotification = (id: number) => {
@@ -196,7 +201,8 @@ const NotificationTable = ({
     <Container>
       <Table
         pagination={false}
-        dataSource={notificationList}
+        rowKey={(record: any) => record.idNotification || record.id || Math.random()}
+        dataSource={Array.isArray(notificationList) ? notificationList : []}
         columns={columns}
       />
     </Container>

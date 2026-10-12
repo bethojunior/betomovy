@@ -157,7 +157,11 @@ export const Neighborhoods = () => {
       });
       const result = await response.json();
       const neighborhoodFormated = Array.isArray(result)
-        ? result.filter((data: any) => data?.geojson?.type === "Polygon")
+        ? result.filter(
+            (data: any) =>
+              data?.geojson?.type === "Polygon" ||
+              data?.geojson?.type === "MultiPolygon"
+          )
         : [];
       if (neighborhoodFormated.length <= 0) {
         swal({
@@ -189,9 +193,13 @@ export const Neighborhoods = () => {
 
   const handleSelectPlace = (value: any) => {
     setPlaceSelected(value);
-    setCoordinatesCaptured(value?.geojson?.coordinates);
-    if (value?.geojson?.coordinates?.[0]) {
-      const centerMap = Utils.CenterCoordinates(value.geojson.coordinates[0]);
+    const coords =
+      value?.geojson?.type === "MultiPolygon"
+        ? value?.geojson?.coordinates?.[0]
+        : value?.geojson?.coordinates;
+    setCoordinatesCaptured(coords);
+    if (coords?.[0]) {
+      const centerMap = Utils.CenterCoordinates(coords[0]);
       if (map.current) {
         map.current.flyTo({
           center: centerMap,
@@ -203,7 +211,7 @@ export const Neighborhoods = () => {
             type: "Feature",
             geometry: {
               type: "Polygon",
-              coordinates: value.geojson.coordinates,
+              coordinates: coords,
             },
           };
           draw.current.add(defaultPolygon as any);

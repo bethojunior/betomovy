@@ -237,6 +237,7 @@ export const UsersList = () => {
       <ContentTable>
         <Table
           pagination={false}
+          rowKey={(record: any) => record.idUser || record.email || Math.random()}
           columns={columns}
           dataSource={Array.isArray(list) ? list : []}
           loading={loading}

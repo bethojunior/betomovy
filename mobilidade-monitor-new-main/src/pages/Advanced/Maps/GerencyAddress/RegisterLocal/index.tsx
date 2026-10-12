@@ -88,6 +88,19 @@ export const RegisterLocal = () => {
       dataIndex: "address",
       key: "address",
       width: 300,
+      render: (text: string, data: any) => {
+        return (
+          text ||
+          data?.address ||
+          data?.name ||
+          data?.nome ||
+          data?.neighborhood ||
+          data?.formatted_address ||
+          (data?.latitude && data?.longitude
+            ? `Coordenadas: ${data.latitude}, ${data.longitude}`
+            : "Endereço cadastrado")
+        );
+      },
     },
     {
       title: "",
