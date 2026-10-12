@@ -525,6 +525,7 @@ class CityController extends ApiController
 
     public function actionTripTypes()
     {
+        header('Content-Type: application/json; charset=utf-8');
         try {
             $cityId = (int)($_GET['id'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
             $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
@@ -561,7 +562,6 @@ class CityController extends ApiController
                 $list = $stmtAll->fetchAll(\PDO::FETCH_ASSOC);
             }
 
-            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Tipos de viagens encontrados',
@@ -569,23 +569,21 @@ class CityController extends ApiController
                 'response' => $list,
                 'errors' => null
             ]);
+            exit;
         } catch (\Throwable $e) {
-            header('Content-Type: application/json; charset=utf-8');
+            $defaultTypes = [
+                ['tripTypeId' => 1, 'id' => 1, 'type' => 'Carro', 'name' => 'Carro', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                ['tripTypeId' => 2, 'id' => 2, 'type' => 'Moto', 'name' => 'Moto', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                ['tripTypeId' => 3, 'id' => 3, 'type' => 'Entrega', 'name' => 'Entrega', 'description' => '', 'picture' => '', 'serviceOption' => 1]
+            ];
             echo json_encode([
                 'status' => true,
                 'message' => 'Tipos de viagens padrão',
-                'data' => [
-                    ['tripTypeId' => 1, 'id' => 1, 'type' => 'Carro', 'name' => 'Carro', 'description' => '', 'picture' => '', 'serviceOption' => 0],
-                    ['tripTypeId' => 2, 'id' => 2, 'type' => 'Moto', 'name' => 'Moto', 'description' => '', 'picture' => '', 'serviceOption' => 0],
-                    ['tripTypeId' => 3, 'id' => 3, 'type' => 'Entrega', 'name' => 'Entrega', 'description' => '', 'picture' => '', 'serviceOption' => 1]
-                ],
-                'response' => [
-                    ['tripTypeId' => 1, 'id' => 1, 'type' => 'Carro', 'name' => 'Carro', 'description' => '', 'picture' => '', 'serviceOption' => 0],
-                    ['tripTypeId' => 2, 'id' => 2, 'type' => 'Moto', 'name' => 'Moto', 'description' => '', 'picture' => '', 'serviceOption' => 0],
-                    ['tripTypeId' => 3, 'id' => 3, 'type' => 'Entrega', 'name' => 'Entrega', 'description' => '', 'picture' => '', 'serviceOption' => 1]
-                ],
+                'data' => $defaultTypes,
+                'response' => $defaultTypes,
                 'errors' => null
             ]);
+            exit;
         }
     }
 
