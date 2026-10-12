@@ -143,6 +143,8 @@ return [
         '/map/allservicetest',
         '/map/servicetest',
         '/map/checkservices',
-        '/map/listpriorityservice'
+        '/map/listpriorityservice',
+        '/mapservice',
+        '/mapservice/types'
     ]
 ];

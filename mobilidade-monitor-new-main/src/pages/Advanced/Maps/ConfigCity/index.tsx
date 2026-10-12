@@ -31,16 +31,16 @@ export const ConfigCity = () => {
 
     Promise.all([responseMapServices, responseTypes])
       .then((response) => {
-        if (response[0].status) {
-          setMapServices(response[0].data.response);
-        }
+        const rawMapServices = response[0]?.data?.response ?? response[0]?.data?.data;
+        setMapServices(Array.isArray(rawMapServices) ? rawMapServices : []);
 
-        if (response[1].status) {
-          setTypesServices(response[1].data.response);
-        }
+        const rawTypes = response[1]?.data?.response ?? response[1]?.data?.data;
+        setTypesServices(Array.isArray(rawTypes) ? rawTypes : []);
       })
       .catch((error) => {
         console.error(error);
+        setMapServices([]);
+        setTypesServices([]);
       })
       .finally(() => {
         setLoadingTable(false);
@@ -89,15 +89,20 @@ export const ConfigCity = () => {
       title: "Tipo",
       key: "type",
       render: (_, data) => {
-        return data.type.toLocaleUpperCase();
+        return (data?.type || "-").toLocaleUpperCase();
       },
     },
     {
       title: "Credenciais",
       key: "credencies",
       render: (_, data) => {
-        return data.keys.map((value) => {
-          return <Tag color="#138496">{value.value}</Tag>;
+        const keysList = Array.isArray(data?.keys) ? data.keys : [];
+        if (keysList.length === 0) {
+          return <span>-</span>;
+        }
+        return keysList.map((value, idx) => {
+          const valText = typeof value === "object" ? value?.value : String(value ?? "");
+          return <Tag key={idx} color="#138496">{valText || "-"}</Tag>;
         });
       },
     },
@@ -112,7 +117,7 @@ export const ConfigCity = () => {
                 style={{
                   color: theme_colors.red_crismon,
                 }}
-                onClick={() => handleRemoveMapService(data.groupCode)}
+                onClick={() => handleRemoveMapService(data?.groupCode)}
                 icon={<FaTrash />}
               />
             )}
@@ -138,7 +143,13 @@ export const ConfigCity = () => {
       )}
 
       <ContentTable>
-        <Table columns={columns} dataSource={mapServices} pagination={false} loading={loadingTable} />
+        <Table
+          columns={columns}
+          dataSource={Array.isArray(mapServices) ? mapServices : []}
+          rowKey={(record, idx) => record?.groupCode || record?.id || String(idx)}
+          pagination={false}
+          loading={loadingTable}
+        />
       </ContentTable>
 
       <ModalAddMapService

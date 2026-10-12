@@ -31,10 +31,10 @@ export const ModalAddMapService = ({
     MapServiceMetaDataProps[]
   >([]);
 
-  const typesMapsFormated = typesMaps.map((value) => {
+  const typesMapsFormated = (Array.isArray(typesMaps) ? typesMaps : []).map((value) => {
     return {
-      value: JSON.stringify(value.map_service_meta_data),
-      label: value.description,
+      value: JSON.stringify(value?.map_service_meta_data || []),
+      label: value?.description || value?.name || "",
     };
   });
 
@@ -48,15 +48,15 @@ export const ModalAddMapService = ({
     try {
       setLoading(true);
 
-      const metadasSend = listConfigCredencies.map((value) => {
+      const metadasSend = (Array.isArray(listConfigCredencies) ? listConfigCredencies : []).map((val) => {
         return {
-          key: value.key,
-          value: value.value,
+          key: val?.key,
+          value: val?.value,
         };
       });
 
       const objectSend = {
-        mapServiceId: listConfigCredencies[0].mapServiceId,
+        mapServiceId: listConfigCredencies?.[0]?.mapServiceId,
         metadata: metadasSend,
       };
 
@@ -87,8 +87,15 @@ export const ModalAddMapService = ({
   };
 
   useEffect(() => {
-    if (value.length > 0) {
-      setListConfigCredencies(JSON.parse(value));
+    if (value && value.length > 0) {
+      try {
+        const parsed = JSON.parse(value);
+        setListConfigCredencies(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        setListConfigCredencies([]);
+      }
+    } else {
+      setListConfigCredencies([]);
     }
   }, [value]);
 
@@ -114,21 +121,21 @@ export const ModalAddMapService = ({
               width: "100%",
             }}
             value={value}
-            onChange={(value) => setValue(value)}
+            onChange={(val) => setValue(val)}
             options={typesMapsFormated}
           />
         </ContentInput>
         <Content>
-          {listConfigCredencies.map((value, index) => {
+          {(Array.isArray(listConfigCredencies) ? listConfigCredencies : []).map((valItem, index) => {
             return (
               <div
-                key={value.id}
+                key={valItem?.id || index}
                 style={{
                   marginTop: 5,
                   marginBottom: 5,
                 }}
               >
-                <LabelText>{value.description}</LabelText>
+                <LabelText>{valItem?.description || valItem?.key || ""}</LabelText>
                 <Input
                   onChange={(event) =>
                     handleChangeInput(index, event.target.value)
