@@ -517,6 +517,77 @@ class CityController extends ApiController
         $this->actionGetConfig();
     }
 
+    public function actionTripTypes()
+    {
+        try {
+            $cityId = (int)($_GET['id'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            $stmt = $pdo->prepare("
+                SELECT DISTINCT
+                    tt.idTripType AS tripTypeId,
+                    tt.idTripType AS id,
+                    tt.type,
+                    tt.name,
+                    tt.description,
+                    tt.picture,
+                    COALESCE(tt.serviceOption, 0) AS serviceOption
+                FROM tripType tt
+                LEFT JOIN price p ON (p.tripTypeId = tt.idTripType AND p.cityId = :cityId AND p.statusId = 1)
+                ORDER BY tt.idTripType ASC
+            ");
+            $stmt->execute([':cityId' => $cityId]);
+            $list = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            if (empty($list)) {
+                $stmtAll = $pdo->query("
+                    SELECT 
+                        idTripType AS tripTypeId,
+                        idTripType AS id,
+                        type,
+                        name,
+                        description,
+                        picture,
+                        COALESCE(serviceOption, 0) AS serviceOption
+                    FROM tripType
+                    ORDER BY idTripType ASC
+                ");
+                $list = $stmtAll->fetchAll(\PDO::FETCH_ASSOC);
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Tipos de viagens encontrados',
+                'data' => $list,
+                'response' => $list,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Tipos de viagens padrão',
+                'data' => [
+                    ['tripTypeId' => 1, 'id' => 1, 'type' => 'Carro', 'name' => 'Carro', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                    ['tripTypeId' => 2, 'id' => 2, 'type' => 'Moto', 'name' => 'Moto', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                    ['tripTypeId' => 3, 'id' => 3, 'type' => 'Entrega', 'name' => 'Entrega', 'description' => '', 'picture' => '', 'serviceOption' => 1]
+                ],
+                'response' => [
+                    ['tripTypeId' => 1, 'id' => 1, 'type' => 'Carro', 'name' => 'Carro', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                    ['tripTypeId' => 2, 'id' => 2, 'type' => 'Moto', 'name' => 'Moto', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                    ['tripTypeId' => 3, 'id' => 3, 'type' => 'Entrega', 'name' => 'Entrega', 'description' => '', 'picture' => '', 'serviceOption' => 1]
+                ],
+                'errors' => null
+            ]);
+        }
+    }
+
+    public function actionTriptypes()
+    {
+        $this->actionTripTypes();
+    }
+
     public function actionGetActives()
     {
         try {

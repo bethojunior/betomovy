@@ -12,6 +12,39 @@ use Exception;
  */
 class TripTypeController extends ApiController
 {
+    public function actionIndex()
+    {
+        try {
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+            $stmt = $pdo->query("
+                SELECT 
+                    idTripType,
+                    idTripType as id,
+                    type,
+                    name,
+                    description,
+                    picture,
+                    statusId,
+                    COALESCE(serviceOption, 0) as serviceOption
+                FROM tripType
+                WHERE statusId = 1
+                ORDER BY idTripType ASC
+            ");
+            $list = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Tipos de viagem encontrados',
+                'data' => $list,
+                'response' => $list,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            $this->actionActives();
+        }
+    }
+
     public function actionActives()
     {
         try {

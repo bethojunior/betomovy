@@ -13,6 +13,199 @@ use app\model\Location;
  */
 class PriceController extends ApiController
 {
+    public function actionIndex()
+    {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if ($method === 'POST') {
+            $this->actionStore();
+            return;
+        }
+
+        try {
+            $cityId = (int)($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            $stmt = $pdo->prepare("
+                SELECT 
+                    p.*,
+                    tt.idTripType,
+                    tt.type,
+                    tt.name as tripTypeName,
+                    tt.description as tripTypeDescription,
+                    tt.picture as tripTypePicture,
+                    COALESCE(tt.serviceOption, 0) as serviceOption
+                FROM price p
+                INNER JOIN tripType tt ON p.tripTypeId = tt.idTripType
+                WHERE (p.cityId = :cityId OR :cityIdZero = 0)
+                  AND p.statusId = 1
+                ORDER BY p.cityId ASC, p.`order` ASC, p.tripTypeId ASC
+            ");
+            $stmt->execute([':cityId' => $cityId, ':cityIdZero' => $cityId]);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $data = array_map(function ($row) {
+                $item = $row;
+                $item['trip_type'] = [
+                    'idTripType' => (int)$row['idTripType'],
+                    'id' => (int)$row['idTripType'],
+                    'type' => $row['type'],
+                    'name' => $row['tripTypeName'],
+                    'description' => $row['tripTypeDescription'],
+                    'picture' => $row['tripTypePicture'],
+                    'serviceOption' => (int)$row['serviceOption']
+                ];
+                return $item;
+            }, $rows);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Preços encontrados',
+                'data' => $data,
+                'response' => $data,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Preços encontrados',
+                'data' => [],
+                'response' => [],
+                'errors' => null
+            ]);
+        }
+    }
+
+    public function actionStore()
+    {
+        try {
+            $raw = file_get_contents('php://input');
+            $body = json_decode($raw, true) ?: $_POST;
+            $cityId = (int)($body['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+            $tripTypeId = (int)($body['tripTypeId'] ?? 0);
+
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+            // Inactivate existing price for same city and tripType
+            if ($cityId > 0 && $tripTypeId > 0) {
+                $upd = $pdo->prepare("UPDATE price SET statusId = 2 WHERE cityId = :cityId AND tripTypeId = :tripTypeId");
+                $upd->execute([':cityId' => $cityId, ':tripTypeId' => $tripTypeId]);
+            }
+
+            $fields = [
+                'cityId' => $cityId,
+                'tripTypeId' => $tripTypeId,
+                'minPrice' => (float)($body['minPrice'] ?? 0),
+                'basePrice' => (float)($body['basePrice'] ?? 0),
+                'kmPrice' => (float)($body['kmPrice'] ?? 0),
+                'minutePrice' => (float)($body['minutePrice'] ?? 0),
+                'tag' => $body['tag'] ?? null,
+                'statusId' => 1
+            ];
+
+            $cols = implode(', ', array_keys($fields));
+            $placeholders = ':' . implode(', :', array_keys($fields));
+            $ins = $pdo->prepare("INSERT INTO price ({$cols}) VALUES ({$placeholders})");
+            $ins->execute($fields);
+            $id = $pdo->lastInsertId();
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Preço salvo com sucesso',
+                'data' => array_merge(['id' => $id], $fields),
+                'response' => array_merge(['id' => $id], $fields),
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao salvar preço: ' . $e->getMessage(),
+                'data' => null,
+                'response' => null,
+                'errors' => null
+            ]);
+        }
+    }
+
+    public function actionRange()
+    {
+        try {
+            $cityId = (int)($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+            $tripTypeId = (int)($_GET['tripTypeId'] ?? 0);
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            $stmt = $pdo->prepare("
+                SELECT * FROM priceRange
+                WHERE (cityId = :cityId OR :cityIdZero = 0)
+                  AND (tripTypeId = :tripTypeId OR :tripTypeIdZero = 0)
+                  AND statusId = 1
+                ORDER BY id ASC
+            ");
+            $stmt->execute([
+                ':cityId' => $cityId,
+                ':cityIdZero' => $cityId,
+                ':tripTypeId' => $tripTypeId,
+                ':tripTypeIdZero' => $tripTypeId
+            ]);
+            $list = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Faixas de preço encontradas',
+                'data' => $list,
+                'response' => $list,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Faixas de preço vazias',
+                'data' => [],
+                'response' => [],
+                'errors' => null
+            ]);
+        }
+    }
+
+    public function actionDynamic()
+    {
+        try {
+            $cityId = (int)($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            $stmt = $pdo->prepare("
+                SELECT * FROM priceDynamic
+                WHERE (cityId = :cityId OR :cityIdZero = 0)
+                  AND statusId = 1
+                ORDER BY id ASC
+            ");
+            $stmt->execute([':cityId' => $cityId, ':cityIdZero' => $cityId]);
+            $list = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Tarifas dinâmicas encontradas',
+                'data' => $list,
+                'response' => $list,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Tarifas dinâmicas vazias',
+                'data' => [],
+                'response' => [],
+                'errors' => null
+            ]);
+        }
+    }
+
     public function actionFindByTripType()
     {
         try {
