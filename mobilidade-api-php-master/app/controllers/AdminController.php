@@ -80,6 +80,16 @@ class AdminController extends ApiController
             } catch (\Throwable $t) {
             }
 
+            // Ensure roleId column exists on user table
+            try {
+                $pdo->exec("ALTER TABLE user ADD COLUMN roleId INT NULL DEFAULT 1");
+            } catch (\Throwable $t) {
+            }
+            try {
+                $pdo->exec("ALTER TABLE user ADD COLUMN blocked TINYINT(1) DEFAULT 0");
+            } catch (\Throwable $t) {
+            }
+
             $users = [];
             try {
                 $sql = "
@@ -99,6 +109,7 @@ class AdminController extends ApiController
                     LEFT JOIN role r ON u.roleId = r.id
                     LEFT JOIN levelAccess la ON u.idUser = la.userId
                     WHERE (u.statusId = 1 OR u.statusId IS NULL)
+                      AND (u.email IS NOT NULL AND u.email != '')
                       AND (u.roleId IS NOT NULL OR la.userTypeId = 4)
                     ORDER BY u.idUser DESC
                 ";
@@ -121,13 +132,37 @@ class AdminController extends ApiController
                             IF(COALESCE(u.roleId, 1) = 1, 1, 0) as isRoot,
                             'Administrador' as roleName
                         FROM user u
-                        WHERE u.statusId = 1 OR u.statusId IS NULL
+                        WHERE (u.statusId = 1 OR u.statusId IS NULL)
+                          AND (u.email IS NOT NULL AND u.email != '')
                         ORDER BY u.idUser DESC
                         LIMIT 50
                     ";
                     $stmt = $pdo->query($sqlFallback);
                     $users = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
                 } catch (\Throwable $t2) {
+                    try {
+                        $sqlSimple = "
+                            SELECT 
+                                u.idUser,
+                                u.email,
+                                u.name,
+                                COALESCE(u.nickname, u.name) as nickname,
+                                COALESCE(u.phone, '') as phone,
+                                COALESCE(u.document, '') as document,
+                                0 as blocked,
+                                1 as statusId,
+                                1 as roleId,
+                                1 as isRoot,
+                                'Administrador' as roleName
+                            FROM user u
+                            WHERE (u.email IS NOT NULL AND u.email != '')
+                            ORDER BY u.idUser DESC
+                            LIMIT 50
+                        ";
+                        $stmt = $pdo->query($sqlSimple);
+                        $users = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+                    } catch (\Throwable $t3) {
+                    }
                 }
             }
 
@@ -142,19 +177,19 @@ class AdminController extends ApiController
                             COALESCE(u.nickname, u.name) as nickname,
                             COALESCE(u.phone, '') as phone,
                             COALESCE(u.document, '') as document,
-                            COALESCE(u.blocked, 0) as blocked,
+                            0 as blocked,
                             COALESCE(u.statusId, 1) as statusId,
-                            COALESCE(u.roleId, 1) as roleId,
-                            IF(COALESCE(u.roleId, 1) = 1, 1, 0) as isRoot,
+                            1 as roleId,
+                            1 as isRoot,
                             'Administrador' as roleName
                         FROM user u
-                        WHERE u.statusId = 1 OR u.statusId IS NULL
+                        WHERE (u.email IS NOT NULL AND u.email != '')
                         ORDER BY u.idUser DESC
                         LIMIT 50
                     ";
                     $stmt = $pdo->query($sqlFallback);
                     $users = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-                } catch (\Throwable $t3) {
+                } catch (\Throwable $t4) {
                 }
             }
 
@@ -296,6 +331,25 @@ class AdminController extends ApiController
 
             $pdo = Connection::open(Connection::DB_MYSQL);
 
+            // Ensure schema compatibility
+            try {
+                $pdo->exec("ALTER TABLE user ADD COLUMN roleId INT NULL DEFAULT 1");
+            } catch (\Throwable $t) {
+            }
+            try {
+                $pdo->exec("ALTER TABLE user ADD COLUMN blocked TINYINT(1) DEFAULT 0");
+            } catch (\Throwable $t) {
+            }
+
+            // Check if roleId column exists in user table
+            $hasRoleIdCol = true;
+            try {
+                $chk = $pdo->query("SHOW COLUMNS FROM user LIKE 'roleId'");
+                $hasRoleIdCol = ($chk && $chk->fetch());
+            } catch (\Throwable $t) {
+                $hasRoleIdCol = false;
+            }
+
             // Check if email already exists
             $stmtCheck = $pdo->prepare("SELECT idUser FROM user WHERE LOWER(TRIM(email)) = :email LIMIT 1");
             $stmtCheck->execute([':email' => $email]);
@@ -305,48 +359,93 @@ class AdminController extends ApiController
                 // If user exists, update password and role to grant admin access
                 $userId = (int)$existing['idUser'];
                 $base64Pass = base64_encode($password);
-                $stmtUpd = $pdo->prepare("
-                    UPDATE user SET 
-                        name = :name,
-                        nickname = :nickname,
-                        phone = :phone,
-                        document = :document,
-                        password = :password,
-                        roleId = :roleId,
-                        statusId = 1,
-                        blocked = 0,
-                        updated_at = NOW()
-                    WHERE idUser = :userId
-                ");
-                $stmtUpd->execute([
-                    ':name' => $name,
-                    ':nickname' => $nickname,
-                    ':phone' => $phone,
-                    ':document' => $document,
-                    ':password' => $base64Pass,
-                    ':roleId' => $roleId,
-                    ':userId' => $userId
-                ]);
+                if ($hasRoleIdCol) {
+                    $stmtUpd = $pdo->prepare("
+                        UPDATE user SET 
+                            name = :name,
+                            nickname = :nickname,
+                            phone = :phone,
+                            document = :document,
+                            password = :password,
+                            roleId = :roleId,
+                            statusId = 1,
+                            blocked = 0,
+                            updated_at = NOW()
+                        WHERE idUser = :userId
+                    ");
+                    $stmtUpd->execute([
+                        ':name' => $name,
+                        ':nickname' => $nickname,
+                        ':phone' => $phone,
+                        ':document' => $document,
+                        ':password' => $base64Pass,
+                        ':roleId' => $roleId,
+                        ':userId' => $userId
+                    ]);
+                } else {
+                    $stmtUpd = $pdo->prepare("
+                        UPDATE user SET 
+                            name = :name,
+                            nickname = :nickname,
+                            phone = :phone,
+                            document = :document,
+                            password = :password,
+                            statusId = 1,
+                            updated_at = NOW()
+                        WHERE idUser = :userId
+                    ");
+                    $stmtUpd->execute([
+                        ':name' => $name,
+                        ':nickname' => $nickname,
+                        ':phone' => $phone,
+                        ':document' => $document,
+                        ':password' => $base64Pass,
+                        ':userId' => $userId
+                    ]);
+                }
             } else {
                 $base64Pass = base64_encode($password);
-                $stmtIns = $pdo->prepare("
-                    INSERT INTO user (
-                        name, nickname, email, phone, document, password, 
-                        roleId, statusId, blocked, created_at, updated_at
-                    ) VALUES (
-                        :name, :nickname, :email, :phone, :document, :password, 
-                        :roleId, 1, 0, NOW(), NOW()
-                    )
-                ");
-                $stmtIns->execute([
-                    ':name' => $name,
-                    ':nickname' => $nickname,
-                    ':email' => $email,
-                    ':phone' => $phone,
-                    ':document' => $document,
-                    ':password' => $base64Pass,
-                    ':roleId' => $roleId
-                ]);
+                $apiToken = password_hash($email . '_' . time(), PASSWORD_BCRYPT);
+                if ($hasRoleIdCol) {
+                    $stmtIns = $pdo->prepare("
+                        INSERT INTO user (
+                            name, nickname, email, phone, document, password, 
+                            roleId, statusId, blocked, api_token, registered_in, created_at, updated_at
+                        ) VALUES (
+                            :name, :nickname, :email, :phone, :document, :password, 
+                            :roleId, 1, 0, :token, 'admin', NOW(), NOW()
+                        )
+                    ");
+                    $stmtIns->execute([
+                        ':name' => $name,
+                        ':nickname' => $nickname,
+                        ':email' => $email,
+                        ':phone' => $phone,
+                        ':document' => $document,
+                        ':password' => $base64Pass,
+                        ':roleId' => $roleId,
+                        ':token' => $apiToken
+                    ]);
+                } else {
+                    $stmtIns = $pdo->prepare("
+                        INSERT INTO user (
+                            name, nickname, email, phone, document, password, 
+                            statusId, api_token, registered_in, created_at, updated_at
+                        ) VALUES (
+                            :name, :nickname, :email, :phone, :document, :password, 
+                            1, :token, 'admin', NOW(), NOW()
+                        )
+                    ");
+                    $stmtIns->execute([
+                        ':name' => $name,
+                        ':nickname' => $nickname,
+                        ':email' => $email,
+                        ':phone' => $phone,
+                        ':document' => $document,
+                        ':password' => $base64Pass,
+                        ':token' => $apiToken
+                    ]);
+                }
                 $userId = (int)$pdo->lastInsertId();
             }
 
@@ -473,7 +572,16 @@ class AdminController extends ApiController
                 $fields[] = "password = :password";
                 $params[':password'] = base64_encode($password);
             }
-            if ($roleId !== null && $roleId > 0) {
+            // Check if roleId column exists
+            $hasRoleIdCol = true;
+            try {
+                $chk = $pdo->query("SHOW COLUMNS FROM user LIKE 'roleId'");
+                $hasRoleIdCol = ($chk && $chk->fetch());
+            } catch (\Throwable $t) {
+                $hasRoleIdCol = false;
+            }
+
+            if ($roleId !== null && $roleId > 0 && $hasRoleIdCol) {
                 $fields[] = "roleId = :roleId";
                 $params[':roleId'] = $roleId;
             }
