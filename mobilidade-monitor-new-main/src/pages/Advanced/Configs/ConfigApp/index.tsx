@@ -42,9 +42,11 @@ export const ConfigApp = () => {
       const responseAppConfig = await api.get("appConfig");
 
       if (responseAppConfig.status) {
-        setConfigsApps(responseAppConfig.data.response);
+        const raw = responseAppConfig.data?.response;
+        setConfigsApps(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
+      setConfigsApps([]);
       console.error(error);
       swal({
         title: "Erro ao pegar configurações de aplicações",
@@ -237,7 +239,7 @@ export const ConfigApp = () => {
       <Preload visible={loading} />
       <h3>CONFIGURAÇÃO DE CORES E LOGO DE APPS</h3>
       <ContentTable>
-        {configsApps.length <= 1 && (
+        {(configsApps?.length || 0) <= 1 && (
           <Button
             style={{
               marginBottom: "15px",
@@ -248,7 +250,7 @@ export const ConfigApp = () => {
             Adicionar Configurações
           </Button>
         )}
-        <TableAntd locale={locale} columns={columns} dataSource={configsApps} />
+        <TableAntd locale={locale} columns={columns} dataSource={Array.isArray(configsApps) ? configsApps : []} />
       </ContentTable>
 
       <div

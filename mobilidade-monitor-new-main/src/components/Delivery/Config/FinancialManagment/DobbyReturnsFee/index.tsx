@@ -29,20 +29,17 @@ export const DobbyReturnsFee = () => {
   const cityId = Session.getLocal("citySelected")?.cityId;
 
   const getPayMachineReturns = async () => {
+    if (!cityId) return;
     try {
       const responsePayMachineReturns = await api.get(
         `payMachineReturn/${cityId}`
       );
 
-      if (responsePayMachineReturns.status) {
-        setPayMachineReturns(responsePayMachineReturns.data.response);
+      if (responsePayMachineReturns?.data) {
+        setPayMachineReturns(responsePayMachineReturns.data?.response ?? null);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: responseError.response?.data.message,
-        icon: "error",
-      });
+      // Silencioso se não houver dados
     }
   };
 
@@ -50,15 +47,12 @@ export const DobbyReturnsFee = () => {
     try {
       const responseTypesFee = await api.get("payMachineReturn/types");
 
-      if (responseTypesFee.status) {
-        setTypesFee(responseTypesFee.data.response);
+      if (responseTypesFee?.data) {
+        const raw = responseTypesFee.data?.response ?? responseTypesFee.data?.data;
+        setTypesFee(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: responseError.response?.data.message,
-        icon: "error",
-      });
+      setTypesFee([]);
     }
   };
 
@@ -103,27 +97,31 @@ export const DobbyReturnsFee = () => {
     getPayMachineReturns();
   }, []);
 
-  const typesFeeFormated = typesFee.map((value) => {
+  const typesFeeFormated = (Array.isArray(typesFee) ? typesFee : []).map((value) => {
     return {
-      value: String(value.id),
-      label: value.name,
+      value: String(value?.id),
+      label: value?.name || "",
     };
   });
 
   useEffect(() => {
     if (payMachineReturns) {
+      const valNum = Number(payMachineReturns.value ?? 0);
       setValueDobby(
-        payMachineReturns.value
+        valNum
           .toLocaleString("pt-br", {
             style: "currency",
             currency: "BRL",
           })
           .replace("R$", "")
+          .trim()
       );
       setPayMachineReturnTypeId(
-        String(payMachineReturns.payMachineReturnTypeId)
+        payMachineReturns.payMachineReturnTypeId ? String(payMachineReturns.payMachineReturnTypeId) : null
       );
-      setPaidByPlatform(String(payMachineReturns.paidByPlatform));
+      setPaidByPlatform(
+        payMachineReturns.paidByPlatform != null ? String(payMachineReturns.paidByPlatform) : null
+      );
     }
   }, [payMachineReturns]);
 

@@ -69,13 +69,15 @@ const ConfirmationCode = () => {
 			responseExternalServiceType,
 		])
 			.then((values) => {
-				setConfirmationCodeCustomer(values[0].data.response);
-				setExternalServiceActive(values[1].data.response);
+				setConfirmationCodeCustomer(Array.isArray(values[0]?.data?.response) ? values[0].data.response : []);
+				setExternalServiceActive(Array.isArray(values[1]?.data?.response) ? values[1].data.response : []);
 				setLoading(false);
 			})
 			.catch((error) => {
 				console.log(error);
 				setLoading(false);
+				setConfirmationCodeCustomer([]);
+				setExternalServiceActive([]);
 				handleMessageAlert('Erro nas requisições!', 'error');
 			});
 	};
@@ -149,7 +151,7 @@ const ConfirmationCode = () => {
 			<Content>
 				<CardCodeConfirmation
 					title="Tipo do código de confirmação do cliente"
-					content={confirmationCodeCustomer.map((value) => {
+					content={(Array.isArray(confirmationCodeCustomer) ? confirmationCodeCustomer : []).map((value) => {
 						return (
 							<React.Fragment key={value.id}>
 								<div>
@@ -175,8 +177,9 @@ const ConfirmationCode = () => {
 					})}
 				/>
 				{Object.values(
-					externalServiceActive.reduce((acc: any, curr) => {
-						const actionId = curr.external_service_action.id;
+					(Array.isArray(externalServiceActive) ? externalServiceActive : []).reduce((acc: any, curr) => {
+						const actionId = curr?.external_service_action?.id;
+						if (!actionId) return acc;
 						if (!acc[actionId]) {
 							acc[actionId] = {
 								action: curr.external_service_action,
@@ -188,24 +191,24 @@ const ConfirmationCode = () => {
 					}, {}),
 				).map(({ action, channels }: any) => (
 					<CardCodeConfirmation
-						key={action.id}
-						title={action.name}
-						content={channels.map(
+						key={action?.id}
+						title={action?.name}
+						content={(Array.isArray(channels) ? channels : []).map(
 							(channel: ExternalServiceActivesProps) => (
-								<React.Fragment key={channel.id}>
+								<React.Fragment key={channel?.id}>
 									<div>
 										<input
 											type="checkbox"
-											checked={channel.status === 1}
+											checked={channel?.status === 1}
 											onChange={() =>
 												handleChangeExternalServiceChannel(
-													channel.id,
-													channel.status,
+													channel?.id,
+													channel?.status,
 												)
 											}
 										/>
 										<label>
-											{channel.external_service_type.name}
+											{channel?.external_service_type?.name}
 										</label>
 									</div>
 								</React.Fragment>

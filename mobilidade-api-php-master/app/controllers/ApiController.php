@@ -82,6 +82,7 @@ class ApiController
             'status' => true,
             'message' => $message,
             'data' => $data,
+            'response' => $data,
             'errors' => null
         ]);
     }
@@ -120,6 +121,7 @@ class ApiController
             'status' => false,
             'message' => $message,
             'data' => $exception instanceof ApiTokenException ? null : $data,
+            'response' => is_array($data) ? $data : [$message],
             'errors' => $exception instanceof Throwable ? [
                 'code' => $exception instanceof BaseException ? $exception->getCode() : 0,
                 'exception_code' => $exception->getCode(),

@@ -202,9 +202,10 @@ export const ReportsFinancial = () => {
       );
 
       if (responseReferralDriver.status) {
-        setListDriversReferral(responseReferralDriver.data.response);
+        setListDriversReferral(Array.isArray(responseReferralDriver.data?.response) ? responseReferralDriver.data.response : []);
       }
     } catch (error) {
+      setListDriversReferral([]);
       console.error(error);
     } finally {
       setLoading(false);
@@ -218,12 +219,14 @@ export const ReportsFinancial = () => {
       );
 
       if (responseUserIndications.status) {
-        setListIndications(responseUserIndications.data.data);
-        if (responseUserIndications.data.data.length > 0) {
-          setIdUserIndication(responseUserIndications.data.data[0].idUser);
+        const uList = Array.isArray(responseUserIndications.data?.data) ? responseUserIndications.data.data : [];
+        setListIndications(uList);
+        if (uList.length > 0) {
+          setIdUserIndication(uList[0].idUser);
         }
       }
     } catch (error) {
+      setListIndications([]);
       console.error(error);
       swal({
         title: "Erro ao pegar dados!",
@@ -254,9 +257,10 @@ export const ReportsFinancial = () => {
       );
 
       if (responseReferrealEarnings.status) {
-        setListDatasIndications(responseReferrealEarnings.data.response);
+        setListDatasIndications(Array.isArray(responseReferrealEarnings.data?.response) ? responseReferrealEarnings.data.response : []);
       }
     } catch (error) {
+      setListDatasIndications([]);
       console.error(error);
       swal({
         title: "Erro ao buscar indicações!",

@@ -128,7 +128,7 @@ const AccessoriesTable = ({
     },
   ];
 
-  const tableData = accessoriesList.map((item: DeliveryListProps) => {
+  const tableData = (Array.isArray(accessoriesList) ? accessoriesList : []).map((item: DeliveryListProps) => {
     return {
       logo: item.picture,
       key: item.id,

@@ -38,9 +38,9 @@ const DeliveryAccessories = () => {
       const { data } = result;
       setTableLoading(false);
       if (data?.status) {
-        setAccessoriesList(data.response);
+        setAccessoriesList(Array.isArray(data.response) ? data.response : []);
       }
-      if (data.response.length === 0) {
+      if (!data?.response || (Array.isArray(data.response) && data.response.length === 0)) {
         setLoadingText("Nenhum item encontrado");
       }
     } catch (error) {

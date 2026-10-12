@@ -177,9 +177,9 @@ const RegisterEstablishments = () => {
       const { data } = result;
       setTableLoading(false);
       if (data?.status) {
-        setListEstablishments(data.response);
+        setListEstablishments(Array.isArray(data.response) ? data.response : []);
       }
-      if (data.response.length === 0) {
+      if (!data?.response || (Array.isArray(data.response) && data.response.length === 0)) {
         setLoadingText("Nenhum estabelecimento encontrado");
       }
     } catch (error) {
@@ -206,7 +206,7 @@ const RegisterEstablishments = () => {
       );
       const { data } = result;
       if (data?.status) {
-        const responseFilterFormated = data.response.map(
+        const responseFilterFormated = (Array.isArray(data?.response) ? data.response : []).map(
           (result: FantasyNameProps) => ({
             value: result.id,
             label: result.fantasyName,
@@ -214,7 +214,7 @@ const RegisterEstablishments = () => {
         );
         setListFantasyName(responseFilterFormated);
       }
-      if (data.response.length == 0) {
+      if (!data?.response || (Array.isArray(data.response) && data.response.length == 0)) {
         setLoadingText("Nenhum encontrado");
       }
     } catch (error) {

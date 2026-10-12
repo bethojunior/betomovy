@@ -60,7 +60,9 @@ interface PrepaidProps {
 export const BuyCredit = () => {
   const history = useHistory();
   const [listPrePaid, setListPrepaid] = useState<PrepaidProps[]>([]);
-  const listPrePaidWithKey = listPrePaid.map(item => ({ ...item, key: item.id })).filter((data) => data.credit_prepaid !== null);
+  const listPrePaidWithKey = (Array.isArray(listPrePaid) ? listPrePaid : [])
+    .map((item) => ({ ...item, key: item?.id }))
+    .filter((data) => data?.credit_prepaid != null);
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [messageAlert, setMessage] = useState("");
@@ -314,9 +316,10 @@ const loadData = async (changeMode = true) => {
       );
     }
 
-    setListPrepaid(responseInformations.data.response);
+    const rawPrepaid = responseInformations.data?.response ?? responseInformations.data?.data;
+    setListPrepaid(Array.isArray(rawPrepaid) ? rawPrepaid : []);
   } catch (error) {
-    console.error(error);
+    setListPrepaid([]);
   } finally {
     setLoading(false);
   }

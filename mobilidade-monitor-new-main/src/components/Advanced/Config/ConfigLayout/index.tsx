@@ -155,13 +155,14 @@ export const ConfigLayout = () => {
       const responseAnimations = await api.get("appAnimation");
 
       if (responseAnimations.status) {
-        setListAnimations(responseAnimations.data.response);
+        setListAnimations(Array.isArray(responseAnimations.data?.response) ? responseAnimations.data.response : []);
       }
     } catch (error) {
+      setListAnimations([]);
       const responseError = error as AxiosError;
 
       swal({
-        title: responseError.response?.data.message,
+        title: responseError.response?.data?.message || "Erro ao buscar animações",
         icon: "error",
       });
     } finally {
@@ -278,8 +279,8 @@ export const ConfigLayout = () => {
     getAnimations();
   }, []);
 
-  const dataAnimations = animationsSended.map((value) => {
-    if (listAnimations.length > 0) {
+  const dataAnimations = (Array.isArray(animationsSended) ? animationsSended : []).map((value) => {
+    if (Array.isArray(listAnimations) && listAnimations.length > 0) {
       const isAnimationExists = listAnimations?.find(
         (data) => data.id_app === Number(value.id)
       );

@@ -52,9 +52,10 @@ export const EstablishmentsCharges = () => {
         }`
       );
 
-      if (responseEstablishment.status) {
-        setListEstablishments(responseEstablishment.data.response.data);
-        last_page = responseEstablishment.data.response.last_page;
+      if (responseEstablishment?.data) {
+        const raw = responseEstablishment.data?.response?.data ?? responseEstablishment.data?.response ?? responseEstablishment.data?.data;
+        setListEstablishments(Array.isArray(raw) ? raw : []);
+        last_page = responseEstablishment.data?.response?.last_page ?? 1;
       }
     } catch (error) {
       const responseError = error as AxiosError;
@@ -172,27 +173,30 @@ export const EstablishmentsCharges = () => {
       title: "Nome",
       key: "name",
       render: (_, data) => {
-        return <span>{data.company.name}</span>;
+        return <span>{data?.company?.name || "-"}</span>;
       },
     },
     {
       title: "Descrição",
       key: "description",
       dataIndex: "description",
+      render: (desc: any) => <span>{desc || "-"}</span>,
     },
     {
       title: "Valor",
       key: "value",
       render: (_, data) => {
+        const val = Number(data?.value ?? 0);
         return (
           <span>
             {" "}
-            {data.value
+            {val
               .toLocaleString("pt-br", {
                 style: "currency",
                 currency: "BRL",
               })
-              .replace("R$", "")}
+              .replace("R$", "")
+              .trim()}
           </span>
         );
       },
@@ -201,14 +205,14 @@ export const EstablishmentsCharges = () => {
       title: "Criado em",
       key: "created-at",
       render: (_, data) => {
-        return <span>{new Date(data.created_at).toLocaleString()}</span>;
+        return <span>{data?.created_at ? new Date(data.created_at).toLocaleString() : "-"}</span>;
       },
     },
     {
       title: "Status de cobrança",
       key: "status-payment",
       render: (_, data) => {
-        return <span>{data.status_payment.description}</span>;
+        return <span>{data?.status_payment?.description || "-"}</span>;
       },
     },
     {
@@ -273,10 +277,10 @@ export const EstablishmentsCharges = () => {
     option?: { label: string; value: string }
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
-  const companiesFormated = listCompanies.map((value) => {
+  const companiesFormated = (Array.isArray(listCompanies) ? listCompanies : []).map((value) => {
     return {
-      value: String(value.id),
-      label: `Nome: ${value.name} Telefone: ${value.phone} CNPJ: ${value.document}`,
+      value: String(value?.id),
+      label: `Nome: ${value?.name || "-"} Telefone: ${value?.phone || "-"} CNPJ: ${value?.document || "-"}`,
     };
   });
 

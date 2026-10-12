@@ -49,17 +49,14 @@ export function LinkedDrivers() {
       setLoadingCallGroups(true);
       const responseCallGroup = await api.get("callGroup");
 
-      if (responseCallGroup?.status) {
-        setListCallGroups(responseCallGroup?.data?.response);
-        setIdCallGroup(responseCallGroup?.data?.response[0].id ?? null);
+      if (responseCallGroup?.data) {
+        const rawGroups = responseCallGroup?.data?.response ?? responseCallGroup?.data?.data;
+        const groups = Array.isArray(rawGroups) ? rawGroups : [];
+        setListCallGroups(groups);
+        setIdCallGroup(groups.length > 0 ? (groups[0]?.id ?? null) : null);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: "Erro",
-        icon: "error",
-        text: responseError.response?.data.response[0],
-      });
+      setListCallGroups([]);
     } finally {
       setLoadingCallGroups(false);
     }
@@ -94,11 +91,14 @@ export function LinkedDrivers() {
         last_page = responseSearchLinkedDrivers?.data?.response?.last_page;
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao capturar motoristas vinculados");
       swal({
-        title: "Erro",
-        icon: "error",
-        text: responseError.response?.data.response[0],
+        title: "Atenção",
+        icon: "warning",
+        text: errMsg,
       });
     } finally {
       setLoadingCallGroups(false);
@@ -119,11 +119,14 @@ export function LinkedDrivers() {
         setListLinkedDrivers(responseDrivers?.data?.response?.data ?? []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao buscar motoristas");
       swal({
-        title: "Erro",
-        icon: "error",
-        text: responseError.response?.data.response[0],
+        title: "Atenção",
+        icon: "warning",
+        text: errMsg,
       });
     } finally {
       setLoadingCallGroups(false);
@@ -155,11 +158,14 @@ export function LinkedDrivers() {
             handleSearchLinkedDriver(idCallGroup);
           })
           .catch((error) => {
-            const responseError = error as AxiosError;
+            const responseError = error as AxiosError<any>;
+            const errMsg = Array.isArray(responseError.response?.data?.response)
+              ? responseError.response?.data?.response[0]
+              : (responseError.response?.data?.message || "Erro ao desvincular motorista");
             swal({
               title: "Erro",
               icon: "error",
-              text: responseError.response?.data.response[0],
+              text: errMsg,
             });
           });
       }
@@ -232,10 +238,10 @@ export function LinkedDrivers() {
     }
   }, [idCallGroup]);
 
-  const listCallGroupsFormated = listCallGroups.map((callGroups) => {
+  const listCallGroupsFormated = (Array.isArray(listCallGroups) ? listCallGroups : []).map((callGroups) => {
     return {
-      label: callGroups.name,
-      value: callGroups.id,
+      label: callGroups?.name || "",
+      value: callGroups?.id,
     };
   });
 
@@ -278,7 +284,7 @@ export function LinkedDrivers() {
         ) : null}
         <Table
           columns={columns}
-          dataSource={listLinkedDrivers}
+          dataSource={Array.isArray(listLinkedDrivers) ? listLinkedDrivers : []}
           pagination={false}
         />
       </ContentTable>

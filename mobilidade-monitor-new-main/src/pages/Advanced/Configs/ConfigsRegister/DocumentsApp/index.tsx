@@ -33,13 +33,14 @@ export const DocumentsApp = () => {
       const responseDocuments = await api.get("doc");
 
       if (responseDocuments.status) {
-        setDocs(responseDocuments.data.response);
+        setDocs(Array.isArray(responseDocuments.data?.response) ? responseDocuments.data.response : []);
       }
     } catch (error) {
+      setDocs([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao buscar documentos",
         icon: "error",
       });
       console.error(error);
@@ -176,7 +177,7 @@ export const DocumentsApp = () => {
       <ContentTable>
         <Table
           columns={columns}
-          dataSource={docs}
+          dataSource={Array.isArray(docs) ? docs : []}
           loading={loading}
           pagination={false}
         />

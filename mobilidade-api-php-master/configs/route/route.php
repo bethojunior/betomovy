@@ -145,6 +145,12 @@ return [
         '/map/checkservices',
         '/map/listpriorityservice',
         '/mapservice',
-        '/mapservice/types'
+        '/mapservice/types',
+        '/callgroup',
+        '/callgroup/linkeddrivers',
+        '/callgroup/linkdriver',
+        '/callgroup/unlinkdriver',
+        '/callgroup/searchdriver',
+        '/withdraw'
     ]
 ];

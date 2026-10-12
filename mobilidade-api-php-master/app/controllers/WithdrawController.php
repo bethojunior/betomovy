@@ -12,6 +12,35 @@ use Exception;
  */
 class WithdrawController extends ApiController
 {
+    public function actionIndex()
+    {
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        if ($method === 'PUT' || $method === 'POST') {
+            try {
+                $id = $_GET['id'] ?? null;
+                if ($id) {
+                    $db = \app\utils\Connection::getConnection(\app\utils\Connection::DB_MYSQL_RW);
+                    $stmt = $db->prepare("UPDATE withdraw SET paymentDate = NOW() WHERE idWithdraw = :id");
+                    $stmt->execute([':id' => $id]);
+                }
+                echo $this->returnSuccess("Transferência confirmada com sucesso");
+            } catch (Exception $e) {
+                echo $this->returnError($e, "Erro ao confirmar transferência");
+            }
+            return;
+        }
+
+        try {
+            $data = (new WithdrawDao)->getAll();
+            echo $this->returnSuccess("Solicitações de transferências", [
+                'data' => $data ?: [],
+                'last_page' => 1
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e, "Erro ao capturar listagens de transferências.");
+        }
+    }
+
     public function actionNew()
     {
         try {

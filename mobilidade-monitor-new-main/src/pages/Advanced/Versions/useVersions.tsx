@@ -46,7 +46,7 @@ export const useVersions = (): UseVersionsResult => {
     setShowModal(true);
   };
 
-  const listVersionsApp: ListVersionsAppProps[] = listVersions.map((value) => ({
+  const listVersionsApp: ListVersionsAppProps[] = (Array.isArray(listVersions) ? listVersions : []).map((value) => ({
     appType: value.appId,
     versions: value.version,
   }));
@@ -57,10 +57,12 @@ export const useVersions = (): UseVersionsResult => {
       const responseAllVersions = await api.get(`appVersion?page=${page}`);
 
       if (responseAllVersions.status) {
-        setListVersions(responseAllVersions.data.response.data);
-        setTotalPage(responseAllVersions.data.response.last_page);
+        const raw = responseAllVersions.data?.response?.data ?? responseAllVersions.data?.response;
+        setListVersions(Array.isArray(raw) ? raw : []);
+        setTotalPage(responseAllVersions.data?.response?.last_page ?? null);
       }
     } catch (error) {
+      setListVersions([]);
       console.error(error);
     } finally {
       setLoadingTable(false);

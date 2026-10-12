@@ -39,9 +39,11 @@ const AdditionalSettings = () => {
       const responseConfigsAdditionals = await api.get("config/additional");
 
       if (responseConfigsAdditionals.data) {
-        setDataListConfigAdditional(responseConfigsAdditionals.data.response);
+        const raw = responseConfigsAdditionals.data?.response;
+        setDataListConfigAdditional(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
+      setDataListConfigAdditional([]);
       console.error(error);
     } finally {
       setLoading(false);
@@ -107,7 +109,7 @@ const AdditionalSettings = () => {
       <h1>Configurações do Gestor</h1>
       <Content>
         <Collapse>
-          {dataListConfigAdditional.map((response) => {
+          {(Array.isArray(dataListConfigAdditional) ? dataListConfigAdditional : []).map((response) => {
             return (
               <Collapse.Panel header={response.description} key={response.key}>
                 {isBooleanConfigInputType(response.inputTypePro) ? (

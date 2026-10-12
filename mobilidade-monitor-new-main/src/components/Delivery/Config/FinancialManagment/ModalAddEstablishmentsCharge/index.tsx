@@ -87,14 +87,11 @@ export const ModalAddEstablishmentsCharge = ({
       );
 
       if (responseCompany.status) {
-        setListCompanies(responseCompany.data.response);
+        const rawComp = responseCompany.data?.response ?? responseCompany.data?.data;
+        setListCompanies(Array.isArray(rawComp) ? rawComp : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: responseError.response?.headers.message,
-        icon: "error",
-      });
+      setListCompanies([]);
     } finally {
       setLoadingSelect(false);
     }
@@ -105,10 +102,10 @@ export const ModalAddEstablishmentsCharge = ({
     option?: { label: string; value: string }
   ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
-  const companiesFormated = listCompanies.map((value) => {
+  const companiesFormated = (Array.isArray(listCompanies) ? listCompanies : []).map((value) => {
     return {
-      value: String(value.id),
-      label: `Nome: ${value.name} Telefone: ${value.phone} CNPJ: ${value.document}`,
+      value: String(value?.id),
+      label: `Nome: ${value?.name || "-"} Telefone: ${value?.phone || "-"} CNPJ: ${value?.document || "-"}`,
     };
   });
 

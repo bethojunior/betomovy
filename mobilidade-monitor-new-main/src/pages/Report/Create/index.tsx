@@ -65,9 +65,7 @@ const CreateReport = () => {
         return setShowAlert(true);
       }
       return setTypeReport(
-        (result.data.response || []).map((item: ReportName) => {
-          return item;
-        })
+        Array.isArray(result?.data?.response) ? result.data.response : []
       );
     }).catch(() => {
       setLoading(false);
@@ -98,15 +96,15 @@ const CreateReport = () => {
             <List.Item>
               <Collapse ghost>
                 <Pannel header={item.name} key={item.id}>
-                  {item.reports.map((result) => {
+                  {(Array.isArray(item?.reports) ? item.reports : []).map((result) => {
                     return (
                       <Button
-                        key={result.id}
-                        value={result.id}
+                        key={result?.id}
+                        value={result?.id}
                         onClick={() => handleShowModal(result)}
                         type="link"
                       >
-                        {result.name}
+                        {result?.name}
                       </Button>
                     );
                   })}

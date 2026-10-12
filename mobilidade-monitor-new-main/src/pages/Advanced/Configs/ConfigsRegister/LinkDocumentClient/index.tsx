@@ -18,12 +18,13 @@ export const LinkDocumentClient = () => {
   const getDocs = async () => {
     try {
       const responseDocs = await api.get("doc");
-      setDocsCustomer(responseDocs.data.response);
+      setDocsCustomer(Array.isArray(responseDocs.data?.response) ? responseDocs.data.response : []);
     } catch (error) {
+      setDocsCustomer([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao buscar documentos",
         icon: "error",
       });
       console.error(error);
@@ -37,18 +38,20 @@ export const LinkDocumentClient = () => {
       );
 
       if (responseDocsUserType.status) {
-        const docsUserTypeFormated = responseDocsUserType.data.response.map(
+        const rawDocs = responseDocsUserType.data?.response;
+        const docsUserTypeFormated = (Array.isArray(rawDocs) ? rawDocs : []).map(
           (value: DocsUserTypeProps) => {
-            return value.doc;
+            return value?.doc;
           }
-        );
+        ).filter(Boolean);
         setDocsTypeUser(docsUserTypeFormated);
       }
     } catch (error) {
+      setDocsTypeUser([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao buscar documentos do tipo",
         icon: "error",
       });
       console.error(error);
@@ -59,10 +62,10 @@ export const LinkDocumentClient = () => {
     try {
       setLoadingButton(true);
 
-      const objectPayload = docsTypeUser.map((value) => {
+      const objectPayload = (Array.isArray(docsTypeUser) ? docsTypeUser : []).map((value) => {
         return {
           userTypeId: TYPE_DOCUMENT_CUSTOMER,
-          docId: value.id,
+          docId: value?.id,
         };
       });
 
@@ -83,7 +86,7 @@ export const LinkDocumentClient = () => {
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao salvar documentos",
         icon: "error",
       });
       console.error(error);
@@ -95,10 +98,10 @@ export const LinkDocumentClient = () => {
   const onChangeDocuments = (value: DocsProps, isChecked: boolean) => {
     if (!isChecked) {
       setDocsTypeUser(
-        docsTypeUser.filter((data) => data.label !== value.label)
+        (Array.isArray(docsTypeUser) ? docsTypeUser : []).filter((data) => data?.label !== value?.label)
       );
     } else {
-      setDocsTypeUser((data) => [...data, value]);
+      setDocsTypeUser((data) => [...(Array.isArray(data) ? data : []), value]);
     }
   };
 
@@ -126,9 +129,9 @@ export const LinkDocumentClient = () => {
             margin: "1rem 0",
           }}
         >
-          {docsCustomer.map((value) => {
+          {(Array.isArray(docsCustomer) ? docsCustomer : []).map((value) => {
             const isChecked =
-              docsTypeUser.find((data) => data.label === value.label) !==
+              (Array.isArray(docsTypeUser) ? docsTypeUser : []).find((data) => data?.label === value?.label) !==
               undefined;
 
             return (

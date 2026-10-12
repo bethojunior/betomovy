@@ -46,16 +46,12 @@ export function ListCallGroups() {
       setLoadingTable(true);
       const responseCallGroup = await api.get("callGroup");
 
-      if (responseCallGroup?.status) {
-        setListCallGroups(responseCallGroup?.data?.response);
+      if (responseCallGroup?.data) {
+        const raw = responseCallGroup?.data?.response ?? responseCallGroup?.data?.data;
+        setListCallGroups(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: "Erro",
-        icon: "error",
-        text: responseError.response?.data.response[0],
-      });
+      setListCallGroups([]);
     } finally {
       setLoadingTable(false);
     }
@@ -97,11 +93,14 @@ export function ListCallGroups() {
             getCallGroups();
           })
           .catch((error) => {
-            const responseError = error as AxiosError;
+            const responseError = error as AxiosError<any>;
+            const errMsg = Array.isArray(responseError.response?.data?.response)
+              ? responseError.response?.data?.response[0]
+              : (responseError.response?.data?.message || "Erro ao deletar grupo de chamado");
             swal({
               title: "Erro",
               icon: "error",
-              text: responseError.response?.data.response[0],
+              text: errMsg,
             });
           });
       }
@@ -181,7 +180,7 @@ export function ListCallGroups() {
       <ContentTable>
         <Table
           columns={columns}
-          dataSource={listCallGroups}
+          dataSource={Array.isArray(listCallGroups) ? listCallGroups : []}
           pagination={false}
           loading={loadingTable}
         />

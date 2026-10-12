@@ -168,7 +168,7 @@ export const Versions = () => {
       {canManageVersions && (
         <ContentTable>
           <Table
-            dataSource={listVersions}
+            dataSource={Array.isArray(listVersions) ? listVersions : []}
             columns={columns}
             pagination={false}
             loading={loadingTable}

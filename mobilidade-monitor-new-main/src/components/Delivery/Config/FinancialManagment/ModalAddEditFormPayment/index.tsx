@@ -120,15 +120,12 @@ export const ModalAddEditFormPayment = ({
       setLoadingListFormPayment(true);
       const responseGetFormPayments = await api.get("paymentFormType");
 
-      if (responseGetFormPayments.status) {
-        setListFormsPayments(responseGetFormPayments.data.response);
+      if (responseGetFormPayments?.data) {
+        const raw = responseGetFormPayments.data?.response ?? responseGetFormPayments.data?.data;
+        setListFormsPayments(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: responseError.response?.data.message,
-        icon: "error",
-      });
+      setListFormsPayments([]);
     } finally {
       setLoadingListFormPayment(false);
     }
@@ -140,15 +137,15 @@ export const ModalAddEditFormPayment = ({
 
   useEffect(() => {
     if (formPaymentSelected) {
-      setDescription(formPaymentSelected?.name);
-      setIdFormPayment(formPaymentSelected?.paymentFormTypeId);
+      setDescription(formPaymentSelected?.name || "");
+      setIdFormPayment(formPaymentSelected?.paymentFormTypeId ?? null);
     }
   }, [formPaymentSelected]);
 
-  const optionsFormPaymentsFormated = listFormsPayments.map((value) => {
+  const optionsFormPaymentsFormated = (Array.isArray(listFormsPayments) ? listFormsPayments : []).map((value) => {
     return {
-      value: value.id,
-      label: value.description,
+      value: value?.id,
+      label: value?.description || "",
     };
   });
 

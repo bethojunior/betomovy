@@ -30,15 +30,12 @@ export const Acquirers = () => {
       setLoading(true);
       const responseAcquirers = await api.get("deliveryAcquirer");
 
-      if (responseAcquirers.status) {
-        setDeliveryAcquirers(responseAcquirers.data.response);
+      if (responseAcquirers?.data) {
+        const raw = responseAcquirers.data?.response ?? responseAcquirers.data?.data;
+        setDeliveryAcquirers(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
-      swal({
-        title: responseError.response?.data.message,
-        icon: "error",
-      });
+      setDeliveryAcquirers([]);
     } finally {
       setLoading(false);
     }
@@ -50,18 +47,20 @@ export const Acquirers = () => {
 
   useEffect(() => {
     if (acquirersSelected) {
-      const selectedAcquirer = JSON.parse(
-        acquirersSelected
-      ) as DeliveryAcquirersProps;
-      const initialInputValues: { [key: string]: string } = {};
-      selectedAcquirer.delivery_acquirer_meta_data.forEach(
-        (metadata: DeliveryAcquirerMetadataProps) => {
-          if (metadata.value !== null) {
-            initialInputValues[metadata.key] = metadata.value;
+      try {
+        const selectedAcquirer = JSON.parse(
+          acquirersSelected
+        ) as DeliveryAcquirersProps;
+        const initialInputValues: { [key: string]: string } = {};
+        (selectedAcquirer?.delivery_acquirer_meta_data || []).forEach(
+          (metadata: DeliveryAcquirerMetadataProps) => {
+            if (metadata && metadata.value !== null) {
+              initialInputValues[metadata.key] = metadata.value;
+            }
           }
-        }
-      );
-      setInputValues(initialInputValues);
+        );
+        setInputValues(initialInputValues);
+      } catch {}
     }
   }, [acquirersSelected]);
 
@@ -73,8 +72,12 @@ export const Acquirers = () => {
     }));
   };
 
-  const acquirersFormated: DeliveryAcquirersProps | undefined =
-    acquirersSelected && JSON.parse(acquirersSelected);
+  let acquirersFormated: DeliveryAcquirersProps | undefined;
+  try {
+    if (acquirersSelected) {
+      acquirersFormated = JSON.parse(acquirersSelected);
+    }
+  } catch {}
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -125,7 +128,7 @@ export const Acquirers = () => {
         onChange={(event) => setAcquirersSelected(event.target.value)}
         value={acquirersSelected}
       >
-        {deliveryAcquirers.map((value) => {
+        {(Array.isArray(deliveryAcquirers) ? deliveryAcquirers : []).map((value) => {
           return (
             <Radio key={value.id} value={JSON.stringify(value)}>
               {value.name}
@@ -136,7 +139,7 @@ export const Acquirers = () => {
 
       <ContentInputsAcquirers>
         <form onSubmit={handleSubmit}>
-          {acquirersFormated?.delivery_acquirer_meta_data.map(
+          {(acquirersFormated?.delivery_acquirer_meta_data || []).map(
             (value: DeliveryAcquirerMetadataProps) => {
               return (
                 <ContentInput key={value.key}>

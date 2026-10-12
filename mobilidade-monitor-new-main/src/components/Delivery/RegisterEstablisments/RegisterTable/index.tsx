@@ -92,15 +92,15 @@ const RegisterTable = ({
     },
   ];
 
-  const tableData = listEstablishments.map((item) => {
+  const tableData = (Array.isArray(listEstablishments) ? listEstablishments : []).map((item) => {
     return {
-      key: item.id,
-      logo: item.picture,
-      name: item.company.name,
-      cnpj: item.company.document,
+      key: item?.id,
+      logo: item?.picture,
+      name: item?.company?.name ?? String(item?.companyId ?? ""),
+      cnpj: item?.company?.document ?? "",
       delivery: item,
       menu: item,
-      locais: item.companyId,
+      locais: item?.companyId,
       edit: item,
     };
   });

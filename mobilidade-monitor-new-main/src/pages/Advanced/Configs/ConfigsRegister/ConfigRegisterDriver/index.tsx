@@ -73,7 +73,8 @@ export const ConfigRegisterDriver = () => {
       setLoadingSelect(true);
       const responseTypesDrivers = await api.get("userType/drivers");
 
-      const typesDriversFormated = responseTypesDrivers.data.response.map(
+      const rawTypes = responseTypesDrivers.data?.response;
+      const typesDriversFormated = (Array.isArray(rawTypes) ? rawTypes : []).map(
         (value: DriverUserTypesProps) => {
           return {
             value: value.idUserType,
@@ -83,10 +84,11 @@ export const ConfigRegisterDriver = () => {
       );
       setTypesDrivers(typesDriversFormated);
     } catch (error) {
+      setTypesDrivers([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao buscar tipos de motoristas",
         icon: "error",
       });
       console.error(error);
@@ -100,13 +102,14 @@ export const ConfigRegisterDriver = () => {
       const responseFormsStep = await api.get("config/formStep");
 
       if (responseFormsStep.status) {
-        setFormsStep(responseFormsStep.data.response);
+        setFormsStep(Array.isArray(responseFormsStep.data?.response) ? responseFormsStep.data.response : []);
       }
     } catch (error) {
+      setFormsStep([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao buscar etapas",
         icon: "error",
       });
       console.error(error);
@@ -128,7 +131,7 @@ export const ConfigRegisterDriver = () => {
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao excluir etapa",
         icon: "error",
       });
       console.error(error);
@@ -145,15 +148,16 @@ export const ConfigRegisterDriver = () => {
 
       if (responseSelectCategory.status) {
         getFormsStep();
-        setStepsSelected(responseSelectCategory.data.response);
+        setStepsSelected(Array.isArray(responseSelectCategory.data?.response) ? responseSelectCategory.data.response : []);
         setUserTypeIdSelected(id);
         listIdsSelected = [];
       }
     } catch (error) {
+      setStepsSelected([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao selecionar categoria",
         icon: "error",
       });
       console.error(error);
@@ -167,12 +171,13 @@ export const ConfigRegisterDriver = () => {
   }, []);
 
   useEffect(() => {
-    stepsSelected.map((value) => {
+    listIdsSelected = [];
+    (Array.isArray(stepsSelected) ? stepsSelected : []).forEach((value) => {
       listIdsSelected.push(value.formStepId);
     });
   }, [stepsSelected, formsStep]);
 
-  const formsStepFiltered = formsStep.filter(
+  const formsStepFiltered = (Array.isArray(formsStep) ? formsStep : []).filter(
     (data) => !listIdsSelected.includes(data.id)
   );
 
@@ -200,7 +205,7 @@ export const ConfigRegisterDriver = () => {
               width: "100%",
             }}
           >
-            {formsStepFiltered.map((value) => {
+            {(Array.isArray(formsStepFiltered) ? formsStepFiltered : []).map((value) => {
               return (
                 <Fragment key={value.id}>
                   <ItemConfigs>
@@ -228,11 +233,11 @@ export const ConfigRegisterDriver = () => {
               width: "100%",
             }}
           >
-            {stepsSelected.map((value) => {
+            {(Array.isArray(stepsSelected) ? stepsSelected : []).map((value) => {
               return (
                 <Fragment key={value.id}>
                   <ItemConfigs key={value.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <p>{value.form_step.description}</p>
+                    <p>{value?.form_step?.description ?? ""}</p>
                     <ButtonAntd
                       danger
                       shape="circle"

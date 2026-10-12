@@ -126,16 +126,15 @@ export const TransferRequests = () => {
     setLoading(true);
     try {
       const responseListFinancial = await api.get(`withdraw?page=${page}`);
-      if (responseListFinancial.status) {
-        setListFinancial(responseListFinancial.data.response.data);
-        last_page = responseListFinancial.data.response.last_page;
+      if (responseListFinancial?.data) {
+        const raw = responseListFinancial.data?.response ?? responseListFinancial.data?.data;
+        const list = Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []);
+        setListFinancial(list);
+        last_page = raw?.last_page ?? 1;
       }
     } catch (error) {
       console.error(error);
-      swal({
-        title: "Erro ao capturar listagens de transferências.",
-        icon: "error",
-      });
+      setListFinancial([]);
     }
     setLoading(false);
   };

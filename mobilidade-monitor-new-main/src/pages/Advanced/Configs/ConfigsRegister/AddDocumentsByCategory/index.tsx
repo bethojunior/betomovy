@@ -29,13 +29,14 @@ export const AddDocumentsByCategory = () => {
       const responseDocs = await api.get("doc");
 
       if (responseDocs.status) {
-        setDocs(responseDocs.data.response);
+        setDocs(Array.isArray(responseDocs.data?.response) ? responseDocs.data.response : []);
       }
     } catch (error) {
+      setDocs([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao buscar documentos",
         icon: "error",
       });
       console.error(error);
@@ -47,7 +48,8 @@ export const AddDocumentsByCategory = () => {
       setLoadingSelect(true);
       const responseTypesDrivers = await api.get("userType/drivers");
 
-      const typesDriversFormated = responseTypesDrivers.data.response.map(
+      const rawTypes = responseTypesDrivers.data?.response;
+      const typesDriversFormated = (Array.isArray(rawTypes) ? rawTypes : []).map(
         (value: DriverUserTypesProps) => {
           return {
             value: value.idUserType,
@@ -57,10 +59,11 @@ export const AddDocumentsByCategory = () => {
       );
       setTypesDrivers(typesDriversFormated);
     } catch (error) {
+      setTypesDrivers([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao buscar tipos de motoristas",
         icon: "error",
       });
       console.error(error);
@@ -75,14 +78,15 @@ export const AddDocumentsByCategory = () => {
       const responseDocsTypeDriver = await api.get(`doc/userType/${id}`);
 
       if (responseDocsTypeDriver.status) {
-        setDocsUserTypes(responseDocsTypeDriver.data.response);
+        setDocsUserTypes(Array.isArray(responseDocsTypeDriver.data?.response) ? responseDocsTypeDriver.data.response : []);
         setIdDocUserType(id);
       }
     } catch (error) {
+      setDocsUserTypes([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao buscar documentos do tipo",
         icon: "error",
       });
       console.error(error);
@@ -147,9 +151,9 @@ export const AddDocumentsByCategory = () => {
   }, []);
 
   useEffect(() => {
-    const docsActives = docsUserTypes?.map((value) => {
-      return value.doc;
-    });
+    const docsActives = (Array.isArray(docsUserTypes) ? docsUserTypes : []).map((value) => {
+      return value?.doc;
+    }).filter(Boolean);
 
     setListDocumentsSelected(docsActives as DocsProps[]);
   }, [docsUserTypes]);
@@ -175,7 +179,7 @@ export const AddDocumentsByCategory = () => {
               marginTop: "1rem",
             }}
           >
-            {docs.map((value) => {
+            {(Array.isArray(docs) ? docs : []).map((value) => {
               const isChecked =
                 listDocumentsSelected?.find(
                   (data) => data.label === value.label

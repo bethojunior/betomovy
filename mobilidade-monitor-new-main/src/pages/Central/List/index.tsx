@@ -306,7 +306,8 @@ export const ListCentral = () => {
         console.error("Erro ao obter cidade selecionada:", error);
       }
       
-      let filteredCentrals = data.response.data;
+      const rawData = data?.response?.data ?? data?.response;
+      let filteredCentrals = Array.isArray(rawData) ? rawData : [];
       const isFilteringByCity = true;
 
       if (isFilteringByCity && citySelected && citySelected.cityId) {
@@ -323,17 +324,20 @@ export const ListCentral = () => {
       
       setListCentral(filteredCentrals);
 
-      if (data.response.next_page_url !== null && page !== null) {
+      if (data?.response?.next_page_url && page !== null) {
         setNextPage(page + 1);
       } else {
         setNextPage(null);
       }
 
-      if (data.response.prev_page_url !== null && page !== null) {
+      if (data?.response?.prev_page_url && page !== null) {
         setLastPage(page - 1);
       } else {
         setLastPage(null);
       }
+    }).catch(() => {
+      setLoading(false);
+      setListCentral([]);
     });
   };
 
@@ -421,7 +425,10 @@ export const ListCentral = () => {
         return;
       }
 
-      setTripType(data.response);
+      setTripType(Array.isArray(data?.response) ? data.response : []);
+    }).catch(() => {
+      setLoading(false);
+      setTripType([]);
     });
   };
 
@@ -438,7 +445,10 @@ export const ListCentral = () => {
         return;
       }
 
-      setCity(data.response);
+      setCity(Array.isArray(data?.response) ? data.response : []);
+    }).catch(() => {
+      setLoading(false);
+      setCity([]);
     });
   };
 

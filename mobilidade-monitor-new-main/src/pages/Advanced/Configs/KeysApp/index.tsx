@@ -19,16 +19,21 @@ const KeysApp: FC = () => {
       const responseConfigs = await api.get("config");
 
       if (responseConfigs.status) {
-        const keys = responseConfigs.data.response;
+        const raw = responseConfigs.data?.response;
+        const keys = Array.isArray(raw) ? raw : [];
 
         setListKeys(keys);
         localStorage.setItem("keysApp", JSON.stringify(keys));
       }
     } catch (error) {
+      setListKeys([]);
       console.error(error);
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao buscar chaves");
       swal({
-        title: responseError.response?.data.response,
+        title: errMsg,
         icon: "error",
       });
     } finally {
@@ -46,10 +51,10 @@ const KeysApp: FC = () => {
     <Content>
        
       <Collapse>
-        {listKeys.map((item) => {
+        {(Array.isArray(listKeys) ? listKeys : []).map((item) => {
           return (
             <Panel header={item.type} key={item.type}>
-              {item.config.map((value) => {
+              {(Array.isArray(item?.config) ? item.config : []).map((value) => {
                 return (
                   <ContentKeys key={value.key}>
                     <Title>{value.description}</Title>

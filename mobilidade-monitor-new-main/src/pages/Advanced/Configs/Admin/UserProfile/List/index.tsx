@@ -46,13 +46,17 @@ const UserProfile = () => {
   const handleLoadProfile = () => {
     api("role").then((result) => {
       setLoading(false);
-      if (!result.data.status) {
+      if (!result?.data?.status) {
         setMessageAlert("Não foi possível carregar os perfis. Tente novamente");
         setTypeAlert("error");
+        setListProfile([]);
         return setShowAlert(true);
       }
 
-      return setListProfile(result.data.response);
+      return setListProfile(Array.isArray(result.data.response) ? result.data.response : []);
+    }).catch(() => {
+      setLoading(false);
+      setListProfile([]);
     });
   };
 
@@ -112,7 +116,7 @@ const UserProfile = () => {
       </Button>
       <ListContent
         bordered
-        dataSource={listProfile}
+        dataSource={Array.isArray(listProfile) ? listProfile : []}
         renderItem={(item) => (
           <List.Item key={(item as ListProfile).id}>
             <p style={{ marginBottom: 0 }}>{(item as ListProfile).name}</p>

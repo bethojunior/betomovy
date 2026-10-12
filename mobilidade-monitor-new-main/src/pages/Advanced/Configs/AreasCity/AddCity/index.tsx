@@ -92,12 +92,16 @@ export const AddCity = () => {
       const responseCountries = await api.get("country");
 
       if (responseCountries.status) {
-        setCountries(responseCountries.data.response);
+        setCountries(Array.isArray(responseCountries.data?.response) ? responseCountries.data.response : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      setCountries([]);
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao buscar países");
       swal({
-        title: responseError.response?.data.response[0],
+        title: errMsg,
         icon: "error",
       });
     } finally {
@@ -111,12 +115,16 @@ export const AddCity = () => {
       const responseState = await api.get(`estate/country/${idCountry}`);
 
       if (responseState.status) {
-        setStates(responseState.data.response);
+        setStates(Array.isArray(responseState.data?.response) ? responseState.data.response : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      setStates([]);
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao buscar estados");
       swal({
-        title: responseError.response?.data.response[0],
+        title: errMsg,
         icon: "error",
       });
     } finally {
@@ -133,12 +141,16 @@ export const AddCity = () => {
       );
 
       if (responseGetCities.status) {
-        setCities(responseGetCities.data.response);
+        setCities(Array.isArray(responseGetCities.data?.response) ? responseGetCities.data.response : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      setCities([]);
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao buscar informações da cidade");
       swal({
-        title: responseError.response?.data.response[0],
+        title: errMsg,
         icon: "error",
       });
     } finally {
@@ -151,12 +163,16 @@ export const AddCity = () => {
       setLoading(true);
       const responseCity = await api.get(`city?estateId=${idState}`);
       if (responseCity.status) {
-        setCities(responseCity.data.response);
+        setCities(Array.isArray(responseCity.data?.response) ? responseCity.data.response : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      setCities([]);
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao buscar cidades");
       swal({
-        title: responseError.response?.data.response[0],
+        title: errMsg,
         icon: "error",
       });
     } finally {
@@ -169,12 +185,16 @@ export const AddCity = () => {
       setLoading(true);
       const responseCities = await api.get("city/actives/fully");
       if (responseCities.status) {
-        setCitiesFully(responseCities.data.response);
+        setCitiesFully(Array.isArray(responseCities.data?.response) ? responseCities.data.response : []);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      setCitiesFully([]);
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao buscar cidades ativas");
       swal({
-        title: responseError.response?.data.response[0],
+        title: errMsg,
         icon: "error",
       });
     } finally {
@@ -240,21 +260,21 @@ export const AddCity = () => {
     }
   };
 
-  const countriesFormated: DeafaultOptionsAntd[] = countries.map((value) => {
+  const countriesFormated: DeafaultOptionsAntd[] = (Array.isArray(countries) ? countries : []).map((value) => {
     return {
-      value: value.id,
-      label: value.name,
+      value: value?.id,
+      label: value?.name,
     };
   });
 
-  const statesFormated: DeafaultOptionsAntd[] = states.map((value) => {
+  const statesFormated: DeafaultOptionsAntd[] = (Array.isArray(states) ? states : []).map((value) => {
     return {
       value: JSON.stringify(value),
-      label: value.name,
+      label: value?.name,
     };
   });
 
-  const citiesFormated = cities?.map((value, index) => {
+  const citiesFormated = (Array.isArray(cities) ? cities : []).map((value, index) => {
     const polygon = value?.polygon
       ? JSON.stringify(Utils.TransformCoordinates(value.polygon, true))
       : "";

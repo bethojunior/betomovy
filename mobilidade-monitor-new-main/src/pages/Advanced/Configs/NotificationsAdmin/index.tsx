@@ -45,16 +45,20 @@ export const NotificationAdmin = () => {
       );
 
       if (responseNotification.status) {
-        if (responseNotification.data.response !== null) {
-          total_pages = responseNotification.data.response.last_page;
-          setNotifications(responseNotification.data.response.data);
+        if (responseNotification.data?.response) {
+          total_pages = responseNotification.data.response?.last_page ?? null;
+          const nData = responseNotification.data.response?.data;
+          setNotifications(Array.isArray(nData) ? nData : (Array.isArray(responseNotification.data.response) ? responseNotification.data.response : []));
+        } else {
+          setNotifications([]);
         }
       }
     } catch (error) {
+      setNotifications([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao carregar notificações",
         icon: "error",
       });
       console.error(error);
@@ -68,22 +72,21 @@ export const NotificationAdmin = () => {
       const responseTypesNotifications = await api.get("adminNotificationType");
 
       if (responseTypesNotifications.status) {
-        const typesNotificationsFormated =
-          responseTypesNotifications.data.response.map(
-            (value: TypesNotificationsProps) => {
-              return {
-                value: value.id,
-                label: value.name,
-              };
-            }
-          );
+        const rawTypes = responseTypesNotifications.data?.response;
+        const typesNotificationsFormated = (Array.isArray(rawTypes) ? rawTypes : []).map(
+          (value: TypesNotificationsProps) => ({
+            value: value?.id,
+            label: value?.name,
+          })
+        );
         setTypesNotifications(typesNotificationsFormated);
       }
     } catch (error) {
+      setTypesNotifications([]);
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message || "Erro ao carregar tipos de notificação",
         icon: "error",
       });
       console.error(error);
@@ -156,16 +159,16 @@ export const NotificationAdmin = () => {
       render: (_, data) => {
         return (
           <span>
-            {data.driver ? (
+            {data?.driver ? (
               <a
-                href={`/driver/list?openModalDriverId=${data.driver.idDriver}`}
+                href={`/driver/list?openModalDriverId=${data?.driver?.idDriver}`}
                 target="_blank"
                 rel="noreferrer"
               >
-                Motorista {data.user.name}
+                Motorista {data?.user?.name ?? ""}
               </a>
             ) : (
-              data.user.name
+              data?.user?.name ?? ""
             )}
           </span>
         );
@@ -176,16 +179,17 @@ export const NotificationAdmin = () => {
       key: "contact",
       width: 200,
       render: (_, data) => {
+        const phone = data?.user?.phone ?? "";
         return (
           <Button
             type="link"
-            href={`https://wa.me/55${data.user.phone.replace(/\D/g, "")}`}
+            href={`https://wa.me/55${phone.replace(/\D/g, "")}`}
             target="_blank"
             style={{
               padding: 0,
             }}
           >
-            {data.user.phone}
+            {phone}
           </Button>
         );
       },
@@ -197,8 +201,8 @@ export const NotificationAdmin = () => {
       render: (_, data) => {
         return (
           <>
-            {data.read === 0 && (
-              <Button type="primary" onClick={() => handleConfirmRead(data.id)}>
+            {data?.read === 0 && (
+              <Button type="primary" onClick={() => handleConfirmRead(data?.id)}>
                 Marcar
               </Button>
             )}
@@ -239,7 +243,7 @@ export const NotificationAdmin = () => {
       <ContentTable>
         <Table
           columns={columns}
-          dataSource={notifications}
+          dataSource={Array.isArray(notifications) ? notifications : []}
           loading={loading}
           pagination={false}
         />

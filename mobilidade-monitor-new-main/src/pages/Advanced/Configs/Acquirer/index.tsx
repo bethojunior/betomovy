@@ -88,9 +88,9 @@ const Acquirer: FC = () => {
 	const { Option } = Select;
 
 	useEffect(() => {
-		if (list !== null) {
+		if (list !== null && list !== undefined) {
 			const result: ResultProps = {};
-			list?.acquirer_meta_data?.map((item: ListDataMap) => {
+			(Array.isArray(list?.acquirer_meta_data) ? list.acquirer_meta_data : []).map((item: ListDataMap) => {
 				result[item.key] = item.value;
 				return null;
 			});
@@ -103,19 +103,22 @@ const Acquirer: FC = () => {
 		api.get(`acquirer`).then((values) => {
 			setLoading(false);
 			if (values.status === 200) {
+				const resp = Array.isArray(values.data?.response) ? values.data.response : [];
 				setList(
-					values.data.response.find(
+					resp.find(
 						(item: FindActive) => item.active === 1,
 					),
 				);
 				setAcquirerArray(
-					values.data.response.map((item: AcquirerData) => ({
+					resp.map((item: AcquirerData) => ({
 						value: item,
-						label: item.name,
+						label: item?.name,
 					})),
 				);
-				setSearchResponse(values.data.response);
+				setSearchResponse(resp);
 			}
+		}).catch(() => {
+			setLoading(false);
 		});
 	}, []);
 
@@ -197,13 +200,13 @@ const Acquirer: FC = () => {
 							setShowButton(true);
 						}}
 					>
-						{acquirerArray?.map((item: AcquirerData) => {
+						{(acquirerArray || []).map((item: AcquirerData) => {
 							return (
 								<Option
-									key={item.value.idFinancialIntermediary}
-									value={item.value.idFinancialIntermediary}
+									key={item?.value?.idFinancialIntermediary}
+									value={item?.value?.idFinancialIntermediary}
 								>
-									{item.value.name}
+									{item?.value?.name}
 								</Option>
 							);
 						})}
@@ -218,7 +221,7 @@ const Acquirer: FC = () => {
 					name="keysForm"
 					onFinish={onFinish}
 				>
-					{list?.acquirer_meta_data?.map((item: ListDataMap) => {
+					{(Array.isArray(list?.acquirer_meta_data) ? list.acquirer_meta_data : []).map((item: ListDataMap) => {
 						return (
 							<Container key={item.key}>
 								<DataContainer>

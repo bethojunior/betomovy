@@ -87,11 +87,14 @@ export const ModalAddAndEditCallGroup = ({
         handleCloseModal();
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao salvar grupo de chamado");
       swal({
         title: "Erro",
         icon: "error",
-        text: responseError.response?.data.response[0],
+        text: errMsg,
       });
     } finally {
       setLoading(false);
@@ -125,11 +128,14 @@ export const ModalAddAndEditCallGroup = ({
         handleCloseModal();
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao atualizar grupo de chamado");
       swal({
         title: "Erro",
         icon: "error",
-        text: responseError.response?.data.response[0],
+        text: errMsg,
       });
     } finally {
       setLoading(false);

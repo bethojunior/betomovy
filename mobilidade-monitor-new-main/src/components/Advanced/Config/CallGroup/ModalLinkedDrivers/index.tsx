@@ -41,11 +41,14 @@ export function ModalLinkedDrivers({
         getCallGroups();
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao vincular motorista");
       swal({
         title: "Erro",
         icon: "error",
-        text: responseError.response?.data.response[0],
+        text: errMsg,
       });
     } finally {
       setLoading(false);

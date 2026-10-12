@@ -66,11 +66,12 @@ export const CommissionManagement = () => {
   const filterRowsByAllowedCities = (
     rows: CommissionsProps[]
   ): CommissionsProps[] => {
+    if (!Array.isArray(rows)) return [];
     if (!mustFilterByAllowedCities) {
       return rows;
     }
     return rows.filter((row) => {
-      const cid = row.cityId ?? row.city?.id;
+      const cid = row?.cityId ?? row?.city?.id;
       if (cid === null || cid === undefined || cid === "") {
         return false;
       }
@@ -87,15 +88,16 @@ export const CommissionManagement = () => {
       setLoading(true);
       const responseReferralMonetization = await api.get(
         `referralMonetization${
-          scopeToCity ? `?cityId=${city.cityId}` : ""
+          scopeToCity ? `?cityId=${city?.cityId}` : ""
         }`
       );
 
       if (responseReferralMonetization.status) {
-        const raw = responseReferralMonetization.data.response;
-        setCommissionManagement(filterRowsByAllowedCities(raw));
+        const raw = responseReferralMonetization.data?.response;
+        setCommissionManagement(filterRowsByAllowedCities(Array.isArray(raw) ? raw : []));
       }
     } catch (error) {
+      setCommissionManagement([]);
       console.error(error);
       swal({
         title: "Erro ao pegar dados de comissão",
@@ -111,9 +113,11 @@ export const CommissionManagement = () => {
       const responseTypesTrips = await api.get("tripType");
 
       if (responseTypesTrips.status) {
-        setTripTypes(responseTypesTrips.data.response);
+        const rawTrips = responseTypesTrips.data?.response;
+        setTripTypes(Array.isArray(rawTrips) ? rawTrips : []);
       }
     } catch (error) {
+      setTripTypes([]);
       console.error(error);
     }
   };
@@ -182,8 +186,9 @@ export const CommissionManagement = () => {
       ellipsis: true,
       width: 250,
       render: (_, data) => {
-        const mountTripTypes = data.trip_types.map((value) => {
-          return value.type;
+        const tripList = Array.isArray(data?.trip_types) ? data.trip_types : [];
+        const mountTripTypes = tripList.map((value) => {
+          return value?.type;
         });
         return String(mountTripTypes);
       },
@@ -194,7 +199,8 @@ export const CommissionManagement = () => {
       ellipsis: true,
       width: 150,
       render: (_, data) => {
-        return data.trip_types[0].pivot.value.toLocaleString("pt-br", {
+        const val = data?.trip_types?.[0]?.pivot?.value ?? 0;
+        return Number(val).toLocaleString("pt-br", {
           style: "currency",
           currency: "BRL",
         });
@@ -206,7 +212,7 @@ export const CommissionManagement = () => {
       ellipsis: true,
       width: 100,
       render: (_, data) => {
-        return data.trip_types[0].pivot.valueType;
+        return data?.trip_types?.[0]?.pivot?.valueType ?? "-";
       },
     },
     {
@@ -215,7 +221,7 @@ export const CommissionManagement = () => {
       ellipsis: true,
       width: 150,
       render: (_, data) => {
-        return data.city ? data.city.cityName : "Todas";
+        return data?.city ? data.city.cityName : "Todas";
       },
     },
     {
@@ -224,7 +230,7 @@ export const CommissionManagement = () => {
       ellipsis: true,
       width: 200,
       render: (_, data) => {
-        return data.trip_types[0].backToTripBalance === 0
+        return data?.trip_types?.[0]?.backToTripBalance === 0
           ? "Saldo em Conta"
           : "Voucher";
       },
