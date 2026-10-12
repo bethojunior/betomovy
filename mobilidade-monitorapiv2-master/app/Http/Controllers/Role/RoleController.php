@@ -14,8 +14,13 @@ class RoleController extends Controller
     public function all(Request $request, RoleService $service, $id = null)
     {
         try {
+            $userId = $request->header('userId') ?? $request->header('userid');
+            if (!$userId && \Auth::check()) {
+                $userId = \Auth::id() ?? (\Auth::user() ? \Auth::user()->idUser : null);
+            }
+
             $result = $service
-                ->findAll($request->header('userId'), $id);
+                ->findAll($userId, $id);
         } catch (\Exception $e) {
             return ApiResponse::error($e, "Erro ao buscar os perfis");
         }

@@ -63,7 +63,7 @@ const schemaForm = yup
       .string()
       .min(6, "Confirmação de senha precisa ter no mínimo 6 caracteres")
       .required("Campo obrigatório"),
-    type_account: yup.string().required("Campo obrigatório"),
+    type_account: yup.mixed().required("Campo obrigatório"),
   })
   .required();
 
@@ -76,19 +76,50 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
     });
 
   const [loading, setLoading] = useState(false);
+  const [loadingRoles, setLoadingRoles] = useState(false);
 
   const [listTypeProfile, setListTypeProfile] = useState<ListProfileArray>([]);
 
   const { checkCpfIsValue } = Utils;
 
-  useEffect(() => {
-    api("role").then((result) => {
-      if (!result?.data?.status) {
-        return "";
+  const loadRoles = async () => {
+    try {
+      setLoadingRoles(true);
+      const userStorage = localStorage.getItem("@App:user");
+      const headers: Record<string, string> = {};
+      if (userStorage && userStorage !== "undefined" && userStorage !== "null") {
+        try {
+          const u = JSON.parse(userStorage);
+          if (u?.api_token) headers.token = u.api_token;
+          if (u?.idUser) {
+            headers.userid = String(u.idUser);
+            headers.userId = String(u.idUser);
+          }
+        } catch (e) {}
       }
 
-      return setListTypeProfile(result.data.response || result.data.data || []);
-    }).catch(() => {});
+      const result = await api.get("role", { headers });
+      const raw = result?.data?.response ?? result?.data?.data ?? result?.data;
+      if (Array.isArray(raw)) {
+        setListTypeProfile(raw);
+      } else if (Array.isArray(raw?.data)) {
+        setListTypeProfile(raw.data);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar perfis:", error);
+    } finally {
+      setLoadingRoles(false);
+    }
+  };
+
+  useEffect(() => {
+    if (visible) {
+      loadRoles();
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    loadRoles();
   }, []);
 
   const handleCloseModal = () => {

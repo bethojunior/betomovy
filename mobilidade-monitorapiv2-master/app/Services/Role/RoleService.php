@@ -45,19 +45,32 @@ class RoleService
         if ($id)
             return $this->findOne($id);
 
-        $roleLogged = $this->repository
-            ->findByUser($userId);
+        if (!$userId && Auth::check()) {
+            $userId = Auth::id() ?? (Auth::user() ? Auth::user()->idUser : null);
+        }
+
+        $roleLogged = $userId ? $this->repository->findByUser($userId) : null;
+        if (!$roleLogged && Auth::check() && Auth::user() && Auth::user()->role) {
+            $roleLogged = Auth::user()->role;
+        }
+
+        $isRoot = $roleLogged ? (bool) $roleLogged->isRoot : true;
 
         return $this->repository
-            ->findAll($roleLogged->isRoot);
+            ->findAll($isRoot);
     }
 
     private function findOne($roleId)
     {
         $role = $this->repository->findWithCity($roleId);
 
+        $authIsRoot = false;
+        if (Auth::check() && Auth::user() && Auth::user()->role) {
+            $authIsRoot = (bool) Auth::user()->role->isRoot;
+        }
+
         $role->permissions = $this->userGroupRepository
-            ->findByRoleWithPermissions($roleId, (bool)(Auth::user())->role->isRoot);
+            ->findByRoleWithPermissions($roleId, $authIsRoot);
 
         return $role;
     }

@@ -26,8 +26,9 @@ class RoleUserPermissionService
 
     public function findAll(User $user)
     {
+        $isRoot = ($user->role) ? (bool)$user->role->isRoot : false;
         return $this->repository
-            ->findByRoleWithPermissions($user->roleId, (bool)$user->role->isRoot);
+            ->findByRoleWithPermissions($user->roleId, $isRoot);
     }
 
     public function hasPermission(User $user, string $groupName, string $permissionName): bool
