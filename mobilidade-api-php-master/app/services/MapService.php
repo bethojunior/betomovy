@@ -142,11 +142,27 @@ class MapService
             $result = $this->getServiceByType($service);
             $configOk = true;
 
-            foreach ($result->keys as $key) {
-                $valueKey = Config::get($key);
-                if (!isset($valueKey) || strlen($valueKey) === 0) {
-                    $configOk = false;
-                    break; 
+            if ($service === 'google') {
+                $hasGoogleKey = false;
+                $candidateKeys = array_merge($result->keys, ['key_google_maps', 'key_google', 'google_api_key_web']);
+                foreach ($candidateKeys as $key) {
+                    $valueKey = Config::get($key);
+                    if (!empty($valueKey) && strlen(trim((string)$valueKey)) > 0) {
+                        $hasGoogleKey = true;
+                        break;
+                    }
+                }
+                if (!$hasGoogleKey && (!empty(env('GOOGLE_API_KEY')) || !empty(env('GOOGLE_API_KEY_API')))) {
+                    $hasGoogleKey = true;
+                }
+                $configOk = $hasGoogleKey;
+            } else {
+                foreach ($result->keys as $key) {
+                    $valueKey = Config::get($key);
+                    if (!isset($valueKey) || strlen($valueKey) === 0) {
+                        $configOk = false;
+                        break; 
+                    }
                 }
             }
 

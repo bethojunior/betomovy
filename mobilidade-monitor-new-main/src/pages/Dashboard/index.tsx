@@ -147,16 +147,22 @@ const DashBoard: FC = () => {
   };
 
   useEffect(() => {
+    // Não exibe se o teste ainda não carregou (null)
+    if (!errorMapKey) {
+      return;
+    }
+
     const alreadyShown = sessionStorage.getItem("hasSeenMapKeyModal");
 
-    const shouldShow =
-      errorMapKey?.direction !== true ||
-      errorMapKey?.geocoding !== true ||
-      errorMapKey?.place !== true;
+    // Apenas exibe se houver erro real (qualquer serviço diferente de true)
+    const hasError =
+      errorMapKey.direction !== true ||
+      errorMapKey.geocoding !== true ||
+      errorMapKey.place !== true;
 
     const notTestPage = window.location.pathname !== "/mapSetting/tests";
 
-    if (!alreadyShown && shouldShow && notTestPage) {
+    if (!alreadyShown && hasError && notTestPage) {
       setShowModalMapKeysThisSession(true);
       sessionStorage.setItem("hasSeenMapKeyModal", "true");
     }
@@ -202,20 +208,14 @@ const DashBoard: FC = () => {
     try {
       const responseErrorKeysMaps = await apiApp.get("map/allServiceTest/");
 
-      if (responseErrorKeysMaps.status && responseErrorKeysMaps.data?.data) {
-        setErrorMapKey(responseErrorKeysMaps.data.data);
+      if (responseErrorKeysMaps?.data) {
+        const data = responseErrorKeysMaps.data?.data ?? responseErrorKeysMaps.data?.response;
+        if (data) {
+          setErrorMapKey(data);
+        }
       }
     } catch (error) {
-      const responseError = error as AxiosError;
-
-      if (responseError.message === "Não autorizado") {
-        return;
-      }
-
-      swal({
-        title: responseError.response?.data?.message || "Erro ao carregar dados",
-        icon: "error",
-      });
+      // Falha de rede ou não autorizado tratada silenciosamente para não interromper a navegação
     }
   };
 

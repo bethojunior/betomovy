@@ -139,6 +139,10 @@ return [
         '/configapppartner/find_by_key',
         '/usertypelinkedapp/getusertypelinkedapppartner',
         '/usertype/driversbyapppartners',
-        '/listcontacts/savelistcontactgeneral'
+        '/listcontacts/savelistcontactgeneral',
+        '/map/allservicetest',
+        '/map/servicetest',
+        '/map/checkservices',
+        '/map/listpriorityservice'
     ]
 ];

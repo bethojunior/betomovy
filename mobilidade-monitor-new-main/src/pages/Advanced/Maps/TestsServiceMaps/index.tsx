@@ -56,8 +56,11 @@ export const TestServiceMaps = () => {
     try {
       const responseErrorKeysMaps = await apiApp.get("map/allServiceTest/");
 
-      if (responseErrorKeysMaps.status && responseErrorKeysMaps.data?.data) {
-        setErrorMapKey(responseErrorKeysMaps.data.data);
+      if (responseErrorKeysMaps?.data) {
+        const data = responseErrorKeysMaps.data?.data ?? responseErrorKeysMaps.data?.response;
+        if (data) {
+          setErrorMapKey(data);
+        }
       }
     } catch (error) {
       const responseError = error as AxiosError;
