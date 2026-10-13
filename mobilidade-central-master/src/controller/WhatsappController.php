@@ -49,11 +49,11 @@ class WhatsAppController extends View
             ],
             [
                 'repositories/TripRepository',
-                'repositories/tripPaymentFormRepository',
-                'repositories/keyRepository',
+                'repositories/TripPaymentFormRepository',
+                'repositories/KeyRepository',
                 'utils/whatsappSession',
                 'repositories/whatsappRepository',
-                'repositories/configRepository',
+                'repositories/ConfigRepository',
                 'modules/whatsapp/management'
             ],
             [

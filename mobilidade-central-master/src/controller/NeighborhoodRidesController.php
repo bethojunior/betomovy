@@ -11,7 +11,7 @@ class NeighborhoodRidesController extends View
                 "neighborhoodRides/list"
             ],
             [
-                "service/mapService",
+                "service/MapService",
                 "controllers/NeighborhoodController",
                 "modules/neighborhoodRides/list",
             ],

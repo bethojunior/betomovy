@@ -17,7 +17,7 @@ class DistrictController extends View
                 "district/list"
             ],
             [
-                "service/mapService",
+                "service/MapService",
                 "controllers/NeighborhoodController",
                 "modules/district/list",
             ],
