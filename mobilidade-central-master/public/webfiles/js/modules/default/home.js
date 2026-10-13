@@ -799,33 +799,39 @@ document.addEventListener('DOMContentLoaded', function () {
     const header = document.getElementById('monitoringHeader')
     if (header) {
       header.classList.remove('skeleton')
+      header.classList.remove('hidden')
     }
 
     if (content) content.classList.remove('hidden')
 
-    if (toggleBtn) {
-      toggleBtn.textContent = 'Ocultar detalhes'
+    if (typeof FooterMonitorManager !== 'undefined' && FooterMonitorManager.isExpanded()) {
+      FooterMonitorManager.setButtonState(true)
     }
 
     const driversData = data.drivers || { available: 0, occupied: 0 }
-    document.getElementById('infoAvailable').textContent = driversData.available
-    document.getElementById('infoOccupied').textContent = driversData.occupied
+    const setElemText = (id, val) => {
+      const el = document.getElementById(id)
+      if (el) el.textContent = val
+    }
 
-    document.getElementById('totalTrips').textContent = stats.totalTrips
-    document.getElementById('acceptedTrips').textContent = stats.acceptedTrips
-    document.getElementById('finishedTrips').textContent = stats.finishedCount
-    document.getElementById('cancelledTrips').textContent = stats.canceledCount
-    document.getElementById('cancelledByDriver').textContent = stats.canceledByDriver
-    document.getElementById('cancelledByCustomer').textContent = stats.canceledByCustomer
+    setElemText('infoAvailable', driversData.available || 0)
+    setElemText('infoOccupied', driversData.occupied || 0)
 
-    document.getElementById('cashTrips').textContent = stats.cashTrips
-    document.getElementById('voucherTrips').textContent = stats.voucherTrips
-    document.getElementById('cardTrips').textContent = stats.cardTrips
+    setElemText('totalTrips', stats.totalTrips)
+    setElemText('acceptedTrips', stats.acceptedTrips)
+    setElemText('finishedTrips', stats.finishedCount)
+    setElemText('cancelledTrips', stats.canceledCount)
+    setElemText('cancelledByDriver', stats.canceledByDriver)
+    setElemText('cancelledByCustomer', stats.canceledByCustomer)
 
-    document.getElementById('unattendedTrips').textContent = stats.notAnsweredCount
+    setElemText('cashTrips', stats.cashTrips)
+    setElemText('voucherTrips', stats.voucherTrips)
+    setElemText('cardTrips', stats.cardTrips)
 
-    document.getElementById('totalRevenue').textContent = formatCurrency(stats.totalRevenue)
-    document.getElementById('netRevenue').textContent = formatCurrency(stats.netRevenue)
+    setElemText('unattendedTrips', stats.notAnsweredCount)
+
+    setElemText('totalRevenue', formatCurrency(stats.totalRevenue))
+    setElemText('netRevenue', formatCurrency(stats.netRevenue))
 
     lastUpdateTime = new Date()
   }
@@ -895,6 +901,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         } else {
           monitoringData.trips = { canceled: [], not_answered: [] }
+          updateMonitoringUI(monitoringData)
           initializeDropdowns()
         }
       })
@@ -916,7 +923,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const header = document.getElementById('monitoringHeader')
         if (header) {
           header.classList.remove('skeleton')
+          header.classList.remove('hidden')
         }
+        updateMonitoringUI(monitoringData)
+        initializeDropdowns()
       })
   }
 
@@ -947,21 +957,65 @@ document.addEventListener('DOMContentLoaded', function () {
       this._content = document.getElementById('monitoringContent')
       this._containerPointLocal = document.querySelector('.container-point-local-map')
     },
+    setButtonState(isExpanded) {
+      if (!this._btn) return
+      let lbl = this._btn.querySelector('.footer-toggle-label')
+      let icon = this._btn.querySelector('.footer-toggle-icon')
+      if (!lbl || !icon) {
+        this._btn.innerHTML = `<span class="footer-toggle-label">${isExpanded ? 'Ocultar detalhes' : 'Exibir detalhes'}</span><i class="material-icons footer-toggle-icon">expand_less</i>`
+        return
+      }
+      lbl.textContent = isExpanded ? 'Ocultar detalhes' : 'Exibir detalhes'
+    },
     isExpanded() {
-      return this._content && !this._content.classList.contains('hidden')
+      return !!(this._footer && this._footer.classList.contains('expanded'))
+    },
+    expand() {
+      if (!this._footer) return
+      SidebarManager.closeAll()
+
+      this.setButtonState(true)
+
+      const header = document.getElementById('monitoringHeader')
+      if (header) header.classList.remove('hidden')
+      if (this._content) this._content.classList.remove('hidden')
+
+      this._footer.classList.add('active', 'expanded')
+
+      if (this._btnCallTrip) {
+        this._btnCallTrip.classList.add('monitoring-active', 'monitoring-expanded')
+      }
+      document.querySelector('.map-zoom-controls')?.classList.add('monitoring-active', 'monitoring-expanded')
+      if (this._containerPointLocal?.classList.contains('active')) {
+        this._containerPointLocal.classList.add('monitoring-expanded')
+      }
+
+      requestAnimationFrame(() => {
+        const height = this._footer.offsetHeight || this._footer.getBoundingClientRect().height || 220
+        document.documentElement.style.setProperty('--footer-height', `${height}px`)
+        scheduleMapResize()
+      })
+
+      initializeDropdowns()
+
+      const CARD_IDS = ['tripsCard', 'showCancelledTrips', 'ridesCard', 'showUnattendedTrips', 'revenueCard']
+      CARD_IDS.forEach((id) => document.getElementById(id)?.classList.add('skeleton'))
+      document.getElementById('monitoringHeader')?.classList.add('skeleton')
+
+      fetchMonitoringData().catch(() => {})
     },
     collapse() {
-      if (!this._content || !this.isExpanded()) return
+      if (!this._footer || !this.isExpanded()) return
       this._onBeforeCollapse?.()
-      this._content.classList.add('hidden')
-      if (this._btn) {
-        const lbl = this._btn.querySelector('.footer-toggle-label')
-        if (lbl) lbl.textContent = 'Exibir detalhes'
-        else this._btn.textContent = 'Exibir detalhes'
-      }
+
+      this.setButtonState(false)
+
+      if (this._content) this._content.classList.add('hidden')
       const header = document.getElementById('monitoringHeader')
       if (header) header.classList.add('hidden')
-      this._footer?.classList.remove('expanded')
+
+      this._footer.classList.remove('expanded')
+
       if (this._btnCallTrip) {
         this._btnCallTrip.classList.remove('monitoring-expanded')
       }
@@ -969,9 +1023,16 @@ document.addEventListener('DOMContentLoaded', function () {
         this._containerPointLocal.classList.remove('monitoring-expanded')
       }
       document.querySelector('.map-zoom-controls')?.classList.remove('monitoring-expanded')
-      // Reset da variável no :root ao colapsar
+
       document.documentElement.style.removeProperty('--footer-height')
       scheduleMapResize()
+    },
+    toggle() {
+      if (this.isExpanded()) {
+        this.collapse()
+      } else {
+        this.expand()
+      }
     },
   }
   window.FooterMonitorManager = FooterMonitorManager
@@ -982,32 +1043,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const reloadBtn = document.getElementById('reloadBtn')
   const btnCallTrip = document.querySelector('.btn-call-trip')
 
-  const syncFooterHeightOnExpand = (event) => {
-    if (!footerMonitoring) return
-    if (event.target !== footerMonitoring) return
-    if (event.propertyName !== 'max-height') return
-    if (!FooterMonitorManager.isExpanded()) {
-      footerMonitoring.removeEventListener('transitionend', syncFooterHeightOnExpand)
-      return
-    }
-    footerMonitoring.removeEventListener('transitionend', syncFooterHeightOnExpand)
-    document.documentElement.style.setProperty(
-      '--footer-height',
-      `${footerMonitoring.getBoundingClientRect().height}px`
-    )
-    scheduleMapResize()
-  }
-
   if (footerMonitoring) {
     FooterMonitorManager.init(footerMonitoring, toggleMonitoringBtn, btnCallTrip)
-    FooterMonitorManager._onBeforeCollapse = () => {
-      footerMonitoring.removeEventListener('transitionend', syncFooterHeightOnExpand)
-    }
     footerMonitoring.classList.add('active')
     if (toggleMonitoringBtn) {
       toggleMonitoringBtn.classList.remove('hidden')
-      const lbl = toggleMonitoringBtn.querySelector('.footer-toggle-label')
-      if (lbl) lbl.textContent = 'Exibir detalhes'
+      FooterMonitorManager.setButtonState(false)
     }
     if (btnCallTrip) btnCallTrip.classList.add('monitoring-active')
     document.querySelector('.map-zoom-controls')?.classList.add('monitoring-active')
@@ -1017,46 +1058,7 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleMonitoringBtn.addEventListener('click', function (event) {
       event.preventDefault()
       event.stopPropagation()
-
-      const content = document.getElementById('monitoringContent')
-      const containerPointLocalMap = document.querySelector('.container-point-local-map')
-      if (!content) return
-
-      if (FooterMonitorManager.isExpanded()) {
-        FooterMonitorManager.collapse()
-      } else {
-        // Fechar todos os sidebars ao expandir o footer
-        SidebarManager.closeAll()
-
-        const lbl = toggleMonitoringBtn.querySelector('.footer-toggle-label')
-        if (lbl) lbl.textContent = 'Ocultar detalhes'
-        else toggleMonitoringBtn.textContent = 'Ocultar detalhes'
-        const header = document.getElementById('monitoringHeader')
-        if (header) header.classList.remove('hidden')
-
-        footerMonitoring?.classList.add('active', 'expanded')
-        if (btnCallTrip) {
-          btnCallTrip.classList.add('monitoring-active', 'monitoring-expanded')
-        }
-        document.querySelector('.map-zoom-controls')?.classList.add('monitoring-active', 'monitoring-expanded')
-        if (containerPointLocalMap?.classList.contains('active')) {
-          containerPointLocalMap.classList.add('monitoring-expanded')
-        }
-
-        content.classList.remove('hidden')
-        initializeDropdowns()
-        scheduleMapResize()
-
-        const CARD_IDS = ['tripsCard', 'showCancelledTrips', 'ridesCard', 'showUnattendedTrips', 'revenueCard']
-        CARD_IDS.forEach((id) => document.getElementById(id)?.classList.add('skeleton'))
-        document.getElementById('monitoringHeader')?.classList.add('skeleton')
-
-        fetchMonitoringData().catch(() => {})
-
-        // :root porque .btn-call-trip é irmão no DOM, não filho — var() não herda entre siblings
-        footerMonitoring?.removeEventListener('transitionend', syncFooterHeightOnExpand)
-        footerMonitoring?.addEventListener('transitionend', syncFooterHeightOnExpand)
-      }
+      FooterMonitorManager.toggle()
     })
   }
 
