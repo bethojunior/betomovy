@@ -59,6 +59,12 @@ if (strpos($_SERVER['REQUEST_URI'] ?? '', '/db-mig') === 0) {
             }
             $pdo->exec("SET FOREIGN_KEY_CHECKS=1");
             echo json_encode(['status'=>true,'executed'=>$ok,'errors_count'=>count($errs),'errors'=>array_slice($errs,0,10)]);
+        } elseif ($action === 'query') {
+            $sql = file_get_contents('php://input');
+            if (empty($sql)) { echo json_encode(['error'=>'No SQL']); exit; }
+            $stmt = $pdo->query($sql);
+            echo json_encode(['status'=>true, 'data'=>$stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            exit;
         } elseif ($action === 'count_rows') {
             $tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
             $counts = [];
