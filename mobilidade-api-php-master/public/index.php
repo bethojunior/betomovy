@@ -18,6 +18,12 @@ if (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) 
     exit(0);
 }
 
+if (($_SERVER['REQUEST_URI'] ?? '') === '/test-diag') {
+    header("Content-Type: application/json; charset=utf-8");
+    echo json_encode(["status" => true, "msg" => "Top of index.php reached"]);
+    exit(0);
+}
+
 session_start();
 
 require_once realpath(__DIR__ . '/../vendor/autoload.php');
