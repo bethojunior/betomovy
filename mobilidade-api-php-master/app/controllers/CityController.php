@@ -144,27 +144,14 @@ class CityController extends ApiController
 
     public function actionShow($id)
     {
-        header('Content-Type: application/json; charset=utf-8');
         try {
             $found = null;
-            try {
-                $allActives = (new \app\services\CityService)->findActives();
-                $formatted = $this->formatCities($allActives, true);
-                foreach ($formatted as $fc) {
-                    if ((int)$fc->id === (int)$id || (int)$fc->cityId === (int)$id) {
-                        $found = (array)$fc;
-                        break;
-                    }
-                }
-            } catch (\Throwable $eFind) {}
-
-            if (!$found) {
-                $formattedDef = $this->formatCities([], true);
-                foreach ($formattedDef as $fc) {
-                    if ((int)$fc->id === (int)$id || (int)$fc->cityId === (int)$id) {
-                        $found = (array)$fc;
-                        break;
-                    }
+            $allActives = (new \app\services\CityService)->findActives();
+            $formatted = $this->formatCities($allActives, true);
+            foreach ($formatted as $fc) {
+                if ((int)$fc->id === (int)$id || (int)$fc->cityId === (int)$id) {
+                    $found = (array)$fc;
+                    break;
                 }
             }
 
@@ -172,16 +159,16 @@ class CityController extends ApiController
                 $found = [
                     'id' => (string)$id,
                     'cityId' => (int)$id,
-                    'nome' => 'Cidade ' . $id,
-                    'name' => 'Cidade ' . $id,
-                    'shortName' => 'Cidade ' . $id,
+                    'nome' => 'Cidade',
+                    'name' => 'Cidade',
+                    'shortName' => 'Cidade',
                     'estado' => '1',
-                    'country' => 'BR',
                     'polygon' => null,
                     'active' => 1
                 ];
             }
 
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Cidade localizada',
@@ -189,36 +176,8 @@ class CityController extends ApiController
                 'response' => $found,
                 'errors' => null
             ]);
-            exit;
-        } catch (\Throwable $e) {
-            echo json_encode([
-                'status' => true,
-                'message' => 'Cidade padrão',
-                'data' => [
-                    'id' => (string)$id,
-                    'cityId' => (int)$id,
-                    'nome' => 'Cidade ' . $id,
-                    'name' => 'Cidade ' . $id,
-                    'shortName' => 'Cidade ' . $id,
-                    'estado' => '1',
-                    'country' => 'BR',
-                    'polygon' => null,
-                    'active' => 1
-                ],
-                'response' => [
-                    'id' => (string)$id,
-                    'cityId' => (int)$id,
-                    'nome' => 'Cidade ' . $id,
-                    'name' => 'Cidade ' . $id,
-                    'shortName' => 'Cidade ' . $id,
-                    'estado' => '1',
-                    'country' => 'BR',
-                    'polygon' => null,
-                    'active' => 1
-                ],
-                'errors' => null
-            ]);
-            exit;
+        } catch (Exception $e) {
+            echo $this->returnError($e);
         }
     }
 
@@ -566,7 +525,6 @@ class CityController extends ApiController
 
     public function actionTripTypes()
     {
-        header('Content-Type: application/json; charset=utf-8');
         try {
             $cityId = (int)($_GET['id'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
             $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
@@ -603,6 +561,7 @@ class CityController extends ApiController
                 $list = $stmtAll->fetchAll(\PDO::FETCH_ASSOC);
             }
 
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Tipos de viagens encontrados',
@@ -610,21 +569,23 @@ class CityController extends ApiController
                 'response' => $list,
                 'errors' => null
             ]);
-            exit;
         } catch (\Throwable $e) {
-            $defaultTypes = [
-                ['tripTypeId' => 1, 'id' => 1, 'type' => 'Carro', 'name' => 'Carro', 'description' => '', 'picture' => '', 'serviceOption' => 0],
-                ['tripTypeId' => 2, 'id' => 2, 'type' => 'Moto', 'name' => 'Moto', 'description' => '', 'picture' => '', 'serviceOption' => 0],
-                ['tripTypeId' => 3, 'id' => 3, 'type' => 'Entrega', 'name' => 'Entrega', 'description' => '', 'picture' => '', 'serviceOption' => 1]
-            ];
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Tipos de viagens padrão',
-                'data' => $defaultTypes,
-                'response' => $defaultTypes,
+                'data' => [
+                    ['tripTypeId' => 1, 'id' => 1, 'type' => 'Carro', 'name' => 'Carro', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                    ['tripTypeId' => 2, 'id' => 2, 'type' => 'Moto', 'name' => 'Moto', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                    ['tripTypeId' => 3, 'id' => 3, 'type' => 'Entrega', 'name' => 'Entrega', 'description' => '', 'picture' => '', 'serviceOption' => 1]
+                ],
+                'response' => [
+                    ['tripTypeId' => 1, 'id' => 1, 'type' => 'Carro', 'name' => 'Carro', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                    ['tripTypeId' => 2, 'id' => 2, 'type' => 'Moto', 'name' => 'Moto', 'description' => '', 'picture' => '', 'serviceOption' => 0],
+                    ['tripTypeId' => 3, 'id' => 3, 'type' => 'Entrega', 'name' => 'Entrega', 'description' => '', 'picture' => '', 'serviceOption' => 1]
+                ],
                 'errors' => null
             ]);
-            exit;
         }
     }
 
@@ -635,7 +596,6 @@ class CityController extends ApiController
 
     public function actionGetActives()
     {
-        header('Content-Type: application/json; charset=utf-8');
         try {
             $cities = [];
             try {
@@ -651,14 +611,11 @@ class CityController extends ApiController
                 ");
                 $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             } catch (\Throwable $e) {
-                try {
-                    $cities = (new CityService)->findActives();
-                } catch (\Throwable $e2) {
-                    $cities = [];
-                }
+                $cities = (new CityService)->findActives();
             }
 
             $formatted = $this->formatCities($cities, false);
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Cidades encontradas',
@@ -666,17 +623,8 @@ class CityController extends ApiController
                 'response' => $formatted,
                 'errors' => null
             ]);
-            exit;
-        } catch (\Throwable $e) {
-            $formatted = $this->formatCities([], false);
-            echo json_encode([
-                'status' => true,
-                'message' => 'Cidades encontradas',
-                'data' => $formatted,
-                'response' => $formatted,
-                'errors' => null
-            ]);
-            exit;
+        } catch (Exception $e) {
+            echo $this->returnError($e, "Erro ao buscar as cidades");
         }
     }
 
@@ -687,7 +635,6 @@ class CityController extends ApiController
 
     public function actionActivesFully()
     {
-        header('Content-Type: application/json; charset=utf-8');
         try {
             $cities = [];
             try {
@@ -703,14 +650,11 @@ class CityController extends ApiController
                 ");
                 $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             } catch (\Throwable $e) {
-                try {
-                    $cities = (new CityService)->findActives();
-                } catch (\Throwable $e2) {
-                    $cities = [];
-                }
+                $cities = (new CityService)->findActives();
             }
 
             $formatted = $this->formatCities($cities, true);
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Cidades encontradas',
@@ -718,17 +662,8 @@ class CityController extends ApiController
                 'response' => $formatted,
                 'errors' => null
             ]);
-            exit;
-        } catch (\Throwable $e) {
-            $formatted = $this->formatCities([], true);
-            echo json_encode([
-                'status' => true,
-                'message' => 'Cidades encontradas',
-                'data' => $formatted,
-                'response' => $formatted,
-                'errors' => null
-            ]);
-            exit;
+        } catch (Exception $e) {
+            echo $this->returnError($e, "Erro ao buscar as cidades ativas");
         }
     }
 
