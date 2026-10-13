@@ -343,6 +343,11 @@ class CentralController extends ApiController
         echo json_encode(['status' => true, 'response' => [], 'data' => []]);
     }
 
+    public function actionCentralCallTypesFindAll()
+    {
+        $this->actionCentralCallTypes();
+    }
+
     public function actionCentralCallTypes()
     {
         try {
