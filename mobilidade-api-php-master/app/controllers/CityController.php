@@ -589,11 +589,6 @@ class CityController extends ApiController
         }
     }
 
-    public function actionTriptypes()
-    {
-        $this->actionTripTypes();
-    }
-
     public function actionGetActives()
     {
         try {
