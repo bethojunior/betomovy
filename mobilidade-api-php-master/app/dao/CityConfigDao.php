@@ -31,20 +31,23 @@ class CityConfigDao extends BaseDao
 
     public function getByCoordinate($lat, $lng)
     {
-        $sql =
-            /** @lang sql */
-            "
-            SELECT
-              cc.*
+        $lat = (float)str_replace(',', '.', (string)$lat);
+        $lng = (float)str_replace(',', '.', (string)$lng);
+
+        $sql = "
+            SELECT cc.*
             FROM {$this->table} cc
-              INNER JOIN cityArea ca ON cc.cityId = ca.cityId
-              WHERE
-                ca.statusId = 1 AND
-                ST_CONTAINS(ca.polygon, ST_GeomFromText('POINT({$lat} {$lng})'))
-              LIMIT 1;
+            INNER JOIN cityArea ca ON cc.cityId = ca.cityId
+            WHERE ca.statusId = 1 
+              AND ca.polygon IS NOT NULL
+              AND ST_CONTAINS(ca.polygon, ST_GeomFromText('POINT({$lat} {$lng})'))
+            LIMIT 1;
         ";
 
-        return $this->sqlRawSelect($sql)
-            ->get(false);
+        try {
+            return $this->sqlRawSelect($sql)->get(false);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 }

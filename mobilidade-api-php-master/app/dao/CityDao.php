@@ -39,6 +39,8 @@ class CityDao extends BaseDao
     public function findByCoordinate($latitude, $longitude)
     {
         try {
+            $lat = (float)str_replace(',', '.', (string)$latitude);
+            $lng = (float)str_replace(',', '.', (string)$longitude);
             $sql = /** @lang sql */ "
                 SELECT
                     c.*
@@ -46,7 +48,8 @@ class CityDao extends BaseDao
                   INNER JOIN cityArea ca ON c.id = ca.cityId
                   WHERE
                     ca.statusId = 1 AND
-                    ST_CONTAINS(ca.polygon, ST_GeomFromText('POINT({$latitude} {$longitude})'))
+                    ca.polygon IS NOT NULL AND
+                    ST_CONTAINS(ca.polygon, ST_GeomFromText('POINT({$lat} {$lng})'))
                 LIMIT 1
             ";
 

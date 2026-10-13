@@ -296,8 +296,11 @@ abstract class PriceService
         $cityConfig = $this->cityConfigService
             ->getCityByCoordinates($lat, $lng);
 
-        if (isset($cityConfig->cityId))
+        if (isset($cityConfig->cityId)) {
             $this->cityId = $cityConfig->cityId;
+        } elseif (empty($this->cityId)) {
+            $this->cityId = 1;
+        }
     }
 
     /**
