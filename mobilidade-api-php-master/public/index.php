@@ -61,6 +61,23 @@ try {
         exit;
     }
 
+    if ($uriPath === '/test-city') {
+        header('Content-Type: application/json; charset=utf-8');
+        try {
+            $ctl = new \app\controllers\CityController();
+            echo json_encode(['status' => true, 'loaded' => get_class($ctl)]);
+        } catch (\Throwable $err) {
+            echo json_encode([
+                'status' => false,
+                'message' => $err->getMessage(),
+                'file' => $err->getFile(),
+                'line' => $err->getLine(),
+                'trace' => $err->getTraceAsString()
+            ]);
+        }
+        exit;
+    }
+
     $route = new RouteListener;
 
     if (!isset($_SERVER['REQUEST_URI'])) {
