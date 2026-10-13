@@ -185,7 +185,17 @@ const EditUserModal: FC<EditModalProps> = ({
       return;
     }
 
-    if (!checkCpfIsValue(document)) {
+    const cleanDoc = (document || "").replace(/\D/g, "");
+    if (cleanDoc.length < 11) {
+      swal({
+        title: "Alerta",
+        text: "O CPF inserido deve ter pelo menos 11 dígitos",
+        icon: "warning",
+      });
+      return;
+    }
+
+    if (cleanDoc.length === 11 && !checkCpfIsValue(cleanDoc)) {
       swal({
         title: "Alerta",
         text: "O CPF inserido é inválido",
@@ -202,7 +212,7 @@ const EditUserModal: FC<EditModalProps> = ({
         email,
         phone,
         document,
-        roleId: type_account,
+        roleId: Number(type_account || 1),
       };
 
       if (password) {
@@ -212,23 +222,22 @@ const EditUserModal: FC<EditModalProps> = ({
 
       const responseUpdateUser = await api.put(`admin/${userData?.idUser}`, updateData);
 
-      if (responseUpdateUser.status) {
+      if (responseUpdateUser.status === 200 || responseUpdateUser.data?.status) {
+        handleCloseModal();
+        loadUsers();
         swal({
           title: "Sucesso",
           text: "Usuário atualizado com sucesso",
           icon: "success",
-        }).then((isAccept) => {
-          if (isAccept) {
-            handleCloseModal();
-            loadUsers();
-          }
+        }).then(() => {
+          loadUsers();
         });
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<{ message?: string }>;
       swal({
-        title: "Error",
-        text: responseError.response?.data.message,
+        title: "Erro",
+        text: responseError.response?.data?.message || "Erro ao atualizar usuário.",
         icon: "error",
       });
     } finally {
@@ -343,7 +352,8 @@ const EditUserModal: FC<EditModalProps> = ({
                   onChange={(event) =>
                     setValue(
                       "phone",
-                      Mask.setMaskPhoneValue(event.target.value)
+                      Mask.setMaskPhoneValue(event.target.value),
+                      { shouldValidate: true, shouldDirty: true }
                     )
                   }
                   status={Boolean(error) ? "error" : ""}
@@ -365,7 +375,8 @@ const EditUserModal: FC<EditModalProps> = ({
                   onChange={(event) => {
                     setValue(
                       "document",
-                      Mask.setMaskCPFCNPJ(event.target.value)
+                      Mask.setMaskCPFCNPJ(event.target.value),
+                      { shouldValidate: true, shouldDirty: true }
                     );
                   }}
                   status={Boolean(error) ? "error" : ""}

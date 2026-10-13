@@ -76,9 +76,12 @@ const schemaForm = yup
 type SchemaFormType = yup.InferType<typeof schemaForm>;
 
 const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
-  const { control, setValue, handleSubmit, resetField } =
+  const { control, setValue, handleSubmit, reset } =
     useForm<SchemaFormType>({
       resolver: yupResolver(schemaForm),
+      defaultValues: {
+        type_account: 1,
+      },
     });
 
   const [loading, setLoading] = useState(false);
@@ -124,6 +127,7 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
   useEffect(() => {
     if (visible) {
       loadRoles();
+      setValue("type_account", 1, { shouldValidate: true, shouldDirty: true });
     }
   }, [visible]);
 
@@ -133,15 +137,16 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
 
   const handleCloseModal = () => {
     setVisible(false);
-
-    resetField("name");
-    resetField("email");
-    resetField("type_account");
-    resetField("phone");
-    resetField("nickname");
-    resetField("document");
-    resetField("password");
-    resetField("confirm_password");
+    reset({
+      name: "",
+      email: "",
+      type_account: 1,
+      phone: "",
+      nickname: "",
+      document: "",
+      password: "",
+      confirm_password: "",
+    });
   };
 
   const registerUser = async (datas: SchemaFormType) => {
@@ -159,13 +164,23 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
     if (password !== confirm_password) {
       swal({
         title: "Aviso",
-        text: "O campo confirmação de senha não é igual ao o campo senha.",
+        text: "O campo confirmação de senha não é igual ao campo senha.",
         icon: "warning",
       });
       return;
     }
 
-    if (!checkCpfIsValue(document)) {
+    const cleanDoc = (document || "").replace(/\D/g, "");
+    if (cleanDoc.length < 11) {
+      swal({
+        title: "Alerta",
+        text: "O CPF inserido deve ter pelo menos 11 dígitos",
+        icon: "warning",
+      });
+      return;
+    }
+
+    if (cleanDoc.length === 11 && !checkCpfIsValue(cleanDoc)) {
       swal({
         title: "Alerta",
         text: "O CPF inserido é inválido",
@@ -184,7 +199,7 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
         document,
         password,
         confirmationPassword: confirm_password,
-        roleId: Number(type_account),
+        roleId: Number(type_account || 1),
       });
 
       if (responseRegisterUser.status === 200 || responseRegisterUser.status === 201 || responseRegisterUser.data?.status) {
@@ -313,7 +328,8 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
                   onChange={(event) =>
                     setValue(
                       "phone",
-                      Mask.setMaskPhoneValue(event.target.value)
+                      Mask.setMaskPhoneValue(event.target.value),
+                      { shouldValidate: true, shouldDirty: true }
                     )
                   }
                   status={Boolean(error) ? "error" : ""}
@@ -335,7 +351,8 @@ const NewUserModal: FC<ModalProps> = ({ visible, setVisible, loadUsers }) => {
                   onChange={(event) => {
                     setValue(
                       "document",
-                      Mask.setMaskCPFCNPJ(event.target.value)
+                      Mask.setMaskCPFCNPJ(event.target.value),
+                      { shouldValidate: true, shouldDirty: true }
                     );
                   }}
                   status={Boolean(error) ? "error" : ""}

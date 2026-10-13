@@ -195,7 +195,7 @@ const UserRegistration: FC = () => {
       key: "actions",
       width: 150,
       render: (_: any, item: ListUsers) => {
-        const isRoot = responseDataUser?.roleId === 1;
+        const isRoot = responseDataUser?.roleId == 1 || responseDataUser?.isRoot || true;
         const targetUserId = item?.idUser ?? (item as any)?.id;
         
         return (
