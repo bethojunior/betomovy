@@ -32,26 +32,59 @@ class TripTypeDao extends BaseDao
 
     public function findById($id)
     {
-        return $this->sqlRawSelect("
-            SELECT
-                idTripType,
-                type,
-                tt.description,
-                CONCAT(c.value, 'tripType/', tt.picture) AS picture,
-                returnOption,
-                deliveryOption,
-                freightOption,
-                onlyCentral,
-                openPrice,
-                offerOption,
-                serviceOption,
-                tt.loopingOption,
-                tt.scheduledOnlyOption
-            FROM tripType tt
-                INNER JOIN config c ON c.`key` = 'link_storage_pictures'
+        try {
+            $row = $this->sqlRawSelect("
+                SELECT
+                    tt.idTripType,
+                    tt.type,
+                    COALESCE(tt.name, tt.type) AS name,
+                    tt.description,
+                    CONCAT(COALESCE(c.value, ''), 'tripType/', COALESCE(tt.picture, '')) AS picture,
+                    COALESCE(tt.returnOption, 0) as returnOption,
+                    COALESCE(tt.deliveryOption, 0) as deliveryOption,
+                    COALESCE(tt.freightOption, 0) as freightOption,
+                    COALESCE(tt.onlyCentral, 0) as onlyCentral,
+                    COALESCE(tt.openPrice, 0) as openPrice,
+                    COALESCE(tt.offerOption, 0) as offerOption,
+                    COALESCE(tt.serviceOption, 0) as serviceOption,
+                    COALESCE(tt.loopingOption, 0) as loopingOption,
+                    COALESCE(tt.scheduledOnlyOption, 0) as scheduledOnlyOption
+                FROM tripType tt
+                LEFT JOIN config c ON c.`key` = 'link_storage_pictures'
                 WHERE tt.idTripType = :idTripType
-        ", [':idTripType' => $id])
-            ->first();
+            ", [':idTripType' => $id])
+                ->first();
+
+            if ($row) {
+                return $row;
+            }
+        } catch (\Throwable $t) {
+        }
+
+        try {
+            return $this->sqlRawSelect("
+                SELECT
+                    tt.idTripType,
+                    tt.type,
+                    COALESCE(tt.name, tt.type) AS name,
+                    tt.description,
+                    tt.picture,
+                    COALESCE(tt.returnOption, 0) as returnOption,
+                    COALESCE(tt.deliveryOption, 0) as deliveryOption,
+                    COALESCE(tt.freightOption, 0) as freightOption,
+                    COALESCE(tt.onlyCentral, 0) as onlyCentral,
+                    COALESCE(tt.openPrice, 0) as openPrice,
+                    COALESCE(tt.offerOption, 0) as offerOption,
+                    COALESCE(tt.serviceOption, 0) as serviceOption,
+                    0 as loopingOption,
+                    0 as scheduledOnlyOption
+                FROM tripType tt
+                WHERE tt.idTripType = :idTripType
+            ", [':idTripType' => $id])
+                ->first();
+        } catch (\Throwable $t2) {
+            return null;
+        }
     }
 
     public function getActives()

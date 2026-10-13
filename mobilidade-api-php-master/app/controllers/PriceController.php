@@ -30,7 +30,7 @@ class PriceController extends ApiController
                     p.*,
                     tt.idTripType,
                     tt.type,
-                    tt.name as tripTypeName,
+                    COALESCE(tt.name, tt.type) as tripTypeName,
                     tt.description as tripTypeDescription,
                     tt.picture as tripTypePicture,
                     COALESCE(tt.serviceOption, 0) as serviceOption
