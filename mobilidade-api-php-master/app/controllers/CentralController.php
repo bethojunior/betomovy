@@ -325,10 +325,51 @@ class CentralController extends ApiController
                 ]);
                 return;
             }
-        }
+        // GET /central/{id}/customer
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $search = $_GET['name'] ?? $_GET['phone'] ?? $_GET['document'] ?? '';
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $limit = 20;
+            $offset = ($page - 1) * $limit;
 
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['status' => true, 'response' => ['data' => []], 'data' => ['data' => []]]);
+            $params = [];
+            $where = "WHERE c.statusId = 1";
+            if (!empty($search)) {
+                $where .= " AND (u.name LIKE :s OR u.phone LIKE :s OR u.document LIKE :s)";
+                $params[':s'] = "%{$search}%";
+            }
+
+            $sql = "SELECT c.idCustomer, c.userId, u.name, u.phone, u.document, u.email, u.rating 
+                    FROM customer c 
+                    INNER JOIN user u ON c.userId = u.idUser 
+                    {$where} 
+                    ORDER BY u.name ASC 
+                    LIMIT {$limit} OFFSET {$offset}";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Clientes encontrados',
+                'response' => ['data' => $customers, 'current_page' => $page],
+                'data' => ['data' => $customers, 'current_page' => $page],
+                'errors' => null
+            ]);
+            return;
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'response' => ['data' => []],
+                'data' => ['data' => []],
+                'errors' => null
+            ]);
+            return;
+        }
     }
 
     public function actionTrip()
