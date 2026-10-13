@@ -1517,6 +1517,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (modal) {
       modal.classList.remove('active')
       modal.style.display = 'none'
+      modal.className = 'trip-details-modal'
+      modal.style.left = ''
+      modal.style.bottom = ''
     }
   }
 
@@ -1602,6 +1605,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const formattedContent = formatTripDetails(trip)
     modalBody.innerHTML = formattedContent
 
+    modal.className = 'trip-details-modal'
+    modal.style.left = ''
+    modal.style.bottom = ''
     modal.style.display = 'flex'
     modal.classList.add('active')
   }
@@ -1615,6 +1621,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     modalTitle.textContent = 'Carregando detalhes...'
     modalBody.innerHTML = getSkeletonTemplate()
+    modal.className = 'trip-details-modal'
+    modal.style.left = ''
+    modal.style.bottom = ''
     modal.style.display = 'flex'
     modal.classList.add('active')
 
@@ -1667,10 +1676,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalTitle = document.getElementById('tripDetailsTitle')
     const modalBody = document.getElementById('tripDetailsBody')
 
+    if (!modal || !modalTitle || !modalBody) return
+
     modalTitle.textContent = 'Detalhes da Viagem'
 
     const formattedContent = formatTripDetails(trip)
     modalBody.innerHTML = formattedContent
+    modal.className = 'trip-details-modal'
+    modal.style.left = ''
+    modal.style.bottom = ''
+    modal.style.display = 'flex'
+    modal.classList.add('active')
   }
 
   function getSkeletonTemplate() {
