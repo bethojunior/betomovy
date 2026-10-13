@@ -51,6 +51,21 @@ try {
         exit;
     }
 
+    if ($action === 'query') {
+        $sql = file_get_contents('php://input');
+        if (empty($sql)) {
+            $sql = $_GET['q'] ?? '';
+        }
+        $stmt = $pdo->query($sql);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode([
+            'status' => true,
+            'count' => count($rows),
+            'rows' => $rows
+        ], JSON_PRETTY_PRINT);
+        exit;
+    }
+
     if ($action === 'check_missing') {
         // Lista tabelas existentes
         $stmt = $pdo->query("SHOW TABLES");

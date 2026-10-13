@@ -109,6 +109,14 @@ class RouteListener extends ApiController
     {
         $action = 'actionIndex';
 
+        if (isset($path[1], $path[2], $path[3]) && !empty($path[3])) {
+            $composite3 = "action" . ucfirst($path[2]) . ucfirst($path[3]);
+            if (method_exists($class, $composite3)) {
+                $_GET['id'] = $path[1];
+                return $composite3;
+            }
+        }
+
         if (isset($path[1], $path[2]) && !empty($path[2])) {
             $compositeAction = "action" . ucfirst($path[1]) . ucfirst($path[2]);
             if (method_exists($class, $compositeAction)) {

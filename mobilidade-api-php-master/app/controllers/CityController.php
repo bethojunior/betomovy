@@ -186,10 +186,24 @@ class CityController extends ApiController
         try {
             $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
             $id = (int)($_GET['id'] ?? $input['id'] ?? 0);
-            $name = $input['name'] ?? $input['nome'] ?? '';
+            $name = trim($input['name'] ?? $input['nome'] ?? '');
             $estateId = (int)($input['estate_id'] ?? $input['estado'] ?? 1);
             $shortName = $input['short_name'] ?? $name;
             $polygonInput = $input['polygon'] ?? [];
+
+            if (empty($name) && $id > 0) {
+                try {
+                    $pdoLookup = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+                    $stmtLookup = $pdoLookup->prepare("SELECT nome, estado FROM city WHERE id = :id LIMIT 1");
+                    $stmtLookup->execute([':id' => $id]);
+                    $rowLookup = $stmtLookup->fetch(\PDO::FETCH_ASSOC);
+                    if ($rowLookup) {
+                        $name = $rowLookup['nome'];
+                        $shortName = $name;
+                        $estateId = (int)($rowLookup['estado'] ?: $estateId);
+                    }
+                } catch (\Throwable $t) {}
+            }
 
             if (empty($name)) {
                 throw new Exception("Nome da cidade é obrigatório");

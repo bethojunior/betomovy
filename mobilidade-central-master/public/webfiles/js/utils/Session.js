@@ -1,7 +1,13 @@
 class Session {
     static get(name) {
-        const result = $.cookie(name);
-        if (!result) return null;
+        let result = $.cookie(name);
+        if (!result) {
+            try {
+                const local = localStorage.getItem("session_" + name);
+                if (local) return JSON.parse(local);
+            } catch (e) {}
+            return null;
+        }
 
         try {
             return JSON.parse(decodeURIComponent(escape(atob(result))));
@@ -12,6 +18,10 @@ class Session {
                 try {
                     return JSON.parse(result);
                 } catch (e3) {
+                    try {
+                        const local = localStorage.getItem("session_" + name);
+                        if (local) return JSON.parse(local);
+                    } catch (e4) {}
                     return null;
                 }
             }
@@ -19,6 +29,10 @@ class Session {
     }
 
     static set(name, value) {
+        try {
+            localStorage.setItem("session_" + name, JSON.stringify(value));
+        } catch (storageErr) {}
+
         try {
             const str = JSON.stringify(value);
             const valueB64 = btoa(unescape(encodeURIComponent(str)));
@@ -34,6 +48,9 @@ class Session {
     }
 
     static delete(name) {
+        try {
+            localStorage.removeItem("session_" + name);
+        } catch (e) {}
         $.removeCookie(name, {path: '/'});
     }
 

@@ -276,8 +276,106 @@ class CentralController extends ApiController
 
     public function actionDriver()
     {
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['status' => true, 'response' => [], 'data' => []]);
+        if (strpos($_SERVER['REQUEST_URI'] ?? '', '/positions') !== false) {
+            $this->actionDriverPositions();
+            return;
+        }
+
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $limit = 50;
+            $offset = ($page - 1) * $limit;
+
+            $sql = "SELECT d.idDriver, d.userId, u.name, u.phone, u.document, u.email, d.status, d.last_lat, d.last_lon
+                    FROM driver d
+                    INNER JOIN user u ON d.userId = u.idUser
+                    WHERE (d.driverRegisterStatusId = 1 OR d.driverRegisterStatusId IS NULL)
+                    ORDER BY u.name ASC
+                    LIMIT {$limit} OFFSET {$offset}";
+
+            $stmt = $pdo->query($sql);
+            $drivers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'response' => $drivers,
+                'data' => $drivers,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => true, 'response' => [], 'data' => []]);
+        }
+    }
+
+    public function actionDriverPositions()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $statusParam = $_GET['status'] ?? 'disponivel,corrida';
+            $statusList = array_filter(array_map('trim', explode(',', $statusParam)));
+            if (empty($statusList)) {
+                $statusList = ['disponivel', 'corrida'];
+            }
+            $inClause = "'" . implode("','", array_map('addslashes', $statusList)) . "'";
+
+            $sql = "SELECT d.idDriver, d.last_lat AS latitude, d.last_lon AS longitude, 
+                           d.status, u.name, d.profileImage,
+                           CONCAT('https://api.movymob.com/uploads/driver/', d.profileImage) AS iconMapDriver
+                    FROM driver d
+                    INNER JOIN user u ON d.userId = u.idUser
+                    WHERE d.last_lat IS NOT NULL 
+                      AND d.last_lat != '' 
+                      AND d.last_lon IS NOT NULL 
+                      AND d.last_lon != ''
+                      AND (d.driverRegisterStatusId = 1 OR d.driverRegisterStatusId IS NULL)
+                      AND d.status IN ({$inClause})
+                    LIMIT 200";
+
+            $stmt = $pdo->query($sql);
+            $drivers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Posições encontradas',
+                'response' => $drivers,
+                'data' => $drivers,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => true, 'response' => [], 'data' => []]);
+        }
+    }
+
+    public function actionTripInfoQuestion()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $centralId = (int)($_GET['id'] ?? 0);
+            $stmt = $pdo->prepare("SELECT * FROM centralTripInfoQuestion WHERE centralId = :cid OR centralId IS NULL OR centralId = 0");
+            $stmt->execute([':cid' => $centralId]);
+            $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Campos dinâmicos encontrados',
+                'response' => $questions,
+                'data' => $questions,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'response' => [],
+                'data' => []
+            ]);
+        }
     }
 
     public function actionCustomer()
@@ -325,6 +423,8 @@ class CentralController extends ApiController
                 ]);
                 return;
             }
+        }
+
         // GET /central/{id}/customer
         try {
             $pdo = Connection::open(Connection::DB_MYSQL_RO);
@@ -334,7 +434,7 @@ class CentralController extends ApiController
             $offset = ($page - 1) * $limit;
 
             $params = [];
-            $where = "WHERE c.statusId = 1";
+            $where = "WHERE (c.customerRegisterStatusId = 1 OR c.customerRegisterStatusId IS NULL)";
             if (!empty($search)) {
                 $where .= " AND (u.name LIKE :s OR u.phone LIKE :s OR u.document LIKE :s)";
                 $params[':s'] = "%{$search}%";

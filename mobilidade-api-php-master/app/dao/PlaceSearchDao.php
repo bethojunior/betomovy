@@ -79,7 +79,7 @@ class PlaceSearchDao extends BaseDao
                 AND MATCH(a.`address`) AGAINST(:query IN BOOLEAN MODE)
                 AND a.blocked IS FALSE
                 {$typeFilter}
-                GROUP BY address
+                GROUP BY a.address, a.neighborhood, a.latitude, a.longitude, a.created_at, a.type
             ORDER BY relevance DESC, proximity
                 LIMIT 10;
         ";

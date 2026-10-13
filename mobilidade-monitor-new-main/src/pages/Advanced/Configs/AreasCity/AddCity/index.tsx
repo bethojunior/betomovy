@@ -253,9 +253,14 @@ export const AddCity = () => {
   });
 
   const citiesFormated = (Array.isArray(cities) ? cities : []).map((value, index) => {
-    const polygon = value?.polygon
-      ? JSON.stringify(Utils.TransformCoordinates(value.polygon, true))
-      : "";
+    let polygon = "";
+    if (value?.polygon) {
+      try {
+        polygon = JSON.stringify(Utils.TransformCoordinates(value.polygon, true));
+      } catch (err) {
+        polygon = "";
+      }
+    }
 
     const objectValue = {
       polygon: polygon,

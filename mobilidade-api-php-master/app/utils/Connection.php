@@ -109,15 +109,13 @@ final class Connection
             }
 
             $conn = new PDO($dsn, $user, $pass, $options);
-            $conn->exec(
-                "SET NAMES 'utf8mb4_unicode_ci';
-                    SET character_set_connection=utf8mb4_unicode_ci;
-                    SET character_set_client=utf8mb4_unicode_ci;
-                    SET character_set_results=utf8mb4_unicode_ci;
-                    SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';"
-            );
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+            try {
+                $conn->exec("SET NAMES utf8mb4");
+            } catch (\Throwable $t) {}
+            try {
+                $conn->exec("SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'");
+            } catch (\Throwable $t) {}
 
             return $conn;
         }
@@ -132,15 +130,13 @@ final class Connection
             $connRO = new PDO($dsn, $user, $pass, [
                 PDO::MYSQL_ATTR_FOUND_ROWS => true
             ]);
-            $connRO->exec(
-                "SET NAMES 'utf8mb4_unicode_ci';
-                    SET character_set_connection=utf8mb4_unicode_ci;
-                    SET character_set_client=utf8mb4_unicode_ci;
-                    SET character_set_results=utf8mb4_unicode_ci;
-                    SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';"
-            );
             $connRO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+            try {
+                $connRO->exec("SET NAMES utf8mb4");
+            } catch (\Throwable $t) {}
+            try {
+                $connRO->exec("SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'");
+            } catch (\Throwable $t) {}
 
             return $connRO;
         }

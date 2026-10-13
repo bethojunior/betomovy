@@ -38,6 +38,11 @@ trait SqlTrait
                 $this->conn = Connection::open($this->dbType);
             }
         }
+        if (!empty($this->conn) && $this->conn instanceof PDO) {
+            try {
+                $this->conn->exec("SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'");
+            } catch (\Throwable $t) {}
+        }
     }
 
     /**
