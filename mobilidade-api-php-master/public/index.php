@@ -62,13 +62,27 @@ try {
     }
 
     if ($uriPath === '/test-city') {
+        ini_set('display_errors', 1);
+        error_reporting(E_ALL);
         header('Content-Type: application/json; charset=utf-8');
         try {
+            $file = realpath(__DIR__ . '/../app/controllers/CityController.php');
+            if (!$file || !file_exists($file)) {
+                echo json_encode(['status' => false, 'error' => 'File does not exist: ' . $file]);
+                exit;
+            }
+            require_once $file;
+            $classExists = class_exists('\app\controllers\CityController');
+            if (!$classExists) {
+                echo json_encode(['status' => false, 'error' => 'Class CityController not found after require']);
+                exit;
+            }
             $ctl = new \app\controllers\CityController();
             echo json_encode(['status' => true, 'loaded' => get_class($ctl)]);
         } catch (\Throwable $err) {
             echo json_encode([
                 'status' => false,
+                'class' => get_class($err),
                 'message' => $err->getMessage(),
                 'file' => $err->getFile(),
                 'line' => $err->getLine(),
