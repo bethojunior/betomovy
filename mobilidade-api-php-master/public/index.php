@@ -46,8 +46,11 @@ if (strpos($_SERVER['REQUEST_URI'] ?? '', '/db-mig') === 0) {
         } elseif ($action === 'run_sql') {
             $sql = file_get_contents('php://input');
             if (empty($sql)) { echo json_encode(['error'=>'No SQL']); exit; }
-            $pdo->exec("SET FOREIGN_KEY_CHECKS=0"); $pdo->exec("SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO'"); $pdo->exec("SET NAMES utf8mb4");
-            $queries = preg_split('/;\s*\n/', $sql);
+            $pdo->exec("SET FOREIGN_KEY_CHECKS=0");
+            $pdo->exec("SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO'");
+            $pdo->exec("SET NAMES utf8mb4");
+            try { $pdo->exec("SET SESSION sql_require_primary_key = 0"); } catch (\Throwable $t) {}
+            $queries = preg_split('/;\s*[\r\n]+/', $sql);
             $ok = 0; $errs = [];
             foreach ($queries as $q) {
                 $q = trim($q);
