@@ -343,9 +343,61 @@ class CentralController extends ApiController
         echo json_encode(['status' => true, 'response' => [], 'data' => []]);
     }
 
-    public function actionZone()
+    public function actionCentralCallTypes()
     {
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['status' => true, 'response' => [], 'data' => []]);
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            // Busca tipos de chamada ativos do banco
+            $stmt = $pdo->query("SELECT id, name, active FROM centralCallType WHERE active = 1");
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $callTypes = [];
+            if (!empty($rows)) {
+                foreach ($rows as $r) {
+                    $callTypes[] = [
+                        'centralCallTypeId' => (int)$r['id'],
+                        'id' => (int)$r['id'],
+                        'name' => $r['name'],
+                        'isActive' => (bool)$r['active']
+                    ];
+                }
+            } else {
+                $callTypes = [
+                    ['centralCallTypeId' => 1, 'id' => 1, 'name' => 'Procurar Cliente', 'isActive' => true],
+                    ['centralCallTypeId' => 2, 'id' => 2, 'name' => 'Chamar para Central', 'isActive' => true],
+                    ['centralCallTypeId' => 3, 'id' => 3, 'name' => 'Procurar Motorista', 'isActive' => true]
+                ];
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Tipos de chamada encontrados',
+                'response' => $callTypes,
+                'data' => $callTypes,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'response' => [
+                    ['centralCallTypeId' => 1, 'id' => 1, 'name' => 'Procurar Cliente', 'isActive' => true],
+                    ['centralCallTypeId' => 2, 'id' => 2, 'name' => 'Chamar para Central', 'isActive' => true],
+                    ['centralCallTypeId' => 3, 'id' => 3, 'name' => 'Procurar Motorista', 'isActive' => true]
+                ],
+                'data' => [
+                    ['centralCallTypeId' => 1, 'id' => 1, 'name' => 'Procurar Cliente', 'isActive' => true],
+                    ['centralCallTypeId' => 2, 'id' => 2, 'name' => 'Chamar para Central', 'isActive' => true],
+                    ['centralCallTypeId' => 3, 'id' => 3, 'name' => 'Procurar Motorista', 'isActive' => true]
+                ],
+                'errors' => null
+            ]);
+        }
+    }
+
+    public function actionCallType()
+    {
+        $this->actionCentralCallTypes();
     }
 }

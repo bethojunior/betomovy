@@ -102,9 +102,40 @@ class ConfigController extends ApiController
             return;
         }
 
-        // GET /config
+        // GET /config or GET /config/{key}
         try {
+            $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+            $parts = array_values(array_filter(explode('/', trim($uri, '/'))));
+            $reqKey = (isset($parts[1]) && strtolower($parts[0]) === 'config') ? $parts[1] : ($_GET['key'] ?? null);
+
             $conn = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+
+            if (!empty($reqKey)) {
+                $stmt = $conn->prepare("SELECT `key`, value, description FROM config WHERE `key` = :k LIMIT 1");
+                $stmt->execute([':k' => $reqKey]);
+                $cfg = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+                if ($cfg) {
+                    echo json_encode([
+                        'status' => true,
+                        'message' => 'Configuração encontrada',
+                        'data' => $cfg['value'],
+                        'response' => $cfg['value'],
+                        'config' => $cfg,
+                        'errors' => null
+                    ]);
+                } else {
+                    echo json_encode([
+                        'status' => false,
+                        'message' => "Configuração '{$reqKey}' não encontrada",
+                        'data' => null,
+                        'response' => null,
+                        'errors' => null
+                    ]);
+                }
+                return;
+            }
+
             $stmt = $conn->query("SELECT `key`, value, description FROM config");
             $configs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             echo $this->returnSuccess("Configurações encontradas", $configs);
