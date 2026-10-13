@@ -113,7 +113,8 @@ final class Connection
                 "SET NAMES 'utf8mb4_unicode_ci';
                     SET character_set_connection=utf8mb4_unicode_ci;
                     SET character_set_client=utf8mb4_unicode_ci;
-                    SET character_set_results=utf8mb4_unicode_ci;"
+                    SET character_set_results=utf8mb4_unicode_ci;
+                    SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';"
             );
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -135,7 +136,8 @@ final class Connection
                 "SET NAMES 'utf8mb4_unicode_ci';
                     SET character_set_connection=utf8mb4_unicode_ci;
                     SET character_set_client=utf8mb4_unicode_ci;
-                    SET character_set_results=utf8mb4_unicode_ci;"
+                    SET character_set_results=utf8mb4_unicode_ci;
+                    SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION';"
             );
             $connRO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
