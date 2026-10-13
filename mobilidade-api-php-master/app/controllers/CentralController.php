@@ -250,7 +250,27 @@ class CentralController extends ApiController
     private function handleList()
     {
         try {
-            $pdo = Connection::open(Connection::DB_MYSQL);
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+            if ($id > 0) {
+                $stmt = $pdo->prepare("SELECT * FROM central WHERE id = :id LIMIT 1");
+                $stmt->execute([':id' => $id]);
+                $central = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($central) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'status' => true,
+                        'message' => 'Sucesso',
+                        'response' => $central,
+                        'data' => $central,
+                        'errors' => null
+                    ]);
+                    return;
+                }
+            }
+
             $stmt = $pdo->query("SELECT * FROM central WHERE statusId = 1 LIMIT 50");
             $centrals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

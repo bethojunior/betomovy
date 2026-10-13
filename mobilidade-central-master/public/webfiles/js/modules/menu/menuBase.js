@@ -398,9 +398,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!status || !response)
                     return;
 
-                Session.set("centralSelected", response);
+                const centralObj = Array.isArray(response) ? (response[0] || {}) : response;
+                Session.set("centralSelected", centralObj);
 
-                if (response.centralCallDriver !== "only_app") {
+                if (centralObj.centralCallDriver !== "only_app") {
                     const menuItemDriver = document.querySelector("#menuItemDriver");
                     if (menuItemDriver) {
                         menuItemDriver.innerHTML = `

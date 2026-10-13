@@ -283,6 +283,10 @@ function initProcessingCallTrip(showButtonCall = true, forceReset = false) {
 
 function getUpdateTrip() {
   const central = Session.get('centralSelected')
+  if (!central || !central.id) {
+    setTimeout(getUpdateTrip, 2000)
+    return
+  }
 
   CentralRepository.get(central.id)
     .then(({ message, status, response }) => {
@@ -291,15 +295,20 @@ function getUpdateTrip() {
         return
       }
 
+      const centralData = Array.isArray(response) ? (response[0] || {}) : (response || {})
+
       verifyListTripActivePartner()
 
       // Usa utilitário que verifica o estado do menu antes de alterar o botão
       updateBtnCallTripVisibility()
 
-      if (response.centralCallDriver !== 'only_app') {
-        document.querySelector('#menuItemDriver').innerHTML = `
-                    <div><a href="/driver/list"><i class="material-icons nav-icon">person</i>Motoristas</a></div>
-                `
+      if (centralData.centralCallDriver !== 'only_app') {
+        const itemDriver = document.querySelector('#menuItemDriver')
+        if (itemDriver) {
+          itemDriver.innerHTML = `
+                      <div><a href="/driver/list"><i class="material-icons nav-icon">person</i>Motoristas</a></div>
+                  `
+        }
       }
     })
     .catch((err) => {
