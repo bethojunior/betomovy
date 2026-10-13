@@ -16,13 +16,9 @@ class UsuarioController extends View
                 'customer/new'
             ],
             [
-                'user/register',
                 'repositories/UserRepository',
                 'modules/user/register'
-            ],
-            [
-                'user/register',
-            ],
+            ]
         );
     }
 

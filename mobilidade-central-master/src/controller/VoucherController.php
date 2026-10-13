@@ -14,7 +14,6 @@ class VoucherController extends View
                 'repositories/VoucherRepository',
                 'controllers/VoucherController',
                 'controllers/CentralVoucherPurchasePaymentController',
-                'utils/QrCodeGenerator',
                 'modules/voucher/index'
             ],
             [

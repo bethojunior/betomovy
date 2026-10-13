@@ -32,23 +32,7 @@ class WhatsAppController extends View
     }
 
     public function actionList(){
-        if (!$this->isWhatsappEnabled()) {
-            $this->redirectController('');
-            return;
-        }
-
-        $this->setTemplate(Template::defaultView());
-
-        $this->layoutBuilder(
-            [
-                'whatsapp/index'
-            ],
-            [
-                'repositories/whatsappRepository',
-                'utils/whatsappSession',
-                'modules/whatsapp/index'
-            ]
-        );
+        $this->actionManagement();
     }
 
     public function actionManagement(){
