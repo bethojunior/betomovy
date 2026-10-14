@@ -38,11 +38,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const customer = {
             name: document.getElementById("nameCustomer") ? document.getElementById("nameCustomer").value : "",
             phone: document.getElementById("phoneCustomer") ? document.getElementById("phoneCustomer").value : "",
-            email: document.getElementById("emailCustomer") ? document.getElementById("emailCustomer").value : "",
             document: document.getElementById("documentCustomer") ? document.getElementById("documentCustomer").value.trim() : "",
             dateOfBirth: document.getElementById("dateOfBirthCustomer") ? document.getElementById("dateOfBirthCustomer").value : "",
             isCompany: document.getElementById("isCompanyCustomerPj") ? document.getElementById("isCompanyCustomerPj").checked : false,
         };
+
+        const emailInput = document.getElementById("emailCustomer");
+        if (emailInput && emailInput.value.trim().length > 0) {
+            customer.email = emailInput.value.trim();
+            if (!ValidateForm.validateEmail(customer.email)) {
+                SwalCustom.messageDialog("", "E-mail inválido", undefined, "info");
+                return;
+            }
+        }
 
         if (customer.name.length === 0) {
             SwalCustom.messageDialog("", "Informe o nome do cliente", undefined, "info");

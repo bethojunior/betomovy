@@ -28,7 +28,7 @@ class StoreCentralCustomerRequest extends FormRequest
         return [
             'central_id' => 'bail|required|numeric',
             'name' => 'required|string',
-            'email' => 'required|email|unique:user,email',
+            'email' => 'sometimes|nullable|email|unique:user,email',
             'phone' => [
                 'sometimes',
                 'nullable',

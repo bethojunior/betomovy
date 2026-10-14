@@ -45,11 +45,6 @@
             </div>
 
             <div class="mcc-field mcc-field--full">
-                <label class="mcc-label" for="emailCustomer">E-mail <span class="mcc-required">*</span></label>
-                <input type="email" class="mcc-input form-control" id="emailCustomer">
-            </div>
-
-            <div class="mcc-field">
                 <label class="mcc-label" id="descriptionDate" for="dateOfBirthCustomer">Data de nascimento</label>
                 <input type="date" class="mcc-input form-control" id="dateOfBirthCustomer">
             </div>

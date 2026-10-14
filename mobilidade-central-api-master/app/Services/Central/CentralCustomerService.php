@@ -46,7 +46,7 @@ class CentralCustomerService
             $user = new User();
             $user->name  = $request['name'];
             $user->nickname  = $request['name'];
-            $user->email = $request['email'];
+            $user->email = !empty($request['email']) ? $request['email'] : null;
             $user->phone = $request['phone'];
             if (isset($request['document']) && $request['document'] !== '') {
                 $user->document = $request['document'];

@@ -29,12 +29,7 @@
                 <input type="text" class="form-control" id="phoneCustomer">
             </div>
         </div>
-        <div class="row">
-            <div class="form-group col-sm-4">
-                <label for="emailCustomer" class="mb-0">E-mail</label>
-                <input type="email" class="form-control" id="emailCustomer">
-            </div>
-        </div>
+
         <div class="row">
             <div class="form-group col-sm-4">
                 <label id="descriptionDate" for="dateOfBirthCustomer" class="mb-0">Data de nascimento</label>
