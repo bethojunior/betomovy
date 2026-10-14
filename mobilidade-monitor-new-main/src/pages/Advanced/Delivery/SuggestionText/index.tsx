@@ -102,15 +102,15 @@ export const SuggestionText = () => {
   }, []);
 
   useEffect(() => {
-    if (suggestionsDelivery) {
-      setValue("obs", suggestionsDelivery.deliveryInfoSuggestion.obs);
+    if (suggestionsDelivery && suggestionsDelivery.deliveryInfoSuggestion) {
+      setValue("obs", suggestionsDelivery.deliveryInfoSuggestion.obs || "");
       setValue(
         "obs_destination",
-        suggestionsDelivery.deliveryInfoSuggestion.obsDestination
+        suggestionsDelivery.deliveryInfoSuggestion.obsDestination || ""
       );
       setValue(
         "obs_origin",
-        suggestionsDelivery.deliveryInfoSuggestion.obsOrigin
+        suggestionsDelivery.deliveryInfoSuggestion.obsOrigin || ""
       );
     }
   }, [suggestionsDelivery]);

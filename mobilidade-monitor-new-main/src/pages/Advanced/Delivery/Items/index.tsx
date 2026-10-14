@@ -37,9 +37,12 @@ const itemInformation = async () => {
   setLoading(true);
   try {
     const result = await api.get(`deliveryInfoSuggestion`);
-    setNotificationList(result.data.response.tripItemType);
+    const items = Array.isArray(result?.data?.response?.tripItemType)
+      ? result.data.response.tripItemType
+      : (Array.isArray(result?.data?.response) ? result.data.response : []);
+    setNotificationList(items);
   } catch (error) {
-    
+    setNotificationList([]);
   } finally {
     setLoading(false);
   }

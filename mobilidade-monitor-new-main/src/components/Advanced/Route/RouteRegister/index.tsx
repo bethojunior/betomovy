@@ -104,17 +104,16 @@ const RouteRegister: FC = () => {
     setLoading(true);
     try {
       const result = await api.get("/deliveryInfoSuggestion");
-      setTripItemTypes(result.data.response.tripItemType);
-      if (result.data.response.tripItemType.length > 0) {
-        setSelectedObject(result.data.response.tripItemType[0].id);
+      const items = Array.isArray(result?.data?.response?.tripItemType)
+        ? result.data.response.tripItemType
+        : (Array.isArray(result?.data?.response) ? result.data.response : []);
+      setTripItemTypes(items);
+      if (items.length > 0 && items[0]?.id) {
+        setSelectedObject(items[0].id);
       }
     } catch (error) {
-      console.error("Erro ao buscar tipos de itens de viagem:", error);
-      swal(
-        "Erro",
-        "Não foi possível carregar os tipos de itens de viagem",
-        "error"
-      );
+      console.warn("Aviso ao buscar tipos de itens de viagem:", error);
+      setTripItemTypes([]);
     } finally {
       setLoading(false);
     }

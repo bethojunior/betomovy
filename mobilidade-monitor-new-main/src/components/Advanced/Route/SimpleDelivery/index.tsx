@@ -33,9 +33,13 @@ const SimpleDelivery: FC = () => {
 const itemInformation = async () => {
   setLoading(true);  
   api.get(`deliveryInfoSuggestion`).then((result) => {
-    setNotificationList(result.data.response.tripItemType);
+    const items = Array.isArray(result?.data?.response?.tripItemType)
+      ? result.data.response.tripItemType
+      : (Array.isArray(result?.data?.response) ? result.data.response : []);
+    setNotificationList(items);
     setLoading(false); 
   }).catch(() => {
+    setNotificationList([]);
     setLoading(false); 
   });
 };

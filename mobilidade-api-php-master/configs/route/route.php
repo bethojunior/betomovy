@@ -188,6 +188,10 @@ return [
         '/mongologs/logsapplication',
         '/mongologs/logstransaction',
         '/eventnotification',
-        '/admin'
+        '/admin',
+        '/deliveryinfosuggestion',
+        '/deliveryinfosuggestion/',
+        '/tripitemtype',
+        '/tripitemtype/'
     ]
 ];
