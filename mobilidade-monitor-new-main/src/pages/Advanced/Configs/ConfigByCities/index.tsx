@@ -215,7 +215,8 @@ const ConfigByCities: FC = () => {
               );
             }
             
-            if (item.attribute === "typeMoney" || item.description.toLowerCase().includes("moeda") || item.description.toLowerCase().includes("currency")) {
+            const itemDesc = (item.description || "").toLowerCase();
+            if (item.attribute === "typeMoney" || itemDesc.includes("moeda") || itemDesc.includes("currency")) {
               return (
                 <CardCurrency
                   key={`${item.attribute}-${renderKey}`}
@@ -225,7 +226,7 @@ const ConfigByCities: FC = () => {
               );
             }
             
-            if (item.attribute === "prepayPerPeriod" || item.description.toLowerCase().includes("pré-pago") || item.description.toLowerCase().includes("prepago") || item.description.toLowerCase().includes("prepaid")) {
+            if (item.attribute === "prepayPerPeriod" || itemDesc.includes("pré-pago") || itemDesc.includes("prepago") || itemDesc.includes("prepaid")) {
               return (
                 <CardPrepaid
                   key={`${item.attribute}-${renderKey}`}

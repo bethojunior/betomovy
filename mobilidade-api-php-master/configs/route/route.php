@@ -192,6 +192,13 @@ return [
         '/deliveryinfosuggestion',
         '/deliveryinfosuggestion/',
         '/tripitemtype',
-        '/tripitemtype/'
+        '/tripitemtype/',
+        '/paymentformtype',
+        '/paymentformtype/',
+        '/paymentformtype/getall',
+        '/customer/central',
+        '/customer/central/',
+        '/user/central',
+        '/user/central/'
     ]
 ];

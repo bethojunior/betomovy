@@ -45,16 +45,10 @@ export const DynamicPerArea = () => {
   const onChangeStatus = async (checked: boolean, id: number) => {
     setLoadingTable(true);
     try {
-      if (checked) {
-        const responseStatusEnable = await api.put(`dynamicArea/${id}/disable`);
-        if (responseStatusEnable.status) {
-          getDynamicAreas();
-        }
-      } else {
-        const responseStatusDisable = await api.put(`dynamicArea/${id}/enable`);
-        if (responseStatusDisable.status) {
-          getDynamicAreas();
-        }
+      const endpoint = checked ? `dynamicArea/${id}/enable` : `dynamicArea/${id}/disable`;
+      const response = await api.put(endpoint);
+      if (response.status) {
+        getDynamicAreas();
       }
     } catch (error) {
       console.error(error);
@@ -155,7 +149,7 @@ export const DynamicPerArea = () => {
           >
             <div style={{ display: "flex", gap: 10 }}>
               <Switch
-                onChange={() => onChangeStatus(statusData, datas.id)}
+                onChange={(checked) => onChangeStatus(checked, datas.id)}
                 checked={statusData}
               />
               <LabelSwitch>

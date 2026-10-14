@@ -101,14 +101,16 @@ class Mask {
     return v;
   }
 
-  static setMaskMoneyAlternative(valor: number): string {
-    if (!valor || !Number(valor)) return "0,00";
-    
-    return valor.toLocaleString("pt-br", { minimumFractionDigits: 2 });
+  static setMaskMoneyAlternative(valor: any): string {
+    const num = Number(valor);
+    if (isNaN(num) || !num) return "0,00";
+    return num.toLocaleString("pt-br", { minimumFractionDigits: 2 });
   }
 
-  static setMaskMoneyNumber(valor: number): string {
-    return valor.toLocaleString("pt-br", {
+  static setMaskMoneyNumber(valor: any): string {
+    const num = Number(valor);
+    if (isNaN(num)) return "R$ 0,00";
+    return num.toLocaleString("pt-br", {
       style: "currency",
       currency: "BRL",
     });

@@ -116,7 +116,7 @@ export const ListCentral = () => {
       width: 150,
       render: (item: number) => (
         <label>
-          {item !== null ? Mask.setMaskMoneyNumber(item) : "Não informado"}
+          {item != null ? Mask.setMaskMoneyNumber(item) : "Não informado"}
         </label>
       ),
     },
@@ -210,7 +210,7 @@ export const ListCentral = () => {
       width: 100,
       ellipsis: true,
       render: (value: number) => (
-        <label>{value !== undefined ? Mask.setMaskMoneyNumber(value) : "N/A"}</label>
+        <label>{value != null ? Mask.setMaskMoneyNumber(value) : "N/A"}</label>
       ),
     },
     {

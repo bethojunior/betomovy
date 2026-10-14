@@ -89,7 +89,7 @@ export const ServicesExtras = () => {
       title: "Nome",
       key: "name",
       render: (_, data) => {
-        return <span>{data.accessibility_help.name}</span>;
+        return <span>{data?.accessibility_help?.name || "Não informado"}</span>;
       },
     },
     {
@@ -100,7 +100,7 @@ export const ServicesExtras = () => {
           <Image
             width={70}
             src={
-              data.accessibility_help.picture
+              data?.accessibility_help?.picture
                 ? data.accessibility_help.picture
                 : Constants.defaultImgNotFound
             }

@@ -14,6 +14,8 @@ use Exception;
 use app\model\Trip;
 use app\model\User;
 use app\utils\Headers;
+use app\utils\Connection;
+use PDO;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -508,6 +510,78 @@ class CustomerController extends ApiController
         } catch (Exception $e) {
             $message = $e->getMessage() ?: 'Erro ao validar cadastro';
             echo $this->returnError($e, $message);
+        }
+    }
+
+    public function actionCentral()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+            $name = isset($_GET['name']) ? trim($_GET['name']) : '';
+            $perPage = 15;
+            $offset = ($page - 1) * $perPage;
+
+            $whereSql = "WHERE cu.statusId = 1";
+            $params = [];
+            if (!empty($name)) {
+                $whereSql .= " AND (u.name LIKE :name OR u.email LIKE :name OR c.name LIKE :name)";
+                $params[':name'] = "%{$name}%";
+            }
+
+            // Total count
+            $countStmt = $pdo->prepare("
+                SELECT COUNT(*) as total
+                FROM centralUser cu
+                INNER JOIN user u ON u.idUser = cu.userId
+                INNER JOIN central c ON c.id = cu.centralId
+                {$whereSql}
+            ");
+            $countStmt->execute($params);
+            $total = (int)$countStmt->fetchColumn();
+
+            // Data
+            $dataStmt = $pdo->prepare("
+                SELECT 
+                    cu.userId AS idUser,
+                    u.name,
+                    u.email,
+                    c.name AS centralName
+                FROM centralUser cu
+                INNER JOIN user u ON u.idUser = cu.userId
+                INNER JOIN central c ON c.id = cu.centralId
+                {$whereSql}
+                ORDER BY cu.id DESC
+                LIMIT {$perPage} OFFSET {$offset}
+            ");
+            $dataStmt->execute($params);
+            $rows = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $lastPage = ceil($total / $perPage);
+            $nextPageUrl = ($page < $lastPage) ? "customer/central?page=" . ($page + 1) : null;
+            $prevPageUrl = ($page > 1) ? "customer/central?page=" . ($page - 1) : null;
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Usuários da central listados com sucesso',
+                'response' => [
+                    'current_page' => $page,
+                    'data' => $rows,
+                    'total' => $total,
+                    'per_page' => $perPage,
+                    'last_page' => $lastPage,
+                    'next_page_url' => $nextPageUrl,
+                    'prev_page_url' => $prevPageUrl
+                ]
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao carregar usuários da central: ' . $e->getMessage(),
+                'response' => null
+            ]);
         }
     }
 }

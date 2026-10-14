@@ -31,6 +31,8 @@ google-services.json
 *.crt
 *.cert
 backup/keystore.jks*
+BANCO DE DADOS MIGRAR PARA OCEAN/
+*.sql
 
 # 3. Dependências
 node_modules/

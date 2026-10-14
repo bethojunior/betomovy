@@ -806,8 +806,8 @@ export const ServicesApps = () => {
     try {
       const responsePrices = await api.get(`price?cityId=${cityId}`);
 
-      const pricesTypes = responsePrices.data.response.filter(
-        (data: ListPricesProps) => data.trip_type.serviceOption === 1
+      const pricesTypes = (responsePrices.data.response || []).filter(
+        (data: ListPricesProps) => data?.trip_type?.serviceOption === 1
       );
 
       setListPrices(pricesTypes);
@@ -893,17 +893,20 @@ export const ServicesApps = () => {
 
   useEffect(() => {
     if (pricesSelected) {
-      const dataFormPayments = driverCommissions.filter(
+      const filteredCommissions = driverCommissions.filter(
         (data) => data.tripTypeId === pricesSelected.tripTypeId
-      )[0].commissions_payment_form;
-      dataFormPayments.map((value, index) => {
-        handleChangePaymentsCommissions(
-          index,
-          "value",
-          Mask.setMaskMoneyAlternative(value.value as number)
-        );
-        handleChangePaymentsCommissions(index, "valueType", value.valueType);
-      });
+      );
+      const dataFormPayments = filteredCommissions[0]?.commissions_payment_form;
+      if (Array.isArray(dataFormPayments)) {
+        dataFormPayments.map((value, index) => {
+          handleChangePaymentsCommissions(
+            index,
+            "value",
+            Mask.setMaskMoneyAlternative(value.value as number)
+          );
+          handleChangePaymentsCommissions(index, "valueType", value.valueType);
+        });
+      }
       setTaxRate(Mask.setMaskMoneyAlternative(pricesSelected.tax_price));
       setDescriptionTaxRate(pricesSelected.tax_price_description);
       setValueSurchase(
@@ -1417,9 +1420,11 @@ export const ServicesApps = () => {
                                 </tr>
                                 <tr>
                                   <th>
-                                    {new Date(
-                                      value.created_at
-                                    ).toLocaleDateString()}
+                                    {value.created_at
+                                      ? new Date(
+                                          value.created_at
+                                        ).toLocaleDateString()
+                                      : "-"}
                                   </th>
                                   <th>
                                     {`R$ ${Mask.setMaskMoneyAlternative(
@@ -1436,7 +1441,7 @@ export const ServicesApps = () => {
                                       value.new_value
                                     )}`}
                                   </th>
-                                  <th>{value.trip_type.type}</th>
+                                  <th>{value.trip_type?.type || value.tripTypeName || "Geral"}</th>
                                   <th>
                                     <ButtonClosePrices
                                       onClick={() =>

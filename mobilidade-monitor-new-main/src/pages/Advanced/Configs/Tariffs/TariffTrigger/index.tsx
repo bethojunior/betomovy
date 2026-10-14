@@ -149,19 +149,22 @@ export const TariffTrigger = () => {
       title: "Etiqueta",
       dataIndex: "tag",
       render: (_, data) => {
-        const element = document.createElement("div");
-        element.innerHTML = data.tag;
+        let tagText = "";
+        if (data?.tag) {
+          const element = document.createElement("div");
+          element.innerHTML = data.tag;
+          tagText = element.querySelector("div")?.textContent?.replace("trending_up", "") || element.textContent || data.tag;
+        }
         return (
           <div
             style={{
               display: "flex",
               alignItems: "center",
+              gap: 6,
             }}
           >
             <FiTrendingUp color="#000" size={20} />
-            {element
-              .querySelector("div")
-              ?.textContent?.replace("trending_up", "")}
+            <span>{tagText || "Padrão"}</span>
           </div>
         );
       },

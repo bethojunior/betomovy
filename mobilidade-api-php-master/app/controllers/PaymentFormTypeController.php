@@ -12,6 +12,11 @@ use Exception;
  */
 class PaymentFormTypeController extends ApiController
 {
+    public function actionIndex()
+    {
+        return $this->actionGetAll();
+    }
+
     public function actionGetAll()
     {
         try {

@@ -481,7 +481,7 @@ export const TypesTravels = () => {
   const listTravelsDisabled = typesTravels.filter((item) => {
     return (
       listPrices.filter((data) => {
-        return item.idTripType === data.trip_type.idTripType;
+        return item.idTripType === (data.trip_type?.idTripType ?? data.tripTypeId);
       }).length === 0
     );
   });
@@ -1079,9 +1079,11 @@ export const TypesTravels = () => {
                                 </tr>
                                 <tr>
                                   <th>
-                                    {new Date(
-                                      value.created_at
-                                    ).toLocaleDateString()}
+                                    {value.created_at
+                                      ? new Date(
+                                          value.created_at
+                                        ).toLocaleDateString()
+                                      : "-"}
                                   </th>
                                   <th>
                                     {`R$ ${Mask.setMaskMoneyAlternative(
@@ -1098,7 +1100,7 @@ export const TypesTravels = () => {
                                       value.new_value
                                     )}`}
                                   </th>
-                                  <th>{value.trip_type.type}</th>
+                                  <th>{value.trip_type?.type || value.tripTypeName || "Geral"}</th>
                                   <th>
                                     <ButtonClosePrices
                                       onClick={() =>

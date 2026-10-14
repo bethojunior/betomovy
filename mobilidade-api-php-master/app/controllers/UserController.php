@@ -7,6 +7,8 @@ use app\dao\UserTypeDao;
 use app\services\UserDuplicateCheckService;
 use app\services\UserService;
 use app\utils\Headers;
+use app\utils\Connection;
+use PDO;
 use Exception;
 use app\model\User;
 
@@ -194,6 +196,41 @@ class UserController extends ApiController
             echo $this->returnSuccess("Sucesso", $result);
         } catch (Exception $e) {
             echo $this->returnError($e, "Erro ao remover dados da conta");
+        }
+    }
+
+    public function actionCentral()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $userId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+            if (!$userId) {
+                $raw = file_get_contents('php://input');
+                $json = json_decode($raw, true);
+                $userId = (int)($json['id'] ?? $json['userId'] ?? 0);
+            }
+
+            if ($userId <= 0) {
+                throw new Exception("ID do usuário inválido");
+            }
+
+            // Desvincular usuário da central (statusId = 2)
+            $stmt = $pdo->prepare("UPDATE centralUser SET statusId = 2, updated_at = NOW() WHERE userId = :userId");
+            $stmt->execute([':userId' => $userId]);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Usuário desvinculado da central com sucesso',
+                'response' => true
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao desvincular usuário da central: ' . $e->getMessage(),
+                'response' => false
+            ]);
         }
     }
 }

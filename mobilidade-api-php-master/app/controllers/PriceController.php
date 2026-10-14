@@ -131,17 +131,96 @@ class PriceController extends ApiController
 
     public function actionRange()
     {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+        // POST: criar nova faixa de preço
+        if ($method === 'POST') {
+            try {
+                $raw = file_get_contents('php://input');
+                $body = json_decode($raw, true) ?: $_POST;
+                $cityId = (int)($body['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+                $tripTypeId = (int)($body['tripTypeId'] ?? 0);
+                $description = $body['description'] ?? '';
+                $minValue = (float)($body['min_value'] ?? 0);
+                $maxValue = (float)($body['max_value'] ?? 0);
+                $newValue = (float)($body['new_value'] ?? 0);
+
+                $ins = $pdo->prepare("
+                    INSERT INTO priceRange (cityId, tripTypeId, description, min_value, max_value, new_value, statusId, created_at, updated_at)
+                    VALUES (:cityId, :tripTypeId, :description, :min_value, :max_value, :new_value, 1, NOW(), NOW())
+                ");
+                $ins->execute([
+                    ':cityId' => $cityId,
+                    ':tripTypeId' => $tripTypeId,
+                    ':description' => $description,
+                    ':min_value' => $minValue,
+                    ':max_value' => $maxValue,
+                    ':new_value' => $newValue
+                ]);
+                $newId = $pdo->lastInsertId();
+
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Faixa de preço adicionada com sucesso',
+                    'response' => ['id' => $newId],
+                    'data' => ['id' => $newId]
+                ]);
+                return;
+            } catch (\Throwable $e) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'Erro ao salvar faixa de preço: ' . $e->getMessage()
+                ]);
+                return;
+            }
+        }
+
+        // DELETE: excluir faixa de preço
+        if ($method === 'DELETE') {
+            try {
+                $id = (int)($_GET['id'] ?? 0);
+                if ($id > 0) {
+                    $del = $pdo->prepare("UPDATE priceRange SET statusId = 2, updated_at = NOW() WHERE id = :id");
+                    $del->execute([':id' => $id]);
+                }
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Faixa de preço excluída com sucesso',
+                    'response' => true
+                ]);
+                return;
+            } catch (\Throwable $e) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'Erro ao excluir faixa de preço: ' . $e->getMessage()
+                ]);
+                return;
+            }
+        }
+
+        // GET: listar faixas de preço
         try {
             $cityId = (int)($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
             $tripTypeId = (int)($_GET['tripTypeId'] ?? 0);
-            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
 
             $stmt = $pdo->prepare("
-                SELECT * FROM priceRange
-                WHERE (cityId = :cityId OR :cityIdZero = 0)
-                  AND (tripTypeId = :tripTypeId OR :tripTypeIdZero = 0)
-                  AND statusId = 1
-                ORDER BY id ASC
+                SELECT 
+                    pr.*,
+                    tt.idTripType,
+                    COALESCE(tt.name, tt.type) as tripTypeName,
+                    tt.description as tripTypeDescription,
+                    tt.picture as tripTypePicture
+                FROM priceRange pr
+                LEFT JOIN tripType tt ON pr.tripTypeId = tt.idTripType
+                WHERE (pr.cityId = :cityId OR :cityIdZero = 0)
+                  AND (pr.tripTypeId = :tripTypeId OR :tripTypeIdZero = 0)
+                  AND pr.statusId = 1
+                ORDER BY pr.id ASC
             ");
             $stmt->execute([
                 ':cityId' => $cityId,
@@ -149,7 +228,20 @@ class PriceController extends ApiController
                 ':tripTypeId' => $tripTypeId,
                 ':tripTypeIdZero' => $tripTypeId
             ]);
-            $list = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $list = array_map(function ($row) {
+                $item = $row;
+                $item['trip_type'] = [
+                    'idTripType' => (int)($row['tripTypeId'] ?? 0),
+                    'id' => (int)($row['tripTypeId'] ?? 0),
+                    'type' => $row['tripTypeName'] ?? 'Geral',
+                    'name' => $row['tripTypeName'] ?? 'Geral',
+                    'description' => $row['tripTypeDescription'] ?? '',
+                    'picture' => $row['tripTypePicture'] ?? ''
+                ];
+                return $item;
+            }, $rows);
 
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
