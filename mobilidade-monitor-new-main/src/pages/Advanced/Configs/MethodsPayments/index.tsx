@@ -60,8 +60,18 @@ const MethodsPayments = () => {
         api.get("/tripPaymentForm"),
         api.get("/paymentFormType"),
       ]);
-      setDatasTripPayments(responseTripPayment.data.response);
-      setDatasTypePayments(responseTypePayment.data.response);
+      const tripRaw =
+        responseTripPayment.data?.response ??
+        responseTripPayment.data?.data ??
+        responseTripPayment.data ??
+        [];
+      const typeRaw =
+        responseTypePayment.data?.response ??
+        responseTypePayment.data?.data ??
+        responseTypePayment.data ??
+        [];
+      setDatasTripPayments(Array.isArray(tripRaw) ? tripRaw : []);
+      setDatasTypePayments(Array.isArray(typeRaw) ? typeRaw : []);
     } catch (error) {
       console.error("Erro ao buscar dados de formas de pagamento:", error);
       handleShowMessageAlert("Erro ao buscar dados de formas de pagamento!", "error");
@@ -125,6 +135,14 @@ const MethodsPayments = () => {
       dataIndex: ["payment_form_type", "description"],
       key: "type",
       width: 300,
+      render: (_: any, record: TripPaymentsFormProps) => {
+        return (
+          record.payment_form_type?.description ||
+          record.payment_form_type?.name ||
+          (record as any).description ||
+          "-"
+        );
+      },
     },
     {
       title: "Ações",
@@ -185,6 +203,7 @@ const MethodsPayments = () => {
 
       <ContentTable>
         <Table
+          rowKey="idTripPaymentForm"
           columns={colums}
           dataSource={datasTripPayments}
           pagination={false}

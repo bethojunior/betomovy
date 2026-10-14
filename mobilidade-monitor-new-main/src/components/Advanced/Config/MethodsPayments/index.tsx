@@ -1,5 +1,5 @@
 import { Modal, Button, Input, Select } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageObservation } from "./style";
 import api from "../../../../services/api";
 import swal from "sweetalert";
@@ -48,10 +48,40 @@ const ModalMethodsPayments = ({
   const [DescriptionPayment, setDescriptionPayment] = useState<string>("");
   const [TypePayments, setTypePayments] = useState<string>("");
 
+  useEffect(() => {
+    if (showModal) {
+      if (data) {
+        setDescriptionPayment(data.name || "");
+        const typeId =
+          data.payment_form_type?.id || (data as any).paymentFormTypeId;
+        setTypePayments(typeId ? String(typeId) : "");
+      } else {
+        setDescriptionPayment("");
+        setTypePayments("");
+      }
+    }
+  }, [showModal, data]);
+
   const handleEditFormPayment = (datas: TripPaymentsFormProps) => {
-    if (TypePayments.length <= 0) {
+    const nameToSend = DescriptionPayment.trim() || datas.name;
+    const typeToSend =
+      TypePayments ||
+      datas.payment_form_type?.id ||
+      (datas as any).paymentFormTypeId;
+
+    if (!nameToSend) {
       swal({
-        title: "Escolha o tipo de pagamento",
+        title: "Aviso",
+        text: "Por favor, digite a descrição da forma de pagamento.",
+        icon: "warning",
+      });
+      return;
+    }
+
+    if (!typeToSend) {
+      swal({
+        title: "Aviso",
+        text: "Escolha o tipo de pagamento.",
         icon: "warning",
       });
       return;
@@ -61,58 +91,93 @@ const ModalMethodsPayments = ({
     setLoading(true);
     api
       .put(`/tripPaymentForm/${idTripPaymentForm}`, {
-        name: DescriptionPayment,
-        paymentFormTypeId: TypePayments,
+        name: nameToSend,
+        paymentFormTypeId: Number(typeToSend),
       })
       .then((response) => {
         setLoading(false);
-        if (response.data.status) {
+        if (response.data.status || response.status === 200) {
           messageAlert("Forma de pagamento editada com sucesso!", "success");
-          setShowModal(false);
+          handleCloseModal();
           getDatas();
-          setTypePayments("");
+        } else {
+          messageAlert(
+            response.data.message || "Erro ao editar forma de pagamento!",
+            "error"
+          );
         }
       })
       .catch((error) => {
         console.log(error);
         setLoading(false);
-        messageAlert("Erro ao editar forma de pagamento!", "error");
-        setShowModal(false);
+        const errorMsg =
+          error?.response?.data?.message || "Erro ao editar forma de pagamento!";
+        messageAlert(errorMsg, "error");
       });
   };
 
   const handleCreateFormPayment = () => {
+    if (!DescriptionPayment.trim()) {
+      swal({
+        title: "Aviso",
+        text: "Por favor, digite a descrição da forma de pagamento.",
+        icon: "warning",
+      });
+      return;
+    }
+
+    if (!TypePayments) {
+      swal({
+        title: "Aviso",
+        text: "Por favor, escolha o tipo de pagamento.",
+        icon: "warning",
+      });
+      return;
+    }
+
     setLoading(true);
 
     api
       .post("/tripPaymentForm", {
-        name: DescriptionPayment,
-        paymentFormTypeId: TypePayments,
+        name: DescriptionPayment.trim(),
+        paymentFormTypeId: Number(TypePayments),
       })
       .then((response) => {
         setLoading(false);
-        if (response.data.status) {
+        if (
+          response.data.status ||
+          response.status === 200 ||
+          response.status === 201
+        ) {
           messageAlert("Forma de pagamento criada com sucesso!", "success");
-          setShowModal(false);
-          setLoading(false);
+          handleCloseModal();
           getDatas();
+        } else {
+          messageAlert(
+            response.data.message || "Erro ao criar forma de pagamento!",
+            "error"
+          );
         }
       })
       .catch((error) => {
         console.log(error);
-        messageAlert("Erro ao criar forma de pagmento!", "error");
-        setShowModal(false);
+        setLoading(false);
+        const errorMsg =
+          error?.response?.data?.message || "Erro ao criar forma de pagamento!";
+        messageAlert(errorMsg, "error");
       });
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setDataModal(null);
+    setDescriptionPayment("");
+    setTypePayments("");
   };
 
-  const formPaymentsFormated = formPayments.map((value) => {
+  const formPaymentsFormated = (formPayments || []).map((value) => {
     return {
-      value: value.id,
+      value: Number(value.id),
       label: value.name,
     };
   });
@@ -126,20 +191,30 @@ const ModalMethodsPayments = ({
       onOk={handleCloseModal}
       onCancel={handleCloseModal}
       footer={[
-        <Button onClick={handleCloseModal}>Cancelar</Button>,
+        <Button onClick={handleCloseModal} key="cancel">
+          Cancelar
+        </Button>,
         data ? (
-          <Button type="primary" onClick={() => handleEditFormPayment(data)}>
+          <Button
+            type="primary"
+            onClick={() => handleEditFormPayment(data)}
+            key="edit"
+          >
             Editar
           </Button>
         ) : (
-          <Button type="primary" onClick={handleCreateFormPayment}>
+          <Button
+            type="primary"
+            onClick={handleCreateFormPayment}
+            key="create"
+          >
             Cadastrar
           </Button>
         ),
       ]}
     >
       <Input
-        defaultValue={data ? data.name : ""}
+        value={DescriptionPayment}
         placeholder="Descrição"
         onChange={(event) => setDescriptionPayment(event.target.value)}
       />
@@ -153,6 +228,7 @@ const ModalMethodsPayments = ({
           marginTop: 10,
         }}
         placeholder="Escolha a forma de pagamento"
+        value={TypePayments ? Number(TypePayments) : undefined}
         onChange={(value) => setTypePayments(String(value))}
         options={formPaymentsFormated}
       />
