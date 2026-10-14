@@ -53,10 +53,33 @@ export const TariffFlag = () => {
   const getTypeTrips = async () => {
     setLoadingTable(true);
     try {
-      const responseTypeTrips = await api.get(`city/${cityId}/tripTypes`);
-      if (responseTypeTrips.status) {
-        setTripTypes(responseTypeTrips.data.response);
+      let data: TripTypesProps[] = [];
+
+      // Try city-specific endpoint first
+      if (cityId) {
+        try {
+          const responseTypeTrips = await api.get(`city/${cityId}/tripTypes`);
+          if (responseTypeTrips.status) {
+            const raw = responseTypeTrips.data.response ?? responseTypeTrips.data.data ?? [];
+            data = Array.isArray(raw) ? raw : [];
+          }
+        } catch (_) {
+          // fall through to global endpoint
+        }
       }
+
+      // Fallback: use global tripType endpoint if no city data
+      // Note: global endpoint returns idTripType, city endpoint returns tripTypeId — normalize here
+      if (data.length === 0) {
+        const fallback = await api.get("tripType");
+        const raw = fallback.data.response ?? fallback.data.data ?? [];
+        data = (Array.isArray(raw) ? raw : []).map((item: any) => ({
+          ...item,
+          tripTypeId: item.tripTypeId ?? item.idTripType,
+        }));
+      }
+
+      setTripTypes(data);
     } catch (error) {
       console.error(error);
     } finally {

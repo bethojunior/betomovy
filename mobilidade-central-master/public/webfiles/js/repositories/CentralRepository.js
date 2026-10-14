@@ -47,7 +47,10 @@ class CentralRepository {
         `PricePartner/Calculate`,
         'POST',
         { origin, destination, waypoints, onlyCentral, isCentral, centralId },
-        resolve,
+        (result) => {
+          const payload = result?.data || result?.response || result;
+          resolve({ ...result, data: payload, response: payload });
+        },
         reject,
         false
       )

@@ -61,13 +61,26 @@ function addItemAddressDelivery(address, value, isWayPoint = true, id) {
 
 function getTripItemTypeTitle(tripItemTypeId) {
     const option = document.querySelector(`#itemTripSelected option[value="${tripItemTypeId}"]`);
-    return option ? option.textContent.trim() : String(tripItemTypeId);
+    if (option && option.textContent && option.textContent.trim() !== "" && option.textContent.trim().toLowerCase() !== "undefined") {
+        return option.textContent.trim();
+    }
+    return "Entrega";
 }
 
 function getItemsTripDelivery() {
-    TripController.getItems().then(({data}) => {
-        document.querySelector("#itemTripSelected").innerHTML += data.map(item => {
-            return `<option value="${item.id}">${item.name}</option>`
-        }).join("")
-    })
+    TripController.getItems().then((res) => {
+        const select = document.querySelector("#itemTripSelected");
+        if (!select) return;
+        const raw = res?.data || res?.response || res || [];
+        const items = Array.isArray(raw) ? raw : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.response) ? raw.response : []));
+        
+        select.innerHTML = '<option value="" selected disabled>Selecione um item para entrega</option>';
+        items.forEach(item => {
+            if (item && item.id != null && item.name && String(item.name).trim().toLowerCase() !== "undefined") {
+                select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            }
+        });
+    }).catch(err => {
+        console.warn("Não foi possível carregar tipos de item de entrega:", err);
+    });
 }

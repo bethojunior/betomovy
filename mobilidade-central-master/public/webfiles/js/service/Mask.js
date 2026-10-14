@@ -78,7 +78,10 @@ class Mask {
      * @returns {string}
      */
     static maskMoney(value) {
-        let number = value.toFixed(4).split(".");
+        if (value === null || value === undefined || value === '') return '0,00';
+        let num = typeof value === 'number' ? value : parseFloat(String(value).replace(/\s/g, '').replace(',', '.'));
+        if (isNaN(num)) return '0,00';
+        let number = num.toFixed(4).split(".");
 
         number = parseFloat(`${number[0]}.${number[1].slice(0, 2)}`);
 
@@ -216,7 +219,10 @@ class Mask {
      * @returns {number}
      */
     static removeMaskMoney(value) {
-        return parseFloat(value.replace(/\./g, "").replace(/\,/g, "."));
+        if (value === null || value === undefined || value === '') return 0;
+        if (typeof value === 'number') return value;
+        const parsed = parseFloat(String(value).replace(/\./g, "").replace(/\,/g, "."));
+        return isNaN(parsed) ? 0 : parsed;
     }
 
     static setCreditCard(nameElement) {

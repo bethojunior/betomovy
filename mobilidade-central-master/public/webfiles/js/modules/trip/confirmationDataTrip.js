@@ -53,7 +53,8 @@ function getTravelCustomer(trip, customer) {
     });
 
     elementProperty.getElement("#typeTripConfirmation", element => {
-        element.innerHTML = managerTrip.typeTaxi.priceName;
+        const typeName = managerTrip?.typeTaxi?.priceName || (Array.isArray(trip?.tripItems) && trip.tripItems[0]?.title) || "Normal";
+        element.innerHTML = (typeName && String(typeName).trim().toLowerCase() !== "undefined") ? typeName : "Normal";
     });
 
     elementProperty.getElement("#routeTrip", element => {

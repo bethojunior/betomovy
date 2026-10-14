@@ -108,26 +108,26 @@ class PriceTrip {
         });
     }
 
-    calculatePriceCustomer({message, status, data: response}, resolve) {
-
+    calculatePriceCustomer(result, resolve) {
         preload(false);
 
-        // Voltar caso acontece algo durante a listagem de preços
-        // if (!Route.isGroupComponentActive(COMPONENT_CREATE_TRIP))
-        //     return;
+        const status = result?.status !== false;
+        const message = result?.message || "";
+        let response = result?.data || result?.response || result;
 
         if (!status) {
             document.querySelector("*[place='origin']").disabled = false;
             document.querySelector("*[place='destination']").disabled = false;
-            SwalCustom.messageDialog(response[0] || "",
-                message, undefined, "warning");
+            viewController.elementProperty.removeClass(".container-box-price", "update");
+            const errDetail = Array.isArray(response) ? (response[0] || "") : (typeof response === "string" ? response : "");
+            SwalCustom.messageDialog(errDetail, message || "Não foi possível calcular o preço", undefined, "warning");
             initProcessingCallTrip();
             return;
         }
 
         this.createLayoutPrices(response);
 
-        resolve(response);
+        if (resolve) resolve(response);
     }
 
     createLayoutPrices(data) {
@@ -136,81 +136,109 @@ class PriceTrip {
         });
 
         viewController.elementProperty.getElement(".type-cars", element => {
-            data = this.verifyOrderPrices(data);
+            try {
+                data = this.verifyOrderPrices(data);
 
-            let containerPrices = this.separateInContainer(data);
+                let containerPrices = this.separateInContainer(data);
 
-            element.innerHTML = containerPrices.map((prices, index) => {
-                return `<div><div>${this.buildListPrices(prices, index === 0)}</div></div>`;
-            }).join("");
+                if (!containerPrices || containerPrices.length === 0) {
+                    element.innerHTML = '<p class="no-prices-msg" style="padding:15px;text-align:center;color:#666;font-size:13px;width:100%;">Nenhuma categoria disponível no momento</p>';
+                } else {
+                    element.innerHTML = containerPrices.map((prices, index) => {
+                        return `<div><div>${this.buildListPrices(prices, index === 0)}</div></div>`;
+                    }).join("");
+                }
 
-            Session.setLocal("distanceTrip", data.distance);
-            Session.setLocal("estimatedTripTime", data.duration);
+                if (data && data.distance) Session.setLocal("distanceTrip", data.distance);
+                if (data && data.duration) Session.setLocal("estimatedTripTime", data.duration);
 
-            this.createIndicationsContainer(containerPrices);
-            this.initEventScrollPrice();
-            this.verifyIndicationContainerPrice();
-            viewController.elementProperty.removeClass(".container-box-price", "update");
-            scheduleMapResize();
+                this.createIndicationsContainer(containerPrices);
+                this.initEventScrollPrice();
+                this.verifyIndicationContainerPrice();
+            } catch (e) {
+                console.error("Erro ao renderizar precos:", e);
+                element.innerHTML = '<p class="no-prices-msg" style="padding:15px;text-align:center;color:#666;font-size:13px;width:100%;">Nenhuma categoria disponível</p>';
+            } finally {
+                viewController.elementProperty.removeClass(".container-box-price", "update");
+                scheduleMapResize();
+            }
         });
     }
 
     verifyIndicationContainerPrice() {
+        const typeCars = document.querySelector(".type-cars");
+        if (!typeCars) return;
 
         viewController.elementProperty.addClass(".prev-container-price", "active");
         viewController.elementProperty.addClass(".next-container-price", "active");
 
-        const width = document.querySelector(".type-cars").scrollWidth;
-        const positionScroll = document.querySelector(".type-cars").scrollLeft;
+        const width = typeCars.scrollWidth;
+        const positionScroll = typeCars.scrollLeft;
 
-        const positionItem = (positionScroll * 100 / width);
-
-        const amountContainer = document.querySelector(".type-cars")
-            .childNodes.length;
+        const positionItem = (positionScroll * 100 / (width || 1));
+        const amountContainer = typeCars.childNodes.length;
 
         const itemSelect = parseInt(Math.round((positionItem * amountContainer) / 100));
-
 
         if (itemSelect === 0)
             viewController.elementProperty.removeClass(".prev-container-price", "active");
 
         if (itemSelect === amountContainer - 1)
             viewController.elementProperty.removeClass(".next-container-price", "active");
-
     }
 
     createIndicationsContainer(containerPrices) {
+        if (!Array.isArray(containerPrices) || containerPrices.length === 0) {
+            viewController.elementProperty.getElement(".indication-list-prices", element => {
+                element.innerHTML = "";
+            });
+            return;
+        }
         viewController.elementProperty.getElement(".indication-list-prices", element => {
             element.innerHTML = containerPrices.map(() => {
                 return `<div></div>`;
             }).join("");
 
-            document.querySelector(".indication-list-prices").childNodes[0].classList.add("active");
+            if (element.childNodes && element.childNodes[0] && element.childNodes[0].classList) {
+                element.childNodes[0].classList.add("active");
+            }
         });
     }
 
     separateInContainer(data) {
-        const auxPrices = data.prices.map(item => item);
+        let pricesList = [];
+        if (data && Array.isArray(data.prices)) {
+            pricesList = data.prices;
+        } else if (Array.isArray(data)) {
+            pricesList = data;
+        } else if (data && typeof data === 'object') {
+            if (Array.isArray(data.response)) {
+                pricesList = data.response;
+            } else if (Array.isArray(data.data)) {
+                pricesList = data.data;
+            }
+        }
+        if (!Array.isArray(pricesList)) pricesList = [];
 
+        const auxPrices = pricesList.filter(item => item != null).map(item => item);
         let containerPrices = [];
-
         while (auxPrices.length) {
             containerPrices.push(auxPrices.splice(0, 3));
         }
-
         return containerPrices;
     }
 
     buildListPrices(prices, existItemActive = false) {
+        if (!Array.isArray(prices)) return "";
         return prices.map((object, index) => {
-
+            if (!object) return "";
             let className = "";
 
             if (index === 0 && existItemActive) {
-                managerTrip.typeTaxi.priceId = object.idPrice;
-                managerTrip.typeTaxi.tripTypeId = object.tripTypeId;
-                managerTrip.typeTaxi.price = object.price;
-                managerTrip.typeTaxi.priceName = object.priceName;
+                managerTrip.typeTaxi.priceId = object.idPrice || object.id;
+                managerTrip.typeTaxi.tripTypeId = object.tripTypeId || object.idTripType;
+                managerTrip.typeTaxi.price = object.price || 0;
+                managerTrip.typeTaxi.priceName = object.priceName || object.name || "Padrão";
                 className = "active";
             }
 
@@ -223,15 +251,21 @@ class PriceTrip {
                 if (config && config.typeMoney) typeMoney = config.typeMoney;
             }
 
+            const tagText = object.tag || object.name || object.priceName || '';
+            const tagBg = object.color ? `background-color: ${object.color}` : 'background-color: #333';
+            const pictureUrl = object.picture || 'webfiles/img/icon/carro_eco.png';
+            const priceVal = (object.price !== undefined && object.price !== null) ? object.price : 0;
+            const tripTypeIdVal = object.tripTypeId || object.idTripType || index;
+
             return `<div class="trip-type ${className}"
                             value='${JSON.stringify(object)}'>
-                            <span style="background-color: ${object.color}">${object.tag}</span>
-                            <img src="${object.picture}">
+                            <span style="${tagBg}">${tagText}</span>
+                            <img src="${pictureUrl}">
                             <p  
                                 class="label-prices-trip"
-                                id="valueTypeTrip${object.tripTypeId}" 
-                                valueDefault="${Mask.maskMoney(object.price)}">
-                                    <span>${typeMoney}</span> ${Mask.maskMoney(object.price)}</p>
+                                id="valueTypeTrip${tripTypeIdVal}" 
+                                valueDefault="${Mask.maskMoney(priceVal)}">
+                                    <span>${typeMoney}</span> ${Mask.maskMoney(priceVal)}</p>
                         </div>`;
         }).join("");
     }
@@ -285,10 +319,19 @@ class PriceTrip {
     }
 
     verifyOrderPrices(data) {
-        if (Session.getLocal("orderPrices").length === 0)
+        if (!data) return { prices: [] };
+        if (Array.isArray(data)) {
+            data = { prices: data };
+        } else if (!data.prices && (data.response || data.data)) {
+            data.prices = Array.isArray(data.response) ? data.response : (Array.isArray(data.data) ? data.data : []);
+        }
+        if (!Array.isArray(data.prices)) data.prices = [];
+
+        const orderPrices = Session.getLocal("orderPrices");
+        if (!Array.isArray(orderPrices) || orderPrices.length === 0)
             return data;
 
-        const newOrderPrices = Session.getLocal("orderPrices").map(item => {
+        const newOrderPrices = orderPrices.map(item => {
             return data.prices.filter(price => {
                 return item === parseInt(price.tripTypeId);
             })[0];
@@ -303,24 +346,19 @@ class PriceTrip {
         });
 
         data.prices = [...newOrderPrices, ...notExistInListOrder];
-
-
         return data;
     }
 
     errorCaculatePrice(error) {
         preload(false);
+        viewController.elementProperty.removeClass(".container-box-price", "update");
         document.querySelector("*[place='origin']").disabled = false;
         document.querySelector("*[place='destination']").disabled = false;
-        if (error) {
-            SwalCustom.messageDialog(error.errors.message, error.message, () => {
-                closeAddressTrip();
-            });
-        } else {
-            SwalCustom.messageDialog("", "Ocorreu um erro ao tentar calcular o preços da rota", () => {
-                closeAddressTrip();
-            });
-        }
+        const msg = error?.errors?.message || error?.message || "Ocorreu um erro ao tentar calcular os preços da rota";
+        const title = error?.message && error?.errors?.message ? error.message : "";
+        SwalCustom.messageDialog(msg, title, () => {
+            closeAddressTrip();
+        });
     }
 
     searchInPlace(name, place) {

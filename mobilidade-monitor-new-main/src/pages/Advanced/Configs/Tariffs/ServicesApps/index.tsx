@@ -161,7 +161,7 @@ export const ServicesApps = () => {
       const responseTypesTravels = await api.get("tripType");
 
       const typesTravels = responseTypesTravels.data.response.filter(
-        (data: TypesTravelsProps) => data.serviceOption === 1
+        (data: TypesTravelsProps) => Number(data.serviceOption) === 1
       );
       setTypesTravels(typesTravels);
     } catch (error) {
@@ -997,7 +997,7 @@ export const ServicesApps = () => {
   let listTravelsDisabled = typesTravels.filter((item) => {
     return (
       listPrices.filter((data) => {
-        return item.idTripType === data.trip_type.idTripType;
+        return Number(item.idTripType) === Number(data.trip_type?.idTripType ?? data.tripTypeId);
       }).length === 0
     );
   });
