@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Collapse, Radio, Button, Input, Upload } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Collapse, Radio, Button, Input, Upload, Image } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { Content } from './styles';
 import { deliveryConfigService } from '../../../services/deliveryConfig';
@@ -19,11 +19,57 @@ const GeneralConfig: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [messageAlert, setMessageAlert] = useState('');
   const [typeAlert, setTypeAlert] = useState<'success' | 'info' | 'warning' | 'error'>('success');
+  const [bannerPreview, setBannerPreview] = useState<string>('');
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+
   const [config, setConfig] = useState<DeliveryConfig>({
-    type_of_delivery_area: '' as any,
+    type_of_delivery_area: 'by_area',
     name_establishment_delivery: '',
-    customer_register_sms_confirmation_code: '' as any
+    customer_register_sms_confirmation_code: '0'
   });
+
+  const loadInitialConfigs = async () => {
+    setLoading(true);
+    try {
+      const [typeRes, nameRes, smsRes, bannerRes] = await Promise.allSettled([
+        deliveryConfigService.getTypeOfDeliveryArea(),
+        deliveryConfigService.getNameEstablishmentDelivery(),
+        deliveryConfigService.getCustomerRegisterSmsConfirmationCode(),
+        deliveryConfigService.getBannerDeliverySignUp(),
+      ]);
+
+      setConfig((prev) => ({
+        ...prev,
+        type_of_delivery_area:
+          typeRes.status === 'fulfilled' && (typeRes.value?.response || (typeRes.value as any)?.data?.response)
+            ? (typeRes.value?.response || (typeRes.value as any)?.data?.response)
+            : prev.type_of_delivery_area,
+        name_establishment_delivery:
+          nameRes.status === 'fulfilled' && (nameRes.value?.response || (nameRes.value as any)?.data?.response)
+            ? (nameRes.value?.response || (nameRes.value as any)?.data?.response)
+            : prev.name_establishment_delivery,
+        customer_register_sms_confirmation_code:
+          smsRes.status === 'fulfilled' && (smsRes.value?.response !== undefined || (smsRes.value as any)?.data?.response !== undefined)
+            ? String(smsRes.value?.response ?? (smsRes.value as any)?.data?.response) as any
+            : prev.customer_register_sms_confirmation_code,
+      }));
+
+      if (bannerRes.status === 'fulfilled') {
+        const url = bannerRes.value?.response || (bannerRes.value as any)?.data?.response;
+        if (url && typeof url === 'string') {
+          setBannerPreview(url);
+        }
+      }
+    } catch (err) {
+      console.error('Erro ao carregar configurações de delivery:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadInitialConfigs();
+  }, []);
 
   const updateConfig = async (data: Partial<DeliveryConfig>) => {
     setLoading(true);
@@ -54,29 +100,33 @@ const GeneralConfig: React.FC = () => {
     updateConfig({ customer_register_sms_confirmation_code: value });
   };
 
-  const handleBannerUpload = async (info: any) => {
-    if (info.file.status === 'uploading') {
-      setLoading(true);
+  const handleBannerSave = async () => {
+    if (!bannerFile) {
+      setMessageAlert('Por favor, selecione uma imagem para o banner');
+      setTypeAlert('warning');
+      setShowAlert(true);
       return;
     }
-    
-    if (info.file.status === 'done') {
-      try {
-        await deliveryConfigService.uploadBanner(info.file.originFileObj);
+
+    setLoading(true);
+    try {
+      const response = await deliveryConfigService.uploadBanner(bannerFile);
+      if (response?.status) {
+        if (response.url) {
+          setBannerPreview(response.url);
+        }
         setMessageAlert('Banner atualizado com sucesso!');
         setTypeAlert('success');
         setShowAlert(true);
-      } catch (error) {
-        setMessageAlert('Erro ao fazer upload do banner');
-        setTypeAlert('error');
-        setShowAlert(true);
-      } finally {
-        setLoading(false);
+        setBannerFile(null);
+      } else {
+        throw new Error('Falha no upload');
       }
-    } else if (info.file.status === 'error') {
+    } catch (error) {
       setMessageAlert('Erro ao fazer upload do banner');
       setTypeAlert('error');
       setShowAlert(true);
+    } finally {
       setLoading(false);
     }
   };
@@ -91,7 +141,7 @@ const GeneralConfig: React.FC = () => {
         setVisibility={setShowAlert}
       />
       <Content>
-        <Collapse ghost>
+        <Collapse ghost defaultActiveKey={["1", "2", "3", "4"]}>
           <Panel header="Configurações do tipo de chamado" key="1">
             <div>
               <Radio.Group
@@ -111,7 +161,7 @@ const GeneralConfig: React.FC = () => {
                 <Button 
                   type="primary" 
                   onClick={() => handleTypeChange(config.type_of_delivery_area)}
-                  style={{ width: '220px' }}
+                  style={{ width: '220px', borderRadius: 6 }}
                 >
                   Salvar
                 </Button>
@@ -125,13 +175,13 @@ const GeneralConfig: React.FC = () => {
                 value={config.name_establishment_delivery}
                 onChange={(e) => setConfig(prev => ({ ...prev, name_establishment_delivery: e.target.value }))}
                 placeholder="Nome do estabelecimento"
-                style={{ marginBottom: 15 }}
+                style={{ marginBottom: 15, borderRadius: 6 }}
               />
               <div style={{ textAlign: 'left' }}>
                 <Button 
                   type="primary" 
                   onClick={handleNameChange}
-                  style={{ width: '220px' }}
+                  style={{ width: '220px', borderRadius: 6 }}
                 >
                   Atualizar
                 </Button>
@@ -141,21 +191,43 @@ const GeneralConfig: React.FC = () => {
 
           <Panel header="Configuração de banner da tela de cadastro no painel do delivery" key="3">
             <div>
+              {bannerPreview && (
+                <div style={{ marginBottom: 15 }}>
+                  <p style={{ margin: "0 0 6px 0", fontSize: 13, color: "#64748b" }}>Banner Atual:</p>
+                  <Image
+                    src={bannerPreview}
+                    alt="Banner de cadastro"
+                    style={{ maxHeight: 150, borderRadius: 8, border: "1px solid #e2e8f0" }}
+                  />
+                </div>
+              )}
               <Upload
                 name="imageBannerSignUp"
-                action="/api/upload/banner"
-                onChange={handleBannerUpload}
+                beforeUpload={(file) => {
+                  setBannerFile(file);
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                    setBannerPreview(e.target?.result as string);
+                  };
+                  reader.readAsDataURL(file);
+                  return false;
+                }}
+                showUploadList={false}
                 accept="image/*"
                 style={{ marginBottom: 15, display: 'block' }}
               >
-                <Button icon={<UploadOutlined />}>Selecionar Banner</Button>
+                <Button icon={<UploadOutlined />} style={{ borderRadius: 6, marginBottom: 15 }}>
+                  {bannerFile ? bannerFile.name : 'Selecionar Novo Banner'}
+                </Button>
               </Upload>
               <div style={{ textAlign: 'left' }}>
                 <Button 
                   type="primary" 
-                  style={{ width: '220px' }}
+                  onClick={handleBannerSave}
+                  disabled={!bannerFile}
+                  style={{ width: '220px', borderRadius: 6 }}
                 >
-                  Atualizar
+                  Atualizar Banner
                 </Button>
               </div>
             </div>
@@ -180,7 +252,7 @@ const GeneralConfig: React.FC = () => {
                 <Button 
                   type="primary" 
                   onClick={() => handleCodeChange(config.customer_register_sms_confirmation_code)}
-                  style={{ width: '220px' }}
+                  style={{ width: '220px', borderRadius: 6 }}
                 >
                   Salvar
                 </Button>

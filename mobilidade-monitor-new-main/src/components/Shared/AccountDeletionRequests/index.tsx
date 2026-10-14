@@ -1,10 +1,10 @@
-import { Table, Tag, Pagination, Button } from "antd";
+import { Table, Tag, Pagination, Button, Input } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { AiOutlineInbox } from "react-icons/ai";
-import { FaTrash, FaUndo } from "react-icons/fa";
+import { FaTrash, FaUndo, FaSearch, FaRedo } from "react-icons/fa";
 import { IoLogoWhatsapp } from "react-icons/io";
 import swal from "sweetalert";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Container,
   ContentHeader,
@@ -31,6 +31,20 @@ export const AccountDeletionRequests = ({ type }: AccountDeletionRequestsProps) 
   const [messageAlert, setMessageAlert] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [typeAlert, setTypeAlert] = useState<AlertType>("success");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    if (!searchTerm.trim()) return data;
+    const term = searchTerm.toLowerCase();
+    return data.filter(
+      (item) =>
+        item.userName?.toLowerCase().includes(term) ||
+        item.userPhone?.toLowerCase().includes(term) ||
+        item.reason?.toLowerCase().includes(term) ||
+        item.details?.toLowerCase().includes(term)
+    );
+  }, [data, searchTerm]);
 
   const renderAlert = (alertType: AlertType, message: string) => {
     setTypeAlert(alertType);
@@ -163,14 +177,26 @@ export const AccountDeletionRequests = ({ type }: AccountDeletionRequestsProps) 
         setVisibility={setShowAlert}
       />
 
-      <ContentHeader>
-        {pagination && <Tag color="green">{pagination.total} pendente(s)</Tag>}
+      <ContentHeader style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Input
+            placeholder="Pesquisar por nome, telefone ou motivo..."
+            prefix={<FaSearch style={{ color: "#94a3b8", marginRight: 6 }} />}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            allowClear
+            style={{ width: 320, borderRadius: 6 }}
+          />
+        </div>
+        <div>
+          {pagination && <Tag color="green" style={{ fontSize: 13, padding: "4px 10px" }}>{pagination.total} pendente(s)</Tag>}
+        </div>
       </ContentHeader>
 
       <ContentTable>
-        {data?.length ? (
+        {filteredData?.length ? (
           <Table
-            dataSource={data}
+            dataSource={filteredData}
             columns={columns}
             rowKey="id"
             pagination={false}

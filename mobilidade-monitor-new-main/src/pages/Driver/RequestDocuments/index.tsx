@@ -91,10 +91,17 @@ const RequestDocuments = () => {
     try {
       const result = await api.put("driver/documents/requestDocuments", data);
       setSelectedUsers([]);
-      console.log("result", result);
+      setCheckedValues([]);
+      swal({
+        title: "Solicitação enviada com sucesso!",
+        icon: "success",
+      });
     } catch (error) {
       console.error("Erro ao enviar solicitação:", error);
-      message.error("Erro ao enviar solicitação.");
+      swal({
+        title: "Erro ao enviar solicitação",
+        icon: "error",
+      });
     }
   };
 

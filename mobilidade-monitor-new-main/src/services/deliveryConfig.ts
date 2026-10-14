@@ -14,6 +14,10 @@ export const deliveryConfigService = {
     return api.get('/config/customer_register_sms_confirmation_code').then(response => response.data);
   },
 
+  getBannerDeliverySignUp: (): Promise<ConfigResponse> => {
+    return api.get('/config/banner_delivery_signup').then(response => response.data);
+  },
+
   updateConfig: (data: UpdateConfigRequest): Promise<{ status: boolean }> => {
     return api.put('/config', data).then(response => response.data);
   },
