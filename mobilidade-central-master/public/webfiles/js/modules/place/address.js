@@ -7,10 +7,19 @@ function getAddressCurrent(address) {
         ConfigRepository.getConfigByLocation(address.latitude, address.longitude)
             .then(({status, response}) => {
 
-                if (!status)
+                if (!status || !response)
                     return;
 
-                managerPlaceStop.amount = parseInt(response.quantityTripWayPoints);
+                if (!response.typeMoney) {
+                    response.typeMoney = 'R$';
+                }
+
+                Session.setLocal("cityConfig", response);
+                try {
+                    localStorage.setItem("cityConfig", JSON.stringify(response));
+                } catch (e) {}
+
+                managerPlaceStop.amount = parseInt(response.quantityTripWayPoints || 0);
             });
     });
 
@@ -22,12 +31,19 @@ function getAddressCurrent(address) {
 function getConfigCentral(central) {
     ConfigRepository.getConfigByLocation(central.latitude, central.longitude)
         .then(({status, response}) => {
-            if (!status)
+            if (!status || !response)
                 return;
 
-            Session.setLocal("cityConfig", response);
+            if (!response.typeMoney) {
+                response.typeMoney = 'R$';
+            }
 
-            managerPlaceStop.amount = parseInt(response.quantityTripWayPoints);
+            Session.setLocal("cityConfig", response);
+            try {
+                localStorage.setItem("cityConfig", JSON.stringify(response));
+            } catch (e) {}
+
+            managerPlaceStop.amount = parseInt(response.quantityTripWayPoints || 0);
         }).catch(e => console.log(e));
 }
 

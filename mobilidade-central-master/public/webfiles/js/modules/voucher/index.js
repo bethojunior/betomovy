@@ -18,8 +18,9 @@ document.addEventListener("DOMContentLoaded",function () {
         if(central.responsibleId) {
             CentralRepository.getBalance(central.responsibleId).then(({response}) => {
                 const voucherElement = document.querySelector('#saldVoucher')
+                const typeMoney = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || 'R$';
                 if(response.tripBalance && response.tripBalance !== 0 && voucherElement){
-                    document.querySelector('#saldVoucher').innerHTML = `Saldo: ${JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney} ${Mask.maskMoney(response.tripBalance)}`
+                    document.querySelector('#saldVoucher').innerHTML = `Saldo: ${typeMoney} ${Mask.maskMoney(response.tripBalance)}`
                 }
             });
         }

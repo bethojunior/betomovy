@@ -58,7 +58,7 @@ function listFeeByNeighborhood () {
         }
 
         resultTable.innerHTML = items.map((item) => {
-            const money = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney ?? "R$";
+            const money = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || "R$";
             return `
             <tr>
                 <td>${escapeHtml(item.neighborhood?.name || "-")}</td>

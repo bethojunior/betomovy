@@ -178,10 +178,11 @@ function showDataPaymentForm(idTripPaymentForm) {
 
 function showBalanceVoucherClient() {
     viewController.elementProperty.getElement("#cardSelectedPayTrip", element => {
+        const typeMoney = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || 'R$';
         if(Array.isArray(Session.getLocal("currentBalanceClient")))
-            return element.innerHTML = `<label>${JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney} 0,00</label>`;
+            return element.innerHTML = `<label>${typeMoney} 0,00</label>`;
         element.innerHTML = `<label>
-            ${JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney} ${Mask.maskMoney(parseFloat(Session.getLocal("currentBalanceClient")))}</label>`;
+            ${typeMoney} ${Mask.maskMoney(parseFloat(Session.getLocal("currentBalanceClient")))}</label>`;
     });
 }
 

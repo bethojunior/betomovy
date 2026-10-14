@@ -406,10 +406,18 @@ document.addEventListener('DOMContentLoaded', function () {
     Session.setLocal('managerTrip', managerTrip)
 
     if (fee) {
+      let typeMoney = 'R$'
+      try {
+        const config = JSON.parse(localStorage.getItem('cityConfig')) || Session.getLocal('cityConfig')
+        if (config && config.typeMoney) typeMoney = config.typeMoney
+      } catch (e) {
+        const config = Session.getLocal('cityConfig')
+        if (config && config.typeMoney) typeMoney = config.typeMoney
+      }
       document.getElementById('returnFee').innerHTML =
-        `${JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney} ${Mask.maskMoney(fee.feePrice)} ${fee.isByKm ? 'x Km' : 'Fixo'}`
+        `${typeMoney} ${Mask.maskMoney(fee.feePrice)} ${fee.isByKm ? 'x Km' : 'Fixo'}`
       document.getElementById('finalPrice').innerHTML =
-        `${JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney} ${Mask.maskMoney(fee.newPrice)}`
+        `${typeMoney} ${Mask.maskMoney(fee.newPrice)}`
     }
 
     if (haveReturn) {
@@ -1986,7 +1994,7 @@ document.addEventListener('DOMContentLoaded', function () {
       newValue = currentValue - discountValue
     }
     const formatted = Mask.maskMoney(newValue)
-    priceLabel.innerHTML = `<span>${moeda}</span>${formatted}`
+    priceLabel.innerHTML = `<span>${moeda}</span> ${formatted}`
     return newValue
   }
 

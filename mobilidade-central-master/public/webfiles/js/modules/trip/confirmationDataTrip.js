@@ -26,7 +26,7 @@ function getTravelCustomer(trip, customer) {
     });
 
     const isBatchSchedule = Array.isArray(trip?.schedules) && trip.schedules.length > 1;
-    const typeMoney = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney;
+    const typeMoney = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || 'R$';
 
     elementProperty.getElement("#valueTripConfirmationLabel", element => {
         element.innerHTML = isBatchSchedule ? "Valor por viagem" : "Valor";

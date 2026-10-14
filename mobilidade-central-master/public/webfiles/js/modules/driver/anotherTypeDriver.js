@@ -15,12 +15,21 @@ function showAnotherPrice() {
 
 
     if (!Array.isArray(managerTrip)) {
+        let typeMoney = 'R$';
+        try {
+            const config = JSON.parse(localStorage.getItem('cityConfig')) || Session.getLocal('cityConfig');
+            if (config && config.typeMoney) typeMoney = config.typeMoney;
+        } catch (e) {
+            const config = Session.getLocal('cityConfig');
+            if (config && config.typeMoney) typeMoney = config.typeMoney;
+        }
+
         viewController.elementProperty.getElement("#typeOtherReturn", element => {
             element.innerHTML = managerTrip.prices
                 .filter(item => item.tripTypeId !== managerTrip.tripCurrent.tripTypeId).map(item => {
                     return `<li class="trip-another-type" value='${JSON.stringify(item)}'>
                     <img src="${environment.hosts.local}webfiles/img/logo/return-${item.tripTypeId}.png">
-                    <p><span>${JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney}</span>${Mask.maskMoney(item.price)}</p>
+                    <p><span>${typeMoney}</span> ${Mask.maskMoney(item.price)}</p>
                     </li>`
                 }).join("");
         });

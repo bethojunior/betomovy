@@ -214,6 +214,15 @@ class PriceTrip {
                 className = "active";
             }
 
+            let typeMoney = 'R$';
+            try {
+                const config = JSON.parse(localStorage.getItem('cityConfig')) || Session.getLocal('cityConfig');
+                if (config && config.typeMoney) typeMoney = config.typeMoney;
+            } catch (e) {
+                const config = Session.getLocal('cityConfig');
+                if (config && config.typeMoney) typeMoney = config.typeMoney;
+            }
+
             return `<div class="trip-type ${className}"
                             value='${JSON.stringify(object)}'>
                             <span style="background-color: ${object.color}">${object.tag}</span>
@@ -222,7 +231,7 @@ class PriceTrip {
                                 class="label-prices-trip"
                                 id="valueTypeTrip${object.tripTypeId}" 
                                 valueDefault="${Mask.maskMoney(object.price)}">
-                                    <span>${JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney}</span>${Mask.maskMoney(object.price)}</p>
+                                    <span>${typeMoney}</span> ${Mask.maskMoney(object.price)}</p>
                         </div>`;
         }).join("");
     }

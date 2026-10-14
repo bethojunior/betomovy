@@ -40,7 +40,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         elementProperty.getElement(".price-trip",element=>{
-            element.innerHTML = `${JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney} ${Mask.maskMoney(response.price)}`;
+            const typeMoney = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || 'R$';
+            element.innerHTML = `${typeMoney} ${Mask.maskMoney(response.price)}`;
         });
 
         elementProperty.getElement("#haveReturn",element=>{

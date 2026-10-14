@@ -162,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function showListTrip(response) {
         const dataCentral = Session.get("centralSelected");
-        const money = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney ?? "R$";
+        const money = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || "R$";
 
         const trips = Array.isArray(response?.data) ? response.data : (Array.isArray(response) ? response : []);
 

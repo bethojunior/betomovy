@@ -1,7 +1,12 @@
 const elementProperty = new ElementProperty();
 let mapDraw = null;  // MapboxDraw instance
 
-const cityConfig = JSON.parse(localStorage.getItem('cityConfig'));
+let cityConfig = null;
+try {
+    cityConfig = JSON.parse(localStorage.getItem('cityConfig')) || Session.getLocal('cityConfig');
+} catch (e) {
+    cityConfig = Session.getLocal('cityConfig');
+}
 const idCentral = Session.getValueInSession('centralSelected', 'id');
 
 let mapResult = {
@@ -94,7 +99,7 @@ function listAllNeighborhood() {
                 <td></td>
                 <td>${item.originName}</td>
                 <td>${item.destinyName}</td>
-                <td>${cityConfig?.typeMoney} ${Mask.maskMoney(item.price)}</td>
+                <td>${cityConfig?.typeMoney || 'R$'} ${Mask.maskMoney(item.price)}</td>
                 <td>${item.city}</td>
                 <td>${item.tripType}</td>
                 <td>

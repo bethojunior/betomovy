@@ -532,7 +532,7 @@ function verifyListTripActivePartner() {
                         <p class="info-scheduled-trip ${!!trip?.schedule ? 'active' : ''}">
                             <span>Data e hora da viagem:</span> ${moment(trip?.schedule?.schedule).format("DD/MM/YYYY HH:mm")}
                         </p>
-                        <p><span>Valor:</span> ${JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney}${Mask.maskMoney(parseFloat(trip.price))}</p>
+                        <p><span>Valor:</span> ${(JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || 'R$')} ${Mask.maskMoney(parseFloat(trip.price))}</p>
                         <ul>
                             <li><span>${trip.origin?.address || trip.origin?.name}</span></li>
                             ${(trip.tripWayPoints || []).map(waypoint => `<li><span>${waypoint.address || waypoint.name || ''}</span></li>`).join('')}
