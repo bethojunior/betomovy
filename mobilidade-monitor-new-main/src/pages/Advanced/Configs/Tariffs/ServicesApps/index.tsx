@@ -1700,6 +1700,7 @@ export const ServicesApps = () => {
         visible={visibleModal}
         listPrices={listPrices}
         setListPrices={setListPrices}
+        onSelect={handleSelectTravel}
       />
     </Container>
   );

@@ -16,21 +16,34 @@ class TripTypeController extends ApiController
     {
         try {
             $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+            $cityId = (int)($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+
             $stmt = $pdo->query("
                 SELECT 
-                    idTripType,
-                    idTripType as id,
-                    type,
-                    name,
-                    description,
-                    picture,
-                    statusId,
-                    COALESCE(serviceOption, 0) as serviceOption
-                FROM tripType
-                WHERE statusId = 1
-                ORDER BY idTripType ASC
+                    tt.idTripType,
+                    tt.idTripType as id,
+                    tt.type,
+                    COALESCE(tt.name, tt.type) as name,
+                    tt.description,
+                    tt.picture,
+                    tt.statusId,
+                    COALESCE(tt.serviceOption, 0) as serviceOption,
+                    tt.gender_id,
+                    COALESCE(g.name, 'todos') as gender_name
+                FROM tripType tt
+                LEFT JOIN gender g ON tt.gender_id = g.id
+                WHERE tt.statusId = 1
+                ORDER BY tt.idTripType ASC
             ");
-            $list = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $list = array_map(function ($row) {
+                $row['gender'] = [
+                    'id' => (int)($row['gender_id'] ?? 1),
+                    'name' => $row['gender_name'] ?? 'todos'
+                ];
+                return $row;
+            }, $rows);
 
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([

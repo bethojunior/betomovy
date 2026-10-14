@@ -122,6 +122,7 @@ return [
         '/city',
         '/triptype',
         '/pricedynamicscheduled',
+        '/dynamicarea',
         '/driver/datasheet',
         '/militaryforce/getall',
         '/militaryforce/graduations',

@@ -543,20 +543,19 @@ class CityController extends ApiController
             $cityId = (int)($_GET['id'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
             $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
 
-            $stmt = $pdo->prepare("
-                SELECT DISTINCT
+            $stmt = $pdo->query("
+                SELECT 
                     tt.idTripType AS tripTypeId,
                     tt.idTripType AS id,
                     tt.type,
-                    tt.name,
+                    COALESCE(tt.name, tt.type) as name,
                     tt.description,
                     tt.picture,
                     COALESCE(tt.serviceOption, 0) AS serviceOption
                 FROM tripType tt
-                LEFT JOIN price p ON (p.tripTypeId = tt.idTripType AND p.cityId = :cityId AND p.statusId = 1)
+                WHERE tt.statusId = 1
                 ORDER BY tt.idTripType ASC
             ");
-            $stmt->execute([':cityId' => $cityId]);
             $list = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             if (empty($list)) {

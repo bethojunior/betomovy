@@ -1429,6 +1429,7 @@ export const TypesTravels = () => {
         visible={visibleModal}
         listPrices={listPrices}
         setListPrices={setListPrices}
+        onSelect={handleSelectTravel}
       />
     </Container>
   );

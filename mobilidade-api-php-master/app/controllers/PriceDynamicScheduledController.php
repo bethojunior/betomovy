@@ -14,6 +14,11 @@ class PriceDynamicScheduledController extends ApiController
             return;
         }
 
+        if ($method === 'PUT') {
+            $this->actionUpdate();
+            return;
+        }
+
         if ($method === 'DELETE') {
             $this->actionDelete();
             return;
@@ -138,6 +143,57 @@ class PriceDynamicScheduledController extends ApiController
             echo json_encode([
                 'status' => false,
                 'message' => 'Erro ao inserir gatilhos: ' . $e->getMessage(),
+                'data' => null,
+                'response' => null,
+                'errors' => null
+            ]);
+        }
+    }
+
+    public function actionUpdate()
+    {
+        try {
+            $raw = file_get_contents('php://input');
+            $body = json_decode($raw, true) ?: $_POST;
+            $id = (int)($_GET['id'] ?? ($body['id'] ?? 0));
+
+            $cityId = (int)($body['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 1));
+            $tripTypeId = (int)($body['tripTypeId'] ?? 1);
+            $multiplierValue = (float)($body['multiplierValue'] ?? 1.0);
+            $startDate = $body['startDate'] ?? date('Y-m-d H:i:s');
+            $endDate = $body['endDate'] ?? date('Y-m-d H:i:s', strtotime('+1 day'));
+            $tag = $body['tag'] ?? '';
+
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+            $stmt = $pdo->prepare("
+                UPDATE priceDynamicScheduled 
+                SET cityId = :cityId, tripTypeId = :tripTypeId, multiplierValue = :multiplierValue, 
+                    tag = :tag, startDate = :startDate, endDate = :endDate, updated_at = NOW()
+                WHERE id = :id
+            ");
+            $stmt->execute([
+                ':id' => $id,
+                ':cityId' => $cityId,
+                ':tripTypeId' => $tripTypeId,
+                ':multiplierValue' => $multiplierValue,
+                ':tag' => $tag,
+                ':startDate' => $startDate,
+                ':endDate' => $endDate
+            ]);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Gatilho atualizado com sucesso',
+                'data' => true,
+                'response' => true,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao atualizar gatilho: ' . $e->getMessage(),
                 'data' => null,
                 'response' => null,
                 'errors' => null

@@ -173,18 +173,230 @@ class PriceController extends ApiController
 
     public function actionDynamic()
     {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+        // POST: criar nova bandeira
+        if ($method === 'POST') {
+            try {
+                $raw = file_get_contents('php://input');
+                $body = json_decode($raw, true) ?: $_POST;
+
+                $cityId = (int)($body['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+                $days = (array)($body['dayOfWeek'] ?? []);
+                $tripTypeIds = (array)($body['tripTypeId'] ?? []);
+                $multiplierValue = (float)($body['multiplierValue'] ?? 1.0);
+                $timeStart = $body['timeStart'] ?? '00:00:00';
+                $timeEnd = $body['timeEnd'] ?? '23:59:59';
+                $timezone = $body['timezone'] ?? null;
+
+                if (empty($days)) $days = [1];
+                if (empty($tripTypeIds)) $tripTypeIds = [1];
+
+                $stmt = $pdo->prepare("
+                    INSERT INTO priceDynamic (cityId, dayOfWeek, tripTypeId, multiplierValue, timeStart, timeEnd, timezone, active, statusId)
+                    VALUES (:cityId, :dayOfWeek, :tripTypeId, :multiplierValue, :timeStart, :timeEnd, :timezone, 1, 1)
+                ");
+
+                $inserted = [];
+                foreach ($days as $day) {
+                    foreach ($tripTypeIds as $tid) {
+                        $stmt->execute([
+                            ':cityId' => $cityId,
+                            ':dayOfWeek' => (int)$day,
+                            ':tripTypeId' => (int)$tid,
+                            ':multiplierValue' => $multiplierValue,
+                            ':timeStart' => $timeStart,
+                            ':timeEnd' => $timeEnd,
+                            ':timezone' => $timezone
+                        ]);
+                        $inserted[] = $pdo->lastInsertId();
+                    }
+                }
+
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Novo gatilho criado com sucesso',
+                    'data' => $inserted,
+                    'response' => $inserted,
+                    'errors' => null
+                ]);
+            } catch (\Throwable $e) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'Erro ao criar bandeira: ' . $e->getMessage(),
+                    'data' => null,
+                    'response' => null,
+                    'errors' => null
+                ]);
+            }
+            return;
+        }
+
+        // PUT: atualizar ou alterar status
+        if ($method === 'PUT') {
+            try {
+                $raw = file_get_contents('php://input');
+                $body = json_decode($raw, true) ?: $_POST;
+                $uri = $_SERVER['REQUEST_URI'] ?? '';
+                $id = (int)($_GET['id'] ?? 0);
+
+                if (strpos($uri, '/disable') !== false) {
+                    $upd = $pdo->prepare("UPDATE priceDynamic SET active = 0 WHERE idPriceDynamic = :id");
+                    $upd->execute([':id' => $id]);
+                } elseif (strpos($uri, '/enable') !== false) {
+                    $upd = $pdo->prepare("UPDATE priceDynamic SET active = 1 WHERE idPriceDynamic = :id");
+                    $upd->execute([':id' => $id]);
+                } else {
+                    // Update dados
+                    $cityId = (int)($body['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+                    $tripTypeId = (int)($body['tripTypeId'] ?? 1);
+                    $dayOfWeek = (int)($body['dayOfWeek'] ?? 1);
+                    $multiplierValue = (float)($body['multiplierValue'] ?? 1.0);
+                    $timeStart = $body['timeStart'] ?? '00:00:00';
+                    $timeEnd = $body['timeEnd'] ?? '23:59:59';
+
+                    $upd = $pdo->prepare("
+                        UPDATE priceDynamic 
+                        SET cityId = :cityId, tripTypeId = :tripTypeId, dayOfWeek = :dayOfWeek, 
+                            multiplierValue = :multiplierValue, timeStart = :timeStart, timeEnd = :timeEnd
+                        WHERE idPriceDynamic = :id
+                    ");
+                    $upd->execute([
+                        ':id' => $id,
+                        ':cityId' => $cityId,
+                        ':tripTypeId' => $tripTypeId,
+                        ':dayOfWeek' => $dayOfWeek,
+                        ':multiplierValue' => $multiplierValue,
+                        ':timeStart' => $timeStart,
+                        ':timeEnd' => $timeEnd
+                    ]);
+                }
+
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Status atualizado com sucesso!',
+                    'data' => true,
+                    'response' => true,
+                    'errors' => null
+                ]);
+            } catch (\Throwable $e) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'Erro ao atualizar bandeira: ' . $e->getMessage(),
+                    'data' => null,
+                    'response' => null,
+                    'errors' => null
+                ]);
+            }
+            return;
+        }
+
+        // DELETE: excluir bandeira
+        if ($method === 'DELETE') {
+            try {
+                $id = (int)($_GET['id'] ?? 0);
+                if ($id > 0) {
+                    $del = $pdo->prepare("UPDATE priceDynamic SET statusId = 2 WHERE idPriceDynamic = :id");
+                    $del->execute([':id' => $id]);
+                }
+
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Gatilho deletado com sucesso',
+                    'data' => true,
+                    'response' => true,
+                    'errors' => null
+                ]);
+            } catch (\Throwable $e) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'Erro ao deletar bandeira',
+                    'data' => null,
+                    'response' => null,
+                    'errors' => null
+                ]);
+            }
+            return;
+        }
+
+        // GET: Listagem formatada para o monitor
         try {
             $cityId = (int)($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
-            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
 
             $stmt = $pdo->prepare("
-                SELECT * FROM priceDynamic
-                WHERE (cityId = :cityId OR :cityIdZero = 0)
-                  AND statusId = 1
-                ORDER BY id ASC
+                SELECT 
+                    pd.idPriceDynamic,
+                    pd.idPriceDynamic as id,
+                    pd.cityId,
+                    pd.dayOfWeek,
+                    pd.multiplierValue,
+                    pd.active,
+                    pd.tripTypeId,
+                    pd.timeStart,
+                    pd.timeEnd,
+                    pd.timezone,
+                    pd.statusId,
+                    c.id as c_id,
+                    c.nome as c_nome,
+                    c.estado as c_estado,
+                    c.shortName as c_shortName,
+                    tt.idTripType as tt_id,
+                    tt.type as tt_type,
+                    tt.picture as tt_picture,
+                    w.id as w_id,
+                    w.day as w_day,
+                    w.slug as w_slug,
+                    w.description as w_description
+                FROM priceDynamic pd
+                LEFT JOIN city c ON pd.cityId = c.id
+                LEFT JOIN tripType tt ON pd.tripTypeId = tt.idTripType
+                LEFT JOIN weekDay w ON pd.dayOfWeek = w.day
+                WHERE (pd.cityId = :cityId OR :cityIdZero = 0)
+                  AND pd.statusId = 1
+                ORDER BY pd.idPriceDynamic DESC
             ");
             $stmt->execute([':cityId' => $cityId, ':cityIdZero' => $cityId]);
-            $list = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $list = array_map(function ($row) {
+                return [
+                    'id' => (int)$row['idPriceDynamic'],
+                    'idPriceDynamic' => (int)$row['idPriceDynamic'],
+                    'cityId' => (int)$row['cityId'],
+                    'dayOfWeek' => (int)$row['dayOfWeek'],
+                    'multiplierValue' => (float)$row['multiplierValue'],
+                    'active' => (int)$row['active'],
+                    'tripTypeId' => (int)$row['tripTypeId'],
+                    'timeStart' => (string)$row['timeStart'],
+                    'timeEnd' => (string)$row['timeEnd'],
+                    'timezone' => $row['timezone'],
+                    'statusId' => (int)$row['statusId'],
+                    'city' => [
+                        'id' => (int)($row['c_id'] ?? $row['cityId']),
+                        'nome' => $row['c_nome'] ?? '',
+                        'estado' => (int)($row['c_estado'] ?? 0),
+                        'shortName' => $row['c_shortName'] ?? null
+                    ],
+                    'trip_type' => [
+                        'idTripType' => (int)($row['tt_id'] ?? $row['tripTypeId']),
+                        'type' => $row['tt_type'] ?? '',
+                        'picture' => $row['tt_picture'] ?? ''
+                    ],
+                    'week_day' => [
+                        'id' => (int)($row['w_id'] ?? $row['dayOfWeek']),
+                        'day' => (int)($row['w_day'] ?? $row['dayOfWeek']),
+                        'slug' => $row['w_slug'] ?? '',
+                        'description' => $row['w_description'] ?? 'Dia ' . $row['dayOfWeek']
+                    ]
+                ];
+            }, $rows);
 
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
