@@ -136,6 +136,7 @@ export const InputLink = ({
         icon={<FaCheck />}
         onClick={updateKey}
         loading={loading}
+        style={{ height: 38, minWidth: 38, borderRadius: 6 }}
       />
     </Container>
   );

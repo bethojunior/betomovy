@@ -1,11 +1,32 @@
 import {
   Container,
-  ContentInput,
-  LabelText,
-  ContainerInputs,
+  HeaderCard,
+  HeaderInfo,
+  MainTitle,
+  Subtitle,
   ContentConfigLocalization,
+  StepperContainer,
+  StepCard,
+  StepHeader,
+  StepNumber,
+  StepTitle,
+  SelectedBanner,
+  SelectedInfo,
+  SelectedActions,
   ContentMap,
+  MapOverlayBadge,
+  BottomActionBar,
 } from "./styles";
+import { 
+  FaGlobeAmericas, 
+  FaMapMarkerAlt, 
+  FaCity, 
+  FaList, 
+  FaSearch, 
+  FaPlus, 
+  FaDrawPolygon, 
+  FaCheckCircle 
+} from "react-icons/fa";
 
 import { Button, MenuProps, Select, Modal, Input, List } from "antd";
 import mapboxgl, { Map as MapboxMap } from "mapbox-gl";
@@ -593,25 +614,54 @@ export const AddCity = () => {
   return (
     <Container>
       <Preload visible={loading} />
-      <ContentConfigLocalization>
-        <ButtonDropdown
-          titleButton="Configuração de Localidade"
-          typeButton="primary"
-          menu={{
-            items,
-          }}
-        />
-      </ContentConfigLocalization>
-      <ContainerInputs>
-        <ContentInput>
-          <LabelText>País:</LabelText>
-          <Select
-            style={{
-              width: "100%",
+
+      <HeaderCard>
+        <HeaderInfo>
+          <MainTitle>
+            <FaCity style={{ color: "#0284c7" }} /> Adicionar Nova Cidade
+          </MainTitle>
+          <Subtitle>
+            Selecione país, estado e cidade para cadastrar e delimitar a área geográfica de atuação
+          </Subtitle>
+        </HeaderInfo>
+
+        <ContentConfigLocalization>
+          <ButtonDropdown
+            titleButton="Configuração de Localidade"
+            typeButton="primary"
+            menu={{
+              items,
             }}
+          />
+          <Button
+            icon={<FaList style={{ marginRight: 6 }} />}
+            onClick={() => history.push("/config/areasCity/editCity")}
+          >
+            Ver Cidades Cadastradas
+          </Button>
+        </ContentConfigLocalization>
+      </HeaderCard>
+
+      <StepperContainer>
+        <StepCard
+          active={!selectedCountryObj}
+          completed={!!selectedCountryObj}
+        >
+          <StepHeader>
+            <StepNumber completed={!!selectedCountryObj} active={!selectedCountryObj}>
+              {selectedCountryObj ? <FaCheckCircle /> : "1"}
+            </StepNumber>
+            <StepTitle>
+              <FaGlobeAmericas style={{ marginRight: 6, color: "#0284c7" }} />
+              1. Selecionar País
+            </StepTitle>
+          </StepHeader>
+          <Select
+            style={{ width: "100%" }}
             showSearch
             placeholder="Escolha um país"
             optionFilterProp="children"
+            value={selectedCountryObj?.id}
             onChange={(idCountry) => {
               const country = countries.find((c) => c.id === Number(idCountry));
               setSelectedCountryObj(country || null);
@@ -624,17 +674,28 @@ export const AddCity = () => {
             filterOption={filterOption}
             options={countriesFormated}
             loading={loadingState}
+            size="large"
           />
-        </ContentInput>
+        </StepCard>
 
-        <ContentInput>
-          <LabelText>Estado:</LabelText>
+        <StepCard
+          active={!!selectedCountryObj && !selectedStateObj}
+          completed={!!selectedStateObj}
+        >
+          <StepHeader>
+            <StepNumber completed={!!selectedStateObj} active={!!selectedCountryObj && !selectedStateObj}>
+              {selectedStateObj ? <FaCheckCircle /> : "2"}
+            </StepNumber>
+            <StepTitle>
+              <FaMapMarkerAlt style={{ marginRight: 6, color: "#0284c7" }} />
+              2. Selecionar Estado
+            </StepTitle>
+          </StepHeader>
           <Select
-            style={{
-              width: "100%",
-            }}
+            style={{ width: "100%" }}
             showSearch
-            placeholder="Escolha um estado"
+            placeholder={selectedCountryObj ? "Escolha um estado" : "Selecione o país primeiro"}
+            disabled={!selectedCountryObj}
             optionFilterProp="children"
             onChange={(datasEstate: string) => {
               const parsedState = JSON.parse(datasEstate);
@@ -648,116 +709,127 @@ export const AddCity = () => {
             filterOption={filterOption}
             options={statesFormated}
             loading={loadingCity}
+            size="large"
           />
-        </ContentInput>
+        </StepCard>
 
-        <ContentInput>
-          <LabelText>Cidade:</LabelText>
+        <StepCard
+          active={!!selectedStateObj && !selectedCityObj}
+          completed={!!selectedCityObj}
+        >
+          <StepHeader>
+            <StepNumber completed={!!selectedCityObj} active={!!selectedStateObj && !selectedCityObj}>
+              {selectedCityObj ? <FaCheckCircle /> : "3"}
+            </StepNumber>
+            <StepTitle>
+              <FaCity style={{ marginRight: 6, color: "#0284c7" }} />
+              3. Selecionar Cidade
+            </StepTitle>
+          </StepHeader>
           <Select
-            style={{
-              width: "100%",
-            }}
+            style={{ width: "100%" }}
             showSearch
-            placeholder="Escolha uma cidade"
+            placeholder={selectedStateObj ? "Escolha uma cidade" : "Selecione o estado primeiro"}
+            disabled={!selectedStateObj}
             optionFilterProp="children"
             value={coordinatesCitySelected}
             onChange={(datasCity) => handleChangeCenterMap(datasCity as any)}
             filterOption={filterOption}
             options={citiesFormated}
+            size="large"
           />
-        </ContentInput>
-      </ContainerInputs>
+        </StepCard>
+      </StepperContainer>
 
       {coordinatesCitySelected && (
-        <div
-          style={{
-            marginTop: 18,
-            marginBottom: 16,
-            padding: "16px 20px",
-            background: "#f0f5ff",
-            border: "1px solid #adc6ff",
-            borderRadius: 8,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
-          <div>
-            <h3 style={{ margin: 0, color: "#1d39c4", fontSize: 16, fontWeight: 700 }}>
-              📍 Cidade Selecionada: {selectedCityObj?.name || "Cidade"}
+        <SelectedBanner>
+          <SelectedInfo>
+            <h3>
+              <FaMapMarkerAlt /> Cidade Selecionada: {selectedCityObj?.name || "Cidade"}
               {selectedStateObj ? ` - ${selectedStateObj.name}` : ""}
               {selectedCountryObj ? ` (${selectedCountryObj.name})` : ""}
             </h3>
-            <p style={{ margin: "4px 0 0 0", color: "#595959", fontSize: 13 }}>
+            <p>
               {searchLoading
-                ? "Carregando delimitação geográfica da cidade..."
+                ? "Buscando delimitação geográfica oficial no OpenStreetMap..."
                 : coordinatesCaptured
-                ? "Área definida! Clique em 'Adicionar Cidade' para salvar e habilitar no sistema."
-                : "Defina ou confirme a área da cidade no mapa abaixo."}
+                ? "Área geográfica definida com sucesso! Revise no mapa e clique em Adicionar Cidade."
+                : "Defina ou desenhe a área de cobertura da cidade no mapa interativo abaixo."}
             </p>
-          </div>
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          </SelectedInfo>
+          <SelectedActions>
             <Button
+              icon={<FaSearch style={{ marginRight: 6 }} />}
               onClick={() => setShowSearchAreaModal(true)}
-              style={{ borderRadius: 6 }}
+              style={{ borderRadius: 6, height: 40 }}
             >
-              🔍 Buscar Outra Área / Limites
+              Buscar Outra Área
             </Button>
             <Button
               type="primary"
               size="large"
+              icon={<FaPlus style={{ marginRight: 6 }} />}
               style={{
                 fontWeight: 700,
                 height: 42,
-                padding: "0 28px",
+                padding: "0 24px",
                 borderRadius: 6,
-                background: "#1890ff",
-                boxShadow: "0 2px 6px rgba(24, 144, 255, 0.4)",
+                background: "#0284c7",
+                border: "none",
+                boxShadow: "0 2px 6px rgba(2, 132, 199, 0.4)",
               }}
               onClick={handleConfirmAddCity}
               loading={loading}
             >
-              ➕ Adicionar Cidade
+              Adicionar Cidade
             </Button>
-          </div>
-        </div>
+          </SelectedActions>
+        </SelectedBanner>
       )}
 
       <ContentMap>
+        <MapOverlayBadge>
+          <FaDrawPolygon style={{ color: "#0284c7" }} />
+          <span>Use as ferramentas no canto direito do mapa para desenhar ou editar a área da cidade</span>
+        </MapOverlayBadge>
         <div
           ref={mapContainer}
           style={{
             width: "100%",
-            height: "450px",
-            borderRadius: 8,
-            overflow: "hidden",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            height: "480px",
             background: "#e5e3df",
           }}
         />
       </ContentMap>
 
       {coordinatesCitySelected && (
-        <div style={{ marginTop: 16, display: "flex", gap: 12 }}>
-          <Button
-            type="primary"
-            size="large"
-            style={{ fontWeight: 700, height: 44, padding: "0 32px", borderRadius: 6 }}
-            onClick={handleConfirmAddCity}
-            loading={loading}
-          >
-            ➕ Adicionar Cidade (Salvar Área)
-          </Button>
+        <BottomActionBar>
           <Button
             size="large"
             style={{ height: 44, borderRadius: 6 }}
             onClick={() => setShowSearchAreaModal(true)}
+            icon={<FaSearch style={{ marginRight: 6 }} />}
           >
-            🔍 Buscar Outra Área
+            Buscar Outra Área
           </Button>
-        </div>
+          <Button
+            type="primary"
+            size="large"
+            style={{
+              fontWeight: 700,
+              height: 44,
+              padding: "0 32px",
+              borderRadius: 6,
+              background: "#0284c7",
+              border: "none",
+            }}
+            onClick={handleConfirmAddCity}
+            loading={loading}
+            icon={<FaPlus style={{ marginRight: 6 }} />}
+          >
+            Adicionar Cidade (Salvar Área)
+          </Button>
+        </BottomActionBar>
       )}
 
       <ModalReplyConfig
