@@ -1021,7 +1021,19 @@ export const ServicesApps = () => {
                 }
                 onClick={() => handleSelectTravel(value.trip_type)}
               >
-                <ImageTariff src={value.trip_type?.picture} />
+                <ImageTariff
+                  src={
+                    value.trip_type?.picture
+                      ? (value.trip_type.picture.startsWith("http")
+                          ? value.trip_type.picture
+                          : `https://minio.704app.com.br/rota101fb704/tripType/${value.trip_type.picture}`)
+                      : "/default-trip-icon.png"
+                  }
+                  onError={(e: any) => {
+                    e.target.onerror = null;
+                    e.target.src = "/default-trip-icon.png";
+                  }}
+                />
                 <TitleCardTariff>{value.trip_type?.type}</TitleCardTariff>
                 <TextCardTariff>{`Id: ${value.trip_type?.idTripType}`}</TextCardTariff>
               </CardTariff>

@@ -647,12 +647,20 @@ class Price extends BaseModel
      */
     public function getPicture()
     {
-        if ($this->picture)
-            return
-                env('S3_URL') .
-                env('S3_BUCKET_NAME') .
-                TripTypeConst::PICTURE_DIR .
-                $this->picture;
+        if ($this->picture) {
+            if (strpos($this->picture, 'http://') === 0 || strpos($this->picture, 'https://') === 0) {
+                return $this->picture;
+            }
+            $storage = '';
+            try {
+                $storage = \app\model\Config::get('link_storage_pictures');
+            } catch (\Throwable $t) {}
+
+            if (empty($storage)) {
+                $storage = 'https://minio.704app.com.br/rota101fb704/';
+            }
+            return rtrim($storage, '/') . '/tripType/' . ltrim($this->picture, '/');
+        }
 
         return $this->picture;
     }

@@ -161,14 +161,16 @@ class PriceCustomerService extends PriceService
         $prices = $this->getPricesByCityArea($origin, null, null, $onlyCentral, $noDestination);
 
         return array_map(function (Price $price) {
+            $tripType = (new TripTypeDao)->findById($price->getTripTypeId());
+            $picture = $price->getPicture() ?: ($tripType->picture ?? '');
             return [
                 'idPrice' => $price->getId(),
                 'tripTypeId' => $price->getTripTypeId(),
-                'tripType' => (new TripTypeDao)->findById($price->getTripTypeId()),
+                'tripType' => $tripType,
                 'typeDrivers' => $this->tripTypeDriverService->findDriverTypes($price->getTripTypeId()),
                 'priceName' => $price->getName(),
                 'description' => $price->getDescription(),
-                'picture' => $price->getPicture(),
+                'picture' => $picture,
                 'tag' => $price->getDynamicTag() ?: $price->getTag(),
                 'color' => $price->getColor(),
                 'order' => $price->getOrder(),
@@ -290,17 +292,19 @@ class PriceCustomerService extends PriceService
                 $price->getCityId(), $price->getTripTypeId(), $calculatedPrice
             );
 
+            $tripType = (new TripTypeDao)->findById($price->getTripTypeId());
+            $picture = $price->getPicture() ?: ($tripType->picture ?? '');
             return [
                 'idPrice' => $price->getId(),
                 'price' => round($calculatedPrice, 2),
                 'platformAmount' => $senacon['platformAmount'],
                 'driverAmount' => $senacon['driverAmount'],
                 'tripTypeId' => $price->getTripTypeId(),
-                'tripType' => (new TripTypeDao)->findById($price->getTripTypeId()),
+                'tripType' => $tripType,
                 'typeDrivers' => $this->tripTypeDriverService->findDriverTypes($price->getTripTypeId()),
                 'priceName' => $price->getName(),
                 'description' => $price->getDescription(),
-                'picture' => $price->getPicture(),
+                'picture' => $picture,
                 'tag' => $price->getDynamicTag() ?: $price->getTag(),
                 'color' => $price->getColor(),
                 'cancellationFee' => $cancellationFee,

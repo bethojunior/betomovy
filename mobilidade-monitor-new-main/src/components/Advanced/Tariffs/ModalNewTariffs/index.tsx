@@ -67,13 +67,26 @@ export const ModalNewTariffs = ({
           </div>
         ) : (
           datasTariffs.map((value) => {
+            const rawPic = value?.picture || "";
+            const picSrc = rawPic
+              ? (rawPic.startsWith("http")
+                  ? rawPic
+                  : `https://minio.704app.com.br/rota101fb704/tripType/${rawPic}`)
+              : "/default-trip-icon.png";
+
             return (
               <CardTariffs
                 key={value.idTripType}
                 onClick={() => handleActivateTariffs(value)}
               >
                 <ContentTariffs>
-                  <PictureTariff src={value?.picture} />
+                  <PictureTariff
+                    src={picSrc}
+                    onError={(e: any) => {
+                      e.target.onerror = null;
+                      e.target.src = "/default-trip-icon.png";
+                    }}
+                  />
                   <DescriptionTariffs>
                     <TitleTariff>{value?.type}</TitleTariff>
                     <TextTariff>{value?.description}</TextTariff>

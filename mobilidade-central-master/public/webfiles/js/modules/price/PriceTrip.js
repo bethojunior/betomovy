@@ -253,14 +253,33 @@ class PriceTrip {
 
             const tagText = object.tag || object.name || object.priceName || '';
             const tagBg = object.color ? `background-color: ${object.color}` : 'background-color: #333';
-            const pictureUrl = object.picture || 'webfiles/img/icon/carro_eco.png';
+            
+            // Resolucao robusta da imagem do tipo de viagem
+            let rawPicture = object.picture || (object.tripType && object.tripType.picture) || '';
+            let pictureUrl = 'webfiles/img/icon/carro_eco.png';
+
+            if (rawPicture && typeof rawPicture === 'string') {
+                if (rawPicture.startsWith('http://') || rawPicture.startsWith('https://')) {
+                    if (rawPicture.includes('s3-sa-east-1.amazonaws.com/voutehomologar') || rawPicture.includes('s3.amazonaws.com/voutehomologar')) {
+                        const filename = rawPicture.split('/').pop();
+                        pictureUrl = 'https://minio.704app.com.br/rota101fb704/tripType/' + filename;
+                    } else {
+                        pictureUrl = rawPicture;
+                    }
+                } else if (rawPicture.startsWith('webfiles/') || rawPicture.startsWith('/')) {
+                    pictureUrl = rawPicture;
+                } else {
+                    pictureUrl = 'https://minio.704app.com.br/rota101fb704/tripType/' + rawPicture;
+                }
+            }
+
             const priceVal = (object.price !== undefined && object.price !== null) ? object.price : 0;
             const tripTypeIdVal = object.tripTypeId || object.idTripType || index;
 
             return `<div class="trip-type ${className}"
                             value='${JSON.stringify(object)}'>
                             <span style="${tagBg}">${tagText}</span>
-                            <img src="${pictureUrl}">
+                            <img src="${pictureUrl}" onerror="this.onerror=null; this.src='webfiles/img/icon/carro_eco.png';">
                             <p  
                                 class="label-prices-trip"
                                 id="valueTypeTrip${tripTypeIdVal}" 
