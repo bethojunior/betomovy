@@ -176,12 +176,22 @@ class ConfigService
         $results = $this->repository
             ->getConfigs();
 
-        return array_map(function ($configType){
+        return array_values(array_map(function ($configType){
+            $type = is_array($configType)
+                ? ($configType['type'] ?? $configType['name'] ?? null)
+                : ($configType->type ?? $configType->name ?? null);
+
+            $rawConfig = is_array($configType)
+                ? ($configType['config'] ?? null)
+                : ($configType->config ?? null);
+
+            $config = is_string($rawConfig) ? json_decode($rawConfig) : $rawConfig;
+
             return [
-                'type' => $configType->type,
-                'config' => json_decode($configType->config)
+                'type' => !empty($type) ? (string) $type : 'Geral',
+                'config' => is_array($config) ? array_values($config) : []
             ];
-        }, $results->toArray());
+        }, $results->toArray()));
     }
 
     /**

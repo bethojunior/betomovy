@@ -65,7 +65,7 @@ class ConfigRepository extends AbstractRepository
         return $this->getModel()
             ::getQuery()
             ->select(
-                'ct.name AS type',
+                \DB::raw("COALESCE(NULLIF(ct.name, ''), CONCAT('Categoria ', config.configTypeId), 'Geral') AS type"),
                 \DB::raw(
                     "
                     JSON_ARRAYAGG(
@@ -73,9 +73,10 @@ class ConfigRepository extends AbstractRepository
                     ) AS config
                 ")
             )
-            ->join('configType AS ct', 'ct.idConfigType', '=', 'config.configTypeId')
+            ->leftJoin('configType AS ct', 'ct.idConfigType', '=', 'config.configTypeId')
             ->where('config.frontEndConfigurable', true)
-            ->groupBy('config.configTypeId')
+            ->groupBy('config.configTypeId', 'ct.name')
+            ->orderBy('type')
             ->get();
     }
 }
