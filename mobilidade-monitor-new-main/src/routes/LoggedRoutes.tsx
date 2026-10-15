@@ -327,9 +327,13 @@ const LoggedRoutes: FC = () => {
               </Menu>
             </Route>
             <Route path="/financial/commission">
-              <Menu titlePage="Pré-Pago">
-                <BuyCredit />
-              </Menu>
+              <PermissionRouteGuard
+                group={FINANCEIRO}
+                permission="gestao_monetizacao"
+                titlePage="Comissão"
+              >
+                <CommissionManagement />
+              </PermissionRouteGuard>
             </Route>
             <Route path="/financial/charge">
               <PermissionRouteGuard

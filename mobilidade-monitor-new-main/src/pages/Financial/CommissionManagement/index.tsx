@@ -241,9 +241,11 @@ export const CommissionManagement = () => {
       ellipsis: true,
       width: 250,
       render: (_, data) => {
-        return `${new Date(data.updated_at).toLocaleDateString()} - ${new Date(
-          data.updated_at
-        ).toLocaleTimeString()}`;
+        if (!data?.updated_at) return "-";
+        const dateObj = new Date(data.updated_at);
+        return isNaN(dateObj.getTime())
+          ? "-"
+          : `${dateObj.toLocaleDateString()} - ${dateObj.toLocaleTimeString()}`;
       },
     },
     {
@@ -308,6 +310,7 @@ export const CommissionManagement = () => {
           </div>
         )}
         <Table
+          rowKey="id"
           columns={columns}
           dataSource={commissionsManagement}
           pagination={false}

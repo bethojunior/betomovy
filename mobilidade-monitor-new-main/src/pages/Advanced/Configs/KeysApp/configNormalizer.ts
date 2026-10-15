@@ -269,13 +269,27 @@ export const CONFIG_METADATA: Record<string, { category: string; label: string; 
   description_registration: { category: "SISTEMA", label: "Instruções Explicativas na Tela de Cadastro" },
 };
 
-export function inferCategoryAndType(key: string, value: any, description?: string | null) {
+export function inferCategoryAndType(
+  key: string, 
+  value: any, 
+  description?: string | null,
+  typeName?: string | null
+) {
   const meta = CONFIG_METADATA[key];
   if (meta) {
     return {
       category: meta.category,
       label: description && description.trim() ? description : meta.label,
       inputType: meta.inputType || (meta.label.toLowerCase().includes("habilitar") ? "boolean" : undefined)
+    };
+  }
+
+  if (typeName && typeName.trim()) {
+    const cleanType = typeName.trim().toUpperCase();
+    return {
+      category: cleanType,
+      label: description && description.trim() ? description : key.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
+      inputType: (value === "0" || value === "1") ? "boolean" : undefined
     };
   }
 
@@ -348,7 +362,7 @@ export function normalizeKeys(raw: any[]): NormalizedCategory[] {
       return {
         type,
         config: configs.map((item: any) => {
-          const inferred = inferCategoryAndType(item.key, item.value, item.description);
+          const inferred = inferCategoryAndType(item.key, item.value, item.description, item.typeName || cat.type);
           return {
             key: item.key,
             value: item.value !== null && item.value !== undefined ? String(item.value) : "",
@@ -381,7 +395,7 @@ export function normalizeKeys(raw: any[]): NormalizedCategory[] {
   raw.forEach((item: any) => {
     if (!item || !item.key) return;
 
-    const inferred = inferCategoryAndType(item.key, item.value, item.description);
+    const inferred = inferCategoryAndType(item.key, item.value, item.description, item.typeName);
     const catKey = inferred.category;
 
     if (!categoriesMap.has(catKey)) {

@@ -90,8 +90,8 @@ export const BuyCredit = () => {
       width: 150,
       ellipsis: true,
       render: (user: any) => (
-        <UserCell onClick={() => history.push(`/driver/list?editDriverId=${user.idUser}`)}>
-          {user.name}
+        <UserCell onClick={() => user?.idUser && history.push(`/driver/list?editDriverId=${user.idUser}`)}>
+          {user?.name || "Não informado"}
         </UserCell>
       ),
     },
@@ -108,7 +108,7 @@ export const BuyCredit = () => {
       key: "credit_prepaid",
       width: 150,
       render: (credit_prepaid: any) => (
-        <p>{credit_prepaid ? credit_prepaid.stripe : ""}</p>
+        <p>{credit_prepaid?.stripe || ""}</p>
       ),
     },
     {
@@ -130,11 +130,14 @@ export const BuyCredit = () => {
       key: "credit_prepaid",
       width: 150,
       render: (credit_prepaid: any) => {
+        const priceNum = Utils.convertStringToNumber(
+          credit_prepaid?.sellPrice ?? "0"
+        );
         return (
           <p>
-            {Utils.convertStringToNumber(
-              credit_prepaid?.sellPrice
-            ).toLocaleString("pt-br", { style: "currency", currency: "BRL" })}
+            {isNaN(priceNum)
+              ? "N/A"
+              : priceNum.toLocaleString("pt-br", { style: "currency", currency: "BRL" })}
           </p>
         );
       },
@@ -144,13 +147,11 @@ export const BuyCredit = () => {
       dataIndex: "credit_prepaid",
       key: "credit_prepaid",
       width: 200,
-      render: (credit_prepaid: any) => (
-        <p>
-          {credit_prepaid
-            ? new Date(credit_prepaid?.created_at).toLocaleDateString()
-            : ""}
-        </p>
-      ),
+      render: (credit_prepaid: any) => {
+        if (!credit_prepaid?.created_at) return <p>-</p>;
+        const d = new Date(credit_prepaid.created_at);
+        return <p>{isNaN(d.getTime()) ? "-" : d.toLocaleDateString()}</p>;
+      },
     },
     {
       title: "Status",

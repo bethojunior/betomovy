@@ -221,7 +221,9 @@ const CancellationFee: FC = () => {
         setShowCardButtons(false);
         setLoading(false);
         setThisPage(page);
-        if (values.data.response.data.length === 0) {
+        const resData = values.data?.response?.data ?? (Array.isArray(values.data?.response) ? values.data.response : []);
+        if (!Array.isArray(resData) || resData.length === 0) {
+          setCancellationList([]);
           setShowNoData(true);
           setHideCard(true);
           setShowCardButtons(true);
@@ -231,29 +233,35 @@ const CancellationFee: FC = () => {
         setHideCard(false);
         setShowNoData(false);
         setShowTableButtons(true);
-        setCurrentPage(values.data.response.current_page);
-        setLastPage(values.data.response.last_page);
-        if (page === lastPage) {
+        setCurrentPage(values.data?.response?.current_page ?? page);
+        setLastPage(values.data?.response?.last_page ?? page);
+        if (page === (values.data?.response?.last_page ?? page)) {
           setShowCardButtons(true);
         }
         if (page !== 1) {
           if (Utils.isMobile()) {
             setCancellationList((state) =>
-              state?.concat(...values.data.response.data)
+              (state || []).concat(...resData)
             );
             return;
           }
-          setCancellationList(values.data.response.data);
+          setCancellationList(resData);
           return;
         }
-        setCancellationList(values.data.response.data);
-        setPagination(values.data.response.next_page_url);
+        setCancellationList(resData);
+        setPagination(values.data?.response?.next_page_url || "");
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+        setCancellationList([]);
+        setShowNoData(true);
       });
   };
 
   const deleteFee = (idFee: number) => {
     swal({
-      title: "Você realmente deseja zera essa taxa?",
+      title: "Você realmente deseja zerar essa taxa?",
       text: "Essa ação é irreversível",
       icon: "warning",
       buttons: ["Cancelar", "Confirmar"],
@@ -261,15 +269,27 @@ const CancellationFee: FC = () => {
     }).then((value) => {
       if (value) {
         setLoading(true);
-        api.delete(`trip/cancellationFee/${idFee}`).then(() => {
-          setMessageAlert("Taxa zerada com sucesso!");
-          setTypeAlert("success");
-          searchRequest();
-          return setShowAlert(true);
-        });
-        // setLoading(false);
-        setTypeAlert("error");
-        setMessageAlert("Erro ao tentar zerada taxa");
+        api.delete(`trip/cancellationFee/${idFee}`)
+          .then((res) => {
+            if (res.data?.status || res.status === 200) {
+              setMessageAlert("Taxa zerada com sucesso!");
+              setTypeAlert("success");
+              searchRequest(thisPage);
+            } else {
+              setMessageAlert("Erro ao tentar zerar taxa");
+              setTypeAlert("error");
+            }
+            setShowAlert(true);
+          })
+          .catch((err) => {
+            console.error(err);
+            setMessageAlert("Erro ao tentar zerar taxa");
+            setTypeAlert("error");
+            setShowAlert(true);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
       }
     });
   };

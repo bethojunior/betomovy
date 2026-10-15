@@ -179,8 +179,9 @@ export const ReportsFinancial = () => {
   const getReferrealMonetization = async () => {
     setLoading(true);
     try {
+      const cityId = citySelected?.cityId || "";
       const responseReferralMonetization = await api.get(
-        `referralMonetization?cityId=${citySelected.cityId}`
+        `referralMonetization${cityId ? `?cityId=${cityId}` : ""}`
       );
 
       if (responseReferralMonetization.status) {
@@ -508,6 +509,7 @@ export const ReportsFinancial = () => {
 
               <ContentTable>
                 <Table
+                  rowKey={(record, index) => String((record as any)?.id || index)}
                   style={{
                     width: "100%",
                   }}
@@ -548,6 +550,7 @@ export const ReportsFinancial = () => {
             </ContentHeader>
             <ContentTable style={{ position: "relative" }}>
               <Table
+                rowKey={(record, index) => String((record as any)?.id || index)}
                 style={{
                   width: "100%",
                 }}

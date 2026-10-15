@@ -132,14 +132,14 @@ export const FinancialCharge: FC = () => {
 
   const mountBalancePosting = async (data: balancePostingType[]) => {
     const mountBalance: balancePostingType[] = [];
-    data.map((item: any) => {
+    (Array.isArray(data) ? data : []).forEach((item: any) => {
       mountBalance.push({
         id: item.id,
-        balanceTypeName: item.balance_flow_type.name,
-        flow: item.balance_flow_type.flow,
+        balanceTypeName: item.balance_flow_type?.name ?? "Lançamento",
+        flow: item.balance_flow_type?.flow ?? "-",
         value: Mask.setMaskMoneyNumber(item.value),
-        billingDay: item.billingDay,
-        category: item.user_type.name,
+        billingDay: item.billingDay ?? "-",
+        category: item.user_type?.name ?? "Geral",
       });
     });
     setBalancePosting(mountBalance);
@@ -284,6 +284,7 @@ export const FinancialCharge: FC = () => {
       ) : (
         <ContentTable>
           <Table
+            rowKey="id"
             pagination={false}
             dataSource={balancePosting}
             columns={columnsBalance}

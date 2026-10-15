@@ -103,14 +103,16 @@ export const TransferRequests = () => {
         false
       );
 
+      const paidParam = isPendentFilter === "on" || isCheckedPendent ? "&paid=0" : "";
       const responseFilter = await api.get(
-        `withdraw?page=1&name=${nameFilter}&phone=${phoneFilter}&document=${cpfFilter}&dateStart=${dateInitFormated}&dateEnd=${dateFinalFormated}&${
-          isPendentFilter === "on" && "paid=0"
-        }`
+        `withdraw?page=1&name=${encodeURIComponent(String(nameFilter || ""))}&phone=${encodeURIComponent(String(phoneFilter || ""))}&document=${encodeURIComponent(String(cpfFilter || ""))}&dateStart=${dateInitFormated || ""}&dateEnd=${dateFinalFormated || ""}${paidParam}`
       );
 
       if (responseFilter.status) {
-        setListFinancial(responseFilter.data.response.data);
+        const raw = responseFilter.data?.response ?? responseFilter.data?.data;
+        const list = Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw) ? raw : []);
+        setListFinancial(list);
+        last_page = raw?.last_page ?? 1;
       }
     } catch (error) {
       console.error(error);
@@ -422,6 +424,7 @@ export const TransferRequests = () => {
           </div>
         )}
         <Table
+          rowKey="idWithdraw"
           columns={columns}
           dataSource={listFinancial}
           pagination={false}
