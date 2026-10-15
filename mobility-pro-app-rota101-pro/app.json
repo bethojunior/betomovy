@@ -3,7 +3,7 @@
     "name": "Movy",
     "scheme": "rota101pro",
     "slug": "expoappv2",
-    "version": "8.1.0",
+    "version": "8.3.1",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "splash": {
@@ -38,9 +38,9 @@
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "buildToolsVersion": "35.0.0"
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "buildToolsVersion": "36.0.0"
           }
         }
       ],
@@ -73,7 +73,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "buildNumber": "80100",
+      "buildNumber": "80301",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSCameraUsageDescription": "A câmera é usada durante o cadastro para tirar sua foto de perfil e fotografar os documentos necessários para o cadastro. Ela também é usada quando você troca sua foto de perfil no aplicativo.",
@@ -81,7 +81,12 @@
         "NSPhotoLibraryUsageDescription": "A biblioteca de fotos é utilizada para selecionar fotos do perfil e enviar imagens ou documentos salvos no aparelho.",
         "UIBackgroundModes": ["location", "fetch"],
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
+        "NSLocationAlwaysUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
         "NSLocationWhenInUseUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
+        "NSContactsUsageDescription": "Queremos ajudar você a se conectar com seus contatos. Precisamos da sua permissão para o ${PRODUCT_NAME} acessar sua agenda e facilitar o envio de mensagens e SMS.",
+        "NSFaceIDUsageDescription": "O Face ID é utilizado para autenticação segura no aplicativo.",
+        "NSBluetoothAlwaysUsageDescription": "O Bluetooth é utilizado para conectar dispositivos auxiliares.",
+        "NSBluetoothPeripheralUsageDescription": "O Bluetooth é utilizado para conectar dispositivos auxiliares.",
         "NSSpeechRecognitionUsageDescription": "O reconhecimento de fala é usado para converter em texto o endereço informado por voz ao realizar um chamado no aplicativo."
       },
       "bundleIdentifier": "br.com.client.rota101",
@@ -92,7 +97,7 @@
     "android": {
       "package": "br.com.client.rota101",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 80100,
+      "versionCode": 80301,
       "edgeToEdgeEnabled": true,
       "config": {
         "googleMaps": {
