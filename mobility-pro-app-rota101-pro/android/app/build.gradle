@@ -111,9 +111,9 @@ android {
                 keyAlias MOVY_RELEASE_KEY_ALIAS
                 keyPassword MOVY_RELEASE_KEY_PASSWORD
             } else {
-                storeFile file('keystore.jks')
+                storeFile file('movy_upload_keystore.jks')
                 storePassword 'MovyMob2026@'
-                keyAlias 'rota101'
+                keyAlias 'movy'
                 keyPassword 'MovyMob2026@'
             }
         }
