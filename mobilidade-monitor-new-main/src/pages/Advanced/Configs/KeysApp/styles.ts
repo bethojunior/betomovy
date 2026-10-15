@@ -3,9 +3,10 @@ import { Spin } from "antd";
 
 export const Content = styled.div`
   width: 100%;
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 6rem 1.5rem;
   background-color: #f8fafc;
-  min-height: 100vh;
+  min-height: 100%;
+  position: relative;
 
   .ant-collapse {
     border-radius: 10px;
@@ -235,4 +236,67 @@ export const Loader = styled(Spin)`
   justify-content: center;
   align-items: center;
   min-height: 300px;
+`;
+
+export const CategoryFilterContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+`;
+
+export const CategoryFilterPill = styled.button<{ active: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid ${(props) => (props.active ? "#0284c7" : "#cbd5e1")};
+  background: ${(props) => (props.active ? "#0284c7" : "#ffffff")};
+  color: ${(props) => (props.active ? "#ffffff" : "#475569")};
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #0284c7;
+    color: ${(props) => (props.active ? "#ffffff" : "#0284c7")};
+    background: ${(props) => (props.active ? "#0369a1" : "#f0f9ff")};
+  }
+
+  span.pill-count {
+    background: ${(props) => (props.active ? "rgba(255, 255, 255, 0.25)" : "#f1f5f9")};
+    color: ${(props) => (props.active ? "#ffffff" : "#64748b")};
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 10px;
+  }
+`;
+
+export const FloatingScrollTopButton = styled.button`
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background-color: #0284c7;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9999;
+  font-size: 18px;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background-color: #0369a1;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(2, 132, 199, 0.55);
+  }
 `;

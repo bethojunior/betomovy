@@ -90,9 +90,11 @@ export const HomeScreenSimulator = ({
             modulesActive
               .filter((data) => data.isActive === 1)
               .map((value) => {
+                const name = value.name || (value as any).moduleName || `Módulo #${value.id}`;
                 return (
                   <CardModule
-                    nameModule={value.name}
+                    key={value.id}
+                    nameModule={name}
                     primaryColor={
                       colorPrimary ? colorPrimary : constants.colors.primary
                     }

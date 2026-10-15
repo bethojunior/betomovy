@@ -4,8 +4,22 @@ import { Image } from "antd";
 export const Container = styled.div`
   display: flex;
   gap: 2rem;
-  overflow: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 90px);
+  padding: 24px;
   background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  ::-webkit-scrollbar {
+    width: 7px !important;
+    height: 10px;
+    display: block !important;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d3d3d3 !important;
+    border-radius: 5px !important;
+  }
 
   @media (max-width: 900px) {
     flex-direction: column;

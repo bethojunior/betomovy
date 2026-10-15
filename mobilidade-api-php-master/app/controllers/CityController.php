@@ -534,7 +534,264 @@ class CityController extends ApiController
 
     public function actionConfig()
     {
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        $cityId = (int)($_GET['id'] ?? ($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0)));
+
+        if ($method === 'PUT' || $method === 'POST') {
+            $this->actionUpdateCityConfig($cityId);
+            return;
+        }
+
+        if ($cityId > 0 && !isset($_GET['lat']) && !isset($_GET['lng'])) {
+            $this->actionGetCityConfigView($cityId);
+            return;
+        }
+
         $this->actionGetConfig();
+    }
+
+    public function actionGetCityConfigView($cityId = null)
+    {
+        try {
+            $cityId = (int)($cityId ?: ($_GET['id'] ?? ($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0))));
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            if ($cityId <= 0) {
+                $stmtFirst = $pdo->query("SELECT id FROM city WHERE active = 1 ORDER BY id ASC LIMIT 1");
+                $first = $stmtFirst ? $stmtFirst->fetch(\PDO::FETCH_ASSOC) : null;
+                $cityId = $first ? (int)$first['id'] : 0;
+            }
+
+            if ($cityId <= 0) {
+                echo $this->returnSuccess("Nenhuma cidade informada", []);
+                return;
+            }
+
+            // Garante que exista registro na tabela cityConfig para esta cidade
+            $stmtCheck = $pdo->prepare("SELECT id FROM cityConfig WHERE cityId = :cityId LIMIT 1");
+            $stmtCheck->execute([':cityId' => $cityId]);
+            if (!$stmtCheck->fetch()) {
+                $stmtTpl = $pdo->query("SELECT * FROM cityConfig ORDER BY id DESC LIMIT 1");
+                $tpl = $stmtTpl ? $stmtTpl->fetch(\PDO::FETCH_ASSOC) : null;
+                if ($tpl) {
+                    unset($tpl['id']);
+                    $tpl['cityId'] = $cityId;
+                    $cols = array_keys($tpl);
+                    $colNames = implode('`, `', $cols);
+                    $placeholders = ':' . implode(', :', $cols);
+                    $stmtIns = $pdo->prepare("INSERT INTO cityConfig (`{$colNames}`) VALUES ({$placeholders})");
+                    $stmtIns->execute($tpl);
+                }
+            }
+
+            $rows = [];
+            try {
+                $stmtView = $pdo->prepare("
+                    SELECT 
+                        `attribute`,
+                        `value`,
+                        `description`,
+                        `inputType`,
+                        `cityId`
+                    FROM city_config_view
+                    WHERE cityId = :cityId
+                ");
+                $stmtView->execute([':cityId' => $cityId]);
+                $rows = $stmtView->fetchAll(\PDO::FETCH_ASSOC);
+            } catch (\Throwable $tv) {
+                $rows = [];
+            }
+
+            if (empty($rows)) {
+                $rows = $this->buildCityConfigRowsFromTable($pdo, $cityId);
+            } else {
+                // Decode enabledDriverFields if it is json
+                foreach ($rows as &$r) {
+                    if ($r['attribute'] === 'enabledDriverFields' && !empty($r['value'])) {
+                        $dec = json_decode($r['value'], true);
+                        if (is_array($dec)) {
+                            $r['value'] = $dec;
+                        }
+                    }
+                }
+            }
+
+            echo $this->returnSuccess("Configurações da cidade encontradas", $rows);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, "Erro ao buscar configurações da cidade");
+        }
+    }
+
+    public function actionUpdateCityConfig($cityId = null)
+    {
+        try {
+            $cityId = (int)($cityId ?: ($_GET['id'] ?? ($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0))));
+            if ($cityId <= 0) {
+                throw new Exception("ID da cidade não informado");
+            }
+
+            $rawInput = file_get_contents('php://input');
+            $payload = json_decode($rawInput, true);
+            if (!is_array($payload)) {
+                $payload = $_POST;
+            }
+
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            $globalKeys = [
+                'whatsapp_zafira_validated_driver_message',
+                'whatsapp_zafira_validated_client_message',
+            ];
+
+            $stmtCols = $pdo->query("SHOW COLUMNS FROM cityConfig");
+            $validCols = $stmtCols ? $stmtCols->fetchAll(\PDO::FETCH_COLUMN) : [];
+
+            // Garante que cityConfig existe
+            $stmtCheck = $pdo->prepare("SELECT id FROM cityConfig WHERE cityId = :cityId LIMIT 1");
+            $stmtCheck->execute([':cityId' => $cityId]);
+            if (!$stmtCheck->fetch()) {
+                $stmtTpl = $pdo->query("SELECT * FROM cityConfig ORDER BY id DESC LIMIT 1");
+                $tpl = $stmtTpl ? $stmtTpl->fetch(\PDO::FETCH_ASSOC) : null;
+                if ($tpl) {
+                    unset($tpl['id']);
+                    $tpl['cityId'] = $cityId;
+                    $cols = array_keys($tpl);
+                    $colNames = implode('`, `', $cols);
+                    $placeholders = ':' . implode(', :', $cols);
+                    $stmtIns = $pdo->prepare("INSERT INTO cityConfig (`{$colNames}`) VALUES ({$placeholders})");
+                    $stmtIns->execute($tpl);
+                }
+            }
+
+            foreach ($payload as $key => $val) {
+                if (in_array($key, $globalKeys, true)) {
+                    $stmtGlobal = $pdo->prepare("UPDATE config SET `value` = :val WHERE `key` = :k");
+                    $stmtGlobal->execute([':val' => (string)$val, ':k' => $key]);
+                    continue;
+                }
+
+                if (in_array($key, $validCols, true)) {
+                    if (is_array($val) || is_object($val)) {
+                        $val = json_encode($val);
+                    }
+                    $stmtUpdate = $pdo->prepare("UPDATE cityConfig SET `{$key}` = :val WHERE cityId = :cityId");
+                    $stmtUpdate->execute([':val' => $val, ':cityId' => $cityId]);
+                }
+            }
+
+            $this->actionGetCityConfigView($cityId);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, "Erro ao atualizar configuração da cidade");
+        }
+    }
+
+    private function buildCityConfigRowsFromTable(\PDO $pdo, int $cityId): array
+    {
+        $stmt = $pdo->prepare("SELECT * FROM cityConfig WHERE cityId = :cityId LIMIT 1");
+        $stmt->execute([':cityId' => $cityId]);
+        $cfg = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$cfg) {
+            return [];
+        }
+
+        $definitions = [
+            'kmRemainingToPutDriverPreAvailable' => ['Distância que falta para colocar o motorista que está em viagem com status de pré-disponível (Em KM)', 'number'],
+            'quantityTripWayPoints' => ['Quantidade de paradas que é permitido para aquela cidade', 'number'],
+            'cancellationCustomerFeeValue' => ['Se valor for maior que 0, a cidade terá taxa de cancelamento', 'number'],
+            'waitingTimeCustomerCancellationFee' => ['Tempo em segundos do tempo que o motorista poderá cancelar a corrida sem penalidades e gerando taxa de cancelamento para o cliente', 'number'],
+            'routePercentageCancellationFee' => ['Porcentagem de deslocamento do motorista para inserir taxa de cancelamento ao cliente', 'number'],
+            'daysToBillCancellationFee' => ['Caso a corrida for pagamento eletrônico, esses serão os dias postergados para efetuar o repasse da taxa para o motorista', 'number'],
+            'securityContactNumber' => ['Número de contato de segurança para o botão de panico', 'tel'],
+            'supportContactNumber' => ['Número de contato de suporte', 'tel'],
+            'supportEmail' => ['Email de suporte', 'email'],
+            'urlFacebook' => ['URL perfil do facebook da cidade', 'link'],
+            'urlInstagram' => ['URL do perfil do instagram da cidade', 'link'],
+            'enableTripSharing' => ['Habilita compartilhamento de viagem', 'boolean'],
+            'enableTripSuggestion' => ['Habilita sugestões de viagens caso o cliente não seja atendido', 'boolean'],
+            'enableTripRecalculation' => ['Habilita recálculo de rotas no final da viagem', 'boolean'],
+            'enableDriverDataSheet' => ['Habilita a ficha técnica do motorista na cidade', 'boolean'],
+            'enableChoicePriceTripRecalculation' => ['Habilita escolha de preço pelo motorista ao final de uma viagem recalculada', 'boolean'],
+            'showPriceWhileTrip' => ['Exibir preço ao motorista durante a viagem', 'boolean'],
+            'showUserRating' => ['Exibe a avaliação entre cliente e motorista ao final da viagem', 'boolean'],
+            'enableCallInChat' => ['Habilita ligação durante um chat de viagem', 'boolean'],
+            'enableTripScheduled' => ['Habilita viagem agendada', 'boolean'],
+            'enableKnobTrip' => ['Habilita chamada de maçaneta (App Cliente e Motorista)', 'boolean'],
+            'enableTripTurbo' => ['Habilita viagem Turbo', 'boolean'],
+            'enableSearchDriver' => ['Se ativo, exibe a opção de buscar motorista (botão chamar); quando desativado, exibe somente botão de agendamento.', 'boolean'],
+            'showCategoriesOnHome' => ['Exibir atalhos de categorias de chamado na tela inicial do cliente', 'boolean'],
+            'quantityDriversCloseOnCall' => ['Quantidade de motoristas próximos a ser chamado no chamado individual', 'number'],
+            'kmForCalculatePrice' => ['Distância máxima para calcular preço', 'number'],
+            'enabledDriverFields' => ['Campos que serão exibidos no app do motorista', 'json'],
+            'timezone' => ['Timezone da cidade', 'text'],
+            'typeMoney' => ['Moeda utilizada na cidade', 'text'],
+            'enableRouteDrawingInTicketScreen' => ['Habilitar desenho de rota na tela de chamado', 'boolean'],
+            'enableDepartureAddressConfirmation' => ['Habilitar confirmação de endereço de partida', 'boolean'],
+            'showFormOfPaymentToDriverDuringTrip' => ['Mostrar forma de pagamento ao motorista durante a viagem', 'boolean'],
+            'showCancellationFeeForCustomer' => ['Informar taxa de cancelamento em aberto para o cliente na tela de chamado', 'boolean'],
+            'allowDriverGenerateCancellationFee' => ['Permitir que o motorista escolha gerar taxa de cancelamento caso cancele a viagem', 'boolean'],
+            'recalculationFromKm' => ['Realizar recálculo na viagem a partir de (km)', 'number'],
+            'showNetValueForDriverOnCall' => ['Mostrar valor líquido para motorista no chamado', 'boolean'],
+            'addTripNote' => ['Adicionar descrição da viagem antes do chamado', 'boolean'],
+            'enableValidationDocumentInTrip' => ['Habilitar fazer verificação de documento', 'boolean'],
+            'marginForRecalculation' => ['Margem para o recálculo em km', 'number'],
+            'showDynamicAreaInMap' => ['Mostrar áreas com dinâmicas no mapa do motorista', 'boolean'],
+            'showRiskAreaInCall' => ['Mostrar a área de risco no chamado', 'boolean'],
+            'maximumAmountNegativeBalanceDriver' => ['Valor máximo de saldo negativo do motorista', 'number'],
+            'prepayPerPeriod' => ['Define o modo pré-pago: 0 - Desabilitado, 1 - Ativado por saldo, 2 - Ativado por período, 3 - Ambos.', 'text'],
+            'enableCustomOrderTripType' => ['Habilitar ordem personalizada dos tipos de viagem', 'boolean'],
+            'enableZafiraValidationMonitor' => ['Habilita validação de cadastro Zafira no Monitor nesta cidade', 'boolean'],
+            'enableZafiraValidationApp' => ['Habilita validação de cadastro Zafira no App nesta cidade', 'boolean'],
+            'requireCustomerDataKnobTrip' => ['Exige CPF, email e validação Zafira na maçaneta manual', 'boolean'],
+            'zafiraValidationPrice' => ['Valor cobrado por validação Zafira quando habilitada (padrão: R$ 0,99)', 'number'],
+        ];
+
+        $rows = [];
+        foreach ($definitions as $attr => $def) {
+            $val = $cfg[$attr] ?? null;
+            if ($def[1] === 'boolean') {
+                $val = ($val !== null && $val != '0') ? '1' : '0';
+            } elseif ($def[1] === 'json' && !empty($val)) {
+                $dec = json_decode($val, true);
+                if (is_array($dec)) {
+                    $val = $dec;
+                }
+            }
+
+            $rows[] = [
+                'attribute' => $attr,
+                'value' => $val !== null ? $val : '',
+                'description' => $def[0],
+                'inputType' => $def[1],
+                'cityId' => $cityId,
+            ];
+        }
+
+        // WhatsApp Zafira global templates
+        try {
+            $stmtWpp = $pdo->query("SELECT `key`, `value` FROM config WHERE `key` IN ('whatsapp_zafira_validated_driver_message', 'whatsapp_zafira_validated_client_message')");
+            $wppConfigs = $stmtWpp ? $stmtWpp->fetchAll(\PDO::FETCH_KEY_PAIR) : [];
+        } catch (\Throwable $tw) {
+            $wppConfigs = [];
+        }
+
+        $rows[] = [
+            'attribute' => 'whatsapp_zafira_validated_driver_message',
+            'value' => $wppConfigs['whatsapp_zafira_validated_driver_message'] ?? '',
+            'description' => 'Template WhatsApp enviado ao motorista após validação Zafira no monitor. Placeholders: {firstName}, {projectName}.',
+            'inputType' => 'textarea',
+            'cityId' => $cityId,
+        ];
+
+        $rows[] = [
+            'attribute' => 'whatsapp_zafira_validated_client_message',
+            'value' => $wppConfigs['whatsapp_zafira_validated_client_message'] ?? '',
+            'description' => 'Template WhatsApp enviado ao cliente após validação Zafira no monitor. Placeholders: {firstName}, {projectName}.',
+            'inputType' => 'textarea',
+            'cityId' => $cityId,
+        ];
+
+        return $rows;
     }
 
     public function actionTripTypes()

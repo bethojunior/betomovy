@@ -16,9 +16,15 @@ export const Container = styled(Layout)`
   position: absolute;
   overflow: hidden;
 
-  > aside,
-  > section {
+  > aside {
     overflow-y: auto;
+  }
+
+  > section {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .trigger {

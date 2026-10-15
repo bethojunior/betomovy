@@ -14,6 +14,7 @@ class AppActiveModuleDao extends BaseDao
         $sql = "
             SELECT
                 aam.id AS id,
+                am.name AS name,
                 am.name AS moduleName,
                 aam.logo AS logo,
                 aam.isActive AS isActive,

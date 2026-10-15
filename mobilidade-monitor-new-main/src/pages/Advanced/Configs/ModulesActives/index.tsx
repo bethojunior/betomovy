@@ -41,12 +41,19 @@ export const ModulesActives = () => {
       const responseModulesActives = await api.get("appModule");
 
       if (responseModulesActives.status) {
-        setModulesActives(responseModulesActives.data.response);
+        const raw = responseModulesActives.data?.response ?? responseModulesActives.data?.data ?? responseModulesActives.data ?? [];
+        const normalized: ModulesActivesProps[] = (Array.isArray(raw) ? raw : []).map((item: any) => ({
+          id: Number(item.id),
+          name: item.name || item.moduleName || `Módulo #${item.id}`,
+          isActive: Number(item.isActive ?? 0),
+          logo: item.logo || "",
+        }));
+        setModulesActives(normalized);
       }
     } catch (error) {
       const errorResponse = error as AxiosError;
       swal({
-        title: errorResponse.response?.data.message,
+        title: (errorResponse.response?.data as any)?.message || "Erro ao carregar módulos ativos",
         icon: "error",
       });
     } finally {
@@ -96,7 +103,7 @@ export const ModulesActives = () => {
           })
           .catch((error: AxiosError) => {
             swal({
-              title: error?.response?.data.message,
+              title: (error?.response?.data as any)?.message || "Erro ao atualizar status",
               icon: "error",
             });
           })
@@ -124,7 +131,13 @@ export const ModulesActives = () => {
       title: "Módulo",
       key: "module",
       render: (_, value) => {
-        return <span>{value.name}</span>;
+        const name = value.name || (value as any).moduleName || `Módulo #${value.id}`;
+        return (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{ fontWeight: 600, fontSize: "14px", color: "#1f2937" }}>{name}</span>
+            <span style={{ fontSize: "11px", color: "#8c8c8c" }}>ID: {value.id}</span>
+          </div>
+        );
       },
     },
     {

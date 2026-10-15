@@ -360,10 +360,12 @@ const Menu = ({ children, titlePage }: MenuProps) => {
           </div>
         </HeaderLayout>
         <Content
+          id="main-scroll-content"
           style={{
-            height: "100%",
+            height: "calc(100vh - 64px)",
             padding: "1vw",
-            overflow: "auto",
+            overflowY: "auto",
+            overflowX: "hidden",
           }}
         >
           {children}
