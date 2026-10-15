@@ -40,16 +40,18 @@ export const ManageToll = () => {
   const getTolls = async () => {
     try {
       setLoadingTable(true);
-      const responseTolls = await api.get(`toll${showAll ? "" : `/${cityId}`}`);
+      const url = showAll || !cityId ? "toll" : `toll/${cityId}`;
+      const responseTolls = await api.get(url);
 
-      if (responseTolls.status) {
-        setTolls(responseTolls.data.response);
+      if (responseTolls?.data) {
+        const raw = responseTolls.data?.response ?? responseTolls.data?.data;
+        setTolls(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message ?? "Erro ao listar pedágios",
         icon: "error",
       });
       console.error(error);
@@ -176,6 +178,7 @@ export const ManageToll = () => {
       </ContentHeaderButton>
       <ContentTable>
         <Table
+          rowKey="id"
           columns={columns}
           dataSource={tolls}
           pagination={false}

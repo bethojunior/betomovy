@@ -29,8 +29,8 @@ export const DeliveryRates: React.FC = () => {
     setLoading(true);
     try {
       const response = await api.get('deliveryRate');
-      if (response.data.status) {
-        setRates(response.data.response || []);
+      if (response?.data?.status) {
+        setRates(Array.isArray(response.data.response) ? response.data.response : []);
       }
     } catch (error) {
       message.error('Erro ao carregar taxas');
@@ -53,10 +53,10 @@ export const DeliveryRates: React.FC = () => {
     try {
       const data = {
         range: values.range,
-        tax: parseFloat(values.tax.replace(',', '.')),
+        tax: parseFloat(String(values.tax ?? '0').replace(',', '.')),
         time: values.time,
         cityId,
-        deliveryServiceFee: parseFloat(values.deliveryServiceFee.replace(',', '.')),
+        deliveryServiceFee: parseFloat(String(values.deliveryServiceFee ?? '0').replace(',', '.')),
         deliveryServiceFeeType: values.deliveryServiceFeeType
       };
 
@@ -71,7 +71,7 @@ export const DeliveryRates: React.FC = () => {
   };
 
   const formatMoney = (value: number) => {
-    return value?.toFixed(2).replace('.', ',') || '0,00';
+    return Number(value ?? 0).toFixed(2).replace('.', ',');
   };
 
   const getTypeLabel = (type: string) => {

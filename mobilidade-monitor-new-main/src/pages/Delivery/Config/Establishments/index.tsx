@@ -43,9 +43,13 @@ const Establishments = () => {
       const { data } = result;
       setTableLoading(false);
       if (data?.status) {
-        setListEstablishments(data.response);
-      }
-      if (data.response.length === 0) {
+        const list = Array.isArray(data.response) ? data.response : [];
+        setListEstablishments(list);
+        if (list.length === 0) {
+          setLoadingText("Nenhum item encontrado");
+        }
+      } else {
+        setListEstablishments([]);
         setLoadingText("Nenhum item encontrado");
       }
     } catch (error) {
@@ -132,7 +136,7 @@ const Establishments = () => {
           setEditValues(undefined);
         }}
       >
-        Adcionar um tipo de categoria
+        Adicionar um tipo de categoria
       </Button>
       <EstablishmentsTable
         getAll={getAll}

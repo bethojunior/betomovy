@@ -23,6 +23,7 @@ const ConfigCard = ({ item, sendAlert, setLoading }: CardProps) => {
       setLoading(false);
       const { data } = result;
       if (data.status) {
+        setButtonDisable(true);
         return sendAlert("Configuração alterada com sucesso", "success");
       }
       sendAlert("Erro ao alterar configuração", "warning");
@@ -49,13 +50,25 @@ const ConfigCard = ({ item, sendAlert, setLoading }: CardProps) => {
           ></InputConf>
         );
       case "boolean":
-        return <Switch defaultChecked={Boolean(item.value)}></Switch>;
+        return (
+          <Switch
+            checked={inputValue === "1" || inputValue === "true"}
+            onChange={(checked) => {
+              setInputValue(checked ? "1" : "0");
+              setButtonDisable(false);
+            }}
+          />
+        );
       default:
         return (
           <InputConf
-            defaultValue={item.value}
+            value={inputValue}
             width="70%"
             type="text"
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setButtonDisable(false);
+            }}
           ></InputConf>
         );
     }

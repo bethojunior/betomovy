@@ -149,10 +149,10 @@ const RegisterEstablishments = () => {
       const { data } = result;
       if (data.status) {
         setOpen(false);
-        sendAlert("Estabalecimento editado com sucesso", "success");
+        sendAlert("Estabelecimento editado com sucesso", "success");
         return getAll();
       }
-      sendAlert("Erro ao tentar editar o stabalecimento", "warning");
+      sendAlert("Erro ao tentar editar o estabelecimento", "warning");
     } catch (error) {
       const axiosError = error as AxiosError;
       console.error(axiosError.request);
@@ -230,7 +230,7 @@ const RegisterEstablishments = () => {
       const result = await api.get("establishmentCollectionManagement");
       const { data } = result;
       if (data?.status) {
-        setListPerfil(data.response);
+        setListPerfil(Array.isArray(data.response) ? data.response : []);
       }
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -252,9 +252,9 @@ const RegisterEstablishments = () => {
       setLoading(false);
       const { data } = result;
 
-      if (data.status) {
+      if (data?.status) {
         setCompanyId(companyId);
-        setListLocals(data.response);
+        setListLocals(Array.isArray(data.response) ? data.response : []);
         setOpenLocalsModal(true);
       }
     } catch (error) {

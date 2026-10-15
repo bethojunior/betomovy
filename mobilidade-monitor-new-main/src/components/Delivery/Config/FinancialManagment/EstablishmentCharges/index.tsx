@@ -60,7 +60,7 @@ export const EstablishmentsCharges = () => {
     } catch (error) {
       const responseError = error as AxiosError;
       swal({
-        title: responseError.response?.headers.message,
+        title: responseError.response?.data?.message ?? "Erro ao carregar cobranças",
         icon: "error",
       });
     } finally {
@@ -89,7 +89,7 @@ export const EstablishmentsCharges = () => {
           })
           .catch((error: AxiosError) => {
             swal({
-              title: error.response?.headers.message,
+              title: error.response?.data?.message ?? "Erro ao deletar cobrança",
               icon: "error",
             });
           })

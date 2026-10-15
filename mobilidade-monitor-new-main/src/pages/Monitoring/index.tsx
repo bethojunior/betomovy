@@ -144,15 +144,17 @@ const Monitoring: FC = () => {
   const [driversUpdateKey, setDriversUpdateKey] = useState(0);
   const history = useHistory();
   const keysApp = Session.getLocal('keysApp');
-  const realTimeSocket = isRealtimeSocketEnabled()
-  const activeTripsPollingIntervalSeconds = Number(
-    keysApp.find((key: any) => key.type === 'GESTOR')
-      ?.config?.find((config: any) => config.key === 'interval-to-get-trips')
-      ?.value
-  )
+  const realTimeSocket = isRealtimeSocketEnabled();
+  const gestorKey = Array.isArray(keysApp)
+    ? keysApp.find((key: any) => key.type === 'GESTOR')
+    : undefined;
+  const intervalConfig = Array.isArray(gestorKey?.config)
+    ? gestorKey.config.find((config: any) => config.key === 'interval-to-get-trips')
+    : undefined;
+  const activeTripsPollingIntervalSeconds = Number(intervalConfig?.value);
   const activeTripsPollingIntervalMs = activeTripsPollingIntervalSeconds > 0
     ? activeTripsPollingIntervalSeconds * 1000
-    : DEFAULT_ACTIVE_TRIPS_POLLING_INTERVAL_MS
+    : DEFAULT_ACTIVE_TRIPS_POLLING_INTERVAL_MS;
   const tripsRef = useRef<TripDto[]>([]);
   const selectedCityId = Session.getLocal("citySelected")?.cityId;
   const selectedCityPolygon = useMemo(() => {

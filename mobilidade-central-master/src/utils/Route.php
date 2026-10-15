@@ -13,12 +13,12 @@ class Route extends Controller
 
     public function get($url)
     {
+        $cleanUrl = parse_url($url, PHP_URL_PATH) ?: '/';
+        $cleanUrl = str_replace("-", "", $cleanUrl);
 
-        $url = str_replace("-","",$url);
+        $path = explode('/', $cleanUrl);
 
-        $path = explode('/', $url);
-
-        array_splice($path,0,1);
+        array_splice($path, 0, 1);
 
         $this->class = $this->getController($path);
 

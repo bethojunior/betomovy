@@ -212,7 +212,12 @@ const DetailsTrip: FC = () => {
 
     Promise.all([requestDetailsTrip, requestPointsTrip])
       .then((result) => {
-      const tripDetails: TripDetailsProps = result[0].data.response
+      const tripDetails: TripDetailsProps = result[0]?.data?.response
+      if (!tripDetails) {
+        setLoadingTripDetails(false)
+        handleMessageAlerts('Detalhes da corrida não encontrados', 'warning')
+        return
+      }
       const driverCalledId = tripDetails.driverId
       const drivers = tripDetails.driver_called
       const hourTripStarted = tripDetails.date

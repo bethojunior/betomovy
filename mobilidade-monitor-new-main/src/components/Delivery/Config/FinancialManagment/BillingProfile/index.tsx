@@ -32,13 +32,14 @@ export const BillingProfile = () => {
         "establishmentCollectionManagement"
       );
 
-      if (responseEstabilishments.status) {
-        setEstablishmentsCollections(responseEstabilishments.data.response);
+      if (responseEstabilishments?.data) {
+        const raw = responseEstabilishments.data?.response ?? responseEstabilishments.data?.data;
+        setEstablishmentsCollections(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
       const responseError = error as AxiosError;
       swal({
-        title: responseError.response?.data.message,
+        title: responseError.response?.data?.message ?? "Erro ao buscar estabelecimentos",
         icon: "error",
       });
     } finally {
@@ -51,13 +52,13 @@ export const BillingProfile = () => {
       setLoadingDayBilling(true);
       const responseBillingDate = await api.get("config/billing_date");
 
-      if (responseBillingDate.status) {
-        setBillingDate(responseBillingDate.data.response);
+      if (responseBillingDate?.data) {
+        setBillingDate(responseBillingDate.data?.response ?? "");
       }
     } catch (error) {
       const responseError = error as AxiosError;
       swal({
-        title: responseError.response?.data.message,
+        title: responseError.response?.data?.message ?? "Erro ao buscar dia de cobrança",
         icon: "error",
       });
     } finally {
@@ -86,7 +87,7 @@ export const BillingProfile = () => {
           })
           .catch((error: AxiosError) => {
             swal({
-              title: error.response?.data.message,
+              title: error.response?.data?.message ?? "Erro ao deletar cobrança",
               icon: "error",
             });
           })
@@ -114,7 +115,7 @@ export const BillingProfile = () => {
     } catch (error) {
       const responseError = error as AxiosError;
       swal({
-        title: responseError.response?.data.message,
+        title: responseError.response?.data?.message ?? "Erro ao atualizar dia de cobrança",
         icon: "error",
       });
     } finally {
@@ -141,7 +142,7 @@ export const BillingProfile = () => {
       render: (_, data) => {
         return (
           <span>
-            {data.fixedValue.toLocaleString("pt-br", {
+            {Number(data.fixedValue ?? 0).toLocaleString("pt-br", {
               style: "currency",
               currency: "BRL",
             })}
@@ -156,13 +157,13 @@ export const BillingProfile = () => {
       render: (_, data) => {
         return (
           <span>
-            {" "}
-            {data.orderValue
+            {Number(data.orderValue ?? 0)
               .toLocaleString("pt-br", {
                 style: "currency",
                 currency: "BRL",
               })
-              .replace("R$", "")}
+              .replace("R$", "")
+              .trim()}
           </span>
         );
       },
@@ -174,12 +175,13 @@ export const BillingProfile = () => {
       render: (_, data) => {
         return (
           <span>
-            {data.orderPercentage
+            {Number(data.orderPercentage ?? 0)
               .toLocaleString("pt-br", {
                 style: "currency",
                 currency: "BRL",
               })
-              .replace("R$", "")}
+              .replace("R$", "")
+              .trim()}
           </span>
         );
       },
@@ -189,7 +191,7 @@ export const BillingProfile = () => {
       key: "created-at",
       width: 200,
       render: (_, data) => {
-        return <span>{new Date(data.created_at).toLocaleString()}</span>;
+        return <span>{data.created_at ? new Date(data.created_at).toLocaleString() : "-"}</span>;
       },
     },
     {

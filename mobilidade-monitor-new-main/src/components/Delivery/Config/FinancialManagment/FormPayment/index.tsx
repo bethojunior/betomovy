@@ -34,13 +34,14 @@ export const FormPayment = () => {
 
       const responseFormsPayments = await api.get("deliveryPaymentForm");
 
-      if (responseFormsPayments.status) {
-        setFormsPayments(responseFormsPayments.data.response);
+      if (responseFormsPayments?.data) {
+        const raw = responseFormsPayments.data?.response ?? responseFormsPayments.data?.data;
+        setFormsPayments(Array.isArray(raw) ? raw : []);
       }
     } catch (error) {
       const responseError = error as AxiosError;
       swal({
-        title: responseError.response?.data.message,
+        title: responseError.response?.data?.message ?? "Erro ao buscar formas de pagamento",
       });
     } finally {
       setLoading(false);
@@ -65,7 +66,7 @@ export const FormPayment = () => {
           .then((response) => {
             if (response.status) {
               swal({
-                title: "Forma de pagamento deletado com sucesso",
+                title: "Forma de pagamento deletada com sucesso",
                 icon: "success",
               });
               getFormsPayments();
@@ -74,7 +75,7 @@ export const FormPayment = () => {
           .catch((error: AxiosError) => {
             console.error(error);
             swal({
-              title: error.response?.data.message,
+              title: error.response?.data?.message ?? "Erro ao deletar forma de pagamento",
               icon: "error",
             });
           })
@@ -97,7 +98,7 @@ export const FormPayment = () => {
       key: "type",
       width: 300,
       render: (_, data) => {
-        return <span>{data.payment_form_type.description}</span>;
+        return <span>{data.payment_form_type?.description || "-"}</span>;
       },
     },
     {

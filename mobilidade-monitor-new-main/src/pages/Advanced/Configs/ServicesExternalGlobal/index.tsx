@@ -34,19 +34,20 @@ export const ServicesExternalGlobal = () => {
       const responseExternalServices = await api.get(
         `externalServiceType/fully`
       );
-      if (responseExternalServices.status) {
-        const externalServicesFormated =
-          responseExternalServices.data.response.map(
-            (value: FullyTypesServicesProps) => {
-              return {
-                ...value,
-                key: formatStringToKeyObject(value.name),
-              };
-            }
-          );
+      if (responseExternalServices?.data) {
+        const raw = responseExternalServices.data?.response ?? responseExternalServices.data?.data;
+        const list = Array.isArray(raw) ? raw : [];
+        const externalServicesFormated = list.map(
+          (value: FullyTypesServicesProps) => {
+            return {
+              ...value,
+              key: formatStringToKeyObject(value.name),
+            };
+          }
+        );
         setExternalServices(externalServicesFormated);
         externalServicesFormated.forEach((service: FullyTypesServicesProps) => {
-          const activeService = service.external_services.find(
+          const activeService = (service.external_services || []).find(
             (s: ExternalServicesProps) =>
               s.active === 1 && s.name === selectedService?.name
           );
@@ -62,7 +63,7 @@ export const ServicesExternalGlobal = () => {
       const responseError = error as AxiosError;
       swal({
         title: "Error",
-        text: responseError.response?.data.message,
+        text: responseError.response?.data?.message ?? "Erro ao buscar serviços externos",
         icon: "error",
       });
       console.error(error);
@@ -128,7 +129,7 @@ export const ServicesExternalGlobal = () => {
         console.error(error);
         swal({
           title: "Error",
-          text: responseError.response?.data.response[0],
+          text: responseError.response?.data?.response?.[0] ?? responseError.response?.data?.message ?? "Erro ao alterar serviço",
           icon: "error",
         });
       } finally {
@@ -218,7 +219,7 @@ export const ServicesExternalGlobal = () => {
 
   // console.log(JSON.parse(selectedRadioValue));
 
-  if (loading) return <Loader spinning />;
+  if (loading && externalServices.length === 0) return <Loader spinning />;
 
   return (
     <Container>

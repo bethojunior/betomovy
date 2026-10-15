@@ -79,7 +79,8 @@ const ListTrip: FC = () => {
     api
       .get(url)
       .then((values) => {
-        changeCardPage(page, values.data.response.trips.data);
+        const tripsData = values.data?.response?.trips?.data ?? values.data?.response?.data ?? [];
+        changeCardPage(page, Array.isArray(tripsData) ? tripsData : []);
       })
       .catch((error) => {
         console.error(error);
@@ -133,11 +134,12 @@ const ListTrip: FC = () => {
           setFinancialMirror(financialResponse.data.response);
         }
 
-        if (tripsResponse.status) {
-          const { trips } = tripsResponse.data.response;
-          const hasMultiplePages = trips.last_page > 1;
+        if (tripsResponse?.status) {
+          const trips = tripsResponse.data?.response?.trips;
+          const tripsData = Array.isArray(trips?.data) ? trips.data : [];
+          const hasMultiplePages = (trips?.last_page ?? 0) > 1;
           
-          changeCardPage(1, trips.data);
+          changeCardPage(1, tripsData);
 
           if (hasMultiplePages) {
             setPagination(trips.current_page);
@@ -183,7 +185,7 @@ const ListTrip: FC = () => {
         `trip?page=1&driverId=${driverId}&date=${dateStart},${dateEnd}&withTotalValue=0`
       )
         .then((values) => {
-          if (!values.data.status) {
+          if (!values.data?.status) {
             setLoading(false);
             setMessageAlert(
               "Não foi possível carregar as viagens desse motorista, tente novamente"
@@ -191,10 +193,12 @@ const ListTrip: FC = () => {
             setTypeAlert("error");
             return setShowAlert(true);
           }
-          changeCardPage(page, values.data.response.trips.data);
-          if (values.data.response.trips.last_page !== 1) {
-            setPagination(values.data.response.trips.current_page);
-            setLastPage(values.data.response.trips.last_page);
+          const trips = values.data?.response?.trips;
+          const tripsData = Array.isArray(trips?.data) ? trips.data : [];
+          changeCardPage(page, tripsData);
+          if (trips?.last_page && trips.last_page !== 1) {
+            setPagination(trips.current_page);
+            setLastPage(trips.last_page);
           }
           setShowAdvancedFilter(false);
           return setLoading(false);

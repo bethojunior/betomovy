@@ -477,7 +477,7 @@ const LoggedRoutes: FC = () => {
                 <ConfigByCities />
               </Menu>
             </Route>
-            <Route path="/config/manage-toll">
+            <Route path={["/config/manage-toll", "/config/toll"]}>
               <Menu titlePage="Gerenciar Pedágio">
                 <ManageToll />
               </Menu>
@@ -897,17 +897,17 @@ const LoggedRoutes: FC = () => {
                 <AdditionalSettings />
               </Menu>
             </Route>
-            <Route path="/config/services-externals-globals">
+            <Route path={["/config/services-externals-globals", "/config/servicesExternal", "/config/services-external"]}>
               <Menu titlePage="Serviços Externos Globais">
                 <ServicesExternalGlobal />
               </Menu>
             </Route>
-            <Route path="/config/services-externals-by-city">
+            <Route path={["/config/services-externals-by-city", "/config/servicesExternalByCity"]}>
               <Menu titlePage="Serviços Externos Por Cidade">
                 <ServicesExternalByCity />
               </Menu>
             </Route>
-            <Route path="/config/services-externals-webhook">
+            <Route path={["/config/services-externals-webhook", "/config/servicesExternalWebhook"]}>
               <Menu titlePage="Serviços Externos Webhook">
                 <ServicesExternalsWebhook />
               </Menu>

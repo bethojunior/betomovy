@@ -30,13 +30,21 @@ const EstablishmentsTable = ({
       }).then((res) => {
         if (res) {
           setTableLoading(true);
-          api.delete(`typeDeliveryCategory/${id}`).then(({ data }) => {
-            if (data?.status) {
-              sendAlert("categoria excluida com sucesso", "success");
-              return getAll();
-            }
-            sendAlert("Erro ao tentar excluir essa categoria", "warning");
-          });
+          api.delete(`typeDeliveryCategory/${id}`)
+            .then(({ data }) => {
+              if (data?.status) {
+                sendAlert("Categoria excluída com sucesso", "success");
+                return getAll();
+              }
+              sendAlert("Erro ao tentar excluir essa categoria", "warning");
+            })
+            .catch((error) => {
+              console.error(error);
+              sendAlert("Erro ao tentar excluir essa categoria", "warning");
+            })
+            .finally(() => {
+              setTableLoading(false);
+            });
         }
       });
     } catch (error) {
@@ -99,7 +107,7 @@ const EstablishmentsTable = ({
     },
   ];
 
-  const tableData = listEstablishments.map((item) => {
+  const tableData = (Array.isArray(listEstablishments) ? listEstablishments : []).map((item) => {
     return {
       key: item.id,
       name: item.name,
@@ -112,9 +120,6 @@ const EstablishmentsTable = ({
     emptyText: loadingText,
   };
 
-  useEffect(() => {
-    getAll();
-  }, []);
   return (
     <Table
       dataSource={tableData}

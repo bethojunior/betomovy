@@ -57,7 +57,9 @@ class View extends Controller
 
     protected function addEvents($events)
     {
-        $event = explode("/", $_SERVER['REQUEST_URI']);
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+        $uri = rtrim($uri, '/');
+        $event = explode("/", $uri);
 
         array_splice($event, 0, 1);
 
@@ -66,7 +68,7 @@ class View extends Controller
             return false;
         }
 
-        $params = explode("/", $_SERVER['REQUEST_URI']);
+        $params = explode("/", $uri);
 
         array_splice($params, 0, 2);
 

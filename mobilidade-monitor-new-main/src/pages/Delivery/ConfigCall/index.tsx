@@ -42,7 +42,7 @@ const ConfigCall = () => {
     getAll();
   }, []);
 
-  if (loading) return <Loader spinning />;
+  if (loading && listConfig.length === 0) return <Loader spinning />;
 
   return (
     <>
