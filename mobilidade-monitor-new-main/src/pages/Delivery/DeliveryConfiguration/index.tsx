@@ -76,6 +76,8 @@ const DeliveryConfiguration: React.FC = () => {
         setMessageAlert('Informações enviadas com sucesso');
         setTypeAlert('success');
         setShowAlert(true);
+        setImageFile(null);
+        loadConfigs();
       }
     } catch (error) {
       setMessageAlert('Erro ao salvar configurações');

@@ -13,7 +13,10 @@ import {
   FaSms,
   FaRedo,
   FaAngleDoubleDown,
-  FaAngleDoubleUp
+  FaAngleDoubleUp,
+  FaWhatsapp,
+  FaVolumeUp,
+  FaCar
 } from "react-icons/fa";
 
 import { InputLink } from "../../../../components/Advanced/Config/KeysApp/InputLink";
@@ -42,45 +45,66 @@ import api from "../../../../services/api";
 import swal from "sweetalert";
 import { AxiosError } from "axios";
 import Utils from "../../../../utils/Utils";
+import { normalizeKeys, NormalizedCategory } from "./configNormalizer";
 
 const { Panel } = Collapse;
 
 const CATEGORY_MAP: Record<string, { label: string; icon: JSX.Element }> = {
-  GESTOR: {
-    label: "Painel & Gestão Administrativa",
-    icon: <FaCog />,
+  MAPS: {
+    label: "Mapas, Geocodificação & Rotas",
+    icon: <FaMapMarkedAlt />,
+  },
+  PAGAMENTOS: {
+    label: "Gateways & Meios de Pagamento",
+    icon: <FaCreditCard />,
+  },
+  PAGAMENTO: {
+    label: "Gateways & Meios de Pagamento",
+    icon: <FaCreditCard />,
+  },
+  FIREBASE: {
+    label: "Firebase & Notificações Push",
+    icon: <FaBell />,
+  },
+  WHATSAPP: {
+    label: "WhatsApp & Atendimento Integrado",
+    icon: <FaWhatsapp />,
   },
   SOCKET: {
-    label: "Servidor Socket & Tempo Real",
+    label: "Servidor Socket, Redis & Tempo Real",
     icon: <FaServer />,
   },
   DELIVERY: {
     label: "Módulo de Entregas & Delivery",
     icon: <FaMotorcycle />,
   },
-  MAPS: {
-    label: "Mapas, Geocodificação & Rotas",
-    icon: <FaMapMarkedAlt />,
-  },
   SMS: {
     label: "Envio de SMS & Autenticação",
     icon: <FaSms />,
   },
-  FIREBASE: {
-    label: "Firebase & Notificações Push",
-    icon: <FaBell />,
-  },
-  PAGAMENTO: {
-    label: "Gateways & Meios de Pagamento",
-    icon: <FaCreditCard />,
-  },
-  PAGAMENTOS: {
-    label: "Gateways & Meios de Pagamento",
-    icon: <FaCreditCard />,
-  },
   EMAIL: {
-    label: "Serviço de E-mail (SMTP)",
+    label: "Serviço de E-mail (SMTP & Notificações)",
     icon: <FaEnvelope />,
+  },
+  SONS: {
+    label: "Sons & Alertas do Aplicativo",
+    icon: <FaVolumeUp />,
+  },
+  VIAGENS: {
+    label: "Regras de Viagens & Despacho de Corridas",
+    icon: <FaCar />,
+  },
+  SISTEMA: {
+    label: "Aplicativos, Cadastros & Segurança",
+    icon: <FaCog />,
+  },
+  GESTOR: {
+    label: "Painel & Gestão Administrativa",
+    icon: <FaCog />,
+  },
+  GERAL: {
+    label: "Configurações Gerais do Sistema",
+    icon: <FaKey />,
   },
 };
 
@@ -106,7 +130,7 @@ const getCategoryMeta = (type: string | undefined | null) => {
 
 const KeysApp: FC = () => {
   const [loading, setLoading] = useState(false);
-  const [listKeys, setListKeys] = useState<KeysAppProps[]>([]);
+  const [listKeys, setListKeys] = useState<NormalizedCategory[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeKeys, setActiveKeys] = useState<string[]>([]);
 
@@ -117,13 +141,13 @@ const KeysApp: FC = () => {
 
       if (responseConfigs.status) {
         const raw = responseConfigs.data?.response;
-        const keys = Array.isArray(raw) ? raw : [];
+        const normalized = normalizeKeys(Array.isArray(raw) ? raw : []);
 
-        setListKeys(keys);
-        localStorage.setItem("keysApp", JSON.stringify(keys));
+        setListKeys(normalized);
+        localStorage.setItem("keysApp", JSON.stringify(normalized));
         
         // Open all categories by default on initial load
-        setActiveKeys(keys.map((k, index) => String(k.type || `cat-${index}`)));
+        setActiveKeys(normalized.map((k, index) => String(k.type || `cat-${index}`)));
       }
     } catch (error) {
       setListKeys([]);
@@ -176,7 +200,7 @@ const KeysApp: FC = () => {
         }
         return null;
       })
-      .filter((cat): cat is KeysAppProps => cat !== null);
+      .filter((cat): cat is NormalizedCategory => cat !== null);
   }, [listKeys, searchTerm]);
 
   // Total configurable items count

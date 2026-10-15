@@ -133,7 +133,7 @@ const DeliveryAccessories = () => {
         if (!imgResized) return;
 
         const formData = new FormData();
-        formData.append("picture", event?.icon?.file as any);
+        formData.append("picture", (imgResized ?? event?.icon?.file) as any);
         const resultLogo = api.post(
           `driverAttachmentType/${editValues?.id}/updatePicture`,
           formData

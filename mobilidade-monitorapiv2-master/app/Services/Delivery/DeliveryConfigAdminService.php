@@ -24,24 +24,24 @@ class DeliveryConfigAdminService
 
     public function insert($request) {
         $config = $this->findAll();
+        $firstConfig = $config instanceof \Illuminate\Support\Collection ? $config->first() : (isset($config[0]) ? $config[0] : null);
         $data = new DeliveryConfigAdmin();
 
-        if($request->image){
-
-            $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '',$request->image));
-            $imageName = 'delivery/'.rand(10,100).'.png';
+        if ($request->image) {
+            $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $request->image));
+            $imageName = 'delivery/' . time() . '_' . uniqid() . '.png';
 
             Storage::cloud()->put($imageName, $image);
             $image_url = Storage::cloud()->url($imageName);
 
             $data->image = $image_url;
         } else {
-            $data->image = $config[0]->image;
+            $data->image = $firstConfig ? $firstConfig->image : null;
         }
 
-            $data->linkAndroid = $request->linkAndroid ?? $config[0]->linkAndroid;
-            $data->linkIos = $request->linkIos ?? $config[0]->linkIos;
-            $data->cities = $request->cities ?? $config[0]->cities;
+        $data->linkAndroid = $request->linkAndroid ?? ($firstConfig ? $firstConfig->linkAndroid : null);
+        $data->linkIos = $request->linkIos ?? ($firstConfig ? $firstConfig->linkIos : null);
+        $data->cities = $request->cities ?? ($firstConfig ? $firstConfig->cities : null);
 
         return $this->repository->insert($data);
     }

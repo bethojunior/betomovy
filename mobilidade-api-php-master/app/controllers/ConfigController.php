@@ -136,7 +136,7 @@ class ConfigController extends ApiController
                 return;
             }
 
-            $stmt = $conn->query("SELECT `key`, value, description FROM config");
+            $stmt = $conn->query("SELECT idConfig, configTypeId, `key`, value, description, inputTypePro FROM config ORDER BY `key` ASC");
             $configs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             echo $this->returnSuccess("Configurações encontradas", $configs);
         } catch (\Throwable $e) {

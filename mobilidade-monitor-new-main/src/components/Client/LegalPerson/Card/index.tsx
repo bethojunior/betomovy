@@ -41,9 +41,9 @@ const CardLegalPerson: FC<LegalCardProps> = ({ data, menu, whatsAppMessageProps 
 						document={data.document}
 						phone={data.phone}
 						email={data.email}
-						status={data.company_register_status.name}
+						status={data.company_register_status?.name ?? "ATIVO"}
 						createdAt={data.created_at}
-						voucherBalance={Number(data.balance.tripBalance)}
+						voucherBalance={Number(data.balance?.tripBalance ?? 0)}
 						whatsAppMessage={whatsAppMessageProps}
 					/>
 					<Workers

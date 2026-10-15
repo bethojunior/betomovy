@@ -160,24 +160,37 @@ const LegalPerson: FC = () => {
   };
 
   const stateAndCityEdit = async (id: number) => {
-    setLoading(true);
-    api.get(`estate`).then((values) => {
-      setStateList(values.data.response);
-    });
-    const state = await api.get(`company/${id}`).then((values) => {
-      return values.data.response.stateId;
-    });
+    try {
+      setLoading(true);
+      const [estateRes, companyRes] = await Promise.all([
+        api.get("estate"),
+        api.get(`company/${id}`),
+      ]);
+      if (estateRes.data?.response) {
+        setStateList(estateRes.data.response);
+      }
+      const companyData = companyRes.data?.response;
+      const state = companyData?.stateId;
+      const city = companyData?.cityId;
 
-    await api.get(`city?estateId=${state}`).then((values) => {
-      setCityList(values.data.response);
-    });
-    const city = await api.get(`company/${id}`).then((values) => {
+      if (state) {
+        const cityRes = await api.get(`city?estateId=${state}`);
+        if (cityRes.data?.response) {
+          setCityList(cityRes.data.response);
+        }
+      }
+      setStateSelected(state);
+      setCitySelected(city);
       setShowModalEdition(true);
-      return values.data.response.cityId;
-    });
-    setLoading(false);
-    setStateSelected(state);
-    setCitySelected(city);
+    } catch (error) {
+      console.error(error);
+      swal({
+        title: "Erro ao buscar dados da empresa",
+        icon: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resisterInfos = async () => {
@@ -341,6 +354,7 @@ const LegalPerson: FC = () => {
             (listLegalPerson || []).map((data) => {
               return (
                 <CardLegalPerson
+                  key={data.id}
                   data={data}
                   menu={menu}
                   whatsAppMessageProps={whatsAppMessage}

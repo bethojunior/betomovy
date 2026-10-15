@@ -103,8 +103,8 @@ const EditionModal: FC<ModalProps> = ({
         }),
       })
         .then((values) => {
-          const requestSuccess = registerOrEdit ? 200 : 201;
-          if (values.status === requestSuccess) {
+          const isSuccess = values.status === 200 || values.status === 201 || Boolean(values.data?.status);
+          if (isSuccess) {
             setMessageAlert(
               registerOrEdit
                 ? "Pessoa jurídica editada com sucesso!"
@@ -213,9 +213,9 @@ const EditionModal: FC<ModalProps> = ({
             }
             resolve();
           })
-          .catch((error: AxiosError) => {
+          .catch((error: AxiosError<any>) => {
             setTypeAlert("error");
-            setMessageAlert(error.response?.data.resonse);
+            setMessageAlert(error.response?.data?.response?.message || error.response?.data?.message || "Erro ao adicionar usuário");
             console.error(error);
             reject(error);
           });
@@ -286,7 +286,7 @@ const EditionModal: FC<ModalProps> = ({
         cityId: String(data.cityId),
         document: data.document,
         email: data.email,
-        facebook: data.email,
+        facebook: data.facebook || "",
         fantasyName: data.fantasyName,
         id: null,
         instagram: data.instagram,
