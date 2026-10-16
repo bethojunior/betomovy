@@ -90,8 +90,9 @@ export default function Login() {
     driverSelected,
     generalSettings,
     authenticateLogin,
+    loading,
   } = useAuth();
-  const [loading, setLoading] = useState(false);
+
   const [modalForgotPassword, setModalForgotPassword] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [modalFacebook, setModalFacebook] = useState(false);
@@ -135,21 +136,15 @@ export default function Login() {
           return;
         }
 
-        setLoading(true);
-        try {
-          const { email, password } = form;
+        const { email, password } = form;
 
-          await authenticateLogin({
-            email,
-            password,
-            keyAppPartner: appPartnerSelected?.key ?? undefined,
-          });
-        } finally {
-          setLoading(false);
-        }
+        await authenticateLogin({
+          email,
+          password,
+          keyAppPartner: appPartnerSelected?.key ?? undefined,
+        });
       } catch (error) {
         console.error(error);
-        setLoading(false);
       }
     },
     [betaEnd, isBeta, authenticateLogin, translate, appPartnerSelected],
