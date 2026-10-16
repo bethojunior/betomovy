@@ -19,7 +19,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>6.6.0</string>
+    <string>8.3.1</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleURLTypes</key>
@@ -39,7 +39,7 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>80301</string>
     <key>GMSApiKey</key>
     <string>AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I</string>
     <key>LSMinimumSystemVersion</key>
