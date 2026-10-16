@@ -3,7 +3,7 @@ import { Container } from "./styles";
 import { IoIosEyeOff, IoMdEye } from "react-icons/io";
 import api from "../../../api/apiAxios";
 import { AxiosError } from "axios";
-import pathBackgroundImage from "../../../assets/img/Banner2_1366x768.png";
+import pathBackgroundImage from "../../../assets/img/Banner4_1366x768.png";
 import { getPathImageDefault, LogoMovyDefault } from "../../../config/configApp";
 
 import { schema } from "./schema_validations";

@@ -11,12 +11,14 @@ import IconGoogle from '../../assets/images/google.svg';
 import IconFacebook from '../../assets/images/facebook.svg';
 import IconApple from '../../assets/images/apple-logo.svg';
 import logo from '../../../../assets/logo.png';
+import loginBg from '../../../../assets/login-bg.png';
 import Preload from '../../components/Preload';
 import { translate } from '../../locales';
 import { SwalAlert } from '../../components/SwalAlert';
 import { AppsId } from '../../../context/ConfigGlobal/constants';
 import getAppColors from '../../../utils/GetAppColors';
 import {
+  BackgroundImage,
   ButtonRedefinePassword,
   ButtonRedefinePasswordText,
   BtnBackAppPartners,
@@ -32,9 +34,11 @@ import {
   ContentOrSocial,
   ContentSocial,
   ContentTermsOfUse,
+  LoginCard,
   Logo,
   OrSocialText,
   OrSocialTrace,
+  Overlay,
   TextBackAppPartners,
   TermsOfUseButton,
   TermsOfUseText,
@@ -338,182 +342,187 @@ export default function Login() {
             visible={showAlertBeta}
             setVisible={setShowAlertBeta}
           />
-          <Container>
-            <If condition={APP_PARTNER}>
-              <BtnBackAppPartners onPress={handleRedirectSelectAppPartner}>
-                <AntDesign
-                  name="arrow-left"
-                  size={24}
-                  color={theme.colors.primary}
-                />
-                <TextBackAppPartners>
-                  {translate('login.text_button_redirect_app_partner')}
-                </TextBackAppPartners>
-              </BtnBackAppPartners>
-            </If>
-
-            <If condition={verifyDelivery}>
-              <BackPage onPress={() => navigation.goBack()} text={''} />
-            </If>
-
-            <Content>
-              <ContentImage>
-                <Logo
-                  source={
-                    loginTheme.images.logo
-                      ? { uri: loginTheme.images.logo }
-                      : logo
-                  }
-                  resizeMode="contain"
-                />
-              </ContentImage>
-
-              <InputContainer
-                color={loginTheme.colors.primary}
-                label={translate('login.label_email')}
-              >
-                <Input
-                  name="email"
-                  color={loginTheme.colors.primary}
-                  control={control}
-                  error={errors.email && (errors.email.message as string)}
-                  placeholder={translate('login.text_placeholder_email')}
-                  keyboardType="email-address"
-                  icon
-                  autoComplete="email"
-                />
-              </InputContainer>
-
-              <InputContainer
-                color={loginTheme.colors.primary}
-                label={translate('login.label_password')}
-              >
-                <InputPassword
-                  name="password"
-                  color={loginTheme.colors.primary}
-                  control={control}
-                  placeholder={translate('login.text_placeholder_password')}
-                  error={errors.password && (errors.password.message as string)}
-                  icon
-                  onSubmitEditing={handleSubmit(handleAuth)}
-                />
-              </InputContainer>
-
-              <ContentActions>
-                <If condition={!verifyIsActive('enable_im_partner')}>
-                  <CheckBox
-                    colorText={loginTheme.colors.primary}
-                    title={translate('register.im_partner')}
-                    checked={driverSelected}
-                    onCheck={isDriver}
+          <BackgroundImage source={loginBg} resizeMode="cover">
+            <Overlay />
+            <Container>
+              <If condition={APP_PARTNER}>
+                <BtnBackAppPartners onPress={handleRedirectSelectAppPartner}>
+                  <AntDesign
+                    name="arrow-left"
+                    size={24}
+                    color="#ffffff"
                   />
+                  <TextBackAppPartners>
+                    {translate('login.text_button_redirect_app_partner')}
+                  </TextBackAppPartners>
+                </BtnBackAppPartners>
+              </If>
+
+              <If condition={verifyDelivery}>
+                <BackPage onPress={() => navigation.goBack()} text={''} />
+              </If>
+
+              <Content>
+                <ContentImage>
+                  <Logo
+                    source={
+                      loginTheme.images.logo
+                        ? { uri: loginTheme.images.logo }
+                        : logo
+                    }
+                    resizeMode="contain"
+                  />
+                </ContentImage>
+
+                <LoginCard>
+                  <InputContainer
+                    color={loginTheme.colors.primary}
+                    label={translate('login.label_email')}
+                  >
+                    <Input
+                      name="email"
+                      color={loginTheme.colors.primary}
+                      control={control}
+                      error={errors.email && (errors.email.message as string)}
+                      placeholder={translate('login.text_placeholder_email')}
+                      keyboardType="email-address"
+                      icon
+                      autoComplete="email"
+                    />
+                  </InputContainer>
+
+                  <InputContainer
+                    color={loginTheme.colors.primary}
+                    label={translate('login.label_password')}
+                  >
+                    <InputPassword
+                      name="password"
+                      color={loginTheme.colors.primary}
+                      control={control}
+                      placeholder={translate('login.text_placeholder_password')}
+                      error={errors.password && (errors.password.message as string)}
+                      icon
+                      onSubmitEditing={handleSubmit(handleAuth)}
+                    />
+                  </InputContainer>
+
+                  <ContentActions>
+                    <If condition={!verifyIsActive('enable_im_partner')}>
+                      <CheckBox
+                        colorText={loginTheme.colors.primary}
+                        title={translate('register.im_partner')}
+                        checked={driverSelected}
+                        onCheck={isDriver}
+                      />
+                    </If>
+
+                    <ButtonRedefinePassword
+                      activeOpacity={0.8}
+                      onPress={handleRecoveryPassword}
+                    >
+                      <ButtonRedefinePasswordText color={loginTheme.colors.primary}>
+                        {translate('recoveryPassword.title')}
+                      </ButtonRedefinePasswordText>
+                    </ButtonRedefinePassword>
+                  </ContentActions>
+
+                  <If condition={enabled && !driverSelected}>
+                    <ContentActions>
+                      <ContainerBiometry>
+                        <ContentActions>
+                          <TextEdit color={loginTheme.colors.primary}>
+                            {translate('myProfile.biometry')}
+                          </TextEdit>
+                          <Switch
+                            enabled={switchEnabled}
+                            value={switchEnabled}
+                            onValueChange={async check => {
+                              if (check) {
+                                await AsyncStorage.setItem(
+                                  'biometry_switch',
+                                  String(switchEnabled),
+                                );
+                              }
+
+                              setSwitchEnabled(!switchEnabled);
+                            }}
+                          />
+                        </ContentActions>
+                      </ContainerBiometry>
+                    </ContentActions>
+                  </If>
+
+                  <ContentButton>
+                    <Button
+                      colorText={loginTheme.colors.primaryText}
+                      color={loginTheme.colors.primary}
+                      title={translate('login.text_login')}
+                      onPress={handleSubmit(handleAuth)}
+                    />
+                  </ContentButton>
+                </LoginCard>
+
+                <ButtonRegister
+                  activeOpacity={0.7}
+                  onPress={() => handleSignUp()}
+                >
+                  <ButtonRegisterText>
+                    {translate('login.not_account')}
+                  </ButtonRegisterText>
+                  <ButtonRegisterTextGrif color="#ff2d75">
+                    {translate('login.text_register')}
+                  </ButtonRegisterTextGrif>
+                </ButtonRegister>
+
+                <If
+                  condition={
+                    verifyIsActive('enable_google_login') ||
+                    verifyIsActive('enable_facebook_login') ||
+                    verifyIsActive('enable_apple_login')
+                  }
+                >
+                  <ContentOrSocial>
+                    <OrSocialTrace />
+                    <OrSocialText>
+                      {''} {translate('login.init_ssesion_social')} {''}
+                    </OrSocialText>
+                    <OrSocialTrace />
+                  </ContentOrSocial>
+
+                  <ContentSocial>
+                    <If condition={verifyIsActive('enable_google_login')}>
+                      <Accessory onPress={() => handlePressButtonGoogle()}>
+                        <IconGoogle height={RFValue(31)} width={RFValue(31)} />
+                      </Accessory>
+                    </If>
+                    <If condition={verifyIsActive('enable_facebook_login')}>
+                      <Accessory onPress={() => handlePressButtonFacebook()}>
+                        <IconFacebook height={RFValue(31)} width={RFValue(31)} />
+                      </Accessory>
+                    </If>
+                    <If condition={verifyIsActive('enable_apple_login')}>
+                      <Accessory onPress={() => { }}>
+                        <IconApple height={RFValue(31)} width={RFValue(31)} />
+                      </Accessory>
+                    </If>
+                  </ContentSocial>
                 </If>
 
-                <ButtonRedefinePassword
-                  activeOpacity={0.8}
-                  onPress={handleRecoveryPassword}
-                >
-                  <ButtonRedefinePasswordText color={loginTheme.colors.primary}>
-                    {translate('recoveryPassword.title')}
-                  </ButtonRedefinePasswordText>
-                </ButtonRedefinePassword>
-              </ContentActions>
+                <ContentTermsOfUse>
+                  <TermsOfUseButton
+                    activeOpacity={0.7}
+                    onPress={() => setModalTerms(true)}
+                  >
+                    <TermsOfUseText>
+                      {translate('myProfile.text_terms_of_use')}
+                    </TermsOfUseText>
+                  </TermsOfUseButton>
+                </ContentTermsOfUse>
+              </Content>
 
-              <If condition={enabled && !driverSelected}>
-                <ContentActions>
-                  <ContainerBiometry>
-                    <ContentActions>
-                      <TextEdit color={loginTheme.colors.primary}>
-                        {translate('myProfile.biometry')}
-                      </TextEdit>
-                      <Switch
-                        enabled={switchEnabled}
-                        value={switchEnabled}
-                        onValueChange={async check => {
-                          if (check) {
-                            await AsyncStorage.setItem(
-                              'biometry_switch',
-                              String(switchEnabled),
-                            );
-                          }
-
-                          setSwitchEnabled(!switchEnabled);
-                        }}
-                      />
-                    </ContentActions>
-                  </ContainerBiometry>
-                </ContentActions>
-              </If>
-
-              <ContentButton>
-                <Button
-                  colorText={loginTheme.colors.primaryText}
-                  color={loginTheme.colors.primary}
-                  title={translate('login.text_login')}
-                  onPress={handleSubmit(handleAuth)}
-                />
-              </ContentButton>
-
-              <ButtonRegister
-                activeOpacity={0.5}
-                onPress={() => handleSignUp()}
-              >
-                <ButtonRegisterText>
-                  {translate('login.not_account')}
-                </ButtonRegisterText>
-                <ButtonRegisterTextGrif color={loginTheme.colors.primary}>
-                  {translate('login.text_register')}
-                </ButtonRegisterTextGrif>
-              </ButtonRegister>
-
-              <If
-                condition={
-                  verifyIsActive('enable_google_login') ||
-                  verifyIsActive('enable_facebook_login') ||
-                  verifyIsActive('enable_apple_login')
-                }
-              >
-                <ContentOrSocial>
-                  <OrSocialTrace />
-                  <OrSocialText>
-                    {''} {translate('login.init_ssesion_social')} {''}
-                  </OrSocialText>
-                  <OrSocialTrace />
-                </ContentOrSocial>
-
-                <ContentSocial>
-                  <If condition={verifyIsActive('enable_google_login')}>
-                    <Accessory onPress={() => handlePressButtonGoogle()}>
-                      <IconGoogle height={RFValue(31)} width={RFValue(31)} />
-                    </Accessory>
-                  </If>
-                  <If condition={verifyIsActive('enable_facebook_login')}>
-                    <Accessory onPress={() => handlePressButtonFacebook()}>
-                      <IconFacebook height={RFValue(31)} width={RFValue(31)} />
-                    </Accessory>
-                  </If>
-                  <If condition={verifyIsActive('enable_apple_login')}>
-                    <Accessory onPress={() => { }}>
-                      <IconApple height={RFValue(31)} width={RFValue(31)} />
-                    </Accessory>
-                  </If>
-                </ContentSocial>
-              </If>
-
-              <ContentTermsOfUse>
-                <TermsOfUseButton
-                  activeOpacity={0.7}
-                  onPress={() => setModalTerms(true)}
-                >
-                  <TermsOfUseText>
-                    {translate('myProfile.text_terms_of_use')}
-                  </TermsOfUseText>
-                </TermsOfUseButton>
-              </ContentTermsOfUse>
-            </Content>
-
-            <Preload visible={loading} />
-          </Container>
+              <Preload visible={loading} />
+            </Container>
+          </BackgroundImage>
 
           <TermsOfUseModal
             visible={modalTerms}
