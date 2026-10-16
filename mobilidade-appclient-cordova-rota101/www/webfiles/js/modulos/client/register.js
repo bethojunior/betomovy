@@ -154,7 +154,7 @@ viewController.setObserver("signup", function () {
         const user = {
             name: document.getElementById("name-user").value,
             nickname: "",
-            document: document.getElementById("cpf-user").value,
+            document: document.getElementById("cpf-user") ? document.getElementById("cpf-user").value : "",
             phone: document.getElementById("phone-user").value,
             email: document.getElementById("email-user").value,
             password: document.getElementById("password-user").value,
@@ -164,7 +164,7 @@ viewController.setObserver("signup", function () {
             location
         };
 
-        if (!document.getElementById("cpf-user").parentElement.classList.contains("active"))
+        if (!document.getElementById("cpf-user") || !document.getElementById("cpf-user").parentElement.classList.contains("active"))
             delete user.document;
 
         if (user.gender === "") delete user.gender;

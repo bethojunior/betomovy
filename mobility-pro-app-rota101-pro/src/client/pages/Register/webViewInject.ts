@@ -20,6 +20,45 @@ export const injectDynamic = (titleElement: string) => {
     }
     }, 200);
     interval
+
+  const removePassengerCpf = function() {
+    const isPassenger = !window.location.href.includes("motorista") && !window.location.href.includes("driver");
+    if (!isPassenger) return;
+
+    const selectors = [
+      'input[name="document"]',
+      'input[placeholder*="CPF"]',
+      'input[placeholder*="cpf"]',
+      'input[placeholder*="Cpf"]',
+      '#cpf-user',
+      '.container-compel-field[type="document"]',
+      '[data-field="document"]'
+    ];
+
+    selectors.forEach(function(sel) {
+      document.querySelectorAll(sel).forEach(function(el) {
+        const ph = (el.getAttribute('placeholder') || '').toLowerCase();
+        const nm = (el.getAttribute('name') || '').toLowerCase();
+        if (ph.includes('nasc') || ph.includes('data') || nm.includes('date') || nm.includes('birth')) {
+          return;
+        }
+        const container = el.closest('.cpf-container') || el.closest('.container-compel-field') || el.parentElement;
+        if (container && container !== document.body && container !== document.documentElement) {
+          const dateInput = container.querySelector('input[name="dateOfBirth"]') || container.querySelector('input[placeholder*="nasc"]');
+          if (!dateInput) {
+            container.style.display = 'none';
+            container.remove();
+            return;
+          }
+        }
+        el.style.display = 'none';
+        el.remove();
+      });
+    });
+  };
+
+  setInterval(removePassengerCpf, 200);
+  removePassengerCpf();
     
   true;
 
