@@ -1,9 +1,8 @@
 import {useEffect, useState} from 'react';
 import {translate} from '../../../../client/locales';
-import {CardTravel} from '../../components/CardTravel';
-import {PaginationSelect} from '../../components/PaginationSelect';
+import {TripListCard} from '../../components/TripListCard';
+import {TripListFooter} from '../../components/TripListFooter';
 import Preload from '../../components/Preload';
-import {TextEdit} from '../../components/TextEdit';
 import {useMyTravels} from '../../context/MyTravel';
 import {Container, ContainerCards, TextNone} from './styles';
 
@@ -16,21 +15,20 @@ export default function MyTrips() {
 
   const listTrips = async () => {
     setLoading(true);
-    const response = await getTrips(selectedValue, page, null, setDataPage);
+    await getTrips(selectedValue, page, null, setDataPage);
     setLoading(false);
   };
 
   useEffect(() => {
     listTrips();
   }, [selectedValue, page]);
+
   return (
     <Container>
       <Preload visible={loading} />
       <ContainerCards>
         {trips.length > 0 && !loading
-          ? trips.map((trip, index) => {
-              return <CardTravel key={index} trip={trip} />;
-            })
+          ? trips.map(trip => <TripListCard key={trip.tripReference} trip={trip} />)
           : trips.length === 0 &&
             !loading && (
               <TextNone>
@@ -39,7 +37,7 @@ export default function MyTrips() {
             )}
       </ContainerCards>
 
-      <PaginationSelect
+      <TripListFooter
         dataPage={dataPage}
         page={page}
         setPage={setPage}

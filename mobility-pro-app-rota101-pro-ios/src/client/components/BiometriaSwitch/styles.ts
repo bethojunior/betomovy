@@ -2,17 +2,24 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 
 export const ItemRow = styled.View`
+  min-height: ${RFValue(50)}px;
   width: 100%;
   flex-direction: row;
-  padding-top: ${RFValue(15)}px;
-  padding-bottom: ${RFValue(15)}px;
+  padding-top: ${({theme}) => theme.spacing.medium}px;
+  padding-bottom: ${({theme}) => theme.spacing.medium}px;
   align-items: center;
-  justify-content: space-between;
+  gap: ${({theme}) => theme.spacing.medium}px;
+  border-bottom-width: ${({theme}) => theme.borderWidth.small}px;
+  border-bottom-color: ${({theme}) => theme.colors.border_white_light};
+`;
+
+export const TextGroup = styled.View`
+  flex: 1;
 `;
 
 export const Item = styled.Text`
   font-size: ${({theme}) => theme.fontSizes.medium}px;
-  font-family: ${({theme}) => theme.fonts.regular};
+  font-family: ${({theme}) => theme.fonts.medium};
   color: ${({theme}) => theme.colors.secondary};
 `;
 

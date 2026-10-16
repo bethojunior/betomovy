@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import {RouteTraveledProvider} from '../../context/RouteTraveled';
 import {OnListenerLocationComponent} from '../../components/OnListenerLocationComponent';
 

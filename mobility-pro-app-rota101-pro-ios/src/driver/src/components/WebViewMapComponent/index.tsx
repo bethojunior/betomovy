@@ -1,18 +1,19 @@
-import {useState} from 'react';
 import {
   STATUS_ACCEPTED,
   STATUS_BOARDING,
   STATUS_IN_PROGRESS,
 } from '../../constants/trip';
 import {useTripProvider} from '../../context/Trip';
-import theme from '../../styles/theme';
-import {FloatButton} from '../FloatButton';
 import {If} from '../If';
 import {WebviewMapCoordinate} from '../WebviewMapCoordinate';
-import {FontAwesome} from '@expo/vector-icons';
 
 export const WebViewMapComponent = ({onVisibleMap, setOnVisibleMap}) => {
-  const {tripAccepted, trip} = useTripProvider()?.stateTrip;
+  const tripAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripAccepted,
+  );
+  const trip: any = useTripProvider((context: any) => context.stateTrip.trip);
+
+  if (!onVisibleMap) return null;
 
   const switchCaseSearchNative = (
     status,
@@ -23,13 +24,13 @@ export const WebViewMapComponent = ({onVisibleMap, setOnVisibleMap}) => {
   ) => {
     switch (status) {
       case STATUS_ACCEPTED:
-        return origin[dir];
+        return origin?.[dir];
       case STATUS_BOARDING:
-        return origin[dir];
+        return origin?.[dir];
       case STATUS_IN_PROGRESS:
         return waypoints && waypoints.length > 0
-          ? waypoints[0][dir]
-          : destination[dir];
+          ? waypoints[0]?.[dir]
+          : destination?.[dir];
     }
   };
 
@@ -44,7 +45,7 @@ export const WebViewMapComponent = ({onVisibleMap, setOnVisibleMap}) => {
           (onVisibleMap &&
             tripAccepted &&
             Object.keys(tripAccepted)?.length > 0) ||
-          (onVisibleMap && Object.keys(trip).length > 0)
+          (onVisibleMap && Object.keys(trip ?? {}).length > 0)
         }
       >
         <WebviewMapCoordinate

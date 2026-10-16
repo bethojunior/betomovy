@@ -1,12 +1,12 @@
-import {createContext, useContext, useEffect, useMemo, useState} from 'react';
-import {customToast} from '../../../utils/FlashMessage';
-import {translate} from '../../locales';
-import {modulesService} from './services';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { customToast } from '../../../utils/FlashMessage';
+import { translate } from '../../locales';
+import { modulesService } from './services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNetwork } from '../../../context/ConfigGlobal';
 
-interface ModuleArray extends Array<ModuleItem> {}
-interface ModuleItem {
+interface ModuleArray extends Array<ModuleItem> { }
+export interface ModuleItem {
   id: number;
   isActive: boolean;
   logo: string;
@@ -24,10 +24,10 @@ interface iModules {
 
 const ModulesContext = createContext<iModules>({} as iModules);
 
-export const ModulesProvider = ({children}: any) => {
+export const ModulesProvider = ({ children }: any) => {
   const [modulesActives, setModulesActives] = useState<any>([]);
   const [init, setInit] = useState('');
-  const {itsNetwork} = useNetwork();
+  const { itsNetwork } = useNetwork();
   const [loading, setLoading] = useState(true);
   const [verifyDelivery, setVerifyDelivery] = useState<boolean>(false);
 
@@ -53,7 +53,7 @@ export const ModulesProvider = ({children}: any) => {
 
   const getModules = async () => {
     try {
-      const {data} = await modulesService.get();
+      const { data } = await modulesService.get();
       if (!data.status) {
         return customToast(translate('contexts.error_module'), 'danger');
       }
@@ -72,34 +72,36 @@ export const ModulesProvider = ({children}: any) => {
         );
       }
 
+      const activeModules = data.data.filter((item: ModuleItem) => item.isActive);
+
       if (data.data.length === 1) {
-        return setInit(data.data[0].moduleName);
+        setInit(data.data[0].moduleName);
+        return setModulesActives(activeModules);
       }
       verifyModule('Delivery', data);
 
-      if (
-        data.data.some((item: ModuleItem) => item.moduleName === 'Mobilidade')
-      ) {
+      if (activeModules.some((item) => item.moduleName === 'Mobilidade')) {
         setInit('Mobilidade');
+      } else if (activeModules.some((item) => item.moduleName === 'Delivery')) {
+        setInit('Delivery');
       } else {
-        setInit('Home');
+        const firstActive = activeModules[0];
+        setInit(firstActive?.moduleName || 'Delivery');
       }
-      setLoading(false);
-      return setModulesActives(
-        data.data.filter((item: ModuleItem) => item.isActive),
-      );
+      return setModulesActives(activeModules);
     } catch (error) {
-      getModulesStorage().then((data: any) => {
-        if (data) {
-          setModulesActives(data.filter((item: ModuleItem) => item.isActive));
-          setInit(data[0]?.moduleName || 'Mobilidade');
-          setLoading(false);
-          return;
-        }
-        return setInit('Mobilidade');
-      });
+      const response: any = await getModulesStorage();
+      if (response) {
+        const activeModules = response.filter((item: ModuleItem) => item.isActive);
+        setModulesActives(activeModules);
+        const firstActiveModule = activeModules[0];
+        setInit(firstActiveModule?.moduleName || 'Delivery');
+        return;
+      }
 
-      return;
+      return setInit('Delivery');
+    } finally {
+      setLoading(false);
     }
   };
 

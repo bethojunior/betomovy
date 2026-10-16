@@ -1,4 +1,5 @@
-import React, {FC, useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {FC} from 'react';
 import StarIcon from '@expo/vector-icons/EvilIcons';
 import {useLocal} from '../../contexts/local';
 import {
@@ -11,6 +12,7 @@ import {
 import theme from '../../styles/theme';
 import {TextEdit} from '../TextEdit';
 import {translate} from '../../locales';
+import {useTrip} from '../../contexts/Trip';
 
 interface Props {
   handleAddressSelected: (item: PlacesItem, type: string) => void;
@@ -30,11 +32,8 @@ export const SavedLocals: FC<Props> = ({
   setVisible,
   type,
 }) => {
-  const {places, getLocals} = useLocal();
-
-  useEffect(() => {
-    getLocals();
-  }, []);
+  const {places} = useLocal();
+  const {dispatchTripCustomer} = useTrip();
 
   return (
     <>
@@ -46,9 +45,26 @@ export const SavedLocals: FC<Props> = ({
           return (
             <CardPlace
               key={index}
-              onPress={() => {
+              onPress={async () => {
+                const isTripNoDestinationAnother = JSON.parse(
+                  await AsyncStorage.getItem('@app:tripNoDestinationAnother'),
+                );
                 handleAddressSelected(item, type);
                 setVisible(false);
+
+                if (isTripNoDestinationAnother) {
+                  dispatchTripCustomer({
+                    type: 'update',
+                    field: 'hideTravelOptions',
+                    arg: false,
+                  });
+
+                  dispatchTripCustomer({
+                    type: 'update',
+                    field: 'visibleLookUpAddressesModal',
+                    arg: false,
+                  });
+                }
               }}
             >
               <ContentTitle>

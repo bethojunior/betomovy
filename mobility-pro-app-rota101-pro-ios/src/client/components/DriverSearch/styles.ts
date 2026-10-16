@@ -1,9 +1,30 @@
 import styled from 'styled-components/native';
+import Animated from 'react-native-reanimated';
+import LottieView from 'lottie-react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
 
-export const ViewBar = styled.View`
-  height: 10px;
-  width: 200px;
-  border-radius: 25px;
+export const Container = styled(Animated.View)`
+  width: 100%;
+  align-items: center;
+  border-top-left-radius: ${RFValue(25)}px;
+  border-top-right-radius: ${RFValue(25)}px;
+  overflow: hidden;
+  background-color: ${({ theme }) => theme.colors.background_global};
+  shadow-color: ${({ theme }) => theme.colors.black};
+  shadow-offset: 0px -2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 6px;
+  elevation: 8;
+`;
+
+export const Handle = styled.View`
+  align-self: center;
+  width: ${RFValue(40)}px;
+  height: ${RFValue(4)}px;
+  border-radius: ${RFValue(2)}px;
+  background-color: ${({theme}) => theme.colors.border};
+  margin-top: ${({theme}) => theme.spacing.medium}px;
+  margin-bottom: ${({theme}) => theme.spacing.small}px;
 `;
 
 export const Header = styled.View`
@@ -30,14 +51,12 @@ export const HeaderTitle = styled.Text`
 `;
 
 export const CenterContentContainer = styled.View`
-  flex: 1;
   width: 100%;
   align-items: center;
-  padding: 20px 0;
+  padding: ${({ theme }) => theme.spacing.xsslarge}px 0;
 `;
 
 export const IconContainer = styled.View`
-  flex: 1;
   align-items: center;
   justify-content: center;
 `;
@@ -46,13 +65,23 @@ export const DotContainer = styled.View`
   flex-direction: row;
 `;
 
+export const LoadingLineAnimation = styled(LottieView)`
+  width: 100%;
+`;
+
+export const StatusAnimation = styled(LottieView)`
+  width: ${RFValue(150)}px;
+  height: ${RFValue(150)}px;
+`;
+
 export const ButtonCancel = styled.TouchableOpacity`
   background-color: ${({theme}) => theme.colors.primary};
-  height: 38px;
-  width: 200px;
+  height: ${RFValue(44)}px;
+  width: ${RFValue(200)}px;
   align-items: center;
   justify-content: center;
   border-radius: 5px;
+  margin-bottom: ${RFValue(16)}px;
 `;
 
 export const TextCancel = styled.Text`

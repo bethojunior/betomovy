@@ -1,26 +1,26 @@
 /* eslint-disable eqeqeq */
 // @ts-nocheck
 
-import React, {useState, useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LocalInput from '../../../../components/form/LocalInput';
-import {useLocal} from '../../../../contexts/local';
+import { useLocal } from '../../../../contexts/local';
 import ListEstablishment from '../../components/ListEstablishment';
 import PermissionLocal from '../../../../pages/PermissionLocal';
-import {styles} from './styles';
-import {useAuth} from '../../../../../context/auth';
+import { styles } from './styles';
+import { useAuth } from '../../../../../context/auth';
 
 export default function ListRestaurant() {
-  const {placeSelected, getLocalByPosition} = useLocal();
-  const {permissionLocal} = useAuth();
+  const { placeSelected, getLocalByPosition } = useLocal();
+  const { permissionLocal } = useAuth();
   const [position, setPosition] = useState(null);
   const [isWithoutLocal, setIsWithoutLocal] = useState(false);
 
   const navigation = useNavigation();
-  const {params} = useRoute();
+  const { params } = useRoute();
   useEffect(() => {
     async function getEstablishment() {
       if (placeSelected == null) {
@@ -34,23 +34,20 @@ export default function ListRestaurant() {
   }, [placeSelected, permissionLocal]);
 
   async function getByLocal() {
-    const permissions = JSON.parse(await AsyncStorage.getItem('permissions'));
-    const {status} = await Location.getForegroundPermissionsAsync({
+    const { status } = await Location.getForegroundPermissionsAsync({
       accuracy: 1,
     });
 
     if (status === 'granted') {
-      const {coords} = await Location.getCurrentPositionAsync({accuracy: 1});
-      const {latitude, longitude} = coords;
+      const { coords } = await Location.getCurrentPositionAsync({ accuracy: 1 });
+      const { latitude, longitude } = coords;
       getLocalByPosition(latitude, longitude);
       getDeliveryCompanys(latitude, longitude);
-      permissions.location = true;
-      await AsyncStorage.setItem('permissions', JSON.stringify(permissions));
     }
   }
 
   function getDeliveryCompanys(latitude, longitude) {
-    setPosition({latitude, longitude});
+    setPosition({ latitude, longitude });
   }
 
   return (

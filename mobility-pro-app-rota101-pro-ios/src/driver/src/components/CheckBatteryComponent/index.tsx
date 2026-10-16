@@ -1,5 +1,4 @@
 import {translate} from '../../../../client/locales';
-import {UseContextBattery} from '../../../../context/Battery';
 import {customToast} from '../../../../utils/FlashMessage';
 import {useUserDriver} from '../../context/userDriver';
 import {BatteryState} from 'expo-battery';
@@ -9,11 +8,12 @@ import {useBattery} from '../../hooks/battery';
 import {useTripProvider} from '../../context/Trip';
 
 export const CheckBatteryComponent = () => {
-  const {levelBatteryMin} = UseContextBattery();
   const {userDriverFind, toogleDriverStatus} = useUserDriver();
   const {location} = useLocal();
-  const {battery} = useBattery();
-  const {tripAccepted} = useTripProvider().stateTrip;
+  const {battery, levelBatteryMin} = useBattery();
+  const tripAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripAccepted,
+  );
 
   const checkIsBatteryLow = async (levelBattery: number, state: number) => {
     if (

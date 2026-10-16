@@ -1,70 +1,106 @@
-import {Button} from 'react-native-paper';
+import { Dimensions } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { rgba } from 'polished';
 import styled from 'styled-components/native';
 
-export const Header = styled.View`
-  height: 60px;
-  flex-direction: row-reverse;
-  align-items: center;
-  padding: 0 ${({theme}) => theme.spacing.xxlarge}px;
-  justify-content: space-between;
+const MAX_SHEET_HEIGHT = Dimensions.get('window').height * 0.85;
+
+export const ScrollContent = styled.ScrollView.attrs(({ theme }) => ({
+  keyboardShouldPersistTaps: 'handled',
+  contentContainerStyle: {
+    paddingHorizontal: theme.spacing.xlarge,
+    paddingBottom: theme.spacing.xlarge,
+  },
+}))`
+  max-height: ${MAX_SHEET_HEIGHT}px;
 `;
 
-export const ButtonBack = styled.TouchableOpacity``;
+export const TitleRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.medium}px;
+  margin-bottom: ${({ theme }) => theme.spacing.large}px;
+`;
 
-export const Content = styled.View`
-  margin-top: 20px;
+export const IconBadge = styled.View`
+  width: ${RFValue(40)}px;
+  height: ${RFValue(40)}px;
+  border-radius: ${RFValue(20)}px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => rgba(theme.colors.red, 0.12)};
+`;
+
+export const TitleColumn = styled.View`
+  flex: 1;
 `;
 
 export const Title = styled.Text`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.fontSizes.xlarge}px;
+  font-family: ${({ theme }) => theme.fonts.bold};
+  color: ${({ theme }) => theme.colors.secondary};
 `;
 
-export const SelectPaymentMethodButton = styled.TouchableOpacity`
-  border-width: 0.5px;
-  border-color: ${({theme}) => theme.colors.primary};
-  border-radius: 4px;
-  padding: 14px;
-  margin-bottom: 5px;
+export const Subtitle = styled.Text`
+  color: ${({ theme }) => theme.colors.text_gray};
+  font-size: ${({ theme }) => theme.fontSizes.medium}px;
+  line-height: ${RFValue(18)}px;
+  margin-top: ${RFValue(2)}px;
+`;
+
+export const TextArea = styled.TextInput.attrs({
+  underlineColorAndroid: 'transparent',
+  multiline: true,
+  textAlignVertical: 'top',
+})`
+  height: ${RFValue(120)}px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.borderRadius.medium}px;
+  padding: ${({ theme }) => theme.spacing.medium}px;
+  margin-bottom: ${({ theme }) => theme.spacing.large}px;
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: ${({ theme }) => theme.fontSizes.medium}px;
+`;
+
+export const ContentButton = styled.View`
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacing.medium}px;
+  margin-top: ${({ theme }) => theme.spacing.small}px;
+`;
+
+export const CancelButton = styled.TouchableOpacity`
+  flex: 1;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-`;
-
-export const PaymentMethodName = styled.Text`
-  font-size: 14px;
-  color: ${({theme}) => theme.colors.primaryText};
-`;
-
-export const TextArea = styled.TextInput`
-  background-color: ${({theme}) => theme.colors.border_white_light};
-  border-radius: 10px;
-  text-align: justify;
-  padding: 12px;
-  margin-top: 20px;
-`;
-
-export const ContentLogo = styled.View`
-  flex-direction: row;
   justify-content: center;
+  gap: ${({ theme }) => theme.spacing.small}px;
+  padding-vertical: ${({ theme }) => theme.spacing.large}px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.borderRadius.medium}px;
+`;
+
+export const CancelButtonText = styled.Text`
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: ${({ theme }) => theme.fontSizes.medium}px;
+  font-family: ${({ theme }) => theme.fonts.medium};
+`;
+
+export const ConfirmButton = styled.TouchableOpacity<{ disabled?: boolean }>`
+  flex: 1;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
+  gap: ${({ theme }) => theme.spacing.small}px;
+  padding-vertical: ${({ theme }) => theme.spacing.large}px;
+  background-color: ${({ theme }) => theme.colors.primary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium}px;
+  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
 `;
 
-export const ContainerText = styled.View`
-  align-items: center;
-`;
-
-export const Image = styled.Image`
-  width: 150px;
-  height: 150px;
-`;
-
-export const ViewButton = styled.View`
-  width: 100%;
-  height: 50px;
-  margin-top: ${({theme}) => theme.spacing.xxlarge}px;
-`;
-export const Buton = styled(Button)`
-  background-color: ${({theme}) => theme.colors.primary};
-  border-radius: 5px;
-  width: 100%;
+export const ConfirmButtonText = styled.Text`
+  color: ${({ theme }) => theme.colors.primaryText};
+  font-size: ${({ theme }) => theme.fontSizes.medium}px;
+  font-family: ${({ theme }) => theme.fonts.bold};
 `;

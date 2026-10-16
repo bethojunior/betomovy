@@ -1,13 +1,11 @@
 import {Ionicons} from '@expo/vector-icons';
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 
 import {customToast} from '../../../../utils/FlashMessage';
 import {useReceipt} from '../../../contexts/Receipt';
 
 import {useAuth} from '../../../../context/auth';
-
-import {Alert} from 'react-native';
 
 import {translate} from '../../../locales';
 
@@ -28,12 +26,10 @@ import theme from '../../../styles/theme';
 export default function ContactUsSpeedMob({route}: any) {
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [exclude, setExclude] = useState<boolean>(false);
-  const [textReason, setTextReason] = useState('');
 
   const navigation = useNavigation();
 
-  const {postContactUs, postExcludeAccount} = useReceipt();
+  const {postContactUs} = useReceipt();
   const {user} = useAuth();
 
   const title = () => {
@@ -48,36 +44,11 @@ export default function ContactUsSpeedMob({route}: any) {
       return customToast(translate('contactUs.alert_incomplete'), 'warning');
     }
 
-    if (exclude) {
-      Alert.alert(
-        translate('exclude.text_dialog_delete'),
-        translate('exclude.text_dialog_delete_message'),
-        [
-          {
-            text: translate('exclude.text_dialog_delete_cancel'),
-            style: 'cancel',
-          },
-          {
-            text: translate('exclude.text_dialog_delete_confirm'),
-            onPress: async () => {
-              postExcludeAccount(textReason, message);
-            },
-          },
-        ],
-      );
-      return;
-    }
     setLoading(true);
     await postContactUs(message, user?.idUser);
     setMessage('');
     setLoading(false);
   };
-
-  useEffect(() => {
-    if (route.params?.exclude) {
-      setExclude(true);
-    }
-  }, []);
 
   return (
     <Container>
@@ -90,11 +61,9 @@ export default function ContactUsSpeedMob({route}: any) {
         {title()}
       </TitlePage>
       <TextArea
-        multiline
         value={message}
         onChangeText={text => setMessage(text)}
         placeholder={translate('contactUs.text_description')}
-        style={{textAlignVertical: 'top', height: 300}}
       />
       <ButtonSend
         colorButton={theme.colors.primary}

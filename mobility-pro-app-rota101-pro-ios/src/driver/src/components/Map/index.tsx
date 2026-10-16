@@ -1,113 +1,119 @@
-import React, {memo, useEffect, useState} from 'react';
-import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
-import {useTripProvider} from '../../context/Trip';
-import {mapAubergine} from '../../styles/mapNight';
-import {useAuth} from '../../../../context/auth';
-import {mapLight} from '../../styles/mapLight';
-import {Dimensions, Platform} from 'react-native';
-import {useIsFocused} from '@react-navigation/native';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import MapView, { MapStyleElement, MapViewProps } from 'react-native-maps';
+import { useTripProvider } from '../../context/Trip';
+import { mapAubergine } from '../../styles/mapNight';
+import { mapLight } from '../../styles/mapLight';
+import { useAuth } from '../../../../context/auth';
+import { useFocusEffect } from '@react-navigation/native';
+import { useInitialCoordsByLocale } from '~/hooks/useInitialCoordsByLocale';
 
-const {width, height} = Dimensions.get('screen');
-
-interface Props {
-  mapRef: (ref: MapView) => void;
+interface Props extends MapViewProps {
   setCountVisible: (value: boolean) => void;
-  onTouchMove?: () => void;
-  onTouchEnd?: () => void;
-  onMapLoaded?: () => void;
   noDriver?: boolean;
-  children?: React.ReactNode;
-  latitude: number;
-  longitude: number;
   setCenterInBottom?: boolean;
-  mapType?:
-    | 'standard'
-    | 'satellite'
-    | 'hybrid'
-    | 'terrain'
-    | 'none'
-    | 'mutedStandard';
   distanceMapBottom?: number;
 }
 
-export const Map = ({
-  mapRef,
-  setCountVisible,
-  distanceMapBottom,
-  onTouchMove,
-  onTouchEnd,
-  onMapLoaded,
-  noDriver,
-  children,
-  latitude,
-  longitude,
-  mapType,
-  setCenterInBottom,
-}: Props) => {
-  const {stateTrip} = useTripProvider();
-  const {generalSettings} = useAuth();
-  const {tripAccepted} = stateTrip;
+type MapTheme = 'light' | 'dark';
 
-  const [itsDay, setItsDay] = useState(false);
+export const Map = forwardRef<MapView, Props>(
+  ({ setCountVisible, noDriver, ...props }, ref) => {
+    const tripAccepted: any = useTripProvider((context: any) => context.stateTrip.tripAccepted);
+    const [customMapStyle, setCustomMapStyle] = useState<MapStyleElement[]>(mapLight);
+    const [mapUserInterfaceStyle, setMapUserInterfaceStyle] = useState<MapTheme>('light');
+    const { generalSettings, } = useAuth();
+    const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+    const isMountedRef = useRef(true);
 
-  const getHourToDayOrNight = () => {
-    const date = new Date();
-    const hour = date.getHours();
-    const hourNow = hour > 6 && hour < 18 ? true : false;
-    const conditionalSettings =
-      generalSettings?.find(item => item?.key === 'enable_map_dark_driver')
-        ?.value === '1'
-        ? hourNow
-        : true;
-    return conditionalSettings;
-  };
+    const { initialCoords: region } = useInitialCoordsByLocale();
 
-  useEffect(() => {
-    setItsDay(getHourToDayOrNight());
-  }, []);
+    const darkMapEnabled = useMemo(() =>
+      generalSettings?.find(item => item.key === "enable_map_dark_driver")
+      , [generalSettings]);
 
-  const isFocused = useIsFocused();
+    const updateMapMode = () => {
+      const date = new Date();
+      const hour = date.getHours();
+      const hourNow = hour >= 6 && hour < 18;
 
-  return (
-    <>
-      <MapView
-        ref={mapRef}
-        style={
-          setCenterInBottom
-            ? {
-                width,
-                height: height + distanceMapBottom,
-              }
-            : {flex: 1}
+      const isDarkModeActive = darkMapEnabled?.value === "1" && !hourNow;
+
+      setCustomMapStyle(isDarkModeActive ? mapAubergine : mapLight);
+      setMapUserInterfaceStyle(isDarkModeActive ? 'dark' : 'light');
+    }
+
+
+    const scheduleMapModeUpdate = () => {
+      const now = new Date();
+      let nextChange = new Date();
+
+      if (now.getHours() >= 18) {
+        nextChange.setDate(now.getDate() + 1);
+        nextChange.setHours(6, 0, 0, 0);
+      } else if (now.getHours() >= 6) {
+        nextChange.setHours(18, 0, 0, 0);
+      } else {
+        nextChange.setHours(6, 0, 0, 0);
+      }
+
+      const msUntilNextChange = nextChange.getTime() - now.getTime();
+
+      if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+
+      timeoutIdRef.current = setTimeout(() => {
+        updateMapMode();
+        scheduleMapModeUpdate();
+      }, msUntilNextChange);
+    };
+
+    useFocusEffect(useCallback(() => {
+      updateMapMode();
+
+      if (darkMapEnabled?.value === "1") scheduleMapModeUpdate();
+
+      return () => {
+        if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
+      };
+    }, [darkMapEnabled]));
+
+    // Cleanup when component unmounts
+    useEffect(() => {
+      isMountedRef.current = true;
+
+      return () => {
+        isMountedRef.current = false;
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
         }
-        onPress={() => setCountVisible(false)}
-        onMapLoaded={() => onMapLoaded && onMapLoaded}
-        onTouchMove={() => onTouchMove && onTouchMove()}
-        onTouchEnd={() => onTouchEnd && onTouchEnd()}
+      };
+    }, []);
+
+    return (
+      <MapView
+        ref={ref}
+        style={{ flex: 1 }}
+        initialRegion={region}
+        onPress={() => {
+          if (isMountedRef.current) {
+            setCountVisible(false);
+          }
+        }}
         showsUserLocation={!!noDriver}
         showsCompass={false}
         showsMyLocationButton={false}
         zoomEnabled
-        initialCamera={{
-          center: {
-            latitude: latitude,
-            longitude: longitude,
-          },
-          heading: 0,
-          zoom: 18,
-          pitch: 0,
-          altitude: 0,
-        }}
+        maxZoomLevel={19}
+        minZoomLevel={5}
         showsBuildings={false}
         mapType={'standard'}
-        rotateEnabled={
-          tripAccepted && Object.keys(tripAccepted)?.length > 0 ? true : false
-        }
-        // customMapStyle={itsDay ? mapLight : mapAubergine}
-      >
-        {/* AGUARDAR SERVIÇO DO SOCKET PRA DESCOMENTAR {polyline !== null && <Polyline coordinates={polyline} />} */}
-        {children}
-      </MapView>
-    </>
-  );
-};
+        rotateEnabled={!!tripAccepted}
+        customMapStyle={customMapStyle}
+        {...props}
+        userInterfaceStyle={mapUserInterfaceStyle}
+        onMapReady={() => {
+          // Map is ready, safe to use
+        }}
+      />
+    );
+  });

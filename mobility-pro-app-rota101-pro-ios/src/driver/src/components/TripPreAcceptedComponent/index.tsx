@@ -1,23 +1,43 @@
-import {useEffect, useMemo, useRef} from 'react';
-import {useTripProvider} from '../../context/Trip';
-import {TripRealtime} from '../../service/realtime/TripRealtime';
+import { useEffect, useRef } from 'react';
+import { useTripProvider } from '../../context/Trip';
 import { useNetwork } from '../../../../context/ConfigGlobal';
-import {mountSong} from '../../utils/mountSong';
-import {useBubbleButton} from '@704apps/react-native-bubble-button';
-import {useUserDriver} from '../../context/userDriver';
-import {customToast} from '../../../../utils/FlashMessage';
-import {translate} from '../../../../client/locales';
+import { useBubbleButton } from '@704apps/react-native-bubble-button';
+import { useUserDriver } from '../../context/userDriver';
+import { customToast } from '../../../../utils/FlashMessage';
+import { translate } from '../../../../client/locales';
+import useTripRealtime from '../../hooks/tripRealtime';
+import { TripCallback } from '../../interfaces/tripRealtime';
+import { useAuth } from '../../../../context/auth';
+import { emitTripStatusChange } from '../../utils/tripStatusChangeEmitter';
+import { emitDriverLocation } from '~/utils/driverLocationEmmit';
+import { useSong } from '../../hooks/song';
 
-export const TripPreAcceptedComponent = ({setIniTripModal}) => {
-  const tripRealtime = useMemo(() => new TripRealtime(), []);
-  const {clearDataPreAcceptedTrip, verifyExistTrip, clearDataTrip, stateTrip} =
-    useTripProvider();
-  const {tripPreAccepted, cancelTrip, tripAccepted} = stateTrip;
-  const {itsNetwork} = useNetwork();
-  const {openApp} = useBubbleButton();
-  const {getDriverFind} = useUserDriver();
+export const TripPreAcceptedComponent = () => {
+  const { tripRealtime } = useTripRealtime();
 
-  const tripPreAcceptedRef = useRef({});
+  const { clearDataPreAcceptedTrip, verifyExistTrip, stateTrip } =
+    useTripProvider((context) => context);
+
+  const { tripAccepted, tripPreAccepted } = stateTrip;
+
+  const { itsNetwork } = useNetwork();
+  const { openApp } = useBubbleButton();
+  const { getDriverFind, userDriverFind } = useUserDriver();
+  const { cityConfig } = useAuth();
+
+  const { playSong } = useSong();
+
+  const unsubscribeRef = useRef<string | null>(null);
+  const tripAcceptedRef = useRef<string>(tripAccepted.tripReference);
+  const tripPreAcceptedRef = useRef<string>(tripPreAccepted.tripReference);
+
+  useEffect(() => {
+    tripAcceptedRef.current = tripAccepted?.tripReference;
+  }, [tripAccepted]);
+
+  useEffect(() => {
+    tripPreAcceptedRef.current = tripPreAccepted?.tripReference;
+  }, [tripPreAccepted]);
 
   const verify = async (tripReference: string, isPreAccepted = false) => {
     if (!itsNetwork) {
@@ -26,67 +46,73 @@ export const TripPreAcceptedComponent = ({setIniTripModal}) => {
     const response = await verifyExistTrip(tripReference);
 
     if (response && response.status === 'canceled') {
-      await mountSong(
-        require('../../assets/songs/alertClientCancelTrip.mp3'),
-      ).then(async sound => {
-        await sound?.playAsync();
+      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      if (tripReference) {
+        emitTripStatusChange(tripReference, 'removed', configCityId);
+      }
 
-        await openApp();
-      });
+      const currentLocation =
+        userDriverFind?.latitude && userDriverFind?.longitude
+          ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+          : undefined;
+      emitDriverLocation(userDriverFind, currentLocation, cityConfig);
+
+      await openApp();
 
       getDriverFind();
 
+      const cancelMessages: Record<string, string> = {
+        customer: 'finishTrip.text_trip_pre_accepted_cancelled_by_true',
+        admin: 'finishTrip.text_trip_pre_accepted_cancelled_by_false',
+      };
+
+      const messageKey = cancelMessages[response.canceledBy || 'admin'];
+
       if (
         isPreAccepted &&
-        tripPreAccepted.tripReference !== undefined &&
-        tripAccepted.tripReference !== tripPreAccepted.tripReference
+        tripPreAcceptedRef.current !== undefined &&
+        tripAcceptedRef.current !== tripPreAcceptedRef.current
       ) {
-        customToast(
-          translate(
-            `finishTrip.text_trip_pre_accepted_cancelled_by_${
-              response.canceledBy === 'customer'
-            }`,
-          ),
-          'warning',
-        );
-
         clearDataPreAcceptedTrip();
-        return;
+
+        if (['admin', 'customer'].includes(response.canceledBy)) {
+          playSong('cancel');
+          customToast(translate(messageKey), 'warning');
+        }
       }
+    }
+  };
 
-      customToast(
-        translate(
-          `finishTrip.text_trip_cancelled_by_${
-            response.canceledBy === 'customer'
-          }`,
-        ),
-        'warning',
-      );
-      setIniTripModal(false);
+  const clearRealtimeEvent = () => {
+    if (unsubscribeRef.current) {
+        tripRealtime.unsubscribe(unsubscribeRef.current);
+        unsubscribeRef.current = null;
+      }
+  };
 
-      clearDataTrip();
+  const onTripUpdate: TripCallback = ({ data: _trip, type }) => {
+    if (type === 'removed') {
+
+      verify(_trip.tripReference, true);
+
+      clearRealtimeEvent();
     }
   };
 
   useEffect(() => {
-    if (Object.keys(tripPreAccepted).length !== 0) {
-      tripPreAcceptedRef.current = tripPreAccepted;
+    if (!tripPreAccepted.tripReference) {
+      return;
     }
-  }, [tripPreAccepted]);
 
-  useEffect(() => {
-    if (Object.keys(tripPreAcceptedRef?.current)?.length !== 0) {
-      tripRealtime.getTrip(
-        tripPreAccepted.tripReference,
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-        async (tripFirebase, type: string) => {
-          if (type === 'removed' && Object.keys(cancelTrip).length === 0) {
-            verify(tripFirebase.tripReference, true);
-          }
-          return '';
-        },
-      );
-    }
-  }, [tripPreAccepted]);
+    unsubscribeRef.current = tripRealtime.getTrip(
+      tripPreAccepted.tripReference,
+      onTripUpdate,
+    );
+
+    return () => {
+      clearRealtimeEvent();
+    };
+  }, [tripPreAccepted?.tripReference, tripPreAccepted?.status]);
+
   return null;
 };

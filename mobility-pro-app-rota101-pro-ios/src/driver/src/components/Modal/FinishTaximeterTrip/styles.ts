@@ -57,3 +57,8 @@ export const ConfirmButton = styled.TouchableOpacity`
   height: 40px;
   margin-top: 20px;
 `;
+
+export const AnimationContainer = styled.View`
+  justify-content: center;
+  align-items: center;
+`;

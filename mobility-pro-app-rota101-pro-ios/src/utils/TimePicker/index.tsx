@@ -3,6 +3,8 @@ import { View, Button, TextInput, Modal, ScrollView, StyleSheet, TouchableOpacit
 import { translate } from '../../client/locales';
 import theme from '../../client/styles/theme';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { initialWindowMetrics } from 'react-native-safe-area-context';
+import { readableTextColor } from '../color';
 
 interface TimePickerProps {
   isPickerVisible: boolean;
@@ -11,7 +13,10 @@ interface TimePickerProps {
   setSelectedTime: (Value: string) => void
 }
 
-export function TimePicker ({
+const topInset = initialWindowMetrics?.insets?.top ?? 0;
+const bottomInset = initialWindowMetrics?.insets?.bottom ?? 0;
+
+export function TimePicker({
   isPickerVisible,
   setPickerVisible,
   selectedTime,
@@ -29,7 +34,7 @@ export function TimePicker ({
   };
 
   const setHourAndMinute = () => {
-    const hourAndMinute = selectedTime.split(':')
+    const hourAndMinute = selectedTime?.split(':')
     setSelectedHour(Number(hourAndMinute[0]))
     setSelectedMinute(Number(hourAndMinute[1]))
   }
@@ -61,11 +66,11 @@ export function TimePicker ({
       <TouchableOpacity
         key={time}
         ref={itemRef}
-        style={[styles.pickerItem, isSelected && {backgroundColor: `${theme.colors.primary}`}]}
+        style={[styles.pickerItem, isSelected && { backgroundColor: `${theme.colors.primary}` }]}
         onLayout={scrollToSelected}
         onPress={() => type === 'hour' ? setSelectedHour(time) : setSelectedMinute(time)}
       >
-        <Text style={[styles.pickerItemText, {color: `${theme.colors.secondary}`}, isSelected && styles.selectedPickerItemText]}>
+        <Text style={[styles.pickerItemText, { color: `${theme.colors.secondary}` }, isSelected && styles.selectedPickerItemText]}>
           {time.toString().padStart(2, '0')}
         </Text>
       </TouchableOpacity>
@@ -81,40 +86,42 @@ export function TimePicker ({
       <TextInput
         value={selectedTime}
         editable={false}
-        style={{color: `${theme.colors.secondary}`, fontSize: 18}}
+        style={{ color: `${theme.colors.secondary}`, fontSize: 18 }}
       />
       <Modal visible={isPickerVisible} animationType="slide" transparent={true}>
-        <TouchableWithoutFeedback onPress={handleTimeChange}>
-          <View style={styles.modalContainer}>
-            <View style={styles.pickerContainer}>
-              <View style={[styles.pickerSection, {backgroundColor: `${theme.colors.background_global}`}]}>
-                <View style={styles.pickerColumn}>
-                  <Text style={[styles.pickerHeaderText, {color: `${theme.colors.secondary}`}]}>{capitalize(translate('pageRoutes.text_hour'))}</Text>
-                  <ScrollView
-                    ref={hourScrollViewRef}
-                    contentContainerStyle={styles.pickerSectionContent}
-                  >
-                    {[...Array(24).keys()].map((hour) => renderTimeItem(hour, 'hour'))}
-                  </ScrollView>
+        <View style={{ flex: 1, paddingBottom: bottomInset, paddingTop: topInset}}>
+          <TouchableWithoutFeedback onPress={handleTimeChange}>
+            <View style={styles.modalContainer}>
+              <View style={styles.pickerContainer}>
+                <View style={[styles.pickerSection, { backgroundColor: `${theme.colors.background_global}` }]}>
+                  <View style={styles.pickerColumn}>
+                    <Text style={[styles.pickerHeaderText, { color: `${theme.colors.secondary}` }]}>{capitalize(translate('pageRoutes.text_hour'))}</Text>
+                    <ScrollView
+                      ref={hourScrollViewRef}
+                      contentContainerStyle={styles.pickerSectionContent}
+                    >
+                      {[...Array(24).keys()].map((hour) => renderTimeItem(hour, 'hour'))}
+                    </ScrollView>
+                  </View>
+                  <View style={styles.pickerColumn}>
+                    <Text style={[styles.pickerHeaderText, { color: `${theme.colors.secondary}` }]}>{capitalize(translate('pageRoutes.text_min'))}</Text>
+                    <ScrollView
+                      ref={minuteScrollViewRef}
+                      contentContainerStyle={styles.pickerSectionContent}
+                    >
+                      {[...Array(60).keys()].map((minute) => renderTimeItem(minute, 'minute'))}
+                    </ScrollView>
+                  </View>
                 </View>
-                <View style={styles.pickerColumn}>
-                  <Text style={[styles.pickerHeaderText, {color: `${theme.colors.secondary}`}]}>{capitalize(translate('pageRoutes.text_min'))}</Text>
-                  <ScrollView
-                    ref={minuteScrollViewRef}
-                    contentContainerStyle={styles.pickerSectionContent}
-                  >
-                    {[...Array(60).keys()].map((minute) => renderTimeItem(minute, 'minute'))}
-                  </ScrollView>
-                </View>
+                <TouchableOpacity style={[styles.buttonConfirm, { backgroundColor: `${theme.colors.primary}` }]} onPress={handleTimeChange}>
+                  <Text style={[styles.textConfirm]}>
+                    {translate('buttonModal.confirm')}
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={[styles.buttonConfirm, {backgroundColor: `${theme.colors.primary}`}]} onPress={handleTimeChange}>
-                <Text style={[styles.textConfirm, {color: `${theme.colors.secondary}`}]}>
-                  {translate('buttonModal.confirm')}
-                </Text>
-              </TouchableOpacity>
             </View>
-          </View>
-        </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback>
+        </View>
       </Modal>
     </View>
   );
@@ -140,8 +147,8 @@ const styles = StyleSheet.create({
   },
   pickerSection: {
     flexDirection: 'row',
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderTopLeftRadius: RFValue(16),
+    borderTopRightRadius: RFValue(16),
     maxHeight: RFValue(300),
   },
   pickerColumn: {
@@ -152,7 +159,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   pickerHeaderText: {
-    fontSize: 16,
+    paddingVertical: RFValue(12),
+    fontSize: RFValue(16),
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
@@ -169,11 +177,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   buttonConfirm: {
-    padding: 5,
+    padding: RFValue(16),
   },
   textConfirm: {
     textAlign: 'center',
-    fontSize: 18,
-      color: `${theme.colors.primaryText}`
+    fontSize: RFValue(16),
+    fontWeight: 'bold',
+    color: readableTextColor(theme.colors.primary)
   },
 });

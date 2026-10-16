@@ -1,16 +1,16 @@
-import {useEffect, useState} from 'react';
-import {translate} from '../../../../client/locales';
-import {Dialog} from '../../components/Dialog';
-import {If} from '../../components/If';
-import {ItemFavoriteClient} from '../../components/itemFavoriteClient';
+import { useEffect, useState } from 'react';
+import { translate } from '../../../../client/locales';
+import { Dialog } from '../../components/Dialog';
+import { If } from '../../components/If';
+import { ItemFavoriteClient } from '../../components/itemFavoriteClient';
 import Preload from '../../components/Preload';
-import {useUserDriver} from '../../context/userDriver';
-import {FavoritesProps, Pagination} from '../../context/userDriver/types';
+import { useUserDriver } from '../../context/userDriver';
+import { FavoritesProps, Pagination } from '../../context/userDriver/types';
 
-import {Container, IndicatorListData, NotFavorites, Title} from './styles';
+import { Container, IndicatorListData, NotFavorites, Title } from './styles';
 
 export function ListClient() {
-  const {listClientFavorites, deleteFavorite} = useUserDriver();
+  const { listClientFavorites, deleteFavorite } = useUserDriver();
   const [favorites, setFavorites] = useState<FavoritesProps[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -26,7 +26,7 @@ export function ListClient() {
 
     if (response) {
       setPage(page)
-      setFavorites([...favorites, ...response.favorites]);
+      setFavorites(response.favorites);
       setDataPage(response.paginate);
 
       setLoading(false);
@@ -47,7 +47,7 @@ export function ListClient() {
   };
 
   const changePage = () => {
-    if(page < dataPage.lastPage) {
+    if (page < dataPage.lastPage) {
       onInit(page + 1)
     }
   }
@@ -66,7 +66,7 @@ export function ListClient() {
           keyExtractor={(item, index) => index.toString()}
           onEndReached={changePage}
           onEndReachedThreshold={0.1}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <ItemFavoriteClient
               image={item.profileImage}
               name={item.name}

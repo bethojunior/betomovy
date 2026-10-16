@@ -1,13 +1,13 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable array-callback-return */
 // @ts-nocheck
-import {useEffect, useMemo, useRef, useState} from 'react';
-import {Button, Linking, Modal, Platform, Text, View} from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Linking, Modal, Platform, Text, View } from 'react-native';
 import Iconicons from '@expo/vector-icons/Ionicons';
-import {Audio} from 'expo-av';
+import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useAuth, useAuth} from '../../../../../context/auth';
-import {useTripGL} from '../../../../contexts/Trip';
+import { useAuth, useAuth } from '../../../../../context/auth';
+import { useTripGL } from '../../../../contexts/Trip';
 import {
   BackButton,
   ButtonSend,
@@ -24,8 +24,7 @@ import {
   TextHeader,
   TypeMessage,
 } from './styles';
-import {ButtonIcon} from '../ButtonIcon';
-import AppSocket from '../../../../services/socket';
+import { ButtonIcon } from '../ButtonIcon';
 import apiMain from '../../../../api/apiMain';
 import {
   RecordingButton,
@@ -33,15 +32,16 @@ import {
   TrashIconContainer,
 } from '../../../../pages/TripChat/styles';
 import theme from '../../../../styles/theme';
-import {If} from '../If';
+import { If } from '../If';
 import TripMessage from '../../../../components/TripMessage';
-import {ShippingDateText} from '../../../../components/TripMessage/styles';
-import {MessageAudio} from '../MessageAudio';
-import {customToast} from '../../../../../utils/FlashMessage';
-import {convertBase64ToBlob} from '../../../../utils/dicument';
-import {translate} from '../../../../locales';
-import {TripRealtime} from '../../../../services/realtime/TripRealtime';
-import {ChatRealtime} from '../../../../services/realtime/ChatRealtime';
+import { ShippingDateText } from '../../../../components/TripMessage/styles';
+import { MessageAudio } from '../MessageAudio';
+import { customToast } from '../../../../../utils/FlashMessage';
+import { convertBase64ToBlob } from '../../../../utils/dicument';
+import { translate } from '../../../../locales';
+import { ChatRealtime } from '../../../../services/realtime/ChatRealtime';
+import useTripRealtime from '../../../../hooks/tripRealtime';
+import { TripCallback } from '../../../../interfaces/tripRealtime';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
 interface Props {
@@ -55,10 +55,10 @@ export const ModalChatService = ({
   visible,
   referenceTrip,
 }: Props) => {
-  const socket = useRef<any>(null);
+  const { tripRealtime } = useTripRealtime();
   const scroll = useRef<any>(null);
-  const {user} = useAuth();
-  const {tripSchedule} = useTripGL();
+  const { user, generalSettings } = useAuth();
+  const { tripSchedule } = useTripGL();
 
   const [text, setText] = useState('');
   const [recording, setRecording] = useState();
@@ -67,7 +67,6 @@ export const ModalChatService = ({
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [detailsTrip, setDetailsTrip] = useState({});
-  const tripRealtime = useMemo(() => new TripRealtime(), []);
   const chatRealtime = useMemo(() => new ChatRealtime(), []);
 
   const INJECTED_JAVASCRIPT = `(function() {
@@ -100,35 +99,38 @@ export const ModalChatService = ({
     }
   }, [referenceTrip, detailsTrip]);
 
-  useEffect(() => {
-    tripCurrent();
+  const tripCurrent = useCallback(() => {
+    const onTripUpdate: TripCallback = ({ data: trip, type }) => {
+      setDetailsTrip(trip);
+    };
+
+    return tripRealtime.getTrip(referenceTrip, onTripUpdate);
   }, [referenceTrip]);
 
-  const tripCurrent = async () => {
-    tripRealtime.getTrip(referenceTrip, (trip, type) => {
-      setDetailsTrip(trip);
-    });
-  };
+  useEffect(() => {
+    const unsubscribe = tripCurrent();
+
+    return () => {
+      if (unsubscribe) tripRealtime.unsubscribe(unsubscribe);
+    };
+  }, [tripCurrent]);
 
   const scrollToEndWhenOpeningKeyboard = () => {
-    scroll.current.scrollToEnd({animated: true});
+    scroll.current.scrollToEnd({ animated: true });
   };
   async function handleMessage(idUser: string, tripReference: string) {
     if (text !== '') {
       apiMain.post('ChatTrip/SendMessage', {
-        stdObject: [{tripReference, message: text, userId: idUser}],
+        stdObject: [{ tripReference, message: text, userId: idUser }],
       });
       setText('');
     } else {
-      customToast('error', 'Digite uma mensagem');
+      customToast(translate('toast.text_empty_message'), 'warning');
     }
   }
   // gravaction
   async function handleStartRecording() {
     try {
-      const permissionsApp = JSON.parse(
-        await AsyncStorage.getItem('permissions'),
-      );
       const permission = await Audio.getPermissionsAsync();
       if (permission.status === 'granted') {
         await Audio.requestPermissionsAsync();
@@ -137,18 +139,13 @@ export const ModalChatService = ({
           playsInSilentModeIOS: true,
         });
         // eslint-disable-next-line @typescript-eslint/no-shadow
-        const {recording} = await Audio.Recording.createAsync(
+        const { recording } = await Audio.Recording.createAsync(
           Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY,
         );
         setRecording(recording);
         console.log(recording);
-        permissionsApp.audio = permission.status === 'granted';
-        await AsyncStorage.setItem(
-          'permissions',
-          JSON.stringify(permissionsApp),
-        );
       } else {
-        customToast('Você precisa permitir o acesso ao microfone', 'error');
+        customToast(translate('toast.text_microphone_permission_required'), 'error');
       }
       // eslint-disable-next-line @typescript-eslint/no-shadow
 
@@ -163,7 +160,7 @@ export const ModalChatService = ({
   async function stopRecording() {
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
-    const {sound, status} = await recording.createNewLoadedSoundAsync();
+    const { sound, status } = await recording.createNewLoadedSoundAsync();
     setExecSound({
       duration: getDurationFormatted(10),
       sound,
@@ -205,7 +202,7 @@ export const ModalChatService = ({
       const platform = Platform.OS;
       // eslint-disable-next-line no-underscore-dangle
       const extensionFile = recording._options[platform].extension;
-      const fileName = uri.split('/').pop().split(extensionFile)[0];
+      const fileName = uri?.split('/').pop()?.split(extensionFile)[0];
       const formData = new FormData();
       // const blob = await new Promise((resolve, reject) => {
       //   const xhr = new XMLHttpRequest();
@@ -290,12 +287,12 @@ export const ModalChatService = ({
           </BackButton>
           <ContainerDetails>
             {detailsTrip ? (
-              <Image source={{uri: detailsTrip?.driver.profilePicture}} />
+              <Image source={{ uri: detailsTrip?.driver.profilePicture }} />
             ) : (
               ''
             )}
             <TextHeader>
-              {detailsTrip ? detailsTrip?.driver.name.split(' ')[0] : ''}
+              {detailsTrip ? detailsTrip?.driver.name?.split(' ')[0] : ''}
             </TextHeader>
           </ContainerDetails>
           <ButtonIcon
@@ -307,7 +304,7 @@ export const ModalChatService = ({
           <ContentChat
             ref={scroll}
             onContentSizeChange={() =>
-              scroll.current.scrollToEnd({animated: true})
+              scroll.current.scrollToEnd({ animated: true })
             }
           >
             {messages.length > 0 &&
@@ -323,7 +320,9 @@ export const ModalChatService = ({
                   <TypeMessage>
                     {data.messageData.userId == user.idUser
                       ? translate('schedule.chat_you')
-                      : translate('schedule.chat_job')}
+                      : generalSettings.find(
+                        item => item?.key === 'text_name_driver_custom',
+                      )?.value || translate('register.partner')}
                   </TypeMessage>
                   {data.messageData.isAudio ? (
                     <>
@@ -363,7 +362,7 @@ export const ModalChatService = ({
   );
 };
 
-function ShippingDate({timeSendInSeconds, messageReceived}) {
+function ShippingDate({ timeSendInSeconds, messageReceived }) {
   const shippingDate = new Date();
 
   shippingDate.setTime(timeSendInSeconds * 1000);

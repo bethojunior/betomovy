@@ -2,7 +2,8 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import {buildApp} from '../../../../constantBuild/config';
 import {Avatar, Container, Content, Name} from './styles';
 import theme from '../../styles/theme';
-import { TouchableOpacity } from 'react-native';
+import {TouchableOpacity} from 'react-native';
+import {useStoragePictures} from '../../hooks/useStoragePictures';
 
 interface Props {
   image?: string;
@@ -11,12 +12,16 @@ interface Props {
 }
 
 export function ItemFavoriteClient({image, name, onPress}: Props) {
+  const {getStoragePictureSpecific} = useStoragePictures();
   return (
     <Container>
       <Content>
         <Avatar
           source={{
-            uri: `${buildApp().HOST_IMAGE_CUSTOMER}${image}`,
+            uri: `${
+              getStoragePictureSpecific('customer') ||
+              buildApp().HOST_IMAGE_CUSTOMER
+            }${image}`,
           }}
         />
 

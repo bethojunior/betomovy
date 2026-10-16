@@ -7,7 +7,7 @@ import {
   useState,
   useRef,
 } from 'react';
-import {useTripProvider} from '../Trip';
+import { useTripProvider } from '../Trip';
 import {
   STATUS_ACCEPTED,
   STATUS_BOARDING,
@@ -15,55 +15,95 @@ import {
   STATUS_IN_PROGRESS,
   TRIP_CALL_TAXIMETER,
 } from '../../constants/trip';
-import {useLocal} from '../../hooks/location';
-import {decode} from '@googlemaps/polyline-codec';
+import { useLocal } from '../../hooks/location';
+import { decode } from '@googlemaps/polyline-codec';
 import {
   calculateDistanceFromLatLonInMeters,
   getDistanceFromLatLonInMeters,
 } from '../../../../client/utils/position';
-import {useAuth} from '../../../../context/auth';
-import {TripStatusService} from '../TripStatus/service';
-import {useUserDriver} from '../userDriver';
+import { useAuth } from '../../../../context/auth';
+import { TripStatusService } from '../TripStatus/service';
+import { useUserDriver } from '../userDriver';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ResponsePropsApi, RouteTraveledProps} from './types';
-import {ChildrenType} from '../../../@types';
-import {debounce} from 'lodash';
-import {searchNative, updateRoute} from '../Trip/directionRoute';
-import {TripService} from '../Trip/service';
-import {useStorage} from '../../../../utils/Storage';
+import { RouteTraveledProps } from './types';
+import { ILocation } from '../../../../interfaces/location';
+import { ChildrenType } from '../../../@types';
+import { debounce } from 'lodash';
+import { searchNative, updateRoute } from '../Trip/directionRoute';
+import { useStorage } from '../../../../utils/Storage';
 import MapService from '../../../../client/services/mapService';
-import {useConfigLocal} from '../ConfigLocal';
+import { useConfigLocal } from '../ConfigLocal';
+import { DirectionResponse } from '~/interfaces/direction';
+import Helper from '../../utils/Helper';
+
+const AVG_SPEED_KMH = 40;
+const AVG_SPEED_MS = (AVG_SPEED_KMH * 1000) / 3600;
+
+const estimateRemainingSeconds = (remainingPolyline: ILocation[]): number => {
+  if (!remainingPolyline || remainingPolyline.length < 2) return 0;
+  let totalMeters = 0;
+  for (let i = 0; i < remainingPolyline.length - 1; i++) {
+    totalMeters += getDistanceFromLatLonInMeters(
+      remainingPolyline[i].latitude,
+      remainingPolyline[i].longitude,
+      remainingPolyline[i + 1].latitude,
+      remainingPolyline[i + 1].longitude,
+    );
+  }
+  return totalMeters / AVG_SPEED_MS;
+};
 
 const RouteTraveledContext = createContext({} as RouteTraveledProps);
-export const RouteTraveledProvider = ({children}: ChildrenType) => {
+export const RouteTraveledProvider = ({ children }: ChildrenType) => {
   const [polyline, setPolyline] = useState([]);
-  const {stateTrip, clearDataTrip} = useTripProvider();
+
+  const clearDataTrip: any = useTripProvider((context: any) => context.clearDataTrip);
+  const tripAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripAccepted,
+  );
+  const tripPreAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripPreAccepted,
+  );
 
   const cachePol = useRef(false);
   const remakePol = useRef(false);
 
-  const {cityConfig, tokenDriver} = useAuth();
-  const {tripAccepted, tripPreAccepted} = stateTrip;
-  const {location} = useLocal();
-  const {setItem, getItem} = useStorage();
+  const { cityConfig, tokenDriver, generalSettings } = useAuth();
+  const { location, setLocation } = useLocal();
+  const { setItem, getItem } = useStorage();
 
-  const {userDriverFind, setUserDriverFind} = useUserDriver();
-  const [verifyPosition, setVerifyPosition] = useState(false);
+  const isLoadRouteAutomatically = useMemo(() => {
+    return Helper.generalSettingsActive(generalSettings, 'load_route_automatically');
+  }, [generalSettings]);
+
+  const { userDriverFind, setUserDriverFind } = useUserDriver();
   const [metersRound, setMetersRound] = useState(0);
   const [minutesTraveled, setMinutesTraveled] = useState(0);
-  const service = TripService();
 
   const [lastPositionMarker, setLastPositionMarker] = useState(null);
 
-  const lastKnownLocation = useRef(null);
+  const lastKnownLocation = useRef<ILocation | null>(null);
   const metersDiffCalculation = 30; // Quantidade de metros antes de uma nova chamada ser necessária
   const metersDiffCalculationCache = 15; // Quantidade de metros antes de uma nova chamada ser necessária
   const isLoadingRoute = useRef(false); // Variável para verificar se uma cham
   const lastDate = useRef(new Date());
-  const {states} = useConfigLocal();
-  const {metersToCut, cachePolylineOn} = states;
+  const lastApiDuration = useRef<number>(0);
 
-  const sendPolyline = async ({lat, lng}, data) => {
+  const updateDuration = (seconds: number) => {
+    lastApiDuration.current = seconds;
+    AsyncStorage.setItem('timePolyline', `${Math.floor(seconds / 60)} min`);
+  };
+
+  const { states } = useConfigLocal();
+  const { cachePolylineOn } = states;
+
+  const noDestination =
+    tripAccepted &&
+    Object.keys(tripAccepted || {}).length !== 0 &&
+    tripAccepted?.tripCallType === 'CHAMADA TAXÍMETRO' &&
+    tripAccepted?.status === STATUS_ACCEPTED;
+
+  const sendPolyline = async (coords: ILocation, data: DirectionResponse) => {
     const [kmProgressing, minuteProgressing] = await Promise.all([
       getKmRouteTraveled(),
       getMinutesRouteTraveled(),
@@ -72,9 +112,9 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
     const routeUpdatePayload = {
       tripReference: tripAccepted?.tripReference,
       polyline: data?.overview_polyline?.points,
-      time: `${(data?.duration / 60).toFixed(0)} min`,
+      time: `${Math.floor(data?.duration / 60)} min`,
       idDriver: userDriverFind?.idDriver,
-      position: {lat, lng},
+      position: { lat: coords.latitude, lng: coords.longitude },
       kmProgressing: kmProgressing,
       minuteProgressing: minuteProgressing,
     };
@@ -86,12 +126,12 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
         userid: userDriverFind?.userId,
       },
       cityConfig?.configDriverLocation?.port_url,
-    ).catch(err => {
+    ).catch((err) => {
       console.error('Erro ao enviar polyline:', err);
       // Você pode querer logar isso em um serviço de monitoramento de erros
     });
   };
-  const sendPolylinePreAccepted = async ({lat, lng}, data) => {
+  const sendPolylinePreAccepted = async (coords: ILocation, data: DirectionResponse) => {
     const [kmProgressing, minuteProgressing] = await Promise.all([
       getKmRouteTraveled(),
       getMinutesRouteTraveled(),
@@ -100,15 +140,15 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
       {
         tripReference: tripPreAccepted?.tripReference,
         polyline: data?.overview_polyline?.points,
-        time: `${Number(data?.duration / 60)?.toFixed(0)} min`,
+        time: `${Math.floor(data?.duration / 60)} min`,
         idDriver: userDriverFind?.idDriver,
-        position: {lat, lng},
+        position: { lat: coords.latitude, lng: coords.longitude },
         kmProgressing: kmProgressing,
         minuteProgressing: minuteProgressing,
       },
-      {token: tokenDriver, userid: userDriverFind?.userId},
+      { token: tokenDriver, userid: userDriverFind?.userId },
       cityConfig?.configDriverLocation?.port_url,
-    ).catch(err => {
+    ).catch((err) => {
       console.error('Erro ao enviar polyline:', err);
       // Você pode querer logar isso em um serviço de monitoramento de erros
     });
@@ -127,9 +167,7 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
       case STATUS_BOARDING:
         return origin[dir];
       case STATUS_IN_PROGRESS:
-        return waypoints && waypoints.length > 0
-          ? waypoints[0][dir]
-          : destination[dir];
+        return waypoints && waypoints.length > 0 ? waypoints[0][dir] : destination[dir];
       default:
         return destination[dir];
     }
@@ -149,7 +187,7 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
 
   const distance = useRef(0);
 
-  const calcularPontosIntermediarios = polyline => {
+  const calcularPontosIntermediarios = (polyline) => {
     let pontosIntermediarios = [];
 
     for (let i = 0; i < polyline.length - 1; i++) {
@@ -166,16 +204,12 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
 
       distance.current += distanceToSegment;
 
-      const quantityPoints = removeLastDigit(
-        Number(distanceToSegment.toFixed(0)),
-      );
+      const quantityPoints = removeLastDigit(Number(distanceToSegment.toFixed(0)));
 
       const latDiff =
-        (polyline[i + 1].latitude - polyline[i].latitude) /
-        (quantityPoints + 1);
+        (polyline[i + 1].latitude - polyline[i].latitude) / (quantityPoints + 1);
       const lonDiff =
-        (polyline[i + 1].longitude - polyline[i].longitude) /
-        (quantityPoints + 1);
+        (polyline[i + 1].longitude - polyline[i].longitude) / (quantityPoints + 1);
 
       for (let j = 1; j <= quantityPoints; j++) {
         const latIntermediaria = polyline[i].latitude + j * latDiff;
@@ -190,76 +224,107 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
     return pontosIntermediarios;
   };
 
-  const cutPolyline = (originalPolyline, currentLocation) => {
-    const minDistanceThreshold = metersToCut; // Distância mínima padrão de 20 metros
+  const cutPolyline = (
+    originalPolyline: ILocation[],
+    currentLocation: ILocation,
+  ): ILocation[] => {
+    if (!originalPolyline || originalPolyline.length < 2) return originalPolyline;
 
-    for (let i = 0; i < originalPolyline.length - 1; i++) {
-      const point1 = originalPolyline[i];
+    let minDist = Infinity;
+    let closestIndex = 0;
 
-      const distanceToSegment = getDistanceFromLatLonInMeters(
-        point1.latitude,
-        point1.longitude,
+    for (let i = 0; i < originalPolyline.length; i++) {
+      const dist = getDistanceFromLatLonInMeters(
+        originalPolyline[i].latitude,
+        originalPolyline[i].longitude,
         currentLocation.latitude,
         currentLocation.longitude,
       );
-
-      if (distanceToSegment <= minDistanceThreshold) {
-        // O veículo se aproximou o suficiente da polyline, corta a polyline
-        const indexToCut = i + 1;
-        const updatedPolyline = originalPolyline.slice(
-          indexToCut,
-          originalPolyline.length,
-        );
-        return updatedPolyline;
-      } else if (distanceToSegment > 70 && i == 0) {
-        cachePol.current = false;
+      if (dist < minDist) {
+        minDist = dist;
+        closestIndex = i;
       }
     }
-    return originalPolyline;
+
+    if (closestIndex === 0 && minDist > 70) {
+      cachePol.current = false;
+    }
+
+    return originalPolyline.slice(closestIndex);
   };
 
-  const calculateToDoRoute = ({lat, lng}) => {
+  const isOffRoute = (
+    currentPolyline: ILocation[],
+    coords: ILocation,
+    threshold = 50,
+  ): boolean => {
+    if (!currentPolyline || currentPolyline.length === 0) return true;
+    for (const point of currentPolyline) {
+      const dist = getDistanceFromLatLonInMeters(
+        coords.latitude,
+        coords.longitude,
+        point.latitude,
+        point.longitude,
+      );
+      if (dist <= threshold) return false;
+    }
+    return true;
+  };
+
+  const calculateToDoRoute = (coords: ILocation) => {
+    const hasPolyline = polyline.length > 0;
+    const shouldReuseRoute =
+      !remakePol.current && (!isLoadRouteAutomatically || !isOffRoute(polyline, coords));
+
+    if (hasPolyline && shouldReuseRoute) {
+      const poli = cutPolyline(polyline, coords);
+      const estimatedSeconds = estimateRemainingSeconds(poli);
+
+      updateDuration(estimatedSeconds);
+
+      sendPositionOnTrip(coords, {
+        distance: distance.current,
+        duration: estimatedSeconds,
+        overview_polyline: {
+          points: String(MapService.encondePolyline(poli)),
+        },
+        type: 'cache',
+      });
+
+      setPolyline(poli);
+
+      return;
+    }
+
     if (Number(cachePolylineOn) !== 0) {
       return calculateAndDisplayRoute(
         tripAccepted?.origin,
         tripAccepted?.destination,
-        {
-          lat: location?.coords?.latitude,
-          lng: location?.coords?.longitude,
-        },
+        location?.coords,
         false,
       );
     }
 
-    return calculateAndDisplayRouteWithoutCache(
+    calculateAndDisplayRouteWithoutCache(
       tripAccepted?.origin,
       tripAccepted?.destination,
-      {
-        lat: lat,
-        lng: lng,
-      },
+      coords,
       false,
     );
   };
 
-  const calcMinutesWithMeters = () => {
-    const velocityMeters = 40;
-    const minutesOriginal = distance.current / velocityMeters;
-    return minutesOriginal;
-  };
-
   const calculateAndDisplayRouteWithoutCache = useCallback(
-    debounce(async (origin, destination, {lat, lng}, continueTrue = false) => {
+    debounce(async (origin, destination, coords: ILocation, continueTrue = false) => {
       if (isLoadingRoute.current && !continueTrue) {
         // Se uma requisição já está em progresso, não inicie uma nova
         return;
       }
       if (lastKnownLocation.current && !continueTrue) {
         const metersDiffPosition = getDistanceFromLatLonInMeters(
-          lastKnownLocation.current?.lat,
-          lastKnownLocation.current?.lng,
-          lat,
-          lng,
+          lastKnownLocation.current?.latitude,
+          lastKnownLocation.current?.longitude,
+          coords.latitude,
+          coords.longitude,
         );
 
         if (metersDiffPosition < metersDiffCalculation) {
@@ -270,15 +335,12 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
 
       isLoadingRoute.current = true; // Uma requisição está prestes a começar
 
-      lastKnownLocation.current = {
-        lat,
-        lng,
-      };
+      lastKnownLocation.current = coords;
 
-      if (tripAccepted && Object.keys(tripAccepted).length === 0) {
+      if (tripAccepted && Object.keys(tripAccepted || {}).length === 0) {
         return clearDataTrip();
       }
-      const waypoints = tripAccepted?.tripWayPoints?.filter(waypoint => {
+      const waypoints = tripAccepted?.tripWayPoints?.filter((waypoint) => {
         return waypoint?.confirmed === '0';
       });
 
@@ -294,8 +356,13 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
 
       lastDate.current = new Date();
 
+      if (tripAccepted?.status === STATUS_FINISHED) {
+        isLoadingRoute.current = false;
+        return;
+      }
+
       searchNative(
-        `${lat},${lng}`, // Minha latitude e longitude de onde estou no momento
+        `${coords.latitude},${coords.longitude}`, // Minha latitude e longitude de onde estou no momento
         `${switchCaseSearchNative(
           tripAccepted?.status,
           origin,
@@ -309,25 +376,22 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
           'longitude',
         )}`,
       )
-        .then(({status, data}: any) => {
+        .then(({ status, data }) => {
           if (!status) {
             return;
           }
 
-          AsyncStorage.setItem(
-            'timePolyline',
-            `${Number(data?.duration / 60)} min`,
-          );
+          updateDuration(data?.duration ?? lastApiDuration.current);
 
-          sendPolyline({lat, lng}, data); // ENVIO DE POLYLINE PARA O CLIENTE
+          sendPolyline(coords, data); // ENVIO DE POLYLINE PARA O CLIENTE
           // await socketOnTrip(); // Colocar quando houver socket
 
           if (tripPreAccepted?.tripReference) {
-            sendPolylinePreAccepted({lat, lng}, data); // ENVIO DE POLYLINE PARA O CLIENTE PREACEITO
+            sendPolylinePreAccepted(coords, data); // ENVIO DE POLYLINE PARA O CLIENTE PREACEITO
           }
 
-          const polilyne = decode(data.overview_polyline.points).map(item => {
-            return {latitude: item[0], longitude: item[1]};
+          const polilyne = decode(data.overview_polyline.points).map((item) => {
+            return { latitude: item[0], longitude: item[1] };
           });
 
           setPolyline(polilyne);
@@ -338,7 +402,7 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
 
           // dispatchTrip({type: 'update', field: 'polyline', arg: polilyne});
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('erro ao calcular rota ', e);
         })
         .finally(() => {
@@ -351,7 +415,7 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
   const calculateAndDisplayRoute = async (
     origin,
     destination,
-    {lat, lng},
+    coords: ILocation,
     continueTrue = false,
     forceCache = false,
   ) => {
@@ -362,10 +426,10 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
 
     if (lastKnownLocation.current && !continueTrue) {
       const metersDiffPosition = getDistanceFromLatLonInMeters(
-        lastKnownLocation.current?.lat,
-        lastKnownLocation.current?.lng,
-        lat,
-        lng,
+        lastKnownLocation.current?.latitude,
+        lastKnownLocation.current?.longitude,
+        coords.latitude,
+        coords.longitude,
       );
 
       if (metersDiffPosition < metersDiffCalculationCache) {
@@ -376,15 +440,12 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
 
     isLoadingRoute.current = true; // Uma requisição está prestes a começar
 
-    lastKnownLocation.current = {
-      lat,
-      lng,
-    };
+    lastKnownLocation.current = coords;
 
-    if (tripAccepted && Object.keys(tripAccepted).length === 0) {
+    if (tripAccepted && Object.keys(tripAccepted || {}).length === 0) {
       return clearDataTrip();
     }
-    const waypoints = tripAccepted?.tripWayPoints?.filter(waypoint => {
+    const waypoints = tripAccepted?.tripWayPoints?.filter((waypoint) => {
       return waypoint?.confirmed === '0';
     });
 
@@ -392,27 +453,21 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
       if (cachePol.current && !forceCache && Number(cachePolylineOn) !== 0) {
         if (remakePol.current) {
           remakePol.current = false;
-          setPolyline(
-            cutPolyline(calcularPontosIntermediarios(polyline), {
-              latitude: lat,
-              longitude: lng,
-            }),
-          );
+          distance.current = 0;
+          setPolyline(cutPolyline(calcularPontosIntermediarios(polyline), coords));
           isLoadingRoute.current = false;
           return;
         }
 
-        const poli = cutPolyline(polyline, {
-          latitude: lat,
-          longitude: lng,
-        });
+        const poli = cutPolyline(polyline, coords);
 
-        sendPositionOnTrip(lat, lng, {
+        sendPositionOnTrip(coords, {
           distance: distance.current,
-          duration: calcMinutesWithMeters(),
+          duration: lastApiDuration.current,
           overview_polyline: {
             points: String(MapService.encondePolyline(poli)),
           },
+          type: 'cache',
         });
 
         setPolyline(poli);
@@ -425,8 +480,13 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
       console.log('error', error);
     }
 
+    if (tripAccepted?.status === STATUS_FINISHED) {
+      isLoadingRoute.current = false;
+      return;
+    }
+
     searchNative(
-      `${lat},${lng}`, // Minha latitude e longitude de onde estou no momento
+      `${coords.latitude},${coords.longitude}`, // Minha latitude e longitude de onde estou no momento
       `${switchCaseSearchNative(
         tripAccepted?.status,
         origin,
@@ -440,25 +500,22 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
         'longitude',
       )}`,
     )
-      .then(({status, data}: {status: boolean; data: ResponsePropsApi}) => {
+      .then(({ status, data }) => {
         if (!status) {
           return;
         }
 
-        AsyncStorage.setItem(
-          'timePolyline',
-          `${Number(data?.duration / 60)} min`,
-        );
+        updateDuration(data?.duration ?? lastApiDuration.current);
 
-        sendPolyline({lat, lng}, data); // ENVIO DE POLYLINE PARA O CLIENTE
+        sendPolyline(coords, data); // ENVIO DE POLYLINE PARA O CLIENTE
         // await socketOnTrip(); // Colocar quando houver socket
 
         if (tripPreAccepted?.tripReference) {
-          sendPolylinePreAccepted({lat, lng}, data); // ENVIO DE POLYLINE PARA O CLIENTE PREACEITO
+          sendPolylinePreAccepted(coords, data); // ENVIO DE POLYLINE PARA O CLIENTE PREACEITO
         }
 
-        const polilyne = decode(data.overview_polyline.points).map(item => {
-          return {latitude: item[0], longitude: item[1]};
+        const polilyne = decode(data.overview_polyline.points).map((item) => {
+          return { latitude: item[0], longitude: item[1] };
         });
 
         setPolyline(polilyne);
@@ -471,7 +528,7 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
           longitude: decode(data.overview_polyline.points).pop()[1],
         });
       })
-      .catch(e => {
+      .catch((e) => {
         console.log('erro ao calcular rota ', e);
       })
       .finally(() => {
@@ -479,19 +536,50 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
       });
   };
 
-  const sendPositionOnTrip = (lat, lng, data: ResponsePropsApi) => {
-    sendPolyline({lat, lng}, data); // ENVIO DE POLYLINE PARA O CLIENTE
+  const sendPositionOnTrip = (coords: ILocation, data: DirectionResponse) => {
+    sendPolyline(coords, data); // ENVIO DE POLYLINE PARA O CLIENTE
     // await socketOnTrip(); // Colocar quando houver socket
 
     if (tripPreAccepted?.tripReference) {
-      sendPolylinePreAccepted({lat, lng}, data); // ENVIO DE POLYLINE PARA O CLIENTE PREACEITO
+      sendPolylinePreAccepted(coords, data); // ENVIO DE POLYLINE PARA O CLIENTE PREACEITO
     }
   };
 
-  const verifyPositionPreAvailable = async (trip, preAvailable) => {
-    if (trip?.tripCallType === 'CHAMADA TAXÍMETRO') {
-      return setVerifyPosition(false);
+  const enablePreAvailable = async (trip) => {
+    const user = userDriverFind;
+
+    if (trip.tripCallTypeId === TRIP_CALL_TAXIMETER) {
+      return;
     }
+
+    const existsWaypoint =
+      trip.tripWayPoints.filter((waypoint) => {
+        return waypoint.confirmed === '0';
+      }).length > 0;
+
+    if (existsWaypoint) {
+      return;
+    }
+
+    if (user.preAvailable == '1') {
+      return;
+    }
+
+    if (trip.status === 'in_progress') {
+      const { status } = await TripStatusService().putPreAvailable();
+
+      if (status) {
+        userDriverFind.preAvailable = '1';
+        setUserDriverFind(userDriverFind);
+      }
+    }
+  };
+
+  const verifyPositionPreAvailable = async (trip) => {
+    if (trip?.tripReference === tripPreAccepted?.tripReference) {
+      return;
+    }
+
     const meter = await calculateDistanceFromLatLonInMeters(
       {
         latitude: parseFloat(trip.destination.latitude),
@@ -500,37 +588,13 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
       location?.coords,
     );
 
-    const meterMax =
-      Number(cityConfig.kmRemainingToPutDriverPreAvailable) * 1000;
+    const meterMax = Number(cityConfig.kmRemainingToPutDriverPreAvailable) * 1000;
 
     if (meterMax >= meter) {
-      if (trip.tripCallTypeId === TRIP_CALL_TAXIMETER) {
-        return setVerifyPosition(false);
-      }
-
-      if (
-        trip.tripWayPoints.filter(waypoint => {
-          return waypoint.confirmed === '0';
-        }).length > 0
-      ) {
-        return setVerifyPosition(false);
-      }
-
-      if (preAvailable) {
-        // return checkPreAvailable();
-        return setVerifyPosition(false);
-      }
-
-      const {status} = await TripStatusService().putPreAvailable();
-      if (status) {
-        userDriverFind.preAvailable = '1';
-        setUserDriverFind(userDriverFind);
-      }
-      setVerifyPosition(false);
+      await enablePreAvailable(trip);
       return true;
-      // enablePreAvailable();
     }
-    return setVerifyPosition(true);
+    return;
   };
 
   const setRouteTraveled = async () => {
@@ -540,10 +604,7 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
       routeTraveled = MapService.decodePolyline(routeTraveled);
     }
 
-    routeTraveled.push([
-      location?.coords?.latitude,
-      location?.coords?.longitude,
-    ]);
+    routeTraveled.push([location?.coords?.latitude, location?.coords?.longitude]);
 
     routeTraveled = MapService.encondePolyline(routeTraveled);
 
@@ -566,10 +627,7 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
         return;
       }
 
-      meters += calculateDistanceFromLatLonInMeters(
-        routeTraveled[index - 1],
-        point,
-      );
+      meters += calculateDistanceFromLatLonInMeters(routeTraveled[index - 1], point);
     });
     setMetersRound(meters);
 
@@ -577,14 +635,9 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
   };
 
   async function getMinutesRouteTraveled() {
-    const dateTime = JSON.parse(
-      await AsyncStorage.getItem('dateTimeInProgress'),
-    );
+    const dateTime = JSON.parse(await AsyncStorage.getItem('dateTimeInProgress'));
     if (Array.isArray(dateTime) || !dateTime) {
-      await AsyncStorage.setItem(
-        'dateTimeInProgress',
-        JSON.stringify(new Date()),
-      );
+      await AsyncStorage.setItem('dateTimeInProgress', JSON.stringify(new Date()));
       return 0;
     }
 
@@ -597,17 +650,9 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
 
   let lastPositionInRealTime = null;
   const metersDiffSendPosition = 50;
-  let isLoading = false;
 
   const sendPosition = useCallback(
-    debounce(async payload => {
-      const data = {
-        latitude: payload?.latitude,
-        longitude: payload?.longitude,
-        idDriver: userDriverFind?.idDriver,
-        tripReference: tripAccepted?.tripReference || null,
-      };
-
+    debounce(async (payload) => {
       if (lastPositionInRealTime) {
         const metersDiffPosition = getDistanceFromLatLonInMeters(
           lastPositionInRealTime?.latitude,
@@ -620,48 +665,55 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
           return;
         }
       }
-
-      if (isLoading) {
-        // If a request is already in progress, don't make a new request
-        return;
-      }
-
-      isLoading = true; // A request is about to start
-
-      lastPositionInRealTime = {
-        latitude: payload?.latitude,
-        longitude: payload?.longitude,
-      };
-
-      try {
-        await service.sendPosition(data);
-        isLoading = false; // Request finished
-      } catch (error) {
-        console.log(error);
-        isLoading = false; // Request finished
-      }
-    }, 1000), // Adjust this time based on your needs
+    }, 5000), // Adjust this time based on your needs
     [userDriverFind, tripAccepted],
   );
+
+  const clearRoute = () => {
+    setPolyline([]);
+    setLastPositionMarker(null);
+    setMetersRound(0);
+    setMinutesTraveled(0);
+  };
+
+  // ESTA FUNÇÃO É UMA GAMBIARRA NÃO MEXAM. QUANDO O APP MOTORISTA É ABERTO A PRIMEIRA VEZ É CAUSADO UM ERRO DE ATUALIZAÇÃO DE POLYLINES EM CORRIDAS SEM DESTINO. O ERRO ACONTECE POR CAUSA DA ORDEM DE CHAMADAS DOS CONTEXTOS INFELIZMENTE NÃO CONSEGUI ENCONTRAR ONDE ESTÁ OCORRENDO ISSO NESSE PROJETO GIGANTE. MAS CONSEGUI RESOLVER MOVENDO A LOCALIZAÇÃO DO USUÁRIO MILIMETRICAMENTE.
+  const changeLocationDriver = async () => {
+    const counter = await AsyncStorage.getItem('@app:renderize-first-time-route-counter');
+    const count = counter ? JSON.parse(counter) : 0;
+
+    if (
+      count < 3 &&
+      tripAccepted &&
+      Object.keys(tripAccepted || {}).length !== 0 &&
+      tripAccepted?.tripCallType === 'CHAMADA TAXÍMETRO' &&
+      noDestination
+    ) {
+      setLocation((prevLocation) => ({
+        ...prevLocation,
+        coords: {
+          ...prevLocation.coords,
+          latitude: prevLocation.coords.latitude + 0.00001,
+          longitude: prevLocation.coords.longitude + 0.00001,
+        },
+      }));
+
+      await AsyncStorage.setItem(
+        '@app:renderize-first-time-route-counter',
+        JSON.stringify(count + 1),
+      );
+    }
+  };
 
   useEffect(() => {
     if (location?.coords) sendPosition(location.coords);
     if (
-      tripAccepted &&
-      Object.keys(tripAccepted).length > 0 &&
-      tripAccepted?.status === STATUS_IN_PROGRESS
+      (tripAccepted &&
+        Object.keys(tripAccepted || {}).length !== 0 &&
+        tripAccepted?.tripCallType !== 'CHAMADA TAXÍMETRO' &&
+        tripAccepted?.status !== STATUS_FINISHED) ||
+      noDestination
     ) {
-      verifyPositionPreAvailable(tripAccepted, false);
-    }
-    if (
-      tripAccepted &&
-      Object.keys(tripAccepted).length !== 0 &&
-      tripAccepted?.tripCallType !== 'CHAMADA TAXÍMETRO'
-    ) {
-      calculateToDoRoute({
-        lat: location?.coords?.latitude,
-        lng: location?.coords?.longitude,
-      });
+        calculateToDoRoute(location?.coords);
 
       if (tripAccepted?.status === STATUS_IN_PROGRESS) {
         setRouteTraveled();
@@ -674,7 +726,17 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
   useEffect(() => {
     if (
       tripAccepted &&
-      Object.keys(tripAccepted).length !== 0 &&
+      Object.keys(tripAccepted || {}).length > 0 &&
+      tripAccepted?.status === STATUS_IN_PROGRESS
+    ) {
+      verifyPositionPreAvailable(tripAccepted);
+    }
+  }, [location, tripAccepted]);
+
+  useEffect(() => {
+    if (
+      tripAccepted &&
+      Object.keys(tripAccepted || {}).length !== 0 &&
       tripAccepted?.tripCallType !== 'CHAMADA TAXÍMETRO' &&
       ![STATUS_BOARDING, STATUS_FINISHED].includes(tripAccepted?.status)
     ) {
@@ -684,10 +746,7 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
         calculateAndDisplayRoute(
           tripAccepted?.origin,
           tripAccepted?.destination,
-          {
-            lat: location?.coords?.latitude,
-            lng: location?.coords?.longitude,
-          },
+          location?.coords,
           true,
           true,
         );
@@ -695,10 +754,7 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
         calculateAndDisplayRouteWithoutCache(
           tripAccepted?.origin,
           tripAccepted?.destination,
-          {
-            lat: location?.coords?.latitude,
-            lng: location?.coords?.longitude,
-          },
+          location?.coords,
           true,
         );
       }
@@ -707,14 +763,33 @@ export const RouteTraveledProvider = ({children}: ChildrenType) => {
     }
   }, [tripAccepted]);
 
+  useEffect(() => {
+    if (
+      (tripAccepted &&
+        Object.keys(tripAccepted || {}).length !== 0 &&
+        tripAccepted?.tripCallType === 'CHAMADA TAXÍMETRO') ||
+      noDestination
+    ) {
+      calculateAndDisplayRouteWithoutCache(
+        tripAccepted?.origin,
+        tripAccepted?.destination,
+        location?.coords,
+        true,
+      );
+    }
+    changeLocationDriver();
+  }, [tripAccepted, location]);
+
   const value = useMemo(() => {
     return {
       metersRound,
       minutesTraveled,
       polyline,
       lastPositionMarker,
+      setMetersRound,
+      clearRoute,
     };
-  }, [metersRound, minutesTraveled]);
+  }, [metersRound, minutesTraveled, polyline]);
 
   return (
     <RouteTraveledContext.Provider value={value}>

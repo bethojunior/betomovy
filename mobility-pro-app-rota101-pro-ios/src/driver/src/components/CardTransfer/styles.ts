@@ -49,6 +49,15 @@ export const TextAddress = styled.Text`
   margin-right: 10px;
 `;
 
+export const TextObservation = styled.Text`
+  font-size: ${RFValue(11)}px;
+  text-align: left;
+  margin-right: 10px;
+  margin-top: 4px;
+  font-style: italic;
+  color: ${({theme}) => theme.colors.text_gray};
+`;
+
 export const ContainerValue = styled.View`
   flex-direction: column;
   align-items: flex-end;

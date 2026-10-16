@@ -5,7 +5,7 @@ import {
   CardStyleInterpolators,
 } from '@react-navigation/stack';
 import Icon from '@expo/vector-icons/FontAwesome5';
-import {useState} from 'react';
+import { useState } from 'react';
 import TabRoutes from './tab.routes';
 import BagDetail from '../modules/delivery/pages/BagDetail';
 import Local from '../pages/Local';
@@ -30,18 +30,18 @@ import Favorites from '../modules/GetLight/pages/Favorites';
 import PaymentPage from '../pages/Payment';
 import IndicationPage from '../pages/Indication';
 
-import {translate} from '../locales';
-import {GetLightApp} from './getLightRoute';
-import {MyTravels} from '../pages/MyTravels';
-import {AppProvider} from '../providers/appProvider';
-import {Languages} from '../pages/Languages';
+import { translate } from '../locales';
+import { GetLightApp } from './getLightRoute';
+import { MyTravels } from '../pages/MyTravels';
+import { AppProvider } from '../providers/appProvider';
+import { Languages } from '../pages/Languages';
 import NotificationButton from '../components/NotificationButton';
 import theme from '../styles/theme';
-import {useModules} from '../contexts/modules';
+import { useModules } from '../contexts/modules';
 import TripRoutes from './trip.routes';
-import {DetailsTrip} from '../pages/DetailsTrip';
-import {ContactUs} from '../pages/ContactUs';
-import {Transfer} from '../pages/Transfer';
+import { DetailsTrip } from '../pages/DetailsTrip';
+import { ContactUs } from '../pages/ContactUs';
+import { Transfer } from '../pages/Transfer';
 import Profile from '../pages/Profile';
 import ProfileSpeedMob from '../pages/Profile/SpeedMob';
 import NotificationUser from '../pages/SpeedMob/NotificationsUser';
@@ -51,12 +51,20 @@ import MyProfileSpeedMob from '../pages/MyProfile/SpeedMob';
 import MyTravelsSpeedMob from '../pages/MyTravels/SpeedMob';
 import DetailsTripSpeedMob from '../pages/DetailsTrip/SpeedMob';
 import PaymentPageSpeedMob from '../pages/Payment/SpeedMob';
-import {ApresentationApp} from '../pages/AppApresentation';
+import SharedTrips from '../pages/SharedTrips';
+import { DevMenu } from '../pages/DevMenu';
+import { VoucherPayment } from '../pages/VoucherPayment';
+import CouponsMobility from '../pages/CouponsMobility';
+import { TermsOfUse } from '../pages/TermsOfUse';
 
-const {Navigator, Screen} = createStackNavigator();
+const { Navigator, Screen } = createStackNavigator();
 
-export function AppRoutes() {
-  const {init} = useModules();
+interface AppRoutesProps {
+  initialRoute?: string;
+}
+
+export function AppRoutes({ initialRoute }: AppRoutesProps = {}) {
+  const { init } = useModules();
   const [showHome, setShowHome] = useState(true);
 
   return (
@@ -66,49 +74,22 @@ export function AppRoutes() {
         screenOptions={{
           gestureEnabled: false,
           gestureDirection: 'horizontal',
-          animationEnabled: true,
-          transitionSpec: {
-            open: {
-              animation: 'timing',
-            },
-            close: {
-              animation: 'timing',
-            },
-          },
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-          headerStyle: {backgroundColor: theme.colors.background_global},
+          headerStyle: { backgroundColor: theme.colors.background_global },
           headerTintColor: theme.colors.secondary,
-          headerTitleStyle: {fontSize: theme.fontSizes.large},
           headerTitleAlign: 'center',
+          headerBackTitleVisible: false,
+          headerRightContainerStyle: { paddingRight: 10 },
+          headerLeftContainerStyle: { paddingLeft: 10 },
           headerRight: () => {
-            return <NotificationButton marginR={10} />;
+            return <NotificationButton />;
           },
         }}
       >
-        {/* <Screen
-          name="Mobilidade"
-          component={showHome ? Home : Profile}
-          options={{
-            headerShown: false,
-            headerTitle: '',
-            headerLeft: () => {
-              return (
-                <Icon
-                  color={theme.colors.secondary}
-                  style={{padding: 15}}
-                  name={showHome ? 'user' : 'arrow-left'}
-                  size={20}
-                  onPress={() => {
-                    setShowHome(!showHome);
-                  }}
-                />
-              );
-            },
-          }}
-        /> */}
         <Screen
           name="TripRoutes"
           component={TripRoutes}
+          initialParams={{ initialRoute }}
           options={{
             headerShown: false,
             headerTitle: '',
@@ -116,7 +97,7 @@ export function AppRoutes() {
               return (
                 <Icon
                   color={theme.colors.secondary}
-                  style={{padding: 15}}
+                  style={{ padding: 15 }}
                   name={showHome ? 'user' : 'arrow-left'}
                   size={20}
                   onPress={() => {
@@ -130,13 +111,6 @@ export function AppRoutes() {
         <Screen
           name="GetLight"
           component={GetLightApp}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Screen
-          name="ApresentationApp"
-          component={ApresentationApp}
           options={{
             headerShown: false,
           }}
@@ -161,7 +135,7 @@ export function AppRoutes() {
           name="Profile"
           component={Profile}
           options={{
-            title: '',
+            title: translate('profile.text_title_perfil'),
           }}
         />
 
@@ -185,13 +159,13 @@ export function AppRoutes() {
           name="Local"
           component={Local}
           options={{
-            title: translate('appRoutes.title_delivery_address'),
+            title: translate('profile.text_title_adresses'),
           }}
         />
         <Screen
           name="LocalMap"
           component={LocalMap}
-          options={{headerShown: true}}
+          options={{ headerShown: true }}
         />
         <Screen
           name="AddAddressMap"
@@ -257,7 +231,7 @@ export function AppRoutes() {
           name="MyProfile"
           component={MyProfile}
           options={{
-            title: translate('appRoutes.title_my_profile'),
+            title: translate('profile.text_subtitle_edit_profile'),
             headerShown: true,
           }}
         />
@@ -269,11 +243,36 @@ export function AppRoutes() {
           }}
         />
         <Screen
+          name="TermsOfUse"
+          component={TermsOfUse}
+          options={{
+            headerShown: true,
+            headerRight: null,
+            title: translate('modalTerms.title'),
+          }}
+        />
+        <Screen
           name="PaymentPage"
           component={PaymentPage}
           options={{
             title: translate('appRoutes.title_payment'),
             headerShown: true,
+          }}
+        />
+        <Screen
+          name="VoucherPayment"
+          component={VoucherPayment}
+          options={{
+            title: translate('paymentPage.title_voucher_purchase'),
+            headerRight: null,
+          }}
+        />
+        <Screen
+          name="CouponsMobility"
+          component={CouponsMobility}
+          options={{
+            title: translate("paymentPage.title_cuopon"),
+            headerRight: null,
           }}
         />
         <Screen
@@ -359,7 +358,7 @@ export function AppRoutes() {
         <Screen
           name="SearchLocal"
           component={SearchLocal}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Screen
           name="MyTravels"
@@ -379,7 +378,7 @@ export function AppRoutes() {
         <Screen
           name="Languages"
           component={Languages}
-          options={{headerShown: true, title: translate('language.title')}}
+          options={{ headerShown: true, title: translate('language.title') }}
         />
         <Screen
           name="DetailsTrip"
@@ -403,7 +402,7 @@ export function AppRoutes() {
           //   headerShown: true,
           //   title: translate('appRoutes.title_contact_us'),
           // }}
-          options={({route}) => ({
+          options={({ route }) => ({
             title:
               route?.params?.name || translate('appRoutes.title_contact_us'),
             headerShown: true,
@@ -416,6 +415,41 @@ export function AppRoutes() {
             headerShown: false,
           }}
         />
+        {/* nome da rota mantido por compatibilidade com MyProfile, CongratulationSignUp e
+            useProfileCompletionGuard (todos navegam pra 'DocumentPending') — o componente foi
+            renomeado pra DocumentList porque agora lista todos os documentos, não só pendentes. */}
+        <Screen
+          name="DocumentPending"
+          component={require('../pages/DocumentList').DocumentList}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Screen
+          name="DocumentSend"
+          component={require('../pages/DocumentSend').DocumentSend}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Screen
+          name="SharedTrips"
+          component={SharedTrips}
+          options={{
+            headerShown: false,
+          }}
+        />
+        {__DEV__ && (
+          <Screen
+            name="DevMenu"
+            component={DevMenu}
+            options={{
+              headerTitle: 'Desenvolvedor',
+              headerBackTitleVisible: false,
+              headerRight: null,
+            }}
+          />
+        )}
       </Navigator>
     </AppProvider>
   );

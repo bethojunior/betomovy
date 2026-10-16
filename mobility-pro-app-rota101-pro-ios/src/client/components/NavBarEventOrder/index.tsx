@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-expressions */
 // @ts-nocheck
 
-import React, {useEffect, useRef, useState} from 'react';
-import {TouchableOpacity, View, Text, Alert, StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import React, { useEffect, useRef, useState } from 'react';
+import { TouchableOpacity, View, Text, Alert, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Icon from '@expo/vector-icons/Ionicons';
 import {
   order_canceled,
@@ -13,13 +13,13 @@ import {
 import apiDelivery from '../../api/apiDelivery';
 import AppSocket from '../../services/socket';
 
-import {translate} from '../../locales';
-import {styles} from './styles';
+import { translate } from '../../locales';
+import { styles } from './styles';
 
 import theme from '../../styles/theme';
-import {buildApp} from '../../../constantBuild/config';
+import { buildApp } from '../../../constantBuild/config';
 
-export default function NavBarEventOrder({order}) {
+export default function NavBarEventOrder({ order }) {
   const [showCancelButton, setShowCancelButton] = useState(false);
   const [showChatButton, setShowChatButton] = useState(false);
 
@@ -29,8 +29,8 @@ export default function NavBarEventOrder({order}) {
     );
     setShowChatButton(
       order.delivery_order_status.id !== order_waiting_confirmation &&
-        order.delivery_order_status.id !== order_canceled &&
-        order.delivery_order_status.id !== order_finished,
+      order.delivery_order_status.id !== order_canceled &&
+      order.delivery_order_status.id !== order_finished,
     );
   }, [order]);
 
@@ -42,11 +42,11 @@ export default function NavBarEventOrder({order}) {
   );
 }
 
-function ChatButton({visible, order}) {
+function ChatButton({ visible, order }) {
   const socketChat = useRef(null);
   const navigation = useNavigation();
   const [active, setActive] = useState(false);
-  const {driverId} = order;
+  const { driverId } = order;
 
   useEffect(() => {
     async function openSocket() {
@@ -65,22 +65,22 @@ function ChatButton({visible, order}) {
         onPress={() => {
           setActive(false);
           driverId
-            ? navigation.navigate('OrderMessageOption', {order})
-            : navigation.navigate('OrderChat', {order, type: 'company'});
+            ? navigation.navigate('OrderMessageOption', { order })
+            : navigation.navigate('OrderChat', { order, type: 'company' });
         }}
         style={styles.containerButton}
       >
         <Icon
-          name="ios-chatbubbles"
+          name="chatbubbles"
           size={30}
-          color={active ? theme.colors.orange : theme.colors.black}
+          color={active ? theme.colors.primary : theme.colors.black}
         />
       </TouchableOpacity>
     )
   );
 }
 
-function CancelButton({visible, order}) {
+function CancelButton({ visible, order }) {
   const navigation = useNavigation();
 
   function handleCancel() {

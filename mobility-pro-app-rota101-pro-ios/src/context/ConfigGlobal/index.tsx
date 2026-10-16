@@ -1,50 +1,95 @@
-import React, {createContext, useState, useEffect, useContext} from 'react';
-import {WebView} from 'react-native-webview';
-import {NetworkPropsContext} from './types';
-import {Linking, View} from 'react-native';
-import {NetWorkAlert} from '../NetWorkAlert';
-import {TargetAlert} from '../TargetAlert';
-import {If} from '../../client/components/If';
-import {isBeta} from '../../constantBuild/config';
-import {ConfigGlobalServices} from './services';
-import {SwalAlert} from '../../client/components/SwalAlert';
+import { createContext, useState, useEffect, useContext } from 'react';
+import NetInfo from '@react-native-community/netinfo';
+import { NetworkPropsContext } from './types';
+import { Linking, Platform, View } from 'react-native';
+import { NetWorkAlert } from '../NetWorkAlert';
+import { TargetAlert } from '../TargetAlert';
+import { If } from '../../client/components/If';
+import { isBeta } from '../../constantBuild/config';
+import { ConfigGlobalServices } from './services';
+import { AppUpdateModal } from '../../components/AppUpdateModal';
 import Constants from 'expo-constants';
-import {translate} from '../../client/locales';
-import {AppsId} from './constants';
+import { translate } from '../../client/locales';
+import { AppsId } from './constants';
+import { buildApp } from '../../constantBuild/config';
 
 export const ConfigGlobalContext = createContext({} as NetworkPropsContext);
 
-export const ConfigGlobalProvider = ({children}) => {
+function isVersionNewer(targetVersion?: string, currentVersion?: string): boolean {
+  if (!targetVersion || !currentVersion) return false;
+
+  const parse = (v: string) =>
+    v.split('.').map(n => parseInt(n.replace(/\D/g, ''), 10) || 0);
+
+  const targetParts = parse(targetVersion);
+  const currentParts = parse(currentVersion);
+
+  const maxLength = Math.max(targetParts.length, currentParts.length);
+  for (let i = 0; i < maxLength; i++) {
+    const t = targetParts[i] || 0;
+    const c = currentParts[i] || 0;
+    if (t > c) return true;
+    if (t < c) return false;
+  }
+  return false;
+}
+
+export const ConfigGlobalProvider = ({ children }) => {
   const [itsNetwork, setItsNetwork] = useState(true);
   const [betaEnd, setBetaEnd] = useState(false);
   const [needUpdate, setNeedUpdate] = useState(false);
   const [linkUpdate, setLinkUpdate] = useState('' as string);
   const [versionApp, setVersionApp] = useState('' as string);
+  const { IS_APP_DEMO } = buildApp();
 
-  const onMessage = event => {
-    if (event?.nativeEvent?.data === 'online') {
-      setItsNetwork(true);
-    } else if (event?.nativeEvent?.data === 'offline') {
-      setItsNetwork(false);
-    }
-  };
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setItsNetwork(state.isConnected === true && state.isInternetReachable !== false);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const checkVersionMobilityPro = async () => {
-    const data = await ConfigGlobalServices.checkVersion(
-      AppsId['MOBILITY PRO'],
-    );
-    if (!data?.status) {
-      return;
-    }
-    const {update, version} = data?.data;
-    setVersionApp(version?.version);
+    try {
+      const data = await ConfigGlobalServices.checkVersion(AppsId['MOBILITY PRO']);
+      if (!data?.status || !data?.data) {
+        setNeedUpdate(false);
+        return;
+      }
+      const { update, version } = data.data;
 
-    if (update) {
-      setNeedUpdate(true);
-      setLinkUpdate(version?.link);
-      return;
+      // Se o backend não exigir update ou não fornecer objeto de versão válido, não bloqueia
+      if (!update || !version || !version?.version) {
+        setNeedUpdate(false);
+        return;
+      }
+
+      setVersionApp(version.version);
+
+      const currentVersion =
+        Constants.expoConfig?.version ||
+        Constants.nativeAppVersion ||
+        '8.1.2';
+      const targetVersion = version.version;
+
+      const isNewer = isVersionNewer(targetVersion, currentVersion);
+
+      if (isNewer) {
+        const defaultStoreLink = Platform.select({
+          android: 'https://play.google.com/store/apps/details?id=br.com.client.rota101',
+          ios: 'https://apps.apple.com/app/id6474148440',
+          default: '',
+        });
+        setLinkUpdate(version?.link || defaultStoreLink || '');
+        setNeedUpdate(true);
+      } else {
+        setNeedUpdate(false);
+      }
+    } catch (error) {
+      console.log('Erro ao checar versão do aplicativo:', error);
+      setNeedUpdate(false);
     }
-    setNeedUpdate(false);
   };
 
   useEffect(() => {
@@ -53,21 +98,21 @@ export const ConfigGlobalProvider = ({children}) => {
 
   return (
     <ConfigGlobalContext.Provider
-      value={{itsNetwork, setItsNetwork, betaEnd, needUpdate, versionApp}}
+      value={{ itsNetwork, setItsNetwork, betaEnd, needUpdate, versionApp }}
     >
-      <If condition={needUpdate}>
-        <SwalAlert
-          visible={needUpdate}
-          description={translate(
-            'configGlobal.A_new_version_of_name_is_available_Please_update_the_app',
-          ).replace('{name}', Constants?.manifest?.name)}
-          textButton={translate('configGlobal.update')}
-          callBack={() => {
-            Linking.openURL(linkUpdate);
-          }}
-          title={translate('configGlobal.needs_update')}
-        />
-      </If>
+      <AppUpdateModal
+        visible={needUpdate && !IS_APP_DEMO}
+        title={translate('configGlobal.needs_update')}
+        description={translate(
+          'configGlobal.A_new_version_of_name_is_available_Please_update_the_app',
+        ).replace('{name}', Constants?.expoConfig?.name || 'Movy')}
+        onPressUpdate={() => {
+          if (linkUpdate) {
+            Linking.openURL(linkUpdate).catch(() => {});
+          }
+        }}
+        onClose={() => setNeedUpdate(false)}
+      />
       <View
         style={{
           width: '100%',
@@ -79,64 +124,6 @@ export const ConfigGlobalProvider = ({children}) => {
           <TargetAlert betaEnd={betaEnd} setBetaEnd={setBetaEnd} />
         </If>
         <NetWorkAlert itsNetwork={itsNetwork} />
-      </View>
-      <View
-        style={{
-          width: 1,
-          height: 1,
-          position: 'absolute',
-        }}
-      >
-        <WebView
-          source={{
-            html: `
-        <html>
-        <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          
-        </head>
-        <body>
-          
-          <script>
-            window.addEventListener('online', function () {
-              window.ReactNativeWebView.postMessage('online');
-            });
-            window.addEventListener('offline', function () {
-              window.ReactNativeWebView.postMessage('offline');
-            });
-            // Check the initial network status
-            if (navigator.onLine) {
-              window.ReactNativeWebView.postMessage('online');
-            } else {
-              window.ReactNativeWebView.postMessage('offline');
-            }
-          </script>
-        </body>
-      </html>
-      
-        `,
-          }}
-          onMessage={onMessage}
-          onError={() => {
-            setItsNetwork(false);
-          }}
-          onHttpError={() => {
-            setItsNetwork(false);
-          }}
-          style={{flex: 1}}
-          containerStyle={{flex: 1}}
-          originWhitelist={['*']}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          startInLoadingState={true}
-          scalesPageToFit={true}
-          allowsInlineMediaPlayback={true}
-          allowsFullscreenVideo={true}
-          allowsBackForwardNavigationGestures={true}
-          allowsLinkPreview={true}
-          allowsPictureInPictureMediaPlayback={true}
-          allowsWebContentPlayback={true}
-        />
       </View>
       {children}
     </ConfigGlobalContext.Provider>

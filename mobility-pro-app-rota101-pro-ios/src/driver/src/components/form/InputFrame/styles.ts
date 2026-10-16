@@ -1,17 +1,13 @@
-import styled from 'styled-components/native';
+import { StyleSheet } from 'react-native';
+import theme from '../../../styles/theme';
 
-interface InputProps {
-  textAlign?: 'left' | 'right' | 'center' | 'auto';
-  editable?: boolean;
-}
-
-export const Input = styled.TextInput<InputProps>`
-  border-width: ${({editable}) => (editable ? '1px' : 0)};
-  border-color: ${({theme}) => theme.colors.secondary};
-  border-radius: 5px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  padding: 5px;
-  color: ${({theme}) => theme.colors.secondary};
-  text-align: ${({textAlign}) => textAlign || 'left'};
-`;
+export const styles = StyleSheet.create({
+  input: {
+    borderColor: theme.colors.secondary,
+    borderRadius: 5,
+    marginTop: 5,
+    marginBottom: 5,
+    padding: 5,
+    color: theme.colors.secondary,
+  },
+});

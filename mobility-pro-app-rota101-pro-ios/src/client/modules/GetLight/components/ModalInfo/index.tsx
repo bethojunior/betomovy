@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import React from 'react';
-import {FlatList, Text} from 'react-native';
+import { FlatList, Text } from 'react-native';
 import {
   Container,
   ContainerColumnText,
@@ -11,13 +11,13 @@ import {
   TextTitle,
 } from './style';
 import ModalFrame from '../../../../components/form/Modal';
-import {SvgUri} from 'react-native-svg';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {If} from '../If';
-import {Feather} from '@expo/vector-icons';
+import { SvgUri } from 'react-native-svg';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { If } from '../If';
+import { Feather } from '@expo/vector-icons';
 import theme from '../../../../styles/theme';
 
-export function ModalInfo({setVisible, visible, prices}) {
+export function ModalInfo({ setVisible, visible, prices }) {
 
   const transformTag = (tag: string) => {
     return tag.includes('div');
@@ -36,33 +36,32 @@ export function ModalInfo({setVisible, visible, prices}) {
         <Container>
           <FlatList
             data={prices}
-            renderItem={({item}) => (
+            renderItem={({ item }) => (
               <ContainerContent>
-                {item?.picture.split('.').pop() === 'svg' ? (
+                {item?.picture?.split('.').pop() === 'svg' ? (
                   <SvgUri
                     width={RFValue(50)}
                     height={RFValue(50)}
                     uri={item?.picture}
                   />
                 ) : (
-                  <ImageCar source={{uri: item.picture}} />
+                  <ImageCar source={{ uri: item.picture }} />
                 )}
 
                 <ContainerColumnText>
                   <ContainerIcon>
                     <If condition={transformTag(item?.tag)}>
                       <Feather
-                        style={{marginRight: 5}}
+                        style={{ marginRight: 5 }}
                         name="trending-up"
                         size={RFValue(12)}
                         color={theme.colors.primary}
                       />
                     </If>
-                    <TextTitle>{`${
-                      transformTag(item?.tag)
+                    <TextTitle>{`${transformTag(item?.tag)
                         ? item?.multiplierPriceDynamic
                         : item?.tag
-                    }`}</TextTitle>
+                      }`}</TextTitle>
                   </ContainerIcon>
 
                   <Text>{item?.description}</Text>

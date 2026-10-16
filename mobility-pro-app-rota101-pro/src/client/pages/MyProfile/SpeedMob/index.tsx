@@ -81,33 +81,65 @@ export default function MyProfileSpeedMob() {
       }
 
       const asset = cameraResult.assets[0];
-      const result = await resizeImage(asset.uri, 400, 400);
-      setUriProfile(result.uri);
-      await uploadProfileImage(result.uri, {
+      let imageToUpload = asset.uri;
+      try {
+        const result = await resizeImage(asset.uri, 400, 400);
+        if (result?.uri) {
+          imageToUpload = result.uri;
+        }
+      } catch (resizeErr) {
+        console.warn('Falha ao redimensionar foto:', resizeErr);
+      }
+
+      setUriProfile(imageToUpload);
+      await uploadProfileImage(imageToUpload, {
         onSuccess: serverUrl => {
           setUriProfile(serverUrl);
           setImageKey(Date.now());
           customToast(translate('toast.text_photo_updated_success'), 'success');
         },
       });
-    } catch (error) {
-      customToast(translate('toast.text_photo_processing_error'), 'danger');
+    } catch (error: any) {
+      console.error('Erro ao atualizar foto:', error);
+      if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
+        customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
+      } else if (error?.response?.status === 413) {
+        customToast(translate('toast.text_image_too_large'), 'danger');
+      } else {
+        customToast(error?.response?.data?.message || error?.message || translate('toast.text_photo_update_error'), 'danger');
+      }
     }
   }
 
-  async function sendPhotoRecognition(uri) {
+  async function sendPhotoRecognition(uri: string) {
     try {
-      const result = await resizeImage(uri, 400, 400);
-      setUriProfile(result.uri);
-      await uploadProfileImage(result.uri, {
+      let imageToUpload = uri;
+      try {
+        const result = await resizeImage(uri, 400, 400);
+        if (result?.uri) {
+          imageToUpload = result.uri;
+        }
+      } catch (resizeErr) {
+        console.warn('Falha ao redimensionar foto:', resizeErr);
+      }
+
+      setUriProfile(imageToUpload);
+      await uploadProfileImage(imageToUpload, {
         onSuccess: serverUrl => {
           setUriProfile(serverUrl);
           setImageKey(Date.now());
           customToast(translate('toast.text_photo_updated_success'), 'success');
         },
       });
-    } catch (error) {
-      customToast(translate('toast.text_photo_update_error'), 'danger');
+    } catch (error: any) {
+      console.error('Erro ao atualizar foto:', error);
+      if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
+        customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
+      } else if (error?.response?.status === 413) {
+        customToast(translate('toast.text_image_too_large'), 'danger');
+      } else {
+        customToast(error?.response?.data?.message || error?.message || translate('toast.text_photo_update_error'), 'danger');
+      }
     }
   }
 

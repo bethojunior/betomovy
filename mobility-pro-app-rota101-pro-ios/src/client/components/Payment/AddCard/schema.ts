@@ -12,11 +12,11 @@ export const schema = Yup.object().shape({
     ),
 
   document: Yup.string()
-    .min(7, () => translate('paymentPage.error_document'))
+    .min(11, () => translate('paymentPage.error_document'))
     .required(() => translate('paymentPage.error_required')),
 
   cardNumber: Yup.string()
-    .min(16, () => translate('paymentPage.error_card_number'))
+    .min(19, () => translate('paymentPage.error_card_number'))
     .required(() => translate('paymentPage.error_required'))
     .test(
       'cardNumber',
@@ -25,7 +25,9 @@ export const schema = Yup.object().shape({
     ),
 
   dueDate: Yup.string()
-    .min(4, () => translate('paymentPage.error_date'))
+    .matches(/(0[1-9]|1[0-2])\/([0-9]{2})$/, () =>
+      translate('paymentPage.error_date'),
+    )
     .required(() => translate('paymentPage.error_required'))
     .test(
       'dueDate',
@@ -35,10 +37,13 @@ export const schema = Yup.object().shape({
 
   cvv: Yup.string()
     .min(3, () => translate('paymentPage.error_cvv'))
+    .max(4, () => translate('paymentPage.error_cvv'))
     .required(() => translate('paymentPage.error_required')),
 
   birthday: Yup.string()
-    .min(8, () => translate('paymentPage.error_date'))
+    .matches(/(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/([0-9]{4})$/, () =>
+      translate('paymentPage.error_date'),
+    )
     .required(() => translate('paymentPage.error_required'))
     .test(
       'birthday',
@@ -50,10 +55,10 @@ export const schema = Yup.object().shape({
 function validateDate(date: string | undefined) {
   if (!date) return false;
 
-  const [month, year] = date.split('/');
+  const [month, year] = date?.split('/');
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
-  const currentYear = currentDate.getFullYear();
+  const currentYear = currentDate.getFullYear() % 100; // Dois últimos dígitos do ano
 
   if (Number(year) < currentYear) {
     return false;
@@ -69,7 +74,7 @@ function validateDate(date: string | undefined) {
 function validateBirthday(date: string | undefined) {
   if (!date) return false;
 
-  const [day, month, year] = date.split('/');
+  const [day, month, year] = date?.split('/');
   const currentDate = new Date();
   const currentDay = currentDate.getDate();
   const currentMonth = currentDate.getMonth() + 1;
@@ -106,7 +111,7 @@ function validateCreditCardNumber(value: string | undefined) {
 function validateName(value: string | undefined) {
   if (!value) return false;
 
-  const words = value.split(' ');
+  const words = value?.split(' ');
 
   if (words.length >= 2 && words[1].length >= 1) return true;
 

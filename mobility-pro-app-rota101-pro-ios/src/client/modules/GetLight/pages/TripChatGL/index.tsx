@@ -5,14 +5,16 @@
 /* eslint-disable array-callback-return */
 // @ts-nocheck
 
-import {useRef, useEffect, useState, useMemo} from 'react';
-import {View, TouchableOpacity, Platform, Linking} from 'react-native';
+import { useRef, useEffect, useState, useMemo } from 'react';
+import { View, TouchableOpacity, Platform, Linking } from 'react-native';
 import MaterialIcon from '@expo/vector-icons/MaterialIcons';
-import {Ionicons} from '@expo/vector-icons';
-import {useNavigation} from '@react-navigation/native';
-import {Audio} from 'expo-av';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { storage } from '~/common/services/mmkv/storage';
+import { STORAGE_KEYS } from '~/common/constants/storageKeys';
 import apiMain from '../../../../api/apiMain';
 import LoadView from '../../../../components/LoadView';
 import TripMessage from '../../../../components/TripMessage';
@@ -29,19 +31,19 @@ import {
   RecordingButtonContainer,
   TrashIconContainer,
 } from './styles';
-import {useAuth} from '../../../../../context/auth';
-import {ContentSwitch} from '../../components/ModalChat/styles';
-import {ButtonIcon} from '../../components/ButtonIcon';
+import { useAuth } from '../../../../../context/auth';
+import { ContentSwitch } from '../../components/ModalChat/styles';
+import { ButtonIcon } from '../../components/ButtonIcon';
 import theme from '../../../../styles/theme';
-import {TextEdit} from '../../../../components/TextEdit';
-import {Switch} from '../../../../components/Switch';
-import {translate} from '../../../../locales';
-import {useTripGL} from '../../../../contexts/TripGL';
-import {ChatRealtime} from '../../../../services/realtime/ChatRealtime';
+import { TextEdit } from '../../../../components/TextEdit';
+import { Switch } from '../../../../components/Switch';
+import { translate } from '../../../../locales';
+import { useTripGL } from '../../../../contexts/TripGL';
+import { ChatRealtime } from '../../../../services/realtime/ChatRealtime';
 
 export default function TripChat() {
-  const {user} = useAuth();
-  const {tripSchedule} = useTripGL();
+  const { user } = useAuth();
+  const { tripSchedule } = useTripGL();
   const scroll = useRef(null);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ export default function TripChat() {
   const chatRealtime = useMemo(() => new ChatRealtime(), []);
 
   const scrollToEndWhenOpeningKeyboard = () => {
-    scroll.current.scrollToEnd({animated: true});
+    scroll.current.scrollToEnd({ animated: true });
   };
 
   useEffect(() => {
@@ -130,8 +132,7 @@ export default function TripChat() {
     }
     if (received) {
       Speech.speak(
-        `${tripSchedule?.driver?.name} ${translate('trip.said')} ${
-          object.message
+        `${tripSchedule?.driver?.name} ${translate('trip.said')} ${object.message
         }`,
         {
           language: 'pt-BR',
@@ -150,7 +151,7 @@ export default function TripChat() {
     speakMessage('', messagesToSpeech);
   };
   const verifyStorageSwitchRead = async () => {
-    (await AsyncStorage.getItem('switchRead')) === 'true' &&
+    storage.getItem(STORAGE_KEYS.SWITCH_READ, 'boolean') === true &&
       setSwitchValue(true);
   };
   useEffect(() => {
@@ -163,9 +164,9 @@ export default function TripChat() {
 
   useEffect(() => {
     if (switchValue) {
-      AsyncStorage.setItem('switchRead', 'true');
+      storage.setItem(STORAGE_KEYS.SWITCH_READ, true, 'boolean');
     } else {
-      AsyncStorage.removeItem('switchRead');
+      storage.setItem(STORAGE_KEYS.SWITCH_READ, false, 'boolean');
     }
   }, [switchValue]);
 
@@ -183,11 +184,11 @@ export default function TripChat() {
           <Content
             ref={scroll}
             onContentSizeChange={() =>
-              scroll.current.scrollToEnd({animated: true})
+              scroll.current.scrollToEnd({ animated: true })
             }
           >
             {messages.length > 0 &&
-              messages.map(({messageData, id}) => {
+              messages.map(({ messageData, id }) => {
                 if (messageData.userId == user.idUser)
                   return (
                     <TripMessage
@@ -227,7 +228,7 @@ export default function TripChat() {
 }
 
 function NavBar() {
-  const {tripSchedule} = useTripGL();
+  const { tripSchedule } = useTripGL();
   const navigation = useNavigation();
 
   return (
@@ -238,7 +239,7 @@ function NavBar() {
         }}
       >
         <Ionicons
-          name="ios-arrow-back"
+          name="arrow-back-outline"
           size={30}
           color={theme.colors.primary}
         />
@@ -256,16 +257,16 @@ function NavBar() {
   );
 }
 
-function Footer({tripReference, userId, scrollToEnd}) {
+function Footer({ tripReference, userId, scrollToEnd }) {
   const [message, setMessage] = useState('');
   const [recording, setRecording] = useState();
-  const {tripSchedule} = useTripGL();
-  const {user} = useAuth();
+  const { tripSchedule } = useTripGL();
+  const { user } = useAuth();
 
   async function handleMessage() {
     if (message.trim().length > 0) {
       apiMain.post('ChatTrip/SendMessage', {
-        stdObject: [{tripReference, message, userId}],
+        stdObject: [{ tripReference, message, userId }],
       });
       setMessage('');
     }
@@ -277,8 +278,8 @@ function Footer({tripReference, userId, scrollToEnd}) {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      const {ios, android} = Audio.RecordingOptionsPresets.HIGH_QUALITY;
-      const {recording} = await Audio.Recording.createAsync({
+      const { ios, android } = Audio.RecordingOptionsPresets.HIGH_QUALITY;
+      const { recording } = await Audio.Recording.createAsync({
         android,
         ios,
         web: {},
@@ -296,7 +297,7 @@ function Footer({tripReference, userId, scrollToEnd}) {
       const uri = await recording.getURI();
       const platform = Platform.OS;
       const extensionFile = recording._options[platform].extension;
-      const fileName = uri.split('/').pop().split(extensionFile)[0];
+      const fileName = uri?.split('/').pop()?.split(extensionFile)[0];
       const formData = new FormData();
       formData.append(
         'chatTrip',
@@ -356,7 +357,7 @@ function Footer({tripReference, userId, scrollToEnd}) {
 
           <RecordingButton
             onPress={async () => {
-              const {granted} = await Audio.getPermissionsAsync();
+              const { granted } = await Audio.getPermissionsAsync();
               if (!granted) {
                 Audio.requestPermissionsAsync();
               }
@@ -378,7 +379,7 @@ function Footer({tripReference, userId, scrollToEnd}) {
             recording={Boolean(recording)}
           >
             <Ionicons
-              name="md-mic"
+              name="mic"
               size={24}
               color={
                 recording

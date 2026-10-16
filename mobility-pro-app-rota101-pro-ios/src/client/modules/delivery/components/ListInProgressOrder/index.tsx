@@ -1,23 +1,22 @@
 // @ts-nocheck
 
-import React, {useEffect, useState} from 'react';
-import {FlatList, RefreshControl, AppState} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, RefreshControl, AppState } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import RequestItem from '../RequestItem';
 import AppSocket from '../../../../services/socket';
-import {useOrderService} from '../../../../contexts/orderService';
+import { useOrderService } from '../../../../contexts/orderService';
 
 import Colors from '../../../../components/Colors';
-import {useAuth} from '../../../../../context/auth';
-import {buildApp} from '../../../../../constantBuild/config';
+import { useAuth } from '../../../../../context/auth';
+import { buildApp } from '../../../../../constantBuild/config';
 
 let socket = null;
 
 export default function ListInProgressOrder() {
-  const {ordersActive, updateListOrdersActive} = useOrderService();
-  const {user} = useAuth();
+  const { ordersActive, updateListOrdersActive } = useOrderService();
+  const { user } = useAuth();
   const [refresh, setRefresh] = useState(false);
-
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -28,16 +27,17 @@ export default function ListInProgressOrder() {
         updateListOrdersActive();
       });
 
-      AppState.addEventListener('change', updateListOnResume);
+      const subscription = AppState.addEventListener('change', updateListOnResume);
+
+      return () => {
+        if (socket) socket.close();
+        subscription.remove();
+      };
     }
 
     openSocket();
 
-    return () => {
-      if (socket) socket.close();
-      AppState.removeEventListener('change', updateListOnResume);
-    };
-  }, []);
+  }, [user.idUser]);
 
   function updateListOnResume(event) {
     if (event === 'active') updateListOrdersActive();
@@ -61,13 +61,13 @@ export default function ListInProgressOrder() {
           tintColor={Colors.PRIMARY}
         />
       }
-      keyExtractor={item => item.id.toString()}
-      renderItem={({item}) => {
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => {
         return (
           <RequestItem
             order={item}
             onPress={() => {
-              navigation.push('TrackOrder', {order: item});
+              navigation.push('TrackOrder', { order: item });
             }}
           />
         );

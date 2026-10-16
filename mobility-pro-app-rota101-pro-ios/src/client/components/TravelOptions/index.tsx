@@ -1,7 +1,7 @@
-import {useCallback, useState, useEffect} from 'react';
-import {Ionicons} from '@expo/vector-icons';
-import {useNavigation} from '@react-navigation/native';
-import {LogBox, ScrollView} from 'react-native';
+import { useCallback, useState, useEffect, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { LogBox, ScrollView, Modal, View } from 'react-native';
 import moment from 'moment';
 import {
   BackButton,
@@ -12,42 +12,46 @@ import {
   DriverImage,
   ButtonNavigate,
 } from './styles';
-import {useTrip} from '../../contexts/Trip';
+import { useTrip } from '../../contexts/Trip';
 import PaymentMethodModal from '../PaymentMethodModal';
-import {useLocal} from '../../contexts/local';
-import {ModalInfo} from '../../modules/GetLight/components/ModalInfo';
-import {If} from '../If';
-import {usePaymentForm} from '../../contexts/paymentForms';
+import { useLocal } from '../../contexts/local';
+import { ModalInfo } from '../../modules/GetLight/components/ModalInfo';
+import { If } from '../If';
+import { usePaymentForm } from '../../contexts/paymentForms';
 import ModalFrame from '../form/Modal';
-import {translate} from '../../locales';
-import {customToast} from '../../../utils/FlashMessage';
-import {convertUSDate} from '../../utils/FormatDate';
-import {TextEdit} from '../TextEdit';
+import { translate } from '../../locales';
+import { customToast } from '../../../utils/FlashMessage';
+import { convertUSDate } from '../../utils/FormatDate';
+import { TextEdit } from '../TextEdit';
 import theme from '../../styles/theme';
-import {ModalSchedule} from '../ModalSchedule';
-import {ModalReadQrCode} from '../ModalReadQrCode';
-import {useFavorite} from '../../contexts/favorite';
-import {formatPrice} from '../../utils/money';
-import {useAuth} from '../../../context/auth';
-import {ModalInDriver} from '../ModalInDriver';
-import {useModules} from '../../contexts/modules';
+import { ModalSchedule } from '../ModalSchedule';
+import { ModalReadQrCode } from '../ModalReadQrCode';
+import { useFavorite } from '../../contexts/favorite';
+import { useAuth } from '../../../context/auth';
+import { ModalInDriver } from '../ModalInDriver';
+import { useModules } from '../../contexts/modules';
 import CouponTripContent from '../../modules/mobility/pages/CouponTripContent';
-import {DeliveryOption} from '../DeliveryOption';
-import {ModalPartner} from '../ModalPartner';
-import {ModalOfferInPrice} from '../ModalOfferInPrice';
-import {CardCart} from '../CardCart';
-import {buildApp} from '../../../constantBuild/config';
-import {ModalFavorite} from '../ModalFavorite';
+import { DeliveryOption } from '../DeliveryOption';
+import { ModalPartner } from '../ModalPartner';
+import { ModalOfferInPrice } from '../ModalOfferInPrice';
+import { CardCart } from '../CardCart';
+import { buildApp } from '../../../constantBuild/config';
+import { ModalFavorite } from '../ModalFavorite';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ModalConfirmOrigin} from '../ModalConfirmOrigin';
-import {PixPayment} from '../PixPayment';
+import { loadCache } from '../../../hooks/useCityConfig';
+import { ModalConfirmOrigin } from '../ModalConfirmOrigin';
 import {
   useAddressConfirmation,
   useFavoriteConfirmation,
-  usePixConfirmation,
 } from '../../../driver/src/hooks/addressConfirmation';
-import {calculateDiscountByCoupon} from '../../utils/CalulateDiscountByCoupon';
+import {
+  verifyCardOnCoupon as verifyCardOnCouponFn,
+  changePriceByDiscount,
+} from '../../utils/CalulateDiscountByCoupon';
+import { getAvailableFavorites } from '../../utils/favoriteDrivers';
 import TravelOptionsContainer from '../TravelOptionsContainer';
+import { useStoragePictures } from '../../../driver/src/hooks/useStoragePictures';
+import apiMain from '../../api/apiMain';
 
 let getPricesTimeout = null;
 let serviceSelected;
@@ -57,6 +61,7 @@ export default function TravelOptions({
   valueVoucher,
   visibleOptionTravel,
   setVisibleOptionTravel,
+  setIsTripNoDestinationAnother,
 }) {
   const {
     calculateAll,
@@ -80,15 +85,13 @@ export default function TravelOptions({
     selectedCoupon,
     inputWho,
   } = stateTripCustomer;
+  const { waitFavoriteConfirmation, confirmFavorite } = useFavoriteConfirmation();
+  const { getCards, getCoupons, cards } = usePaymentForm();
 
-  const {confirmAddress, waitForAddressConfirmation} = useAddressConfirmation();
-  const {confirmPix} = usePixConfirmation();
-  const {waitFavoriteConfirmation, confirmFavorite} = useFavoriteConfirmation();
-  const {getCards, getCoupons, cards} = usePaymentForm();
-  const {setLastPlaceSelected} = useLocal();
-  const {cityConfig} = useAuth();
-  const {modulesActives, init} = useModules();
-  const {findPerCodeDriver, getFavorites, favorites} = useFavorite();
+  const { setLastPlaceSelected } = useLocal();
+  const { cityConfig } = useAuth();
+  const { modulesActives, init } = useModules();
+  const { findPerCodeDriver, getFavorites, favorites } = useFavorite();
   const [visible, setVisible] = useState(false);
   const [modalInfo, setModalInfo] = useState(false);
   const [modalCoupon, setModalCoupon] = useState(false);
@@ -98,7 +101,6 @@ export default function TravelOptions({
   const [modalCard, setModalCard] = useState(false);
   const [modalOfferInPrice, setModalOfferInPrice] = useState(false);
   const [modalTripSend, setModalTripSend] = useState(false);
-  const [modalPix, setModalPix] = useState(false);
   const [dataScanned, setDataScanned] = useState('');
   const [detailsDriver, setDetailsDriver] = useState<any>({});
   const [visibleModalReadQrCode, setVisibleModalReadQrCode] = useState(false);
@@ -107,7 +109,8 @@ export default function TravelOptions({
   const [modalFavorite, setModalFavorite] = useState(false);
   const [loadingConfirm, setLoadingConfirm] = useState(false);
   const [haveCancelationFee, setHaveCancelationFee] = useState(false);
-
+  const { getStoragePictureSpecific } = useStoragePictures();
+  const [turbined, setTurbined] = useState(false);
   const [date, setDate] = useState(
     convertUSDate(new Date(new Date().setDate(new Date().getDate()))),
   );
@@ -123,18 +126,19 @@ export default function TravelOptions({
   const [
     enableDepartureAddresConfirmation,
     setEnableDepartureAddressConfirmation,
-  ] = useState<'1' | '0' | null>(null);
+  ] = useState<string | null>(null);
 
-  const [turbined, setTurbined] = useState(false);
 
   const [lastService, setLastService] = useState<any>(null);
   const [listServices, setListServices] = useState<any>();
 
+  const addressConfirmation = useAddressConfirmation();
+
   const getCityConfig = async () => {
     try {
-      const responseCityConfig = await AsyncStorage.getItem('cityConfig');
+      const responseCityConfig = loadCache();
       setEnableDepartureAddressConfirmation(
-        JSON.parse(responseCityConfig).enableDepartureAddressConfirmation,
+        responseCityConfig?.enableDepartureAddressConfirmation || '0',
       );
     } catch (error) {
       console.log(error);
@@ -149,16 +153,29 @@ export default function TravelOptions({
   ].includes(typeTrip);
   LogBox.ignoreLogs(['Setting a timer']);
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+  const route = useRoute<RouteProp<any>>();
+  const openedPixRef = useRef(false);
 
-  const handleBack = useCallback(results => {
+  useFocusEffect(
+    useCallback(() => {
+      const pixWasConfirmed = route.params?.pixResult === 'confirmed';
+
+      if (pixWasConfirmed) {
+        confirmPixReturnedTrip();
+        return;
+      }
+
+      retryAddressConfirmationAfterPix();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route.params?.pixResult, route.params?.idTransaction, enableDepartureAddresConfirmation, turbined, selectedOptionTravel]),
+  );
+
+  const handleBack = useCallback(async results => {
     if (navigation.canGoBack()) {
-      setLastPlaceSelected({});
       navigation.goBack();
     } else {
-      navigation.navigate('TripRoutes', {screen: 'Trip'});
-
-      setLastPlaceSelected({});
+      navigation.navigate('TripRoutes', { screen: 'Trip' });
     }
   }, []);
 
@@ -175,6 +192,7 @@ export default function TravelOptions({
   const listCards = async () => {
     const response = await getCards();
     if (response.length > 0) {
+      AsyncStorage.setItem("cardSelected", JSON.stringify(response[0]))
       setSelectedCard(response[0].idCard);
     }
   };
@@ -215,41 +233,78 @@ export default function TravelOptions({
   }, [showLoadingToGetPrices]);
 
   useEffect(() => {
+    // Só aplica lastService se não houver seleção manual E se for a primeira renderização
     if (lastService && typeof lastService === 'object' && lastService?.price) {
-      dispatchTripCustomer({
-        type: 'update',
-        field: 'selectedOptionTravel',
-        arg: lastService,
-      });
-      setOfferInDriver(lastService?.price);
-    }
-  }, [lastService]);
+      // Verifica se já existe uma seleção manual diferente
+      const hasManualSelection = selectedOptionTravel?.tripTypeId &&
+        selectedOptionTravel?.tripTypeId !== lastService?.tripTypeId;
 
-  const orderElement = listPrices => {
-    if (
-      listPrices &&
-      Array.isArray(listPrices) &&
-      listPrices.length > 0 &&
-      lastService?.idPrice.length > 0
-    ) {
-      const el = listPrices.find(data => {
-        return Number(data?.tripTypeId) === Number(lastService?.tripTypeId);
-      });
+      if (hasManualSelection) {
+        return;
+      }
 
-      if (el) {
-        const array = listPrices.filter(
-          data => data?.tripTypeId !== lastService?.tripTypeId,
-        );
-        array.unshift(el);
-        setListServices(array);
+      // Só aplica se não houver nenhuma seleção
+      if (!selectedOptionTravel?.tripTypeId) {
         dispatchTripCustomer({
           type: 'update',
           field: 'selectedOptionTravel',
-          arg: el,
+          arg: lastService,
         });
-        setOfferInDriver(el.price);
-        return;
+        setOfferInDriver(lastService?.price);
       }
+    }
+  }, [lastService]); // Removido selectedOptionTravel da dependência para evitar loop
+
+  const selectLastUsedService = (pricesList: any[]) => {
+    if (!lastService?.idPrice?.length) {
+      return undefined;
+    }
+
+    const foundService = pricesList.find(data => {
+      return Number(data?.tripTypeId) === Number(lastService?.tripTypeId);
+    });
+
+    if (foundService) {
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'selectedOptionTravel',
+        arg: foundService,
+      });
+      setOfferInDriver(foundService.price);
+    }
+
+    return foundService;
+  };
+
+  const orderElement = async listPrices => {
+    if (!listPrices || !Array.isArray(listPrices) || listPrices.length === 0) {
+      setListServices([]);
+      return;
+    }
+
+    const isCustomOrderEnabled = cityConfig?.enableCustomOrderTripType === '1';
+
+    if (isCustomOrderEnabled) {
+      const sortedPrices = [...listPrices].sort((a, b) => {
+        const orderA = a.order ? parseInt(a.order) : 9999;
+        const orderB = b.order ? parseInt(b.order) : 9999;
+        return orderA - orderB;
+      });
+
+      setListServices(sortedPrices);
+      selectLastUsedService(sortedPrices);
+      return;
+    }
+
+    const foundService = selectLastUsedService(listPrices);
+
+    if (foundService) {
+      const array = listPrices.filter(
+        data => data?.tripTypeId !== lastService?.tripTypeId,
+      );
+      array.unshift(foundService);
+      setListServices(array);
+      return;
     }
     setListServices(listPrices);
   };
@@ -264,7 +319,7 @@ export default function TravelOptions({
     if (dataScanned === '') {
       return;
     }
-    const idDriverScanner = dataScanned.split('/').pop();
+    const idDriverScanner = dataScanned?.split('/').pop();
     const response = await findPerCodeDriver(idDriverScanner);
     if (response === undefined) {
       return;
@@ -314,10 +369,7 @@ export default function TravelOptions({
       schedule,
       scheduleUTC,
       selectedCard,
-      changePriceByDiscount(
-        parseFloat(String(selectedOptionTravel.price)),
-        selectedCoupon,
-      ),
+      turbinedOrCoupon(selectedOptionTravel.price),
     );
     setLoadingButton(false);
     if (data && data.status) {
@@ -340,7 +392,7 @@ export default function TravelOptions({
     let hour = value.replace(/[^0-9]/g, '') ?? '';
     if (hour.length > 2) {
       const hourForm = `${hour.substring(0, 2)}:${hour.substring(2, 4)}`;
-      const [h, m] = hourForm.split(':');
+      const [h, m] = hourForm?.split(':');
       if (Number(h) > 23) {
         return (hour = '23');
       }
@@ -351,18 +403,7 @@ export default function TravelOptions({
     }
   }, []);
 
-  const verifyCardOnCoupon =
-    parseFloat(String(selectedOptionTravel.price)) >=
-      parseFloat(selectedCoupon.fromValue) &&
-    parseFloat(String(selectedOptionTravel.price)) <=
-      parseFloat(selectedCoupon.limitedTo);
-
-  const changePriceByDiscount = (price, coupon) => {
-    if (verifyCardOnCoupon) {
-      return calculateDiscountByCoupon(price, coupon).toPrecision(4);
-    }
-    return price || selectedOptionTravel.price;
-  };
+  const verifyCardOnCoupon = verifyCardOnCouponFn(selectedOptionTravel, selectedCoupon);
 
   useEffect(() => {
     try {
@@ -389,7 +430,11 @@ export default function TravelOptions({
   useEffect(() => {
     if (!!origin.latitude && !!destiny.latitude) {
       getPricesTimeout = setTimeout(() => {
-        return calculateAll(origin, destiny, waypoints);
+        return calculateAll(origin, destiny, waypoints, false, {
+          args: {
+            dateTimeSchedule: hours?.hourFinal || null,
+          },
+        });
       }, 2000 * 60);
     }
 
@@ -404,22 +449,30 @@ export default function TravelOptions({
     }
   }, [prices]);
 
-  if (hide) return null;
+  const saveSuggestionTripsData = async () => {
+    const storageData = [
+      ['@App:listServices', JSON.stringify(listServices)],
+      ['@App:lastServices', JSON.stringify(selectedOptionTravel)],
+    ];
 
-  const clearPixTripData = () => {
-    setModalPix(false);
-    setTypeTrip('');
-    dispatchTripCustomer({
-      type: 'update',
-      field: 'hideTravelOptions',
-      arg: false,
-    });
-    setVisibleOptionTravel(true);
+    await Promise.all(
+      storageData.map(([key, value]) => AsyncStorage.setItem(key, value)),
+    );
+
+    setTurbinedStorage();
   };
 
-  const handlePix = () => {
+  const handlePix = async () => {
     setTypeTrip('pixTrip');
-    setModalPix(true);
+    openedPixRef.current = true;
+
+    await saveSuggestionTripsData();
+
+    navigation.navigate('TripPixPayment', {
+      origin: 'TravelOptions',
+      turbined,
+      offerInDriver,
+    });
   };
 
   const handleFavoriteModal = () => {
@@ -435,18 +488,63 @@ export default function TravelOptions({
     setModalInDriver(true);
   };
 
-  const handleNewTrip = async (priceTurbined = null, isTurbine = false) => {
-    await newTrip(
-      selectedCard,
-      changePriceByDiscount(
-        parseFloat(priceTurbined || selectedOptionTravel.price),
-        selectedCoupon,
-      ),
-      isTurbine,
+  const setTurbinedStorage = async () => {
+    await AsyncStorage.setItem(
+      '@App:isPriceTurbined',
+      JSON.stringify(turbined),
     );
   };
 
-  // Exemplo de objeto mapeando tipos de viagens para funções
+  const turbinedOrCoupon = newPrice => {
+    return turbined
+      ? newPrice
+      : changePriceByDiscount(
+          parseFloat(newPrice || selectedOptionTravel.price),
+          selectedCoupon,
+          selectedOptionTravel,
+      );
+  };
+
+  const handleNewTrip = async (priceTurbined = null, isTurbine = false, idTransaction: string = null) => {
+    try {
+      const cardForTrip = idTransaction ? '' : selectedCard;
+
+      await newTrip(
+        cardForTrip,
+        turbinedOrCoupon(priceTurbined),
+        isTurbine,
+        idTransaction,
+      );
+    } catch (error) {
+      customToast(translate('toast.text_start_trip_error'), 'error');
+    }
+  };
+
+  const confirmPixReturnedTrip = () => {
+    const { idTransaction } = route.params;
+    navigation.setParams({ pixResult: undefined, idTransaction: undefined });
+
+    if (!idTransaction) return;
+
+    saveSuggestionTripsData();
+    const priceTurbined = turbined ? selectedOptionTravel?.turbinedPrice : null;
+    handleNewTrip(priceTurbined, turbined, idTransaction);
+  };
+
+  const retryAddressConfirmationAfterPix = () => {
+    if (!openedPixRef.current) return;
+    openedPixRef.current = false;
+    setTypeTrip('');
+
+    if (enableDepartureAddresConfirmation !== '1') return;
+
+    setVisibleConfirmAddress(true);
+    addressConfirmation.waitForAddressConfirmation().then(() => {
+      setVisibleConfirmAddress(false);
+      handlePix();
+    });
+  };
+
   const tripHandlers = {
     tripSchedule: handleSendConfirmSchedule,
     tripPartner: newTripPartner,
@@ -456,7 +554,6 @@ export default function TravelOptions({
     pixTrip: handlePix,
   };
 
-  // Função para processar o tipo de viagem
   const processTripType = async (tripType: string, args: any[]) => {
     if (!tripHandlers[tripType]) {
       throw new Error(
@@ -484,14 +581,23 @@ export default function TravelOptions({
   const handleConfirmRace = async () => {
     setLoadingConfirm(true);
     let response = false;
+
+    await saveSuggestionTripsData();
+
+    // Só abre o modal se existir favorito disponível E que atenda o tipo de
+    // viagem selecionado; senão segue o fluxo normal (busca aleatória)
+    const hasAvailableFavorite =
+      getAvailableFavorites(favorites, selectedOptionTravel?.tripTypeId).length > 0;
+
     if (
-      favorites.length > 0 &&
+      hasAvailableFavorite &&
       conditionalTrip &&
       selectedOptionTravel?.tripType?.offerOption === '0'
     ) {
       handleFavoriteModal();
       await waitFavoriteConfirmation();
     }
+
     response = await handleConfirm(typeTrip);
 
     if (!response) {
@@ -510,6 +616,8 @@ export default function TravelOptions({
     }
     setLoadingConfirm(false);
   };
+
+  if (hide) return null;
 
   return (
     <>
@@ -533,22 +641,23 @@ export default function TravelOptions({
             <DriverImage
               source={{
                 uri:
-                  `${
-                    buildApp().HOST_IMAGE_DRIVER + detailsDriver?.profileImage
+                  `${(getStoragePictureSpecific('driver') ||
+                    buildApp().HOST_IMAGE_DRIVER) +
+                  detailsDriver?.profileImage
                   }` || '',
               }}
             />
             <ContainerTextDriver>
               <TextEdit
                 color={theme.colors.background_global}
-                transform="none"
+                change="none"
                 size="small"
               >
                 {detailsDriver?.name ?? translate('trip.no_name')}
               </TextEdit>
               <TextEdit
                 color={theme.colors.background_global}
-                transform="none"
+                change="none"
                 size="small"
               >
                 {detailsDriver?.car?.plate ?? translate('trip.no_name')}
@@ -573,10 +682,10 @@ export default function TravelOptions({
         <DriverDoorHandle>
           <ContainerDriver>
             <ContainerTextAnother>
-              <TextEdit color={theme.colors.background_global} transform="none">
+              <TextEdit color={theme.colors.background_global} change="none">
                 {inputWho?.name ?? translate('trip.no_name')}
               </TextEdit>
-              <TextEdit color={theme.colors.background_global} transform="none">
+              <TextEdit color={theme.colors.background_global} change="none">
                 {inputWho?.phone ?? ''}
               </TextEdit>
             </ContainerTextAnother>
@@ -601,55 +710,53 @@ export default function TravelOptions({
         </DriverDoorHandle>
       </If>
       {visibleOptionTravel ? (
-        <>
-          <TravelOptionsContainer
-            serviceSelected={serviceSelected}
-            enableDepartureAddresConfirmation={
-              enableDepartureAddresConfirmation
-            }
-            setVisibleOptionTravel={setVisibleOptionTravel}
-            setVisibleConfirmAddress={setVisibleConfirmAddress}
-            handlePix={handlePix}
-            handleConfirmRace={handleConfirmRace}
-            turbined={turbined}
-            setTurbined={setTurbined}
-            setTypeTrip={setTypeTrip}
-            calculatePricesAndSome={calculatePricesAndSome}
-            setOfferInDriver={setOfferInDriver}
-            setModalInfo={setModalInfo}
-            haveCancelationFee={haveCancelationFee}
-            listServices={listServices}
-            setModalOfferInPrice={setModalOfferInPrice}
-            setModalCard={setModalCard}
-            valueVoucher={valueVoucher}
-            setVisible={setVisible}
-            selectedCard={selectedCard}
-            setVisibleModalReadQrCode={setVisibleModalReadQrCode}
-            loadingButton={loadingButton}
-            setModalSchedule={setModalSchedule}
-            loadingConfirm={loadingConfirm}
-            typeTrip={typeTrip}
-            date={date}
-            hours={hours}
-            offerInDriver={offerInDriver}
-            verifyCardOnCoupon={verifyCardOnCoupon}
-            coupons={coupons}
-            setModalCoupon={setModalCoupon}
-            hasInDriver={hasInDriver}
-            waitForAddressConfirmation={waitForAddressConfirmation}
-          />
-        </>
+        <TravelOptionsContainer
+          serviceSelected={serviceSelected}
+          enableDepartureAddresConfirmation={
+            enableDepartureAddresConfirmation
+          }
+          setVisibleOptionTravel={setVisibleOptionTravel}
+          setVisibleConfirmAddress={setVisibleConfirmAddress}
+          handlePix={handlePix}
+          handleConfirmRace={handleConfirmRace}
+          turbined={turbined}
+          setTurbined={setTurbined}
+          setTypeTrip={setTypeTrip}
+          calculatePricesAndSome={calculatePricesAndSome}
+          setOfferInDriver={setOfferInDriver}
+          setModalInfo={setModalInfo}
+          haveCancelationFee={haveCancelationFee}
+          listServices={listServices}
+          setModalOfferInPrice={setModalOfferInPrice}
+          setModalCard={setModalCard}
+          valueVoucher={valueVoucher}
+          setVisible={setVisible}
+          selectedCard={selectedCard}
+          setVisibleModalReadQrCode={setVisibleModalReadQrCode}
+          loadingButton={loadingButton}
+          setModalSchedule={setModalSchedule}
+          loadingConfirm={loadingConfirm}
+          typeTrip={typeTrip}
+          date={date}
+          hours={hours}
+          offerInDriver={offerInDriver}
+          verifyCardOnCoupon={verifyCardOnCoupon}
+          coupons={coupons}
+          setModalCoupon={setModalCoupon}
+          hasInDriver={hasInDriver}
+          waitForAddressConfirmation={addressConfirmation.waitForAddressConfirmation}
+        />
       ) : null}
 
       <If condition={modalFavorite}>
         <ModalFavorite
-          onPressConfirm={async () => {
+          loading={false}
+          onPressConfirm={() => {
             setLoadingConfirm(true);
             confirmFavorite();
             setLoadingConfirm(false);
             setModalFavorite(false);
           }}
-          loading={false}
         />
       </If>
 
@@ -658,7 +765,7 @@ export default function TravelOptions({
           visibleTravelOptions={visibleOptionTravel}
           setVisible={setVisibleConfirmAddress}
           address={origin.address}
-          handleConfirmRace={confirmAddress}
+          handleConfirmRace={addressConfirmation.confirmAddress}
           setVisibleTravelOption={setVisibleOptionTravel}
         />
       ) : null}
@@ -692,25 +799,6 @@ export default function TravelOptions({
         selectedCoupon={selectedCoupon}
       />
 
-      <If condition={modalPix}>
-        <PixPayment
-          callbackBackPage={() => {
-            clearPixTripData();
-          }}
-          confirmPixPayment={async () => {
-            setModalPix(false);
-            confirmPix();
-          }}
-          price={formatPrice(
-            offerInDriver,
-            selectedOptionTravel,
-            serviceSelected,
-            cityConfig,
-            turbined,
-          )}
-        />
-      </If>
-
       <ModalFrame
         visible={modalCard}
         setVisible={setModalCard}
@@ -737,9 +825,7 @@ export default function TravelOptions({
               />
             ))
           ) : (
-            <>
-              <TextEdit>{translate('schedule.no_card')}</TextEdit>
-            </>
+            <TextEdit>{translate('schedule.no_card')}</TextEdit>
           )}
           <ButtonNavigate
             onPress={() => {
@@ -770,11 +856,22 @@ export default function TravelOptions({
         visible={modalSchedule}
         setModal={setModalSchedule}
         date={date}
+        hour={hours}
+        onConfirm={date => {
+          calculateAll(origin, destiny, waypoints, false, {
+            args: {
+              dateTimeSchedule: date,
+            },
+          });
+        }}
         setDate={setDate}
         setHour={setHours}
         setTypeTrip={setTypeTrip}
       />
-      <ModalPartner setTripType={setTypeTrip} />
+      <ModalPartner
+        setTripType={setTypeTrip}
+        setIsTripNoDestinationAnother={setIsTripNoDestinationAnother}
+      />
     </>
   );
 }

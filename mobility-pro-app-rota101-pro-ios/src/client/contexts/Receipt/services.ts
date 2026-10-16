@@ -15,10 +15,18 @@ export const ReceiptService = {
     return response.data;
   },
   postExcludeAccount: async (details: string, reason: string) => {
-    const response = await apiMain.post('/User/RemoveAccountRequest', {
+    const response = await apiMain.post<ApiResponse<any>>('/User/RemoveAccountRequest', {
       details: details,
       reason: reason,
     });
     return response.data;
+  },
+  insertByCustomer: async data => {
+    try {
+      const response = await apiMain.post('/TripReport/InsertByCustomer', data);
+      return response.data;
+    } catch (error) {
+      return console.log(error);
+    }
   },
 };

@@ -1,5 +1,5 @@
 import {Ionicons} from '@expo/vector-icons';
-import {Linking} from 'react-native';
+import {Linking, TouchableOpacity, Text} from 'react-native';
 import {RFValue} from 'react-native-responsive-fontsize';
 import theme from '../../client/styles/theme';
 import {translate} from '../../client/locales';
@@ -19,7 +19,13 @@ import {
 } from './styles';
 import {AppUpdateModalProps} from './types';
 
-export const AppUpdateModal = ({visible, title, description, onPressUpdate}: AppUpdateModalProps) => {
+export const AppUpdateModal = ({
+  visible,
+  title,
+  description,
+  onPressUpdate,
+  onClose,
+}: AppUpdateModalProps) => {
   const {supportNumber} = useGlobalSupportNumber();
 
   if (!visible) return null;
@@ -33,6 +39,16 @@ export const AppUpdateModal = ({visible, title, description, onPressUpdate}: App
   return (
     <Overlay>
       <Card>
+        {!!onClose && (
+          <TouchableOpacity
+            style={{ position: 'absolute', top: 12, right: 12, padding: 8, zIndex: 1 }}
+            onPress={onClose}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="close" size={RFValue(22)} color={theme.colors.secondary} />
+          </TouchableOpacity>
+        )}
+
         <Ionicons name="warning" size={RFValue(36)} color={theme.colors.red} />
 
         <Title>{title}</Title>
@@ -50,6 +66,18 @@ export const AppUpdateModal = ({visible, title, description, onPressUpdate}: App
               <SupportButtonText>{translate('configGlobal.text_support_button')}</SupportButtonText>
             </SupportButtonRow>
           </SupportButton>
+        )}
+
+        {!!onClose && (
+          <TouchableOpacity
+            onPress={onClose}
+            style={{ marginTop: 12, padding: 6 }}
+            activeOpacity={0.7}
+          >
+            <Text style={{ color: theme.colors.text_gray, fontSize: RFValue(13), textAlign: 'center' }}>
+              {translate('configGlobal.text_remind_later') || 'Lembrar mais tarde'}
+            </Text>
+          </TouchableOpacity>
         )}
       </Card>
     </Overlay>

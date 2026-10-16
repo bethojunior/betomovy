@@ -1,8 +1,9 @@
-import {useState} from 'react';
-import {Audio} from 'expo-av';
+import { mountSong as mountSongGeneral } from '../utils/mountSong';
+
+type SongType = 'message' | 'cancel' | 'whistle';
 
 export const useSong = () => {
-  const playSong = async (music = 'message', looping = false) => {
+  const playSong = async (music: SongType = 'message', looping = false) => {
     try {
       const sound = await mountSong(songs[music]);
       await sound?.playAsync();
@@ -13,7 +14,7 @@ export const useSong = () => {
     }
   };
 
-  const stopSong = async (music = 'message', sound = null) => {
+  const stopSong = async (music: SongType = 'message', sound = null) => {
     try {
       let soungStop = sound;
       if (!sound) soungStop = await mountSong(songs[music]);
@@ -23,23 +24,15 @@ export const useSong = () => {
     }
   };
 
-  return {playSong, stopSong};
+  const mountSong = async (uri: any, uriRemote = false, alias = '') => {
+    return await mountSongGeneral(uri, uriRemote, alias);
+  };
+
+  return { playSong, stopSong, mountSong };
 };
 
 const songs = {
   message: require('../../../client/assets/songs/alertNewMessageChat.mp3'),
   cancel: require('../../../client/assets/songs/alertClientCancelTrip.mp3'),
   whistle: require('../../../client/assets/songs/assobio.mp3'),
-};
-
-const mountSong = async (uri: any) => {
-  Audio.setAudioModeAsync({
-    allowsRecordingIOS: false,
-    staysActiveInBackground: true,
-    playsInSilentModeIOS: true,
-    shouldDuckAndroid: true,
-    playThroughEarpieceAndroid: false,
-  });
-  const {sound} = await Audio.Sound.createAsync(uri);
-  return sound;
 };

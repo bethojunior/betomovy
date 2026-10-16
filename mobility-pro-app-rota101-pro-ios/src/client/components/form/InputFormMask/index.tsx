@@ -22,6 +22,7 @@ interface InputProps {
   numberOfLines?: number;
   type: TextInputMaskTypeProp;
   options?: TextInputMaskOptionProp;
+  onChangeText?: (value: string) => void;
 }
 
 const InputFormMask: FC<InputProps> = ({

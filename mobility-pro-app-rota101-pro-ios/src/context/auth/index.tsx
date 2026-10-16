@@ -10,66 +10,68 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import * as LocalAuthentication from 'expo-local-authentication';
-import {Alert, Platform} from 'react-native';
-import {getMessaging, getToken, onMessage} from 'firebase/messaging';
+import { Alert } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import Push from '../../client/services/push';
-import apiMain from '../../client/api/apiMain';
-import apiDelivery from '../../client/api/apiDelivery';
-import {customToast} from '../../utils/FlashMessage';
-import {translate} from '../../client/locales';
-import Constants from 'expo-constants';
-import * as Application from 'expo-application';
+import apiMain, { abortRequests as abortRequestsMain } from '../../client/api/apiMain';
+import apiDelivery, {
+  abortRequests as abortRequestsDelivery,
+} from '../../client/api/apiDelivery';
+import { customToast } from '../../utils/FlashMessage';
+import { translate } from '../../client/locales';
 
 import {
-  CityConfig,
   GeneralItem,
   IAuthContext,
-  Position,
   ResponseSocialLoginProps,
   SocialLoginProps,
   User,
   UserDriver,
   UserDataProps,
+  AuthenticateLoginData,
 } from './types';
-import {AuthService} from './service';
-import {getDeviceId} from '../../driver/src/utils/device';
-import apiMainDriver from '../../driver/src/api/apiMain';
-import {useNetwork} from '../ConfigGlobal';
-import {isBeta} from '../../constantBuild/config';
-import {PushNotificationTags} from '../../Constants/push';
-import getAppColors from '../../utils/GetAppColors';
-import {AppsId} from '../ConfigGlobal/constants';
+import { AuthService } from './service';
+import apiMainDriver, { abortRequests as abortRequestsDriver } from '../../driver/src/api/apiMain';
+import { useNetwork } from '../ConfigGlobal';
+import { isBeta } from '../../constantBuild/config';
+import { PushNotificationAction, PushNotificationTags } from '../../constants/push';
+import { setAsyncStorageByTime } from '../../driver/src/hooks/AsyncStorageByTime';
+import { storage } from '../../common/services/mmkv/storage';
+import { useLocationUpdater } from '../../client/hooks/useLocationUpdater';
+import { useSessionState } from '../../hooks/useSessionState';
+import { createAuthInterceptor } from '../../utils/interceptors/createAuthInterceptor';
+import { detachAuthInterceptor } from '../../utils/interceptors/detachAuthInterceptor';
+import { isRealtimeSocketEnabled } from '../../utils/realtime/realtimeSocketFlag';
+import { PIX_CACHE_KEY, TRIP_CACHE_KEY } from '../../client/constants/pixCache';
+import Logger from '../../utils/Logger';
+import {
+  useCityConfig,
+  clearCache as clearCityConfigCache,
+} from '../../hooks/useCityConfig';
 
 const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let breakEventListener = true;
-let permissionsApp;
+const logger = new Logger('AuthProvider');
 
-export const AuthProvider = ({children}: any) => {
+export const AuthProvider = ({ children }: any) => {
   const service = AuthService();
-  const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserDataProps>();
-
+  const { setItem } = storage;
   const [partner, setPartner] = useState({});
-  const {itsNetwork: network, betaEnd} = useNetwork();
+  const { itsNetwork: network, betaEnd } = useNetwork();
   const [deviceToken, setDeviceToken] = useState('1234');
   const [permissionLocal, setPermissionLocal] = useState(true);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingGeneralSettings, setLoadingGeneralSettings] = useState<boolean>(true);
   const [isGuest, setIsGuest] = useState(false);
   const [generalSettings, setGeneralSettings] = useState<GeneralItem[]>([]);
   const [disablePhoneLogin, setDisablePhoneLogin] = useState(null);
-  const [cityConfig, setCityConfig] = useState<CityConfig | null>(null);
   const [notification, setNotification] = useState([]);
   const [offerBiometry, setOfferBiometry] = useState(false);
   const [requestFingerprint, setRequestFingerprint] = useState(false);
-  const [userDriver, setUserDriver] = useState<UserDriver | null>(null);
-  const [isDriver, setIsDriver] = useState(false);
-  const [tokenDriver, setTokenDriver] = useState('');
   const [newActionFb, setNewActionFb] = useState('');
   const executeOnly = useRef(false);
-  const [confirmationCodeSmsRegister, setConfirmationCodeSmsRegister] =
-    useState(null);
+  const [confirmationCodeSmsRegister, setConfirmationCodeSmsRegister] = useState(null);
   const [showModalPanicButton, setShowModalPanicButton] = useState({
     status: false,
     body: '',
@@ -79,316 +81,267 @@ export const AuthProvider = ({children}: any) => {
   const [driverSelected, setDriverSelected] = useState(false);
 
   const [socialLogin, setSocialLogin] = useState({} as SocialLoginProps);
-  const [dataSocialLogin, setDataSocialLogin] = useState(
-    {} as ResponseSocialLoginProps,
-  );
+  const [dataSocialLogin, setDataSocialLogin] = useState({} as ResponseSocialLoginProps);
   const [api_key_google, setApi_key_google] = useState('' as string);
   const [isNegativate, setIsNegativate] = useState(false);
   const [visibleNegativateModal, setVisibleNegativateModal] = useState(false);
+  const biometryCheckExecuted = useRef(false);
+
+  const {
+    loading: loadingSession,
+    session,
+    setSession,
+    clearSession,
+  } = useSessionState();
+  const { updateUserLocation } = useLocationUpdater({ userId: session?.user?.idUser });
+
+  const user = !session?.isDriver ? (session?.user as User) : null;
+  const driver = session?.isDriver ? (session?.user as UserDriver) : null;
+  const isDriver = useMemo(() => session?.isDriver === true, [session?.isDriver]);
+  const tokenDriver = useMemo(
+    () => (isDriver ? session?.token : null),
+    [session?.token, isDriver],
+  );
+  const token = useMemo(
+    () => (!isDriver ? session?.token : null),
+    [session?.token, isDriver],
+  );
+
+  const updateUser = async (userData: User | null) => {
+    setSession('user', { ...session, user: userData });
+  };
+
+  const updateDriver = async (userDriverData: UserDriver | null) => {
+    setSession('driver', { ...session, user: userDriverData });
+  };
 
   const notificationExclude = [
     PushNotificationTags.DRIVERS_CLOSE,
     PushNotificationTags.REQUEST_UPDATE_DRIVER_LOCATION,
   ];
 
-  const formatNotification = async message => {
-    if (
-      message?.data?.tag &&
-      notificationExclude.includes(message?.data?.tag)
-    ) {
-      return;
-    }
-    if (
-      message.notification &&
-      Object.keys(message.notification).length !== 0
-    ) {
-      const lastMessage = await AsyncStorage.getItem('lastMessageSended');
-      const lastMessageSendedBot = await AsyncStorage.getItem(
-        'lastMessageSendedBot',
-      );
-      if (message.notification.body === lastMessage || lastMessageSendedBot) {
-        if (lastMessageSendedBot) {
-          AsyncStorage.removeItem('lastMessageSendedBot');
-        }
+  const lastKnownPosition = storage.getItem('lastPositionSync', 'json') as any;
+  const initialPosition = {
+    latitude: lastKnownPosition?.coords?.latitude ?? 0,
+    longitude: lastKnownPosition?.coords?.longitude ?? 0,
+  };
+
+  const { refresh: refreshCityConfig, data: cityConfig } = useCityConfig(initialPosition);
+
+  const handlePushNotification = useCallback(
+    async (message: any): Promise<void> => {
+      const remoteData = message?.data || (message?.request?.content?.data ?? {});
+
+      if (remoteData?.tag && notificationExclude.includes(remoteData?.tag)) return;
+
+      if (remoteData?.action === PushNotificationAction.CUSTOMER_RELEASED) {
+        setNewActionFb(remoteData.action);
+        getScoreUser(user?.idUser);
         return;
       }
 
-      Push.sendSimple({
-        title: message.notification.title,
-        body: message.notification.body,
-      });
+      if (
+        remoteData?.action === PushNotificationAction.UDATE_STATUS_DOCUMENTS ||
+        remoteData?.action === PushNotificationAction.CHANGE_STATUS_DRIVER
+      ) {
+        setNewActionFb(remoteData?.title);
+        return;
+      }
 
-      return;
-    }
+      if (remoteData?.action === PushNotificationAction.NEW_NOTIFICATION_APP) {
+        setNewActionFb(remoteData?.action);
+        return;
+      }
 
-    if (
-      message?.data?.action === 'updateStatusDocuments' ||
-      message?.data?.action === 'changeStatusDriver'
-    ) {
-      setNewActionFb(message?.data?.title);
-    }
+      if (
+        remoteData?.action === PushNotificationAction.NOTIFY_DEFAULT &&
+        remoteData?.additionalData !== ''
+      ) {
+        setShowModalPanicButton({
+          status: true,
+          body: remoteData.body,
+          additionalData: remoteData.additionalData,
+        });
+        return;
+      }
+    },
+    [user?.idUser],
+  );
 
-    if (message?.data?.action === 'newNotificationApp') {
-      setNewActionFb(message?.data?.action);
-    }
+  const getScoreUser = async (idUser?: string) => {
+    if (!idUser) return;
 
-    if (
-      message?.data.action === 'notifyApp' &&
-      message?.data.additionalData !== ''
-    ) {
-      setShowModalPanicButton({
-        status: true,
-        body: message.data.body,
-        additionalData: message.data.additionalData,
-      });
-
-      Push.sendSimple({
-        title: translate('dataAdditionalUserToOrder.title_alert_attention'),
-        body: message.data.body,
-      });
-
-      return;
-    }
-
-    Push.sendSimple(message.data);
-  };
-
-  // messaging().setBackgroundMessageHandler(async remoteMessage => {
-  //   formatNotification(remoteMessage);
-  // });
-
-  const getScoreUser = async (idUser: string) => {
     try {
-      const {data} = await apiMain.post(`Customer/Find`, {idUser});
-      setUserData(data?.data);
-      setUser({
-        ...user,
-        ...data?.data,
-      });
-      return data;
+      const response = await service.getCustomerScore(idUser);
+      setUserData(response?.data ?? null);
+      return response;
     } catch (error) {
-      console.log(error);
+      console.log('Erro ao buscar score do usuário', error);
     }
   };
 
-  async function getGeneralSettings() {
-    if (generalSettings && generalSettings.length > 0) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    const {
-      data: {data},
-    } = await apiMain.get('config/general');
-    const indexDisablePhoneLoginSetting = data.find((setting: GeneralItem) => {
-      return setting?.key === 'disable_phone_login_delivery';
-    });
-
-    const indexDisableConfirmationCodeSmsRegister = data?.find(setting => {
-      return setting?.key === 'customer_register_sms_confirmation_code';
-    });
-
-    const key_google_api = data?.find(setting => {
-      return setting?.key === 'google_api_key';
-    });
-
-    setApi_key_google(key_google_api?.value || null);
-
-    setConfirmationCodeSmsRegister(
-      indexDisableConfirmationCodeSmsRegister?.value,
-    );
-
-    permissionsApp = JSON.parse(await AsyncStorage.getItem('permissions'));
-
-    if (permissionsApp === null) {
-      permissionsApp = {
-        camera: false,
-        gallery: false,
-        location: false,
-        locationBackground: false,
-        audio: false,
-        notification: false,
-      };
-
-      await AsyncStorage.setItem('permissions', JSON.stringify(permissionsApp));
-    }
-    setDisablePhoneLogin(indexDisablePhoneLoginSetting);
-    setGeneralSettings(data);
-    loadStorageData();
-    interceptorsAxios();
-    await AsyncStorage.setItem('generalSettings', JSON.stringify(data));
+  function logGeneralSettingsStatus() {
+    const isSocketEnabled = isRealtimeSocketEnabled();
+    logger.log(`🔑 Ativar soquete em tempo real: ${isSocketEnabled}.`);
   }
 
-  async function loadStorageData() {
-    const storageUser: any = await AsyncStorage.getItem('@Auth:user');
-    // Type em constantes  = as unknown as User -> força o tipo de retorno para User (typescript)
-    const storageConfig = await AsyncStorage.getItem('cityConfig');
+  async function loadGeneralSettings() {
+    if (generalSettings && generalSettings.length > 0) {
+      setLoadingGeneralSettings(false);
+      return;
+    }
 
-    // Push.init().then(token => {
-    //   setDeviceToken(token || 'dG9rZW5EZWZhdWx0');
-    // });
+    try {
+      const {
+        data: { data },
+      } = await apiMain.get('config/general');
 
-    // @ts-ignore
-    Location.getForegroundPermissionsAsync({accuracy: 1}).then(
-      ({granted}: any) => {
-        setPermissionLocal(granted);
-      },
-    );
-    if (storageUser) {
-      setRequestFingerprint(await biometryIsEnabled());
-      const data = JSON.parse(storageUser);
+      const indexDisablePhoneLoginSetting = data.find((setting: GeneralItem) => {
+        return setting?.key === 'disable_phone_login_delivery';
+      });
+
+      const indexDisableConfirmationCodeSmsRegister = data?.find((setting) => {
+        return setting?.key === 'customer_register_sms_confirmation_code';
+      });
+
+      const key_google_api = data?.find((setting) => {
+        return setting?.key === 'google_api_key';
+      });
+
+      setApi_key_google(key_google_api?.value || null);
+
+      setConfirmationCodeSmsRegister(indexDisableConfirmationCodeSmsRegister?.value);
+
+      setDisablePhoneLogin(indexDisablePhoneLoginSetting);
+      logGeneralSettingsStatus();
+      setGeneralSettings(data);
+      setItem('generalSettings', data, 'json');
+      await AsyncStorage.setItem('generalSettings', JSON.stringify(data));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingGeneralSettings(false);
+    }
+  }
+
+  async function checkBiometryStatus() {
+    if (biometryCheckExecuted.current) {
+      return;
+    }
+    biometryCheckExecuted.current = true;
+
+    if (!session?.isDriver && session?.user) {
+      const biometryEnabled = await biometryIsEnabled();
+
+      if (biometryEnabled) {
+        setRequestFingerprint(true);
+      } else {
+        setRequestFingerprint(false);
+      }
+    }
+  }
+
+  async function syncDeviceToken() {
+    const pushToken = await Push.init() ?? 'dG9rZW5EZWZhdWx0';
+    setDeviceToken(pushToken);
+
+    if (isDriver && driver) {
+      if (driver.deviceToken !== pushToken) {
+        service.updateDriverDeviceToken({
+          deviceToken: pushToken,
+          driverId: driver.idDriver,
+          idUser: driver.idUser,
+        });
+      }
+
+      updateDriver({ ...driver, deviceToken: pushToken });
+    } else {
+      if (user.device_token !== pushToken) {
+        service.updateCustomerDeviceToken(pushToken);
+      }
+
+      updateUser({ ...user, device_token: pushToken });
+    }
+  }
+
+  async function initializeUserSession() {
+    Location.getForegroundPermissionsAsync().then(({ granted }: any) => {
+      setPermissionLocal(granted);
+    });
+
+    if (!session?.isDriver && session?.user) {
+      const data = { ...session.user } as User;
       await setHeaders(data);
-      await getScoreUser(data?.idUser);
-      setUser(data);
-      getFindByUser();
-    }
+      const scoreUser = await getScoreUser(data?.idUser);
 
-    if (storageConfig) {
-      // @ts-ignore
-      setCityConfig(JSON.parse(storageConfig));
+      data.customerRegisterStatusId = scoreUser?.data?.customerRegisterStatusId;
+
+      await updateUser(data);
+      await getFindByUser();
+      await updateUserLocation(true);
     }
-    setLoading(false);
   }
 
   async function getPermissionLocal() {
-    return new Promise((resolve, reject) => {
+    return new Promise<boolean>((resolve, reject) => {
       (async () => {
-        // @ts-ignore
-        const {status} = await Location.getForegroundPermissionsAsync({
-          accuracy: 1,
-        });
-
-        const result = status === 'granted';
-
-        permissionsApp && (permissionsApp.location = status);
-
-        await AsyncStorage.setItem(
-          'permissions',
-          JSON.stringify(permissionsApp),
-        );
-
-        if (result) {
-          resolve(result);
-          setPermissionLocal(result);
-        } else {
-          // @ts-ignore
-          Location.requestForegroundPermissionsAsync({accuracy: 1}).then(
-            // eslint-disable-next-line @typescript-eslint/no-shadow
-            ({status}: any) => {
-              setPermissionLocal(status === 'granted');
-
-              if (status !== 'granted') {
-                reject();
-              } else {
-                resolve(result);
-              }
-            },
-          );
+        try {
+          const { status } = await Location.getForegroundPermissionsAsync();
+          if (status === 'granted') {
+            setPermissionLocal(true);
+            resolve(true);
+            return;
+          }
+          const { status: requestStatus } =
+            await Location.requestForegroundPermissionsAsync();
+          const granted = requestStatus === 'granted';
+          setPermissionLocal(granted);
+          resolve(granted);
+        } catch (error) {
+          setPermissionLocal(false);
+          reject(error);
         }
       })();
     });
   }
 
   async function setHeaders(userData: User | any) {
-    apiMain.defaults.headers.common.token = userData?.api_token;
-    apiMain.defaults.headers.common.userid = userData?.idUser;
-    apiMainDriver.defaults.headers.common.token = userData?.api_token;
-    apiMainDriver.defaults.headers.common.userid = userData?.idUser;
-    apiDelivery.defaults.headers.common.token = userData?.api_token;
-    apiDelivery.defaults.headers.common.userid = userData?.idUser;
     await getNotification(userData);
-
-    /**
-     * Status de token não autorizado
-     * Apos o recebimento do status 401, o usuário perde a sessão
-     */
-    // eslint-disable-next-line consistent-return
-    // apiDelivery.interceptors.response.use(
-    //   response => {
-    //     return response;
-    //   },
-    //   error => {
-    //     if (error?.response?.status === 401 && !executeOnly.current) {
-    //       console.log('caindo no DRIVER');
-    //       Alert.alert(
-    //         'Sessão expirada',
-    //         'Sua sessão expirou, faça login novamente',
-    //         [
-    //           {
-    //             text: 'OK',
-    //             onPress: async () => {
-    //               signOut();
-    //               executeOnly.current = true;
-    //               return;
-    //             },
-    //           },
-    //         ],
-    //       );
-    //     } else {
-    //       return Promise.reject(error);
-    //     }
-    //   },
-    // );
-
-    // apiMain.interceptors.response.use(
-    //   response => {
-    //     return response;
-    //   },
-    //   error => {
-    //     if (error?.response?.status === 401 && !executeOnly.current) {
-    //       console.log('caindo no cliente');
-    //       Alert.alert(
-    //         'Sessão expirada',
-    //         'Sua sessão expirou, faça login novamente',
-    //         [
-    //           {
-    //             text: 'OK',
-    //             onPress: async () => {
-    //               signOut();
-    //               executeOnly.current = true;
-    //               return;
-    //             },
-    //           },
-    //         ],
-    //       );
-    //     } else {
-    //       return Promise.reject(error);
-    //     }
-    //   },
-    // );
   }
 
-  async function updateDataUser() {
+  async function updateDataUser(userData = null) {
+    if (userData) {
+      return await updateUser(userData);
+    }
+
     const {
-      data: {response, status},
+      data: { response, status },
     } = await apiDelivery.get('delivery/customer');
-
     if (status) {
-      setUser({...user, ...response});
-      await AsyncStorage.setItem(
-        '@Auth:user',
-        JSON.stringify({...user, ...response}),
-      );
-    }
-  }
+      const profileImageLink =
+        response.profileImageLink !== undefined
+          ? response.profileImageLink
+          : (session?.user?.profileImageLink ?? null);
 
-  async function getConfigByPosition(position: Position) {
-    if (!position.latitude || !position.longitude) {
-      return console.log('erro na localização');
+      const profileImage =
+        response.profileImage !== undefined
+          ? response.profileImage
+          : (session?.user?.profileImage ?? null);
+
+      const updatedUser = {
+        ...session?.user,
+        ...response,
+        profileImageLink,
+        profileImage,
+      };
+
+      await updateUser(updatedUser);
     }
-    const {
-      data: {data},
-    } = await apiMain.post('City/getConfig', {
-      lat: position.latitude,
-      lng: position.longitude,
-    });
-    await AsyncStorage.setItem('cityConfig', JSON.stringify(data));
-    return setCityConfig(data);
   }
 
   async function getFindByUser() {
     try {
-      const {data} = await apiMain.get('Partner/FindByUser');
+      const { data } = await apiMain.get('Partner/FindByUser');
 
       if (!data.status) {
         return setPartner({});
@@ -396,37 +349,33 @@ export const AuthProvider = ({children}: any) => {
 
       return setPartner(data.data);
     } catch (err) {
-      console.log(err);
+      console.log('Erro ao buscar parceiro', err);
     }
   }
 
   async function signIn(user: any) {
     setIsGuest(false);
+
+    const _session = { user, token: user?.api_token, isDriver: false };
+    await setSession('user', _session);
+
+    const scoreUser = await getScoreUser(user?.idUser);
+    _session.user.customerRegisterStatusId = scoreUser?.data?.customerRegisterStatusId;
+
     setHeaders(user);
-    await getScoreUser(user?.idUser);
-    setUser(user);
-    getFindByUser();
-    interceptorsAxios();
+
+    await setSession('user', _session);
+    await getFindByUser();
+    await updateUserLocation(true);
+
     // @ts-ignore
-    Location.getForegroundPermissionsAsync({accuracy: 1}).then(
-      async ({status}) => {
-        setPermissionLocal(status === 'granted');
-        permissionsApp && (permissionsApp.location = status);
-        await AsyncStorage.setItem(
-          'permissions',
-          JSON.stringify(permissionsApp),
-        );
-      },
-    );
+    Location.getForegroundPermissionsAsync({ accuracy: 1 }).then(async ({ granted }) => {
+      setPermissionLocal(granted);
+    });
+
     await AsyncStorage.removeItem('placeSelected');
     await AsyncStorage.setItem('places', JSON.stringify([]));
-    await AsyncStorage.setItem('@Auth:user', JSON.stringify(user));
     await AsyncStorage.setItem('lastIdUser', user?.idUser);
-    await AsyncStorage.setItem('lastToken', user?.api_token);
-
-    if (user && user.device_token !== deviceToken) {
-      apiMain.post('Customer/EditProfile', {deviceToken});
-    }
 
     if (await checkDeviceIsSupported()) {
       if (!(await biometryIsEnabled())) {
@@ -443,64 +392,45 @@ export const AuthProvider = ({children}: any) => {
 
   const socialLoginFacebook = async (dataUser: SocialLoginProps) => {
     try {
-      const {data} = await apiMain.post('Customer/loginSocial', {
-        ...dataUser,
-      });
-      if (!data.status) {
-        return customToast(data?.message, 'danger');
+      const response = await service.loginSocialCustomer(dataUser);
+      if (!response.status) {
+        return customToast(response?.message, 'danger');
       }
-      setDataSocialLogin(data?.data);
+
+      setDataSocialLogin(response?.data);
 
       if (driverSelected) {
-        // await AsyncStorage.setItem(
-        //   '@Auth:userDriver',
-        //   JSON.stringify(data?.data),
-        // );
-
-        // await AsyncStorage.setItem('@Auth:isDriver', 'true');
-        // await AsyncStorage.setItem('@Auth:tokenDriver', data?.data.api_token);
-
-        // apiMainDriver.defaults.headers.common.token = data?.data.api_token;
-        // apiMainDriver.defaults.headers.common.userid = data?.data.idUser;
-
-        // setIsDriver(true);
-        // setUserDriver(data?.data);
-        // setTokenDriver(data?.data.api_token);
-
-        // // @ts-ignore
-        // Location.getForegroundPermissionsAsync({accuracy: 1}).then(
-        //   ({status}) => {
-        //     setPermissionLocal(status === 'granted');
-        //   },
-        // );
-        return customToast(
-          'Motorista não pode ser logado com redes sociais',
-          'warning',
-        );
+        return customToast(translate('toast.text_driver_social_login_blocked'), 'warning');
       }
-      signIn(data?.data);
-      return data?.data;
+
+      signIn(response?.data);
+      return response?.data;
     } catch (error) {
-      console.log(error);
+      console.log('Erro no login social', error);
     }
   };
+
   async function signOut() {
-    // AsyncStorage.clear().then(() => {
-    //   setUser(null);
-    //   delete apiMain.defaults.headers.common.token;
-    //   delete apiMain.defaults.headers.common.userid;
-    //   delete apiDelivery.defaults.headers.common.token;
-    //   delete apiDelivery.defaults.headers.common.userid;
-    // });
-    await AsyncStorage.removeItem('placeSelected');
-    await AsyncStorage.removeItem('places');
-    await AsyncStorage.removeItem('@Auth:user');
-    await AsyncStorage.removeItem('cityConfig');
-    setUser(null);
-    delete apiMain.defaults.headers.common.token;
-    delete apiMain.defaults.headers.common.userid;
-    delete apiDelivery.defaults.headers.common.token;
-    delete apiDelivery.defaults.headers.common.userid;
+    abortRequestsMain();
+    abortRequestsDelivery();
+    abortRequestsDriver();
+
+    try {
+      await clearSession('user');
+      await clearSession('driver');
+
+      setUserData(null);
+
+      await AsyncStorage.removeItem('placeSelected');
+      await AsyncStorage.removeItem('places');
+      await AsyncStorage.removeItem(PIX_CACHE_KEY);
+      await AsyncStorage.removeItem(TRIP_CACHE_KEY);
+      clearCityConfigCache();
+    } catch (error) {
+      console.log('Erro ao fazer logout', error);
+    } finally {
+      biometryCheckExecuted.current = false;
+    }
   }
 
   async function saveBiometry() {
@@ -512,7 +442,7 @@ export const AuthProvider = ({children}: any) => {
 
     const authenticated = LocalAuthentication.authenticateAsync({
       promptMessage: translate('biometry.prompt'),
-    }).then(async result => {
+    }).then(async (result) => {
       if (result.success) {
         await AsyncStorage.setItem('biometry_enabled', 'true');
         await AsyncStorage.setItem('biometry_email', user?.email);
@@ -545,7 +475,7 @@ export const AuthProvider = ({children}: any) => {
 
   async function authenticateBiometry(
     promptMessage = translate('biometry.prompt'),
-  ) {
+  ): Promise<boolean> {
     const deviceSupportsBiometry = await checkDeviceIsSupported();
 
     if (!deviceSupportsBiometry) {
@@ -560,7 +490,9 @@ export const AuthProvider = ({children}: any) => {
         cancelLabel: 'Cancelar',
         fallbackLabel: 'Tentar novamente',
       })
-        .then(async ({success}) => success)
+        .then((reason) => {
+          return reason.success;
+        })
         .catch(() => {
           return false;
         });
@@ -573,7 +505,7 @@ export const AuthProvider = ({children}: any) => {
     const email = await AsyncStorage.getItem('biometry_email');
     const token = await AsyncStorage.getItem('biometry_token');
 
-    return {email, token};
+    return { email, token };
   }
 
   async function biometryIsEnabled() {
@@ -593,29 +525,21 @@ export const AuthProvider = ({children}: any) => {
     return supportedAuthentications.length > 0;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   async function getNotification(user: any = null) {
-    // eslint-disable-next-line no-unused-expressions
-    let storage = await AsyncStorage.getItem('@Auth:user');
     let api = apiMain;
 
-    if (user?.idDriver || !storage) {
-      storage = await AsyncStorage.getItem('@Auth:userDriver');
+    if (user?.idDriver || session?.isDriver) {
       api = apiMainDriver;
     }
-    // eslint-disable-next-line no-unused-expressions
-    user === null ? (user = JSON.parse(storage)) : user;
+
+    user === null ? (user = session?.user) : user;
 
     await api(`notification/findByUser?idUser=${user?.idUser}&page=1`).then(
-      ({data}) => {
+      ({ data }) => {
         if (!data.status) {
-          return customToast(
-            'Ocorreu um erro ao carregar as notificações',
-            'danger',
-          );
+          return customToast(translate('toast.text_notifications_load_error'), 'danger');
         }
 
-        breakEventListener = true;
         return setNotification(data.data);
       },
     );
@@ -623,110 +547,18 @@ export const AuthProvider = ({children}: any) => {
 
   async function getRequireField() {
     try {
-      const {data} = await apiMain.get(
-        'requiredfield/get?userTypeId=5&fullFields=1',
-      );
+      const { data } = await apiMain.get('requiredfield/get?userTypeId=5&fullFields=1');
       return data;
     } catch (error) {
-      return console.log(error);
+      console.log('Erro ao obter campos obrigatórios', error);
     }
   }
 
-  const interceptorsAxios = () => {
-    apiDelivery.interceptors.response.use(
-      response => {
-        return response;
-      },
-      error => {
-        if (error?.response?.status === 401 && !executeOnly.current) {
-          Alert.alert(
-            'Sessão expirada',
-            'Sua sessão expirou, faça login novamente',
-            [
-              {
-                text: 'OK',
-                onPress: async () => {
-                  signOut();
-                  executeOnly.current = true;
-                },
-              },
-            ],
-          );
-        } else {
-          return Promise.reject(error);
-        }
-      },
-    );
-
-    apiMain.interceptors.response.use(
-      response => {
-        return response;
-      },
-      error => {
-        if (error?.response?.status === 401 && !executeOnly.current) {
-          Alert.alert(
-            'Sessão expirada',
-            'Sua sessão expirou, faça login novamente',
-            [
-              {
-                text: 'OK',
-                onPress: async () => {
-                  await signOut();
-                  executeOnly.current = true;
-                },
-              },
-            ],
-          );
-        } else {
-          return Promise.reject(error);
-        }
-      },
-    );
-
-    apiMainDriver.interceptors.response.use(
-      response => {
-        return response;
-      },
-      async error => {
-        if (error?.response?.status === 401 && !executeOnly.current) {
-          Alert.alert(
-            'Sessão expirada',
-            'Sua sessão expirou, faça login novamente',
-            [
-              {
-                text: 'OK',
-                onPress: async () => {
-                  await signOutDriver();
-                  executeOnly.current = true;
-                },
-              },
-            ],
-          );
-        } else if (error?.response?.status === 401) {
-          await signOutDriver();
-        } else {
-          return Promise.reject(error);
-        }
-      },
-    );
-  };
-
-  async function isDriverLogged() {
-    const tokenUserDriver = await AsyncStorage.getItem('@Auth:tokenDriver');
-    const userDriverLogged = await AsyncStorage.getItem('@Auth:userDriver');
+  async function initializeDriverSession() {
     const appSetting = await AsyncStorage.getItem('appSetting');
 
-    if (tokenUserDriver && userDriverLogged) {
-      const userLogged = JSON.parse(userDriverLogged);
-      apiMainDriver.defaults.headers.common.token = tokenUserDriver;
-      apiMainDriver.defaults.headers.common.userid = userLogged.idUser;
-      apiMain.defaults.headers.common.token = tokenUserDriver;
-      apiMain.defaults.headers.common.userid = userLogged.idUser;
-      apiDelivery.defaults.headers.common.token = tokenUserDriver;
-      apiDelivery.defaults.headers.common.userid = userLogged.idUser;
-      setUserDriver(userLogged);
-      setIsDriver(true);
-      setTokenDriver(tokenUserDriver);
+    if (session?.isDriver && session?.user && session?.token) {
+      const userLogged = session.user as UserDriver;
       getNotification(userLogged);
     }
 
@@ -734,190 +566,150 @@ export const AuthProvider = ({children}: any) => {
       const modeAcceptTrip = {
         enableClick: true,
         enableTouch: true,
-        enableFlashLight: false,
+        enableFlashLight: true,
       };
 
       await AsyncStorage.setItem('appSetting', JSON.stringify(modeAcceptTrip));
     }
-
-    // apiMainDriver.interceptors.response.use(
-    //   response => {
-    //     return response;
-    //   },
-    //   error => {
-    //     if (error?.response?.status === 401 && !executeOnly.current) {
-    //       console.log('caindo no cliente');
-    //       Alert.alert(
-    //         'Sessão expirada',
-    //         'Sua sessão expirou, faça login novamente',
-    //         [
-    //           {
-    //             text: 'OK',
-    //             onPress: async () => {
-    //               signOutDriver();
-    //               executeOnly.current = true;
-    //               return;
-    //             },
-    //           },
-    //         ],
-    //       );
-    //     } else {
-    //       return Promise.reject(error);
-    //     }
-    //   },
-    // );
   }
 
   const loginDriver = useCallback(
-    async (email: string, password: string): Promise<boolean> => {
+    async (email: string, password: string, keyAppPartner?: string): Promise<boolean> => {
       try {
-        const idDevice = await getDeviceId();
+        const effectiveDeviceToken =
+          deviceToken || (await AsyncStorage.getItem('deviceToken')) || '1234';
 
-        const response = await service.loginDriver(email, password, idDevice);
-
-        if (typeof response === 'string') {
-          customToast(response, 'danger');
-
+        const response = await service.loginDriver({
+          email,
+          password,
+          deviceToken: effectiveDeviceToken,
+          keyAppPartner: keyAppPartner ?? null,
+        });
+        if (response.status === false) {
+          customToast(response.message, 'danger');
           return false;
         }
 
-        getAppColors(Number(AppsId.DRIVER));
+        await setSession('driver', {
+          user: response.data,
+          token: response.data.api_token,
+          isDriver: true,
+        });
 
-        await AsyncStorage.setItem(
-          '@Auth:userDriver',
-          JSON.stringify(response),
-        );
-        await AsyncStorage.setItem(
-          'lastLogin',
-          JSON.stringify({
-            email,
-            password,
-          }),
-        );
+        await AsyncStorage.setItem('lastLogin', JSON.stringify({ email, password }));
 
-        await AsyncStorage.setItem('@Auth:isDriver', 'true');
-        await AsyncStorage.setItem('@Auth:tokenDriver', response.api_token);
-
-        apiMainDriver.defaults.headers.common.token = response.api_token;
-        apiMainDriver.defaults.headers.common.userid = response.idUser;
-        apiMain.defaults.headers.common.token = response.api_token;
-        apiMain.defaults.headers.common.userid = response.idUser;
-        apiDelivery.defaults.headers.common.token = response.api_token;
-        apiDelivery.defaults.headers.common.userid = response.idUser;
-
-        setIsDriver(true);
-        setUserDriver(response);
-        setTokenDriver(response.api_token);
         getNotification(response);
 
         // @ts-ignore
-        Location.getForegroundPermissionsAsync({accuracy: 1}).then(
-          async ({status}) => {
+        Location.getForegroundPermissionsAsync({ accuracy: 1 }).then(
+          async ({ status }) => {
             setPermissionLocal(status === 'granted');
-            permissionsApp && (permissionsApp.location = status);
-            await AsyncStorage.setItem(
-              'permissions',
-              JSON.stringify(permissionsApp),
-            );
           },
         );
-        interceptorsAxios();
 
-        if (response && response.deviceToken !== deviceToken) {
-          apiMainDriver.post('driver/edit', {
-            stdObject: [
-              {
-                deviceToken,
-                driverId: response.idDriver,
-                idUser: response.idUser,
-              },
-            ],
-          });
-        }
         return true;
-      } catch (error) {
-        setLoading(false);
-
+      } catch (error: any) {
+        console.error('Erro em loginDriver:', error);
+        customToast(
+          error?.response?.data?.message || error?.message || 'Erro ao conectar ao servidor do motorista.',
+          'danger',
+        );
         return false;
       }
     },
-    [service],
+    [deviceToken],
   );
 
   const listCategories = useCallback(async () => {
     try {
       const response = await service.listCategories();
-
       return response;
     } catch (error) {
-      console.log(error);
-
+      console.log('Erro ao listar categorias', error);
       return [];
     }
-  }, [service]);
-
-  const signOutDriver = useCallback(async () => {
-    await AsyncStorage.removeItem('@Auth:tokenDriver');
-    await AsyncStorage.removeItem('@Auth:userDriver');
-    await AsyncStorage.removeItem('@Auth:isDriver');
-
-    setIsDriver(false);
-    setTokenDriver('');
-
-    signOut();
-
-    delete apiMainDriver.defaults.headers.common.token;
-    delete apiMainDriver.defaults.headers.common.userid;
   }, []);
-
-  const handleLoginEndPoint = async (email, password) => {
-    const {data} = await apiMain.post('Customer/login', {
-      email,
-      password,
-      deviceToken,
-      generateToken: false,
-    });
-
-    return data;
-  };
 
   const authenticateLogin = useCallback(
-    async ({email, password}: {email: string; password: string}) => {
+    async ({ email, password, setModal, keyAppPartner }: AuthenticateLoginData) => {
       setLoading(true);
 
-      if (driverSelected) {
-        await loginDriver(email, password);
+      try {
+        if (driverSelected) {
+          await loginDriver(email, password, keyAppPartner);
+          return;
+        }
 
-        setLoading(false);
-        return;
-      }
+        const effectiveDeviceToken =
+          deviceToken || (await AsyncStorage.getItem('deviceToken')) || '1234';
 
-      const data = await handleLoginEndPoint(email, password);
-      setLoading(false);
-      if (!data.status) {
-        customToast(data.message, 'danger');
-      } else {
-        signIn(data.data);
-        await AsyncStorage.setItem(
-          'lastLogin',
-          JSON.stringify({
-            email,
-            password,
-          }),
+        const response = await service.loginCustomer({
+          email,
+          password,
+          deviceToken: effectiveDeviceToken,
+          keyAppPartner: keyAppPartner ?? null,
+        });
+        if (!response.status) {
+          customToast(response.message, 'danger');
+          if (setModal) setModal(true);
+        } else {
+          await signIn(response.data);
+          await AsyncStorage.setItem('lastLogin', JSON.stringify({ email, password }));
+          await AsyncStorage.setItem('account', JSON.stringify(response.data));
+        }
+      } catch (error: any) {
+        console.error('Erro em authenticateLogin:', error);
+        customToast(
+          error?.response?.data?.message || error?.message || 'Erro ao realizar login.',
+          'danger',
         );
-        await AsyncStorage.setItem('account', JSON.stringify(data.data));
+      } finally {
+        setLoading(false);
       }
     },
-    [signIn, loginDriver, deviceToken],
+    [driverSelected, signIn, loginDriver, deviceToken],
   );
 
-  useEffect(() => {
-    isDriverLogged();
+  const showExpiredSessionAlert = useCallback((onConfirm: () => void) => {
+    if (executeOnly.current) return;
+    executeOnly.current = true;
+
+    const handleOnConfirm = () => {
+      executeOnly.current = false;
+      onConfirm();
+    };
+
+    Alert.alert('Sessão expirada', 'Sua sessão expirou, faça login novamente', [
+      { text: 'OK', onPress: handleOnConfirm },
+    ]);
   }, []);
 
   useEffect(() => {
-    getGeneralSettings();
-  }, [network]);
+    const driverInterceptor = createAuthInterceptor(apiMainDriver, () =>
+      showExpiredSessionAlert(signOut),
+    );
+    const deliveryInterceptor = createAuthInterceptor(apiDelivery, () =>
+      showExpiredSessionAlert(signOut),
+    );
+    const clientInterceptor = createAuthInterceptor(apiMain, () =>
+      showExpiredSessionAlert(signOut),
+    );
+
+    return () => {
+      detachAuthInterceptor(apiMainDriver, driverInterceptor);
+      detachAuthInterceptor(apiDelivery, deliveryInterceptor);
+      detachAuthInterceptor(apiMain, clientInterceptor);
+    };
+  }, [showExpiredSessionAlert]);
+
+  useEffect(() => {
+    if (!loadingSession) {
+      loadGeneralSettings();
+      initializeDriverSession();
+      initializeUserSession();
+      checkBiometryStatus();
+    }
+  }, [loadingSession, network]);
 
   useEffect(() => {
     if (Object.keys(socialLogin).length > 0) {
@@ -926,164 +718,97 @@ export const AuthProvider = ({children}: any) => {
   }, [socialLogin]);
 
   useEffect(() => {
-    if (isBeta && betaEnd) {
-      signOutDriver();
-      signOut();
-    }
+    if (isBeta && betaEnd) signOut();
   }, [betaEnd]);
 
-  // useEffect(() => {
-  //   const onMessage = messaging().onMessage(async remoteMessage => {
-  //     formatNotification(remoteMessage);
-  //   });
+  useEffect(() => {
+    const receivedSub = Notifications.addNotificationReceivedListener(notification => {
+      handlePushNotification(notification);
+    });
 
-  //   return onMessage;
-  // }, [messaging]);
+    return () => {
+      receivedSub.remove();
+    };
+  }, [handlePushNotification]);
 
-  const value = useMemo(
-    () => ({
-      authenticateLogin,
-      user,
-      setUser,
-      cityConfig,
-      setCityConfig,
-      signed: !!user,
-      deviceToken,
-      permissionLocal,
-      singleDelivery: false,
-      loading,
-      setLoading,
-      isGuest,
-      setIsGuest,
-      token: '',
-      offerBiometry,
-      setOfferBiometry,
-      signOut,
-      updateDataUser,
-      saveBiometry,
-      generalSettings,
-      setGeneralSettings,
-      biometryIsEnabled,
-      notification,
-      signIn,
-      authenticateBiometry,
-      disablePhoneLogin,
-      getConfigByPosition,
-      getPermissionLocal,
-      requestFingerprint,
-      setRequestFingerprint,
-      checkDeviceIsSupported,
-      getNotification,
-      setHeaders,
-      setNotification,
-      getRequireField,
-      loginDriver,
-      userDriver,
-      setUserDriver,
-      isDriver,
-      setIsDriver,
-      tokenDriver,
-      setTokenDriver,
-      listCategories,
-      deleteBiometry,
-      signOutDriver,
-      partner,
-      setSocialLogin,
-      socialLogin,
-      setDataSocialLogin,
-      dataSocialLogin,
-      socialLoginFacebook,
-      setDriverSelected,
-      driverSelected,
-      confirmationCodeSmsRegister,
-      userData,
-      setUserData,
-      itsNetwork,
-      setItsNetwork,
-      showModalPanicButton,
-      setShowModalPanicButton,
-      newActionFb,
-      setNewActionFb,
-      api_key_google,
-      setIsNegativate,
-      isNegativate,
-      setVisibleNegativateModal,
-      visibleNegativateModal,
-    }),
-    [
-      authenticateLogin,
-      user,
-      setUser,
-      checkDeviceIsSupported,
-      biometryIsEnabled,
-      cityConfig,
-      setCityConfig,
-      notification,
-      deviceToken,
-      permissionLocal,
-      loading,
-      setLoading,
-      isGuest,
-      setIsGuest,
-      offerBiometry,
-      setOfferBiometry,
-      signOut,
-      updateDataUser,
-      saveBiometry,
-      generalSettings,
-      setGeneralSettings,
-      signIn,
-      authenticateBiometry,
-      disablePhoneLogin,
-      getConfigByPosition,
-      getPermissionLocal,
-      requestFingerprint,
-      setRequestFingerprint,
-      setHeaders,
-      getNotification,
-      setHeaders,
-      notification,
-      setNotification,
-      getRequireField,
-      loginDriver,
-      userDriver,
-      setUserDriver,
-      isDriver,
-      setIsDriver,
-      tokenDriver,
-      setTokenDriver,
-      listCategories,
-      signOutDriver,
-      deleteBiometry,
-      partner,
-      setSocialLogin,
-      socialLogin,
-      setDataSocialLogin,
-      dataSocialLogin,
-      socialLoginFacebook,
-      setDriverSelected,
-      driverSelected,
-      confirmationCodeSmsRegister,
-      setUserData,
-      itsNetwork,
-      setItsNetwork,
-      showModalPanicButton,
-      setShowModalPanicButton,
-      newActionFb,
-      setNewActionFb,
-      api_key_google,
-      setIsNegativate,
-      isNegativate,
-      setVisibleNegativateModal,
-      visibleNegativateModal,
-    ],
-  );
+  const value = {
+    authenticateLogin,
+    syncDeviceToken,
+    user,
+    setUser: updateUser,
+    cityConfig,
+    signed: !!token,
+    deviceToken,
+    permissionLocal,
+    singleDelivery: false,
+    loading,
+    setLoading,
+    isGuest,
+    setIsGuest,
+    token: token,
+    offerBiometry,
+    setOfferBiometry,
+    signOut,
+    updateDataUser,
+    saveBiometry,
+    generalSettings,
+    setGeneralSettings,
+    biometryIsEnabled,
+    notification,
+    signIn,
+    authenticateBiometry,
+    disablePhoneLogin,
+    getConfigByPosition: refreshCityConfig,
+    updateUserLocation,
+    getPermissionLocal,
+    requestFingerprint,
+    setRequestFingerprint,
+    checkDeviceIsSupported,
+    getNotification,
+    setHeaders,
+    setNotification,
+    getRequireField,
+    loginDriver,
+    userDriver: driver,
+    setUserDriver: updateDriver,
+    isDriver: isDriver,
+    tokenDriver: tokenDriver,
+    listCategories,
+    deleteBiometry,
+    signOutDriver: signOut,
+    partner,
+    setSocialLogin,
+    socialLogin,
+    setDataSocialLogin,
+    dataSocialLogin,
+    socialLoginFacebook,
+    setDriverSelected,
+    driverSelected,
+    confirmationCodeSmsRegister,
+    userData,
+    setUserData,
+    itsNetwork,
+    setItsNetwork,
+    showModalPanicButton,
+    setShowModalPanicButton,
+    newActionFb,
+    setNewActionFb,
+    api_key_google,
+    setIsNegativate,
+    isNegativate,
+    setVisibleNegativateModal,
+    visibleNegativateModal,
+    loadingSession,
+    loadingGeneralSettings,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export function useAuth() {
   const context = useContext(AuthContext);
-
+  if (!context) {
+    throw new Error('useAuth must be used within a AuthProvider');
+  }
   return context;
 }

@@ -1,15 +1,15 @@
 // @ts-nocheck
 
-import {useCallback, useEffect, useState} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 // @ts-ignore
-import {Alert} from 'react-native';
+import { Alert } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
-import {useForm} from 'react-hook-form';
-import {yupResolver} from '@hookform/resolvers/yup';
-import {ButtonBackPage} from '../../components/form/SignIn';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { ButtonBackPage } from '../../components/form/SignIn';
 import apiMain from '../../api/apiMain';
 
-import {translate} from '../../locales';
+import { translate } from '../../locales';
 import {
   Container,
   ContainerPhoto,
@@ -17,23 +17,23 @@ import {
   ContentButton,
   InputPhoto,
 } from './styles';
-import {InputContainer} from '../../components/InputContainer';
-import {Input} from '../../components/Input';
-import {schema} from './schema';
-import {InputMask} from '../../components/InputMask';
-import {Button} from '../../components/Button';
-import {InputPassword} from '../../components/InputPassword';
-import {useAuth} from '../../../context/auth';
-import {FaceDetectorScreen} from '../../components/FaceDetector';
-import {If} from '../../components/If';
-import {useNavigation} from '@react-navigation/native';
-import {Label} from '../../components/InputContainer/styles';
-import {PickerIOS} from '@react-native-picker/picker';
+import { InputContainer } from '../../components/InputContainer';
+import { Input } from '../../components/Input';
+import { schema } from './schema';
+import { InputMask } from '../../components/InputMask';
+import { Button } from '../../components/Button';
+import { InputPassword } from '../../components/InputPassword';
+import { useAuth } from '../../../context/auth';
+import { FaceDetectorScreen } from '../../components/FaceDetector';
+import { If } from '../../components/If';
+import { useNavigation } from '@react-navigation/native';
+import { Label } from '../../components/InputContainer/styles';
+import { PickerIOS } from '@react-native-picker/picker';
 import Dropdown from '../../components/DropDown';
 
 export interface FormData {
   name: string;
-  document: string;
+  document?: string;
   date: string;
   email: string;
   phone: string;
@@ -58,10 +58,10 @@ interface CityProps {
   nome: string;
 }
 
-export default function DataUserSignUp({route}) {
-  const {numberPhone} = route.params;
+export default function DataUserSignUp({ route }) {
+  const { numberPhone } = route.params;
   const navigation = useNavigation();
-  const {deviceToken, getRequireField} = useAuth();
+  const { deviceToken, getRequireField, generalSettings } = useAuth();
   const [loading, setLoading] = useState(false);
   const [requireFields, setRequireFields] = useState<RequireField[]>([]);
   const [photo, setPhoto] = useState(null);
@@ -84,7 +84,7 @@ export default function DataUserSignUp({route}) {
 
   const getCities = useCallback(async () => {
     try {
-      const {data} = await apiMain.get('city/getactives');
+      const { data } = await apiMain.get('city/getactives');
 
       if (!data.status) {
         return;
@@ -103,7 +103,7 @@ export default function DataUserSignUp({route}) {
     control,
     handleSubmit,
     setValue,
-    formState: {errors},
+    formState: { errors },
   } = useForm<FormData>({
     resolver: yupResolver(schema),
   });
@@ -112,7 +112,7 @@ export default function DataUserSignUp({route}) {
     const itemPhoto = requireFields.find(item => item.field === 'profileImage');
 
     if (itemPhoto) {
-      const filename = photo.uri.split('/').pop();
+      const filename = photo.uri?.split('/').pop();
       const match = /\.(\w+)$/.exec(filename);
       const type = match ? `image/${match[1]}` : `image`;
       const formData = new FormData();
@@ -125,11 +125,11 @@ export default function DataUserSignUp({route}) {
         'stdObject',
         JSON.stringify({
           name: form.name,
-          document: form.document,
+          document: form.document || '',
           email: form.email,
           phone: form.phone,
           dateOfBirth: date,
-          nickname: form.name.split(' ')[0],
+          nickname: form.name?.split(' ')[0],
           registered_in: 'mobilidade',
           password: form.password,
         }),
@@ -139,9 +139,9 @@ export default function DataUserSignUp({route}) {
       const object = {
         name: form.name,
         email: form.email,
-        document: form.document,
+        document: form.document || '',
         dateOfBirth: date,
-        nickname: form.name.split(' ')[0],
+        nickname: form.name?.split(' ')[0],
         registered_in: 'mobilidade',
         phone: numberPhone ?? form.phone,
         password: form.password,
@@ -173,7 +173,7 @@ export default function DataUserSignUp({route}) {
         Alert.alert('Atenção', 'É necessário tirar uma foto para prosseguir', [
           {
             text: 'OK',
-            onPress: () => setRequired({profileImage: true}),
+            onPress: () => setRequired({ profileImage: true }),
           },
 
           {
@@ -207,7 +207,7 @@ export default function DataUserSignUp({route}) {
     //   object.phone = form.phone;
     // }
 
-    const {data} = await endpoint;
+    const { data } = await endpoint;
     setLoading(false);
 
     if (!data.status) {
@@ -220,20 +220,20 @@ export default function DataUserSignUp({route}) {
     }
     if (!numberPhone) {
       // eslint-disable-next-line @typescript-eslint/no-shadow
-      const {data} = await apiMain.post('Customer/login', {
+      const { data } = await apiMain.post('Customer/login', {
         email: form.email,
         password: form.password,
         deviceToken,
       });
-      navigation.navigate('CongratulationSignUp', {user: data.data});
+      navigation.navigate('CongratulationSignUp', { user: data.data });
     } else {
       // eslint-disable-next-line @typescript-eslint/no-shadow
-      const {data} = await apiMain.post('Customer/LoginByPhone', {
+      const { data } = await apiMain.post('Customer/LoginByPhone', {
         phone: numberPhone,
         deviceToken,
       });
 
-      navigation.navigate('CongratulationSignUp', {user: data.data});
+      navigation.navigate('CongratulationSignUp', { user: data.data });
     }
   }
 
@@ -260,22 +260,22 @@ export default function DataUserSignUp({route}) {
       <FaceDetectorScreen
         setImage={setPhoto}
         visible={required.profileImage && !loading}
-        onClose={() => setRequired({profileImage: false})}
-        sendPhoto={() => setRequired({profileImage: false})}
+        onClose={() => setRequired({ profileImage: false })}
+        sendPhoto={() => setRequired({ profileImage: false })}
       />
       <Spinner visible={loading} />
       <Content>
         <ButtonBackPage onPress={() => navigation.goBack()} text={' '} />
         <ContainerPhoto>
           <InputPhoto
-            onPress={() => (!photo ? setRequired({profileImage: true}) : null)}
+            onPress={() => (!photo ? setRequired({ profileImage: true }) : null)}
             source={
-              photo ? {uri: photo.uri} : require('../../assets/images/user.png')
+              photo ? { uri: photo.uri } : require('../../assets/images/user.png')
             }
           />
           <Label
             onPress={() =>
-              !photo ? setRequired({profileImage: true}) : setPhoto(null)
+              !photo ? setRequired({ profileImage: true }) : setPhoto(null)
             }
           >
             {!photo ? 'Adicionar Foto' : 'Remover Foto'}
@@ -289,15 +289,6 @@ export default function DataUserSignUp({route}) {
             placeholder={translate(
               'dataUserSignUp.text_placeholder_enter_your_full_name',
             )}
-          />
-        </InputContainer>
-
-        <InputContainer label={translate('dataUserSignUp.text_document')}>
-          <Input
-            name="document"
-            control={control}
-            placeholder={translate('dataUserSignUp.text_placeholder_document')}
-            error={errors.document && errors.document.message}
           />
         </InputContainer>
 

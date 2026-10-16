@@ -46,12 +46,6 @@ export function MapCall() {
   }, [position]);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', handleTripStateChange);
-
-    // return route.params?.noUnsubscribe ? null : unsubscribe;
-  }, [navigation]);
-
-  useEffect(() => {
     if (completedTripData) {
       setTimeout(() => {
         setShowTripFinishModal(true);

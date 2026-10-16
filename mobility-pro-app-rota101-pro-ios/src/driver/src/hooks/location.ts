@@ -1,76 +1,48 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
-import {Platform} from 'react-native';
-import {useLocalProvider} from '../context/local';
-import {useStorageSync} from '../../../common/services/mmkv/storage';
+import { useLocalProvider } from '../context/local';
+import { storage } from '../../../common/services/mmkv/storage';
 
 type UseLocalResult = {
   location: Location.LocationObject;
+  setLocation: (data: any) => void;
 };
 
 export const useLocal = (shouldTrack: boolean = true): UseLocalResult => {
-  const locationContext = useLocalProvider()?.location;
-  const {getItem} = useStorageSync();
-  const [location, setLocation] = useState({
+  const { location: contextLocation, setLocation: setContextLocation } = useLocalProvider();
+  const { getItem } = storage;
+
+  const [oneTimeLocation, setOneTimeLocation] = useState({
     coords: {
       latitude:
         getItem('lastPositionSync', 'json')?.coords?.latitude ||
-        locationContext?.coords?.latitude ||
+        contextLocation?.coords?.latitude ||
         0,
       longitude:
         getItem('lastPositionSync', 'json')?.coords?.longitude ||
-        locationContext?.coords?.longitude ||
+        contextLocation?.coords?.longitude ||
         0,
     },
   } as Location.LocationObject);
 
   useEffect(() => {
+    if (shouldTrack) return;
+
     let unmount = false;
-    let unsubscribe = null;
-
-    // Função para obter a localização atual uma única vez
     const getOneTimeLocation = async () => {
-      let {status} = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.error('Permission to access location was denied');
-        return;
-      }
-
-      let local = await Location.getCurrentPositionAsync({});
-      if (!unmount) {
-        setLocation(local);
-      }
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+      const local = await Location.getCurrentPositionAsync({});
+      if (!unmount) setOneTimeLocation(local);
     };
+    getOneTimeLocation();
 
-    if (shouldTrack) {
-      // Se shouldTrack for true, continuar atualizando a localização
-      Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.BestForNavigation,
-          distanceInterval: Platform.OS === 'android' ? 3 : 5,
-        },
-        local => {
-          if (!unmount) {
-            setLocation(local);
-          }
-        },
-      ).then(result => {
-        unsubscribe = result;
-      });
-    } else {
-      // Se shouldTrack for false, obter uma única localização
-      getOneTimeLocation();
-    }
-
-    return () => {
-      unmount = true;
-      if (unsubscribe) {
-        unsubscribe.remove();
-      }
-    };
+    return () => { unmount = true; };
   }, [shouldTrack]);
 
-  return {
-    location,
-  };
+  if (shouldTrack) {
+    return { location: contextLocation, setLocation: setContextLocation };
+  }
+
+  return { location: oneTimeLocation, setLocation: setOneTimeLocation };
 };

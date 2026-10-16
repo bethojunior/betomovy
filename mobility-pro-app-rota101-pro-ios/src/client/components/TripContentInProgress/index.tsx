@@ -1,14 +1,15 @@
-import {useEffect, useState, useCallback, useMemo} from 'react';
-import {Share, Text} from 'react-native';
-import {AntDesign, Feather, Ionicons} from '@expo/vector-icons';
-import {useNavigation} from '@react-navigation/native';
-import {View} from 'moti';
+import { useEffect, useState } from 'react';
+import { Share } from 'react-native';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import {
+  STATUS_ACCEPTED,
+  STATUS_BOARDING,
   STATUS_IN_PROGRESS,
   STATUS_SCHEDULED,
   tripStatus,
 } from '../../constants/trip';
-import {useTrip} from '../../contexts/Trip';
+import { useTrip } from '../../contexts/Trip';
 import {
   BottomContainer,
   CancelButton,
@@ -22,28 +23,35 @@ import {
   ContainerPressable,
   DriverInfoContainer,
   DriverProfilePicture,
+  DriverProfilePictureContainer,
   DriverRating,
   DriverRatingContainer,
+  Handle,
   HeaderContainer,
   Input,
   InputContainer,
   LicensePlate,
+  MoreInfo,
+  MoreInfoButton,
+  MoreInfoContainer,
   Nickname,
   NicknameContainer,
+  NicknameIcon,
   ShareButton,
+  StatusIcon,
   TripStatus,
   TripStatusContainer,
   TripTimeContainer,
+  TripTimeLabel,
+  TripTimeValue,
 } from './styles';
-import {useAuth} from '../../../context/auth';
-import {customToast} from '../../../utils/FlashMessage';
-import {TextEdit} from '../TextEdit';
+import { customToast } from '../../../utils/FlashMessage';
 import theme from '../../styles/theme';
-import {translate} from '../../locales';
+import { translate } from '../../locales';
 import LookUpAddressesModalInTrip from '../LookUpAddressesModalInTrip';
-import {If} from '../If';
-import {convertDatetimeToTime} from '../../utils/FormatDate';
-import {ModalCancellationReasonsCustomer} from '../ModalCancellationReason';
+import { If } from '../If';
+import { convertDatetimeToTime } from '../../utils/FormatDate';
+import { ModalCancellationReasonsCustomer } from '../ModalCancellationReason';
 import Animated, {
   useSharedValue,
   withTiming,
@@ -51,19 +59,18 @@ import Animated, {
   withRepeat,
   withSequence,
 } from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
-import {ChatRealtime} from '../../services/realtime/ChatRealtime';
-import {CardInfoClient} from '../CardInfoClient';
-import {TripProps} from '../../contexts/Trip/types';
-import ModalFrame from '../../../driver/src/components/form/ModalFrame';
-import Helper from '../../utils/Helper';
 
-const height = 260;
+import { CardInfoClient } from '../CardInfoClient';
+import DistantDriverPriceConfirmationModal from '../../../components/DistantDriverPriceConfirmModal';
+import apiMain from '../../api/apiMain';
+import { STATUS_WAITING } from '../../../driver/src/constants/trip';
+import TimerCircle from '../../../driver/src/components/TimerCircle';
 
-export default function TripContentInProgress({setModalDriverData}) {
-  const {user, cityConfig} = useAuth();
-  const chatRealtime = useMemo(() => new ChatRealtime(), []);
+export default function TripContentInProgress({ setModalDriverData,
+  newMessage,
+  setNewMessage
+}) {
+  const [tripStatusText, setTripStatusText] = useState<Record<string, string>>({});
 
   const [cancellationReasonsModal, setCancellationReasonsModal] =
     useState(false);
@@ -74,46 +81,54 @@ export default function TripContentInProgress({setModalDriverData}) {
     dispatchTripCustomer,
     cancelTripByCustomer,
     initNewTripAfterCancel,
+    getWaitingTimer
   } = useTrip();
 
-  const {trip, routeTrip, waypointQuantities, waypoints} = stateTripCustomer;
+  interface WaitingConfigsProps {
+    waiting_tolerance_seconds: string | null
+    waiting_penalty_fee: string | null
+    waiting_extra_fee_per_minute: string | null
+  }
+
+  const { trip, routeTrip, waypointQuantities, waypoints } = stateTripCustomer;
   const navigation = useNavigation();
-  const [newMessage, setNewMessage] = useState(false);
   const [linkShare, setLinkShare] = useState('');
   const [visibleInfoCardInfo, setVisibleInfoCardInfo] = useState(false);
   const [visibleLongDistance, setVisibleLongDistance] = useState(false);
+  const [waitingConfigs, setWaitingConfigs] = useState<WaitingConfigsProps>()
 
   const [visibleLookUpAddressModal, setVisibleLookUpAddressModal] =
     useState(false);
 
-  const seconds = 15;
+  const getTrip = async (tripReference: string) => {
+    try {
+      const {
+        data: { data },
+      } = await apiMain.post('trip/get', { stdObject: [{ tripReference }] });
+      return data;
+    } catch (error) {
+      console.log('error', error);
+
+      return false;
+    }
+  };
 
   useEffect(() => {
-    if (trip.tripReference) {
-      if (trip.tripLongDistanceValue !== null && trip.status == 'accepted') {
-        setVisibleLongDistance(true);
-        setTimeout(() => {
-          setVisibleLongDistance(false);
-        }, seconds * 1000);
-      } else {
-        setVisibleLongDistance(false);
-      }
-      chatRealtime.getLastMessageUnread(trip.tripReference, ({item, id}) => {
-        if (item.message === 'null') {
-          return;
-        }
+    if (!trip?.tripReference) return;
 
-        if (
-          // eslint-disable-next-line eqeqeq
-          item.userId != user.idUser &&
-          !item.viewed &&
-          navigation.isFocused()
-        ) {
-          setNewMessage(true);
-        }
-      });
-    }
-  }, [trip]);
+    getTrip(trip.tripReference).then(tripData => {
+      if (!tripData.acceptedText) {
+        setTripStatusText(tripStatus);
+      } else {
+        setTripStatusText({
+          ...tripStatus,
+          [STATUS_ACCEPTED]: tripData.acceptedText,
+          [STATUS_BOARDING]: tripData.boardingText,
+          [STATUS_IN_PROGRESS]: tripData.inProgressText,
+        });
+      }
+    });
+  }, [trip.tripReference]);
 
   const getLink = async () => {
     if (trip.tripReference) {
@@ -122,29 +137,17 @@ export default function TripContentInProgress({setModalDriverData}) {
     }
   };
 
-  const setSwitchRead = async () => {
-    try {
-      const responseSwitchRead = await AsyncStorage.getItem(
-        'switchRead-client',
-      );
-      if (responseSwitchRead === null) {
-        await AsyncStorage.setItem('switchRead-client', 'true');
-      } else if (responseSwitchRead == 'false') {
-        await AsyncStorage.setItem('switchRead-client', 'false');
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     getLink();
   }, []);
 
   const researchDriver = async () => {
-    const localTrip: TripProps = trip;
-    await cancelTripByCustomer();
-    initNewTripAfterCancel(localTrip, false);
+    setVisibleLongDistance(false);
+
+    const canceled = await cancelTripByCustomer(null);
+    if (!canceled) return;
+
+    await initNewTripAfterCancel(trip, false);
   };
 
   const onShare = async () => {
@@ -163,7 +166,7 @@ export default function TripContentInProgress({setModalDriverData}) {
         // dismissed
       }
     } catch (error) {
-      customToast('Erro ao Compartilhar', 'error');
+      customToast(translate('toast.text_share_error'), 'danger');
     }
   };
 
@@ -171,27 +174,61 @@ export default function TripContentInProgress({setModalDriverData}) {
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateX: rotation.value}],
+      transform: [{ translateX: rotation.value }],
     };
   });
 
-  useFocusEffect(
-    useCallback(() => {
-      setSwitchRead();
-    }, []),
-  );
+  const valideSeconds = (seconds: number | string | null | undefined) => {
+    const safeSeconds = Number(seconds);
+    if (isNaN(safeSeconds) || safeSeconds < 0) {
+      return 0;
+    }
+
+    return safeSeconds;
+  }
+
+  const getWaitingFees = async () => {
+    const data: any = await getWaitingTimer(String(trip?.cityId), trip?.tripTypeId)
+
+    const hasExtraFee =
+      data.waiting_extra_fee_per_minute !== null &&
+      data.waiting_extra_fee_per_minute !== "" &&
+      Number(data.waiting_extra_fee_per_minute) > 0
+
+    const hasPenaltyFee =
+      data.waiting_penalty_fee !== null &&
+      data.waiting_penalty_fee !== "" &&
+      Number(data.waiting_penalty_fee) > 0
+
+    if (hasExtraFee || hasPenaltyFee) {
+      setWaitingConfigs(data)
+    }
+
+  }
 
   useEffect(() => {
     rotation.value = withRepeat(
       withSequence(
-        withTiming(1, {duration: 150}),
-        withTiming(-1, {duration: 150}),
-        withTiming(0, {duration: 150}),
+        withTiming(1, { duration: 150 }),
+        withTiming(-1, { duration: 150 }),
+        withTiming(0, { duration: 150 }),
       ),
       -1,
       true,
     );
   }, []);
+
+  useEffect(() => {
+    getWaitingFees()
+  }, [])
+
+  useEffect(() => {
+    if (trip?.status === STATUS_ACCEPTED && !!trip?.tripLongDistanceValue && !!trip?.recalculatedPrice) {
+      setVisibleLongDistance(true);
+    } else {
+      setVisibleLongDistance(false);
+    }
+  }, [trip?.status, trip?.tripLongDistanceValue, trip?.recalculatedPrice]);
 
   return (
     <>
@@ -212,285 +249,237 @@ export default function TripContentInProgress({setModalDriverData}) {
           />
         </ContainerAddress>
       </If>
-      <View
-        style={{
-          backgroundColor: theme.colors.background_global,
-          height,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          paddingTop: height === 260 ? 0 : 20,
+
+      <Container
+        from={{
+          opacity: 0,
+          translateY: 150,
+        }}
+        animate={{
+          opacity: 1,
+          translateY: 0,
+        }}
+        transition={{
+          type: 'timing',
+        }}
+        exit={{
+          opacity: 0,
+          translateY: 150,
         }}
       >
-        <Container
-          from={{
-            opacity: 0,
-            translateY: 150,
-          }}
-          animate={{
-            opacity: 1,
-            translateY: 0,
-          }}
-          transition={{
-            type: 'timing',
-          }}
-          exit={{
-            opacity: 0,
-            translateY: 150,
-          }}
-        >
-          <HeaderContainer>
-            <TripStatusContainer>
-              <TripStatus>
-                {String(tripStatus[trip.status]).concat(
-                  trip?.status === STATUS_SCHEDULED
-                    ? ` - ${convertDatetimeToTime(trip?.schedule?.schedule)}`
-                    : '',
-                )}
-              </TripStatus>
-            </TripStatusContainer>
-            <TripTimeContainer>
-              <TextEdit size="smalls" color={theme.colors.secondary}>
-                {(routeTrip && String(routeTrip?.time)?.replace('min', '')) ||
-                  0}
-              </TextEdit>
-              <TextEdit size="smalls" color={theme.colors.secondary}>
-                {translate('trip.minutes')}
-              </TextEdit>
-            </TripTimeContainer>
-          </HeaderContainer>
-          <CenterContainer>
-            <DriverInfoContainer
-              activeOpacity={0.8}
-              onPress={() => {
-                // setModalDriverData(true)
-                setVisibleInfoCardInfo(true);
-              }}
-            >
+        <Handle />
+
+        <HeaderContainer>
+          {trip.status == STATUS_WAITING ? (
+            <TimerCircle initialSeconds={valideSeconds(Number(waitingConfigs?.waiting_tolerance_seconds))} onTimeUpdate={() => { }} />
+          ) :
+            <>
+              <TripStatusContainer>
+                <StatusIcon name="time-outline" size={18} color={theme.colors.primary} />
+                <TripStatus numberOfLines={3}>
+                  {tripStatusText[trip.status] &&
+                    String(tripStatusText[trip.status]).concat(
+                      trip?.status === STATUS_SCHEDULED
+                        ? ` - ${convertDatetimeToTime(trip?.schedule?.schedule)}`
+                        : '',
+                    )}
+                </TripStatus>
+              </TripStatusContainer>
+              <TripTimeContainer>
+                <TripTimeValue>
+                  {(routeTrip && String(routeTrip?.time)?.replace('min', '')) ||
+                    0}
+                </TripTimeValue>
+                <TripTimeLabel>
+                  {translate('trip.minutes')}
+                </TripTimeLabel>
+              </TripTimeContainer>
+            </>
+          }
+        </HeaderContainer>
+        <CenterContainer>
+          <DriverInfoContainer
+            activeOpacity={0.8}
+            onPress={() => {
+              // setModalDriverData(true)
+              setVisibleInfoCardInfo(true);
+            }}
+          >
+            <DriverProfilePictureContainer>
               <DriverProfilePicture
-                source={{uri: trip?.driver?.profilePicture}}
+                source={{ uri: trip?.driver?.profilePicture }}
               />
-              <DriverRatingContainer>
-                <DriverRating>
-                  {parseFloat(trip.driver.rating).toFixed(1).replace('.', ',')}
-                </DriverRating>
-                <AntDesign
-                  name="star"
-                  size={10}
-                  color={theme.colors.secondary}
-                />
-              </DriverRatingContainer>
-            </DriverInfoContainer>
-
-            <NicknameContainer>
-              <Feather
-                name="user-check"
-                size={22}
-                color={theme.colors.secondary}
+            </DriverProfilePictureContainer>
+            <DriverRatingContainer>
+              <DriverRating>
+                {parseFloat(trip?.driver?.rating)
+                  .toFixed(1)
+                  .replace('.', ',')}
+              </DriverRating>
+              <AntDesign
+                name="star"
+                size={10}
+                color={theme.colors.primary}
               />
-              <Nickname>{trip?.driver?.nickname}</Nickname>
-            </NicknameContainer>
+            </DriverRatingContainer>
+          </DriverInfoContainer>
 
-            <CarInfoContainer>
-              <LicensePlate>{trip.driver?.car?.plate}</LicensePlate>
-              <CarInfo>{`${trip.driver.car?.brand || ''} ${
-                trip.driver?.car?.model || ''
-              } - ${trip.driver?.car?.color || ''}`}</CarInfo>
-            </CarInfoContainer>
-          </CenterContainer>
-          <BottomContainer>
-            <ContainerPressable
-              onPress={() => {
-                setNewMessage(false);
-                navigation.navigate('TripChat');
-              }}
-            >
-              <InputContainer pointerEvents="none">
-                <Input
-                  editable={false}
-                  color={
-                    newMessage
-                      ? theme.colors.primaryText
-                      : theme.colors.secondary
-                  }
-                  newMessage={newMessage}
-                >
-                  {newMessage
-                    ? translate('trip.new_message_received')
-                    : translate('trip.send_message')}
-                </Input>
-                {newMessage ? (
-                  <>
-                    <Animated.View
-                      style={[
-                        {
-                          width: 24,
-                          height: 24,
-                          position: 'absolute',
-                          right: 0,
-                        },
-                        animatedStyle,
-                      ]}
-                    >
-                      <ChatIcon
-                        name="ios-chatbubble-ellipses-sharp"
-                        size={24}
-                        color={theme.colors.red}
-                      />
-                    </Animated.View>
-                  </>
-                ) : (
-                  <>
+          <CarInfoContainer>
+            <LicensePlate>{trip.driver?.car?.plate}</LicensePlate>
+            <CarInfo>{`${trip?.driver?.car?.brand || ''} ${trip?.driver?.car?.model || ''
+              } - ${trip?.driver?.car?.color || ''}`}</CarInfo>
+          </CarInfoContainer>
+        </CenterContainer>
+
+        <MoreInfoContainer>
+          <NicknameContainer>
+            <NicknameIcon name="user" />
+            <Nickname>{trip?.driver?.nickname}</Nickname>
+          </NicknameContainer>
+
+          <MoreInfoButton onPress={() => setVisibleInfoCardInfo(true)}>
+            <MoreInfo>Mais detalhes</MoreInfo>
+            <Ionicons name="chevron-forward" size={14} color={theme.colors.blue} />
+          </MoreInfoButton>
+        </MoreInfoContainer>
+
+        <BottomContainer>
+          <ContainerPressable
+            onPress={() => {
+              setNewMessage(false);
+              navigation.navigate('TripChat');
+            }}
+          >
+            <InputContainer pointerEvents="none">
+              <Input>
+                {newMessage
+                  ? translate('trip.new_message_received')
+                  : translate('trip.send_message')}
+              </Input>
+              {newMessage ? (
+                <>
+                  <Animated.View
+                    style={[
+                      {
+                        width: 24,
+                        height: 24,
+                        position: 'absolute',
+                        right: 0,
+                      },
+                      animatedStyle,
+                    ]}
+                  >
                     <ChatIcon
-                      name="ios-chatbubble-ellipses-sharp"
+                      name="chatbubble-ellipses-sharp"
                       size={24}
-                      color={theme.colors.primary}
+                      color={theme.colors.black}
                     />
-                  </>
-                )}
-              </InputContainer>
-            </ContainerPressable>
-            <If condition={!trip?.oldDestinationId}>
-              <ContainerButton
-                activeOpacity={0.8}
-                onPress={async () => {
-                  await dispatchTripCustomer({
-                    type: 'update',
-                    field: 'origin',
-                    arg: trip?.origin,
-                  });
+                  </Animated.View>
+                </>
+              ) : (
+                <>
+                  <ChatIcon
+                    name="chatbubble-ellipses-sharp"
+                    size={24}
+                    color={theme.colors.black}
+                  />
+                </>
+              )}
+            </InputContainer>
+          </ContainerPressable>
+          <If condition={!trip?.oldDestinationId}>
+            <ContainerButton
+              activeOpacity={0.8}
+              onPress={async () => {
+                await dispatchTripCustomer({
+                  type: 'update',
+                  field: 'origin',
+                  arg: trip?.origin,
+                });
 
-                  if (trip?.tripWayPoints.length > 0) {
-                    dispatchTripCustomer({
-                      type: 'update',
-                      field: 'waypoints',
-                      arg: [...waypoints, ...trip?.tripWayPoints],
-                    });
-                    return;
-                  }
+                if (trip?.tripWayPoints.length > 0) {
                   dispatchTripCustomer({
                     type: 'update',
-                    field: 'waypointQuantities',
-                    arg: waypointQuantities + 1,
+                    field: 'waypoints',
+                    arg: [...waypoints, ...trip?.tripWayPoints],
                   });
+                  return;
+                }
+                dispatchTripCustomer({
+                  type: 'update',
+                  field: 'waypointQuantities',
+                  arg: waypointQuantities + 1,
+                });
 
-                  dispatchTripCustomer({
-                    type: 'update',
-                    field: 'destination',
-                    arg: {
-                      address:
-                        trip?.destination?.name || trip?.destination?.address,
-                      latitude: trip?.destination?.latitude,
-                      longitude: trip?.destination?.longitude,
-                      street: trip?.destination?.street || null,
-                      type: 'destination',
-                      name:
-                        trip?.destination?.name || trip?.destination?.address,
-                    },
-                  });
-                  setVisibleLookUpAddressModal(!visibleLookUpAddressModal);
-                }}
-              >
-                <Ionicons
-                  name="add"
-                  size={30}
-                  style={{
-                    marginLeft: 3,
-                  }}
-                  color={theme.colors.primaryText}
-                />
-              </ContainerButton>
-            </If>
-            <ShareButton
-              onPress={() => {
-                // Linking.openURL(linkShare);
-                onShare();
+                dispatchTripCustomer({
+                  type: 'update',
+                  field: 'destination',
+                  arg: {
+                    address:
+                      trip?.destination?.name || trip?.destination?.address,
+                    latitude: trip?.destination?.latitude,
+                    longitude: trip?.destination?.longitude,
+                    street: trip?.destination?.street || null,
+                    type: 'destination',
+                    name:
+                      trip?.destination?.name || trip?.destination?.address,
+                  },
+                });
+                setVisibleLookUpAddressModal(!visibleLookUpAddressModal);
               }}
             >
               <Ionicons
-                name="share-social"
+                name="add"
+                size={30}
+                style={{
+                  marginLeft: 3,
+                }}
+                color={theme.colors.primaryText}
+              />
+            </ContainerButton>
+          </If>
+          <ShareButton
+            onPress={() => {
+              // Linking.openURL(linkShare);
+              onShare();
+            }}
+          >
+            <Ionicons
+              name="share-social"
+              size={24}
+              color={theme.colors.primaryText}
+            />
+          </ShareButton>
+          {trip.status !== STATUS_IN_PROGRESS && trip.status !== STATUS_WAITING && (
+            <CancelButton
+              onPress={() => {
+                setCancellationReasonsModal(true);
+              }}
+            >
+              <AntDesign
+                name="close"
                 size={24}
                 color={theme.colors.primaryText}
               />
-            </ShareButton>
-            {trip.status !== STATUS_IN_PROGRESS && (
-              <CancelButton
-                onPress={() => {
-                  setCancellationReasonsModal(true);
-                }}
-              >
-                <AntDesign
-                  name="close"
-                  size={24}
-                  color={theme.colors.primaryText}
-                />
-              </CancelButton>
-            )}
-          </BottomContainer>
-        </Container>
-        <ModalCancellationReasonsCustomer
-          visible={cancellationReasonsModal}
-          setVisible={setCancellationReasonsModal}
-        />
-        <CardInfoClient
-          setVisible={setVisibleInfoCardInfo}
-          visible={visibleInfoCardInfo}
-        />
-      </View>
-      {trip.tripLongDistanceValue !== null && true ? (
-        <ModalFrame
-          textConfirm="Procurar mais próximo"
-          textCancel="Continuar"
-          onClose={() => setVisibleLongDistance(false)}
-          onPressConfirm={researchDriver}
-          setVisible={setVisibleLongDistance}
-          visible={visibleLongDistance}
-        >
-          <View>
-            <View
-              style={{
-                borderBottomWidth: 0.5,
-                borderBottomColor: theme.colors.border,
-                marginBottom: 10,
-              }}
-            >
-              <Text
-                style={{
-                  textAlign: 'center',
-                  fontSize: 18,
-                  fontFamily: 'MavenPro_400Regular',
-                }}
-              >
-                AVISO
-              </Text>
-            </View>
-            <View>
-              <Text
-                style={{
-                  fontFamily: 'MavenPro_400Regular',
-                  margin: 5,
-                }}
-              >
-                Encontramos seu motorista distante da sua localização. Deseja
-                continuar com essa corrida?
-              </Text>
-              <Text
-                style={{
-                  fontFamily: 'MavenPro_600Medium',
-                  margin: 5,
-                  textAlign: 'center',
-                  fontSize: 22,
-                }}
-              >
-                {cityConfig.typeMoney}{' '}
-                {Helper.maskMoney(
-                  Number(trip.price) +
-                    Number(trip?.tripLongDistanceValue?.value),
-                )}
-              </Text>
-            </View>
-          </View>
-        </ModalFrame>
-      ) : null}
+            </CancelButton>
+          )}
+        </BottomContainer>
+      </Container>
+      <ModalCancellationReasonsCustomer
+        visible={cancellationReasonsModal}
+        setVisible={setCancellationReasonsModal}
+      />
+      <CardInfoClient
+        setVisible={setVisibleInfoCardInfo}
+        visible={visibleInfoCardInfo}
+      />
+
+      <DistantDriverPriceConfirmationModal
+        visible={visibleLongDistance}
+        newPrice={Number(trip.price)}
+        onPressSearchNew={researchDriver}
+        onPressContinue={() => setVisibleLongDistance(false)}
+      />
     </>
   );
 }

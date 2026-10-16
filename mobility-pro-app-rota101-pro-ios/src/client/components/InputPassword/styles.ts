@@ -16,7 +16,6 @@ export const Container = styled.View<ContainerProps>`
   margin-bottom: 8px;
   flex-direction: row;
   align-items: center;
-  padding-left: ${({theme}) => theme.spacing.large}px;
   border-bottom-width: ${({theme}) => theme.borderWidth.medium}px;
   border-bottom-color: ${({theme, color}) =>
     color ? color : theme.colors.primary};
@@ -31,9 +30,9 @@ export const Container = styled.View<ContainerProps>`
 export const Content = styled(TextInput).attrs(({theme}) => ({
   placeholderTextColor: theme.colors.input_placeholder,
 }))<InputProps>`
-  font-size: ${({theme}) => theme.fontSizes.smalls}px;
+  font-size: ${({theme}) => theme.fontSizes.medium}px;
   color: ${({theme, color}) => (color ? color : theme.colors.primary)};
-  width: 75%;
+  flex: 1;
   font-family: ${({theme}) => theme.fonts.regular};
   text-decoration: none;
   margin-left: ${({icon}) => (icon ? RFValue(7) : RFValue(1))}px;

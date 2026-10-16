@@ -5,123 +5,136 @@
 /* eslint-disable array-callback-return */
 // @ts-nocheck
 
-import {useRef, useEffect, useState, useMemo} from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import {
-  View,
-  TouchableOpacity,
   Platform,
-  Linking,
   BackHandler,
+  Keyboard,
+  AppState,
+  Animated as RNAnimated,
+  KeyboardAvoidingView,
 } from 'react-native';
-import MaterialIcon from '@expo/vector-icons/MaterialIcons';
-import {Ionicons} from '@expo/vector-icons';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-import {Audio} from 'expo-av';
+import { Ionicons } from '@expo/vector-icons';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Animated, {
-  useDerivedValue,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
-import {RFValue} from 'react-native-responsive-fontsize';
-import apiMain from '../../api/apiMain';
+import { storage } from '~/common/services/mmkv/storage';
+import { STORAGE_KEYS } from '~/common/constants/storageKeys';
+import { RFValue } from 'react-native-responsive-fontsize';
 import LoadView from '../../components/LoadView';
-import {useTrip} from '../../contexts/Trip';
-import TripMessage from '../../components/TripMessage';
-import {IfLoaderInsideScreen} from '../../components/IfLoaderInsideScreen';
+import { useTrip } from '../../contexts/Trip';
 import {
   Container,
-  ContainerButtonCall,
   Content,
-  FooterContent,
-  FooterInput,
-  GoBackButton,
-  NavBarContent,
-  NavBarTitle,
-  RecordingButton,
-  RecordingButtonContainer,
-  TrashIconContainer,
+  AutoReadCard,
+  ScrollToBottomButton,
+  footerLayoutStyles,
 } from './styles';
-import {useAuth} from '../../../context/auth';
-import {ContentSwitch} from '../../modules/GetLight/components/ModalChat/styles';
-import {ButtonIcon} from '../../modules/GetLight/components/ButtonIcon';
+import { useFavoriteQuickMessages } from '../../../common/hooks/useFavoriteQuickMessages';
+import { getPassengerQuickMessages } from './passengerQuickMessages';
+import { NavBar } from './NavBar';
+import { MessageList } from './MessageList';
+import { Footer } from './Footer';
+import { useAuth } from '../../../context/auth';
 import theme from '../../styles/theme';
-import {TextEdit} from '../../components/TextEdit';
-import {Switch} from '../../components/Switch';
-import {translate} from '../../locales';
-import {ChatRealtime} from '../../services/realtime/ChatRealtime';
-import {If} from '../../components/If';
+import { AutoReadToggle } from '../../../common/components/AutoReadToggle';
+import { Switch } from '../../components/Switch';
+import { translate } from '../../locales';
+import { ChatRealtime } from '../../services/realtime/ChatRealtime';
+import { initialWindowMetrics } from 'react-native-safe-area-context';
+import { useChatScrollPosition } from '../../../common/hooks/useChatScrollPosition';
+import { getChatOverlayVisibility } from '../../../common/hooks/chatOverlayVisibility';
 
 export default function TripChat() {
-  const {user, generalSettings} = useAuth();
-  const {stateTripCustomer} = useTrip();
-  const {trip} = stateTripCustomer;
+  const { user } = useAuth();
+  const { stateTripCustomer } = useTrip();
+  const { trip } = stateTripCustomer;
   const scroll = useRef(null);
+
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [switchValue, setSwitchValue] = useState(true);
   const chatRealtime = useMemo(() => new ChatRealtime(), []);
+  const keyboardTranslateY = useRef(new RNAnimated.Value(0)).current;
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const bottomInset = initialWindowMetrics?.insets?.bottom ?? 0;
+  // Chute inicial até o primeiro onLayout do rodapé medir o valor real.
+  const [footerHeight, setFooterHeight] = useState(RFValue(74));
 
-  const {navigate} = useNavigation();
+  const passengerFallbackMessages = useMemo(() => getPassengerQuickMessages(), []);
+  const { quickMessages, favoriteMessage } = useFavoriteQuickMessages(passengerFallbackMessages);
+
+  const { navigate } = useNavigation();
 
   const scrollToEndWhenOpeningKeyboard = () => {
-    scroll.current.scrollToEnd({animated: true});
+    scroll.current?.scrollToEnd({ animated: true });
   };
 
   const isFocused = useIsFocused();
   const isFocusedRef = useRef(isFocused);
 
   useEffect(() => {
+    if (Platform.OS === "ios") return;
+
+    const showSub = Keyboard.addListener('keyboardDidShow', e => {
+      const height = e.endCoordinates.height;
+
+      setKeyboardHeight(height);
+
+      RNAnimated.timing(keyboardTranslateY, {
+        toValue: -height,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+
+      setTimeout(() => {
+        scroll.current?.scrollToEnd({ animated: true });
+      }, 50);
+    });
+
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+
+      RNAnimated.timing(keyboardTranslateY, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'ios') return;
+    const sub = AppState.addEventListener('change', state => {
+      if (state !== 'active') Keyboard.dismiss();
+    });
+    return () => sub.remove();
+  }, []);
+
+  useEffect(() => {
     isFocusedRef.current = isFocused;
   }, [isFocused]);
 
-  const socketEnabled = useRef(
-    generalSettings?.find(item => item?.key === 'enable_realtime_socket'),
-  );
+  useEffect(() => {
+    if (trip?.tripReference) {
+      const unsubscribe = handleChatMessageEvent(trip.tripReference);
+      return () => unsubscribe?.();
+    }
+  }, [trip?.tripReference]);
 
   useEffect(() => {
-    if (trip && Object.keys(trip).length > 0 && trip.tripReference) {
-      if (trip.status === 'finished') {
-        navigate('Trip');
-      }
-      if (Number(socketEnabled?.current?.value)) {
-        handleChatRealtimeSocket();
-      } else {
-        handleChatMessageFirebase();
-      }
+    if (trip?.status === 'finished') {
+      navigate('Trip');
     }
-  }, []);
+  }, [trip?.status, navigate]);
 
-  const handleChatRealtimeSocket = () => {
-    chatRealtime.getCurrentMessages(trip.tripReference, currentMessages => {
-      const addedMessages = currentMessages.filter(
-        message => message?.messageData?.type === 'added',
-      );
-
-      addedMessages.forEach(currentMessage => {
-        if (
-          isFocusedRef.current &&
-          Number(currentMessage?.messageData?.userId) !==
-            Number(user?.idUser) &&
-          !currentMessage.viewed
-        ) {
-          chatRealtime.setViewMessage(
-            currentMessage?.messageData?.id,
-            trip.tripReference,
-          );
-        }
-      });
-      if (currentMessages?.length > 0) {
-        setMessages([...currentMessages]);
-      }
-
-      setLoading(false);
-    });
-  };
-
-  const handleChatMessageFirebase = () => {
-    chatRealtime.getCurrentMessages(trip.tripReference, currentMessages => {
+  const handleChatMessageEvent = (tripReference: string) => {
+    return chatRealtime.getCurrentMessages(tripReference, currentMessages => {
       const addedMessages = currentMessages.filter(
         message => message.type === 'added',
       );
@@ -134,9 +147,12 @@ export default function TripChat() {
           Number(currentMessage.userId) !== Number(user.idUser) &&
           !currentMessage.viewed
         ) {
-          chatRealtime.setViewMessage(currentMessage.id, trip.tripReference);
+          chatRealtime.setViewMessage(currentMessage.id, tripReference);
         }
-        setMessages(prevMessages => [...prevMessages, currentMessage]);
+        setMessages(prevMessages => {
+          if (prevMessages.some(m => m.id === currentMessage.id)) return prevMessages;
+          return [...prevMessages, currentMessage];
+        });
       });
 
       modifiedMessages.forEach(currentMessage => {
@@ -155,14 +171,21 @@ export default function TripChat() {
   useEffect(() => {
     Audio.requestPermissionsAsync();
     verifyStorageSwitchRead();
-    BackHandler.addEventListener('hardwareBackPress', () => {
-      navigate('Trip');
-      return true;
-    });
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        navigate('Trip');
+        return true;
+      }
+    );
+
+    return () => backHandler.remove();
   }, []);
 
+
   const getFirstName = (name: string) => {
-    return !name ? '' : name.split(' ')[0];
+    return !name ? '' : name?.split(' ')[0];
   };
 
   const speakMessage = (message: string = null, object = null) => {
@@ -180,8 +203,7 @@ export default function TripChat() {
 
       if (data.message !== 'null') {
         Speech.speak(
-          `${getFirstName(trip?.driver?.name)} ${translate('trip.said')} ${
-            data.message
+          `${getFirstName(trip?.driver?.name)} ${translate('trip.said')} ${data.message
           }`,
           {
             language: 'pt-BR',
@@ -191,7 +213,13 @@ export default function TripChat() {
 
         data.voiceRead = true;
 
-        // setMessages(state => [...state, data]);
+        setMessages(prev =>
+          prev.map(m =>
+            m.messageData.id === data.id
+              ? { ...m, messageData: { ...m.messageData, voiceRead: true } }
+              : m
+          )
+        );
       }
     });
     // const language = await AsyncStorage.getItem('@language');
@@ -211,8 +239,7 @@ export default function TripChat() {
     }
     if (!received) {
       Speech.speak(
-        `${getFirstName(user?.nickname)} ${translate('trip.said')} ${
-          object.message
+        `${getFirstName(user?.nickname)} ${translate('trip.said')} ${object.message
         }`,
         {
           language: 'pt-BR',
@@ -222,8 +249,7 @@ export default function TripChat() {
     }
     if (received) {
       Speech.speak(
-        `${getFirstName(trip?.driver?.name)} ${translate('trip.said')} ${
-          object.message
+        `${getFirstName(trip?.driver?.name)} ${translate('trip.said')} ${object.message
         }`,
         {
           language: 'pt-BR',
@@ -241,15 +267,25 @@ export default function TripChat() {
       .map(data => data.messageData);
     speakMessage('', messagesToSpeech);
   };
-  const verifyStorageSwitchRead = async () => {
-    const value = await AsyncStorage.getItem('switchRead');
-    if (value || value === null) {
-      setSwitchValue(true);
-      return true;
-    }
-    setSwitchValue(false);
-    return false;
+
+  const verifyStorageSwitchRead = () => {
+    const value = storage.getItem(STORAGE_KEYS.SWITCH_READ, 'boolean');
+    setSwitchValue(value);
   };
+
+  const handleSwitchRead = (value: boolean) => {
+    storage.setItem(STORAGE_KEYS.SWITCH_READ, value, 'boolean');
+    setSwitchValue(value);
+  }
+
+  const { isNearBottom, canScroll, onScroll, onLayout, onContentSizeChange } = useChatScrollPosition(scroll);
+  const { showAutoReadCard, showScrollToBottom } = getChatOverlayVisibility({
+    keyboardHeight,
+    isNearBottom,
+    canScroll,
+    messagesCount: messages.length,
+  });
+
   useEffect(() => {
     if (switchValue) {
       speechAllMessagesAutomatic();
@@ -258,285 +294,73 @@ export default function TripChat() {
     }
   }, [messages, switchValue]);
 
-  useEffect(() => {
-    if (switchValue) {
-      AsyncStorage.setItem('switchRead', 'true');
-    } else {
-      AsyncStorage.removeItem('switchRead');
-    }
-  }, [switchValue]);
-
   return (
     <Container>
-      <NavBar />
+      <NavBar trip={trip} />
       {!loading ? (
-        <>
-          <ContentSwitch>
-            <TextEdit size="smalls" color={theme.colors.secondary}>
-              {translate('trip.automatically_read_all_messages')}
-            </TextEdit>
-            <Switch value={switchValue} onValueChange={setSwitchValue} />
-          </ContentSwitch>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'height' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? bottomInset + 8 : 0}
+          enabled={Platform.OS === 'ios'}
+        >
+          {showAutoReadCard && (
+            <AutoReadCard>
+              <AutoReadToggle>
+                <Switch value={switchValue} onValueChange={handleSwitchRead} />
+              </AutoReadToggle>
+            </AutoReadCard>
+          )}
           <Content
             ref={scroll}
-            onContentSizeChange={() =>
-              scroll.current.scrollToEnd({animated: true})
-            }
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{
+              paddingBottom: keyboardHeight + footerHeight,
+            }}
+            onLayout={onLayout}
+            onContentSizeChange={onContentSizeChange}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
           >
-            {messages.length > 0 &&
-              messages.map(({messageData, id}) => {
-                if (messageData.message === 'null') {
-                  return;
-                }
-
-                if (messageData.userId == user.idUser)
-                  return (
-                    <TripMessage
-                      key={messageData?.id || id}
-                      message={messageData.message}
-                      timeSendInSeconds={messageData.date.seconds}
-                      isAudio={messageData.isAudio}
-                      data={messageData}
-                      speakUnicMessage={speakUnicMessage}
-                    />
-                  );
-
-                return (
-                  <TripMessage
-                    key={messageData?.id || id}
-                    message={messageData.message}
-                    timeSendInSeconds={messageData.date.seconds}
-                    isAudio={messageData.isAudio}
-                    reiceved
-                    data={messageData}
-                    speakUnicMessage={speakUnicMessage}
-                  />
-                );
-              })}
+            {messages.length > 0 && (
+              <MessageList
+                messages={messages}
+                currentUserId={user.idUser}
+                speakUnicMessage={speakUnicMessage}
+                onFavoriteMessage={favoriteMessage}
+              />
+            )}
           </Content>
-          <Footer
-            tripReference={trip.tripReference}
-            userId={user.idUser}
-            scrollToEnd={scrollToEndWhenOpeningKeyboard}
-          />
-        </>
+
+          {showScrollToBottom && (
+            <ScrollToBottomButton
+              offsetBottom={footerHeight + RFValue(16)}
+              onPress={scrollToEndWhenOpeningKeyboard}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="arrow-down" size={20} color={theme.colors.primaryText} />
+            </ScrollToBottomButton>
+          )}
+
+          <RNAnimated.View
+            style={[
+              footerLayoutStyles.wrapper,
+              { transform: [{ translateY: keyboardTranslateY }], }
+            ]}
+          >
+            <Footer
+              tripReference={trip.tripReference}
+              userId={user.idUser}
+              quickMessages={quickMessages}
+              scrollToEnd={scrollToEndWhenOpeningKeyboard}
+              onLayoutChange={setFooterHeight}
+            />
+          </RNAnimated.View>
+        </KeyboardAvoidingView>
       ) : (
         <LoadView />
-      )}
-    </Container>
-  );
-}
-
-function NavBar() {
-  const {stateTripCustomer} = useTrip();
-  const {trip} = stateTripCustomer;
-  const navigation = useNavigation();
-  const {cityConfig} = useAuth();
-
-  return (
-    <NavBarContent>
-      <GoBackButton
-        onPress={() => {
-          navigation.goBack();
-        }}
-      >
-        <Ionicons
-          name="ios-arrow-back"
-          size={30}
-          color={theme.colors.primary}
-        />
-      </GoBackButton>
-      <View>
-        <NavBarTitle>{trip?.driver?.nickname}</NavBarTitle>
-      </View>
-      <ContainerButtonCall>
-        <If condition={cityConfig?.enableCallInChat !== '0'}>
-          <ButtonIcon
-            onPress={() => Linking.openURL(`tel:${trip?.driver.phone}`)}
-            icon={
-              <Ionicons
-                name="call"
-                color={theme.colors.primaryText}
-                size={20}
-              />
-            }
-          />
-        </If>
-      </ContainerButtonCall>
-    </NavBarContent>
-  );
-}
-
-function Footer({tripReference, userId, scrollToEnd}) {
-  const {stateTripCustomer} = useTrip();
-  const {trip} = stateTripCustomer;
-  const {user} = useAuth();
-
-  const [message, setMessage] = useState('');
-  const [recording, setRecording] = useState();
-  const [recordTime, setRecordTime] = useState(0);
-  const recordingScale = useSharedValue(1);
-  const [loading, setLoading] = useState(false);
-
-  async function handleMessage() {
-    if (message.trim().length > 0) {
-      setLoading(true);
-      await apiMain.post('ChatTrip/SendMessage', {
-        stdObject: [{tripReference, message, userId}],
-      });
-      setLoading(false);
-      setMessage('');
-    }
-  }
-
-  async function handleStartRecording() {
-    try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      const {ios, android} = Audio.RecordingOptionsPresets.HIGH_QUALITY;
-      const {recording} = await Audio.Recording.createAsync({
-        android,
-        ios,
-        web: {},
-      });
-      setRecording(recording);
-    } catch (err) {
-      console.error('Failed to start recording', err);
-    }
-  }
-
-  async function handleStopRecordingAndSend() {
-    try {
-      setRecording(undefined);
-      await recording.stopAndUnloadAsync();
-      const uri = await recording.getURI();
-      const platform = Platform.OS;
-      const extensionFile = recording._options[platform].extension;
-      const fileName = uri.split('/').pop().split(extensionFile)[0];
-      const formData = new FormData();
-      formData.append(
-        'chatTrip',
-        JSON.stringify({
-          tripReference: trip.tripReference,
-          userId: user.idUser,
-        }),
-      );
-      formData.append(
-        'audio',
-        {
-          uri,
-          name: `mp3`,
-          type: 'audio/mpeg',
-        },
-        fileName,
-      );
-      setLoading(true);
-      await apiMain
-        .post('ChatTrip/SendMessageAudio', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        .catch(error => console.log(JSON.stringify(error)));
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-    }
-  }
-
-  useEffect(() => {
-    let interval;
-    if (recording) {
-      recordingScale.value = withSpring(1.2); // Spring animação para dar efeito de "pulsar"
-      interval = setInterval(() => {
-        setRecordTime(prev => prev + 1);
-      }, 1000); // Atualiza a cada segundo
-    } else {
-      recordingScale.value = withSpring(1); // Retorna ao tamanho original
-      clearInterval(interval);
-      setRecordTime(0);
-    }
-
-    return () => clearInterval(interval); // Limpa o intervalo ao desmontar
-  }, [recording]);
-
-  const animatedStyle = useDerivedValue(() => {
-    return {
-      transform: [{scale: recordingScale.value}],
-    };
-  });
-
-  return (
-    <FooterContent>
-      <FooterInput
-        value={message}
-        onChangeText={setMessage}
-        multiline
-        numberOfLines={2}
-        placeholder={recording ? `Gravando... ${recordTime}s` : 'Digite algo'}
-        onFocus={scrollToEnd}
-      />
-      <IfLoaderInsideScreen loading={loading}>
-        {message ? (
-          <TouchableOpacity
-            onPress={() => {
-              handleMessage();
-            }}
-          >
-            <MaterialIcon name="send" size={30} color={theme.colors.primary} />
-          </TouchableOpacity>
-        ) : (
-          <RecordingButtonContainer recording={Boolean(recording)}>
-            {Boolean(recording) && (
-              <TrashIconContainer>
-                <Ionicons
-                  name="trash-bin"
-                  size={RFValue(15)}
-                  color={theme.colors.primary}
-                />
-              </TrashIconContainer>
-            )}
-            <Animated.View style={animatedStyle.value}>
-              <RecordingButton
-                onPress={async () => {
-                  const {granted} = await Audio.getPermissionsAsync();
-                  if (!granted) {
-                    Audio.requestPermissionsAsync();
-                  }
-                }}
-                onLongPress={handleStartRecording}
-                onPressOut={event => {
-                  if (recording) {
-                    if (
-                      event.nativeEvent.changedTouches[0] ===
-                      event.nativeEvent.touches[0]
-                    ) {
-                      setRecording(undefined);
-                      recording.stopAndUnloadAsync();
-                    } else {
-                      handleStopRecordingAndSend();
-                    }
-                  }
-                }}
-                recording={Boolean(recording)}
-              >
-                <Ionicons
-                  name="md-mic"
-                  size={24}
-                  color={
-                    recording
-                      ? `${theme.colors.red}`
-                      : `${theme.colors.primaryText}`
-                  }
-                />
-              </RecordingButton>
-            </Animated.View>
-          </RecordingButtonContainer>
-        )}
-      </IfLoaderInsideScreen>
-    </FooterContent>
+      )
+      }
+    </Container >
   );
 }

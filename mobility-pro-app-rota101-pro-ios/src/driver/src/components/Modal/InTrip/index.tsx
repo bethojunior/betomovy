@@ -1,106 +1,119 @@
-/* eslint-disable no-unsafe-optional-chaining */
-import {useEffect, useMemo, useState} from 'react';
-import {ActivityIndicator, Alert, Dimensions, View} from 'react-native';
-import {Feather, AntDesign, MaterialIcons} from '@expo/vector-icons/';
-import {useDynamicAnimation} from 'moti';
-import {useTheme} from 'styled-components';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, TouchableOpacity, View } from 'react-native';
+import { Feather, AntDesign, MaterialIcons } from '@expo/vector-icons/';
+import { useDynamicAnimation } from 'moti';
+import { useTheme } from 'styled-components/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {PanGestureHandler} from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedGestureHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSpring,
-  withTiming,
-  runOnJS,
-} from 'react-native-reanimated';
-import {maskMoney} from '../../../../../client/utils/money';
-import {IsToShowField} from '../../../utils/cityConfig';
+import { storage } from '~/common/services/mmkv/storage';
+import { STORAGE_KEYS } from '~/common/constants/storageKeys';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { IsToShowField } from '../../../utils/cityConfig';
 import {
   Address,
   AddressContent,
   Ball,
   Button,
   ButtonContent,
-  ButtonMinizeModal,
+  ButtonMinimizeModal,
   ClientContent,
   ClientName,
-  ContentProgressTime,
-  CotentTime,
   Dot,
   Line,
   Modal,
   MoreInfo,
-  Picture,
-  ProgressBarrer,
   SimpleText,
   SimpleTitle,
   Square,
-  TextTime,
-  Time,
+  SwalButton,
+  SwalButtonContainers,
 } from './styles';
-import {useTripProvider} from '../../../context/Trip';
+import { useTripProvider } from '../../../context/Trip';
 import {
   STATUS_BOARDING_TRIP,
   STATUS_IN_PROGRESS,
+  STATUS_WAITING,
 } from '../../../constants/trip';
-import {useTripStatusProvider} from '../../../context/TripStatus';
-import {useAuth} from '../../../../../context/auth';
-import {translate} from '../../../../../client/locales';
-import {useUserDriver} from '../../../context/userDriver';
-import {ModalCancellationReasons} from '../CancellationReason';
-import {buildApp} from '../../../../../constantBuild/config';
-import {customToast} from '../../../../../utils/FlashMessage';
-import {If} from '../../If';
-import {MessageProps, NotificationModalMessage} from '../../ModalMessage';
+import { useTripStatusProvider } from '../../../context/TripStatus';
+import { useAuth } from '../../../../../context/auth';
+import { translate } from '../../../../../client/locales';
+import { useUserDriver } from '../../../context/userDriver';
+import { ModalCancellationReasons } from '../CancellationReason';
+import { buildApp } from '../../../../../constantBuild/config';
+import { customToast } from '../../../../../utils/FlashMessage';
+import { If } from '../../If';
 import theme from '../../../styles/theme';
-import {CardInfoDriver} from '../../CardInfoDriver';
+import { CardInfoDriver } from '../../CardInfoDriver';
 import Helper from '../../../utils/Helper';
-import {ChatRealtime} from '../../../service/realtime/ChatRealtime';
-import {RenderSvgImage} from '../../../../../common/RenderSvgImage';
-import {TextWrapper} from '../../../../../common/TextWrapper';
-import {DistanceComponent} from '../../DistanceInScreenComponent/Component';
+import { getTripPaymentFormDisplay } from '../../../utils/tripUtils';
+import { ChatRealtime } from '../../../service/realtime/ChatRealtime';
+import { TextWrapper } from '../../../../../common/TextWrapper';
+import { CustomerAvatar } from '../../CustomerAvatar';
+import { useStoragePictures } from '../../../hooks/useStoragePictures';
+import { Text } from 'react-native-elements';
+import TimerCircle from '../../TimerCircle';
+import AnimatedActionButton from '../../AnimatedActionButton';
+import { AnimatedDragButton } from '../../AnimatedDragButton';
+import { SwalAlert } from '../../../../../client/components/SwalAlert';
+import Preload from '../../Preload';
+import { hasObjectValue } from '~/utils/object';
+import { isTaximeterTripInProgress } from '~/driver/src/service/rules/trip/isTaximeterTripInProgress';
+import { NotificationMessage, MessageProps } from '~/components/NotificationMessage';
 
 interface ModalProps {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  visibleCountPanic: boolean;
 }
 
-export const ModalInTrip = ({
-  visible,
-  setVisible,
-  visibleCountPanic,
-}: ModalProps) => {
-  const {navigate, isFocused}: NavigationProp<ParamListBase> = useNavigation();
-  const [cancellationReasonsModal, setCancellationReasonsModal] =
-    useState(false);
+interface WaitingConfigsProps {
+  waiting_tolerance_seconds: string | null;
+  waiting_penalty_fee: string | null;
+  waiting_extra_fee_per_minute: string | null;
+}
+
+export const ModalInTrip = ({ visible, setVisible }: ModalProps) => {
+  const { navigate }: NavigationProp<ParamListBase> = useNavigation();
+  const [cancellationReasonsModal, setCancellationReasonsModal] = useState(false);
   const [minimize, setMinimize] = useState(false);
   const [percent, setPercent] = useState(0);
   const [showCountTime, setShowCountTime] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const [newMessageNotification, setNewMessageNotification] = useState(false);
-  const [message, setMessage] = useState({} as MessageProps);
+  const [message, setMessage] = useState<MessageProps | null>(null);
+  const chatUnsubscribeRef = useRef<(() => void) | null>(null);
+  const shownMessageIds = useRef(new Set<string>());
   const [markWaypoint, setMarkWaypoint] = useState(0);
   const [waitTime, setWaitTime] = useState(0);
   const [visibleCardInfo, setVisibleCardInfo] = useState(false);
+  const [swalVisible, setSwalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showWaitingTimer, setShowWaitingTimer] = useState(false);
+  const [waitingConfigs, setWaitingConfigs] = useState<WaitingConfigsProps>();
 
-  const {colors} = useTheme();
-  const {cancel, dispatchTrip, stateTrip, priceToShow} = useTripProvider();
-  const {checkStatusTrip, statusTrip, setStatusTrip} = useTripStatusProvider();
-  const {cityConfig} = useAuth();
-  const {userDriverFind} = useUserDriver();
-  const [driverValue, setDriverValue] = useState('');
+  const { colors } = useTheme();
+  const dispatchTrip: any = useTripProvider((context: any) => context.dispatchTrip);
+  const cancel: any = useTripProvider((context: any) => context.cancel);
+  const priceToShow: any = useTripProvider((context: any) => context.priceToShow);
+  const tripAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripAccepted,
+  );
+  const cancelTrip: any = useTripProvider((context: any) => context.stateTrip.cancelTrip);
+  const checkStatusTrip: any = useTripStatusProvider(
+    (context: any) => context.checkStatusTrip,
+  );
+  const statusTrip: any = useTripStatusProvider((context: any) => context.statusTrip);
+  const setStatusTrip: any = useTripStatusProvider(
+    (context: any) => context.setStatusTrip,
+  );
+  const waitingTripStatus: any = useTripStatusProvider(
+    (context: any) => context.waitingTripStatus,
+  );
+  const waitingFees: any = useTripStatusProvider((context: any) => context.waitingFees);
+  const { cityConfig } = useAuth();
+  const { userDriverFind } = useUserDriver();
   const chatRealtime = useMemo(() => new ChatRealtime(), []);
 
-  const {tripAccepted, cancelTrip} = stateTrip;
+  const { getStoragePictureSpecific } = useStoragePictures();
+
+  const hasTripAccepted = useMemo(() => hasObjectValue(tripAccepted), [tripAccepted]);
 
   let dateFinal = new Date();
   let dateStart = new Date();
@@ -109,54 +122,29 @@ export const ModalInTrip = ({
 
   const animation = useDynamicAnimation(() => {
     return {
-      transform: [{translateY: 500}],
+      transform: [{ translateY: 500 }],
     };
   });
 
-  const animationMessage = useDynamicAnimation(() => {
-    return {
-      transform: [{translateY: 500}],
-    };
-  });
-
-  const verifyChat = () => {
-    if (
-      tripAccepted.tripReference &&
-      tripAccepted.tripCallType !== 'CHAMADA TAXÍMETRO'
-    ) {
-      chatRealtime.getLastMessageUnread(
-        tripAccepted.tripReference,
-        ({item, id}) => {
+  const verifyChat = (tripReference: string, tripCallType: string) => {
+    if (tripReference && tripCallType !== 'CHAMADA TAXÍMETRO') {
+      chatUnsubscribeRef.current?.();
+      chatUnsubscribeRef.current = chatRealtime.getLastMessageUnread(
+        tripReference,
+        ({ item, id }) => {
           if (
+            !shownMessageIds.current.has(id) &&
             Number(item?.userId) !== Number(userDriverFind?.userId) &&
             !item.viewed
           ) {
+            shownMessageIds.current.add(id);
             setMessage(item);
             setNewMessage(true);
-            setNewMessageNotification(true);
           }
         },
       );
     }
   };
-
-  useEffect(() => {
-    if (visible && tripAccepted && Object.keys(tripAccepted).length > 0) {
-      animation.animateTo({
-        opacity: 1,
-        transform: [{translateY: 0}],
-      });
-      verifyChat();
-    } else {
-      animation.animateTo({
-        transform: [{translateY: 500}],
-        opacity: 0.7,
-      });
-    }
-    if (tripAccepted?.status === 'in_progress') {
-      changeHeight(true);
-    }
-  }, [visible, tripAccepted]);
 
   const calculatePercentTime = async () => {
     const max = (dateFinal.getTime() - dateStart.getTime()) / 1000;
@@ -182,9 +170,7 @@ export const ModalInTrip = ({
   };
 
   const startCount = async () => {
-    const date = new Date(
-      JSON.parse(await AsyncStorage.getItem('customerWaitTime')),
-    );
+    const date = new Date(JSON.parse(await AsyncStorage.getItem('customerWaitTime')));
     dateFinal = new Date(date.setSeconds(date.getSeconds() + Number(difTime)));
     dateStart = date;
     await calculatePercentTime();
@@ -193,19 +179,19 @@ export const ModalInTrip = ({
   const cancelTripAccepted = async (cancellationReasonId: number) => {
     if (cancellationReasonId === null) {
       return customToast(
-        translate('driverTrip.text_choose_reason_to_cancel'),
+        translate('driverTrip.text_choosbe_reason_to_cancel'),
         'warning',
       );
     }
 
     cancelTrip.cancellationReasonsId = cancellationReasonId;
-    dispatchTrip({type: 'update', field: 'cancelTrip', arg: cancelTrip});
+    dispatchTrip({ type: 'update', field: 'cancelTrip', arg: cancelTrip });
 
     if (percent === 0) {
       await startCount();
     }
 
-    if (tripAccepted.status === STATUS_BOARDING_TRIP && percent >= 100) {
+    if (tripAccepted?.status === STATUS_BOARDING_TRIP && percent >= 100) {
       if (!Array.isArray(cityConfig)) {
         if (!!cityConfig.allowDriverGenerateCancellationFee === true) {
           // ESSE SWITH É PRA SE TRANSFORMAR EM UM RADIO DENTRO DO MODAL
@@ -254,122 +240,231 @@ export const ModalInTrip = ({
     cancelTrip.tripReference = tripAccepted.tripReference;
     cancelTrip.generateCancellationFee = generateCancellationFee;
     cancelTrip.driverId = Number(userDriverFind.idDriver);
-    dispatchTrip({type: 'update', field: 'cancelTrip', arg: cancelTrip});
+    dispatchTrip({ type: 'update', field: 'cancelTrip', arg: cancelTrip });
 
     cancel(false);
 
-    animation.animateTo({
-      transform: [{translateY: 500}],
-      opacity: 0.7,
-    });
+    hideModalAnimation();
 
     setTimeout(() => {
       setVisible(false);
     }, 5000);
   };
 
-  const changeHeight = async (state: boolean) => {
-    if (state) {
-      animation.animateTo({
-        maxHeight: '95%',
-      });
-      return setTimeout(() => setMinimize(true), 200);
-    }
-
-    animation.animateTo({
-      maxHeight: '100%',
-    });
-    return setTimeout(() => setMinimize(false), 100);
-  };
-
   const progressTrip = async () => {
-    const {callback, status, waypoint} = await checkStatusTrip();
+    const previousStatus = statusTrip;
+    try {
+      const result = await checkStatusTrip();
 
-    if (!callback) {
-      customToast(translate('driverTrip.text_error_update_trip'), 'warning');
-      setStatusTrip(status);
-    }
+      if (!result) {
+        setStatusTrip(previousStatus);
+        return;
+      }
 
-    if (status === translate('statusTrip.accepted') && callback === true) {
-      AsyncStorage.setItem('customerWaitTime', JSON.stringify(new Date()));
-      dateFinal = new Date();
-      dateFinal.setSeconds(dateFinal.getSeconds() + Number(difTime));
-      dateStart = new Date();
-      calculatePercentTime();
-      counter = Number(cityConfig?.waitingTimeCustomerCancellationFee);
-      setShowCountTime(true);
-    }
+      const { callback, status, waypoint } = result;
 
-    if (status === translate('statusTrip.in_progress') && callback === true) {
-      setMarkWaypoint(0);
-      setVisible(false);
-    }
+      if (!callback) {
+        customToast(translate('driverTrip.text_error_update_trip'), 'warning');
+        setStatusTrip(status);
+      }
 
-    if (status === translate('statusTrip.waypoint') && waypoint) {
-      setMarkWaypoint(1);
+      if (status === translate('statusTrip.accepted') && callback === true) {
+        AsyncStorage.setItem('customerWaitTime', JSON.stringify(new Date()));
+        dateFinal = new Date();
+        dateFinal.setSeconds(dateFinal.getSeconds() + Number(difTime));
+        dateStart = new Date();
+        calculatePercentTime();
+        counter = Number(cityConfig?.waitingTimeCustomerCancellationFee);
+        setShowCountTime(true);
+      }
+
+      if (status === translate('statusTrip.in_progress') && callback === true) {
+        setMarkWaypoint(0);
+        setVisible(false);
+      }
+
+      if (status === translate('statusTrip.waypoint') && waypoint) {
+        setMarkWaypoint(1);
+      }
+    } catch {
+      setStatusTrip(previousStatus);
     }
   };
 
   const setSwitchRead = async () => {
     try {
-      const responseSwitchRead = await AsyncStorage.getItem(
-        'switchRead-driver',
-      );
+      const responseSwitchRead = storage.getItem(STORAGE_KEYS.SWITCH_READ, 'boolean');
       if (responseSwitchRead === null) {
-        await AsyncStorage.setItem('switchRead-driver', 'true');
+        storage.setItem(STORAGE_KEYS.SWITCH_READ, true, 'boolean');
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  useEffect(() => {
-    setSwitchRead();
-  }, []);
-
-  useEffect(() => {
-    if (newMessage)
-      setTimeout(() => {
-        setNewMessage(false);
-
-        animationMessage.animateTo({
-          transform: [{translateY: 500}],
-          opacity: 0.7,
-        });
-      }, 5000);
-  }, [newMessage]);
-
-  const [originSize, setOriginSize] = useState(2);
-  const [destinationSize, setDestinationSize] = useState(2);
-
-  const changeSizeAddress = (
-    state: number,
-    setState: (val: number) => void,
-  ) => {
-    if (state === 2) {
-      return setState(5);
-    }
-    setState(2);
+  const showModalAnimation = () => {
+    animation.animateTo({
+      opacity: 1,
+      transform: [{ translateY: 0 }],
+    });
   };
 
+  const hideModalAnimation = () => {
+    animation.animateTo({
+      opacity: 0.7,
+      transform: [{ translateY: 500 }],
+    });
+  };
+
+  useEffect(() => {
+    verifyChat(tripAccepted?.tripReference, tripAccepted?.tripCallType);
+
+    return () => {
+      chatUnsubscribeRef.current?.();
+    };
+  }, [tripAccepted?.tripReference, tripAccepted?.tripCallType]);
+
+  useEffect(() => {
+    if (visible && !isTaximeterTripInProgress(tripAccepted)) {
+      showModalAnimation();
+    } else {
+      hideModalAnimation();
+    }
+
+    if (visible && tripAccepted?.status === STATUS_IN_PROGRESS) {
+      setMinimize(true);
+    } else {
+      setMinimize(false);
+    }
+  }, [visible, tripAccepted?.status, tripAccepted?.tripCallType]);
+
+  const putIntWaiting = async () => {
+    setLoading(true);
+    const data = await waitingTripStatus();
+    setLoading(false);
+    if (data) {
+      setSwalVisible(false);
+    }
+  };
+
+  const onEndWaitingTime = async () => {
+    setLoading(true);
+    try {
+      const total = await stopWaiting();
+      console.log('Tempo total em espera:', total, 'segundos');
+      await progressTrip();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const stopWaiting = async () => {
+    const now = Date.now();
+    const raw = await AsyncStorage.getItem('waitingTimer');
+    if (!raw) return 0;
+
+    const data = JSON.parse(raw);
+
+    if (data.startTime) {
+      data.totalPaused += Math.floor((now - data.startTime) / 1000);
+      data.startTime = null;
+      await AsyncStorage.setItem('waitingTimer', JSON.stringify(data));
+    }
+
+    return data.totalPaused;
+  };
+
+  const getWaitingFees = async () => {
+    const data = await waitingFees();
+
+    if (!data) {
+      return setShowWaitingTimer(false);
+    }
+
+    const hasExtraFee =
+      data.waiting_extra_fee_per_minute !== null &&
+      data.waiting_extra_fee_per_minute !== '' &&
+      Number(data.waiting_extra_fee_per_minute) > 0;
+
+    const hasPenaltyFee =
+      data.waiting_penalty_fee !== null &&
+      data.waiting_penalty_fee !== '' &&
+      Number(data.waiting_penalty_fee) > 0;
+
+    if (hasExtraFee || hasPenaltyFee) {
+      setWaitingConfigs(data);
+      return setShowWaitingTimer(true);
+    }
+
+    setShowWaitingTimer(false);
+  };
+
+  const formatTime = (seconds: number | string | null | undefined) => {
+    const safeSeconds = Number(seconds);
+
+    if (isNaN(safeSeconds) || safeSeconds < 0) {
+      return '00:00';
+    }
+
+    const minutes = Math.floor(safeSeconds / 60);
+    const secs = safeSeconds % 60;
+
+    const mm = String(minutes).padStart(2, '0');
+    const ss = String(secs).padStart(2, '0');
+
+    return `${mm}:${ss}`;
+  };
+
+  const valideSeconds = (seconds: number | string | null | undefined) => {
+    const safeSeconds = Number(seconds);
+    if (isNaN(safeSeconds) || safeSeconds < 0) {
+      return 0;
+    }
+
+    return safeSeconds;
+  };
+
+  useEffect(() => {
+    setSwitchRead();
+    getWaitingFees();
+  }, []);
+
   return (
-    <>
+    <If condition={hasTripAccepted}>
+      <Preload visible={loading} />
+      <SwalAlert
+        visible={swalVisible}
+        title="Modo de espera"
+        description={`O modo de espera poderá ser ativado quando o passageiro solicitar uma parada não prevista. Após a tolerância de ${formatTime(Number(waitingConfigs?.waiting_tolerance_seconds)) || 0} minutos o cliente receberá uma cobrança adicional de R$ ${Helper.maskMoney(Number(waitingConfigs?.waiting_penalty_fee))} e terá um acréscimo de R$ ${Helper.maskMoney(Number(waitingConfigs?.waiting_extra_fee_per_minute))} por minuto durante a espera.`}
+        setVisible={() => setSwalVisible(false)}
+        closeButton={true}
+        children={
+          <SwalButtonContainers>
+            <SwalButton backgroundColor={''}>
+              <Text
+                style={{ color: theme.colors.secondary }}
+                onPress={() => setSwalVisible(false)}
+              >
+                Fechar
+              </Text>
+            </SwalButton>
+            <SwalButton
+              backgroundColor={theme.colors.primary}
+              onPress={() => putIntWaiting()}
+            >
+              <Text style={{ color: theme.colors.primaryText }}>Confirmar</Text>
+            </SwalButton>
+          </SwalButtonContainers>
+        }
+      />
       <CardInfoDriver
         visible={visibleCardInfo}
         setVisible={setVisibleCardInfo}
         markWaypoint={markWaypoint}
       />
-      <If condition={message?.message && newMessage}>
-        <NotificationModalMessage
-          animationMessage={animationMessage}
-          isAudio={message?.isAudio}
-          message={message}
-          setNewMessage={setNewMessage}
-          setNewMessageNotification={setNewMessageNotification}
-        />
-      </If>
 
       <Modal
+        pointerEvents={visible ? 'auto' : 'none'}
         transition={{
           type: 'timing',
           duration: 900,
@@ -386,9 +481,9 @@ export const ModalInTrip = ({
           elevation: 24,
         }}
       >
-        <ButtonMinizeModal
+        <ButtonMinimizeModal
           onPress={() => {
-            changeHeight(!minimize);
+            setMinimize(!minimize);
           }}
         >
           <MaterialIcons
@@ -398,10 +493,7 @@ export const ModalInTrip = ({
               color: colors.primaryText,
             }}
           />
-        </ButtonMinizeModal>
-        <If condition={tripAccepted.status === STATUS_IN_PROGRESS}>
-          <DistanceComponent />
-        </If>
+        </ButtonMinimizeModal>
         {!minimize && (
           <>
             <ClientContent
@@ -410,45 +502,25 @@ export const ModalInTrip = ({
                 setVisibleCardInfo(true);
               }}
             >
-              {tripAccepted?.centralId === null ? (
-                <Picture
-                  source={{
-                    uri: `${buildApp().HOST_IMAGE_CUSTOMER}${
-                      tripAccepted?.customer?.profileImage
-                    }`,
-                  }}
-                />
-              ) : (
-                <RenderSvgImage
-                  image={`${buildApp().HOST_IMAGE_TRIP_TYPE}${
-                    tripAccepted?.fare?.picture
-                  }`}
-                  width={80}
-                  heigth={80}
-                />
-              )}
+              <CustomerAvatar trip={tripAccepted} />
 
               <ClientName>
-                {tripAccepted?.customer?.name?.split(' ')[0]}{' '}
-                {
-                  tripAccepted?.customer?.name?.split(' ')[
-                    tripAccepted?.customer?.name?.split(' ').length - 1
-                  ]
-                }
+                {tripAccepted?.customer?.name &&
+                  tripAccepted?.customer?.name?.length > 0 &&
+                  tripAccepted?.customer?.name}
               </ClientName>
             </ClientContent>
             <ButtonContent>
               <Button
                 onPress={() => {
                   setNewMessage(false);
-                  setNewMessageNotification(false);
                   setVisible(false);
                   navigate('TripChatDriver', {
                     trip: tripAccepted,
                   });
                 }}
               >
-                <If condition={newMessageNotification}>
+                <If condition={newMessage}>
                   <Dot
                     from={{
                       opacity: 1,
@@ -467,22 +539,22 @@ export const ModalInTrip = ({
                   />
                 </If>
 
-                <AntDesign name="message1" size={23} color={colors.primary} />
+                <AntDesign name="message" size={23} color={colors.primary} />
               </Button>
               <Button onPress={() => setCancellationReasonsModal(true)}>
                 <Feather name="x" size={25} color={colors.primary} />
               </Button>
             </ButtonContent>
             <MoreInfo>
-              {IsToShowField('paymentForm') && (
+              {IsToShowField('paymentForm', cityConfig) && (
                 <View>
-                  <SimpleTitle>
-                    {translate('callTrip.text_type_payment')}
-                  </SimpleTitle>
-                  <SimpleText>{tripAccepted?.tripPaymentForm}</SimpleText>
+                  <SimpleTitle>{translate('callTrip.text_type_payment')}</SimpleTitle>
+                  <SimpleText>
+                    {getTripPaymentFormDisplay(tripAccepted?.tripPaymentForm)}
+                  </SimpleText>
                 </View>
               )}
-              {IsToShowField('price') && cityConfig !== null && (
+              {IsToShowField('price', cityConfig) && cityConfig !== null && (
                 <View>
                   <SimpleTitle>{translate('callTrip.text_price')}</SimpleTitle>
                   <SimpleText>
@@ -491,210 +563,147 @@ export const ModalInTrip = ({
                 </View>
               )}
             </MoreInfo>
-            <AddressContent>
-              <View style={{alignItems: 'center'}}>
-                <Ball style={{marginTop: 5}} />
-                <Line />
-                {tripAccepted?.tripWayPoints?.length !== 0 &&
-                  tripAccepted?.tripWayPoints?.map(() => (
-                    <>
-                      <Ball />
-                      <Line />
-                    </>
-                  ))}
-                <Square />
+            {showWaitingTimer && tripAccepted?.status == STATUS_IN_PROGRESS && (
+              <View style={{ alignItems: 'flex-end', padding: 10 }}>
+                <TouchableOpacity
+                  style={{ backgroundColor: theme.colors.primary, borderRadius: 18 }}
+                  onPress={() => setSwalVisible(true)}
+                >
+                  <Text
+                    style={{
+                      color: theme.colors.primaryText,
+                      marginHorizontal: 10,
+                      marginVertical: 5,
+                    }}
+                  >
+                    Colocar em espera
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <View>
-                {IsToShowField('origin') && (
-                  <TextWrapper
-                    text={tripAccepted?.origin?.address}
-                    selected={statusTrip === translate('statusTrip.accepted')}
-                    Children={Address}
-                    initialNumber={2}
-                    endNumber={5}
-                  />
-                )}
+            )}
+            {tripAccepted?.status != STATUS_WAITING ? (
+              <AddressContent>
+                <View style={{ alignItems: 'center' }}>
+                  <Ball style={{ marginTop: 5 }} />
+                  <Line />
+                  {tripAccepted?.tripWayPoints?.length !== 0 &&
+                    tripAccepted?.tripWayPoints?.map((_, index) => (
+                      <Fragment key={index}>
+                        <Ball />
+                        <Line />
+                      </Fragment>
+                    ))}
+                  <Square />
+                </View>
+                <View>
+                  {IsToShowField('origin', cityConfig) && (
+                    <TextWrapper
+                      text={tripAccepted?.origin?.address}
+                      selected={statusTrip === translate('statusTrip.accepted')}
+                      Children={Address}
+                      initialNumber={2}
+                      endNumber={5}
+                    />
+                  )}
 
-                {tripAccepted?.tripWayPoints?.length !== 0 &&
-                  tripAccepted?.tripWayPoints?.map((waypoint, index) => {
-                    return (
-                      <TextWrapper
-                        text={waypoint?.address}
-                        selected={
-                          statusTrip === translate('statusTrip.waypoint') &&
-                          markWaypoint === index
-                        }
-                        key={index}
-                        Children={Address}
-                        initialNumber={2}
-                        endNumber={5}
-                      />
-                    );
-                  })}
-                {IsToShowField('destination') && (
-                  <TextWrapper
-                    text={tripAccepted?.destination?.name}
-                    selected={
-                      statusTrip === translate('statusTrip.in_progress')
-                    }
-                    Children={Address}
-                    initialNumber={2}
-                    endNumber={5}
-                  />
-                )}
-              </View>
-            </AddressContent>
+                  {tripAccepted?.tripWayPoints?.length !== 0 &&
+                    tripAccepted?.tripWayPoints?.map((waypoint, index) => {
+                      return (
+                        <TextWrapper
+                          text={waypoint?.address}
+                          selected={
+                            statusTrip === translate('statusTrip.waypoint') &&
+                            markWaypoint === index
+                          }
+                          key={index}
+                          Children={Address}
+                          initialNumber={2}
+                          endNumber={5}
+                        />
+                      );
+                    })}
+                  {IsToShowField('destination', cityConfig) && (
+                    <TextWrapper
+                      text={tripAccepted?.destination?.name}
+                      selected={statusTrip === translate('statusTrip.in_progress')}
+                      Children={Address}
+                      initialNumber={2}
+                      endNumber={5}
+                    />
+                  )}
+                </View>
+              </AddressContent>
+            ) : (
+              <></>
+            )}
           </>
         )}
-
-        <View
-          style={{
-            width: '98%',
-            alignSelf: 'center',
-            marginTop: 10,
-            marginBottom: 10,
-          }}
-        >
-          <DragButton
-            text={statusTrip}
-            onPressButton={() => {
-              setStatusTrip(translate('statusTrip.loading'));
-              progressTrip();
+        {tripAccepted?.status == STATUS_WAITING && (
+          <View
+            style={{
+              width: '98%',
+              alignSelf: 'center',
+              marginBottom: 10,
             }}
-            statusTrip={statusTrip}
-          />
-        </View>
+          >
+            <TimerCircle
+              initialSeconds={valideSeconds(
+                Number(waitingConfigs?.waiting_tolerance_seconds),
+              )}
+              onTimeUpdate={() => {}}
+            />
+            <AnimatedActionButton
+              text={'Retomar viagem'}
+              onPress={() => onEndWaitingTime()}
+              colors={{
+                primary: theme.colors.primary,
+                background_global: theme.colors.primary,
+                primaryText: theme.colors.primaryText,
+              }}
+            />
+          </View>
+        )}
+        {tripAccepted?.status != STATUS_WAITING && (
+          <View
+            style={{
+              width: '98%',
+              alignSelf: 'center',
+              marginTop: 10,
+              marginBottom: 10,
+            }}
+          >
+            <AnimatedDragButton
+              text={statusTrip}
+              onPressButton={() => {
+                setStatusTrip(translate('statusTrip.loading'));
+                progressTrip();
+              }}
+              statusTrip={statusTrip}
+            />
+          </View>
+        )}
       </Modal>
+
       <ModalCancellationReasons
         visible={cancellationReasonsModal}
         setVisible={setCancellationReasonsModal}
         cancelTripAccepted={cancelTripAccepted}
       />
-    </>
-  );
-};
 
-const BUTTON_WIDTH = Dimensions.get('window').width * 0.8;
-const DRAG_THRESHOLD = BUTTON_WIDTH / 2;
-
-const DragButton = ({text, onPressButton, statusTrip}) => {
-  const translateX = useSharedValue(0);
-
-  const gestureHandler = useAnimatedGestureHandler({
-    onStart: (_, ctx: any) => {
-      ctx.startX = translateX.value;
-    },
-    onActive: (event, ctx) => {
-      translateX.value = ctx.startX + event.translationX;
-    },
-    onEnd: () => {
-      if (translateX.value >= DRAG_THRESHOLD) {
-        runOnJS(onPressButton)();
-        translateX.value = withSpring(0);
-      } else {
-        translateX.value = withSpring(0);
-      }
-    },
-  });
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{translateX: translateX.value}],
-    };
-  });
-
-  return (
-    <View
-      style={{
-        flex: 1,
-      }}
-    >
-      <View
-        style={{
-          backgroundColor: theme.colors.primary,
-          borderRadius: 100,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
-      >
-        <PanGestureHandler onGestureEvent={gestureHandler}>
-          <Animated.View
-            style={[
-              {
-                width: RFValue(50),
-                height: RFValue(50),
-                borderRadius: RFValue(50),
-                backgroundColor: theme.colors.primary,
-                justifyContent: 'center',
-                alignItems: 'center',
-                zIndex: 1,
-              },
-              animatedStyle,
-            ]}
-          >
-            <ReanimatedComponent
-              colors={theme.colors}
-              translate={translate}
-              statusTrip={statusTrip}
-            />
-          </Animated.View>
-        </PanGestureHandler>
-        <View
-          style={{
-            marginLeft: 15,
-          }}
-        >
-          <SimpleTitle
-            style={{
-              fontFamily: 'MavenPro_600SemiBold',
-              color: theme.colors.primaryText,
-              fontSize: RFValue(20),
-            }}
-          >
-            {text}
-          </SimpleTitle>
-        </View>
-      </View>
-    </View>
-  );
-};
-
-const ReanimatedComponent = ({statusTrip, colors, translate}) => {
-  const scale = useSharedValue(0.8);
-  const translateX = useSharedValue(0);
-
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      transform: [{scale: scale.value}, {translateX: translateX.value}],
-    };
-  });
-
-  useEffect(() => {
-    scale.value = withRepeat(withTiming(1, {duration: 600}), -1, true);
-    translateX.value = withRepeat(withTiming(6, {duration: 600}), -1, true);
-  }, []);
-
-  if (statusTrip === translate('statusTrip.loading')) {
-    return <ActivityIndicator size={25} color={colors.background_global} />;
-  }
-
-  return (
-    <Animated.View style={[animatedStyles, {flexDirection: 'row'}]}>
-      <MaterialIcons
-        name="arrow-forward-ios"
-        size={25}
-        style={{
-          color: colors.primaryText,
-        }}
+      <NotificationMessage
+        visible={!!message?.message}
+        message={message}
+        isAudio={message?.isAudio}
+        title={tripAccepted?.customer?.name}
+        pictureUri={
+          tripAccepted?.customer?.profileImage
+            ? `${getStoragePictureSpecific('customer') || buildApp().HOST_IMAGE_CUSTOMER}${tripAccepted?.customer?.profileImage}`
+            : undefined
+        }
+        onPress={() => navigate('TripChatDriver', { trip: tripAccepted })}
+        onRead={() => setNewMessage(false)}
+        onDismiss={() => setMessage(null)}
       />
-      <MaterialIcons
-        name="arrow-forward-ios"
-        size={25}
-        style={{
-          color: colors.primaryText,
-          marginLeft: -10,
-        }}
-      />
-    </Animated.View>
+    </If>
   );
 };

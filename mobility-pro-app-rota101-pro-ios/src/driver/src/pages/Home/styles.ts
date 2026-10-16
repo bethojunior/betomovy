@@ -342,21 +342,6 @@ export const InfoDataItemSubTitle = styled.Text`
   margin-right: ${RFValue(5)}px;
 `;
 
-export const ContainerCardPublicity = styled.View`
-  width: 100%;
-  align-self: center;
-  margin-top: ${RFValue(10)}px;
-
-  border: 0.5px solid ${({theme}) => theme.colors.secondary};
-
-  border-radius: ${({theme}) => theme.spacing.large}px;
-
-  shadow-color: ${({theme}) => theme.colors.black};
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.25;
-  shadow-radius: 3.84px;
-`;
-
 export const InfoDataItemNoteSubTitle = styled.Text`
   font-size: ${({theme}) => theme.fontSizes.xslarge}px;
   color: ${({theme}) => theme.colors.white};
@@ -365,10 +350,8 @@ export const InfoDataItemNoteSubTitle = styled.Text`
 `;
 
 export const ContainerPublicityAndDoorHandle = styled.View`
-  width: auto;
+  width: 100%;
   align-self: flex-end;
-  margin-bottom: ${RFValue(10)}px;
-  padding: 0 ${RFValue(10)}px;
   position: relative;
 `;
 

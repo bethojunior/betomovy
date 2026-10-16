@@ -20,7 +20,7 @@ export default function WithdrawInLocal() {
         <Text style={styles.withdrawal_label}>
           {translate('withdrawInLocal.text_withdraw_in')}
         </Text>
-        <Text style={styles.withdrawal_address} numberOfLines={3}>
+        <Text style={styles.withdrawal_address}>
           {establishment && establishment.address}
         </Text>
       </View>

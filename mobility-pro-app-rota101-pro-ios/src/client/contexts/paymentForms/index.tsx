@@ -1,9 +1,9 @@
 // @ts-nocheck
 
-import {createContext, useCallback, useContext, useMemo, useState} from 'react';
-import {customToast} from '../../../utils/FlashMessage';
-import {translate} from '../../locales';
-import {PaymentFormService} from './services';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { customToast } from '../../../utils/FlashMessage';
+import { translate } from '../../locales';
+import { PaymentFormService } from './services';
 import Helper from '../../utils/Helper';
 
 interface iPaymentFormContext {
@@ -14,6 +14,8 @@ interface iPaymentFormContext {
   addCard: any;
   addCoupon: any;
   addVoucher: any;
+  addVoucherByPix: any
+  verifyPaymentByPix: any
   cards: any;
 }
 
@@ -21,16 +23,16 @@ const PaymentFormContext = createContext<iPaymentFormContext>(
   {} as iPaymentFormContext,
 );
 
-export const PaymentFormProvider = ({children}: any) => {
+export const PaymentFormProvider = ({ children }: any) => {
   const [cards, setCards] = useState([]);
 
   const getCards = useCallback(async () => {
     try {
-      const {data} = await PaymentFormService.listCard();
+      const { data } = await PaymentFormService.listCard();
 
       if (!data.status) {
         return customToast(
-          translate('paymentPage.text_error_list_card'),
+          translate('paymentPage.error_list_card'),
           'danger',
         );
       }
@@ -38,7 +40,7 @@ export const PaymentFormProvider = ({children}: any) => {
       return data.data;
     } catch (error) {
       return customToast(
-        translate('paymentPage.text_error_list_card'),
+        translate('paymentPage.error_list_card'),
         'danger',
       );
     }
@@ -57,7 +59,7 @@ export const PaymentFormProvider = ({children}: any) => {
       try {
         if (
           listCard.find(
-            (item: any) => item.number === cardNumber.split(' ').join(''),
+            (item: any) => item.number === cardNumber?.split(' ').join(''),
           )
         ) {
           return customToast(
@@ -66,8 +68,8 @@ export const PaymentFormProvider = ({children}: any) => {
           );
         }
 
-        const date = dueDate.split('/');
-        const organizedBithDay = birthday.split('/')
+        const date = dueDate?.split('/');
+        const organizedBithDay = birthday?.split('/');
 
         const card = {
           cardNumber,
@@ -77,14 +79,19 @@ export const PaymentFormProvider = ({children}: any) => {
           cardholderName: cardHolder,
           docNumber: Helper.unMask(document),
           mpToken: null,
-          firstSixDigits: cardNumber.split(' ').join('').substr(0, 6),
+          firstSixDigits: cardNumber?.split(' ').join('').substr(0, 6),
           paymentMethodName: await Helper.detectCardType(cardNumber),
           securityCodeLength: String(cvv).length,
           lastFourDigits: cardNumber.substr(-4),
-          dateOfBirth: `${organizedBithDay[2] + '-' + organizedBithDay[1] + '-' + organizedBithDay[0]}`,
+          dateOfBirth: `${organizedBithDay[2] +
+            '-' +
+            organizedBithDay[1] +
+            '-' +
+            organizedBithDay[0]
+            }`,
         };
 
-        const {data} = await PaymentFormService.addCard(card);
+        const { data } = await PaymentFormService.addCard(card);
 
         if (!data.status) {
           return customToast(translate('paymentPage.error_add_card'), 'danger');
@@ -125,7 +132,7 @@ export const PaymentFormProvider = ({children}: any) => {
 
   const getCoupons = useCallback(async () => {
     try {
-      const {data} = await PaymentFormService.listCoupom();
+      const { data } = await PaymentFormService.listCoupom();
 
       if (!data.status) {
         return customToast(
@@ -142,7 +149,7 @@ export const PaymentFormProvider = ({children}: any) => {
 
   const getCurrentBalanceVoucher = useCallback(async () => {
     try {
-      const {data} = await PaymentFormService.getCurrentSaldVoucher();
+      const { data } = await PaymentFormService.getCurrentSaldVoucher();
 
       if (!data.status) {
         return customToast(
@@ -169,7 +176,7 @@ export const PaymentFormProvider = ({children}: any) => {
             'warning',
           );
         }
-        const {data} = await PaymentFormService.addCoupon(code, lat, lng);
+        const { data } = await PaymentFormService.addCoupon(code, lat, lng);
 
         if (!data.status) {
           return customToast(
@@ -198,26 +205,57 @@ export const PaymentFormProvider = ({children}: any) => {
 
   const addVoucher = useCallback(async (response: any) => {
     try {
-      if (response.cardId === undefined) {
+      if (!response.cardId) {
         return customToast(
           translate('paymentPage.error_select_card'),
           'danger',
         );
       }
 
-      const {data} = await PaymentFormService.addVoucher(response);
+      const { data } = await PaymentFormService.addVoucher(response);
 
       if (!data.status) {
-        return customToast(
-          data?.data?.message || data?.message,
-          'danger',
-        );
+        return customToast(data?.data?.message || data?.message, 'danger');
       }
 
       return customToast(
         translate('paymentPage.success_buy_voucher'),
         'success',
       );
+    } catch (error) {
+      return customToast(translate('paymentPage.error_buy_voucher'), 'danger');
+    }
+  }, []);
+
+  const addVoucherByPix = useCallback(async (response: any) => {
+    try {
+
+      const { data } = await PaymentFormService.addVoucherByPix(response);
+
+      if (!data.status) {
+        return customToast(data?.data?.message || data?.message, 'danger');
+      }
+
+      const paymentDataCode = String(data.data.payment_data.code);
+      const voucherId = String(data.data.voucher.voucher_id);
+
+
+      return { paymentDataCode, voucherId }
+    } catch (error) {
+      return customToast(translate('paymentPage.error_buy_voucher'), 'danger');
+    }
+  }, []);
+
+  const verifyPaymentByPix = useCallback(async (response: any) => {
+    try {
+      const { data } = await PaymentFormService.verifyPaymentByPix(response);
+
+
+      if (!data.status) {
+        return customToast(data?.data?.message || data?.message, 'danger');
+      }
+
+      return data;
     } catch (error) {
       return customToast(translate('paymentPage.error_buy_voucher'), 'danger');
     }
@@ -232,6 +270,8 @@ export const PaymentFormProvider = ({children}: any) => {
       removeCard,
       addCoupon,
       addVoucher,
+      addVoucherByPix,
+      verifyPaymentByPix,
       cards,
     }),
     [
@@ -242,6 +282,8 @@ export const PaymentFormProvider = ({children}: any) => {
       removeCard,
       addCoupon,
       addVoucher,
+      addVoucherByPix,
+      verifyPaymentByPix,
       cards,
     ],
   );

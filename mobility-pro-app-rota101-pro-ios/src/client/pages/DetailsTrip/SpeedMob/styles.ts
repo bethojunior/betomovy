@@ -1,9 +1,10 @@
 import styled from 'styled-components/native';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { lighten } from 'polished';
+import {RFValue} from 'react-native-responsive-fontsize';
+import {lighten} from 'polished';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-interface ButtonDriverProps{
-  backgroundColor: string; 
+interface ButtonDriverProps {
+  backgroundColor: string;
   isDisabled?: boolean;
 }
 
@@ -106,7 +107,10 @@ export const ContentActionsDriver = styled.View`
 
 export const ButtonDriver = styled.TouchableOpacity<ButtonDriverProps>`
   width: 50%;
-  background-color: ${props => props.isDisabled ? lighten(0.2, props.backgroundColor) : props.backgroundColor};
+  background-color: ${props =>
+    props.isDisabled
+      ? lighten(0.2, props.backgroundColor)
+      : props.backgroundColor};
   padding: 15px 20px;
   border-radius: 0px;
   border-width: 1px;
@@ -119,50 +123,50 @@ export const TextButtonDriver = styled.Text<{colorText: string}>`
   text-align: center;
 `;
 
-export const ContentHelp = styled.View``
+export const ContentHelp = styled.View``;
 
 export const ContentHeaderHelp = styled.View`
   width: 100%;
   background-color: ${({theme}) => theme.colors.grayBright};
   flex-direction: row;
   align-items: center;
-`
+`;
 
-export const ButtonHeaderHelp=  styled.TouchableOpacity`
+export const ButtonHeaderHelp = styled.TouchableOpacity`
   padding: ${RFValue(20)}px;
-`
+`;
 
 export const ButtonTextsHeaderHelp = styled.Text`
   font-size: ${RFValue(14)}px;
-`
+`;
 
-export const ContentItemsList = styled.SafeAreaView`
+export const ContentItemsList = styled(SafeAreaView)`
   height: ${RFValue(230)}px;
-`
+`;
 
 export const ContentReceipt = styled.View`
-  padding:  ${RFValue(20)}px;
-`
+  padding: ${RFValue(20)}px;
+`;
 
 export const ButtonReceiptEmail = styled.TouchableOpacity`
   padding: ${RFValue(15)}px;
   background-color: ${({theme}) => theme.colors.primary};
   border-radius: ${RFValue(30)}px;
-`
+`;
 
 export const TextButtonReceiptEmail = styled.Text`
   text-align: center;
   font-size: ${RFValue(13)}px;
   color: ${({theme}) => theme.colors.background_global};
   font-weight: bold;
-`
+`;
 
 export const ContentTypeHelp = styled.TouchableOpacity`
   border-bottom-width: 1px;
   border-color: gray;
   padding: ${RFValue(15)}px;
-`
+`;
 
 export const PaymentNameTypeHelp = styled.Text`
   font-size: ${RFValue(13)}px;
-`
+`;

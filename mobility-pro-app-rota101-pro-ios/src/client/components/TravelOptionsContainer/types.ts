@@ -58,5 +58,5 @@ interface CouponProps {
   used: string;
   userId: string;
   value: string;
-  valueType: symbol;
+  valueType: string;
 }

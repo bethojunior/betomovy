@@ -1,88 +1,96 @@
-import {useEffect, useMemo, useState} from 'react';
-import {useUserDriver} from '../../context/userDriver';
-import {TripRealtime} from '../../service/realtime/TripRealtime';
-import {useAuth} from '../../../../context/auth';
-import {mountSong} from '../../utils/mountSong';
-import {TripInfo} from '../../context/Trip/types';
-import {useBubbleButton} from '@704apps/react-native-bubble-button';
-import {useNavigation} from '@react-navigation/native';
-import {useTripProvider} from '../../context/Trip';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useUserDriver } from '../../context/userDriver';
+import { useAuth } from '../../../../context/auth';
+import { mountSong } from '../../utils/mountSong';
+import { useBubbleButton } from '@704apps/react-native-bubble-button';
+import { useNavigation } from '@react-navigation/native';
+import { useTripProvider } from '../../context/Trip';
+import offerSoundMp3 from '../../assets/songs/scheduledTrip.mp3';
+import useTripRealtime from '../../hooks/tripRealtime';
+import { InteractionManager } from 'react-native';
+import { shouldOpenAppForOfferTrip } from '../../service/rules/trip/shouldOpenAppForOfferTrip';
+import { useDriverStatus } from '../../hooks/useDriverStatus';
+import { TripCallback } from '../../interfaces/tripRealtime';
 
 export const TripRealtimeSearchOffer = () => {
-  const {userDriverFind} = useUserDriver();
-  const tripRealtime = useMemo(() => new TripRealtime(), []);
-  const {cityConfig} = useAuth();
-  const {openApp} = useBubbleButton();
-  const {navigate} = useNavigation();
-  const {stateTrip, dispatchTrip} = useTripProvider();
-  const {tripsOffer} = stateTrip;
+  const { tripRealtime } = useTripRealtime();
+  const { userDriverFind } = useUserDriver();
+  const { isOnline } = useDriverStatus();
+  const { cityConfig } = useAuth();
+  const { openApp } = useBubbleButton();
+  const { navigate } = useNavigation<any>();
 
-  const [tripsOfferList, setTripsOffer] = useState([...tripsOffer]);
+  const {
+    stateTrip,
+    addOrUpdateList,
+    removeFromList,
+    incrementTripSummaryItem,
+    decrementTripSummaryItem,
+  } = useTripProvider((context) => context);
 
-  const initTripSearchOffer = (itsObserver = false) => {
-    if (itsObserver) {
-      return;
+  const tripsOffer = stateTrip.tripsOffer;
+
+  const cityId = useMemo(() => {
+    return cityConfig?.cityId || userDriverFind?.cityId;
+  }, [cityConfig?.cityId, userDriverFind?.cityId]);
+
+  const playOfferTripAlert = useCallback(async () => {
+    if (isOnline) {
+      try {
+        const sound = await mountSong(offerSoundMp3, true, 'soundCallTripInDriver');
+        await InteractionManager.runAfterInteractions(async () => await sound?.playAsync());
+      } catch (error) {
+        console.log('Erro ao executar: soundCallTripInDriver', error);
+      }
     }
-    userDriverFind?.tripTypes?.map(item => {
-      tripRealtime.getTripOffer(
-        cityConfig?.cityId || userDriverFind?.cityId,
-        item?.tripTypeId,
-        async (tripFirebase: TripInfo, type: string) => {
-          if (userDriverFind.status !== 'desligado') {
-            await mountSong(
-              require('../../assets/songs/scheduledTrip.mp3'),
-            ).then(async sound => {
-              await sound?.playAsync();
-            });
-          }
-          if (type === 'added') {
-            openApp();
-            // colocando lista de ofertas
-            await setTripsOffer([...tripsOffer, tripFirebase]);
-            navigate('tripsOffer');
-          }
+  }, [isOnline]);
 
-          if (type === 'modified') {
-            openApp();
-            // atualizando lista de ofertas
-            setTripsOffer(oldArray =>
-              oldArray.map(item => {
-                if (item.tripReference === tripFirebase.tripReference) {
-                  return tripFirebase;
-                }
-                return item;
-              }),
-            );
-          }
+  const hasItemTripBid = (tripReference: string) => {
+    return tripsOffer.some(item => item.tripReference === tripReference);
+  }
 
-          if (type === 'removed') {
-            openApp();
-            setTripsOffer(oldArray =>
-              oldArray.filter(
-                item => item.tripReference !== tripFirebase.tripReference,
-              ),
-            );
-          }
-          // removendo lista de ofertas
+  const onTripOffer: TripCallback = async ({ data: _trip, type }) => {
+    const driverId = userDriverFind?.idDriver;
 
-          return '';
-        },
-      );
-    });
+    if (type === 'added' || type === 'modified') {
+      if (!hasItemTripBid(_trip.tripReference)) {
+        incrementTripSummaryItem('totalOfferTrips', 1);
+      }
+
+      if (shouldOpenAppForOfferTrip(_trip, tripsOffer, driverId)) {
+        openApp();
+
+        await playOfferTripAlert();
+        addOrUpdateList("tripsOffer", _trip);
+        navigate('tripsOffer');
+      } else {
+        addOrUpdateList("tripsOffer", _trip);
+      }
+    }
+
+    if (type === 'removed') {
+      decrementTripSummaryItem('totalOfferTrips', 1);
+      removeFromList("tripsOffer", _trip);
+    }
   };
 
   useEffect(() => {
-    initTripSearchOffer();
-  }, []);
+    if (userDriverFind.tripTypes == null) return;
 
-  useEffect(() => {
-    // Atualizar o estado tripsOffer no dispatchTrip sempre que tripsOfferList for atualizado
-    dispatchTrip({
-      type: 'update',
-      field: 'tripsOffer',
-      arg: tripsOfferList,
-    });
-  }, [tripsOfferList]);
+    let unsubscribes = [];
+
+    if (isOnline) {
+      userDriverFind.tripTypes.forEach(({ tripTypeId }) => {
+        const unsubscribe = tripRealtime.getTripOffer(cityId, tripTypeId, onTripOffer);
+        unsubscribes.push(unsubscribe);
+      });
+    }
+
+    return () => {
+      unsubscribes.forEach((unsub) => tripRealtime.unsubscribe(unsub));
+      unsubscribes = [];
+    };
+  }, [userDriverFind.tripTypes, isOnline, cityId]);
 
   return null;
 };

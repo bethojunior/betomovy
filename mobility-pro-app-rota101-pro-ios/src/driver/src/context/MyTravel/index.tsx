@@ -3,35 +3,106 @@ import {customToast} from '../../../../utils/FlashMessage';
 import {useUserDriver} from '../userDriver';
 import {TravelService} from './service';
 import {MyTravelContextProps, MyTripProps} from './types';
-const MyTravelContext = createContext({} as MyTravelContextProps);
-export const MyTravelProvider = ({children}: any) => {
-  const {userDriverFind} = useUserDriver();
+import {storage} from '../../../../common/services/mmkv/storage';
+// const MyTravelContext = createContext({} as MyTravelContextProps);
+// export const MyTravelProvider = ({children}: any) => {
+//   const {userDriverFind} = useUserDriver();
+//   const [trips, setTrips] = useState<MyTripProps[]>([]);
+
+//   const getTrips = useCallback(
+//     async (status = null, page = 1, date = null, setDataPage) => {
+//       try {
+//         const response = await TravelService.getTravels(
+//           Number(userDriverFind.idDriver),
+//           status,
+//           page,
+//           date,
+//         );
+//         if (!response.status) {
+//           console.log(response);
+//           return customToast(response.message, 'danger');
+//         }
+//         setTrips(response.data.trips);
+//         setDataPage(response.data.paginate);
+//         return response;
+//       } catch (error) {
+//         console.log(error);
+//       }
+//     },
+//     [userDriverFind],
+//   );
+
+//   const getTrip = useCallback(async (tripReference: string) => {
+//     try {
+//       const response = await TravelService.getTrip(tripReference);
+//       if (!response.status) {
+//         console.log(response);
+//         return customToast(response.message, 'danger');
+//       }
+//       return response;
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   }, []);
+
+//   const reportTrip = useCallback(
+//     async (tripReference: string, message: string) => {
+//       try {
+//         const response = await TravelService.reportTrip(tripReference, message);
+//         return response;
+//       } catch (error) {
+//         console.log(error);
+//       }
+//     },
+//     [],
+//   );
+
+//   const value = useMemo(() => {
+//     return {getTrips, getTrip, trips, setTrips, reportTrip};
+//   }, [getTrips, getTrip, trips, setTrips, reportTrip]);
+//   return (
+//     <MyTravelContext.Provider value={value}>
+//       {children}
+//     </MyTravelContext.Provider>
+//   );
+// };
+// export const useMyTravels = () => {
+//   const context = useContext(MyTravelContext);
+//   return context;
+// };
+
+export const useMyTravels = () => {
+  const {getItem} = storage;
+  const userDriverFind = getItem('userDriverFindLocal', 'json');
+
   const [trips, setTrips] = useState<MyTripProps[]>([]);
 
-  const getTrips = useCallback(
-    async (status = null, page = 1, date = null, setDataPage) => {
-      try {
-        const response = await TravelService.getTravels(
-          Number(userDriverFind.idDriver),
-          status,
-          page,
-          date,
-        );
-        if (!response.status) {
-          console.log(response);
-          return customToast(response.message, 'danger');
-        }
-        setTrips(response.data.trips);
-        setDataPage(response.data.paginate);
-        return response;
-      } catch (error) {
-        console.log(error);
+  const getTrips = async (
+    status = null,
+    page = 1,
+    date = null,
+    setDataPage,
+  ) => {
+    try {
+      const response = await TravelService.getTravels(
+        Number(userDriverFind.idDriver),
+        status,
+        page,
+        date,
+      );
+      if (!response.status) {
+        console.log(response);
+        return customToast(response.message, 'danger');
       }
-    },
-    [userDriverFind],
-  );
+      setTrips(response.data.trips);
+      setDataPage(response.data.paginate);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  const getTrip = useCallback(async (tripReference: string) => {
+  const getTrip = async (tripReference: string) => {
     try {
       const response = await TravelService.getTrip(tripReference);
       if (!response.status) {
@@ -42,30 +113,16 @@ export const MyTravelProvider = ({children}: any) => {
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  };
 
-  const reportTrip = useCallback(
-    async (tripReference: string, message: string) => {
-      try {
-        const response = await TravelService.reportTrip(tripReference, message);
-        return response;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    [],
-  );
+  const reportTrip = async (tripReference: string, message: string) => {
+    try {
+      const response = await TravelService.reportTrip(tripReference, message);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  const value = useMemo(() => {
-    return {getTrips, getTrip, trips, setTrips, reportTrip};
-  }, [getTrips, getTrip, trips, setTrips, reportTrip]);
-  return (
-    <MyTravelContext.Provider value={value}>
-      {children}
-    </MyTravelContext.Provider>
-  );
-};
-export const useMyTravels = () => {
-  const context = useContext(MyTravelContext);
-  return context;
+  return {getTrips, getTrip, trips, setTrips, reportTrip};
 };

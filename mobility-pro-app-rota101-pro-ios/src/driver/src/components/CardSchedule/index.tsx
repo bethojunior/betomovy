@@ -1,196 +1,210 @@
-import {useState} from 'react';
-import {Alert, Text} from 'react-native';
+import { View } from 'react-native';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { useTheme } from 'styled-components/native';
+import { useAuth } from '../../../../context/auth';
+import Preload from '../../../../components/Preload';
+import { convertDatetimeToDate, convertDatetimeToTime } from '../../utils/FormatDate';
+import { maskMoney } from '../../utils/money';
 import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
-import {useAuth} from '../../../../context/auth';
-import {useTripProvider} from '../../context/Trip';
-import {TripScheduleProps} from '../../context/Trip/types';
-import {useUserDriver} from '../../context/userDriver';
-import {
-  convertDatetimeToDate,
-  convertDatetimeToTime,
-} from '../../utils/FormatDate';
-import {maskMoney} from '../../utils/money';
-import {ContainerRow} from '../ContainerRow';
-import {
-  ButtonCancel,
   Container,
-  ContainerCancel,
-  ContainerHeader,
-  Content,
-  ContentItem,
-  ContentPhoto,
-  ContentTrip,
-  Footer,
+  PassengerSection,
   Photo,
-  TextCancel,
-  TextDescription,
+  AvatarFallback,
+  AvatarWrapper,
+  PassengerInfo,
+  PassengerName,
+  TripTypeBadge,
+  TripTypeBadgeText,
+  DateTimeRow,
+  DateTimeItem,
+  DateTimeText,
+  RouteSection,
+  Timeline,
+  DotOrigin,
+  TimelineLine,
+  DotDestination,
+  RouteAddresses,
+  AddressBlock,
+  AddressLabel,
+  AddressText,
+  Footer,
+  PriceBlock,
+  PriceLabel,
+  PriceValue,
+  AcceptButton,
+  AcceptButtonText,
+  CancelButton,
+  CancelButtonText,
 } from './styles';
-import {IfLoaderInsideScreen} from '../IfLoaderInsideScreen';
-import {translate} from '../../../../client/locales';
-import {customToast} from '../../../../utils/FlashMessage';
-import {buildApp} from '../../../../constantBuild/config';
+import { translate } from '../../../../client/locales';
+import { buildApp } from '../../../../constantBuild/config';
+import { aplyDiscount } from '../../../../client/utils/money';
+import { useStoragePictures } from '../../hooks/useStoragePictures';
+import { Trip } from '../../../../interfaces/trip';
+import { useCardScheduleActions } from './useCardScheduleActions';
+import { useDriverDistanceToOrigin } from '../../hooks/use-driver-distance-to-origin';
+import { Fragment } from 'react/jsx-runtime';
+
+const TRIP_TYPE_SHARED = 'COMPARTILHADO';
 
 interface Props {
-  trip: TripScheduleProps;
+  trip: Trip;
   onPress?: string;
 }
-export const CardSchedule = ({trip, onPress}: Props) => {
-  const {cityConfig} = useAuth();
-  const {userDriverFind} = useUserDriver();
-  const {cancelTripSchedule, acceptScheduled} = useTripProvider();
-  const {navigate, goBack}: NavigationProp<ParamListBase> = useNavigation();
 
-  const [loading, setLoading] = useState(false);
+export const CardSchedule = ({ trip, onPress }: Props) => {
+  const { cityConfig } = useAuth();
+  const theme = useTheme();
+  const { getStoragePictureSpecific } = useStoragePictures();
+  const { distanceKm } = useDriverDistanceToOrigin(trip);
+  const { loading, handleAcceptTrip, handleCancelTrip } = useCardScheduleActions();
 
-  const postCancelTrip = async tripReference => {
-    setLoading(true);
-    const data = await cancelTripSchedule(
-      '4',
-      userDriverFind.idDriver,
-      tripReference,
-    );
-    if (!data.status) {
-      customToast(data.message, 'danger');
-    }
-    customToast(data.message, 'success');
-    setLoading(false);
-    goBack();
-  };
-  const postAcceptTrip = async tripReference => {
-    setLoading(true);
-    const data = await acceptScheduled(
-      parseInt(userDriverFind?.idDriver),
-      tripReference,
-    );
-    if (!data.status) {
-      console.log(`error${data}`);
-      return customToast(data.message, 'danger');
-    }
-    customToast(data.message, 'success');
-    setLoading(false);
-    goBack();
-  };
-  const handleAcceptTrip = trip => {
-    Alert.alert(
-      translate('tripDriver.accept_trip'),
-      translate('tripDriver.want_to_accept_this_trip'),
-      [
-        {
-          text: translate('tripDriver.no'),
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: translate('tripDriver.yes'),
-          onPress: () => postAcceptTrip(trip.schedule.tripReference),
-        },
-      ],
-      {cancelable: false},
-    );
-  };
+  const tripReference = trip?.schedule?.tripReference;
+  const tripWayPoints = trip?.tripWayPoints || [];
+  const tripType = trip?.tripType || '';
+  const isShared = tripType === TRIP_TYPE_SHARED;
+
+  const price = parseFloat(
+    String(cityConfig?.showNetValueForDriverOnCall) === '1'
+      ? aplyDiscount(trip?.price, trip?.driverCommissionValue, trip?.driverCommissionType)
+      : trip?.price,
+  );
+
+  const imageUri =
+    (getStoragePictureSpecific('customer') || buildApp().HOST_IMAGE_CUSTOMER) +
+    trip?.customer?.profileImage;
+
+  const scheduleDate = trip?.schedule?.schedule
+    ? convertDatetimeToDate(trip.schedule.schedule)
+    : null;
+  const scheduleTime = trip?.schedule?.schedule
+    ? convertDatetimeToTime(trip.schedule.schedule)
+    : null;
 
   return (
     <Container>
-      <ContainerHeader>
-        <Content>
-          <ContentPhoto>
-            <Photo
-              source={{
-                uri:
-                  buildApp().HOST_IMAGE_CUSTOMER + trip?.customer?.profileImage,
-              }}
-              resizeMode="contain"
-            />
-          </ContentPhoto>
+      <Preload visible={loading} />
 
-          <ContentTrip>
-            <TextDescription>{trip?.customer?.name}</TextDescription>
+      {/* Passenger */}
+      <PassengerSection>
+        <AvatarWrapper>
+          {trip?.customer?.profileImage ? (
+            <Photo source={{ uri: imageUri }} resizeMode="cover" />
+          ) : (
+            <AvatarFallback>
+              <MaterialIcons name="person" size={26} color="#fff" />
+            </AvatarFallback>
+          )}
+        </AvatarWrapper>
 
-            <RenderItemRow
-              title={translate('tripDriver.travel_date')}
-              description={
-                ' ' +
-                  convertDatetimeToDate(trip?.schedule?.schedule) +
-                  ' - ' +
-                  convertDatetimeToTime(trip?.schedule?.schedule) || ''
-              }
-            />
+        <PassengerInfo>
+          <PassengerName numberOfLines={2}>
+            {trip?.customer?.name || translate('tripDriver.passenger_fallback')}
+          </PassengerName>
+          {tripType ? (
+            <TripTypeBadge isShared={isShared}>
+              <MaterialIcons
+                name={isShared ? 'group' : 'person'}
+                size={11}
+                color={isShared ? theme.colors.on : theme.colors.primary}
+              />
+              <TripTypeBadgeText isShared={isShared}>{tripType}</TripTypeBadgeText>
+            </TripTypeBadge>
+          ) : null}
+        </PassengerInfo>
+      </PassengerSection>
 
-            <RenderItemRow
-              title={translate('tripDriver.origin')}
-              description={' ' + trip?.origin?.address}
-            />
+      {/* Date / time / distance */}
+      {scheduleDate || scheduleTime || distanceKm ? (
+        <DateTimeRow>
+          {scheduleDate ? (
+            <DateTimeItem>
+              <MaterialIcons
+                name="calendar-today"
+                size={15}
+                color={theme.colors.primary}
+              />
+              <DateTimeText>{scheduleDate}</DateTimeText>
+            </DateTimeItem>
+          ) : null}
+          {scheduleTime ? (
+            <DateTimeItem>
+              <Ionicons name="time-outline" size={15} color={theme.colors.primary} />
+              <DateTimeText>{scheduleTime}</DateTimeText>
+            </DateTimeItem>
+          ) : null}
+          {distanceKm ? (
+            <DateTimeItem>
+              <MaterialIcons name="straighten" size={15} color={theme.colors.primary} />
+              <DateTimeText>{distanceKm} km</DateTimeText>
+            </DateTimeItem>
+          ) : null}
+        </DateTimeRow>
+      ) : null}
 
-            <RenderItemRow
-              title={translate('tripDriver.destiny')}
-              description={trip?.destination?.name}
-            />
+      {/* Route */}
+      <RouteSection>
+        <Timeline>
+          <DotOrigin />
+          <TimelineLine />
+          {tripWayPoints.map((wayPoint, index) => (
+            <Fragment key={`${wayPoint?.id}-${index}`}>
+              <DotOrigin />
+              <TimelineLine />
+            </Fragment>
+          ))}
+          <DotDestination />
+        </Timeline>
 
-            <RenderItemRow
-              title={cityConfig?.typeMoney + maskMoney(parseFloat(trip?.price))}
-              description={''}
-            />
-            <RenderItemRow
-              title={translate('tripDriver.Tipo')}
-              description={trip?.tripType}
-            />
-          </ContentTrip>
-        </Content>
-      </ContainerHeader>
+        <RouteAddresses>
+          <AddressBlock>
+            <AddressLabel>{translate('tripDriver.origin')}</AddressLabel>
+            <AddressText numberOfLines={2}>{trip?.origin?.address || '-'}</AddressText>
+          </AddressBlock>
+
+          {tripWayPoints.map((wayPoint, index) => (
+            <AddressBlock key={`${wayPoint?.id}-${index}`}>
+              <AddressLabel>{translate('tripDriver.waypoint')}</AddressLabel>
+              <AddressText numberOfLines={2}>{wayPoint?.address || '-'}</AddressText>
+            </AddressBlock>
+          ))}
+
+          <AddressBlock>
+            <AddressLabel>{translate('tripDriver.destiny')}</AddressLabel>
+            <AddressText numberOfLines={2}>{trip?.destination?.name || '-'}</AddressText>
+          </AddressBlock>
+        </RouteAddresses>
+      </RouteSection>
+
+      {/* Footer */}
       <Footer>
-        <ContainerCancel>
-          <IfLoaderInsideScreen loading={loading}>
-            <ButtonCancel
-              mode="text"
-              onPress={() => {
-                setLoading(true);
-                onPress
-                  ? handleAcceptTrip(trip)
-                  : Alert.alert(
-                      translate('tripDriver.cancel_trip'),
-                      translate('tripDriver.want_to_cancel_this_trip'),
-                      [
-                        {
-                          text: translate('tripDriver.no'),
-                          onPress: () => console.log('Cancel Pressed'),
-                          style: 'cancel',
-                        },
-                        {
-                          text: translate('tripDriver.yes'),
-                          onPress: () =>
-                            postCancelTrip(trip.schedule.tripReference),
-                        },
-                      ],
-                      {cancelable: false},
-                    );
-                setLoading(false);
-              }}
-            >
-              <TextCancel>
-                {' '}
-                {onPress
-                  ? translate('tripDriver.accept')
-                  : translate('tripDriver.cancel')}
-              </TextCancel>
-            </ButtonCancel>
-          </IfLoaderInsideScreen>
-        </ContainerCancel>
+        <PriceBlock>
+          <PriceLabel>{translate('tripDriver.value')}</PriceLabel>
+          <PriceValue>
+            {cityConfig?.typeMoney}
+            {maskMoney(price)}
+          </PriceValue>
+        </PriceBlock>
+
+        {!onPress ? (
+          <CancelButton
+            onPress={() => handleCancelTrip(tripReference)}
+            activeOpacity={0.8}
+            disabled={loading}
+          >
+            <CancelButtonText>{translate('tripDriver.cancel')}</CancelButtonText>
+          </CancelButton>
+        ) : (
+          <AcceptButton
+            onPress={() => handleAcceptTrip(tripReference)}
+            activeOpacity={0.85}
+            disabled={loading}
+          >
+            <Ionicons name="checkmark-circle-outline" size={18} color="#fff" />
+            <AcceptButtonText>{translate('tripDriver.accept')}</AcceptButtonText>
+          </AcceptButton>
+        )}
       </Footer>
     </Container>
-  );
-};
-
-const RenderItemRow = ({title, description}) => {
-  return (
-    <ContentItem>
-      <TextDescription numberOfLines={2}>
-        {title}
-        {description}
-      </TextDescription>
-    </ContentItem>
   );
 };

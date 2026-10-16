@@ -40,11 +40,11 @@ export default function TrackOrder({route, navigation}) {
     getOrderDetail();
     openSocket();
 
-    AppState.addEventListener('change', updateListOnResume);
+    const subscription = AppState.addEventListener('change', updateListOnResume);
 
     return () => {
       if (socket) socket.close();
-      AppState.removeEventListener('change', updateListOnResume);
+      subscription.remove();
     };
   }, []);
 

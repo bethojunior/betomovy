@@ -1,43 +1,44 @@
-import {Camera} from 'expo-camera';
+import { CameraView, CameraType, FlashMode, Camera } from 'expo-camera';
 import Helper from '../../utils/Helper';
-import {ButtonPanicContainer} from '../ButtonPanicContainer';
-import {useIsFocused} from '@react-navigation/native';
-import {useEffect, useRef, useState} from 'react';
-import {useConfigLocal} from '../../context/ConfigLocal';
-import {sendDocumentPhoto} from '../Modal/InTrip/services';
-import {useUserDriver} from '../../context/userDriver';
-import {useLocal} from '../../hooks/location';
-import {Platform} from 'react-native';
-import {useTripStatusProvider} from '../../context/TripStatus';
-import {useTripProvider} from '../../context/Trip';
-// @ts-ignore
-import Torch from 'react-native-torch';
-import {useNetwork} from '../../../../context/ConfigGlobal';
+import { ButtonPanicContainer } from '../ButtonPanicContainer';
+import { useIsFocused } from '@react-navigation/native';
+import { useEffect, useRef, useState } from 'react';
+import { useConfigLocal } from '../../context/ConfigLocal';
+import { sendDocumentPhoto } from '../Modal/InTrip/services';
+import { useUserDriver } from '../../context/userDriver';
+import { useLocal } from '../../hooks/location';
+import { Platform } from 'react-native';
+import { useTripStatusProvider } from '../../context/TripStatus';
+import { useTripProvider } from '../../context/Trip';
+import { useNetwork } from '../../../../context/ConfigGlobal';
+import { useFlashlight } from '~/hooks/useFlashlight';
 
-const CameraObject: any = Camera;
-
-export const AlertPanicComponent = ({setCountVisible}) => {
-  const {states} = useConfigLocal();
-  const {stateTrip} = useTripProvider();
-  const {callDriverModal} = stateTrip;
-  const {countTakeVolume, setCountTakeVolume} = useTripStatusProvider();
-  const {itsNetwork} = useNetwork();
-  const {userDriverFind} = useUserDriver();
-  const {durationCam} = states;
+export const AlertPanicComponent = ({ setCountVisible }) => {
+  const { states } = useConfigLocal();
+  const callDriverModal: any = useTripProvider(
+    (context: any) => context.callDriverModal,
+  );
+  const countTakeVolume: any = useTripStatusProvider(
+    (context: any) => context.countTakeVolume,
+  );
+  const setCountTakeVolume: any = useTripStatusProvider(
+    (context: any) => context.setCountTakeVolume,
+  );
+  const { itsNetwork } = useNetwork();
+  const { userDriverFind } = useUserDriver();
+  const { durationCam } = states;
   const cameraRef = useRef<any>(null);
 
   const [videoUri, setVideoUri] = useState('');
   const [cameraReady, setCameraReady] = useState(false);
-  const [flashCamera, setCameraFlash] = useState(
-    CameraObject.Constants.FlashMode.off,
-  );
-  const [typeCamera, setTypeCamera] = useState(
-    CameraObject.Constants.Type.front,
-  );
+  const [flash, setFlash] = useState<FlashMode>('off');
+  const [facing, setFacing] = useState<CameraType>('front');
+
   const [cameraLoading, setCameraLoading] = useState(false);
   const [visibleAlertProtect, setVisibleAlertProtect] = useState(false);
-  const {location} = useLocal();
+  const { location } = useLocal();
 
+  const { enableTorch, stop: stopFlashlight } = useFlashlight();
   const isFocused = useIsFocused();
   const takeVideo = async () => {
     if (cameraRef) {
@@ -52,7 +53,7 @@ export const AlertPanicComponent = ({setCountVisible}) => {
   };
 
   const takePictureAndSendApi = async videoUri => {
-    const {status} = await Camera.requestCameraPermissionsAsync();
+    const { status } = await Camera.requestCameraPermissionsAsync();
     if (status !== 'granted') {
       Camera.requestCameraPermissionsAsync();
       return;
@@ -69,8 +70,8 @@ export const AlertPanicComponent = ({setCountVisible}) => {
     // const filenameVideo = asset.filename;
     // console.log('filenameVideo', filenameVideo);
     // console.log('videoUri', asset);
-    const filename = videoUri.split('/').pop();
-    // const extension = filename.split('.').pop();
+    const filename = videoUri?.split('/').pop();
+    // const extension = filename?.split('.').pop();
 
     const match = /\.(\w+)$/.exec(filename);
     const typeImage = match ? `image/${match[1]}` : `image`;
@@ -97,7 +98,7 @@ export const AlertPanicComponent = ({setCountVisible}) => {
         return;
       }
       setCameraReady(true);
-      setTypeCamera(CameraObject.Constants.Type.front);
+      setFacing("front");
       Helper.timeout(1000).then(() => {
         takeVideo().then(uri => {
           takePictureAndSendApi(uri);
@@ -115,20 +116,20 @@ export const AlertPanicComponent = ({setCountVisible}) => {
   useEffect(() => {
     if (countTakeVolume === 0) {
       setCameraReady(false);
-      Torch && Torch.switchState(false);
+      stopFlashlight();
     }
   }, [cameraReady]);
 
   return (
     <>
       {isFocused && cameraReady && (
-        <Camera
+        <CameraView
           ref={(ref: any) => {
             cameraRef.current = ref;
           }}
-          // @ts-ignore
-          type={typeCamera}
-          flashMode={flashCamera}
+          facing={facing}
+          flash={flash}
+          enableTorch={enableTorch}
           style={{
             width: 1,
             height: 1,
@@ -142,7 +143,7 @@ export const AlertPanicComponent = ({setCountVisible}) => {
         visibleAlertProtect={visibleAlertProtect}
         handleCamera={() => {
           setCameraReady(true);
-          setTypeCamera(CameraObject.Constants.Type.front);
+          setFacing("front");
           Helper.timeout(1000).then(() => {
             takeVideo().then(uri => {
               takePictureAndSendApi(uri);

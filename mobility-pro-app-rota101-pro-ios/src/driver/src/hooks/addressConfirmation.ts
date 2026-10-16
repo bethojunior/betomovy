@@ -1,27 +1,26 @@
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 
 export const useAddressConfirmation = () => {
-  // O estado que será resolvido quando a confirmação do endereço for concluída
-  const [addressConfirmationResolver, setAddressConfirmationResolver] =
-    useState(null);
+  const resolverRef = useRef<null | (() => void)>(null);
 
-  // A função que o usuário chamará para confirmar o endereço
   const confirmAddress = () => {
-    if (addressConfirmationResolver) {
-      addressConfirmationResolver();
-      setAddressConfirmationResolver(null);
+    if (resolverRef.current) {
+      resolverRef.current();
+      resolverRef.current = null;
+    } else {
+      console.log('Nenhum resolver ativo');
     }
   };
 
-  // A função que aguardará a confirmação do endereço
   const waitForAddressConfirmation = () => {
-    return new Promise(resolve => {
-      setAddressConfirmationResolver(() => resolve);
+    return new Promise<void>(resolve => {
+      resolverRef.current = resolve;
     });
   };
 
-  return {confirmAddress, waitForAddressConfirmation};
+  return { confirmAddress, waitForAddressConfirmation };
 };
+
 
 export const usePixConfirmation = () => {
   // O estado que será resolvido quando a confirmação do endereço for concluída

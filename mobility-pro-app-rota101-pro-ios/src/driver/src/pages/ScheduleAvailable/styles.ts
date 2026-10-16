@@ -1,12 +1,14 @@
 import styled from 'styled-components/native';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export const Container = styled.View`
   flex: 1;
-  padding: ${({theme}) => theme.spacing.large}px;
-  background: ${({theme}) => theme.colors.background_global};
+  background-color: ${({ theme }) => theme.colors.background_white};
 `;
 
-export const ContainerCard = styled.ScrollView`
-  flex: 1;
-  margin-top: ${({theme}) => theme.spacing.large}px;
+export const EmptyText = styled.Text`
+  font-size: ${RFValue(12)}px;
+  color: ${({ theme }) => theme.colors.grayLight};
+  text-align: center;
+  line-height: ${RFValue(18)}px;
 `;

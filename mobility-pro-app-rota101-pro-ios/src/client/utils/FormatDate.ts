@@ -2,8 +2,11 @@ import {addSeconds, differenceInSeconds, format} from 'date-fns';
 import {useCallback} from 'react';
 
 export function convertDate(date: string | Date) {
+  // Não retorna nada caso não encontre a data
+  if (!date) return '';
+
   if (typeof date === 'string') {
-    return date.split('-').reverse().join('/');
+    return date?.split('-').reverse().join('/');
   }
 
   return date.toLocaleDateString();
@@ -16,7 +19,7 @@ export function maskHour(value: string) {
   let hour = value.replace(/[^0-9]/g, '') ?? '';
   if (hour.length > 2) {
     const hourForm = `${hour.substring(0, 2)}:${hour.substring(2, 4)}`;
-    const [h, m] = hourForm.split(':');
+    const [h, m] = hourForm?.split(':');
     if (Number(h) > 23) {
       hour = '23';
     }
@@ -29,13 +32,13 @@ export function maskHour(value: string) {
 }
 
 export function convertHourNewIntL(hour: string) {
-  const [h, m] = hour.split(':');
+  const [h, m] = hour?.split(':');
   return parseInt(h, 10) * 60 + parseInt(m, 10);
 }
 
 export function convertUSDate(date: string | Date) {
   if (typeof date === 'string') {
-    return date.split('/').reverse().join('-');
+    return date?.split('/').reverse().join('-');
   }
 
   return format(date, 'yyyy-MM-dd');
@@ -50,7 +53,7 @@ export function now() {
 }
 
 export function convertDatetimeToDate(dateTime: string): string {
-  return dateTime.substring(0, 10).split('-').reverse().join('/');
+  return dateTime.substring(0, 10)?.split('-').reverse().join('/');
 }
 
 export function convertDateTime(dateTime: string): string {
@@ -68,7 +71,7 @@ export function getDayWithSpecificHours(
   if (!completeHours) return new Date();
   const dayWithSpecificHours = new Date(day.valueOf());
   const [hours, min = 0, sec = 0, ms = 0] = completeHours
-    .split(':')
+    ?.split(':')
     .map(value => Number(value));
 
   dayWithSpecificHours.setHours(hours, min, sec, ms);
@@ -77,8 +80,8 @@ export function getDayWithSpecificHours(
 }
 
 export const getDateByApi = (datetime: string): Date => {
-  const [date, time] = datetime.split(' ');
-  const [day, month, year] = date.split('-');
+  const [date, time] = datetime?.split(' ');
+  const [day, month, year] = date?.split('-');
   const iso = `${year}-${month}-${day}T${time}`;
   return new Date(iso);
 };
@@ -90,7 +93,7 @@ export const getDateAndTimeInUtc = (date: string, hour: string) => {
 };
 
 export const hourToUtc = (hour: string) => {
-  const hourSplited = hour.split(':');
+  const hourSplited = hour?.split(':');
 
   if (Number(hourSplited[0]) + 3 > 23) {
     return `${(Number(hourSplited[0]) - 21).toString()}:${hourSplited[1]}`;

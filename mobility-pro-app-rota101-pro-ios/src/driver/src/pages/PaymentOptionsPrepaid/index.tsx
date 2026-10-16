@@ -1,22 +1,31 @@
-import {useCallback, useEffect, useState} from 'react';
 import DeleteIcon from '@expo/vector-icons/Feather';
 import {
   NavigationProp,
   ParamListBase,
   useNavigation,
 } from '@react-navigation/native';
-import {Text, TouchableOpacity} from 'react-native';
-import {translate} from '../../../../client/locales';
-import ModalFrame from '../../components/form/ModalFrame';
-import {usePaymentForm} from '../../context/paymentForms';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Clipboard, Text } from 'react-native';
+import { translate } from '../../../../client/locales';
+import { customToast } from '../../../../utils/FlashMessage';
 import Card1 from '../../assets/images/card.png';
+import AddCard from '../../components/AddCard';
+import ModalFrame from '../../components/form/ModalFrame';
+import Preload from '../../components/Preload';
+import { usePaymentForm } from '../../context/paymentForms';
+import { CreditCard } from '../../context/paymentForms/types';
+import { usePrepaid } from '../../context/prepaid';
+import { useModal } from '../../hooks/useModal';
+import { PaymentPrepaidProps, PaymentProps, PrepaidProps } from '../../context/prepaid/types';
+import theme from '../../styles/theme';
+import { maskMoneyIntl } from '../../utils/money';
 import {
-  Button,
+  AddCardButton,
   ButtonExclused,
   ButtonPrePaid,
   CardContent,
-  CardPaymentForm,
   CardName,
+  CardPaymentForm,
   Container,
   ContentButton,
   Icon,
@@ -29,28 +38,45 @@ import {
   TextPaymentType,
   TitleDeleteCard,
 } from './styles';
-import theme from '../../styles/theme';
-import {customToast} from '../../../../utils/FlashMessage';
-import AddCard from '../../components/AddCard';
-import Preload from '../../components/Preload';
-import {CreditCard} from '../../context/paymentForms/types';
-import {usePrepaid} from '../../context/prepaid';
-import {PaymentPrepaidProps, PaymentProps} from '../../context/prepaid/types';
+import PixPaymentSection from '../../../../components/PixPaymentSection';
 
-export function PaymentOptionsPrepaid({route}) {
-  const {goBack}: NavigationProp<ParamListBase> = useNavigation();
-  const {prepaid} = route.params;
+const COUNTDOWN_INTERVAL = 300;
+
+
+export function PaymentOptionsPrepaid({ route }) {
+  const { goBack }: NavigationProp<ParamListBase> = useNavigation();
+  const { prepaid }: { prepaid: PrepaidProps } = route.params;
   const [loading, setLoading] = useState(false);
   const [listCard, setListCard] = useState([]);
   const [cardSelected, setCardSelected] = useState('');
   const [visibleDialog, setVisibleDialog] = useState(false);
-  const [showCardModal, setShowCardModal] = useState(false);
+  const addCardModal = useModal();
   const [dialogPayment, setDialogPayment] = useState(false);
   const [modalDeposit, setModalDeposit] = useState(false);
-  const [modalVirtualPayment, setModalVirtualPayment] = useState(false);
+  const virtualPaymentModal = useModal();
   const [modeSelected, setModeSelected] = useState({} as PaymentProps);
-  const {getCards, removeCard} = usePaymentForm();
-  const {paymentPrepaid} = usePrepaid();
+  const { getCards, removeCard } = usePaymentForm();
+  const { paymentPrepaid, paymentPrepaidByPix, verifyPaymentByPix } = usePrepaid();
+  const [dialogPixPayment, setDialogPixPayment] = useState(false);
+  const [paymentDataPix, setPaymentDataPix] = useState<any>(null);
+  const [countdown, setCountdown] = useState(COUNTDOWN_INTERVAL);
+  const verifyIntervalRef = useRef(null);
+  const countdownIntervalRef = useRef(null);
+
+
+  const handleCloseModal = () => {
+    setPaymentDataPix(null);
+    // setExpirationTime(null);
+    setCountdown(COUNTDOWN_INTERVAL);
+  };
+
+  useEffect(() => {
+    if (countdown === 0) {
+      handleCloseModal();
+      setDialogPixPayment(false);
+      customToast(translate('prepaidDriver.payment_timeout'), 'warning');
+    }
+  }, [countdown]);
 
   const listCards = useCallback(async () => {
     setLoading(true);
@@ -87,25 +113,100 @@ export function PaymentOptionsPrepaid({route}) {
     };
 
     await paymentPrepaid(data);
-    setModalVirtualPayment(false);
+    virtualPaymentModal.close();
     setModalDeposit(false);
     setLoading(false);
 
     goBack();
   };
 
+  const payPrepaidByPix = async (payment: PaymentProps) => {
+    setLoading(true);
+
+    const result = await paymentPrepaidByPix({
+      creditPrepaidId: Number(payment?.creditPrepaidId || prepaid.id),
+      paymentFormId: Number(payment.paymentFormId),
+    });
+
+    if (!result) {
+      setLoading(false);
+      return false;
+    }
+
+    const { paymentDataCode, prepaidId } = result;
+    const currentPrepaidId = prepaidId;
+
+    setPaymentDataPix(paymentDataCode);
+    // setExpirationTime(new Date(new Date().getTime() + 10 * 60000));
+    setCountdown(COUNTDOWN_INTERVAL);
+    setLoading(false);
+
+    countdownIntervalRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownIntervalRef.current);
+          clearInterval(verifyIntervalRef.current);
+          customToast(translate('prepaidDriver.payment_timeout'), 'warning');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    verifyIntervalRef.current = setInterval(async () => {
+      const verifyResult = await verifyPaymentByPix({ creditPrepaidPurchaseId: currentPrepaidId });
+      if (
+        verifyResult &&
+        verifyResult.data.statusDetail === 'PAGO'
+      ) {
+        customToast(translate('prepaidDriver.payment_success'), 'success');
+        clearInterval(verifyIntervalRef.current);
+        clearInterval(countdownIntervalRef.current);
+        goBack();
+      }
+    }, 15000);
+
+    return true;
+  };
+
+
   useEffect(() => {
     listCards();
+    return () => {
+      if (verifyIntervalRef.current) clearInterval(verifyIntervalRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+    };
   }, []);
 
   const showModalPayment = async (item: PaymentProps) => {
     setModeSelected(item);
 
+    if (item.paymentFormId === '4') {
+      const success = await payPrepaidByPix(item);
+      if (success) {
+        setDialogPixPayment(true);
+      }
+      return;
+    }
+
     if (item.automaticPayment === '1') {
-      return setModalVirtualPayment(true);
+      return virtualPaymentModal.open();
     }
 
     return setModalDeposit(true);
+  };
+
+  const copyToClipboard = async key => {
+    await Clipboard.setString(key);
+  };
+
+  const openAddCardModal = () => {
+    if (listCard.length > 4) {
+      customToast(translate('paymentDriver.text_max_card_recorded'), 'warning');
+      return;
+    }
+
+    virtualPaymentModal.handOff(() => addCardModal.open());
   };
 
   return (
@@ -182,16 +283,17 @@ export function PaymentOptionsPrepaid({route}) {
 
       {/* MODAL DE COMPRA VIA CARTÃO */}
       <ModalFrame
-        visible={modalVirtualPayment}
-        setVisible={setModalVirtualPayment}
+        visible={virtualPaymentModal.visible}
+        setVisible={virtualPaymentModal.setVisible}
         onPressConfirm={() => payPrepaidCreditCard()}
         error={false}
         title={translate('paymentDriver.title_select_card')}
         textError=""
-        hideConfirm={listCard.length === 0 ? true:false}
+        hideConfirm
         onClose={() => {
           setModalDeposit(false);
         }}
+        onDismiss={virtualPaymentModal.onDismiss}
       >
         {listCard.map((card: CreditCard) => {
           return (
@@ -218,32 +320,45 @@ export function PaymentOptionsPrepaid({route}) {
         })}
 
         <ContentButton>
-        {listCard.length === 0 ? <CardName>{translate('paymentDriver.text_card_no_exists')}</CardName>:null}
-          <Button 
-          style={{
-            alignSelf:listCard.length === 0 ? "center":"flex-end",
-            width:listCard.length === 0 ? "100%":"auto",
-          }}
-            onPress={() =>
-              listCard.length > 4
-                ? customToast(
-                    translate('paymentDriver.text_max_card_recorded'),
-                    'warning',
-                  )
-                : setShowCardModal(true)
-            }
+          {listCard.length === 0 ? <CardName>{translate('paymentDriver.text_card_no_exists')}</CardName> : null}
+          <AddCardButton
+            centered={listCard.length === 0}
+            onPress={openAddCardModal}
           >
             <TextButton>{translate('paymentDriver.text_add')}</TextButton>
-          </Button>
+          </AddCardButton>
         </ContentButton>
+      </ModalFrame>
+
+      {/* MODAL DE PAGAMENTO VIA PIX */}
+      <ModalFrame
+        visible={dialogPixPayment}
+        setVisible={setDialogPixPayment}
+        error={false}
+        hideConfirm={true}
+        textError=""
+        onClose={() => {
+          setDialogPixPayment(false);
+        }}
+      >
+        <ModalBody>
+          <PixPaymentSection
+            pixCode={paymentDataPix}
+            amount={maskMoneyIntl(prepaid?.sellPrice)}
+            noPixCodeText={translate('prepaidDriver.no_pix_code')}
+            onCopy={() => copyToClipboard(paymentDataPix)}
+            onClose={() => setDialogPixPayment(false)}
+          />
+        </ModalBody>
       </ModalFrame>
 
       <AddCard
         updateList={listCards}
-        visible={showCardModal}
-        setVisible={setShowCardModal}
+        visible={addCardModal.visible}
+        setVisible={addCardModal.close}
         listCard={listCard}
+        onDismiss={() => virtualPaymentModal.open()}
       />
-    </Container>
+    </Container >
   );
 }

@@ -1,22 +1,22 @@
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import {
   Ionicons,
   MaterialIcons,
   FontAwesome5,
   FontAwesome,
 } from '@expo/vector-icons';
-import {Linking, View} from 'react-native';
+import { Linking, View } from 'react-native';
 import Helper from '../../../utils/Helper';
 
-import {useState} from 'react';
-import {buildApp} from '../../../../../constantBuild/config';
+import { useState } from 'react';
+import { buildApp } from '../../../../../constantBuild/config';
 
-import {customToast} from '../../../../../utils/FlashMessage';
+import { customToast } from '../../../../../utils/FlashMessage';
 
-import {translate} from '../../../../../client/locales';
+import { translate } from '../../../../../client/locales';
 
-import {useUserDriver} from '../../../context/userDriver';
-import {useAuth} from '../../../../../context/auth';
+import { useUserDriver } from '../../../context/userDriver';
+import { useAuth } from '../../../../../context/auth';
 
 import Preload from '../../../components/Preload';
 
@@ -38,29 +38,32 @@ import {
 } from './styles';
 
 import theme from '../../../styles/theme';
+import { useStoragePictures } from '../../../hooks/useStoragePictures';
+import { getProfileImageUrl } from '../../../utils/imageUrl';
 
 export default function ProfileSpeedMob() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const navigation = useNavigation();
 
-  const {userDriverFind} = useUserDriver();
+  const { userDriverFind } = useUserDriver();
 
-  const {signOutDriver, cityConfig} = useAuth();
+  const { signOutDriver, cityConfig } = useAuth();
+  const { getStoragePictureSpecific } = useStoragePictures();
 
   const onNavLinkWPP = async () => {
     try {
       const url = `https://wa.me/55${cityConfig?.supportContactNumber}/`;
       Linking.openURL(url);
     } catch (error) {
-      customToast('Erro ao navegar', 'danger');
+      customToast(translate('toast.text_navigation_error'), 'danger');
     }
   };
 
   return (
     <Container>
       <Preload visible={loading} />
-      {(
+      {
         <>
           <Header backgroundColor={theme.colors.background_white}>
             <ButtonBack onPress={() => navigation.goBack()}>
@@ -77,14 +80,14 @@ export default function ProfileSpeedMob() {
             />
           </Header>
           <Body>
-            <ContentInformationDriver
-              backgroundColor={theme.colors.primary}
-            >
+            <ContentInformationDriver backgroundColor={theme.colors.primary}>
               <ImageDriver
                 source={{
-                  uri: `${buildApp().HOST_IMAGE_DRIVER}${
-                    userDriverFind.profileImage
-                  }`,
+                  uri: getProfileImageUrl(
+                    userDriverFind?.profileImage,
+                    getStoragePictureSpecific('driver'),
+                    buildApp().HOST_IMAGE_DRIVER
+                  ),
                 }}
               />
               <NameDriver colorText={theme.colors.background_global}>
@@ -147,13 +150,17 @@ export default function ProfileSpeedMob() {
                 <ItemText>{translate('menu.text_config')}</ItemText>
               </Item>
               <Item onPress={() => signOutDriver()}>
-                <Ionicons name="exit-outline" color={theme.colors.black} size={25} />
+                <Ionicons
+                  name="exit-outline"
+                  color={theme.colors.black}
+                  size={25}
+                />
                 <ItemText>{translate('menu.text_logout')}</ItemText>
               </Item>
             </ContentOptions>
           </Body>
         </>
-      )}
+      }
     </Container>
   );
 }

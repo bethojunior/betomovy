@@ -1,1 +1,1 @@
-export const moduleHabilited = 'getLightAppp';
+export const moduleHabilited = 'getLightApp';

@@ -1,12 +1,11 @@
-// @ts-nocheck
-import {useEffect, useState} from 'react';
-import {Text, View, ScrollView, ImageSourcePropType, Share} from 'react-native';
+import { useEffect, useState } from 'react';
+import { Text, View, ScrollView, ImageSourcePropType, Share } from 'react-native';
 import Preload from '../../components/Preload';
 import IconSad from '../../assets/images/sad.png';
 import WaveTop from '../../assets/images/wave-top.svg';
 import WaveDown from '../../assets/images/wave-down.svg';
 import iconTest2 from '../../assets/images/perfil-de-usuario.png';
-import {UseUserIndication} from '../../contexts/userIndication';
+import { UseUserIndication } from '../../contexts/userIndication';
 import {
   ButtonIndication,
   ButtonShowMore,
@@ -25,13 +24,18 @@ import {
   TitleButton,
   TypeIndication,
 } from './styles';
-import {translate} from '../../locales';
-import {usePaymentForm} from '../../contexts/paymentForms';
-import {useAuth} from '../../../context/auth';
-import {buildApp} from '../../../constantBuild/config';
+import { translate } from '../../locales';
+import { usePaymentForm } from '../../contexts/paymentForms';
+import { useAuth } from '../../../context/auth';
+import { buildApp } from '../../../constantBuild/config';
 import theme from '../../styles/theme';
+import { userIndicationService } from '../../contexts/userIndication/services';
+import { AppsId } from '../../../context/ConfigGlobal/constants';
+import { useLocal } from '../../contexts/local';
+import { customToast } from '../../../utils/FlashMessage';
+import { useStoragePictures } from '../../../driver/src/hooks/useStoragePictures';
 
-interface ArrayIndication extends Array<ListIndication> {}
+interface ArrayIndication extends Array<ListIndication> { }
 interface ListIndication {
   userIndicatedId: number;
   profileImage: ImageSourcePropType;
@@ -49,20 +53,22 @@ interface Details {
 let page = 1;
 
 const IndicationPage = () => {
-  const [indicationEmpty, setIndicationEmpty] = useState(false);
+  const [indicationEmpty, setIndicationEmpty] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [listIndication, setListIndication] = useState<ArrayIndication>([]);
   const [details, setDetails] = useState<any>();
 
-  const {getIndication} = UseUserIndication();
-  const {getCurrentBalanceVoucher} = usePaymentForm();
-  const {generalSettings, user} = useAuth();
+  const { position } = useLocal();
+  const { getIndication } = UseUserIndication();
+  const { getCurrentBalanceVoucher } = usePaymentForm();
+  const { generalSettings, user } = useAuth();
+  const { getStoragePictureSpecific } = useStoragePictures();
 
   const loadIndication = async () => {
     setLoading(true);
 
-    const {data} = await getIndication(page);
+    const { data } = await getIndication(page);
     setLoading(false);
 
     if (data.nextPage !== 0) {
@@ -86,39 +92,39 @@ const IndicationPage = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     loadIndication();
     getDetails();
+    setLoading(false);
   }, []);
 
   const formatDate = (data: string) => {
-    const t1 = data.split('-');
+    const t1 = data?.split('-');
     return `${t1[1]}/${t1[0]}`;
   };
 
   const onShare = async () => {
     try {
-      const result = await Share.share({
-        message: `${
-          generalSettings.find(item => item.key === 'appSharingCustomerMessage')
-            .value
-        } ${generalSettings
-          .find(item => item.key === 'link_customer_pre_register')
-          .value.replace('{userId}', user.idUser)}`,
+      const { data } = await userIndicationService.sharing({
+        userId: user.idUser,
+        phone: null,
+        appId: Number(AppsId['CLIENTE FINAL']),
+        formOfSharing: 'whatsapp',
+        location: {
+          latitude: position?.latitude || 0,
+          longitude: position?.longitude || 0,
+        },
       });
-
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
+      const result = await Share.share({
+        message: `${data?.data?.message}`,
+      });
     } catch (error) {
-      customToast('Erro ao Compartilhar', 'error');
+      customToast(translate('toast.text_share_error'), 'danger');
     }
   };
+
+  // Evita exibição de dados incorretos na tela 
+  if (indicationEmpty == null) return null;
 
   return (
     <View>
@@ -137,15 +143,15 @@ const IndicationPage = () => {
             </View>
           </ContentEmpty>
         ) : (
-          <View style={{height: '100%'}}>
+          <View style={{ height: '100%' }}>
             <Header>
               <Title>{translate('indicationPage.text_person_indicated')}</Title>
-              <View style={{alignSelf: 'flex-end'}}>
+              <View style={{ alignSelf: 'flex-end' }}>
                 <Section>
                   <SimpleText>
                     {translate('indicationPage.text_nivel')} -{' '}
                   </SimpleText>
-                  <SimpleText style={{fontWeight: 'bold'}}>
+                  <SimpleText style={{ fontWeight: 'bold' }}>
                     {details?.label}
                   </SimpleText>
                 </Section>
@@ -153,7 +159,7 @@ const IndicationPage = () => {
                   <SimpleText>
                     {translate('indicationPage.text_indications')} -{' '}
                   </SimpleText>
-                  <SimpleText style={{fontWeight: 'bold'}}>
+                  <SimpleText style={{ fontWeight: 'bold' }}>
                     {details?.userIndications}
                   </SimpleText>
                 </Section>
@@ -164,20 +170,20 @@ const IndicationPage = () => {
                 {listIndication.map((item: ListIndication) => {
                   return (
                     <Card key={item.userIndicatedId}>
-                      <WaveTop style={{width: '100%', height: 50}} />
+                      <WaveTop style={{ width: '100%', height: 50 }} />
                       <ImageCard
                         source={
                           item.profileImage
                             ? {
-                                uri:
-                                  item.driverStatus === null
-                                    ? `${buildApp().HOST_IMAGE_CUSTOMER}${
-                                        item.profileImage
-                                      }`
-                                    : `${buildApp().HOST_IMAGE_DRIVER}${
-                                        item.profileImage
-                                      }`,
-                              }
+                              uri:
+                                item.driverStatus === null
+                                  ? `${getStoragePictureSpecific('customer') ||
+                                  buildApp().HOST_IMAGE_CUSTOMER
+                                  }${item.profileImage}`
+                                  : `${getStoragePictureSpecific('driver') ||
+                                  buildApp().HOST_IMAGE_DRIVER
+                                  }${item.profileImage}`,
+                            }
                             : iconTest2
                         }
                       />
@@ -189,7 +195,7 @@ const IndicationPage = () => {
                           {item.created_at && formatDate(item.created_at)}
                         </TypeIndication>
                       </ContentInfo>
-                      <WaveDown style={{width: '100%', height: 27}} />
+                      <WaveDown style={{ width: '100%', height: 27 }} />
                     </Card>
                   );
                 })}
@@ -202,7 +208,7 @@ const IndicationPage = () => {
                   loadIndication();
                 }}
               >
-                <Text style={{color: theme.colors.primaryText}}>
+                <Text style={{ color: theme.colors.primaryText }}>
                   {translate('indicationPage.text_show_more')}
                 </Text>
               </ButtonShowMore>

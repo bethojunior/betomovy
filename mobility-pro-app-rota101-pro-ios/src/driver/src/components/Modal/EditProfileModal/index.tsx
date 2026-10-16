@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import I18n from "i18n-js";
 import {View} from 'react-native';
 import ModalFrame from '../../../../../client/components/form/Modal';
 import {translate} from '../../../../../client/locales';
@@ -7,6 +8,7 @@ import {customToast} from '../../../../../utils/FlashMessage';
 import apiMainDriver from '../../../api/apiMain';
 import {useUserDriver} from '../../../context/userDriver';
 import {Content, Input, SimpleText, Title} from './styles';
+import { formatPhone } from '../../../../../client/utils/formatPhone';
 
 interface Props {
   visible: boolean;
@@ -21,7 +23,7 @@ export default function EditProfileModal({visible, setVisible, type}: Props) {
   const [error, setError] = useState(false);
   const [textError, setTextError] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const locale = I18n.locale;
   const {userDriverFind, setUserDriverFind} = useUserDriver();
   const {userDriver, setUserDriver} = useAuth();
 
@@ -66,12 +68,19 @@ export default function EditProfileModal({visible, setVisible, type}: Props) {
       return setError(true);
     }
 
+    if (locale === 'pt_BR' && value.length < 11) {
+      setTextError(translate('changePhone.text_min_size'));
+      return setError(true);
+    }
+
+    const formattedValue = formatPhone(value, false);
+
     setLoading(true);
     await apiMainDriver
       .post('driver/edit', {
         stdObject: [
           {
-            [type]: value,
+            [type]: formattedValue,
             driverId: userDriverFind.idDriver,
             idUser: userDriverFind.userId,
           },
@@ -85,11 +94,11 @@ export default function EditProfileModal({visible, setVisible, type}: Props) {
         }
 
         if (type === 'email') {
-          userDriver.email = value;
+          userDriver.email = formattedValue;
           setUserDriver(userDriver);
         }
         if (type === 'phone') {
-          userDriverFind.phone = value;
+          userDriverFind.phone = formattedValue;
           setUserDriverFind(userDriverFind);
         }
 
@@ -133,6 +142,7 @@ export default function EditProfileModal({visible, setVisible, type}: Props) {
               {translate('driverProfile.text_current_password')}
             </SimpleText>
             <Input
+              autoCapitalize="none"
               secureTextEntry
               value={currentPassword}
               onChangeText={text => setCurrentPassword(text)}
@@ -141,6 +151,7 @@ export default function EditProfileModal({visible, setVisible, type}: Props) {
               {translate('driverProfile.text_new_password')}
             </SimpleText>
             <Input
+              autoCapitalize="none"
               secureTextEntry
               value={value}
               onChangeText={text => setValue(text)}
@@ -149,6 +160,7 @@ export default function EditProfileModal({visible, setVisible, type}: Props) {
               {translate('driverProfile.text_confirm_password')}
             </SimpleText>
             <Input
+              autoCapitalize="none"
               secureTextEntry
               value={confirmPassword}
               onChangeText={text => setConfirmPassword(text)}
@@ -162,8 +174,8 @@ export default function EditProfileModal({visible, setVisible, type}: Props) {
             </SimpleText>
             <Input
               keyboardType={type === 'email' ? 'email-address' : 'numeric'}
-              value={value}
-              onChangeText={text => setValue(text)}
+              value={formatPhone(value)}
+              onChangeText={text => setValue(formatPhone(text, false))}
             />
           </View>
         )}

@@ -14,22 +14,22 @@ export default class Helper {
     if(!value || value == 0 || value === undefined || value === Infinity){
       return '0,00';
     }
-  
+
     let isNegative = false;
     if (value < 0) {
       value = value * -1;
       isNegative = true;
     } if (value === 0) return '0,00';
-  
-    let number = value.toFixed(4).split('.');
-  
+
+    let number = value.toFixed(4)?.split('.');
+
     number = parseFloat(`${number[0]}.${number[1].slice(0, 2)}`);
-  
-    number = number.toFixed(2).split('.');
-    number[0] = number[0].split(/(?=(?:...)*$)/).join('.');
-  
+
+    number = number.toFixed(2)?.split('.');
+    number[0] = number[0]?.split(/(?=(?:...)*$)/).join('.');
+
     if (isNegative) return `-${number.join(',')}`;
-  
+
     return number.join(',');
   }
 
@@ -57,7 +57,7 @@ export default class Helper {
       return '';
     }
     if (seconds <= 60) {
-      return seconds;
+      return `00:${seconds}`;
     }
     const minutes = Math.floor(seconds / 60);
     const secondsRest = seconds % 60;
@@ -108,7 +108,7 @@ export default class Helper {
     return `****${numberReplace}`;
   }
   static formatDateAndHour(date) {
-    const dateSplit = date.split(' ');
+    const dateSplit = date?.split(' ');
     return `${convertDate(dateSplit[0])} ${maskHour(dateSplit[1])}`;
   }
 
@@ -247,13 +247,13 @@ export default class Helper {
   // Condicional para verificar se existe a chave enviada, e generalSettings.
 
   static generalSettingsActive = (generalSettings, key) => {
-    return (generalSettings?.find(
-      item => item?.key === key,
-    )?.value === '1' ? true : false)
+   const config =  generalSettings?.find(item => item?.key === key);
+    return Boolean(Number(config?.value || 0));
   }
 
   static maskNames(name) {
-    let value = name.split(' ');
+    if(!name) return name;
+    let value = name?.split(' ');
     let lastIndex = value.length - 1;
     if (value.length > 2) {
       return `${value[0]} ${value[1].substring(0, 1)} ${value[lastIndex]}`;
@@ -273,9 +273,8 @@ export default class Helper {
 
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    const secondsFormatted = String(date.getSeconds()).padStart(2, '0');
 
-    return `${hours}:${minutes}:${secondsFormatted}`;
+    return `${hours}:${minutes}`;
   }
 
   static isOdd = (num) => {
@@ -294,4 +293,31 @@ export default class Helper {
 
     return colorMap[reference] || 'gray';
   };
+
+
+  static formatSecondsToDays(seconds) {
+    if (!seconds) return "0:00";
+
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    let result = '';
+    if (days > 0) {
+        result += `${days} dia${days > 1 ? 's' : ''}`;
+        if (hours > 0) {
+            result += ` e ${hours} hora${hours > 1 ? 's' : ''}`;
+        }
+        return result;
+    }
+
+    if (hours > 0) {
+        result += `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+    } else if (minutes > 0 || seconds < 3600) {
+        result += `${minutes < 10 ? '0' : ''}${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
+
+    return result;
+}
 }

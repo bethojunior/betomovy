@@ -1,59 +1,47 @@
-// @ts-nocheck
-
-import {useState, useEffect} from 'react';
-import {Dimensions} from 'react-native';
-import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
-import {shade} from 'polished';
-import {useOrderService} from '../../../../contexts/orderService';
+import { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { useOrderService } from '../../../../contexts/orderService';
 import ListInProgressOrder from '../../components/ListInProgressOrder';
 import ListOrder from '../../components/ListOrder';
 import Guest from '../Guest';
 
-import {translate} from '../../../../locales';
-import {Container, styles, TitlePage} from './styles';
+import { translate } from '../../../../locales';
+import { Container, TitlePage } from './styles';
 import theme from '../../../../styles/theme';
-import {useAuth} from '../../../../../context/auth';
+import { useAuth } from '../../../../../context/auth';
 
-const initialLayout = {
-  width: Dimensions.get('window').width,
-};
-
-const renderTabBar = props => (
-  <TabBar
-    getLabelText={({route}) => route.title}
-    {...props}
-    indicatorStyle={{backgroundColor: theme.colors.secondary}}
-    style={{
-      backgroundColor: shade(0.05, theme.colors.background_global),
-      color: theme.colors.secondary,
-    }}
-    activeColor={theme.colors.secondary}
-    inactiveColor={theme.colors.text_gray}
-  />
-);
-
-export default function Requests({navigation}) {
-  const {isGuest} = useAuth();
-  const {indexSelected} = useOrderService();
+export default function Requests({ navigation }) {
+  const { isGuest } = useAuth();
+  const { indexSelected } = useOrderService();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    {key: 'first', title: translate('request.text_previous')},
-    {key: 'second', title: translate('request.text_in_progress')},
+    { key: 'first', title: translate('request.text_previous') },
+    { key: 'second', title: translate('request.text_in_progress') },
   ]);
 
   useEffect(() => {
     setIndex(indexSelected);
   }, [indexSelected]);
 
-  const renderScene = SceneMap({
-    first: ListOrder,
-    second: ListInProgressOrder,
-  });
+  const renderScene = () => {
+    switch (index) {
+      case 0:
+        return <ListOrder />;
+      case 1:
+        return <ListInProgressOrder />;
+      default:
+        return null;
+    }
+  };
+
+  const handleTabChange = (newIndex: number) => {
+    setIndex(newIndex);
+  };
 
   if (isGuest)
     return (
       <Container>
-        <TitlePage style={styles.titlePage}>
+        <TitlePage>
           {translate('request.text_orders')}
         </TitlePage>
         <Guest />
@@ -62,13 +50,34 @@ export default function Requests({navigation}) {
 
   return (
     <Container>
-      <TabView
-        navigationState={{index, routes}}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={initialLayout}
-        renderTabBar={renderTabBar}
-      />
+      <View style={{ flexDirection: 'row' }}>
+        {routes.map((route, i) => (
+          <TouchableOpacity
+            key={route.key}
+            onPress={() => handleTabChange(i)}
+            style={{
+              flex: 1,
+              padding: 10,
+              alignItems: 'center',
+              borderBottomWidth: 2,
+              borderBottomColor: index === i ? theme.colors.secondary : theme.colors.background_global,
+            }}
+          >
+            <Text
+              style={{
+                color: index === i ? theme.colors.secondary : theme.colors.text_gray,
+                fontWeight: index === i ? 'bold' : 'normal',
+              }}
+            >
+              {route.title}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={{ flex: 1 }}>
+        {renderScene()}
+      </View>
     </Container>
   );
 }

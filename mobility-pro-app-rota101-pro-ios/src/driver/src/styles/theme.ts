@@ -1,5 +1,5 @@
 import {RFValue} from 'react-native-responsive-fontsize';
-
+//
 export default {
   colors: {
     primary: '#00349a',
@@ -8,6 +8,7 @@ export default {
 
     button_text_disabled: '#a09e9e',
     background_opacity: '#2B2B28',
+    background_black_opacity: 'rgba(0,0,0,0.5)',
     input_placeholder: '#a09e9e',
     button_terms_of_use: '#3d3d3d',
 
@@ -32,7 +33,10 @@ export default {
     background_greenLight: '#D5E6C9',
     red: '#E83F5B',
     redLight: '#F8E3E1',
-    orange: '#eb4034',
+    destructive: '#FF3B30',
+    marker_origin: '#3b82f6',
+    marker_waypoint: '#94a3b8',
+    marker_destination: '#ef4444',
     yellowStrong: '#f8a63d',
     yellowLight: '#f1d6a9',
     background_blue_light: '#367FAE',
@@ -54,6 +58,17 @@ export default {
     medium: 'Roboto_500Medium',
     bold: 'Roboto_700Bold',
     black: 'Roboto_900Black',
+
+    secondary_regular: 'Lato_400Regular',
+    secondary_regular_Italic: 'Lato_400Regular_Italic',
+    secondary_bold: 'Lato_700Bold',
+    secondary_black: 'Lato_900Black',
+    secondary_bold_Italic: 'Lato_700Bold_Italic',
+
+    source_regular: 'SourceCodePro_400Regular',
+    source_semiBold: 'SourceCodePro_600SemiBold',
+    source_bold: 'SourceCodePro_700Bold',
+    source_Black: 'SourceCodePro_900Black',
   },
   fontSizes: {
     small: RFValue(8),

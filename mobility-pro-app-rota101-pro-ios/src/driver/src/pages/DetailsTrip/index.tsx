@@ -1,573 +1,337 @@
-import {Image, View, Text} from 'react-native';
-import {useEffect, useRef, useState} from 'react';
-import MapView, {Marker, Polyline} from 'react-native-maps';
-import {
-  Address,
-  AddressContent,
-  Ball,
-  ButtonLiberation,
-  CancelationConteiner,
-  CancelationTaxe,
-  ContainerButton,
-  ContainerDialog,
-  ContainerFooter,
-  ContainerModal,
-  ContainerText,
-  Content,
-  ContentDriverInfo,
-  Destiny,
-  DriverContent,
-  DriverName,
-  HeaderCardContainer,
-  Line,
-  MapContent,
-  Square,
-  TextSmall,
-  TitleCentralized,
-} from './styles';
+import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { decode } from '@googlemaps/polyline-codec';
+import { Ionicons } from '@expo/vector-icons';
+import { RFValue } from 'react-native-responsive-fontsize';
 
-import {If} from '../../components/If';
 import apiMain from '../../api/apiMain';
 import theme from '../../styles/theme';
 import {
   STATUS_CANCELED,
-  STATUS_FINISHED,
   STATUS_RELEASED_AFTER_ANALISYS,
   STATUS_SITUATION_RELEASED,
   STATUS_SITUATION_RELEASED_AUTOMATICALLY,
 } from '../../constants/trip';
-import {convertDate, maskHour} from '../../utils/FormatDate';
-import {translate} from '../../../../client/locales';
+import { convertDate, maskHour, getEstimatedTripTimeInMinutes } from '../../utils/FormatDate';
+import { translate } from '../../../../client/locales';
 import Preload from '../../components/Preload';
 import Helper from '../../utils/Helper';
-import {useAuth} from '../../../../context/auth';
+import { useAuth } from '../../../../context/auth';
 import HelpMethodModal from '../../components/HelpMethodModal';
-import {getMinutesAndSeconds} from '../../../../common/Utils';
-import moment from 'moment';
+import { useUserDriver } from '../../context/userDriver';
+import { bubble } from '../Home/service';
+import { useStoragePictures } from '../../hooks/useStoragePictures';
+import { buildApp } from '../../../../constantBuild/config';
 
-interface LocationProps {
-  latitude: string;
-  longitude: string;
-}
+import { StatusBadgeVariant } from '../../components/TripDetail/StatusBadge/types';
+import { Coordinate } from '../../components/TripDetail/TripMap/types';
+import { EarningsRow } from '../../components/TripDetail/EarningsCard/types';
+import { TripSummaryCard } from '../../components/TripDetail/TripSummaryCard';
+import { TripMap } from '../../components/TripDetail/TripMap';
+import { DistanceDurationCard } from '../../components/TripDetail/DistanceDurationCard';
+import { AddressTimeline } from '../../components/TripDetail/AddressTimeline';
+import { PartnerCard } from '../../components/TripDetail/PartnerCard';
+import { ReportProblemButton } from '../../../../common/components/TripDetail/ReportProblemButton';
+import { EarningsCard } from '../../components/TripDetail/EarningsCard';
+import { useTripFareBreakdown } from '../../hooks/useTripFareBreakdown';
 
-export const DetailsTrip = ({route}: any) => {
-  const [detailsTrip, setDetailsTrip] = useState<any>({});
-  const {cityConfig, generalSettings} = useAuth();
+import {
+  Container,
+  Content,
+  ErrorContainer,
+  ErrorSubtitle,
+  ErrorTitle,
+  ReportProblemButtonWrapper,
+  RetryButton,
+  RetryButtonText,
+} from './styles';
+import { DetailsTripRouteParams, TripDetailsResponse } from './types';
+
+const STATUS_VARIANT: Record<string, StatusBadgeVariant> = {
+  FINISHED: 'success',
+  CANCELED: 'error',
+  IN_PROGRESS: 'warning',
+  SCHEDULED: 'neutral',
+  BACK_OFF: 'neutral',
+  NOT_ANSWERED: 'neutral',
+};
+
+const switchStatus = (status: string) => {
+  switch (status) {
+    case 'SCHEDULED':
+      return translate('service.scheduled');
+    case 'IN_PROGRESS':
+      return translate('request.text_in_progress');
+    case 'FINISHED':
+      return translate('service.finished');
+    case 'CANCELED':
+      return translate('service.cancel');
+    case 'BACK_OFF':
+      return translate('service.not_answered');
+    case 'NOT_ANSWERED':
+      return translate('service.not_answered');
+    default:
+      return '';
+  }
+};
+
+const formatDateAndHour = (date: string) => {
+  const dateSplit = date?.split(' ');
+  return { dateLabel: convertDate(dateSplit[0]), timeLabel: maskHour(dateSplit[1]) };
+};
+
+export const DetailsTrip = ({ route }: any) => {
+  const { tripReference, trip }: DetailsTripRouteParams = route.params;
+  const navigation = useNavigation();
+  const { cityConfig, generalSettings } = useAuth();
+  const { userDriverFind } = useUserDriver();
+  const { getStoragePictureSpecific } = useStoragePictures();
+
+  const [detailsTrip, setDetailsTrip] = useState<TripDetailsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [modalMessage, setModalMessage] = useState(false);
-  const mapRef = useRef<any>(null);
 
-  const getDetailsTrip = async (tripReference: string) => {
+  const getDetailsTrip = async (reference: string) => {
     setLoading(true);
+    setHasError(false);
     try {
-      const response = await apiMain.post(`Trip/Get`, {
-        stdObject: [
-          {
-            tripReference,
-          },
-        ],
+      const response = await apiMain.post('Trip/Get', {
+        stdObject: [{ tripReference: reference }],
       });
+
+      if (!response.data.status || !response.data.data) {
+        setHasError(true);
+        return;
+      }
+
       setDetailsTrip(response.data.data);
-      setLoading(false);
-      return response.data.data;
     } catch (error) {
       console.log(error);
+      setHasError(true);
+    } finally {
       setLoading(false);
-
-      return console.log('erro');
     }
-  };
-
-  const formatDateAndHour = (date: string) => {
-    const dateSplit = date.split(' ');
-    return `${convertDate(dateSplit[0])} ${maskHour(dateSplit[1])}`;
-  };
-  const switchStatus = (status: string) => {
-    switch (status) {
-      case 'SCHEDULED':
-        return translate('service.scheduled');
-      case 'IN_PROGRESS':
-        return translate('request.text_in_progress');
-      case 'FINISHED':
-        return translate('service.finished');
-      case 'CANCELED':
-        return translate('service.cancel');
-      case 'BACK_OFF':
-        return translate('service.not_answered');
-      case 'NOT_ANSWERED':
-        return translate('service.not_answered');
-      default:
-        return '';
-    }
-  };
-  const {tripReference} = route.params;
-  const {trip} = route.params;
-
-  const polilyneCoords = () => {
-    return detailsTrip?.location?.length > 0
-      ? detailsTrip?.location?.map((res: LocationProps) => {
-          return {
-            latitude: res.latitude,
-            longitude: res.longitude,
-          };
-        })
-      : [
-          {
-            latitude: parseFloat(detailsTrip?.origin.latitude),
-            longitude: parseFloat(detailsTrip?.origin.longitude),
-          },
-          {
-            latitude: parseFloat(detailsTrip?.destination.latitude),
-            longitude: parseFloat(detailsTrip?.destination.longitude),
-          },
-        ];
   };
 
   useEffect(() => {
     getDetailsTrip(tripReference);
   }, []);
 
-  const cancelations = detailsTrip?.cancellationFee_paid
-    ? detailsTrip?.cancellationFee_paid?.split(',')
+  useFocusEffect(
+    useCallback(() => {
+      const reactivateBubbleIfNeeded = async () => {
+        try {
+          if (userDriverFind?.status === 'disponivel') {
+            await bubble(
+              userDriverFind?.idDriver,
+              theme,
+              cityConfig?.showNetValueForDriverOnCall,
+              Helper.generalSettingsValue(generalSettings, 'show_more_calcs_driver'),
+              Helper.generalSettingsActive(generalSettings, 'enable_realtime_socket'),
+              cityConfig,
+            );
+          }
+        } catch (error) {
+          console.log('Erro ao reativar bubble:', error);
+        }
+      };
+
+      reactivateBubbleIfNeeded();
+    }, [userDriverFind?.status, cityConfig, generalSettings]),
+  );
+
+  const distanceValue = parseFloat(detailsTrip?.distance ?? '0');
+  const fareBreakdown = useTripFareBreakdown(detailsTrip, distanceValue);
+
+  const showContent = !loading && !hasError && detailsTrip;
+  const showError = !loading && hasError;
+
+  // routeTracing (polyline do trajeto real) > location (pontos de GPS brutos) > linha reta origem-destino
+  const tracingCoordinates: Coordinate[] = detailsTrip?.routeTracing
+    ? decode(detailsTrip.routeTracing).map(([latitude, longitude]) => ({ latitude, longitude }))
     : [];
 
+  const routeCoordinates: Coordinate[] =
+    tracingCoordinates.length > 0
+      ? tracingCoordinates
+      : detailsTrip?.location && detailsTrip.location.length > 0
+        ? detailsTrip.location.map(point => ({
+          latitude: Number(point.latitude),
+          longitude: Number(point.longitude),
+        }))
+        : detailsTrip
+          ? [
+            {
+              latitude: Number(detailsTrip.origin.latitude),
+              longitude: Number(detailsTrip.origin.longitude),
+            },
+            {
+              latitude: Number(detailsTrip.destination.latitude),
+              longitude: Number(detailsTrip.destination.longitude),
+            },
+          ]
+          : [];
+
+  const statusKey = trip?.status?.toUpperCase() ?? '';
+  const { dateLabel, timeLabel } = formatDateAndHour(trip?.schedule ? trip.schedule.schedule : trip?.date);
+
+  const cancelations = detailsTrip?.cancellationFee_paid ? detailsTrip.cancellationFee_paid.split(',') : [];
+
+  const isMileageEnabled = Helper.generalSettingsActive(generalSettings, 'enable_transform_km_for_mi');
+
+  const earningsRows: EarningsRow[] = [
+    {
+      label: translate('myTravels.base_price'),
+      valueLabel: `${cityConfig?.typeMoney}${Helper.maskMoney(fareBreakdown.basePrice)}`,
+    },
+    {
+      label: translate(isMileageEnabled ? 'myTravels.mi_price' : 'myTravels.km_price'),
+      valueLabel: `${cityConfig?.typeMoney}${Helper.maskMoney(fareBreakdown.distancePrice)}`,
+    },
+    {
+      label: translate('myTravels.minute_price'),
+      valueLabel: `${cityConfig?.typeMoney}${Helper.maskMoney(fareBreakdown.timePrice)}`,
+    },
+    ...cancelations.map((value, index) => ({
+      label: `${translate('myTravels.fee')} ${index + 1}`,
+      valueLabel: `${cityConfig?.typeMoney}${Helper.maskMoney(Number(value))}`,
+    })),
+  ];
+
+  const customerPhotoUrl = detailsTrip?.customer?.profileImage
+    ? `${getStoragePictureSpecific('customer') || buildApp().HOST_IMAGE_CUSTOMER}${detailsTrip.customer.profileImage}`
+    : null;
+
+  const canReportProblem =
+    trip?.tripAuditId !== String(STATUS_SITUATION_RELEASED) &&
+    trip?.tripAuditId !== String(STATUS_RELEASED_AFTER_ANALISYS) &&
+    trip?.tripAuditId !== String(STATUS_SITUATION_RELEASED_AUTOMATICALLY);
+
   return (
-    <>
+    <Container>
       <Preload visible={loading} />
-      <If condition={Object.keys(detailsTrip).length > 0}>
-        {Object.keys(detailsTrip).length > 0 && (
-          <ContainerModal>
-            {detailsTrip && (
-              <MapContent style={{zIndex: -1}}>
-                <MapView
-                  ref={mapRef}
-                  style={{
-                    width: '100%',
-                    height: 200,
-                  }}
-                  onMapReady={() => {
-                    mapRef.current.fitToCoordinates(polilyneCoords(), {
-                      edgePadding: {
-                        top: 5,
-                        right: 20,
-                        bottom: 15,
-                        left: 100,
-                      },
-                      animated: true,
-                    });
-                  }}
-                  scrollEnabled={false}
-                  rotateEnabled={false}
-                  zoomEnabled={false}
-                  pitchEnabled={false}
-                >
-                  <Marker
-                    coordinate={{
-                      latitude: parseFloat(detailsTrip?.origin.latitude),
-                      longitude: parseFloat(detailsTrip?.origin.longitude),
-                    }}
-                    title="Localização Atual"
-                  />
-                  <Marker
-                    coordinate={{
-                      latitude: parseFloat(detailsTrip?.destination.latitude),
-                      longitude: parseFloat(detailsTrip?.destination.longitude),
-                    }}
-                    title="Chegada"
-                  />
-                  <Polyline strokeWidth={6} coordinates={polilyneCoords()} />
-                </MapView>
-              </MapContent>
-            )}
-            <ContainerDialog>
-              <HeaderCardContainer>
-                {trip.status === STATUS_FINISHED.toLowerCase() &&
-                  detailsTrip.driver != null &&
-                  detailsTrip.driver !== undefined && (
-                    <DriverContent>
-                      <Image
-                        source={{
-                          uri:
-                            detailsTrip?.driver?.profilePicture
-                        }}
-                        style={{
-                          width: 70,
-                          height: 70,
-                          borderRadius: 50,
-                          marginLeft: 10,
-                          marginTop: 5,
-                        }}
-                      />
 
-                      <ContentDriverInfo>
-                        <DriverName>{detailsTrip?.driver?.nickname}</DriverName>
-                      </ContentDriverInfo>
-                    </DriverContent>
-                  )}
-              </HeaderCardContainer>
-            </ContainerDialog>
-            <AddressContent>
-              <View style={{padding: 10}}>
-                <Ball color="primary" />
-                <Line />
-                {detailsTrip.tripWayPoints &&
-                  detailsTrip.tripWayPoints.length > 0 &&
-                  detailsTrip.tripWayPoints.map(() => (
-                    <>
-                      <Ball color="secondary" />
-                      <Line />
-                    </>
-                  ))}
-                <Square />
-              </View>
-              <View style={{paddingRight: 20}}>
-                <Address>{trip?.originAddress}</Address>
-                {detailsTrip?.tripWayPoints &&
-                  detailsTrip?.tripWayPoints.length > 0 &&
-                  detailsTrip?.tripWayPoints.map(wayPoint => (
-                    <Address>{wayPoint?.address}</Address>
-                  ))}
-                <Destiny>{detailsTrip?.destination?.name}</Destiny>
-              </View>
-            </AddressContent>
-            <View
-              style={{
-                width: '100%',
-              }}
-            >
-              <ContainerFooter>
-                <ContainerText>
-                  <TextSmall>
-                    {translate('detailsTrip.text_type_payment')}
-                  </TextSmall>
-                  <Text>{trip.paymentForm}</Text>
-                  <Content style={{marginTop: 20}}>
-                    <TextSmall>{translate('detailsTrip.text_total')}</TextSmall>
-                    <Text>
-                      {cityConfig?.typeMoney}
-                      {Helper.maskMoney(Number(trip.price))}
-                    </Text>
-                  </Content>
-                </ContainerText>
-
-                <ContainerText>
-                  <TextSmall>{translate('detailsTrip.text_status')}</TextSmall>
-                  <Text>{switchStatus(trip.status.toUpperCase())}</Text>
-                  <Content style={{marginTop: 20}}>
-                    <TextSmall>{translate('detailsTrip.text_date')}</TextSmall>
-                    <Text>
-                      {trip.schedule
-                        ? formatDateAndHour(trip.schedule.schedule)
-                        : formatDateAndHour(trip.date)}
-                    </Text>
-                  </Content>
-                </ContainerText>
-              </ContainerFooter>
-              <ContainerFooter>
-                <ContainerText>
-                  <TextSmall>{translate('myTravels.situation')}</TextSmall>
-                  <Text>{detailsTrip?.situation}</Text>
-                </ContainerText>
-                <ContainerText>
-                  <TextSmall>{translate('myTravels.call_type')}</TextSmall>
-                  <Text style={{maxWidth: '80%'}}>
-                    {detailsTrip?.tripCallType}
-                  </Text>
-                </ContainerText>
-              </ContainerFooter>
-              <TitleCentralized>
-                {detailsTrip?.tripCallType === 'CHAMADA TAXÍMETRO'
-                  ? translate('myTravels.route')
-                  : translate('myTravels.estimated')
-                }
-              </TitleCentralized>
-              <ContainerFooter>
-                <ContainerText>
-                  <TextSmall>{translate('myTravels.distance')}</TextSmall>
-                  <Text>
-                    {Helper.kmToMiles(
-                      parseFloat(detailsTrip.distance).toFixed(3),
-                      Helper.generalSettingsActive(
-                        generalSettings,
-                        'enable_transform_km_for_mi',
-                      ),
-                    )}
-                  </Text>
-                </ContainerText>
-                <ContainerText>
-                  <TextSmall>{translate('myTravels.duration')}</TextSmall>
-                  <Text>
-                    {detailsTrip?.tripCallType === 'CHAMADA TAXÍMETRO'
-                      ? moment
-                          .utc(
-                            moment(detailsTrip?.endDate).diff(
-                              moment(detailsTrip?.origin?.created_at)
-                            )
-                          )
-                          .format('mm [min], ss [seg]')
-                      : getMinutesAndSeconds(detailsTrip?.estimatedTimeDriverArrival) + ' min'
-                    }
-                  </Text>
-                </ContainerText>
-              </ContainerFooter>
-              <If condition={trip.status !== STATUS_CANCELED.toLowerCase()}>
-                <>
-                  <TitleCentralized>
-                    {translate('myTravels.price_breakdown')}
-                  </TitleCentralized>
-                  <ContainerFooter>
-                    <ContainerText>
-                      <Content style={{marginTop: 20}}>
-                        <TextSmall>
-                          ({translate('myTravels.dynamics_flags_triggers')})
-                        </TextSmall>
-                        <Text>
-                          {detailsTrip?.multiplierDynamic
-                            ? detailsTrip?.multiplierDynamic
-                            : '0'}
-                        </Text>
-                      </Content>
-                      <Content style={{marginTop: 20}}>
-                        <TextSmall>
-                          {translate('myTravels.value_min')}
-                        </TextSmall>
-                        <Text>
-                          {detailsTrip?.fare
-                            ? cityConfig?.typeMoney +
-                              Helper.maskMoney(
-                                Number(
-                                  Number(detailsTrip?.fare?.min_price) *
-                                    Number(detailsTrip?.multiplierDynamic || 1),
-                                ),
-                              )
-                            : ''}
-                        </Text>
-                      </Content>
-                      <Content style={{marginTop: 20}}>
-                        <TextSmall>
-                          {translate('myTravels.waypoints')}
-                        </TextSmall>
-                        <Text>
-                          {cityConfig?.typeMoney}
-                          {Helper.maskMoney(
-                            parseFloat(detailsTrip?.fare?.waypoint_price) *
-                              parseFloat(detailsTrip?.tripWayPoints?.length),
-                          )}
-                        </Text>
-                      </Content>
-                      <Content style={{marginTop: 20}}>
-                        <TextSmall>
-                          {detailsTrip?.fare?.tax_price_description || ''}
-                        </TextSmall>
-                        <Text>
-                          {cityConfig?.typeMoney}
-                          {Helper.maskMoney(
-                            parseFloat(detailsTrip?.fare?.tax_price),
-                          )}
-                        </Text>
-                      </Content>
-                      <Content style={{marginTop: 20}}>
-                        <View
-                          style={{
-                            width: '80%',
-                          }}
-                        >
-                          <TextSmall>
-                            {translate(
-                              'myTravels.distance_to_charge_additional_amount',
-                            )}
-                          </TextSmall>
-                        </View>
-                        <Text>
-                          {Helper.kmToMiles(
-                            Number(detailsTrip?.fare?.km_to_additional_value),
-                            Helper.generalSettingsActive(
-                              generalSettings,
-                              'enable_transform_km_for_mi',
-                            ),
-                          )}
-                        </Text>
-                      </Content>
-                      <Content style={{marginTop: 20, marginBottom: 20}}>
-                        <TextSmall>
-                          {translate('myTravels.value_estimated')}
-                        </TextSmall>
-                        <Text>
-                          {cityConfig?.typeMoney}
-                          {Helper.maskMoney(
-                            parseFloat(
-                              detailsTrip?.recalculatedPrice
-                                ? detailsTrip?.recalculatedPrice?.oldPrice
-                                : detailsTrip?.price,
-                            ),
-                          )}
-                        </Text>
-                      </Content>
-                    </ContainerText>
-                    <ContainerText>
-                      <TextSmall>
-                        {translate('myTravels.base_price')}{' '}
-                      </TextSmall>
-                      <Text>
-                        {detailsTrip?.fare
-                          ? ' + ' +
-                            cityConfig?.typeMoney +
-                            Helper.maskMoney(
-                              parseFloat(detailsTrip?.fare?.base_price),
-                            )
-                          : ''}
-                      </Text>
-                      <Content style={{marginTop: 20}}>
-                        <TextSmall>
-                          {generalSettings?.find(
-                            item => item?.key === 'enable_transform_km_for_mi',
-                          )?.value == '1'
-                            ? translate('myTravels.mi_price')
-                            : translate('myTravels.km_price')}{' '}
-                          (
-                          {detailsTrip?.fare
-                            ? Helper.maskMoney(
-                                parseFloat(detailsTrip?.fare?.km_price),
-                              ) +
-                              'x ' +
-                              Helper.maskMoney(
-                                parseFloat(detailsTrip?.distance),
-                              )
-                            : ''}
-                          )
-                        </TextSmall>
-                        <Text>
-                          {cityConfig?.typeMoney}
-                          {Helper.maskMoney(
-                            parseFloat(detailsTrip?.fare?.km_price) *
-                              parseFloat(detailsTrip?.distance),
-                          )}
-                        </Text>
-                      </Content>
-                      <Content style={{marginTop: 20}}>
-                        <TextSmall>
-                          {translate('myTravels.minute_price')} (
-                          {detailsTrip?.fare
-                            ? Helper.maskMoney(
-                                parseFloat(detailsTrip?.fare?.minute_price),
-                              ) +
-                              'x ' +
-                              Helper.maskMoney(
-                                parseFloat(detailsTrip?.estimatedTripTime),
-                              )
-                            : ''}
-                          ){' '}
-                        </TextSmall>
-                        <Text>
-                          {detailsTrip?.fare
-                            ? cityConfig?.typeMoney +
-                              Helper.maskMoney(
-                                parseFloat(detailsTrip?.fare?.minute_price) *
-                                  parseFloat(detailsTrip?.estimatedTripTime),
-                              )
-                            : ''}
-                        </Text>
-                      </Content>
-                      <Content style={{marginTop: 20}}>
-                        <TextSmall>
-                          {detailsTrip?.fare?.another_fee_description}
-                        </TextSmall>
-                        <Text>
-                          {cityConfig?.typeMoney}
-                          {Helper.maskMoney(
-                            parseFloat(detailsTrip?.fare?.another_fee || 0),
-                          )}
-                        </Text>
-                      </Content>
-                      <Content style={{marginTop: 20}}>
-                        <TextSmall>
-                          {translate('myTravels.long_distance_price')}
-                        </TextSmall>
-                        <Text>
-                          {cityConfig?.typeMoney}
-                          {Helper.maskMoney(
-                            parseFloat(
-                              detailsTrip?.tripLongDistanceValue
-                                ? Helper.maskMoney(
-                                    parseFloat(
-                                      detailsTrip?.tripLongDistanceValue.value,
-                                    ),
-                                  )
-                                : '0,00',
-                            ),
-                          )}
-                        </Text>
-                      </Content>
-                      <Content style={{marginTop: 20}}>
-                        <TextSmall>
-                          {translate('myTravels.additional_value')}
-                        </TextSmall>
-                        <Text>
-                          {cityConfig?.typeMoney}
-                          {Helper.maskMoney(
-                            parseFloat(
-                              detailsTrip?.fare?.additional_value_after_km,
-                            ),
-                          )}
-                        </Text>
-                      </Content>
-                    </ContainerText>
-                  </ContainerFooter>
-                  <If condition={cancelations.length > 0}>
-                    <TitleCentralized>
-                      {translate('myTravels.cancellation_fee')}
-                    </TitleCentralized>
-                    <CancelationConteiner>
-                      {cancelations.map((value: string, index: number) => (
-                        <CancelationTaxe key={index}>
-                          <Text>
-                            {translate('myTravels.fee')} {index + 1}:{' '}
-                            {cityConfig?.typeMoney}{' '}
-                            {Helper.maskMoney(Number(value))}
-                          </Text>
-                        </CancelationTaxe>
-                      ))}
-                    </CancelationConteiner>
-                  </If>
-                </>
-              </If>
-            </View>
-            {/* <ContainerHelp>
-              <Buton>
-                <TextSmall color={theme.colors.background_global}>
-                  Ajuda
-                </TextSmall>
-              </Buton>
-            </ContainerHelp> */}
-
-            <If
-              condition={
-                trip.tripAuditId !== String(STATUS_SITUATION_RELEASED) &&
-                trip.tripAuditId !== String(STATUS_RELEASED_AFTER_ANALISYS) &&
-                trip.tripAuditId !==
-                  String(STATUS_SITUATION_RELEASED_AUTOMATICALLY)
+      {showContent && (
+        <Content>
+          <TripSummaryCard
+            vehicleTypeLabel={detailsTrip.tripCallType ?? ''}
+            dateLabel={dateLabel}
+            timeLabel={timeLabel}
+            statusLabel={switchStatus(statusKey)}
+            statusVariant={STATUS_VARIANT[statusKey] ?? 'neutral'}
+            priceLabel={`${cityConfig?.typeMoney}${Helper.maskMoney(
+              Number(detailsTrip?.financialBreakdown?.grossPrice ?? trip.price),
+            )}`}
+            priceCaption={translate('detailsTrip.text_total')}
+            paymentMethodLabel={trip.paymentForm}
+            paymentMethodCaption={translate('detailsTrip.text_type_payment')}
+          >
+            <TripMap
+              origin={
+                detailsTrip.origin.latitude
+                  ? {
+                    latitude: Number(detailsTrip.origin.latitude),
+                    longitude: Number(detailsTrip.origin.longitude),
+                  }
+                  : null
               }
-            >
-              <ContainerButton>
-                <ButtonLiberation
-                  onPress={() => {
-                    setModalMessage(true);
-                  }}
-                >
-                  <TextSmall color={theme.colors.background_global}>
-                    {translate('myTravels.request_release')}
-                  </TextSmall>
-                </ButtonLiberation>
-              </ContainerButton>
-            </If>
-          </ContainerModal>
-        )}
-      </If>
-      <HelpMethodModal
-        tripReference={tripReference}
-        visible={modalMessage}
-        setVisible={setModalMessage}
-      />
-    </>
+              destination={
+                detailsTrip.destination.latitude
+                  ? {
+                    latitude: Number(detailsTrip.destination.latitude),
+                    longitude: Number(detailsTrip.destination.longitude),
+                  }
+                  : null
+              }
+              routeCoordinates={routeCoordinates}
+              originLabel="Localização Atual"
+              destinationLabel="Chegada"
+            />
+          </TripSummaryCard>
+
+          <DistanceDurationCard
+            distanceLabel={Helper.kmToMiles(parseFloat(detailsTrip.distance).toFixed(3), isMileageEnabled)}
+            distanceCaption={translate('myTravels.distance')}
+            durationLabel={`${getEstimatedTripTimeInMinutes(detailsTrip).toFixed(0)} min`}
+            durationCaption={translate('myTravels.duration')}
+          />
+
+          <AddressTimeline
+            origin={{ label: translate('myTravels.boarding'), primaryText: trip.originAddress }}
+            waypoints={detailsTrip.tripWayPoints?.map((wayPoint, index) => ({
+              label: `${translate('myTravels.stop')} ${index + 1}`,
+              primaryText: wayPoint.address,
+            }))}
+            stopsToggleLabel={
+              detailsTrip.tripWayPoints?.length
+                ? `+${detailsTrip.tripWayPoints.length} ${
+                  detailsTrip.tripWayPoints.length === 1
+                    ? translate('myTravels.stop')
+                    : translate('myTravels.stops')
+                }`
+                : undefined
+            }
+            destination={{
+              label: translate('myTravels.destination'),
+              primaryText: detailsTrip.destination.name ?? '',
+            }}
+          />
+
+          {detailsTrip.customer && (
+            <PartnerCard
+              label={translate('myTravels.passenger')}
+              name={detailsTrip.customer.nickname ?? detailsTrip.customer.name ?? ''}
+              photoUrl={customerPhotoUrl}
+              rating={detailsTrip.customer.rating}
+              tripsCount={detailsTrip.customer.quantityTrips}
+              tripsCountLabel={translate('myTravels.trips_count')}
+            />
+          )}
+
+          {canReportProblem && (
+            <ReportProblemButtonWrapper>
+              <ReportProblemButton
+                label={translate('myTravels.report_problem')}
+                onPress={() => setModalMessage(true)}
+              />
+            </ReportProblemButtonWrapper>
+          )}
+
+          {statusKey !== STATUS_CANCELED.toUpperCase() && (
+            <EarningsCard
+              title={translate('myTravels.earnings')}
+              rows={earningsRows}
+              totalLabel={translate('myTravels.net_value_received')}
+              totalValueLabel={`${cityConfig?.typeMoney}${Helper.maskMoney(
+                Number(detailsTrip?.financialBreakdown?.netValue ?? fareBreakdown.total),
+              )}`}
+              viewFullCalculationLabel={translate('myTravels.view_full_calculation')}
+              onViewFullCalculation={() => {
+                (navigation as any).navigate('TripCalculationDetails', {
+                  tripReference,
+                  trip,
+                  detailsTrip,
+                });
+              }}
+            />
+          )}
+        </Content>
+      )}
+
+      {showError && (
+        <ErrorContainer>
+          <Ionicons name="alert-circle-outline" size={RFValue(32)} color={theme.colors.primary} />
+          <ErrorTitle>{translate('detailsTrip.error_loading_title')}</ErrorTitle>
+          <ErrorSubtitle>{translate('detailsTrip.error_loading_subtitle')}</ErrorSubtitle>
+          <RetryButton activeOpacity={0.7} onPress={() => getDetailsTrip(tripReference)}>
+            <Ionicons name="reload" size={RFValue(14)} color={theme.colors.white} />
+            <RetryButtonText>{translate('detailsTrip.retry')}</RetryButtonText>
+          </RetryButton>
+        </ErrorContainer>
+      )}
+
+      <HelpMethodModal tripReference={tripReference} visible={modalMessage} setVisible={setModalMessage} />
+    </Container>
   );
 };

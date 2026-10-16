@@ -1,13 +1,26 @@
 import axios from 'axios';
-import {appProccess, buildApp} from '../../../../constantBuild/config';
+import { appProccess, buildApp } from '../../../../constantBuild/config';
 import apiMainDriver from '../../api/apiMain';
+import { UrlBuilder } from '~/utils/UrlBuilder';
+import { DirectionResponse } from '~/interfaces/direction';
 
-export const searchNative = async (origin, destination, waypoints = null) => {
+export const searchNative = async (
+  origin: string,
+  destination: string,
+  waypoints: string | null = null,
+): Promise<ApiResponse<DirectionResponse>> => {
+  if (!origin || !destination) {
+    console.warn('searchNative: origin or destination is undefined');
+    return;
+  }
+
   try {
     let params = `?origin=${origin}&destination=${destination}&simpleDirections=1`;
 
     if (waypoints != null) params += `&waypoints=${waypoints}`;
-    const response = await apiMainDriver.get(`direction/search${params}`);
+    const response = await apiMainDriver.get<ApiResponse<DirectionResponse>>(
+      `direction/search${params}`,
+    );
     return response.data;
   } catch (error) {
     return error;
@@ -29,18 +42,20 @@ export const searchNativeFetch = async (
     lng,
   },
 ) => {
+  if (!origin || !destination) {
+    console.warn('searchNativeFetch: origin or destination is undefined');
+    return;
+  }
+
   try {
     let params = `?origin=${origin}&destination=${destination}&simpleDirections=1`;
 
     if (waypoints != null) params += `&waypoints=${waypoints}`;
 
-    const response = await fetch(
-      `${buildApp().HOST_API_APP}direction/search${params}`,
-      {
-        method: 'GET',
-        headers: headers,
-      },
-    );
+    const response = await fetch(`${buildApp().HOST_API_APP}direction/search${params}`, {
+      method: 'GET',
+      headers: headers,
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -49,17 +64,17 @@ export const searchNativeFetch = async (
       {
         tripReference: tripAccepted?.tripReference,
         polyline: data?.data?.overview_polyline?.points,
-        time: `${Number(data?.data?.duration / 60)?.toFixed(0)} min`,
+        time: `${Math.floor(data?.data?.duration / 60)} min`,
         idDriver: userDriverFind?.idDriver,
-        position: {lat: lat, lng: lng},
+        position: { lat: lat, lng: lng },
         kmProgressing: await getKmRouteTraveled(),
         minuteProgressing: Number(await getMinutesRouteTraveled()),
       },
-      {token: headers?.api_token, userid: userDriverFind?.userId},
+      { token: headers?.api_token, userid: userDriverFind?.userId },
       cityConfig?.configDriverLocation?.port_url,
     )
-      .then(data => {})
-      .catch(err => {
+      .then((data) => {})
+      .catch((err) => {
         console.log('deu erro ', err);
       });
 
@@ -77,7 +92,10 @@ export const updateRoute = async (data, driver, port = ':3704') => {
       uri = buildApp().HOST_SOCKET;
     }
     uri = uri.substring(0, uri.length - 1);
-    const response = await axios.post(`${uri}${port}/location/route`, data, {
+
+    const baseUrl = UrlBuilder.resolveWithPort(uri, port);
+
+    const response = await axios.post(`${baseUrl}/location/route`, data, {
       headers: {
         token: driver?.token,
         userid: driver?.userid,
@@ -97,7 +115,9 @@ export const updateRouteFetch = async (data, driver, port = ':3704') => {
     }
     uri = uri.substring(0, uri.length - 1);
 
-    const response = await fetch(`${uri}${port}/location/route`, {
+    const baseUrl = UrlBuilder.resolveWithPort(uri, port);
+
+    const response = await fetch(`${baseUrl}/location/route`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

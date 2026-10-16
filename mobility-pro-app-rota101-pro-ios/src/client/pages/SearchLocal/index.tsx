@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -8,16 +8,18 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import InputIcon from '../../components/form/InputIcon';
 import apiMain from '../../api/apiMain';
 import LoadView from '../../components/LoadView';
-import {useLocal} from '../../contexts/local';
-import {styles} from './styles';
+import { useLocal } from '../../contexts/local';
+import {translate} from '../../locales';
+import { styles } from './styles';
 
 let timeOut = null;
 
-export default function SearchLocal({navigation}) {
-  const {placeSelected} = useLocal();
+export default function SearchLocal({ navigation }) {
+  const { placeSelected } = useLocal();
   const [listAddress, setListAddress] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -28,36 +30,60 @@ export default function SearchLocal({navigation}) {
   }, []);
 
   useEffect(() => {
+    if (!navigation?.addListener) return;
     const unsubscribe = navigation.addListener('focus', () => {
-      if (placeSelected) navigation.goBack();
+      if (placeSelected && navigation?.goBack) {
+        navigation.goBack();
+      }
     });
 
     return unsubscribe;
-  });
+  }, [navigation, placeSelected]);
+
+  function getAddressWithoutKeywords(address) {
+    return address.toUpperCase().replace(/(\bAVENIDA)|(\bAV)|(\bAV\.)|(\bRUA)|(\bTV)|(\bTRAVESSA)|(\bTRV)\w+/g, "");
+  }
 
   function searchPlaces(text) {
+    if (!text || text.trim().length === 0) {
+      setListAddress([]);
+      return;
+    }
     setLoading(true);
     clearTimeout(timeOut);
-    // eslint-disable-next-line no-restricted-syntax
-    timeOut = setTimeout(async function () {
-      const {
-        data: {data},
-      } = await apiMain.get(`Place/Search?q=${text}`);
+    const value = getAddressWithoutKeywords(text);
+    const { latitude, longitude } = placeSelected || {};
+    if (!latitude || !longitude) {
       setLoading(false);
-
-      if (!data) return;
-
-      setListAddress(data);
+      return;
+    }
+    timeOut = setTimeout(() => {
+      apiMain
+        .get(`Place/Search?latlng=${latitude},${longitude}&q=${encodeURIComponent(value)}`)
+        .then(({ data: { data } }) => {
+          setLoading(false);
+          if (!data) {
+            setListAddress([]);
+            return;
+          }
+          setListAddress(data);
+        })
+        .catch(error => {
+          console.error('Erro ao buscar lugares:', error?.message || error);
+          setLoading(false);
+          setListAddress([]);
+        });
     }, 1000);
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <InputIcon
         nameIcon="chevron-left"
         inputProps={{
           autoFocus: true,
           onChangeText: searchPlaces,
+          placeholder: translate('searchModal.search_address'),
         }}
         iconProps={{
           onPress: () => {
@@ -75,14 +101,21 @@ export default function SearchLocal({navigation}) {
               <TouchableOpacity
                 key={index}
                 onPress={() => {
-                  if (item.latitude == null && item.longitude == null) {
+                  if (item.latitude === null && item.longitude === null) {
                     apiMain
-                      .get(`geocoding/search?address=${item.address}`)
-                      .then(({data: {data}}) => {
-                        navigation.navigate('LocalMap', {place: data});
+                      .get(`geocoding/search?address=${encodeURIComponent(item.address)}`)
+                      .then(({ data: { status, data } }) => {
+                        if (status && data && navigation?.navigate) {
+                          navigation.navigate('LocalMap', { place: data });
+                        }
+                      })
+                      .catch(error => {
+                        console.error('Erro ao buscar geocodificação:', error?.message || error);
                       });
                   } else {
-                    navigation.navigate('LocalMap', {place: item});
+                    if (navigation?.navigate) {
+                      navigation.navigate('LocalMap', { place: item });
+                    }
                   }
                 }}
                 accessible
@@ -100,6 +133,6 @@ export default function SearchLocal({navigation}) {
       ) : (
         <LoadView />
       )}
-    </View>
+    </SafeAreaView>
   );
 }

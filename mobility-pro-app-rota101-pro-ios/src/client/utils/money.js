@@ -6,28 +6,23 @@ export function coinTypePerApi(coin) {
   return coin;
 }
 
-export function maskMoney(value) {
-  if (!value || value == 0 || value === undefined || value === Infinity) {
+export function maskMoney(value = 0) {
+  const num = Number(value);
+
+  if (!Number.isFinite(num)) {
     return '0,00';
   }
 
-  let isNegative = false;
-  if (value < 0) {
-    value = value * -1;
-    isNegative = true;
-  }
-  if (value === 0) return '0,00';
+  const isNegative = num < 0;
+  const absValue = Math.abs(num);
 
-  let number = value.toFixed(4).split('.');
+  const [intPart, decPart] = absValue.toFixed(2).split('.');
 
-  number = parseFloat(`${number[0]}.${number[1].slice(0, 2)}`);
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-  number = number.toFixed(2).split('.');
-  number[0] = number[0].split(/(?=(?:...)*$)/).join('.');
+  const result = `${formattedInt},${decPart}`;
 
-  if (isNegative) return `-${number.join(',')}`;
-
-  return number.join(',');
+  return isNegative ? `-${result}` : result;
 }
 
 // mask Money with new intl
@@ -37,13 +32,26 @@ export function maskMoneyIntl(value) {
     currency: 'BRL',
   }).format(value);
 }
+export function aplyDiscount(price, discount, discountType) {
+  if (!discount || !discountType) return price;
+  if (discountType === '%') {
+    const percentage = parseFloat(discount);
+    const discountValue = (price * percentage) / 100;
+    return price - discountValue;
+  } else if (discountType === '$') {
+    const discountValue = parseFloat(discount);
+    return price - discountValue;
+  } else {
+    return price;
+  }
+}
 
 export function formatPrice(
   offerInDriver,
   selectedOptionTravel,
   item,
   cityConfig,
-  turbined
+  turbined,
 ) {
   if (!item) return;
   const formattedPrice = coinTypePerApi(cityConfig?.typeMoney) + ' ';

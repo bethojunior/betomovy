@@ -1,5 +1,5 @@
-import {useNavigation} from '@react-navigation/native';
-import {useTripProvider} from '../../context/Trip';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { useTripProvider } from '../../context/Trip';
 import {
   Bottom,
   styles,
@@ -10,12 +10,12 @@ import {
   ButtonBottom,
   ButtonBottomText,
 } from './styles';
-import {Ionicons, FontAwesome} from '@expo/vector-icons';
-import {useUserDriver} from '../../context/userDriver';
-import {useTheme} from 'styled-components';
-import {translate} from '../../../../client/locales';
-import {If} from '../If';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { useTheme } from 'styled-components';
+import { translate } from '../../../../client/locales';
 import theme from '../../styles/theme';
+import { TouchableOpacity } from 'react-native';
+import { useDriverStatus } from '../../hooks/useDriverStatus';
 interface Props {
   iniTripModal: boolean;
   setModalVisible: (value: boolean) => void;
@@ -27,17 +27,20 @@ export const BottomCard = ({
   setModalVisible,
   modalVisible,
 }: Props) => {
-  const {navigate} = useNavigation();
-  const {userDriverFind} = useUserDriver();
-  const {colors} = useTheme();
-  const {stateTrip} = useTripProvider();
-  const {tripsOffer} = stateTrip;
-  const {listSchedule, listScheduleAccepted} = stateTrip;
+  const { navigate } = useNavigation<NavigationProp<any>>();
+  const { isOffline } = useDriverStatus();
+  const { colors } = useTheme();
+
+  const tripSummary = useTripProvider((context) => context.stateTrip.tripSummary);
+
+  if (iniTripModal) return;
+
   return (
-    <Bottom visible={!iniTripModal} style={styles.shadow}>
-      {listSchedule.length == 0 &&
-      listScheduleAccepted.length == 0 &&
-      tripsOffer?.length == 0 ? null : (
+    <Bottom style={styles.shadow}>
+      {(tripSummary.totalScheduledAvailable == 0 &&
+        tripSummary.totalScheduledAccepted == 0 &&
+        tripSummary.totalOfferTrips == 0) ||
+        isOffline ? null : (
         <>
           <HeaderBottom>
             <HeaderBottomTitle>
@@ -45,34 +48,34 @@ export const BottomCard = ({
             </HeaderBottomTitle>
           </HeaderBottom>
           <InfoTrip>
-            <InfoTripTitle
-              onPress={() => {
-                navigate('ScheduleAvailable', {
-                  listSchedule,
-                });
-              }}
+            <TouchableOpacity
+              onPress={() => navigate('ScheduleAvailable')}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              {listSchedule.length || 0} {translate('driverhome.info_disp')}
-            </InfoTripTitle>
-            <InfoTripTitle
-              onPress={() =>
-                navigate('ScheduleAccepted', {
-                  listScheduleAccepted,
-                })
-              }
+              <InfoTripTitle>
+                {tripSummary.totalScheduledAvailable}{' '}
+                {translate('driverhome.info_disp')}
+              </InfoTripTitle>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigate('ScheduleAccepted')}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              {listScheduleAccepted.length || 0}{' '}
-              {translate('driverhome.info_schedule')}
-            </InfoTripTitle>
-            <InfoTripTitle
-              onPress={() =>
-                navigate('tripsOffer', {
-                  tripsOffer,
-                })
-              }
+              <InfoTripTitle>
+                {tripSummary.totalScheduledAccepted}{' '}
+                {translate('driverhome.info_schedule')}
+              </InfoTripTitle>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigate('tripsOffer')}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              {tripsOffer?.length || 0} Ofertas
-            </InfoTripTitle>
+              <InfoTripTitle>
+                {tripSummary.totalOfferTrips} Ofertas
+              </InfoTripTitle>
+            </TouchableOpacity>
           </InfoTrip>
         </>
       )}
@@ -85,17 +88,17 @@ export const BottomCard = ({
           name="chevron-up"
           size={25}
           color={theme.colors.secondary}
-          style={{marginTop: 3}}
+          style={{ marginTop: 3 }}
         />
         <ButtonBottomText>
-          {userDriverFind.status === 'desligado'
+          {isOffline
             ? translate('driverhome.info_off')
             : translate('driverhome.info_on')}
         </ButtonBottomText>
         <FontAwesome
           name="circle"
           size={20}
-          color={userDriverFind.status === 'desligado' ? colors.off : colors.on}
+          color={isOffline ? colors.off : colors.on}
         />
       </ButtonBottom>
     </Bottom>

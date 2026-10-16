@@ -10,7 +10,6 @@ export interface iPaymentFormContext {
     cvv: string,
     birthday: string,
   ) => Promise<void>;
-  cards: CreditCard[];
 }
 
 export interface CreditCard {

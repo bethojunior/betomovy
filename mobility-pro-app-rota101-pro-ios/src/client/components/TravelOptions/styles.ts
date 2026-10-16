@@ -145,7 +145,7 @@ export const OptionalButton = styled.TouchableOpacity<{turbined?: boolean}>`
 `;
 
 export const OptionalButtonText = styled.Text`
-  color: ${({theme}) => theme.colors.primary};
+  color: ${({theme}) => theme.colors.secondary};
   font-size: ${RFValue(8)}px;
   font-weight: bold;
 `;
@@ -289,10 +289,18 @@ export const PaymentMethodContainer = styled.View`
 export const ButtonOpenPaymentMethodModal = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
-  border-right-width: ${RFValue(1)}px;
-  border-right-color: ${({theme}) => theme.colors.border};
-  width: ${RFValue(260)}px;
   justify-content: space-between;
+  flex: 1;
+`;
+
+export const ButtonOpenPaymentMethodRight = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  border-left-width: ${RFValue(1)}px;
+  border-left-color: ${({theme}) => theme.colors.border};
+  max-width: 50%;
+  gap: ${RFValue(8)}px;
+  padding: 0 ${RFValue(8)}px;
 `;
 
 export const PaymentMethodSelected = styled.Text`

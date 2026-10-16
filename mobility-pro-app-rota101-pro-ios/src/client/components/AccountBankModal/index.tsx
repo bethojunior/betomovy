@@ -1,19 +1,19 @@
-import {Platform, Text, View} from 'react-native';
-import {useEffect, useState} from 'react';
+import { Platform, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import SearchableDropdown from 'react-native-searchable-dropdown';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {lighten} from 'polished';
-import {Picker} from '@react-native-picker/picker';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { lighten } from 'polished';
+import { Picker } from '@react-native-picker/picker';
 import ModalFrame from '../form/Modal';
 import Preload from '../Preload';
-import {translate} from '../../locales';
+import { translate } from '../../locales';
 import theme from '../../styles/theme';
-import {useTransference} from '../../contexts/Transference';
+import { useTransference } from '../../contexts/Transference';
 import InputFrame from '../form/InputFrame';
-import {ButtonMode, Section, TextButtonMode, Title} from './styles';
-import {customToast} from '../../../utils/FlashMessage';
+import { ButtonMode, Section, TextButtonMode, Title } from './styles';
+import { customToast } from '../../../utils/FlashMessage';
 
 interface AccountInfo {
   agency: string;
@@ -52,7 +52,7 @@ const AccountBankModal = ({
   accountInfo,
   getInfoAccount,
 }: Props) => {
-  const {editAccount, createAccount, getBanksList} = useTransference();
+  const { editAccount, createAccount, getBanksList } = useTransference();
 
   const [banks, setBanks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -258,7 +258,7 @@ const AccountBankModal = ({
               />
             </View>
             <Section>
-              <View style={{width: '50%'}}>
+              <View style={{ width: '50%' }}>
                 <Title modeEdit={modeEdit}>
                   {translate('transfer.number_account')}
                 </Title>
@@ -295,7 +295,7 @@ const AccountBankModal = ({
                     }
                   />
                 </View>
-                <View style={{paddingLeft: 5, paddingRight: 5}}>
+                <View style={{ paddingLeft: 5, paddingRight: 5 }}>
                   <Title modeEdit={modeEdit}>
                     {translate('transfer.agency')}
                   </Title>
@@ -351,8 +351,8 @@ const AccountBankModal = ({
                     borderWidth: 1,
                     borderRadius: 5,
                   }}
-                  itemTextStyle={{color: '#222'}}
-                  itemsContainerStyle={{maxHeight: 140}}
+                  itemTextStyle={{ color: '#222' }}
+                  itemsContainerStyle={{ maxHeight: 140 }}
                   items={mapBanksForIDAndName(banks)}
                   defaultIndex={defaultBank()}
                   resetValue={false}
@@ -378,7 +378,7 @@ const AccountBankModal = ({
               )}
             </View>
             <View>
-              <Title style={{marginBottom: 5}} modeEdit={modeEdit}>
+              <Title style={{ marginBottom: 5 }} modeEdit={modeEdit}>
                 {translate('transfer.type_account')}
               </Title>
               {modeEdit ? (
@@ -433,7 +433,7 @@ const AccountBankModal = ({
               )}
             </View>
             <View>
-              <Title style={{marginTop: 5}} modeEdit={modeEdit}>
+              <Title style={{ marginTop: 5 }} modeEdit={modeEdit}>
                 {translate('transfer.pix')}
               </Title>
               <InputFrame

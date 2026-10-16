@@ -3,9 +3,9 @@ import {lighten, shade} from 'polished';
 import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 import themeCss from '../../../styles/theme';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-
-export const Container = styled.SafeAreaView`
+export const Container = styled(SafeAreaView)`
   flex: 1;
   shadow-color: ${({theme}) => theme.colors.secondary};
   shadow-offset: 0px 0px;
@@ -153,25 +153,25 @@ export const ViewPanic = styled.View`
 
 export const ContentOptionsTrip = styled.View`
   padding: 0 10px;
-`
+`;
 
 export const ContentAddressMenu = styled.View`
   margin: 10px 0;
   flex-direction: row;
   align-items: center;
-`
+`;
 
 export const ButtonAddressMenu = styled.TouchableOpacity`
   flex: 1;
-`
+`;
 
 export const TextAddressMenu = styled.Text`
   font-size: 16px;
-  color: ${({theme}) => (theme.colors.primary)};
-`
+  color: ${({theme}) => theme.colors.primary};
+`;
 
 export const ButtonDeleteAddress = styled.TouchableOpacity`
-    flex: 0.1;
-`
+  flex: 0.1;
+`;
 
-export const TextButtonDeleteAddress = styled.Text``
+export const TextButtonDeleteAddress = styled.Text``;

@@ -1,13 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { ChildrenType } from '../../../driver/@types';
-import { customToast } from '../../../utils/FlashMessage';
+import {createContext, useContext, useEffect, useMemo, useState} from 'react';
+import {ChildrenType} from '../../../driver/@types';
+import {customToast} from '../../../utils/FlashMessage';
 
-import { MenuService } from './service';
-import { ExternalLinkProps, IManuContext, OptionsProps } from './types';
+import {MenuService} from './service';
+import {ExternalLinkProps, IManuContext, OptionsProps} from './types';
 
 const MenuContext = createContext({} as IManuContext);
 
-export const MenuProvider = ({ children }: ChildrenType) => {
+export const MenuProvider = ({children}: ChildrenType) => {
   const service = MenuService();
   const [optionsMenu, setOptionsMenu] = useState<OptionsProps[]>([]);
   const [externalLink, setExternalLink] = useState<ExternalLinkProps>();
@@ -32,12 +32,11 @@ export const MenuProvider = ({ children }: ChildrenType) => {
   const getExternalLink = async () => {
     try {
       const response = await service.getLinkMenu();
-
       return setExternalLink(response);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     getMenuOptions();
@@ -49,7 +48,7 @@ export const MenuProvider = ({ children }: ChildrenType) => {
       getMenuOptions,
       optionsMenu,
       setOptionsMenu,
-      externalLink
+      externalLink,
     };
   }, [getMenuOptions, optionsMenu, setOptionsMenu]);
 

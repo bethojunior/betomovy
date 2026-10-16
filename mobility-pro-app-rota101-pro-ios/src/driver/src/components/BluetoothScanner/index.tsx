@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import BleManager from 'react-native-ble-manager';
 import {customToast} from '../../../../utils/FlashMessage';
+import {translate} from '../../../../client/locales';
 
 // [TIP] https://developer.android.com/reference/android/Manifest.permission#BLUETOOTH_SCAN
 const requestBluetoothPermission = async (): Promise<boolean> => {
@@ -77,7 +78,7 @@ export const BluetoothScanner = () => {
       const deviceBlePermitted = await requestBluetoothPermission();
       if (!deviceBlePermitted) {
         customToast(
-          'Permissão de Bluetooth negada. Por favor, conceda a permissão nas configurações do aplicativo.',
+          translate('bluetooth.text_permission_denied'),
           'warning',
         );
         return false;
@@ -144,7 +145,7 @@ export const BluetoothScanner = () => {
   useEffect(() => {
     const initializeBleManager = async () => {
       customToast(
-        'Religue seu bluetooth e escaneie os dispositivos',
+        translate('bluetooth.text_reconnect_instructions'),
         'success',
       );
       await BleManager.start({showAlert: false});

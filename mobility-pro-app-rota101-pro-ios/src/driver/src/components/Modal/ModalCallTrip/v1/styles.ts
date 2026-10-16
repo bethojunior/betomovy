@@ -1,6 +1,14 @@
 import styled from 'styled-components/native';
 import {Platform} from 'react-native';
-import {lighten} from 'polished';
+import {lighten, darken, desaturate, getLuminance} from 'polished';
+
+const blockedColor = (color: string): string => {
+  const desaturated = desaturate(0.5, color);
+  return getLuminance(color) > 0.5
+    ? darken(0.05, desaturated)
+    : lighten(0.35, desaturated);
+};
+
 import {MotiView} from 'moti';
 import {RFValue} from 'react-native-responsive-fontsize';
 
@@ -18,7 +26,7 @@ type ProgressProps = {
 };
 
 type FavoriteTextProps = {
-  display: boolean;
+  show: boolean;
 };
 
 type RiskAreaProps = {
@@ -54,6 +62,8 @@ export const ClientRating = styled.Text`
 export const ClientInfoContent = styled.View`
   flex-direction: row;
   padding-bottom: 10px;
+  align-items: center;
+  gap: 10px;
 `;
 
 export const ClienSection = styled.View`
@@ -169,17 +179,14 @@ export const ButtonRefuse = styled.TouchableOpacity`
   align-items: center;
   justify-content: flex-start;
   align-self: flex-end;
-  margin-right: 10px;
-  z-index: 5;
-  margin-top: -6px;
-  padding: 10px;
+  padding: 8px;
 `;
 
 export const ButtonAccept = styled.TouchableOpacity`
   width: 97%;
   height: 50px;
   border-color: ${({theme}) => theme.colors.primary};
-  background-color: ${({theme}) => lighten(0.3, theme.colors.primary)};
+  background-color: ${({theme}) => theme.colors.primary};
   border-width: 0.5px;
   border-radius: 5px;
   align-items: center;
@@ -195,7 +202,7 @@ export const ProgressBarrer = styled.View<ProgressProps>`
   align-self: flex-start;
   height: 49px;
   border-radius: 5px;
-  background-color: ${({theme}) => theme.colors.primary};
+  background-color: ${({theme}) => blockedColor(theme.colors.primary)};
   position: absolute;
 `;
 
@@ -233,10 +240,10 @@ export const Distance = styled.Text`
 `;
 
 export const FavoriteText = styled.Text<FavoriteTextProps>`
-  color: ${({theme, display}) =>
-    display ? theme.colors.primary : theme.colors.background_global};
+  color: ${({theme, show}) =>
+    show ? theme.colors.primary : theme.colors.background_global};
   font-size: 18px;
-  text-transform: ${({display}) => (display ? 'uppercase' : 'none')};
+  text-transform: ${({show}) => (show ? 'uppercase' : 'none')};
   margin-left: 5px;
   font-family: MavenPro_700Bold;
 `;
@@ -246,7 +253,7 @@ export const Header = styled.View`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  border-radius: 20px;
+  margin-bottom: 10px;
 `;
 
 export const TextCalc = styled.Text`
@@ -290,5 +297,5 @@ export const GeneralContent = styled.View`
   overflow: hidden;
   flex: 1;
   position: relative;
-  padding: 15px 10px 10px 10px;
+  padding: 12px 10px 10px 10px;
 `;

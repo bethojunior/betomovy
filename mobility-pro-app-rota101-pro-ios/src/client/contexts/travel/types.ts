@@ -33,6 +33,7 @@ export interface TravelProps {
   originAddress: string;
   originLatitude: string;
   originLongitude: string;
+  paymentForm?: string;
   price: string;
   schedule: any;
   status: string;

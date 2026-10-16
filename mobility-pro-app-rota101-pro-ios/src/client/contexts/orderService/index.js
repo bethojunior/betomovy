@@ -1,6 +1,7 @@
-import React, { useContext, createContext, useState, useEffect } from "react";
+import { useContext, createContext, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import apiDelivery from "../../api/apiDelivery";
+import { loadSession } from "~/utils/Storage/sessionStorage";
 
 const OrderServiceContext = createContext({
   bag: [],
@@ -32,7 +33,9 @@ const OrderServiceContext = createContext({
   setChange: () => {},
   setCard: () => {},
   setLoadingRate: () => {},
-  setOrderDeliveryType: () => {}
+  setOrderDeliveryType: () => {},
+  setEstablishment: null,
+  setBag: [],
 });
 
 export const OrderServiceProvider = ({ children }) => {
@@ -50,29 +53,26 @@ export const OrderServiceProvider = ({ children }) => {
   const [loadingRate, setLoadingRate] = useState(false);
   const [orderDeliveryType, setOrderDeliveryType] = useState(1);
 
-  useEffect(() => {
-    async function getData() {
-      const bagStorage = await AsyncStorage.getItem("bagCache");
-      const establishmentStorage = await AsyncStorage.getItem(
-        "establishmentCache"
-      );
-
-      if (bagStorage) setBag(JSON.parse(bagStorage));
-
-      if (establishmentStorage)
-        setEstablishment(JSON.parse(establishmentStorage));
-    }
-
-    getData();
-    updateListOrdersActive();
-  }, []);
-
   async function updateListOrdersActive() {
-    if (!apiDelivery.defaults.headers.common["token"]) return;
-    const {
-      data: { response, status },
-    } = await apiDelivery.get("delivery/order/actives/customer");
-    if (status) setOrdersActive(response);
+    try {
+      const session = await loadSession();
+      if (!session?.token) return;
+
+      const {
+        data: { response, status },
+      } = await apiDelivery.get("delivery/order/actives/customer");
+      if (status) setOrdersActive(response);
+    } catch (error) {
+      const isNetworkError = 
+        error?.message === "Network Error" ||
+        error?.code === "NETWORK_ERROR" ||
+        error?.message?.includes("Network request failed") ||
+        error?.message?.includes("timeout") ||
+        !error?.response;
+      if (!isNetworkError) {
+        console.error("Error updateListOrdersActive", error?.message || error);
+      }
+    }
   }
 
   function addItem(item, amount, complements, observation) {
@@ -120,7 +120,7 @@ export const OrderServiceProvider = ({ children }) => {
   function editItem(id, item, amount, complements, observation) {
     setBag([
       ...bag.map((group) => {
-        if (group.id != id) return group;
+        if (group.id !== id) return group;
 
         return { id, item, amount, complements, observation };
       }),
@@ -129,10 +129,16 @@ export const OrderServiceProvider = ({ children }) => {
 
   function removeItem(id) {
     const newBag = bag.filter((product) => {
-      return product.id != id;
+      return product.id !== id;
     });
 
-    if (newBag.length == 0) setEstablishment(null);
+    if (newBag.length === 0) {
+      setEstablishment(null);
+      AsyncStorage.removeItem("bagCache");
+      AsyncStorage.removeItem("establishmentCache");
+    } else {
+      AsyncStorage.setItem("bagCache", JSON.stringify(newBag));
+    }
 
     setBag([...newBag]);
   }
@@ -173,7 +179,9 @@ export const OrderServiceProvider = ({ children }) => {
         setCard,
         setLoadingRate,
         setDeliveryRateId,
-        setOrderDeliveryType
+        setOrderDeliveryType,
+        setEstablishment,
+        setBag
       }}
     >
       {children}

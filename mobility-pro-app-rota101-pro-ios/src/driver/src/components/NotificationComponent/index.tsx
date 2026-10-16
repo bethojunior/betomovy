@@ -1,29 +1,37 @@
-import {useEffect} from 'react';
-import {ButtonFloatContainer} from '../../../../client/components/FloatButton/styles';
+import { useEffect, useRef } from 'react';
+import { ButtonFloatContainer } from '../../../../client/components/FloatButton/styles';
 import theme from '../../styles/theme';
 import NotificationButton from '../NotificationButton';
-import {Animated as Animation} from 'react-native';
-import {useAuth} from '../../../../context/auth';
+import { Animated as Animation } from 'react-native';
+import { useAuth } from '../../../../context/auth';
 import * as Notifications from 'expo-notifications';
-import {useNetwork} from '../../../../context/ConfigGlobal';
-import {useTripProvider} from '../../context/Trip';
-import {useUserDriver} from '../../context/userDriver';
+import { useTripProvider } from '../../context/Trip';
+import { useUserDriver } from '../../context/userDriver';
+import { loadSession } from '../../../../utils/Storage/sessionStorage';
+import { translate } from '../../../../client/locales';
+import { customToast } from '../../../../utils/FlashMessage';
+import { emitDriverStatusChange } from '../../utils/driverStatusChangeEmitter';
+import { emitTripStatusChange } from '../../utils/tripStatusChangeEmitter';
+import { DriverStatusType } from '../../../../interfaces/driver';
 
 interface NotificationComponentProps {
   onPress?: () => void;
 }
 
-export const NotificationComponent = ({
-  onPress,
-}: NotificationComponentProps) => {
+export const NotificationComponent = ({ onPress }: NotificationComponentProps) => {
   const aminating = new Animation.Value(0);
 
-  const {notification, setNewActionFb, newActionFb, getNotification} =
+  const { notification, setNewActionFb, newActionFb, getNotification, cityConfig } =
     useAuth();
-  const {itsNetwork} = useNetwork();
-  const {stateTrip, refuseTrip, dispatchTrip} = useTripProvider();
-  const {song, trip, tripAccepted} = stateTrip;
-  const {userDriverFind, getDriverFind} = useUserDriver();
+
+  const {
+    stateTrip: { trip, tripAccepted },
+    acceptTrip,
+    refuseTrip,
+    dispatchTrip,
+  } = useTripProvider((context) => context);
+
+  const { getDriverFind, userDriverFind, setUserDriverFind } = useUserDriver();
 
   const haveNotification = () => {
     if (
@@ -39,8 +47,7 @@ export const NotificationComponent = ({
     if (newActionFb.length > 0) {
       if (
         !tripAccepted?.status &&
-        (newActionFb === 'updateStatusDocuments' ||
-          newActionFb === 'changeStatusDriver')
+        (newActionFb === 'updateStatusDocuments' || newActionFb === 'changeStatusDriver')
       ) {
         getDriverFind();
       }
@@ -94,35 +101,136 @@ export const NotificationComponent = ({
     haveNotification() ? animationBell.start() : animationBell.stop();
   }, [haveNotification()]);
 
-  const notificationsActions = async () => {
-    await Notifications.requestPermissionsAsync();
-    Notifications.addNotificationResponseReceivedListener(
-      async optionChoosed => {
-        Notifications.dismissAllNotificationsAsync();
+  const tripRef = useRef(trip);
+  tripRef.current = trip;
 
-        if (optionChoosed.actionIdentifier === 'reject') {
-          try {
-            await song?.stopAsync();
-          } catch (error) {
-            console.log('erro', error);
-          }
-          await refuseTrip(
-            Number(userDriverFind.idDriver),
-            trip?.tripReference,
-          );
-          dispatchTrip({
-            type: 'update',
-            field: 'callDriverModal',
-            arg: false,
-          });
+  const getDriverIdFromSession = async (): Promise<number | undefined> => {
+    const session = await loadSession();
+    if (!session.isDriver || !session.user) return undefined;
+
+    try {
+      return JSON.parse(session.user)?.idDriver;
+    } catch {
+      return undefined;
+    }
+  };
+
+  const getNotificationData = (optionChoosed: any) => {
+    const rawData = optionChoosed.notification?.request?.content?.data ?? {};
+
+    try {
+      return rawData?.additionalData ? JSON.parse(rawData.additionalData) : rawData;
+    } catch {
+      return rawData;
+    }
+  };
+
+  const processedActionsRef = useRef<Set<string>>(new Set());
+
+  const handleNotificationResponse = async (optionChoosed: any) => {
+    if (!optionChoosed) return;
+
+    const notificationData = getNotificationData(optionChoosed);
+    const dedupeKey = `${optionChoosed.actionIdentifier}:${notificationData?.tripReference}`;
+    if (processedActionsRef.current.has(dedupeKey)) return;
+    processedActionsRef.current.add(dedupeKey);
+
+    Notifications.dismissAllNotificationsAsync();
+
+    const currentTrip = tripRef.current;
+    const currentDriverId = Number(await getDriverIdFromSession());
+
+    if (optionChoosed.actionIdentifier === 'reject') {
+      await refuseTrip(currentDriverId, currentTrip?.tripReference);
+      dispatchTrip({
+        type: 'update',
+        field: 'callDriverModal',
+        arg: false,
+      });
+    }
+
+    if (optionChoosed.actionIdentifier === 'accept') {
+      const result = await acceptTrip(
+        currentDriverId?.toString(),
+        notificationData?.tripReference,
+        notificationData?.estimatedTimeDriverArrival,
+        notificationData?.distanceDriverArrival,
+      );
+
+      if (!result?.status) {
+        customToast(translate('driverTrip.text_error_accept_trip'), 'warning');
+        return;
+      }
+
+      if (!result.isPreAcceptedTrip) {
+        const updatedUser = { ...userDriverFind, status: 'corrida' as DriverStatusType };
+        setUserDriverFind(updatedUser);
+
+        const currentLocation =
+          userDriverFind.latitude && userDriverFind.longitude
+            ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+            : undefined;
+
+        emitDriverStatusChange(updatedUser, 'corrida', cityConfig, currentLocation);
+
+        const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+        emitTripStatusChange(notificationData?.tripReference, 'accepted', configCityId);
+      }
+    }
+
+    if (optionChoosed.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
+      const userId = notificationData?.userId;
+      if (userId == null) return;
+
+      dispatchTrip({
+        type: 'update',
+        field: 'notificationTripCallRequest',
+        arg: { userId: parseInt(userId), callType: notificationData?.tripCallTypeId },
+      });
+    }
+  };
+
+  const pendingResponseRef = useRef<any>(null);
+  const hasFetchedLaunchResponse = useRef(false);
+
+  const notificationsActions = async () => {
+    if (!hasFetchedLaunchResponse.current) {
+      hasFetchedLaunchResponse.current = true;
+      const lastResponse = await Notifications.getLastNotificationResponseAsync();
+      if (lastResponse) {
+        const doesNotDependOnTripContext =
+          lastResponse.actionIdentifier === 'accept' ||
+          lastResponse.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER;
+
+        if (doesNotDependOnTripContext) {
+          handleNotificationResponse(lastResponse);
+        } else {
+          pendingResponseRef.current = lastResponse;
         }
-      },
-    );
+      }
+    }
   };
 
   useEffect(() => {
     notificationsActions();
-  }, [itsNetwork]);
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      handleNotificationResponse,
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const pending = pendingResponseRef.current;
+    if (!pending) return;
+    if (!trip?.tripReference) return;
+
+    pendingResponseRef.current = null;
+    handleNotificationResponse(pending);
+  }, [trip?.tripReference]);
 
   return (
     <ButtonFloatContainer
@@ -132,7 +240,7 @@ export const NotificationComponent = ({
           : theme.colors.primary,
       }}
     >
-      <Animation.View style={{transform: [{rotate: rotation}]}}>
+      <Animation.View style={{ transform: [{ rotate: rotation }] }}>
         <NotificationButton isAnimating onPress={onPress} />
       </Animation.View>
     </ButtonFloatContainer>

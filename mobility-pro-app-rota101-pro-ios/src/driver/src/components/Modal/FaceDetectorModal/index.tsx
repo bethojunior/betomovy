@@ -1,11 +1,10 @@
-import {Camera} from 'expo-camera';
-import * as FaceDetector from 'expo-face-detector';
-import {useEffect, useRef, useState} from 'react';
-import {Modal, View, TouchableOpacity} from 'react-native';
-import {Button, Text} from 'react-native-paper';
-import {Ionicons} from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { If } from '../../If';
+import { Camera } from 'expo-camera';
+import { useEffect, useRef, useState } from 'react';
+import { Dimensions, Modal, View } from 'react-native';
+import { Text } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
+import { RFValue } from 'react-native-responsive-fontsize';
+
 import {
   Container,
   ContainerButton,
@@ -16,10 +15,10 @@ import {
   Cam,
   CloseButton,
 } from './styles';
-import theme from '../../../styles/theme';
+import { If } from '../../If';
+import { Mask } from '../../Mask';
 
 interface PropsFaceDetector {
-  setUriProfile?: (uri: string) => void;
   visible: boolean;
   onClose?: () => void;
   sendPhoto?: () => void;
@@ -27,7 +26,6 @@ interface PropsFaceDetector {
 }
 
 export const FaceDetectorScreen = ({
-  setUriProfile,
   visible,
   onClose,
   sendPhoto,
@@ -37,38 +35,52 @@ export const FaceDetectorScreen = ({
   const [faceData, setFaceData] = useState([]);
   const [capturedImage, setCapturedImage] = useState(null);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const camera = useRef<any>();
+  const camera = useRef<any>(null);
+
+  const getCamPermission = async () => {
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    setHasPermission(status === 'granted');
+  };
 
   useEffect(() => {
-    (async () => {
-      const permissions = JSON.parse(await AsyncStorage.getItem('permissions'));
-      const {status} = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-
-      permissions.camera = status === 'granted';
-      await AsyncStorage.setItem('permissions', JSON.stringify(permissions));
-    })();
-  }, []);
+    if (visible) {
+      getCamPermission();
+    }
+  }, [visible]);
 
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
 
-  function getFaceDataView() {
-    if (faceData.length === 0) {
-      return (
-        <Faces>
-          <FaceDesc>Sem rosto detectado :(</FaceDesc>
-        </Faces>
-      );
-    }
+  // function getFaceDataView() {
+  //   if (faceData.length === 0) {
+  //     return (
+  //       <Faces>
+  //         <Ionicons
+  //           name="close"
+  //           size={Dimensions.get('window').width * 0.5}
+  //           color={theme.colors.red}
+  //         />
+  //         <View
+  //           style={{
+  //             position: 'absolute',
+  //             bottom: '15%',
+  //           }}
+  //         >
+  //           <FaceDesc>
+  //             {translate('myProfile.place_your_face_inside_the_circle')}
+  //           </FaceDesc>
+  //         </View>
+  //       </Faces>
+  //     );
+  //   }
 
-    return '';
-  }
+  //   return '';
+  // }
 
-  const handleFacesDetected = ({faces}: any) => {
-    setFaceData(faces);
-  };
+  // const handleFacesDetected = ({ faces }: any) => {
+  //   setFaceData(faces);
+  // };
 
   const takePicture = async () => {
     if (!camera) return;
@@ -77,56 +89,97 @@ export const FaceDetectorScreen = ({
     setImage(photo);
     setCapturedImage(photo);
   };
+
   return (
-    <Modal style={{flex: 1}} visible={visible}>
+    <Modal style={{ flex: 1 }} visible={visible}>
       <If condition={!previewVisible}>
         <Cam
           ref={(ref: any) => {
             camera.current = ref;
           }}
-          type={Camera.Constants.Type.front}
-          onFacesDetected={handleFacesDetected}
-          faceDetectorSettings={{
-            mode: FaceDetector.FaceDetectorMode.fast,
-            detectLandmarks: FaceDetector.FaceDetectorLandmarks.none,
-            runClassifications: FaceDetector.FaceDetectorClassifications.none,
-            minDetectionInterval: 100,
-            tracking: true,
+          facing={"front"}
+        // onFacesDetected={handleFacesDetected}
+        // faceDetectorSettings={{
+        //   mode: FaceDetector.FaceDetectorMode.fast,
+        //   detectLandmarks: FaceDetector.FaceDetectorLandmarks.none,
+        //   runClassifications: FaceDetector.FaceDetectorClassifications.none,
+        //   minDetectionInterval: 100,
+        //   tracking: true,
+        // }}
+        >
+          <Mask />
+          {/* @TODO: migrar reconhecimento facial para "react-native-vision-camera" e "react-native-vision-camera-face-detector" */}
+          {/* {getFaceDataView()} */}
+        </Cam>
+        <View
+          style={{
+            position: 'absolute',
+            top: 50,
+            right: 10,
+            zIndex: 10,
+            width: '100%',
           }}
         >
           <View
             style={{
+              alignSelf: 'center',
+            }}
+          >
+            {/* <FaceDesc
+              style={{
+                fontSize: RFValue(20),
+              }}
+            >
+              {translate('myProfile.security_validation')}
+            </FaceDesc>
+            <Image
+              source={require('../../../../../assets/logo_cadeado.png')}
+              style={{
+                width: 100,
+                height: 100,
+                alignSelf: 'center',
+              }}
+            /> */}
+          </View>
+          <View
+            style={{
+              alignSelf: 'flex-end',
+              justifyContent: 'center',
               position: 'absolute',
-              top: 20,
-              right: 10,
+              top: 0,
             }}
           >
             <CloseButton onPress={onClose}>
               <Ionicons
                 name="close"
-                size={20}
+                size={RFValue(20)}
                 color={theme.colors.primaryText}
               />
             </CloseButton>
           </View>
-          {getFaceDataView()}
-          <If condition={faceData.length !== 0}>
-            <View
-              style={{
-                position: 'absolute',
-                bottom: 80,
-              }}
-            >
-              <CameraButton onPress={takePicture}>
-                <Ionicons name="camera" size={40} color={theme.colors.primaryText} />
-              </CameraButton>
-            </View>
-          </If>
-        </Cam>
+        </View>
+        {/* <If condition={faceData.length !== 0}> */}
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 80,
+            zIndex: 10,
+            alignSelf: 'center',
+          }}
+        >
+          <CameraButton onPress={takePicture}>
+            <Ionicons
+              name="camera"
+              size={40}
+              color="black"
+            />
+          </CameraButton>
+        </View>
+        {/* </If> */}
       </If>
       <If condition={previewVisible}>
         <Container>
-          <Image source={{uri: capturedImage && capturedImage.uri}} />
+          <Image source={{ uri: capturedImage && capturedImage.uri }} />
           <ContainerButton>
             <CameraButton
               onPress={() => {
@@ -134,10 +187,24 @@ export const FaceDetectorScreen = ({
                 setImage(null);
               }}
             >
-              <Ionicons name="md-close" size={40} color={theme.colors.primaryText} />
+              <Ionicons
+                name="close"
+                size={40}
+                style={{
+                  zIndex: 10,
+                }}
+                color="#FF0000"
+              />
             </CameraButton>
             <CameraButton onPress={sendPhoto}>
-              <Ionicons name="checkmark" size={40} color={theme.colors.primaryText} />
+              <Ionicons
+                name="checkmark"
+                size={40}
+                style={{
+                  zIndex: 10,
+                }}
+                color="#00FF00"
+              />
             </CameraButton>
           </ContainerButton>
         </Container>

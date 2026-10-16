@@ -1,7 +1,8 @@
 import { NavigationContainer } from "@react-navigation/native";
 import Routes from "./routes";
 import { AuthProvider } from "./contexts/auth";
-import { KeyboardAvoidingView, SafeAreaView } from "react-native";
+import { KeyboardAvoidingView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function App() {
   return (

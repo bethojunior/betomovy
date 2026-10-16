@@ -1,13 +1,13 @@
-import {useEffect, useState} from 'react';
-import {LayoutChangeEvent, View, TouchableWithoutFeedback} from 'react-native';
+import { useEffect, useState } from 'react';
+import { LayoutChangeEvent, View, TouchableWithoutFeedback } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {CollapseProps} from './typex';
+import { CollapseProps } from './typex';
 
-const Collapse = ({children, open, onPress}: CollapseProps) => {
+const Collapse = ({ children, open, onPress }: CollapseProps) => {
   const [height, setHeight] = useState(0);
   const animatedHeight = useSharedValue(0);
 
@@ -28,11 +28,12 @@ const Collapse = ({children, open, onPress}: CollapseProps) => {
 
   return (
     <TouchableWithoutFeedback onPress={onPress}>
-      <Animated.View style={[collapsableStyle, {overflow: 'hidden'}]}>
+      <Animated.View style={[collapsableStyle, { overflow: 'hidden' }]}>
         <View
           style={{
             position: 'absolute',
             width: '100%',
+            paddingBottom: 2
           }}
           onLayout={onLayout}
         >
@@ -45,12 +46,12 @@ const Collapse = ({children, open, onPress}: CollapseProps) => {
 
 export default Collapse;
 
-export const CollapseDynamic = ({children, open, onPress}: CollapseProps) => {
+export const CollapseDynamic = ({ children, open, onPress }: CollapseProps) => {
   const [layoutHeight, setLayoutHeight] = useState(0);
   const animatedHeight = useSharedValue(0);
 
   useEffect(() => {
-    animatedHeight.value = withTiming(open ? layoutHeight : 0, {duration: 300});
+    animatedHeight.value = withTiming(open ? layoutHeight : 0, { duration: 300 });
   }, [open, layoutHeight]);
 
   const onLayout = event => {
@@ -70,7 +71,10 @@ export const CollapseDynamic = ({children, open, onPress}: CollapseProps) => {
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <Animated.View style={collapsableStyle}>
-        <View onLayout={onLayout} style={{position: 'absolute', width: '100%'}}>
+        <View
+          onLayout={onLayout}
+          style={{ position: 'absolute', width: '100%', paddingBottom: 2 }}
+        >
           {children}
         </View>
       </Animated.View>

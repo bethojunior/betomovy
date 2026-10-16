@@ -29,4 +29,10 @@ export interface MyTripProps {
   status: string;
   tripAuditId: number;
   tripReference: string;
+  schedule?: { schedule: string };
+  driverName?: string;
+  tripType?: string;
+  distance?: string | number;
+  estimatedTripTime?: string | number;
+  netPrice?: number | null;
 }

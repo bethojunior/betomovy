@@ -27,8 +27,8 @@ export default class PaymentCard {
         );
 
         page.addEventListener('loadstart', event => {
-          if (event.url.split('#').length > 1) {
-            const value = JSON.parse(atob(event.url.split('#')[1]));
+          if (event.url?.split('#').length > 1) {
+            const value = JSON.parse(atob(event.url?.split('#')[1]));
             callback(value);
             page.close();
           }

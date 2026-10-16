@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
@@ -21,7 +19,8 @@ import InputIcon from '../../components/form/InputIcon';
 import apiDelivery from '../../api/apiDelivery';
 import LoadView from '../../components/LoadView';
 import ListRestaurant from '../../modules/delivery/pages/ListRestaurants';
-import CardPublicity from '../../components/CardPublicty';
+import ListPublicity from '~/components/ListPublicity';
+import { usePublicity } from '~/hooks/usePublicity';
 import ContactUsBySection from '../../components/ContactUsBySection';
 import {
   Container,
@@ -33,19 +32,54 @@ import {
   Title,
 } from './styles';
 import {useAuth} from '../../../context/auth';
-import {AppTypeConst} from '../../constants/app';
+import { APP_TYPE } from '~/constants/app';
+import { ADVERTISING_APP_SITE_TYPE } from '~/constants/advertisingAppSite';
 
 export default function Sections() {
-  const {permissionLocal} = useAuth();
-  const {placeSelected, getLocalByPosition} = useLocal();
+  const {permissionLocal, getPermissionLocal, user} = useAuth();
+  const {
+    placeSelected,
+    getLocalByPosition,
+    setPosition: setPositionContext,
+  } = useLocal();
 
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadTest, setLoadTest] = useState(false);
   const [position, setPosition] = useState(null);
   const [isWithoutLocal, setIsWithoutLocal] = useState(false);
 
   const navigation = useNavigation();
+
+  const { data: publicityList } = usePublicity({
+    position,
+    typeConst: APP_TYPE.DELIVERY,
+    advertisingAppSiteId: ADVERTISING_APP_SITE_TYPE.ABERTURA,
+    genderId: user?.genderId
+  });
+
+  const getPostion = () => {
+    getPermissionLocal().then(() => {
+      Location.getLastKnownPositionAsync()
+        .then(location => {
+          if (location) {
+            setPositionContext({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            });
+          } else {
+            Location.getCurrentPositionAsync({accuracy: 1}).then(({coords}) => {
+              setPositionContext({
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+              });
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao obter a localização:', error);
+        });
+    });
+  };
 
   useEffect(() => {
     async function getSections() {
@@ -55,8 +89,8 @@ export default function Sections() {
       setSections(response);
       setLoading(true);
     }
-
     getSections();
+    getPostion();
   }, []);
 
   useEffect(() => {
@@ -73,7 +107,6 @@ export default function Sections() {
   }, [placeSelected, permissionLocal]);
 
   async function getByLocal() {
-    const permissions = JSON.parse(await AsyncStorage.getItem('permissions'));
     const {status} = await Location.getForegroundPermissionsAsync({
       accuracy: 1,
     });
@@ -83,8 +116,6 @@ export default function Sections() {
       const {latitude, longitude} = coords;
       getLocalByPosition(latitude, longitude);
       getDeliveryCompanys(latitude, longitude);
-      permissions.location = true;
-      await AsyncStorage.setItem('permissions', JSON.stringify(permissions));
     }
   }
 
@@ -128,16 +159,7 @@ export default function Sections() {
                   }}
                 />
               </Pressable>
-              <View
-                style={{
-                  marginHorizontal: 20,
-                }}
-              >
-                <CardPublicity
-                  setLoading={setLoadTest}
-                  appConstPublicity={AppTypeConst}
-                />
-              </View>
+              <ListPublicity data={publicityList} />
               <Title>Seções</Title>
             </>
           );

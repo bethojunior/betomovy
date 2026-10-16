@@ -1,9 +1,9 @@
 // @ts-nocheck
-import {useEffect, useState} from 'react';
-import {AntDesign} from '@expo/vector-icons';
-import {Dialog} from 'react-native-elements';
-import {convertDate, maskHour} from '../../../../utils/FormatDate';
-import {coinTypePerApi, maskMoneyIntl} from '../../../../utils/money';
+import { useEffect, useState } from 'react';
+import { AntDesign } from '@expo/vector-icons';
+import { Dialog } from 'react-native-elements';
+import { convertDate, maskHour } from '../../../../utils/FormatDate';
+import { coinTypePerApi, maskMoneyIntl } from '../../../../utils/money';
 
 import {
   ContainerButton,
@@ -15,29 +15,29 @@ import {
   Subtitle,
   TextTitle,
 } from './styles';
-import {ButtonSmall} from '../ButtonSmall';
-import {useTrip} from '../../../../contexts/Trip';
+import { ButtonSmall } from '../ButtonSmall';
+import { useTrip } from '../../../../contexts/Trip';
 import Preload from '../../../../components/Preload';
-import {translate} from '../../../../locales';
+import { translate } from '../../../../locales';
 import theme from '../../../../styles/theme';
-import {If} from '../If';
-import {STATUS_SCHEDULED} from '../../../../constants/trip';
+import { If } from '../If';
+import { STATUS_SCHEDULED } from '../../../../constants/trip';
 import Helper from '../../../../utils/Helper';
-import {useAuth} from '../../../../../context/auth';
-import {useTripGL} from '../../../../contexts/TripGL';
+import { useAuth } from '../../../../../context/auth';
+import { useTripGL } from '../../../../contexts/TripGL';
 import ModalFrame from '../../../../components/form/Modal';
-import {TextEdit} from '../../../../components/TextEdit';
-import {View} from 'react-native';
+import { TextEdit } from '../../../../components/TextEdit';
+import { View } from 'react-native';
 
-export function CardService({trip, getListTrips, setLoading}) {
+export function CardService({ trip, getListTrips, setLoading }) {
   const [modalDetails, setModalDetails] = useState(false);
   const [tripSelected, setTripSelected] = useState({});
-  const {cityConfig} = useAuth();
+  const { cityConfig } = useAuth();
 
-  const {cancelTripByCustomerSchedule} = useTripGL();
+  const { cancelTripByCustomerSchedule } = useTripGL();
 
   const formatDateAndHour = (date: string) => {
-    const dateSplit = date.split(' ');
+    const dateSplit = date?.split(' ');
     return `${convertDate(dateSplit[0])} ${maskHour(dateSplit[1])}`;
   };
 
@@ -102,14 +102,14 @@ export function CardService({trip, getListTrips, setLoading}) {
     <>
       <ContainerCard
         activeOpacity={0.8}
-        style={{backgroundColor: switchColor(trip.status.toUpperCase())}}
+        style={{ backgroundColor: switchColor(trip.status.toUpperCase()) }}
         onPress={() => handleTripUnic(trip)}
       >
         <HeaderCard color={theme.colors.white}>
           <View>
             <TextTitle>{trip.type}</TextTitle>
-            <TextEdit transform="capitalize" color={theme.colors.primary}>
-              {translate('schedule.select_date').split(' ').pop()}:{' '}
+            <TextEdit change="capitalize" color={theme.colors.primary}>
+              {translate('schedule.select_date')?.split(' ').pop()}:{' '}
               {trip.schedule
                 ? formatDateAndHour(trip.schedule.schedule)
                 : `${formatDateAndHour(trip?.date)}`}
@@ -151,12 +151,12 @@ export function CardService({trip, getListTrips, setLoading}) {
           <HeaderCard>
             <Content>
               <Subtitle>{switchStatus(trip.status.toUpperCase())}</Subtitle>
-              <TextEdit color={theme.colors.primary} transform="capitalize">
+              <TextEdit color={theme.colors.primary} change="capitalize">
                 {trip.schedule
                   ? formatDateAndHour(trip.schedule.schedule)
                   : `${translate('schedule.select_date')
-                      .split(' ')
-                      .pop()}: ${formatDateAndHour(trip?.date)}`}
+                    ?.split(' ')
+                    .pop()}: ${formatDateAndHour(trip?.date)}`}
               </TextEdit>
             </Content>
             <TextTitle>{`${coinTypePerApi(

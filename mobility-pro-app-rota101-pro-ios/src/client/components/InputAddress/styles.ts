@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 
-export const ContainerPressable = styled.Pressable`
+export const ContainerPressable = styled.TouchableOpacity`
   width: 100%;
 `;
 

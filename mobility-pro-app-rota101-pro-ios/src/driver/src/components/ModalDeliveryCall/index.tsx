@@ -1,4 +1,5 @@
 import {Modal, View, Text, TouchableOpacity} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {
   Header,
   HeaderTitle,
@@ -23,15 +24,19 @@ import {OrderProps} from '../../../../context/DeliveryOrder/types';
 import {AnimatedSource} from '../../../../client/pages/AppApresentation/constants';
 import {RFValue} from 'react-native-responsive-fontsize';
 import logo from '../../../../../assets/logo.png';
+import {useSong} from '../../hooks/song';
 
 export const ModalDeliveryCall = () => {
   const [sound, setSound] = useState(null);
   const {orderTrip, setOrderTrip} = useDeliveryOrder();
   const {cityConfig} = useAuth();
+  const {mountSong: mountSongCall} = useSong();
 
   const mountSong = async () => {
-    const {sound} = await Audio.Sound.createAsync(
+    const sound = await mountSongCall(
       require('../../assets/songs/assobio.mp3'),
+      true,
+      'soundCallTrip',
     );
     setSound(sound);
   };
@@ -68,8 +73,9 @@ export const ModalDeliveryCall = () => {
 
   return (
     <Modal animationType="slide" visible={orderTrip?.id ? true : false}>
-      <Logo source={theme.images.logo ? {uri: theme.images.logo} : logo} />
-      <View style={{height: '90%'}}>
+      <SafeAreaView style={{flex: 1}} edges={['top', 'bottom']}>
+        <Logo source={theme.images.logo ? {uri: theme.images.logo} : logo} />
+        <View style={{flex: 1}}>
         <View
           style={{
             justifyContent: 'center',
@@ -125,13 +131,14 @@ export const ModalDeliveryCall = () => {
             </ContainerAddress>
           </View>
         </View>
-      </View>
-      <ContainersButton>
-        <ContainerButtonsAcceptDelivery
-          callback={handleClear}
-          orderId={orderTrip?.id}
-        />
-      </ContainersButton>
+        </View>
+        <ContainersButton>
+          <ContainerButtonsAcceptDelivery
+            callback={handleClear}
+            orderId={orderTrip?.id}
+          />
+        </ContainersButton>
+      </SafeAreaView>
     </Modal>
   );
 };

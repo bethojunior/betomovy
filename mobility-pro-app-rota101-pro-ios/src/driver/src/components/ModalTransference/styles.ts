@@ -1,168 +1,80 @@
-import {shade} from 'polished';
-import {Platform} from 'react-native';
-import {TextInputMask} from 'react-native-masked-text';
 import styled from 'styled-components/native';
-import {RFValue} from 'react-native-responsive-fontsize';
-import themeCss from '../../styles/theme';
+import { RFValue } from 'react-native-responsive-fontsize';
 
-interface TextProps {
-  color?: string;
-  size?: 'small' | 'medium' | 'large';
-  transform?: string;
+interface SheetContentProps {
+  keyboardHeight?: number;
 }
 
-export const ContainerModal = styled.KeyboardAvoidingView`
-  flex: 1;
-  background-color: ${({theme}) => theme.colors.background_global};
-  padding: ${Platform.OS === 'ios' ? '30px 0' : '0'};
-`;
-export const HeaderModal = styled.View`
-  padding: 0 20px 10px;
-  margin-top: ${({theme}) => theme.spacing.xxlarge}px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom-width: 1px;
-  border-bottom-color: ${({theme}) =>
-    shade(0.02, theme.colors.background_global)};
+export const SheetContent = styled.ScrollView.attrs<SheetContentProps>(({ theme, keyboardHeight = 0 }) => ({
+  keyboardShouldPersistTaps: 'handled',
+  contentContainerStyle: {
+    padding: theme.spacing.xlarge,
+    paddingTop: 0,
+    paddingBottom: theme.spacing.xlarge + keyboardHeight,
+    gap: theme.spacing.large,
+  },
+}))``;
+
+export const ContentValue = styled.View`
+  gap: ${({ theme }) => theme.spacing.small}px;
 `;
 
-export const BackButton = styled.TouchableOpacity`
-  flex-direction: row;
-  align-items: center;
+export const CurrentSaldLabel = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  color: ${({ theme }) => theme.colors.text_gray};
 `;
 
-export const Content = styled.View`
-  flex: 1;
-  padding: 0 20px;
-  justify-content: center;
+export const CurrentSaldValue = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.xxlarge}px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.secondary};
 `;
 
-export const Text = styled.Text<TextProps>`
-  text-transform: ${props => props.transform || 'none'};
-  font-size: ${({size}) => {
-    switch (size) {
-      case 'small':
-        return `${themeCss.fontSizes.small}px`;
-      case 'medium':
-        return `${themeCss.fontSizes.medium}px`;
-      case 'large':
-        return `${themeCss.fontSizes.large}px`;
-      default:
-        return `${themeCss.fontSizes.medium}px`;
-    }
-  }};
-  font-family: ${({theme}) => theme.fonts.regular};
-  color: ${({color, theme}) => color || theme.colors.secondary};
+export const TitleValueTransfer = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.secondary};
 `;
 
-export const ContainerData = styled.View`
-  flex-direction: column;
-`;
-
-export const ContainerDataItem = styled.View`
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: ${({theme}) => theme.spacing.large}px;
-`;
-
-export const ContainerInput = styled.View`
-  flex-direction: column;
-  margin-bottom: ${({theme}) => theme.spacing.large}px;
-`;
-
-export const Input = styled.TextInput`
-  width: 50%;
-  height: 50px;
-  padding: 0 16px;
-  background: ${({theme}) => shade(0.05, theme.colors.background_global)};
-  border-radius: 10px;
-  margin-right: 16px;
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-`;
-
-export const InputLabel = styled.Text`
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-
-  color: ${({theme}) => theme.colors.secondary};
-`;
-
-export const ContainerPiggyBank = styled.View`
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  margin: ${({theme}) => theme.spacing.large}px 0;
-`;
-
-export const Button = styled.TouchableOpacity`
-  width: 100%;
-  height: 50px;
-  background: ${({theme}) => theme.colors.primary};
-  border-radius: 10px;
-  margin-top: 8px;
-  align-items: center;
-  justify-content: center;
-`;
-
-export const Label = styled.Text`
-  font-size: ${({theme}) => theme.fontSizes.small}px;
-  color: ${({theme}) => theme.colors.secondary};
-`;
-
-export const ContentTransferModal = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 10px;
-`;
-
-export const CurrentSald = styled.Text`
-  background-color: ${({theme}) => theme.colors.primary};
-  border-radius: 5px;
+export const InputMoney = styled.TextInput.attrs({
+  underlineColorAndroid: 'transparent',
+})`
+  border-width: ${({ theme }) => theme.borderWidth.small}px;
+  border-color: ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.borderRadius.medium}px;
+  padding: ${({ theme }) => theme.spacing.medium}px;
+  height: ${RFValue(48)}px;
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: ${({ theme }) => theme.fontSizes.large}px;
+  font-weight: 700;
   text-align: center;
-  padding: ${Platform.OS === 'ios' ? '15px 5px' : '5px'};
-  margin: 5px 0;
-  height: ${RFValue(40)}px;
-  color: ${({theme}) => theme.colors.background_global};
-`;
-
-export const TextObservation = styled.Text`
-  font-size: 12px;
-  color: ${({theme}) => theme.colors.secondary};
-`;
-
-export const Asterisk = styled.Text`
-  font-size: 12px;
-  color: ${({theme}) => theme.colors.primary};
 `;
 
 export const ObservationContent = styled.View`
   flex-direction: row;
 `;
 
-export const ContentValue = styled.View`
-  width: 48%;
-  text-align: center;
+export const Asterisk = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
-export const TitleValueTransfer = styled.Text`
-  font-weight: bold;
-  color: ${({theme}) => theme.colors.secondary};
+export const TextObservation = styled.Text`
+  flex: 1;
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  color: ${({ theme }) => theme.colors.text_gray};
 `;
 
-export const SimpleText = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
+export const ConfirmButton = styled.TouchableOpacity`
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.primary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium}px;
+  padding: ${({ theme }) => theme.spacing.large}px;
 `;
 
-export const InputMoney = styled(TextInputMask)`
-  border-width: 1px;
-  border-color: ${({theme}) => theme.colors.secondary};
-  border-radius: 5px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  padding: 5px;
-  height: ${RFValue(40)}px;
-  color: ${({theme}) => theme.colors.secondary};
-  text-align: center;
+export const ConfirmButtonText = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.medium}px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.primaryText};
 `;

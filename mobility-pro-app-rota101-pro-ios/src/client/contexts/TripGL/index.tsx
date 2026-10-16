@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   createContext,
@@ -9,8 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import AppSocket from '../../services/socket';
-import {customToast} from '../../../utils/FlashMessage';
+import { customToast } from '../../../utils/FlashMessage';
 import {
   STATUS_ACCEPTED,
   STATUS_BOARDING,
@@ -21,20 +20,37 @@ import {
   STATUS_SEARCHING,
 } from '../../constants/trip';
 
-import {useLocal} from '../local';
-import {decode} from '@googlemaps/polyline-codec';
-import {translate} from '../../locales';
+import { useLocal } from '../local';
+import { decode } from '@googlemaps/polyline-codec';
+import { translate } from '../../locales';
 import apiMain from '../../api/apiMain';
 import Helper from '../../utils/Helper';
-import {showMessage} from 'react-native-flash-message';
-import {useAuth} from '../../../context/auth';
-import {appProccess, buildApp} from '../../../constantBuild/config';
+import { useAuth } from '../../../context/auth';
+import { appProccess, buildApp } from '../../../constantBuild/config';
 import {
   convertDatetimeToDate,
   convertDatetimeToTime,
 } from '../../utils/FormatDate';
 import Push from '../../services/push';
-import { TripRealtime } from '../../services/realtime/TripRealtime';
+import useTripRealtime from '../../hooks/tripRealtime';
+import { useSocket } from '../../../context/SocketIO';
+import { TripCallback } from '../../interfaces/tripRealtime';
+
+interface CalculateAllData {
+  distance?: number;
+  duration?: number;
+  prices?: any[];
+  overview_polyline?: {
+    points: string;
+  };
+  tolls?: Array<{
+    id: string;
+    name: string;
+    address: string;
+    value: string;
+    active: string;
+  }>;
+}
 
 interface TripGLContextData {
   origin?: any;
@@ -83,13 +99,13 @@ interface TripGLContextData {
   locale?: any;
   setLocale?: any;
   trips?: any;
-  dataCalculate: {};
+  dataCalculate: CalculateAllData;
   tripActiveDetails?: any;
 }
 
 const TripGLContext = createContext({} as TripGLContextData);
-export const TripGLProvider = ({children}: any) => {
-  const {position, setLastPlaceSelected} = useLocal();
+export const TripGLProvider = ({ children }: any) => {
+  const { position, setLastPlaceSelected } = useLocal();
   const [origin, setOrigin] = useState({});
   const [locale, setLocale] = useState({});
   const [destination, setDestination] = useState({});
@@ -117,13 +133,26 @@ export const TripGLProvider = ({children}: any) => {
   const [trip, setTrip] = useState<any>({});
   const [tripSchedule, setTripSchedule] = useState<any>({});
   const [completedTripData, setCompletedTripData] = useState();
-  const socketRouteTrip = useRef<any>(null);
   const [defaultRating, setDefaultRating] = useState(5);
-  const {user, cityConfig} = useAuth();
-  const navigation = useNavigation();
+  const { user, cityConfig } = useAuth();
+  const navigation = useNavigation<any>();
   const [tripStatus, setTripStatus] = useState(null);
-  const [dataCalculate, setDataCalculate] = useState({});
-  const tripRealtime = useMemo(() => new TripRealtime(), []);
+  const [dataCalculate, setDataCalculate] = useState<CalculateAllData>({});
+  const { tripRealtime } = useTripRealtime();
+  const { socket } = useSocket();
+
+  const handleTripRouteListener = (result: any) => {
+    if (!result) return;
+
+    setRouteTripScheduled(result);
+
+    setPolylineCoordinates(
+      // @ts-ignore: Unreachable code error
+      decode(result.polyline).map(item => {
+        return { latitude: item[0], longitude: item[1] };
+      }),
+    );
+  };
 
   const socketOnTripSchedule = async () => {
     if (
@@ -140,30 +169,8 @@ export const TripGLProvider = ({children}: any) => {
       if (appProccess === 'aws') {
         url = buildApp().HOST_SOCKET;
       }
-      socketRouteTrip.current = new AppSocket(
-        // @ts-ignore: Unreachable code error
-        `${url}${cityConfig.configDriverLocation.port_url}`,
-        // @ts-ignore: Unreachable code error
-        {
-          query: `tripReference=${tripSchedule.tripReference}`,
-        },
-      );
 
-      socketRouteTrip.current.onEvent(
-        `location-${tripSchedule.tripReference}`,
-        (result: any) => {
-          if (!result) return;
-
-          setRouteTripScheduled(result);
-
-          setPolylineCoordinates(
-            // @ts-ignore: Unreachable code error
-            decode(result.polyline).map(item => {
-              return {latitude: item[0], longitude: item[1]};
-            }),
-          );
-        },
-      );
+      socket?.on(`location-${tripSchedule.tripReference}`, handleTripRouteListener);
 
       navigation.navigate('GetLightTripCurrent');
     }
@@ -179,55 +186,23 @@ export const TripGLProvider = ({children}: any) => {
         ],
       });
       setTripSchedule(response.data.data);
+
       return response.data.data;
       // return response.data;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
-  const getActiveTripSchedule = useCallback(async () => {
-    tripRealtime.checkTripAccepted(
-      user.idUser,
-      STATUS_ACCEPTED,
-      async (trip: any, type: string) => {
-        console.log("callback getActiveTripSchedule =>>>>", trip)
-        if (['added','modified'].includes(type)) {
-          await tripActiveDetails(trip.tripReference);
-        }
-      },
-    );
-  }, [user, STATUS_BOARDING]);
+  const getActiveTripSchedule = useCallback((): string => {
+    const onTripAccepted: TripCallback = async ({ data: trip, type }) => {
+      if (['added', 'modified'].includes(type)) {
+        await tripActiveDetails(trip.tripReference);
+      }
+    }
 
-  useEffect(() => {
-    tripRealtime.checkTripAcceptedScheduled(
-      user.idUser,
-      STATUS_SCHEDULED,
-      (trip, type) => {
-        if (type === 'modified') {
-          trip?.driver &&
-            customToast(
-              `${trip?.driver?.name} ${translate(
-                'schedule.accepted_your_service_from',
-              )} ${convertDatetimeToDate(
-                trip?.schedule?.schedule,
-              )} - ${convertDatetimeToTime(trip?.schedule?.schedule)} `,
-              'success',
-              6000,
-            );
-          Push.sendSimple({
-            title: `${translate('schedule.accepted_service')}`,
-            message: '',
-            body: `${translate(
-              'schedule.your_service_scheduled_at',
-            )} ${convertDatetimeToDate(
-              trip?.schedule?.schedule,
-            )} - ${convertDatetimeToTime(trip?.schedule?.schedule)}`,
-          });
-        }
-      },
-    );
-  }, []);
+    return tripRealtime.checkTripAccepted(user.idUser, STATUS_ACCEPTED, onTripAccepted);
+  }, [user]);
 
   const getStatus = async (status: string, driverCanceled: boolean = true) => {
     if (status === STATUS_BOARDING) {
@@ -262,13 +237,13 @@ export const TripGLProvider = ({children}: any) => {
     }
   };
 
-  const handleTripStatusChange = (tripReference: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    tripRealtime.getTrip(tripReference, (trip: any, type: string) => {
-      if (['added','modified'].includes(type)) {
+  const handleTripStatusChange = (tripReference: string): string => {
+    const onTripUpdate: TripCallback = ({ data: trip, type }) => {
+      if (['added', 'modified'].includes(type)) {
         setTripStatus(trip.status);
         getStatus(trip.status);
       }
+
       if (type === 'removed') {
         tripActiveDetails(trip.tripReference).then(trip => {
           getStatus(trip.status, trip?.canceledBy === 'driver');
@@ -281,59 +256,77 @@ export const TripGLProvider = ({children}: any) => {
           }
         });
       }
-    });
+    }
+
+    return tripRealtime.getTrip(tripReference, onTripUpdate);
   };
 
   useEffect(() => {
-    if (stateWHile) {
-      getActiveTripSchedule().then(() => setStateWHile(false));
-    }
-  }, [stateWHile]);
+    if (!stateWHile) return;
+
+    const unsubscribe = getActiveTripSchedule();
+    setStateWHile(false);
+
+    return () => {
+      if (unsubscribe) tripRealtime.unsubscribe(unsubscribe);
+    };
+  }, [stateWHile, getActiveTripSchedule]);
 
   useEffect(() => {
+    let unsubscribe: string | null = null;
+
     if (
       tripSchedule != null &&
       Object.keys(tripSchedule).length > 0 &&
       position &&
       cityConfig !== null
     ) {
-      handleTripStatusChange(tripSchedule.tripReference);
+      unsubscribe = handleTripStatusChange(tripSchedule.tripReference);
     }
+
     socketOnTripSchedule();
-  }, [tripSchedule]);
+
+    return () => {
+      socket?.off(`location-${tripSchedule.tripReference}`, handleTripRouteListener);
+      if (unsubscribe) tripRealtime.unsubscribe(unsubscribe);
+    };
+  }, [tripSchedule, socket]);
 
   async function getTripPaymentMethods() {
-    const {data} = await apiMain.post('TripPaymentForm/GetAll', {});
+    const { data } = await apiMain.post('TripPaymentForm/GetAll', {});
 
     setTripPaymentMethods(data.data);
   }
 
   async function calculateAll(origin: any, destiny: any, waypoints: any) {
     setShowLoadingToGetPrices(true);
-    if (origin == undefined || destiny == undefined || waypoints == undefined) {
-      return console.log(false);
-    }
-    const {data} = await apiMain.post('price/calculateAll', {
+    if (origin == undefined || destiny == undefined || waypoints == undefined)
+      return;
+
+    const { data } = await apiMain.post('price/calculateAll', {
       origin,
       destiny,
       waypoints,
       timeCurrent: new Date().toLocaleTimeString(),
     });
+
+    if (data.status === false) {
+      setIsLoading(false);
+      setShowLoadingToGetPrices(false);
+      const errorMessage = data?.errors?.message ?? data?.message;
+      customToast(errorMessage, 'error');
+      setPrices([]);
+      return;
+    }
+
     if (data.data == null) {
       setIsLoading(false);
       setShowLoadingToGetPrices(false);
       customToast(translate('schedule.avaiable'), 'error');
       setPrices([]);
-      return console.log('caiu aqui ');
+      return;
     }
-    // if (!data.data.distance) {
-    //   console.log(data.data);
-    //   setShowLoadingToGetPrices(false);
-    //   setDistance(0);
-    //   setPrices([]);
 
-    //   return console.log('caiu aqui 2');
-    // }
     setTimeout(() => {
       setShowLoadingToGetPrices(false);
     }, 2000);
@@ -346,7 +339,7 @@ export const TripGLProvider = ({children}: any) => {
       setPolylineCoordinates(
         // @ts-ignore: Unreachable code error
         decode(data.data.overview_polyline.points).map(item => {
-          return {latitude: item[0], longitude: item[1]};
+          return { latitude: item[0], longitude: item[1] };
         }),
       );
     }
@@ -357,7 +350,24 @@ export const TripGLProvider = ({children}: any) => {
     setDataCalculate(data.data);
     setDistance(data.data.distance);
     setEstimatedTripTime(data.data.duration);
-    setPrices(data.data.prices);
+
+    let dataPrices = data.data.prices.filter(
+      (e: { tripType: { serviceOption: any } }) =>
+        Number(e.tripType.serviceOption) === 1,
+    );
+
+    const isCustomOrderEnabled = cityConfig?.enableCustomOrderTripType === '1';
+
+    if (isCustomOrderEnabled) {
+      const DEFAULT_SORT_ORDER = 9999;
+      dataPrices = dataPrices.sort((a, b) => {
+        const orderA = a.order ? parseInt(a.order) : DEFAULT_SORT_ORDER;
+        const orderB = b.order ? parseInt(b.order) : DEFAULT_SORT_ORDER;
+        return orderA - orderB;
+      });
+    }
+
+    setPrices(dataPrices);
     AsyncStorage.setItem('listPrices', JSON.stringify(data.data.prices));
   }
 
@@ -370,7 +380,7 @@ export const TripGLProvider = ({children}: any) => {
   }
 
   async function getTrips(status = null, page = 1, setDataPage: any) {
-    const {data} = await apiMain.post('Customer/GetTrips', {
+    const { data } = await apiMain.post('Customer/GetTrips', {
       customerId: user.idCustomer,
       status: status,
       page: page,
@@ -401,7 +411,7 @@ export const TripGLProvider = ({children}: any) => {
       ],
     };
 
-    const {data} = await apiMain.post('Customer/CancelTrip', payload);
+    const { data } = await apiMain.post('Customer/CancelTrip', payload);
 
     if (data.status) {
       setIsLoading(false);
@@ -410,20 +420,7 @@ export const TripGLProvider = ({children}: any) => {
       navigation.navigate('InitalServiceGetLight');
     } else {
       setIsLoading(false);
-      showMessage({
-        message: data.message,
-        type: 'info',
-        position: 'bottom',
-        icon: 'auto',
-        duration: 4000,
-        style: {
-          height: 80,
-          alignItems: 'center',
-        },
-        titleStyle: {
-          fontSize: 16,
-        },
-      });
+      customToast(data.message, 'info');
     }
   }
 
@@ -443,7 +440,7 @@ export const TripGLProvider = ({children}: any) => {
           // @ts-ignore: Unreachable code error
           tripPaymentFormId: selectedPaymentMethod?.idTripPaymentForm,
           waypoints,
-          tolls: [],
+          tolls: Helper.getTollIds(dataCalculate?.tolls),
           schedule: schedule,
           scheduleISO: scheduleISO,
           price: selectedOptionTravel.price,
@@ -458,7 +455,7 @@ export const TripGLProvider = ({children}: any) => {
       ],
     };
 
-    const {data} = await apiMain.post('Customer/NewTrip', payload);
+    const { data } = await apiMain.post('Customer/NewTrip', payload);
     if (!data.status) {
       return customToast(data.message, 'warning');
     }

@@ -1,17 +1,16 @@
 import {useCallback, useEffect, useState} from 'react';
 import Preload from '../../components/Preload';
-import {CardService} from '../../components/CardTravel';
+import {TripListCard} from '../../components/TripListCard';
+import {TripListFooter} from '../../components/TripListFooter';
 import {Container, ContainerContent, NotTravel} from './styles';
-import {PaginationSelect} from '../../components/PaginationSelect';
 import {useTravel} from '../../contexts/travel';
-import {If} from '../../components/If';
 
 export function MyTravels() {
   const {getTravel, travels} = useTravel();
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [dataPage, setDataPage] = useState<any>({});
-  const [selectedValue, setSelectedValue] = useState(true);
+  const [selectedValue, setSelectedValue] = useState<boolean | string>(true);
 
   const getListTravels = useCallback(async () => {
     setLoading(true);
@@ -27,30 +26,15 @@ export function MyTravels() {
     <Container>
       <Preload visible={loading} />
       <ContainerContent>
-        {travels.length > 0 &&
-          travels
-            .filter(
-              item =>
-                item.status !== 'not_answered' && item.status !== 'back_off',
-            )
-            .map((trip: any, index: number) => {
-              return (
-                <CardService
-                  setLoading={setLoading}
-                  getListTrips={getListTravels}
-                  key={index}
-                  trip={trip}
-                />
-              );
-            })}
+        {travels
+          .filter(item => item.status !== 'not_answered' && item.status !== 'back_off')
+          .map(trip => (
+            <TripListCard key={trip.tripReference} trip={trip} />
+          ))}
 
-        <If condition={travels.length === 0 && loading === false}>
-          <>
-            <NotTravel>Sem viagens registradas</NotTravel>
-          </>
-        </If>
+        {travels.length === 0 && !loading && <NotTravel>Sem viagens registradas</NotTravel>}
       </ContainerContent>
-      <PaginationSelect
+      <TripListFooter
         dataPage={dataPage}
         page={page}
         setPage={setPage}

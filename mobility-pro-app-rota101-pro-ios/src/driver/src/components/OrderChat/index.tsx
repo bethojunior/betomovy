@@ -1,4 +1,4 @@
-import React, {useRef, useEffect, useState} from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,29 +9,29 @@ import {
 } from 'react-native';
 import Icon from '@expo/vector-icons/Ionicons';
 import MaterialIcon from '@expo/vector-icons/MaterialIcons';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import LoadView from '../../components/LoadView';
 
 import theme from '../../styles/theme';
-import {useAuth} from '../../../../context/auth';
+import { useAuth } from '../../../../context/auth';
 import AppSocket from '../../../../client/services/socket';
-import {buildApp} from '../../../../constantBuild/config';
+import { buildApp } from '../../../../constantBuild/config';
 import apiDelivery from '../../../../client/api/apiDelivery';
-import {styles} from './styles';
+import { styles } from './styles';
 import Colors from '../../../../client/components/Colors';
-import {translate} from '../../../../client/locales';
-import {useUserDriver} from '../../context/userDriver';
+import { translate } from '../../../../client/locales';
+import { useUserDriver } from '../../context/userDriver';
 
 let socket = null;
 
 export default function OrderChat() {
   const scroll = useRef(null);
-  const {user} = useAuth();
-  const {userDriverFind} = useUserDriver();
+  const { user } = useAuth();
+  const { userDriverFind } = useUserDriver();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const routes: any = useRoute();
-  let {order, type} = routes.params;
+  let { order, type } = routes.params;
   useEffect(() => {
     async function getData() {
       await getMessages();
@@ -41,7 +41,7 @@ export default function OrderChat() {
     async function openSocket() {
       const params =
         type === 'client'
-          ? {query: `driverId=${userDriverFind?.idDriver}`}
+          ? { query: `driverId=${userDriverFind?.idDriver}` }
           : '';
       socket = new AppSocket(buildApp().HOST_SOCKETV2, params);
       socket.onEvent(`deliveryChat_${order.id}`, () => {
@@ -59,10 +59,9 @@ export default function OrderChat() {
 
   async function getMessages() {
     const {
-      data: {response},
+      data: { response },
     } = await apiDelivery.get(
-      `delivery/order/${order.id}/chat?type=${
-        type === 'client' ? 'driver' : type
+      `delivery/order/${order.id}/chat?type=${type === 'client' ? 'driver' : type
       }`,
     );
 
@@ -78,11 +77,11 @@ export default function OrderChat() {
             ref={scroll}
             style={styles.content}
             onContentSizeChange={() =>
-              scroll.current.scrollToEnd({animated: true})
+              scroll.current.scrollToEnd({ animated: true })
             }
           >
             {messages.map(data => {
-              const {message, userId, id, preview, driverId} = data;
+              const { message, userId, id, preview, driverId } = data;
               if (type === 'company' ? data?.company == null : userId == null)
                 return (
                   <MessageSent key={id} message={message} preview={preview} />
@@ -100,9 +99,9 @@ export default function OrderChat() {
   );
 }
 
-function MessageSent({message, preview}) {
+function MessageSent({ message, preview }) {
   return (
-    <View style={[styles.containerMessageSent, {opacity: preview ? 0.75 : 1}]}>
+    <View style={[styles.containerMessageSent, { opacity: preview ? 0.75 : 1 }]}>
       <View style={styles.contentMessage}>
         <Text>{message}</Text>
       </View>
@@ -110,7 +109,7 @@ function MessageSent({message, preview}) {
   );
 }
 
-function MessageReceived({message}) {
+function MessageReceived({ message }) {
   return (
     <View
       style={[styles.containerMessageSent, styles.containerMessageReceived]}
@@ -118,7 +117,7 @@ function MessageReceived({message}) {
       <View
         style={[
           styles.contentMessage,
-          {backgroundColor: theme.colors.border_white_light},
+          { backgroundColor: theme.colors.border_white_light },
         ]}
       >
         <Text>{message}</Text>
@@ -127,7 +126,7 @@ function MessageReceived({message}) {
   );
 }
 
-function NavBar({order, type}) {
+function NavBar({ order, type }) {
   const navigation = useNavigation();
   return (
     <View style={styles.containerNav}>
@@ -137,7 +136,7 @@ function NavBar({order, type}) {
           navigation.goBack();
         }}
       >
-        <Icon name="ios-arrow-back" size={30} color={Colors.PRIMARY} />
+        <Icon name="arrow-back-outline" size={30} color={Colors.PRIMARY} />
       </TouchableOpacity>
       <View>
         <Text style={styles.titleNav}>
@@ -155,7 +154,7 @@ function NavBar({order, type}) {
   );
 }
 
-function Footer({order, type}) {
+function Footer({ order, type }) {
   const [value, setValue] = useState('');
 
   async function handleMessage() {

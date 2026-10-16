@@ -1,4 +1,5 @@
-import {CardContent, CardPaymentForm, Icon, TextPaymentType} from './styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CardContent, CardPaymentForm, Icon, TextPaymentType } from './styles';
 import Card1 from '../../assets/images/card.png';
 
 interface Props {
@@ -14,17 +15,24 @@ export const CardCart = ({
   selectedCard,
   setVisibleSecondModal,
 }: Props) => {
+  const isSelected = selectedCard === card.idCard;
+
+  const storageCard = () => {
+    AsyncStorage.setItem('cardSelected', JSON.stringify(card));
+  };
+
   return (
     <CardContent
       onPress={() => {
         setCardSelected(card.idCard);
+        storageCard();
         setVisibleSecondModal(false);
       }}
-      selected={selectedCard === card.idCard}
+      selected={isSelected}
     >
       <CardPaymentForm>
         <Icon source={Card1} />
-        <TextPaymentType>****{card.number.substr(-4)}</TextPaymentType>
+        <TextPaymentType selected={isSelected}>****{card.number.substr(-4)}</TextPaymentType>
       </CardPaymentForm>
     </CardContent>
   );

@@ -1,6 +1,7 @@
+import {ReactNode} from 'react';
 import {TouchableOpacityProps} from 'react-native';
 import theme from '../../styles/theme';
-import {Container, Loading, Text} from './styles';
+import {Container, IconWrapper, Loading, Text} from './styles';
 
 interface Props extends TouchableOpacityProps {
   title: string;
@@ -11,6 +12,7 @@ interface Props extends TouchableOpacityProps {
   small?: boolean;
   backgroundColor?: string;
   color?: string;
+  icon?: ReactNode;
 }
 
 export function Button({
@@ -19,6 +21,8 @@ export function Button({
   enabled = true,
   loading = false,
   small = false,
+  icon,
+  color,
   ...rest
 }: Props) {
   return (
@@ -29,10 +33,11 @@ export function Button({
       small={small}
       {...rest}
     >
-      <Text small={small} enabled={enabled}>
+      {icon && !loading ? <IconWrapper>{icon}</IconWrapper> : null}
+      <Text small={small} enabled={enabled} color={color}>
         {title}
       </Text>
-      {loading ? <Loading size={'small'} color={theme.colors.white} /> : null}
+      {loading ? <Loading size={'small'} color={color ?? theme.colors.white} /> : null}
     </Container>
   );
 }

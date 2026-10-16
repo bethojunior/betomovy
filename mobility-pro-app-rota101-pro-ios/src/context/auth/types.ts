@@ -1,22 +1,17 @@
 export interface IAuthContext {
-  authenticateLogin: ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }) => Promise<void>;
+  authenticateLogin: (data: AuthenticateLoginData) => Promise<void>;
+  syncDeviceToken: () => Promise<void>;
   user: User | null;
   partner: Partner | null;
   setUser: (user: User | null) => void;
   cityConfig: CityConfig | null;
-  setCityConfig: (cityConfig: CityConfig | null) => void;
   signed: boolean;
   deviceToken: string;
   permissionLocal: boolean;
   checkDeviceIsSupported: () => void;
   singleDelivery: boolean;
   loading: boolean;
+  loadingGeneralSettings: boolean;
   setLoading: (loading: boolean) => void;
   isGuest: boolean;
   setIsGuest: (guest: boolean) => void;
@@ -24,9 +19,9 @@ export interface IAuthContext {
   offerBiometry: boolean;
   setOfferBiometry: (offerBiometry: boolean) => void;
   signOut: () => void;
-  updateDataUser: (user: User) => void;
+  updateDataUser: (userData: User | null) => void;
   signIn: (user: any) => Promise<void>;
-  saveBiometry: () => void;
+  saveBiometry: () => Promise<boolean>;
   biometryIsEnabled: () => Promise<boolean>;
   generalSettings: GeneralItem[];
   setGeneralSettings: (generalSettings: GeneralItem[]) => void;
@@ -45,9 +40,7 @@ export interface IAuthContext {
   userDriver: UserDriver | null;
   setUserDriver: (userDriver: UserDriver | null) => void;
   isDriver: boolean;
-  setIsDriver: (isDriver: boolean) => void;
   tokenDriver: string;
-  setTokenDriver: (tokenDriver: string) => void;
   listCategories: () => Promise<CategoryDriver[] | []>;
   signOutDriver: () => void;
   deleteBiometry: () => void;
@@ -81,6 +74,7 @@ export interface IAuthContext {
   isNegativate: boolean;
   setVisibleNegativateModal: (val: boolean) => void;
   visibleNegativateModal: boolean;
+  loadingSession: boolean;
 }
 
 export interface Position {
@@ -102,6 +96,8 @@ export interface User {
   profileImage?: string;
   profileImageLink?: string;
   birthDate: string;
+  gender: string;
+  genderId: number;
 }
 
 export interface CityConfig {
@@ -164,6 +160,7 @@ export interface CityConfig {
   status_realtime_database: boolean;
   firebase_config: Firebase_config;
   configDriverLocation: ConfigDriverLocation;
+  enableCustomOrderTripType?: string;
 }
 
 export interface AcceptCityConfig {
@@ -277,6 +274,7 @@ export interface GeneralProps {
   how_many_times_alert_will_be_shown: string;
   show_more_calcs_driver: number;
   show_drivers_close: string;
+  enable_pix_trip_end_ipag?: boolean;
 }
 
 export interface UserDriver {
@@ -299,6 +297,8 @@ export interface UserDriver {
   status: string;
   userTypeId: string;
   versionIsCritical: boolean;
+  gender: string;
+  genderId: number;
 }
 
 export interface CategoryDriver {
@@ -402,4 +402,32 @@ export interface UserDataProps {
   appVersion: AnalyserNode;
   referralMonetization: any;
   docsUser: any[];
+}
+
+export interface LoginCustomerData {
+  email: string;
+  password: string;
+  deviceToken: string;
+  generateToken?: boolean;
+  keyAppPartner?: string | null;
+}
+
+export interface LoginDriverData {
+  email: string;
+  password: string;
+  deviceToken: string;
+  keyAppPartner?: string | null;
+}
+
+export interface DriverDeviceTokenData {
+  driverId: string | number;
+  idUser: string | number;
+  deviceToken: string;
+}
+
+export interface AuthenticateLoginData {
+  email: string;
+  password: string;
+  setModal?: (val: boolean) => void;
+  keyAppPartner?: string;
 }

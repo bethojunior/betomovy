@@ -1,6 +1,6 @@
-import {View} from 'react-native';
-import {SimpleLineIcons, Ionicons} from '@expo/vector-icons';
-import {useSharedValue, withRepeat, withTiming} from 'react-native-reanimated';
+import { View } from 'react-native';
+import { SimpleLineIcons, Ionicons } from '@expo/vector-icons';
+import { useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import {
   CardContainer,
   Title,
@@ -8,42 +8,43 @@ import {
   TouchFlex,
   ContainerEnd,
 } from './styles';
-import {useAuth} from '../../../../context/auth';
-import {OrderProps} from '../../../../context/DeliveryOrder/types';
-import {DragButtonDelivery} from '../ButtonOrderDelivery/DragButton';
-import {OrderStatus} from './Constants';
-import {DeliveryOrderService} from '../../../../context/DeliveryOrder/services';
-import {useEffect, useState} from 'react';
-import {useUserDriver} from '../../context/userDriver';
-import {useDeliveryOrder} from '../../../../context/DeliveryOrder';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { useAuth } from '../../../../context/auth';
+import { OrderProps } from '../../../../context/DeliveryOrder/types';
+import { DragButtonDelivery } from '../ButtonOrderDelivery/DragButton';
+import { OrderStatus } from './Constants';
+import { DeliveryOrderService } from '../../../../context/DeliveryOrder/services';
+import { useEffect, useState } from 'react';
+import { useUserDriver } from '../../context/userDriver';
+import { useDeliveryOrder } from '../../../../context/DeliveryOrder';
+import { RFValue } from 'react-native-responsive-fontsize';
 import theme from '../../styles/theme';
-import {TimeLineDelivery} from '../TimeLineDelivery';
-import {FloatButton} from '../FloatButton';
-import {AnimatedSource} from '../../../../client/pages/AppApresentation/constants';
+import { TimeLineDelivery } from '../TimeLineDelivery';
+import { FloatButton } from '../FloatButton';
+import { AnimatedSource } from '../../../../client/pages/AppApresentation/constants';
 import LottieView from 'lottie-react-native';
-import {ModalNavigation} from '../ModalNavigation';
-import {useNavigation} from '@react-navigation/native';
-import {ConfirmationCodeDelivery} from '../ConfirmationCodeDelivery';
+import { ModalNavigation } from '../ModalNavigation';
+import { useNavigation } from '@react-navigation/native';
+import { ConfirmationCodeDelivery } from '../ConfirmationCodeDelivery';
 import Helper from '../../utils/Helper';
 import io from 'socket.io-client';
-import {buildApp} from '../../../../constantBuild/config';
-import {customToast} from '../../../../utils/FlashMessage';
+import { buildApp } from '../../../../constantBuild/config';
+import { customToast } from '../../../../utils/FlashMessage';
+import { translate } from '../../../../client/locales';
 interface Props {
   order: OrderProps;
 }
 
-export const CardOrder = ({order}: Props) => {
-  const {cityConfig, generalSettings} = useAuth();
-  const {userDriverFind} = useUserDriver();
-  const {setOrdersActive} = useDeliveryOrder();
+export const CardOrder = ({ order }: Props) => {
+  const { cityConfig, generalSettings } = useAuth();
+  const { userDriverFind } = useUserDriver();
+  const { setOrdersActive } = useDeliveryOrder();
   const blinkAnim = useSharedValue(1);
-  blinkAnim.value = withRepeat(withTiming(0, {duration: 1000}), -1, true);
+  blinkAnim.value = withRepeat(withTiming(0, { duration: 1000 }), -1, true);
   const [buttonText, setButtonText] = useState('Cheguei na coleta');
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [modalNavigation, setModalNavigation] = useState(false);
-  const {navigate} = useNavigation();
+  const { navigate } = useNavigation();
 
   useEffect(() => {
     // Verifique se o usuário é um entregador
@@ -68,7 +69,9 @@ export const CardOrder = ({order}: Props) => {
           return newOrders || [];
         });
         customToast(
-          `O pedido ${order?.company?.fantasyName || ''} foi cancelado`,
+          translate('cardOrder.text_order_canceled', {
+            companyName: order?.company?.fantasyName || '',
+          }),
           'warning',
         );
         return;
@@ -250,7 +253,7 @@ export const CardOrder = ({order}: Props) => {
             <FloatButton
               icon={
                 <Ionicons
-                  name={'ios-navigate-outline'}
+                  name={'navigate-outline'}
                   color={theme.colors.primaryText}
                   size={RFValue(20)}
                 />
@@ -273,7 +276,7 @@ export const CardOrder = ({order}: Props) => {
                   />
                 }
                 onPress={() => {
-                  navigate('OrderMessageOption', {order});
+                  navigate('OrderMessageOption', { order });
                 }}
               />
             </View>

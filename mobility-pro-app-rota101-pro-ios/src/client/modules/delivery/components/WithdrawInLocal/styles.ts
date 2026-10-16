@@ -15,10 +15,9 @@ export const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   container_information: {
-    height: '80%',
-    overflow: 'scroll',
-    width: '80%',
+    flex: 1,
     marginLeft: 10,
+    paddingRight: 10,
   },
   withdrawal_label: {
     color: theme.colors.text_gray,
@@ -27,5 +26,7 @@ export const styles = StyleSheet.create({
   },
   withdrawal_address: {
     fontSize: 16,
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
 });

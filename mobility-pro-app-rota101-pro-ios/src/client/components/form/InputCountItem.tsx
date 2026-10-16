@@ -27,7 +27,7 @@ export function InputCountItem(props) {
         }}
       >
         <Icon
-          name="ios-remove"
+          name="remove"
           size={25}
           color={count === 1 ? theme.colors.text_gray : theme.colors.black}
           style={styles.btnOption}
@@ -40,7 +40,7 @@ export function InputCountItem(props) {
           setCount(count + 1);
         }}
       >
-        <Icon name="ios-add" size={25} color={theme.colors.black} style={styles.btnOption} />
+        <Icon name="add" size={25} color={theme.colors.black} style={styles.btnOption} />
       </TouchableOpacity>
     </View>
   );

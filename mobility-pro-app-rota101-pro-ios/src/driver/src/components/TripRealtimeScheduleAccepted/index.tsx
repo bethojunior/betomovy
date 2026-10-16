@@ -1,53 +1,78 @@
-import {useEffect, useMemo, useState} from 'react';
-import {useUserDriver} from '../../context/userDriver';
-import {TripRealtime} from '../../service/realtime/TripRealtime';
-import {useTripProvider} from '../../context/Trip';
+import { useEffect, useRef } from 'react';
+import { useUserDriver } from '../../context/userDriver';
+import { useTripProvider } from '../../context/Trip';
+import useTripRealtime from '../../hooks/tripRealtime';
+import { TripCallback } from '../../interfaces/tripRealtime';
+import { useDriverStatus } from '../../hooks/useDriverStatus';
+import { matchesScheduleDateFilter } from '../../utils/scheduleFilter';
 
 export const TripRealtimeScheduleAccepted = () => {
-  const {userDriverFind} = useUserDriver();
-  const tripRealtime = useMemo(() => new TripRealtime(), []);
-  const {stateTrip, dispatchTrip} = useTripProvider();
-  const {listScheduleAccepted, trip} = stateTrip;
+  const { tripRealtime } = useTripRealtime();
+  const { userDriverFind } = useUserDriver();
+  const { isOnline } = useDriverStatus();
+  const unsubscribeRef = useRef<string | null>(null);
 
-  const [tripsScheduleAcceptedLocal, setTripsScheduleAcceptedLocal] =
-    useState<any>([...listScheduleAccepted]);
+  const {
+    stateTrip,
+    addOrUpdateList,
+    removeFromList,
+    incrementTripSummaryItem,
+    decrementTripSummaryItem
+  } = useTripProvider((context) => context);
 
-  const tripScheduledAccepted = () => {
-    tripRealtime.getTripScheduledAccepted(
-      userDriverFind.idDriver,
-      (trip, type) => {
-        if (type === 'added' || type === 'modified') {
-          setTripsScheduleAcceptedLocal(prev => [...prev, trip]);
-        }
-        if (type === 'removed') {
-          setTripsScheduleAcceptedLocal(prev =>
-            prev.filter(
-              (item: {tripReference: string}) =>
-                item.tripReference !== trip.tripReference,
-            ),
-          );
-        }
-        return '';
-      },
-    );
+  const driverId = userDriverFind.idDriver;
+
+  const listScheduleAcceptedRef = useRef(stateTrip.listScheduleAccepted);
+  listScheduleAcceptedRef.current = stateTrip.listScheduleAccepted;
+
+  const scheduleAcceptedFilterRef = useRef(stateTrip.scheduleAcceptedFilter);
+  scheduleAcceptedFilterRef.current = stateTrip.scheduleAcceptedFilter;
+
+  const hasScheduledAcceptedTrip = (tripReference: string) => {
+    return listScheduleAcceptedRef.current.some(item => item.tripReference === tripReference);
+  };
+
+  const onTripScheduledAccepted: TripCallback = ({ data: _trip, type }) => {
+    if (type === 'removed') {
+      if (hasScheduledAcceptedTrip(_trip.tripReference)) {
+        decrementTripSummaryItem('totalScheduledAccepted', 1);
+      }
+      removeFromList("listScheduleAccepted", _trip);
+    }
+
+    if (type === 'added') {
+      if (!hasScheduledAcceptedTrip(_trip.tripReference)) {
+        incrementTripSummaryItem('totalScheduledAccepted', 1);
+      }
+      if (matchesScheduleDateFilter(_trip, scheduleAcceptedFilterRef.current)) {
+        addOrUpdateList("listScheduleAccepted", _trip);
+      }
+    }
+
+    if (type === 'modified') {
+      if (matchesScheduleDateFilter(_trip, scheduleAcceptedFilterRef.current)) {
+        addOrUpdateList("listScheduleAccepted", _trip);
+      } else {
+        removeFromList("listScheduleAccepted", _trip);
+      }
+    }
   };
 
   useEffect(() => {
-    if (Object.keys(trip).length === 0) {
-      if (userDriverFind.tripTypes == null) return;
+    if (userDriverFind.tripTypes == null) return;
 
-      tripScheduledAccepted();
+    if (isOnline) {
+      unsubscribeRef.current = tripRealtime.getTripScheduledAccepted(
+        userDriverFind.idDriver,
+        onTripScheduledAccepted,
+      );
     }
-  }, []);
 
-  useEffect(() => {
-    // Atualizar o estado listScheduleAccepted no dispatchTrip sempre que tripsScheduleAcceptedLocal for atualizado
-    dispatchTrip({
-      type: 'update',
-      field: 'listScheduleAccepted',
-      arg: tripsScheduleAcceptedLocal,
-    });
-  }, [tripsScheduleAcceptedLocal]);
+    return () => {
+      if (unsubscribeRef.current) tripRealtime.unsubscribe(unsubscribeRef.current);
+      unsubscribeRef.current = null;
+    };
+  }, [userDriverFind.tripTypes, userDriverFind.idDriver, isOnline]);
 
   return null;
 };

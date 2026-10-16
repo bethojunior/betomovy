@@ -16,18 +16,29 @@ import ModalFrame from '../form/Modal';
 interface Props {
   visible: boolean;
   setVisible: (visible: boolean) => void;
+  tripReference: string;
 }
 
-export default function HelpMethodModal({visible, setVisible}: Props) {
+export default function HelpMethodModal({
+  visible,
+  setVisible,
+  tripReference,
+}: Props) {
   const [helpers, setHelpers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const listMethodsHelp = async () => {
+    setLoading(true);
     try {
-      const {data} = await apiMain.get('/TripReportType/GetAll');
-      setHelpers(data.data);
+      const {data} = await apiMain.get('/cancellationReasons/getReports');
+      if (!data?.status) {
+        throw new Error('error');
+      }
+      setHelpers(data?.data || []);
     } catch {
       console.log('error');
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -38,7 +49,8 @@ export default function HelpMethodModal({visible, setVisible}: Props) {
     setVisible(false);
     navigation.navigate('ContactUs', {
       title: item.name,
-      id: item.idTripReportType,
+      id: item?.idCancellationReasons,
+      tripReference,
     });
   };
 
@@ -63,14 +75,15 @@ export default function HelpMethodModal({visible, setVisible}: Props) {
       <View style={{maxHeight: 400}}>
         <Title>{translate('detailsTrip.types_help')}</Title>
         <Content>
-          <IfLoaderInsideScreen loading={helpers.length === 0}>
+          <IfLoaderInsideScreen loading={loading}>
             <FlatList
               style={{paddingBottom: 10}}
               data={helpers}
               renderItem={PaymentMethod}
-              keyExtractor={(item: any) => item.idTripReportType}
+              keyExtractor={(item: any) => item?.idCancellationReasons}
             />
           </IfLoaderInsideScreen>
+          {!loading && !helpers.length && <Title>Sem dados no momento</Title>}
         </Content>
       </View>
     </ModalFrame>

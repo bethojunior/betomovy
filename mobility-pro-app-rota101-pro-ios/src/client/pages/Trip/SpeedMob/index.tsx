@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 // @ts-nocheck
-import {useCallback, useEffect, useRef, useState} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MapView, {Marker, Polyline, PROVIDER_GOOGLE} from 'react-native-maps';
-import {useNavigation} from '@react-navigation/native';
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
+import { useNavigation } from '@react-navigation/native';
 
-import {Button} from 'react-native-paper';
-import {Image} from 'react-native';
-import {Audio} from 'expo-av';
-import {useTrip} from '../../../contexts/Trip';
-import {useLocal} from '../../../contexts/local';
+import { Button } from 'react-native-paper';
+import { Image } from 'react-native';
+import { Audio } from 'expo-av';
+import { useTrip } from '../../../contexts/Trip';
+import { useLocal } from '../../../contexts/local';
 import LookUpAddressesModal from '../../../components/LookUpAddressesModal';
 import TravelOptions from '../../../components/TravelOptions';
 
@@ -34,17 +34,17 @@ import Preload from '../../../components/Preload';
 import DriverMarker from '../../../components/DriverMarker';
 import DestinationRoute from '../../../components/DestinationRoute';
 import theme from '../../../styles/theme';
-import {If} from '../../../components/If';
-import {ModalDataDriver} from '../../../components/ModalDataDriver';
-import {TextEdit} from '../../../components/TextEdit';
+import { If } from '../../../components/If';
+import { ModalDataDriver } from '../../../components/ModalDataDriver';
+import { TextEdit } from '../../../components/TextEdit';
 import apiMain from '../../../api/apiMain';
-import {CardPanic} from '../../../components/CardPanic';
-import {usePanic} from '../../../contexts/Panic';
-import {translate} from '../../../locales';
-import {ModalWho} from '../../../components/ModalWho';
-import {useAuth} from '../../../../context/auth';
-import {MarkerLabel} from '../../../components/MarkerLabel';
-import {usePaymentForm} from '../../../contexts/paymentForms';
+import { TIMEOUT_SHORT } from '~/common/constants/timeouts';
+import { CardPanic } from '../../../components/CardPanic';
+import { usePanic } from '../../../contexts/Panic';
+import { translate } from '../../../locales';
+import { ModalWho } from '../../../components/ModalWho';
+import { useAuth } from '../../../../context/auth';
+import { usePaymentForm } from '../../../contexts/paymentForms';
 import {
   STATUS_BOARDING,
   STATUS_FINISHED,
@@ -53,11 +53,16 @@ import {
   STATUS_SEARCHING,
 } from '../../../constants/trip';
 import Helper from '../../../utils/Helper';
-import {FloatButton} from '../../../components/FloatButton';
-import {ProgressBar} from '../../../components/ProgressBar';
+import { FloatButton } from '../../../components/FloatButton';
+import { ProgressBar } from '../../../components/ProgressBar';
 import SearchAddressModal from '../../../components/SearchAddressModal';
+import TripRouteSemanticsView from '../../../components/TripRouteSemanticsView';
+import {
+  formatDistanceForAccessibility,
+  shouldRenderTripRouteSemantics,
+} from '../../../utils/trip-route-accessibility';
 
-import {useModules} from '../../../contexts/modules';
+import { useModules } from '../../../contexts/modules';
 
 import ItemsTripSpeedMob from '../../../components/ItemsTripSpeedMob';
 import {
@@ -91,16 +96,17 @@ export interface AddressesUserProps {
 // Essa variavel local e necessaria, pois , quando se coloca no onRegionChange um valor set, ele da muitas requisicoes de callback
 // let regionChange = {};
 
-export default function Trip({route}) {
+export default function Trip({ route }) {
   const mapRef = useRef(null);
-  const {position} = useLocal();
-  const {partner, generalSettings} = useAuth();
-  const {getListProblems} = usePanic();
-  const {getCurrentBalanceVoucher} = usePaymentForm();
+  const { position } = useLocal();
+  const { partner, generalSettings } = useAuth();
+  const { getListProblems } = usePanic();
+  const { getCurrentBalanceVoucher } = usePaymentForm();
   const [typesProblems, setTypesProblems] = useState<TypeProps[]>([]);
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [modalDriverData, setModalDriverData] = useState(false);
   const [monitoringAnimation, setMonitoringAnimation] = useState(false);
+  const regionChangeTimer = useRef(null);
   const regionChange = useRef({
     latitude: position?.latitude,
     longitude: position?.longitude,
@@ -113,11 +119,11 @@ export default function Trip({route}) {
   const [region, setRegion] = useState(
     position
       ? {
-          latitude: position.latitude,
-          longitude: position.longitude,
-          latitudeDelta: 0.001,
-          longitudeDelta: 0.001,
-        }
+        latitude: position.latitude,
+        longitude: position.longitude,
+        latitudeDelta: 0.001,
+        longitudeDelta: 0.001,
+      }
       : null,
   );
   const [destinationPerson, setDestinationPerson] = useState(false);
@@ -126,7 +132,7 @@ export default function Trip({route}) {
   const [valueVoucher, setValueVoucher] = useState(0);
   const countClick = useRef(0);
 
-  const {modulesActives, init} = useModules();
+  const { modulesActives, init } = useModules();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [typeAddressMenu, setTypeAddressMenu] = useState<
@@ -170,7 +176,7 @@ export default function Trip({route}) {
   const searchAddressModal = useRef(null);
 
   const handleAddressesCapture = useCallback(
-    async ({origin, destination: destiny, waypoints}) => {
+    async ({ origin, destination: destiny, waypoints }) => {
       calculateAll(origin, destiny, waypoints);
       getTripPaymentMethods();
       dispatchTripCustomer({
@@ -226,7 +232,7 @@ export default function Trip({route}) {
         pitch: 90,
       },
 
-      {duration: 500},
+      { duration: 500 },
     );
     Helper.timeout(3500).then(async () => {
       await mapRef.current?.fitToCoordinates(lastPolylineCoordinates, {
@@ -245,7 +251,7 @@ export default function Trip({route}) {
           pitch: 90,
         },
 
-        {duration: 500},
+        { duration: 500 },
       );
     });
 
@@ -293,7 +299,7 @@ export default function Trip({route}) {
 
   useEffect(() => {
     (async () => {
-      const {status} = await Audio.requestPermissionsAsync();
+      const { status } = await Audio.requestPermissionsAsync();
 
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
@@ -323,7 +329,7 @@ export default function Trip({route}) {
       });
     } else {
       if (trip?.status === STATUS_SCHEDULED) {
-        dispatchTripCustomer({type: 'scheduledTrip'});
+        dispatchTripCustomer({ type: 'scheduledTrip' });
       }
       dispatchTripCustomer({
         type: 'update',
@@ -373,9 +379,10 @@ export default function Trip({route}) {
 
   const handleDestinationPerson = useCallback(async (position, setLoading) => {
     const {
-      data: {data},
+      data: { data },
     } = await apiMain.get(
       `geocoding/search?latlng=${position.latitude},${position.longitude}`,
+      { timeout: TIMEOUT_SHORT },
     );
     setDestinationFree(data);
     setLoadingAddress(false);
@@ -587,12 +594,14 @@ export default function Trip({route}) {
               regionChange.current = region;
             }}
             onRegionChangeComplete={region => {
-              loadingDestinationFree(region);
+              if (regionChangeTimer.current) clearTimeout(regionChangeTimer.current);
+              regionChangeTimer.current = setTimeout(() => loadingDestinationFree(region), 600);
             }}
-            style={{flex: 1}}
+            style={{ flex: 1 }}
             showsUserLocation={false}
             showsMyLocationButton={false}
             customMapStyle={mapStyle}
+            userInterfaceStyle="light"
           >
             {trip && !trip?.driverId && (
               <Marker
@@ -661,9 +670,6 @@ export default function Trip({route}) {
                     </Marker>
                   ),
               )}
-            {destination.latitude && !hideTravelOptions && (
-              <MarkerLabel local={destination} address={destination?.address} />
-            )}
             {polylineCoordinates && (
               <Polyline
                 coordinates={polylineCoordinates}
@@ -674,6 +680,19 @@ export default function Trip({route}) {
             <DriverMarker />
             <DestinationRoute />
           </MapView>
+          {shouldRenderTripRouteSemantics(
+            origin?.address,
+            destination?.address,
+          ) && (
+            <TripRouteSemanticsView
+              originAddress={origin?.address ?? ''}
+              destinationAddress={destination?.address ?? ''}
+              distanceLabel={formatDistanceForAccessibility(
+                distance,
+                generalSettings,
+              )}
+            />
+          )}
           <ProgressBar visible={trip?.status == STATUS_BOARDING} />
           <If
             condition={
@@ -779,15 +798,15 @@ export default function Trip({route}) {
                     <ContainerAlertPanic
                       from={{
                         opacity: 0,
-                        transform: [{translateY: -20}],
+                        transform: [{ translateY: -20 }],
                       }}
                       animate={{
                         opacity: 1,
-                        transform: [{translateY: 0}],
+                        transform: [{ translateY: 0 }],
                       }}
                       exit={{
                         opacity: 0,
-                        transform: [{translateY: -20}],
+                        transform: [{ translateY: -20 }],
                       }}
                     >
                       <TextEdit size="small">

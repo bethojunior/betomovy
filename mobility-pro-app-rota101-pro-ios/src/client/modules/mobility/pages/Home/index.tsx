@@ -1,28 +1,23 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Audio} from 'expo-av';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import {
   TouchableOpacity,
   View,
   ScrollView,
   Modal,
-  Dimensions,
   Animated as AnimatedNative,
   AppState,
   Platform,
-  Image,
+  useWindowDimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Ionicons} from '@expo/vector-icons';
-import MapView, {Marker} from 'react-native-maps';
+import { Ionicons } from '@expo/vector-icons';
+import MapView, { Marker } from 'react-native-maps';
 
 import * as Location from 'expo-location';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
-import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-
-import {RFValue} from 'react-native-responsive-fontsize';
-import {MotiView} from 'moti';
-import {shade} from 'polished';
+import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
+import { RFValue } from 'react-native-responsive-fontsize';
 import Animated, {
   Easing,
   Extrapolate,
@@ -33,62 +28,49 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
+import { useCameraPermissions } from 'expo-camera';
 import {
   ButtonMic,
-  CardLastPlace,
-  ContentAddress,
   ContentInput,
-  ContentLastPlace,
-  ContentModuleButton,
-  DetailsContent,
+  DriverSearchOverlay,
   Header,
-  HeaderDetails,
-  ImageLarge,
-  ImageSmall,
   Input,
-  ModuleButtonLarge,
-  ModuleButtonSmall,
-  MyLocationViewer,
-  ProfileImage,
+  MapCard,
+  MapCardWrapper,
+  RootContainer,
   SimpleText,
   styles,
-  TextLarge,
-  TextSmall,
-  Title,
   ViewVoice,
+  VoicePulse,
   ButtonCallRacer,
   TextCallRacer,
   ContentNotification,
   ContentButtonCallRacer,
-  SubTitle,
-  RaceSubTitle,
 } from './styles';
-import {useLocal} from '../../../../contexts/local';
-import {useTrip} from '../../../../contexts/Trip';
+import { HomeBottomSheet } from './HomeBottomSheet';
+import { useLocal } from '../../../../contexts/local';
+import { MODULE_NAME_TO_TRIP_SCREEN, resolveModuleScreen } from '../../../../utils/moduleNavigation';
+import { useFooterModuleShortcut } from '../../../../hooks/useFooterModuleShortcut';
+import { useTrip } from '../../../../contexts/Trip';
 import TripFinishModal from '../../../../components/TripFinishModal';
-import {useModules} from '../../../../contexts/modules';
-import {OfferFingerprint} from '../../../../components/OfferFingerprint';
-import {useAuth} from '../../../../../context/auth';
-import CardPublicity from '../../../../components/CardPublicty';
-import Photo from '../../../../assets/images/user.png';
-import {useTripGL} from '../../../../contexts/TripGL';
+import { ModuleItem, useModules } from '../../../../contexts/modules';
+import { OfferFingerprint } from '../../../../components/OfferFingerprint';
+import { useAuth } from '../../../../../context/auth';
+import { usePublicity } from '~/hooks/usePublicity';
+import { useTripGL } from '../../../../contexts/TripGL';
 import mapStyle from '../../../../styles/map.json';
 import theme from '../../../../styles/theme';
 import NotificationButton from '../../../../components/NotificationButton';
-import {translate} from '../../../../locales';
-import {usePublicity} from '../../../../contexts/publicity';
-import {TextEdit} from '../../../../components/TextEdit';
-import {WebViewVoiceRecognition} from '../../../../components/WebViewVoiceRecognition';
+import { HomeMapHeader } from '../../../../components/HomeMapHeader';
+import CurrentLocationMarker from '../../../../components/CurrentLocationMarker';
+import { translate } from '../../../../locales';
+import { WebViewVoiceRecognition } from '../../../../components/WebViewVoiceRecognition';
 import ModalFrame from '../../../../components/form/Modal';
-import {If} from '../../../../components/If';
-import {Mylocation} from '../../../../components/MyLocation';
-import {useMap} from '../../../../contexts/Map';
-import DriverMarker from '../../../../components/DriverMarker';
 
 import Preload from '../../../../components/Preload';
 
 import AnimationBell from '../../../../components/AnimationBell';
-import {customToast} from '../../../../../utils/FlashMessage';
+import { customToast } from '../../../../../utils/FlashMessage';
 import {
   STATUS_ACCEPTED,
   STATUS_BOARDING,
@@ -100,31 +82,53 @@ import {
   convertDatetimeToDate,
   convertDatetimeToTime,
 } from '../../../../utils/FormatDate';
-import {TripRealtime} from '../../../../services/realtime/TripRealtime';
-import {BarCodeScanner} from 'expo-barcode-scanner';
-import {buildApp} from '../../../../../constantBuild/config';
 import TripPartnerInfo from '../../../../components/TripPartnerInfo';
 import TripListModal from '../../../../components/TripListModal';
-import {TripService} from '../../../../contexts/Trip/services';
-import {TripProps} from '../../../../contexts/Trip/types';
+import { TripService } from '../../../../contexts/Trip/services';
+import { TripProps } from '../../../../contexts/Trip/types';
 
-import apiMain from '../../../../api/apiMain';
-import {useDriversNears} from '../../../../../context/driversNears';
+import { ModalAlert } from '../../../../../driver/src/components/ModalAlert';
+import { useStoragePictures } from '../../../../../driver/src/hooks/useStoragePictures';
+import { CardNoCity } from '../../../../components/CardNoCity';
+import { useBubbleButton } from '@704apps/react-native-bubble-button';
+import DriverSearch from '../../../../components/DriverSearch';
+import useTripRealtime from '../../../../hooks/tripRealtime';
+import { TripCallback } from '../../../../interfaces/tripRealtime';
+import CustomMarkerDriverNear from '~/components/CustomMarkerDriverNear';
+import { useDriversNears } from '~/hooks/useDriversNears';
+import { useActiveTrips } from '~/hooks/useActiveTrips';
+import { useProfileCompletionGuard } from '~/hooks/useProfileCompletionGuard';
+import { TripActive } from '~/interfaces/tripActive';
+import { AvatarProfile } from '../../../../../components/AvatarProfile';
+import { PIX_CACHE_KEY, TRIP_CACHE_KEY } from '~/client/constants/pixCache';
+import { APP_TYPE } from '~/constants/app';
+import { ADVERTISING_APP_SITE_TYPE } from '~/constants/advertisingAppSite';
 
-export default function Home({route}) {
+const STATUS_BLOCKED = 3;
+const LOCATION_TIMEOUT_MS = 2500;
+const POSITION_CACHE_TTL_MS = 30000;
+
+export default function Home() {
+  useProfileCompletionGuard();
+
+  const { tripRealtime } = useTripRealtime();
+  const [currentAddress, setCurrentAddress] = useState('');
   const [showTripFinishModal, setShowTripFinishModal] = useState(false);
-  const [places, setPlaces] = useState([]);
-  const [loadingPulblicity, setLoadingPulblicity] = useState(false);
   const [modalMic, setModalMic] = useState(false);
-  const [firstBlockButtom, setFirstBlockButtom] = useState([]);
-  const [secondBlockButtom, setSecondBlockButtom] = useState([]);
+  const [moduleButtons, setModuleButtons] = useState<ModuleItem[]>([]);
   const [textVoice, setTextVoice] = useState<string | null>(null);
   const [loadingVoice, setLoadingVoice] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [showModalVoiceRecord, setShowModalVoiceRecord] =
+    useState<boolean>(false);
+  const [showDriverSearchFromCache, setShowDriverSearchFromCache] = useState(false);
+
   const mapRef = useRef<any>(null);
-  const navigation = useNavigation();
-  const tripRealtime = useMemo(() => new TripRealtime(), []);
-  const {modulesActives, init} = useModules();
+  const navigation: any = useNavigation();
+  const routeInfo = useRoute();
+
+  const { modulesActives, init } = useModules();
+  const footerModuleShortcut = useFooterModuleShortcut();
   const {
     user,
     getPermissionLocal,
@@ -136,16 +140,23 @@ export default function Home({route}) {
     newActionFb,
     setNewActionFb,
     getNotification,
+    syncDeviceToken,
   } = useAuth();
-  const {hasPublicity} = usePublicity();
-  const {polylineCoordinates} = useTripGL();
-  const {getOnlineDrivers, drivers} = useMap();
+  const { polylineCoordinates } = useTripGL();
   const {
     handleTripStateChange,
     stateTripCustomer,
     dispatchTripCustomer,
     clearTrip,
+    showModalNoCity,
   } = useTrip();
+
+  const { data: tripsActives, loading: loadingTrips } = useActiveTrips({
+    field: "user",
+    id: user?.idUser
+  });
+
+  const { offerOtherTypeTrip } = stateTripCustomer;
   const [tripListVisibility, setTripListVisibility] = useState(false);
 
   const {
@@ -153,18 +164,120 @@ export default function Home({route}) {
     origin: originData,
     tripPartnerList,
     partnerTripsReference,
-    trip,
+    timeExceededFee,
+    showModalNoCity: globalShowModalNoCity,
   } = stateTripCustomer;
   const {
     position,
     setPosition,
-    setLastPlaceSelected,
-    lastPlaceSelected,
     placeUser,
   } = useLocal();
+
+  const { data: publicityList } = usePublicity({
+    position,
+    typeConst: APP_TYPE.CLIENT_FINAL,
+    advertisingAppSiteId: ADVERTISING_APP_SITE_TYPE.ABERTURA,
+    genderId: user.genderId
+  });
+
   const fadeAnim = useRef(new AnimatedNative.Value(1)).current;
 
-  const {getDriversOnline, driversNears} = useDriversNears();
+  const { openApp } = useBubbleButton();
+  const { width } = useWindowDimensions();
+
+  const { data: driversNears } = useDriversNears({
+    latitude: position?.latitude,
+    longitude: position?.longitude,
+  });
+
+  const { getStoragePictureSpecific } = useStoragePictures();
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const isResolvingInputPress = useRef(false);
+  const positionCache = useRef<{ coords: { latitude: number; longitude: number }; address: string; timestamp: number } | null>(null);
+
+  const authorizedTravelUser = async () => {
+    if (Number(user.customerRegisterStatusId) === STATUS_BLOCKED) {
+      customToast(
+        translate('home.authorization'),
+        'warning',
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  const handleInputPress = async () => {
+    // Lock contra toques repetidos (evita várias getCurrentPositionAsync concorrentes travando o app)
+    if (isResolvingInputPress.current) return;
+    isResolvingInputPress.current = true;
+
+    if (!await authorizedTravelUser()) {
+      isResolvingInputPress.current = false;
+      return;
+    }
+
+    try {
+      const cached = positionCache.current;
+      const cacheIsFresh = cached && Date.now() - cached.timestamp < POSITION_CACHE_TTL_MS;
+
+      if (cacheIsFresh) {
+        setPosition(cached.coords);
+        setCurrentAddress(cached.address);
+      } else {
+        const permission = await getPermissionLocal();
+        if (permission) {
+          // Desiste e navega mesmo assim se o GPS demorar demais
+          const location = await Promise.race([
+            Location.getCurrentPositionAsync({ accuracy: 1 }),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('location_timeout')), LOCATION_TIMEOUT_MS),
+            ),
+          ]);
+          const address = await Location.reverseGeocodeAsync(location.coords);
+          const { street, name, city, region, country, postalCode, streetNumber } = address[0];
+          const formattedAddress = `${street || name || ''} ${streetNumber || ''}, ${city || ''}, ${region || ''}, ${country || ''}`.replace(/, ,/g, ',').replace(/, $/, '').replace(/^, /, '');
+          const coords = {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          };
+          positionCache.current = { coords, address: formattedAddress, timestamp: Date.now() };
+          setPosition(coords);
+          setCurrentAddress(formattedAddress);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao obter a localização:', error);
+    } finally {
+      navigation.navigate('TripRoutes', { screen: 'Trip' });
+      isResolvingInputPress.current = false;
+    }
+  };
+
+  const handleModulePress = (moduleName: string) => {
+    if (MODULE_NAME_TO_TRIP_SCREEN[moduleName]) {
+      navigation.navigate('TripRoutes', { screen: resolveModuleScreen(moduleName) });
+      return;
+    }
+
+    navigation.navigate(resolveModuleScreen(moduleName));
+  };
+
+  useEffect(() => {
+    if (currentAddress) {
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'origin',
+        arg: {
+          address: currentAddress,
+          latitude: position.latitude,
+          longitude: position.longitude,
+          street: currentAddress || null,
+          type: 'origin',
+        },
+      });
+    }
+  }, [currentAddress, position]);
 
   useEffect(() => {
     if (
@@ -175,18 +288,16 @@ export default function Home({route}) {
       modulesActives.splice(modulesActives[0], 1);
     }
 
-    if (modulesActives.length > 2) {
-      setFirstBlockButtom([...modulesActives].splice(0, 2));
+    // Módulo já exibido como atalho no footer (só existe quando é o único
+    // extra ativo) não repete aqui no grid — ver useFooterModuleShortcut.
+    const gridModules = footerModuleShortcut
+      ? modulesActives.filter(
+          (module: {moduleName: string}) => module.moduleName !== footerModuleShortcut.moduleName,
+        )
+      : modulesActives;
 
-      if (modulesActives.length > 0) {
-        setSecondBlockButtom(
-          [...modulesActives].splice(2, modulesActives.length),
-        );
-      }
-    } else {
-      setFirstBlockButtom([...modulesActives].splice(0, 2));
-    }
-  }, [modulesActives]);
+    setModuleButtons([...gridModules]);
+  }, [modulesActives, footerModuleShortcut]);
 
   const updateTripPartnerList = (trips: TripProps[]) => {
     dispatchTripCustomer({
@@ -201,36 +312,12 @@ export default function Home({route}) {
     AsyncStorage.removeItem('tripPartnerList');
   };
 
-  const verifyTripPartnerList = async () => {
+  const handleVerifyTripPartnerList = async (): Promise<void> => {
     const tripsLocal = [];
     const trips = JSON.parse(await AsyncStorage.getItem('tripPartnerList'));
     const tripLocal = JSON.parse(await AsyncStorage.getItem('trip'));
 
-    await trips?.map(async ({tripReference}) => {
-      const alredIn = partnerTripsReference?.find(ref => {
-        return ref === tripReference;
-      });
-
-      if (!alredIn) {
-        tripRealtime.getTrip(tripReference, async (trip, type) => {
-          if (type === 'removed') {
-            const tripReferences = partnerTripsReference?.filter(
-              tripReference => {
-                tripReference !== trip.tripReference;
-              },
-            );
-
-            // partnerTripsReference = tripReferences
-
-            const trips = await tripLocal?.filter(tripPartner => {
-              return tripPartner.tripReference !== trip.tripReference;
-            });
-
-            updateTripPartnerList(trips);
-          }
-        });
-      }
-
+    trips?.map(async ({ tripReference }) => {
       if (tripReference === tripLocal?.tripReference) {
         AsyncStorage.removeItem('trip');
         clearTrip();
@@ -253,31 +340,143 @@ export default function Home({route}) {
     });
   };
 
-  useEffect(() => {
-    const getBarCodeScannerPermissions = async () => {
-      await BarCodeScanner.requestPermissionsAsync();
-    };
-    getBarCodeScannerPermissions();
+  const onTripAcceptedReadyScheduled: TripCallback = async ({ data: trip, type }) => {
+    if (['added', 'modified'].includes(type)) {
+      const ride = trip?.ride as any;
+      const isSharedTrip = ride && Array.isArray(ride.riders) && ride.riders.length > 0;
 
-    verifyTripPartnerList();
-  }, []);
+      if (isSharedTrip) {
+        const userIsRider = ride.riders.some((rider: any) =>
+          rider.userId === user?.idUser?.toString() || rider.userId === String(user?.idUser)
+        );
 
-  useEffect(() => {
-    (async () => {
-      const {status} = await Audio.requestPermissionsAsync();
+        if (!userIsRider) {
+          return;
+        }
+      }
 
+      navigation.navigate('TripRoutes', { screen: 'Trip' });
+      openApp();
+
+      if (!!trip?.schedule || !!trip?.schedule && trip?.status === STATUS_ACCEPTED) {
+        dispatchTripCustomer({ type: 'update', field: 'visibleLookUpAddressesModal', arg: false });
+        dispatchTripCustomer({ type: 'update', field: 'showModalScheduled', arg: true });
+      }
+    }
+
+    if (type === 'removed') {
+      if (trip?.status === STATUS_IN_PROGRESS || trip?.status === STATUS_ACCEPTED) {
+        dispatchTripCustomer({ type: 'update', field: 'showModalScheduled', arg: false });
+      }
+    }
+  }
+
+  const audioPermission = async () => {
+    const { status } = await Audio.requestPermissionsAsync();
+
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: true,
+      playsInSilentModeIOS: true,
+    });
+    if (status !== 'granted') {
+      await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      if (status !== 'granted') {
-        await Audio.requestPermissionsAsync();
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
+    }
+  }
+
+  const getBarCodeScannerPermissions = async () => {
+    if (!cameraPermission.granted) {
+      await requestCameraPermission();
+    }
+  };
+
+  const fetchLocation = useCallback(async () => {
+    try {
+      const location = await Location.getLastKnownPositionAsync();
+
+      if (location?.coords) {
+        setPosition({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+      } else {
+        const { coords } = await Location.getCurrentPositionAsync({ accuracy: 1 });
+        setPosition({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
         });
       }
-    })();
+    } catch (error) {
+      console.error('Erro ao obter a localização:', error);
+    }
+  }, [setPosition]);
+
+  const initializePermissions = async () => {
+    await audioPermission();
+    await getBarCodeScannerPermissions();
+    await syncDeviceToken();
+  };
+
+  useEffect(() => {
+    if (loading || loadingTrips) return;
+
+    requestAnimationFrame(() => {
+      void initializePermissions();
+    });
+  }, [loading, loadingTrips]);
+
+  useEffect(() => {
+    const refreshLocation = async () => {
+      setLoading(true);
+      try {
+        await getPermissionLocal();
+        await fetchLocation();
+      } catch (error) {
+        console.error('Error initializing location:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    refreshLocation();
+
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    const listener = AppState.addEventListener('change', state => {
+      if (state === 'active') {
+        if (debounceTimer) return;
+        debounceTimer = setTimeout(async () => {
+          debounceTimer = null;
+          try {
+            await getPermissionLocal();
+            await fetchLocation();
+          } catch (error) {
+            console.error('Error on AppState change:', error);
+          }
+        }, 1000);
+      }
+    });
+
+    return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      listener.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const unsubscribeTripAcceptedReadyScheduled = tripRealtime.checkTripAcceptedReadyScheduled(
+      user?.idUser, onTripAcceptedReadyScheduled
+    );
+
+    handleVerifyTripPartnerList();
+
+    return () => {
+      if (unsubscribeTripAcceptedReadyScheduled) {
+        tripRealtime.unsubscribe(unsubscribeTripAcceptedReadyScheduled);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -305,165 +504,57 @@ export default function Home({route}) {
   }, [newActionFb]);
 
   useEffect(() => {
-    setLoading(true);
-    if (Platform.OS === 'ios') {
-      getPermissionLocal().then(() => {
-        Location.getLastKnownPositionAsync()
-          .then(location => {
-            if (location) {
-              setPosition({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-              });
-              setLoading(false);
-            } else {
-              Location.getCurrentPositionAsync({accuracy: 1}).then(
-                ({coords}) => {
-                  setPosition({
-                    latitude: coords.latitude,
-                    longitude: coords.longitude,
-                  });
-                },
-              );
-              setLoading(false);
-            }
-          })
-          .catch(error => {
-            console.error('Erro ao obter a localização:', error);
-            setLoading(false);
-          });
-      });
-    }
-    const listener = AppState.addEventListener('change', state => {
-      if (state === 'active') {
-        getPermissionLocal().then(() => {
-          Location.getLastKnownPositionAsync().then(location => {
-            if (location) {
-              setPosition({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-              });
-              setLoading(false);
-            } else {
-              Location.getCurrentPositionAsync({accuracy: 1}).then(
-                ({coords}) => {
-                  setPosition({
-                    latitude: coords.latitude,
-                    longitude: coords.longitude,
-                  });
-                },
-              );
-              setLoading(false);
-            }
-          });
-        });
-      }
-    });
-    return () => listener.remove();
-  }, []);
-
-  useEffect(() => {
-    tripRealtime.checkTripAcceptedScheduled(
-      user.idUser,
-      STATUS_SCHEDULED,
-      (trip, type) => {
-        if (type === 'modified') {
-          if (trip?.driver) {
-            customToast(
-              `${trip?.driver?.name} ${translate(
-                'schedule.accepted_your_service_from',
-              )} ${convertDatetimeToDate(
-                trip?.schedule?.schedule,
-              )} - ${convertDatetimeToTime(trip?.schedule?.schedule)} `,
-              'success',
-              6000,
-            );
-            Push.sendSimple({
-              title: `${translate('schedule.accepted_service')}`,
-              message: '',
-              body: `${translate(
-                'schedule.your_service_scheduled_at',
-              )} ${convertDatetimeToDate(
-                trip?.schedule?.schedule,
-              )} - ${convertDatetimeToTime(trip?.schedule?.schedule)}`,
-            });
-            return;
-          }
-          if (!trip?.driver) {
-            Push.sendSimple({
-              title: `${translate('finishTrip.text_trip_cancelled_by_driver')}`,
-              message: '',
-              body: `${translate(
-                'schedule.your_service_scheduled_at',
-              )} ${convertDatetimeToDate(
-                trip?.schedule?.schedule,
-              )} - ${convertDatetimeToTime(trip?.schedule?.schedule)}`,
-            });
-          }
-        }
-      },
-    );
-  }, []);
-
-  const lastPlaces = async () => {
-    setLoading(true);
-    try {
-      const request = await AsyncStorage.getItem('lastPlaces');
-      if (request) {
-        // setPlaces(JSON.parse(lastPlaces).reverse());
-        const parse = await JSON.parse(request);
-        const response = await indicatorsWithFilterId(parse.reverse());
-        setPlaces(response);
-        setLoading(false);
-        return response;
-      }
-      setLoading(false);
-      return [];
-    } catch (error) {
-      console.log(error);
-    }
-    setLoading(false);
-  };
-
-  const indicatorsWithFilterId = useCallback(list => {
-    const newList = list
-      .filter(item => {
-        return item.latitude !== null;
-      })
-      .map(item => {
-        return {
-          ...item,
-          item_latitude: item.latitude,
-        };
-      })
-      .filter((item, index, self) => {
-        return self.findIndex(t => t.item_latitude === item.latitude) === index;
-      });
-    setPlaces(newList);
-    return newList;
-  }, []);
-
-  useEffect(() => {
-    lastPlaces();
-  }, [lastPlaceSelected]);
-
-  useEffect(() => {
     if (position) {
       getConfigByPosition(position);
-      getOnlineDrivers(position?.latitude, position?.longitude);
     }
   }, [position]);
 
+  // Verifica se não há motoristas disponíveis e mostra modal OfferOtherTrip
   useEffect(() => {
-    if (navigation) {
-      const unsubscribe = navigation.addListener('focus', () =>
-        handleTripStateChange(),
-      );
+    if (showDriverSearchFromCache && driversNears && driversNears.length === 0) {
+      // Limpa dados antigos para evitar conflitos
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'origin',
+        arg: {},
+      });
 
-      return route?.params?.noUnsubscribe ? undefined : unsubscribe;
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'destination',
+        arg: {},
+      });
+
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'selectedOptionTravel',
+        arg: {},
+      });
+
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'selectedPaymentMethod',
+        arg: {},
+      });
+
+      // Limpa caches antigos
+      AsyncStorage.removeItem(PIX_CACHE_KEY);
+      AsyncStorage.removeItem(TRIP_CACHE_KEY);
+
+      setShowDriverSearchFromCache(false);
     }
-    return () => {};
-  }, [navigation, route.params?.noUnsubscribe]);
+  }, [showDriverSearchFromCache, driversNears]);
+
+  // Monitora o estado offerOtherTypeTrip do contexto Trip
+  useEffect(() => {
+    if (offerOtherTypeTrip) {
+      setShowDriverSearchFromCache(false);
+
+      // Limpa caches
+      AsyncStorage.removeItem(PIX_CACHE_KEY);
+      AsyncStorage.removeItem(TRIP_CACHE_KEY);
+    }
+  }, [offerOtherTypeTrip]);
 
   useEffect(() => {
     if (completedTripData) {
@@ -474,14 +565,7 @@ export default function Home({route}) {
     return setShowTripFinishModal(false);
   }, [completedTripData]);
 
-  useEffect(() => {
-    if (position) {
-      getDriversOnline(Number(position?.latitude), Number(position?.longitude));
-    }
-  }, [position]);
-
   async function requestMicrophonePermission() {
-    setLoading(true);
     try {
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
@@ -491,12 +575,11 @@ export default function Home({route}) {
     } catch (error) {
       console.log(error);
     }
-    setLoading(false);
   }
+
   useEffect(() => {
     requestMicrophonePermission();
     if (textVoice) {
-      setLoadingVoice(true);
       setTimeout(() => {
         setLoadingVoice(false);
         setModalMic(false);
@@ -512,22 +595,27 @@ export default function Home({route}) {
   }, [textVoice]);
 
   const speakUnicMessage = async () => {
-    setLoading(true);
     try {
-      await Speech.speak(
-        `Ola ${
-          user?.nameUser?.split(' ')[0] || user?.nickname
-        } para onde quer ir ? `,
+      const language = await AsyncStorage.getItem('@language');
+      const formatedLanguage = language.replace('_', '-');
+
+      setShowModalVoiceRecord(false);
+      Speech.speak(
+        `${translate('home.modal_voice_hello')} ${user?.nameUser?.split(' ')[0] || user?.nickname
+        } ${translate('home.modal_voice_where_go')} `,
         {
-          language: 'pt-BR',
+          language: formatedLanguage,
           rate: 0.8,
-          // rate: rate,
+          onDone: () => {
+            setLoadingVoice(true);
+            setShowModalVoiceRecord(true);
+          },
         },
       );
+      setModalMic(true);
     } catch (error) {
       console.log(error);
     }
-    setLoading(false);
   };
 
   const haveNotification = () => {
@@ -544,9 +632,11 @@ export default function Home({route}) {
     haveNotification;
   }, [notification]);
 
-  const handleRedirectTripsSpeedMob = () => {
+  const handleRedirectTripsSpeedMob = async () => {
+    if (!await authorizedTravelUser()) return;
+
     setTimeout(() => {
-      navigation.navigate('TripRoutes', {screen: 'TripSpeedMob'});
+      navigation.navigate('TripRoutes', { screen: 'TripSpeedMob' });
     }, 300);
     fadeOut();
   };
@@ -567,7 +657,7 @@ export default function Home({route}) {
     }).start();
   };
 
-  const Pulse = ({delay = 0, repeat}) => {
+  const Pulse = ({ delay = 0, repeat }) => {
     const animation = useSharedValue(init === 'Speedmob' ? 3.5 : 0.7);
     useEffect(() => {
       animation.value = withDelay(
@@ -591,7 +681,7 @@ export default function Home({route}) {
       );
       return {
         opacity,
-        transform: [{scale: animation.value}],
+        transform: [{ scale: animation.value }],
       };
     });
 
@@ -600,12 +690,12 @@ export default function Home({route}) {
         style={[
           init === 'Speedmob'
             ? [
-                styles.circleSpeedMob,
-                {
-                  backgroundColor: theme.colors.primary,
-                  borderColor: theme.colors.primary,
-                },
-              ]
+              styles.circleSpeedMob,
+              {
+                backgroundColor: theme.colors.primary,
+                borderColor: theme.colors.primary,
+              },
+            ]
             : styles.circle,
           animatedStyles,
         ]}
@@ -621,30 +711,159 @@ export default function Home({route}) {
     textVoice === '' && setModalMic(false);
   }, [textVoice]);
 
+  const handleCloseModalAlert = () => {
+    dispatchTripCustomer({
+      type: 'update',
+      field: 'timeExceededFee',
+      arg: {
+        title: null,
+        description: null,
+        show: false,
+      },
+    });
+  };
+
+  const handleCloseModalVoiceRecording = () => {
+    setTextVoice('');
+    setLoadingVoice(false);
+    setModalMic(false);
+    setShowModalVoiceRecord(false);
+  };
+
+  const clearCacheTripPartnerAnothe = async () => {
+    await AsyncStorage.removeItem('@app:tripNoDestination');
+    await AsyncStorage.removeItem('@app:tripNoDestinationAnother');
+  };
+
   useFocusEffect(
     useCallback(() => {
+      clearCacheTripPartnerAnothe();
+
       fadeIn();
-    }, []),
+
+      if (position?.latitude && position?.longitude) {
+        mapRef?.current?.animateToRegion({
+          latitude: position.latitude,
+          longitude: position.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        });
+      }
+    }, [position]),
   );
 
-  const monitoringInfoDataUser = useCallback(() => {
-    if (userData === undefined) return;
-    if (
-      !userData?.document ||
-      !user.profileImage ||
-      !userData?.dateOfBirth ||
-      user.profileImage === 'user.png'
-    ) {
-      customToast(translate('trip.alert_document_incomplete'), 'warning');
-      navigation.navigate('MyProfile');
-    }
-  }, [userData, user]);
+  useEffect(() => {
+    showModalNoCity(globalShowModalNoCity);
+  }, [globalShowModalNoCity]);
 
-  useFocusEffect(monitoringInfoDataUser);
+  useEffect(() => {
+    const checkPixCache = async () => {
+      const pixData = await AsyncStorage.getItem(PIX_CACHE_KEY);
+      const tripData = await AsyncStorage.getItem(TRIP_CACHE_KEY);
+
+      try {
+        if (pixData === null) {
+          return;
+        }
+
+        const parsedPixData = JSON.parse(pixData);
+        if (tripData === null) {
+          await AsyncStorage.removeItem(PIX_CACHE_KEY);
+          return;
+        }
+
+        const parsedTripData = JSON.parse(tripData);
+        if (!parsedTripData.origin || !parsedTripData.destination || !parsedTripData.selectedOptionTravel) {
+          await AsyncStorage.removeItem(PIX_CACHE_KEY);
+          await AsyncStorage.removeItem(TRIP_CACHE_KEY);
+          return;
+        }
+
+        Object.entries(parsedTripData).forEach(([key, value]) => {
+          dispatchTripCustomer({ type: 'update', field: key, arg: value });
+        });
+
+        if (parsedTripData.polylineCoordinates) {
+          dispatchTripCustomer({
+            type: 'update',
+            field: 'lastPolylineCoordinates',
+            arg: parsedTripData.polylineCoordinates,
+          });
+        }
+
+        navigation.navigate('TripPixPayment', {
+          origin: 'Home',
+          pixCode: parsedPixData.pixKey.key,
+          amount: parsedPixData.price,
+        });
+
+      } catch (error) {
+        await AsyncStorage.removeItem(PIX_CACHE_KEY);
+        await AsyncStorage.removeItem(TRIP_CACHE_KEY);
+      }
+    };
+
+    checkPixCache();
+  }, [navigation, dispatchTripCustomer]);
+
+  const handleModalNoCityPress = () => {
+    showModalNoCity(false);
+    dispatchTripCustomer({
+      type: 'update',
+      field: 'showModalNoCity',
+      arg: false,
+    });
+  };
+
+  // Função para limpar cache do PIX
+  const clearPixCache = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem(PIX_CACHE_KEY);
+      await AsyncStorage.removeItem(TRIP_CACHE_KEY);
+    } catch (error) {
+      console.error('❌ Erro ao limpar cache do PIX:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if ((routeInfo.params as any)?.pixCacheAction === 'cancel') {
+      clearPixCache();
+      navigation.setParams({ pixCacheAction: undefined });
+    }
+  }, [(routeInfo.params as any)?.pixCacheAction]);
+
+  async function initializeActiveTrips(tripsActives: TripActive[]) {
+    if (tripsActives.length === 0) {
+      return;
+    }
+
+    const activeTrip = tripsActives?.[0];
+    if (!activeTrip) return;
+
+    try {
+      handleTripStateChange(activeTrip.tripReference);
+    } catch (error) {
+      console.log("Erro ao verificar viagens ativas", error);
+    }
+  }
+
+  useEffect(() => {
+    initializeActiveTrips(tripsActives);
+  }, [tripsActives]);
 
   return (
-    <View style={{flex: 1}}>
-      <Preload visible={loading} />
+    <RootContainer>
+
+      <Preload visible={(loading || loadingTrips)} />
+      {timeExceededFee.show && (
+        <ModalAlert
+          icon="warning"
+          title={timeExceededFee.title}
+          body={timeExceededFee.description}
+          visibleModal={timeExceededFee.show}
+          handleSubmissModal={handleCloseModalAlert}
+        />
+      )}
       <Modal visible={offerBiometry}>
         <OfferFingerprint />
       </Modal>
@@ -658,110 +877,50 @@ export default function Home({route}) {
             field: 'completedTripData',
             arg: undefined,
           });
+          clearTrip();
         }}
       />
-      <If condition={tripPartnerList?.length > 0}>
+      {tripPartnerList?.length > 0 && (
         <TripPartnerInfo setVisible={setTripListVisibility} />
-      </If>
-      <If condition={tripListVisibility}>
+      )}
+      {tripListVisibility && (
         <TripListModal
           visible={tripListVisibility}
           setVisible={setTripListVisibility}
           trips={tripPartnerList}
         />
-      </If>
-      <View
-        style={{
-          flex: 1,
-          position: 'relative',
-        }}
-      >
-        {position && (
+      )}
+      <MapCardWrapper>
+        <MapCard>
           <MapView
             ref={mapRef}
-            minZoomLevel={15}
-            initialRegion={{
-              latitude: position.latitude,
-              longitude: position.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.001,
-            }}
-            style={{
-              flex: 1,
-              height: Dimensions.get('window').height,
-              width: '100%',
-              position: 'absolute',
-            }}
-            showsUserLocation={!polylineCoordinates}
+            style={styles.mapFill}
+            showsUserLocation={!polylineCoordinates && !position}
             showsMyLocationButton={false}
             showsCompass={false}
             customMapStyle={Platform.OS === 'ios' ? null : mapStyle}
+            userInterfaceStyle="light"
           >
-            {driversNears &&
-              Object.keys(trip).length <= 0 &&
-              driversNears.length > 0 &&
-              driversNears.map((driver, index) => {
-                return (
-                  <Marker
-                    key={index}
-                    coordinate={{
-                      latitude: Number(driver.latitude),
-                      longitude: Number(driver.longitude),
-                    }}
-                    anchor={{x: 0.5, y: 0.5}}
-                  >
-                    <Image
-                      style={{
-                        width: RFValue(28),
-                        height: RFValue(28),
-                      }}
-                      source={
-                        driver.iconMapDriver === null
-                          ? require('../../../../assets/images/car.png')
-                          : {
-                              uri: driver.iconMapDriver,
-                            }
-                      }
-                      resizeMode="contain"
-                    />
-                  </Marker>
-                );
-              })}
+            {position && (
+              <CurrentLocationMarker
+                latitude={position.latitude}
+                longitude={position.longitude}
+              />
+            )}
+            {driversNears?.length > 0 && driversNears.map((driver, index) => (
+              <CustomMarkerDriverNear data={driver} key={index} />
+            ))}
           </MapView>
-        )}
 
-        <Header>
+          <Header>
           {init !== 'Speedmob' && (
-            <>
-              <View
-                style={{
-                  width: 220,
-                }}
-              >
-                <SimpleText>{translate('home.text_hello')}</SimpleText>
-                <SimpleText style={{fontSize: 25}}>
-                  {user
-                    ? user?.nameUser?.split(' ')[0]
-                    : translate('home.text_welcome')}
-                  !
-                </SimpleText>
-              </View>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Profile')}
-                activeOpacity={0.8}
-              >
-                <ProfileImage
-                  source={
-                    user?.profileImage
-                      ? {
-                          uri:
-                            buildApp().HOST_IMAGE_CUSTOMER + user?.profileImage,
-                        }
-                      : Photo
-                  }
-                />
-              </TouchableOpacity>
-            </>
+            <HomeMapHeader
+              greetingName={`${translate('home.text_hello')} ${
+                user ? user?.nameUser?.split(' ')[0] : translate('home.text_welcome')
+              }!`}
+              avatarUri={user?.profileImageLink || getStoragePictureSpecific('customer')}
+              onAvatarPress={() => navigation.navigate('Profile')}
+            />
           )}
 
           {init === 'Speedmob' && (
@@ -792,184 +951,29 @@ export default function Home({route}) {
             </>
           )}
         </Header>
-        {init !== 'Speedmob' && (
-          <>
-            <DetailsContent>
-              <MyLocationViewer
-                backgroundColor={theme.colors.primary}
-                onPress={() => {
-                  if (position) {
-                    mapRef?.current?.animateToRegion({
-                      latitude: position?.latitude,
-                      longitude: position?.longitude,
-                      latitudeDelta: 0.01,
-                      longitudeDelta: 0.001,
-                    });
-                  }
-                }}
-                activeOpacity={0.8}
-              >
-                <Mylocation onPress={() => true} />
-              </MyLocationViewer>
-              <ScrollView>
-                <View>
-                  <HeaderDetails>
-                    <ScrollView>
-                      <Title>
-                        {generalSettings.find(
-                          item => item?.key === 'title_for_home',
-                        )?.value || translate('home.text_lets_find')}
-                      </Title>
-                      {/* <View style={{flexDirection: 'row'}}>
-                        <SubTitle>{translate('home.text_one')}</SubTitle>
-                        <RaceSubTitle>
-                          {translate('home.text_trip')}
-                        </RaceSubTitle>
-                      </View> */}
-                    </ScrollView>
-                    <NotificationButton />
-                  </HeaderDetails>
-                  <View>
-                    <ContentAddress>
-                      <ContentInput>
-                        <Input
-                          onPress={() => {
-                            navigation.navigate('TripRoutes', {screen: 'Trip'});
-                          }}
-                        >
-                          <Ionicons
-                            name="search"
-                            size={20}
-                            color={theme.colors.primary}
-                          />
-                          <SimpleText style={{marginLeft: 10}}>
-                            {translate('home.text_where_we_go')}
-                          </SimpleText>
-                        </Input>
-                        <ButtonMic
-                          style={{
-                            shadowColor: theme.colors.black,
-                            shadowOffset: {
-                              width: 0,
-                              height: 3,
-                            },
-                            shadowOpacity: 0.29,
-                            shadowRadius: 4.65,
+        </MapCard>
 
-                            elevation: 7,
-                          }}
-                          activeOpacity={0.9}
-                          onPress={() => {
-                            speakUnicMessage();
-                            setModalMic(true);
-                          }}
-                        >
-                          {[1].map((item, index) => (
-                            <Pulse repeat={index === 0} key={index} />
-                          ))}
-                          <Ionicons
-                            name="mic"
-                            color={theme.colors.primary}
-                            size={RFValue(30)}
-                            style={{
-                              zIndex: 5,
-                              height: '100%',
-                              marginTop: '30%',
-                              marginLeft: 2,
-                              alignSelf: 'center',
-                            }}
-                          />
-                        </ButtonMic>
-                      </ContentInput>
-
-                      {!hasPublicity && places.length > 0 && (
-                        <ContentLastPlace
-                          hasPlaces={Boolean(places.length) && !hasPublicity}
-                        >
-                          {places
-                            .filter(item => item.latitude)
-                            .map((addressResult, index) => {
-                              return (
-                                <CardLastPlace
-                                  hasBorder={index !== places.length - 1}
-                                  key={index}
-                                  onPress={() => {
-                                    setLastPlaceSelected({
-                                      address: addressResult.address,
-                                      latitude: addressResult.latitude,
-                                      longitude: addressResult.longitude,
-                                      street: addressResult.street || null,
-                                      type: addressResult.type || null,
-                                    });
-                                    navigation.navigate('TripRoutes', {
-                                      screen: 'Trip',
-                                    });
-                                  }}
-                                >
-                                  <SimpleLineIcons
-                                    name="clock"
-                                    size={15}
-                                    color={theme.colors.primary}
-                                    style={{marginRight: 10}}
-                                  />
-                                  <TextEdit
-                                    size={`smalls`}
-                                    color={theme.colors.secondary}
-                                  >
-                                    {addressResult?.address}
-                                  </TextEdit>
-                                </CardLastPlace>
-                              );
-                            })}
-                        </ContentLastPlace>
-                      )}
-                    </ContentAddress>
-                  </View>
-                </View>
-                <View>
-                  <ContentModuleButton>
-                    {firstBlockButtom.length !== 0 &&
-                      firstBlockButtom.map((item, index) => (
-                        <ModuleButtonLarge
-                          activeOpacity={0.8}
-                          onPress={() => navigation.navigate(item.moduleName)}
-                          key={index}
-                        >
-                          <TextLarge>{item.moduleName}</TextLarge>
-                          <ImageLarge source={{uri: item.logo}} />
-                        </ModuleButtonLarge>
-                      ))}
-                  </ContentModuleButton>
-                  <ContentModuleButton>
-                    {secondBlockButtom.length !== 0 &&
-                      secondBlockButtom.map((item, index) => (
-                        <ModuleButtonSmall
-                          activeOpacity={0.8}
-                          onPress={() => navigation.navigate(item.moduleName)}
-                          key={index}
-                        >
-                          <TextSmall>{item.moduleName}</TextSmall>
-                          <ImageSmall source={{uri: item.logo}} />
-                        </ModuleButtonSmall>
-                      ))}
-                  </ContentModuleButton>
-                </View>
-                {hasPublicity && (
-                  <View style={{marginTop: 20, marginBottom: 20}}>
-                    <CardPublicity
-                      appConstPublicity={4}
-                      setLoading={setLoadingPulblicity}
-                    />
-                  </View>
-                )}
-              </ScrollView>
-            </DetailsContent>
-          </>
+        {/* Modal de inicio na simulação de viagem */}
+        {init !== 'Speedmob' && !showDriverSearchFromCache && (
+          <HomeBottomSheet
+            mapRef={mapRef}
+            position={position}
+            onPositionChange={setPosition}
+            searchPlaceholder={
+              generalSettings.find(item => item?.key === 'title_for_home')?.value ||
+              translate('home.text_where_we_go')
+            }
+            onSearchPress={handleInputPress}
+            onMicPress={speakUnicMessage}
+            moduleButtons={moduleButtons}
+            onModulePress={handleModulePress}
+            publicityList={publicityList}
+          />
         )}
 
         {init === 'Speedmob' && (
           <ContentButtonCallRacer>
-            <AnimatedNative.View style={[{opacity: fadeAnim}]}>
+            <AnimatedNative.View style={[{ opacity: fadeAnim }]}>
               <ButtonCallRacer onPress={handleRedirectTripsSpeedMob}>
                 {[1].map((item, index) => (
                   <Pulse repeat={index === 0} key={index} />
@@ -981,7 +985,14 @@ export default function Home({route}) {
             </AnimatedNative.View>
           </ContentButtonCallRacer>
         )}
-      </View>
+
+        {/* DriverSearch quando PIX for carregado do cache */}
+        {showDriverSearchFromCache && (
+          <DriverSearchOverlay>
+            <DriverSearch />
+          </DriverSearchOverlay>
+        )}
+      </MapCardWrapper>
 
       <ModalFrame
         onClose={() => {
@@ -995,8 +1006,8 @@ export default function Home({route}) {
         hideConfirm
       >
         <ViewVoice>
-          <If condition={loadingVoice}>
-            <MotiView
+          {loadingVoice && (
+            <VoicePulse
               from={{
                 opacity: 0,
                 scale: 0.5,
@@ -1010,38 +1021,37 @@ export default function Home({route}) {
                 duration: 500,
                 loop: true,
               }}
-              style={{
-                width: RFValue(100),
-                height: RFValue(100),
-                borderRadius: RFValue(100),
-                backgroundColor: shade(0.08, theme.colors.background_global),
-                position: 'absolute',
-              }}
             />
-          </If>
+          )}
 
           {/* <IfLoaderInsideScreen loading={loadingVoice}> */}
           <Ionicons
             name="mic"
             color={!loadingVoice ? theme.colors.primary : theme.colors.red}
             size={RFValue(80)}
-            style={{
-              marginLeft: 5,
-            }}
+            style={styles.micIconMargin}
           />
           {/* </IfLoaderInsideScreen> */}
 
-          <WebViewVoiceRecognition
-            setText={setTextVoice}
-            text={textVoice}
-            width={1}
-            setStartLoading={setLoadingVoice}
-            height={1}
-            sizeIcon={1}
-            automatic
-          />
+          {showModalVoiceRecord && (
+            <WebViewVoiceRecognition
+              setText={setTextVoice}
+              text={textVoice}
+              width={1}
+              setStartLoading={setLoadingVoice}
+              height={1}
+              sizeIcon={1}
+              automatic
+              showModalVoiceRecord={showModalVoiceRecord}
+              setShowModalVoiceRecord={setShowModalVoiceRecord}
+              handleOnTheEnd={handleCloseModalVoiceRecording}
+            />
+          )}
         </ViewVoice>
       </ModalFrame>
-    </View>
+      {globalShowModalNoCity && (
+        <CardNoCity onPress={handleModalNoCityPress} />
+      )}
+    </RootContainer>
   );
 }

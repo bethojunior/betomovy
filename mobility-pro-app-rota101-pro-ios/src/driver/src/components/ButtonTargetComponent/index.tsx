@@ -1,28 +1,42 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {translate} from '../../../../client/locales';
-import {ButtonTarget} from '../../../../common/ButtonTarget';
-import {useNavigation} from '@react-navigation/native';
-import {useTripStatusProvider} from '../../context/TripStatus';
+import { useTripStatusProvider } from '../../context/TripStatus';
+import { useDriverHours } from '../../hooks/useDriverHours';
+import { ModalHorasLimites } from '../ModalHorasLimites';
+import { useState, useEffect } from 'react';
 
 export const ButtonTargetComponent = () => {
-  const navigation = useNavigation();
-  const {buttonTargetVisibility, setButtonTargetVisibility} =
-    useTripStatusProvider();
-  const navigateToTripDetails = async () => {
-    const trip = JSON.parse(await AsyncStorage.getItem('lastTripFinished'));
-    navigation.navigate('DetailsTrip', {
-      tripReference: trip.tripReference,
-      trip,
-    });
+  const [showModalHoras, setShowModalHoras] = useState(false);
+
+  const buttonTargetVisibility: any = useTripStatusProvider(
+    (context: any) => context.buttonTargetVisibility,
+  );
+
+  const { checkDriverStatusAndHours, shouldShowModal, hasShownModalInHome } =
+    useDriverHours();
+
+  const checkHoursAutomatically = async () => {
+    await checkDriverStatusAndHours();
+
+    setTimeout(() => {
+      if (shouldShowModal && !hasShownModalInHome) {
+        setShowModalHoras(true);
+      }
+    }, 500);
   };
 
+  useEffect(() => {
+    if (buttonTargetVisibility) {
+      const timer = setTimeout(() => {
+        checkHoursAutomatically();
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [buttonTargetVisibility]);
+
   return (
-    <ButtonTarget
-      text={translate('home.see_details_trip')}
-      visible={buttonTargetVisibility}
-      setVisible={setButtonTargetVisibility}
-      callback={navigateToTripDetails}
-      secondsToHide={5}
+    <ModalHorasLimites
+      visible={showModalHoras}
+      onClose={() => setShowModalHoras(false)}
     />
   );
 };

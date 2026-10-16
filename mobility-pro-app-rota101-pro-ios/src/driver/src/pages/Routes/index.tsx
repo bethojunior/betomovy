@@ -1,23 +1,27 @@
 /* eslint-disable radix */
-import {useEffect, useState} from 'react';
-import {TouchableOpacity, View, Image, Alert} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useTheme} from 'styled-components';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import {useLocalization} from '../../../contexts/Localization';
+import { useEffect, useState } from 'react';
+import { Alert, Image, TouchableOpacity, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { useTheme } from 'styled-components';
+import { translate } from '../../../../client/locales';
+import { useAuth } from '../../../../context/auth';
+import { IfLoaderInsideScreen } from '../../components/IfLoaderInsideScreen';
 import ModalFrame from '../../components/Modal/ModalFrame';
-import {useRoutes} from '../../context/Route';
-import {ListRoutesProps} from '../../context/Route/types';
-import {getCoinType, maskMoney} from '../../utils/money';
+import { useLocalProvider } from '../../context/local';
+import { useRoutes } from '../../context/Route';
+import { ListRoutesProps } from '../../context/Route/types';
+import Helper from '../../utils/Helper';
+import { getCoinType, maskMoney } from '../../utils/money';
 import {
   Ball,
   Button,
   ButtonContent,
   Card,
   CardContent,
-  Content,
   Container,
+  Content,
   DataContent,
   Info,
   InfoModal,
@@ -36,11 +40,6 @@ import {
   VacanciesButton,
   VacanciesText,
 } from './styles';
-import {IfLoaderInsideScreen} from '../../components/IfLoaderInsideScreen';
-import {translate} from '../../../../client/locales';
-import Helper from '../../utils/Helper';
-import {useAuth} from '../../../../context/auth';
-import { useLocalProvider } from '../../context/local';
 
 export const Routes = () => {
   const [selected, setSelected] = useState(1);
@@ -57,23 +56,25 @@ export const Routes = () => {
   const [hourOffered, setHourOffered] = useState('');
   const [dateOffered, setDateOffered] = useState('');
 
-  const {colors} = useTheme();
-  const {location} = useLocalProvider();
-  const {generalSettings} = useAuth();
+  const { colors } = useTheme();
+  const { location } = useLocalProvider();
+  const { generalSettings } = useAuth();
   const {
     getNew,
     getReleased,
     getOffered,
-    listRoutes,
     requestRoute,
     offerRoute,
     cancelOffer,
   } = useRoutes();
+  const [listRoutes, setListRoutes] = useState([]);
 
   useEffect(() => {
     setLoadingCard(true);
     const loadNewRoute = async () => {
-      await getNew(location?.coords?.latitude, location?.coords?.longitude);
+      setListRoutes(
+        await getNew(location?.coords?.latitude, location?.coords?.longitude),
+      );
       setLoadingCard(false);
     };
 
@@ -86,7 +87,7 @@ export const Routes = () => {
   function validateDate(date: string) {
     if (!date) return false;
 
-    const [day, month, year] = date.split('/');
+    const [day, month, year] = date?.split('/');
     const currentDate = new Date();
     const currentDay = currentDate.getDate();
     const currentMonth = currentDate.getMonth() + 1;
@@ -126,8 +127,8 @@ export const Routes = () => {
         return setError(true);
       }
 
-      const newTime = time.split(':');
-      const format = date.split('/');
+      const newTime = time?.split(':');
+      const format = date?.split('/');
 
       const isValid = await validateDate(date);
       if (!isValid || format[1] === undefined || format[2] === undefined) {
@@ -181,10 +182,10 @@ export const Routes = () => {
 
         {
           text: 'Voltar',
-          onPress: () => {},
+          onPress: () => { },
         },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
     return '';
   };
@@ -200,9 +201,9 @@ export const Routes = () => {
 
   useEffect(() => {
     if (selected === 3) {
-      let convertDate = routeSelected?.ride?.schedule.split(' ');
+      let convertDate = routeSelected?.ride?.schedule?.split(' ');
       setHourOffered(convertDate[1]);
-      convertDate = convertDate[0].split('-');
+      convertDate = convertDate[0]?.split('-');
       setDateOffered(`${convertDate[2]}-${convertDate[1]}-${convertDate[0]}`);
 
       routeSelected?.ride?.rideItems?.find(item => {
@@ -213,10 +214,11 @@ export const Routes = () => {
 
   return (
     <>
+      {/* Renderiza o conteúdo da tela  */}
       <Content>
         <IfLoaderInsideScreen
           loading={loadingCard}
-          color={colors.primary}
+          color={colors.primary} // Cor do loading que será exibido
           size={30}
         >
           <CardContent>
@@ -318,7 +320,7 @@ export const Routes = () => {
                 })
               ) : (
                 <Info
-                  style={{alignSelf: 'center', marginTop: 20, fontSize: 18}}
+                  style={{ alignSelf: 'center', marginTop: 20, fontSize: 18 }}
                 >
                   {translate('pageRoutes.text_empty_routes')}
                 </Info>
@@ -326,13 +328,23 @@ export const Routes = () => {
             </ScrollView>
           </CardContent>
         </IfLoaderInsideScreen>
+
+        {/* Renderiza os botões */}
         <ButtonContent>
+
+          {/* Novas Ofertas */}
           <Button
             activeOpacity={0.8}
             onPress={async () => {
               setLoadingCard(true);
               setSelected(1);
-              await getNew(location?.coords?.latitude, location?.coords?.longitude);
+              let newOffers = await getNew(
+                location?.coords?.latitude,
+                location?.coords?.longitude,
+              );
+
+              // Caso seja selecionado (após a renderização inicial)
+              setListRoutes(newOffers);
               setLoadingCard(false);
             }}
             disabled={selected === 1}
@@ -341,12 +353,14 @@ export const Routes = () => {
               {translate('pageRoutes.title_new')}
             </TextButton>
           </Button>
+
+          {/* Liberadas */}
           <Button
             activeOpacity={0.8}
             onPress={async () => {
               setLoadingCard(true);
               setSelected(2);
-              await getReleased();
+              setListRoutes(await getReleased());
               setLoadingCard(false);
             }}
             disabled={selected === 2}
@@ -355,12 +369,14 @@ export const Routes = () => {
               {translate('pageRoutes.title_free')}
             </TextButton>
           </Button>
+
+          {/* Minhas Ofertas */}
           <Button
             activeOpacity={0.8}
             onPress={async () => {
               setLoadingCard(true);
               setSelected(3);
-              await getOffered();
+              setListRoutes(await getOffered());
               setLoadingCard(false);
             }}
             disabled={selected === 3}
@@ -387,7 +403,7 @@ export const Routes = () => {
         error={error}
         textError={messageError}
       >
-        <View style={{maxHeight: 510}}>
+        <View style={{ maxHeight: 510 }}>
           <ScrollView>
             <ModalSection>
               <TitleModal>{translate('pageRoutes.title_info')}</TitleModal>
@@ -465,16 +481,17 @@ export const Routes = () => {
                     <TitleModal>
                       {translate('pageRoutes.title_my_offers')}
                     </TitleModal>
-                    {routeSelected?.routeTripItemTypes?.map(res => {
+                    {routeSelected?.routeTripItemTypes?.map((res, index) => {
                       return (
                         <ItemOfferedButton
                           activeOpacity={0.8}
+                          key={index}
                           onPress={() => {
                             // eslint-disable-next-line no-unused-expressions
                             tripItems.includes(res.id)
                               ? setTripItems(
-                                  tripItems.filter(id => id !== res.id),
-                                )
+                                tripItems.filter(id => id !== res.id),
+                              )
                               : setTripItems([...tripItems, res.id]);
                           }}
                           disabled={selected === 3}
@@ -487,7 +504,7 @@ export const Routes = () => {
                             }
                             size={20}
                             color={colors.primary}
-                            style={{marginRight: 5}}
+                            style={{ marginRight: 5 }}
                           />
                           <InfoModal>{res.name}</InfoModal>
                         </ItemOfferedButton>
@@ -529,7 +546,7 @@ export const Routes = () => {
                   </Container>
                 </ModalSection>
                 {selected === 2 && (
-                  <Container style={{marginTop: 10, marginBottom: 10}}>
+                  <Container style={{ marginTop: 10, marginBottom: 10 }}>
                     <TitleModal>
                       {translate('pageRoutes.text_quantity_vacancies')}
                     </TitleModal>
@@ -560,17 +577,17 @@ export const Routes = () => {
             {selected === 3 &&
               (routeSelected?.ride?.riders?.length > 0 ? (
                 <View>
-                  <TitleModal style={{marginBottom: 10, marginTop: 10}}>
+                  <TitleModal style={{ marginBottom: 10, marginTop: 10 }}>
                     Confirmados
                   </TitleModal>
-                  {routeSelected?.ride?.riders?.map(item => {
+                  {routeSelected?.ride?.riders?.map((item: any) => {
                     return (
                       <View
                         key={item.id}
-                        style={{flexDirection: 'row', alignItems: 'center'}}
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
                       >
                         <Image
-                          source={{uri: item.profileImage}}
+                          source={{ uri: item.profileImage }}
                           style={{
                             width: 60,
                             height: 60,
@@ -587,7 +604,7 @@ export const Routes = () => {
                   })}
                 </View>
               ) : (
-                <TitleModal style={{marginTop: 15, alignSelf: 'center'}}>
+                <TitleModal style={{ marginTop: 15, alignSelf: 'center' }}>
                   {translate('pageRoutes.text_empty_clients')}
                 </TitleModal>
               ))}

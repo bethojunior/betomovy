@@ -25,7 +25,7 @@ export const serviceTrasference = {
       {
         agency: account.agency,
         agencyDigit: account.agencyDigit,
-        bankId: account.bankId,
+        bankId: Number(account?.bankId || '2'),
         document: account.document,
         driverId: null,
         holderName: account.holderName,
@@ -48,7 +48,7 @@ export const serviceTrasference = {
       {
         agency: account.agency,
         agencyDigit: account.agencyDigit,
-        bankId: account.bankId,
+        bankId: Number(account?.bankId || '2'),
         document: account.document,
         holderName: account.holderName,
         numberAccount: account.numberAccount,

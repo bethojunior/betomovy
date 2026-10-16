@@ -33,6 +33,7 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.colors.background_white_light,
     borderRadius: 25,
     paddingHorizontal: 10,
+    paddingVertical: 5,
     marginHorizontal: 10,
     marginBottom: 10,
     flexDirection: 'row',

@@ -31,4 +31,19 @@ export const AnimatedSource = {
     id: '8',
     uri: require('../../assets/animation/animation_food.json'),
   },
+  USE_STATIC: {
+    ANIMATION_UPDATE: {
+      uri: require('../../assets/animation/updating.json'),
+    },
+    ANIMATION_ERROR: {
+      uri: require('../../assets/animation/errorAnimation.json'),
+    },
+    ANIMATION_PASSWORD: {
+      uri: require('../../assets/animation/password.json'),
+    },
+  },
+  VOUCHER: {
+    id: '9',
+    uri: require('../../assets/animation/buy_voucher_success.json'),
+  }
 };

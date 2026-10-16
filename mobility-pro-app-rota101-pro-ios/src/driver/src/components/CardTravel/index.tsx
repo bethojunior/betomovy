@@ -1,5 +1,5 @@
-import {useNavigation} from '@react-navigation/native';
-import {convertDate, maskHour} from '../../utils/FormatDate';
+import { useNavigation } from '@react-navigation/native';
+import { convertDate, maskHour } from '../../utils/FormatDate';
 
 import {
   ContainerCard,
@@ -11,22 +11,22 @@ import {
 } from './styles';
 
 import theme from '../../styles/theme';
-import {STATUS_SCHEDULED} from '../../constants/trip';
-import {translate} from '../../../../client/locales';
+import { STATUS_SCHEDULED } from '../../constants/trip';
+import { translate } from '../../../../client/locales';
 import Helper from '../../utils/Helper';
-import {useAuth} from '../../../../context/auth';
-import {View} from 'react-native';
+import { useAuth } from '../../../../context/auth';
+import { View } from 'react-native';
 interface CardServiceProps {
   trip: any;
   isSpeedMob?: boolean;
 }
 
-export function CardTravel({trip, isSpeedMob}: CardServiceProps) {
+export function CardTravel({ trip, isSpeedMob }: CardServiceProps) {
   const navigation = useNavigation();
-  const {cityConfig} = useAuth();
+  const { cityConfig } = useAuth();
 
   const formatDateAndHour = (date: string) => {
-    const dateSplit = date.split(' ');
+    const dateSplit = date?.split(' ');
     return `${convertDate(dateSplit[0])} ${maskHour(dateSplit[1])}`;
   };
 
@@ -78,7 +78,7 @@ export function CardTravel({trip, isSpeedMob}: CardServiceProps) {
     <>
       <ContainerCard
         activeOpacity={0.8}
-        style={{backgroundColor: switchColor(trip.status.toUpperCase())}}
+        style={{ backgroundColor: switchColor(trip.status.toUpperCase()) }}
         onPress={() => handleTripUnic(trip)}
       >
         <HeaderCard color={theme.colors.white}>

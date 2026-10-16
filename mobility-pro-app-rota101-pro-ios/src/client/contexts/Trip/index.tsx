@@ -1,3 +1,7 @@
+import { useBubbleButton } from '@704apps/react-native-bubble-button';
+import { decode } from '@googlemaps/polyline-codec';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 import {
   createContext,
   useCallback,
@@ -5,13 +9,14 @@ import {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
+  useRef
 } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {decode} from '@googlemaps/polyline-codec';
-import {showMessage} from 'react-native-flash-message';
-import {useNavigation} from '@react-navigation/native';
+import { appProccess, buildApp } from '../../../constantBuild/config';
+import { useAuth } from '../../../context/auth';
+import { useSocket } from '../../../context/SocketIO';
+import { customToast } from '../../../utils/FlashMessage';
 import apiMain from '../../api/apiMain';
+import { CREDIT_CARD_APP, PAYMENT_CARD_DEBIT, PIX, PIX_WEB } from '../../constants/paymentFormType';
 import {
   STATUS_ACCEPTED,
   STATUS_BACK_OFF,
@@ -20,36 +25,52 @@ import {
   STATUS_FINISHED,
   STATUS_IN_PROGRESS,
   STATUS_NOT_ANSWERED,
+  STATUS_PRE_ACCEPTED,
   STATUS_SCHEDULED,
   STATUS_SEARCHING,
-  STATUS_SEARCHING_FAVORITE,
+  STATUS_SEARCHING_DRIVER_OFFER,
 } from '../../constants/trip';
+import { usePlaces } from '../../hooks/place';
+import useTripRealtime from '../../hooks/tripRealtime';
+import { usePix } from '../../hooks/usePix';
+import { TripCallback } from '../../interfaces/tripRealtime';
+import { translate } from '../../locales';
+import TripRealtime from '../../services/realtime/TripRealtime';
 import Helper from '../../utils/Helper';
-import AppSocket from '../../services/socket';
-import {customToast} from '../../../utils/FlashMessage';
-import {translate} from '../../locales';
-import {useLocal} from '../local';
-import TripCollection from '../../services/firebase/collection/TripCollection';
-import {useAuth} from '../../../context/auth';
-import {deliveryService, offerService, TripService} from './services';
-import {appProccess, buildApp} from '../../../constantBuild/config';
+import { emitTripStatusChange } from '../../utils/tripStatusChangeEmitter';
+import { emitDriverLocation } from '~/utils/driverLocationEmmit';
+import { useLocal } from '../local';
+import { deliveryService, offerService, TripService } from './services';
+import { useUserDriver } from '../../../driver/src/context/userDriver';
 import {
-  TripContextType,
-  TripContextChildren,
-  SelectedPaymentMethodProps,
+  AddressProps,
+  ChangeRoutePreviewProps,
   DestinationProps,
+  InitialStateProps,
+  NewTripCacheData,
   SelectedCouponProps,
   SelectedOptionTravelProps,
-  ChangeRoutePreviewProps,
-  AddressProps,
-  TripProps,
-  InitialStateProps,
+  SelectedPaymentMethodProps,
+  TripContextChildren,
+  TripContextType,
+  TripProps
 } from './types';
-import {TripRealtime} from '../../services/realtime/TripRealtime';
-
-const tripRealtime = new TripRealtime();
+import { TripFinishStatus } from '~/interfaces/trip';
+const tripRealtime = TripRealtime.getInstance();
 
 const TripContext = createContext<TripContextType>({} as TripContextType);
+
+const normalizeString = (value?: string) =>
+  value ? value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : '';
+
+const isGenderNotAllowedError = (message?: string) => {
+  const normalized = normalizeString(message);
+  if (!normalized) {
+    return false;
+  }
+
+  return /genero\w*\s+nao\s*(e\s*)?permitido/.test(normalized);
+};
 
 const initialState: InitialStateProps = {
   origin: {} as AddressProps,
@@ -98,15 +119,34 @@ const initialState: InitialStateProps = {
   offerOtherTypeTrip: false,
   pixId: null,
   partnerTripsReference: [],
+  timeExceededFee: {
+    title: null,
+    description: null,
+    show: false,
+  },
+  showModalNoCity: false,
+  showModalScheduled: false,
 };
 
-const reducer = (state, action: {type: string; field?: string; arg?: any}) => {
+const reducer = (state, action: { type: string; field?: string; arg?: any }) => {
   switch (action.type) {
-    case 'update':
+    case 'update': {
+
+      if (action.field === 'selectedOptionTravel') {
+        return {
+          ...state,
+          selectedOptionTravel: action.arg,
+          selectedFavorite: [],
+        };
+      }
+
       return {
         ...state,
         [action.field]: action.arg,
       };
+
+    }
+
     case 'calculateAllNull':
       return {
         ...state,
@@ -137,26 +177,20 @@ const reducer = (state, action: {type: string; field?: string; arg?: any}) => {
         ...state,
         trip: action.arg,
         hideTravelOptions: true,
-        origin: {},
-        destination: {},
         selectedCoupon: {},
-        waypoints: [],
         isLoading: false,
-        loadingTrip: false,
-        inputWho: {name: '', phone: ''},
+        loadingTrip: true,
+        inputWho: { name: '', phone: '' },
       };
     case 'tripPartner':
       return {
         ...state,
         tripPartnerList: action.arg,
         hideTravelOptions: true,
-        origin: {},
-        destination: {},
         selectedCoupon: {},
-        waypoints: [],
         isLoading: false,
         loadingTrip: false,
-        inputWho: {name: '', phone: ''},
+        inputWho: { name: '', phone: '' },
       };
     case 'newTripScheduleSuccess':
       return {
@@ -165,11 +199,15 @@ const reducer = (state, action: {type: string; field?: string; arg?: any}) => {
         lastDestination: action.arg.lastDestination,
         tripType: action.arg.tripType,
         hideTravelOptions: true,
+        selectedCoupon: {},
+        isLoading: false,
+      };
+    case 'clearSimulationData':
+      return {
+        ...state,
         origin: {},
         destination: {},
-        selectedCoupon: {},
         waypoints: [],
-        isLoading: false,
       };
     case 'cancelTrip':
       return {
@@ -191,6 +229,7 @@ const reducer = (state, action: {type: string; field?: string; arg?: any}) => {
         loadingTrip: false,
         waypointQuantities: 0,
         polylineCoordinates: null,
+        lastPolylineCoordinates: null,
         prices: [],
         tripPaymentMethods: [],
         selectedPaymentMethod: {},
@@ -218,22 +257,40 @@ const reducer = (state, action: {type: string; field?: string; arg?: any}) => {
         lastOrigin: {},
         distance: null,
       };
+    case 'showModalNoCity':
+      return {
+        ...state,
+        showModalNoCity: action.arg,
+      };
     default:
       return false;
   }
 };
 
-export const TripProvider = ({children}: TripContextChildren) => {
+
+export const TripProvider = ({ children }: TripContextChildren) => {
+  const { tripRealtime } = useTripRealtime();
+  const { userDriverFind } = useUserDriver();
   const [stateTripCustomer, dispatchTripCustomer] = useReducer(
     reducer,
     initialState,
   );
+
+  const { openApp } = useBubbleButton();
+
+  const showModalNoCity = (show) => {
+    dispatchTripCustomer({
+      type: 'showModalNoCity',
+      arg: show,
+    });
+  };
 
   const {
     origin,
     destination,
     waypoints,
     polylineCoordinates,
+    lastPolylineCoordinates,
     selectedPaymentMethod,
     selectedOptionTravel,
     selectedCoupon,
@@ -253,21 +310,84 @@ export const TripProvider = ({children}: TripContextChildren) => {
     tripPartnerList,
   } = stateTripCustomer;
 
-  const {setLastPlaceSelected} = useLocal();
-  const socketRouteTrip = useRef(null);
-  const {user, cityConfig} = useAuth();
-  const navigation = useNavigation();
+  const { setLastPlaceSelected } = useLocal();
+  const { user, cityConfig } = useAuth();
+  const navigation = useNavigation<any>();
   const storageFirstPolyline = useRef(null);
+  const socketRouteTrip = useRef(null);
+  // Ref atualizado sincronamente no render para evitar closure stale no handler do socket
+  const tripStatusRef = useRef<string>(null);
+  // Ref atualizado no render: os criadores de viagem são chamados por closure
+  // antiga (await do modal de favorito em handleConfirmRace)
+  const selectedFavoriteRef = useRef<Array<string | number>>(selectedFavorite);
+  // Acumula todos os overview polylines calculados (com/sem waypoints) para filtrar cache do backend
+  const overviewPolylinesRef = useRef<Set<string>>(new Set());
+  tripStatusRef.current = trip?.status;
+  selectedFavoriteRef.current = selectedFavorite;
+  const { savePlace } = usePlaces();
+  const { socket } = useSocket();
 
-  function getUrlSocket() {
-    let url = buildApp().HOST_API_APP.replace('https', 'http');
-    if (appProccess === 'aws') {
-      url = buildApp().HOST_SOCKET;
+  const isGenderNotAllowedError = (errorMessage: string): boolean => {
+    if (!errorMessage) return false;
+    const genderErrorPatterns = [
+      'gênero não é permitido',
+      'genero nao e permitido',
+      'gender not allowed',
+      'gênero não permitido'
+    ];
+    return genderErrorPatterns.some(pattern =>
+      errorMessage.toLowerCase().includes(pattern.toLowerCase())
+    );
+  };
+
+  // Hook para gerenciar PIX e limpeza de cache
+  const { clearPixCache, clearAllCachesAfterTripStart } = usePix({
+    price: selectedOptionTravel?.price || 0,
+  });
+
+  const handleTripRouteListener = (result: any) => {
+    if (!result) return;
+
+    function getUrlSocket() {
+      let url = buildApp().HOST_API_APP.replace('https', 'http');
+      if (appProccess === 'aws') {
+        url = buildApp().HOST_SOCKET;
+      }
+      return url;
     }
-    url = url.substring(0, url.length - 1);
 
-    return url;
-  }
+    const decodedPolyline = decode(result.polyline).map(item => ({
+      latitude: item[0],
+      longitude: item[1],
+    }));
+
+    // Durante BOARDING/IN_PROGRESS, rejeita qualquer polyline que seja igual a
+    // um overview calculado antes da viagem (calculateAll com ou sem waypoints).
+    if (
+      [STATUS_BOARDING, STATUS_IN_PROGRESS, STATUS_FINISHED].includes(tripStatusRef.current) &&
+      overviewPolylinesRef.current.has(JSON.stringify(decodedPolyline))
+    ) {
+      return;
+    }
+
+    dispatchTripCustomer({
+      type: 'update',
+      field: 'routeTrip',
+      arg: result,
+    });
+
+    // exeute only one time
+    if (storageFirstPolyline.current == null && tripType === 'schedule') {
+      handleTripStateChange();
+      storageFirstPolyline.current = result;
+    }
+
+    dispatchTripCustomer({
+      type: 'update',
+      field: 'polylineCoordinates',
+      arg: decodedPolyline,
+    });
+  };
 
   useEffect(() => {
     if (!cityConfig) {
@@ -282,79 +402,27 @@ export const TripProvider = ({children}: TripContextChildren) => {
       });
     }
 
-    if (Object.keys(trip).length > 0 && socketRouteTrip.current == null) {
-      if (trip.status === STATUS_SEARCHING) {
-        return;
-      }
-
-      socketRouteTrip.current = new AppSocket(
-        `${getUrlSocket()}${cityConfig.configDriverLocation.port_url}`,
-        {
-          query: `tripReference=${trip.tripReference}`,
-        },
-      );
-
-      socketRouteTrip.current.onEvent(
-        `location-${trip.tripReference}`,
-        result => {
-          if (!result) {
-            return;
-          }
-          dispatchTripCustomer({
-            type: 'update',
-            field: 'routeTrip',
-            arg: result,
-          });
-          // exeute only one time
-          if (storageFirstPolyline.current == null && tripType === 'schedule') {
-            handleTripStateChange();
-            storageFirstPolyline.current = result;
-          }
-          dispatchTripCustomer({
-            type: 'update',
-            field: 'polylineCoordinates',
-            arg: decode(result.polyline).map(item => {
-              return {latitude: item[0], longitude: item[1]};
-            }),
-          });
-        },
-      );
+    if (Object.keys(trip).length > 0 && socket) {
+      if (trip.status === STATUS_SEARCHING) return;
+      socket.on(`location-${trip.tripReference}`, handleTripRouteListener);
     }
-  }, [trip, cityConfig]);
 
-  const getActiveTripSchedule = useCallback(async () => {
-    tripRealtime.checkTripAccepted(
-      user.idUser,
-      STATUS_ACCEPTED,
-      async (trip: TripProps, type: string) => {
-        if (['added', 'modified'].includes(type)) {
-          await tripActiveDetails(trip.tripReference);
-        }
-        if (type === 'removed') {
-          getStatus(trip.status);
-        }
-      },
-    );
-  }, []);
+    return () => {
+      socket?.off(`location-${trip.tripReference}`, handleTripRouteListener);
+    };
+  }, [trip, cityConfig, socket]);
 
-  const checkTripScheduleAccepted = useCallback(
-    async tripReference => {
-      tripRealtime.getTrip(tripReference, (trip: TripProps, type: string) => {
-        if (
-          type === 'modified' &&
-          trip?.status === STATUS_SCHEDULED &&
-          trip?.driver
-        ) {
-          customToast(
-            `Sua viagem foi aceita por ${trip?.driver?.nickname}`,
-            'success',
-          );
-          handleTripStateChange();
-        }
-      });
-    },
-    [tripRealtime, STATUS_SCHEDULED, navigation],
-  );
+  const getActiveTripSchedule = useCallback((): string => {
+    if (!user?.idUser) return;
+
+    const onTripAccepted: TripCallback = async ({ data, type }) => {
+      if (['added', 'modified'].includes(type)) {
+        await tripActiveDetails(data.tripReference);
+      }
+    }
+
+    return tripRealtime.checkTripAccepted(user.idUser, STATUS_ACCEPTED, onTripAccepted);
+  }, [user?.idUser]);
 
   const tripActiveDetails = async (tripReference: string) => {
     try {
@@ -400,14 +468,16 @@ export const TripProvider = ({children}: TripContextChildren) => {
         payload['reprovedPhoto'] = true;
       }
 
-      dispatchTripCustomer({type: 'update', field: 'isLoading', arg: true});
-      const {data} = await apiMain.post('TripRating/Rate', payload);
+      dispatchTripCustomer({ type: 'update', field: 'defaultRating', arg: 5 });
 
-      dispatchTripCustomer({type: 'update', field: 'isLoading', arg: false});
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: true });
+      const { data } = await apiMain.post('TripRating/Rate', payload);
+
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
       clearTrip();
       return data.status;
     } catch (error) {
-      dispatchTripCustomer({type: 'update', field: 'isLoading', arg: false});
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
       return clearTrip();
     }
   };
@@ -463,7 +533,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
   }
 
   async function getTripPaymentMethods() {
-    const {data} = await apiMain.post('TripPaymentForm/GetAll', {});
+    const { data } = await apiMain.post('TripPaymentForm/GetAll', {});
 
     dispatchTripCustomer({
       type: 'update',
@@ -477,6 +547,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
     destiny: DestinationProps,
     waypoints: AddressProps[],
     polylineFill = false,
+    argsTrip = null,
   ) {
     dispatchTripCustomer({
       type: 'update',
@@ -493,6 +564,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
       destiny === undefined ||
       waypoints === undefined
     ) {
+      dispatchTripCustomer({ type: 'calculateAllNull' });
       return;
     }
 
@@ -501,13 +573,13 @@ export const TripProvider = ({children}: TripContextChildren) => {
     const noDestination =
       origin?.latitude === destiny?.latitude &&
       origin?.longitude === destiny?.longitude;
-
     if (!inputWho?.name) {
       endpoint = 'price/calculateAll';
       payload = {
         origin,
         destiny,
         noDestination,
+        time: argsTrip?.args?.dateTimeSchedule,
         waypoints:
           waypoints?.map(item => {
             return {
@@ -528,72 +600,96 @@ export const TripProvider = ({children}: TripContextChildren) => {
       };
     }
 
-    const {data} = await apiMain.post(endpoint, payload);
-    if (data.data == null) {
-      dispatchTripCustomer({type: 'calculateAllNull'});
-      customToast(data?.errors?.message ?? data?.message);
-      navigation.navigate('TripRoutes', {
-        screen: 'Home',
+    try {
+      const { data } = await apiMain.post(endpoint, payload, { timeout: 600000 });
+
+      if (data.status === false) {
+        dispatchTripCustomer({ type: 'calculateAllNull' });
+        const errorMessage = data?.errors?.message ?? data?.message;
+        customToast(errorMessage, 'error');
+        navigation.navigate('TripRoutes', {
+          screen: 'Home',
+        });
+        return;
+      }
+
+      if (data.data == null) {
+        dispatchTripCustomer({ type: 'calculateAllNull' });
+        customToast(data?.message ?? translate('schedule.avaiable'), 'error');
+        navigation.navigate('TripRoutes', {
+          screen: 'Home',
+        });
+        showModalNoCity(true);
+        return;
+      }
+
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'calculateAllData',
+        arg: data.data,
       });
-      return;
+
+      setTimeout(() => {
+        dispatchTripCustomer({
+          type: 'update',
+          field: 'showLoadingToGetPrices',
+          arg: false,
+        });
+      }, 2000);
+      if (
+        (data.data != null &&
+          Object.keys(tripSchedule).length === 0) ||
+        polylineFill
+      ) {
+        const overviewDecoded = decode(data.data.overview_polyline.points).map(item => ({
+          latitude: item[0],
+          longitude: item[1],
+        }));
+        // Só armazena como overview a ser filtrado se a viagem ainda não iniciou.
+        // Durante a viagem (confirmação de waypoint), não deve bloquear a rota do socket.
+        const isPreTrip = ![STATUS_ACCEPTED, STATUS_BOARDING, STATUS_IN_PROGRESS].includes(
+          tripStatusRef.current,
+        );
+        if (isPreTrip) {
+          overviewPolylinesRef.current.add(JSON.stringify(overviewDecoded));
+        }
+
+        dispatchTripCustomer({
+          type: 'update',
+          field: 'polylineCoordinates',
+          arg: overviewDecoded,
+        });
+
+        dispatchTripCustomer({
+          type: 'update',
+          field: 'lastPolylineCoordinates',
+          arg: overviewDecoded,
+        });
+      }
+
+      const dataPrices = data?.data?.prices.filter(
+        (e: { tripType: { serviceOption: any } }) =>
+          Number(e.tripType.serviceOption) !== 1,
+      );
+
+      dispatchTripCustomer({
+        type: 'resultCalculateAll',
+        arg: {
+          distance: data.data.distance,
+          estimatedTripTime: data.data.duration,
+          prices: dataPrices,
+        },
+      });
+    } catch (error) {
+      dispatchTripCustomer({ type: 'calculateAllNull' });
+      customToast(translate('trip.error_calculate_price') || 'Erro ao calcular preço', 'error');
     }
-
-    dispatchTripCustomer({
-      type: 'update',
-      field: 'calculateAllData',
-      arg: data.data,
-    });
-    setTimeout(() => {
-      dispatchTripCustomer({
-        type: 'update',
-        field: 'showLoadingToGetPrices',
-        arg: false,
-      });
-    }, 2000);
-    if (
-      (data.data != null &&
-        !polylineCoordinates &&
-        Object.keys(tripSchedule).length === 0) ||
-      polylineFill
-    ) {
-      dispatchTripCustomer({
-        type: 'update',
-        field: 'polylineCoordinates',
-        arg: decode(data.data.overview_polyline.points).map(item => {
-          return {latitude: item[0], longitude: item[1]};
-        }),
-      });
-
-      dispatchTripCustomer({
-        type: 'update',
-        field: 'lastPolylineCoordinates',
-        arg: decode(data.data.overview_polyline.points).map(item => {
-          return {latitude: item[0], longitude: item[1]};
-        }),
-      });
-    }
-
-    const dataPrices = await data?.data?.prices;
-
-    dispatchTripCustomer({
-      type: 'resultCalculateAll',
-      arg: {
-        distance: data.data.distance,
-        estimatedTripTime: data.data.duration,
-        prices: dataPrices,
-      },
-    });
-    await AsyncStorage.setItem('listPrices', JSON.stringify(data.data.prices));
   }
 
   const shareTrip = async (tripReference: string) => {
-    const {data} = await apiMain.get(
+    const { data } = await apiMain.get(
       `Trip/GetShareLink?tripReference=${tripReference}`,
     );
-
-    if (!data.status) {
-      console.log(data.message);
-    }
     return data.data;
   };
 
@@ -620,85 +716,82 @@ export const TripProvider = ({children}: TripContextChildren) => {
     cardSelected: string,
     price: number | null = null,
     isTurbine: boolean | null = false,
+    idTransaction: string = null,
+    cacheData: NewTripCacheData | null = null,
   ) {
+
     dispatchTripCustomer({
       type: 'update',
       field: 'loadingTrip',
       arg: true,
     });
     try {
-      const getPlaces = await AsyncStorage.getItem('lastPlaces');
-      let places = [];
-      if (getPlaces) {
-        const oldPlaces = JSON.parse(getPlaces);
-        if (oldPlaces.length >= 3) {
-          oldPlaces.shift();
-        }
-        places = [...oldPlaces, destination];
-        await AsyncStorage.setItem('lastPlaces', JSON.stringify(places));
-      } else if (!getPlaces) {
-        places = [destination];
-        await AsyncStorage.setItem('lastPlaces', JSON.stringify(places));
-      }
 
-      // guardando todos os lugares clicados para o historico de lugares
+      savePlace(destination)
 
-      const getPlacesAll = await AsyncStorage.getItem('allPlaces');
-      const allPlaces = JSON.parse(getPlacesAll);
-
-      if (allPlaces) {
-        const findPlace = allPlaces.find(
-          (place: AddressProps) => place.address === destination.address,
-        );
-        if (!findPlace) {
-          allPlaces.push(destination);
-          await AsyncStorage.setItem('allPlaces', JSON.stringify(allPlaces));
-        }
-      } else {
-        await AsyncStorage.setItem('allPlaces', JSON.stringify([destination]));
-      }
       const discount = {
         oldPrice: selectedOptionTravel.price,
         userDiscountCouponId: selectedCoupon.id,
       };
+      // Usar dados do cache se disponíveis, senão usar do contexto
+      const finalOrigin = cacheData?.origin || origin;
+      const finalDestination = cacheData?.destination || destination;
+      const finalSelectedOptionTravel = cacheData?.selectedOptionTravel || selectedOptionTravel;
+      const finalSelectedPaymentMethod = cacheData?.selectedPaymentMethod || selectedPaymentMethod;
+      const finalWaypoints = cacheData?.waypoints || waypoints;
+      const finalTolls = cacheData?.tolls ?? stateTripCustomer.calculateAllData?.tolls;
+
       const payload = {
         stdObject: [
           {
-            origin,
-            destination,
+            origin: finalOrigin,
+            destination: finalDestination,
             userId: user.idUser,
+            idTransaction: idTransaction || null,
+            tripTypeId: finalSelectedOptionTravel.tripTypeId,
+            tripPaymentFormId: finalSelectedPaymentMethod?.idTripPaymentForm || finalSelectedPaymentMethod?.paymentFormTypeId || finalSelectedPaymentMethod?.id,
+            waypoints: finalWaypoints,
             pixId: null,
-            tripTypeId: selectedOptionTravel.tripTypeId,
-            tripPaymentFormId: selectedPaymentMethod?.idTripPaymentForm,
-            waypoints,
-            tolls: [],
+            tolls: Helper.getTollIds(finalTolls),
             cardId:
-              selectedPaymentMethod?.paymentFormTypeId === '3' &&
-              cardSelected !== ''
+              finalSelectedPaymentMethod?.paymentFormTypeId === '3' &&
+                cardSelected !== ''
                 ? cardSelected
                 : null,
             schedule: null,
             scheduleISO: null,
-            price: !price ? selectedOptionTravel.price : price,
+            price: !price ? finalSelectedOptionTravel.price : price,
             tripDiscountCoupon:
-              price && price !== selectedOptionTravel.price ? discount : null,
-            priceId: selectedOptionTravel.idPrice,
-            favorites: selectedFavorite || [],
+              price && price !== finalSelectedOptionTravel.price ? discount : null,
+            priceId: finalSelectedOptionTravel.idPrice,
+            favorites: selectedFavoriteRef.current || [],
             multiplierDynamic:
-              Number(selectedOptionTravel.priceDynamicValue) || 0,
-            isFavorite: selectedFavorite || false,
+              Number(finalSelectedOptionTravel.priceDynamicValue) || 0,
             isTurbined: isTurbine,
-            oldPrice: isTurbine ? selectedOptionTravel.price : null,
+            oldPrice: isTurbine ? finalSelectedOptionTravel.price : null,
             distance,
             estimatedTripTime,
+            cashback:
+              finalSelectedOptionTravel.cashback !== null
+                ? finalSelectedOptionTravel.cashback
+                : '',
           },
         ],
       };
+      try {
+        const dataToSave = payload.stdObject[0];
+        await AsyncStorage.setItem(
+          '@App:objectNewTrip',
+          JSON.stringify(dataToSave),
+        );
+      } catch (asyncError) {
+        console.error('Erro no AsyncStorage:', asyncError);
+      }
 
       dispatchTripCustomer({
         type: 'update',
         field: 'trip',
-        arg: {...trip, status: STATUS_SEARCHING},
+        arg: { ...trip, status: STATUS_SEARCHING },
       });
       Helper.timeout(1500).then(() => {
         dispatchTripCustomer({
@@ -707,7 +800,11 @@ export const TripProvider = ({children}: TripContextChildren) => {
           arg: translate('trip.status_search_searching'),
         });
       });
-      const {data} = await apiMain.post('Customer/NewTrip', payload);
+      const { data } = await apiMain.post(
+        'Customer/NewTrip',
+        payload,
+      );
+
       dispatchTripCustomer({
         type: 'update',
         field: 'text',
@@ -720,11 +817,19 @@ export const TripProvider = ({children}: TripContextChildren) => {
           field: 'offerOtherTypeTrip',
           arg: true,
         });
+        dispatchTripCustomer({
+          type: 'update',
+          field: 'inputWho',
+          arg: {
+            name: '',
+            phone: '',
+          },
+        });
         return;
       }
 
       if (!data.status) {
-        dispatchTripCustomer({type: 'newTripError'});
+        dispatchTripCustomer({ type: 'newTripError' });
         dispatchTripCustomer({
           type: 'update',
           field: 'loadingTrip',
@@ -734,21 +839,64 @@ export const TripProvider = ({children}: TripContextChildren) => {
           screen: 'Home',
         });
         clearTrip();
-        customToast(data?.data?.message || data?.message, 'error');
+
+        // Limpar dados do PIX quando a viagem não é criada com sucesso
+        await clearPixCache();
+
+        const errorMessage = data?.data?.message || data?.message;
+        if (isGenderNotAllowedError(errorMessage)) {
+          customToast(translate('error_gender_not_allowed'), 'error');
+        } else {
+          customToast(errorMessage, 'error');
+        }
+        dispatchTripCustomer({
+          type: 'update',
+          field: 'inputWho',
+          arg: {
+            name: '',
+            phone: '',
+          },
+        });
         return;
       }
 
-      dispatchTripCustomer({type: 'newTripSuccess', arg: data.data});
+      dispatchTripCustomer({ type: 'newTripSuccess', arg: data.data });
       setLastPlaceSelected({});
       await AsyncStorage.setItem('trip', JSON.stringify(data.data));
+
+      // Limpar cache do PIX após viagem ser criada com sucesso
+      await clearAllCachesAfterTripStart();
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      navigation.navigate('TripRoutes', { screen: 'Trip' });
+      const tripStatus = data.data?.status || STATUS_SEARCHING;
+      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      if (data.data?.tripReference) {
+        emitTripStatusChange(data.data.tripReference, tripStatus, configCityId);
+      }
+      const currentLocation = userDriverFind?.latitude && userDriverFind?.longitude
+        ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+        : undefined;
+      emitDriverLocation(userDriverFind, currentLocation, cityConfig);
     } catch (error) {
-      dispatchTripCustomer({type: 'newTripError'});
-      customToast(JSON.stringify(error), 'error');
+      dispatchTripCustomer({ type: 'newTripError' });
+      customToast(error?.message, 'error');
       dispatchTripCustomer({
         type: 'update',
         field: 'loadingTrip',
         arg: false,
       });
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'inputWho',
+        arg: {
+          name: '',
+          phone: '',
+        },
+      });
+
+      // Limpar dados do PIX quando há erro na criação da viagem
+      await clearPixCache();
     }
   }
 
@@ -760,7 +908,6 @@ export const TripProvider = ({children}: TripContextChildren) => {
     } | null = null,
     price: number | null = null,
   ) {
-    dispatchTripCustomer({type: 'update', field: 'isLoading', arg: true});
     const getPlaces = await AsyncStorage.getItem('lastPlaces');
     let places = [];
     if (getPlaces) {
@@ -774,6 +921,14 @@ export const TripProvider = ({children}: TripContextChildren) => {
       places = [destination];
       await AsyncStorage.setItem('lastPlaces', JSON.stringify(places));
     }
+
+    const noDestinationPartner = JSON.parse(
+      await AsyncStorage.getItem('@app:tripNoDestinationAnother'),
+    );
+    dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: true });
+
+    savePlace(destination)
+
     const payload = {
       origin,
       destination,
@@ -781,7 +936,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
       tripTypeId: selectedOptionTravel.tripTypeId,
       tripPaymentFormId: selectedPaymentMethod?.idTripPaymentForm,
       waypoints,
-      tolls: [],
+      tolls: Helper.getTollIds(stateTripCustomer.calculateAllData?.tolls),
       cardId:
         selectedPaymentMethod?.paymentFormTypeId === '3' && cardSelected !== ''
           ? cardSelected
@@ -790,20 +945,34 @@ export const TripProvider = ({children}: TripContextChildren) => {
       scheduleISO: null,
       price: price || selectedOptionTravel.price,
       priceId: selectedOptionTravel.idPrice,
-      favorites: selectedFavorite || [],
+      favorites: selectedFavoriteRef.current || [],
       tripDiscountCoupon: null,
-      isFavorite: selectedFavorite || false,
       distance,
       estimatedTripTime,
       tripCustomer: {
         name: tripCustomer?.name,
         phone: tripCustomer?.phone,
       },
+      noDestination: noDestinationPartner ? true : false,
+      cashback:
+        selectedOptionTravel.cashback !== null
+          ? selectedOptionTravel.cashback
+          : '',
     };
-    const {data} = await apiMain.post('Partner/NewTrip', payload);
+    const { data } = await apiMain.post('Partner/NewTrip', payload);
     if (!data.status) {
-      dispatchTripCustomer({type: 'update', field: 'isLoading', arg: false});
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
       customToast(data?.data?.message || data?.message, 'error');
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'inputWho',
+        arg: {
+          name: '',
+          phone: '',
+        },
+      });
+      await AsyncStorage.removeItem('@app:tripNoDestination');
+      await AsyncStorage.removeItem('@app:tripNoDestinationAnother');
       return;
     }
 
@@ -812,6 +981,24 @@ export const TripProvider = ({children}: TripContextChildren) => {
       type: 'tripPartner',
       arg: [...tripPartnerList, data.data],
     });
+
+    dispatchTripCustomer({
+      type: 'update',
+      field: 'inputWho',
+      arg: {
+        name: '',
+        phone: '',
+      },
+    });
+
+    const tripStatus = data.data?.status || STATUS_SEARCHING;
+    const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+    if (data.data?.tripReference) {
+      emitTripStatusChange(data.data.tripReference, tripStatus, configCityId);
+    }
+
+    await AsyncStorage.removeItem('@app:tripNoDestination');
+    await AsyncStorage.removeItem('@app:tripNoDestinationAnother');
     return AsyncStorage.setItem(
       'tripPartnerList',
       JSON.stringify([...tripPartnerList, data.data]),
@@ -819,20 +1006,9 @@ export const TripProvider = ({children}: TripContextChildren) => {
   }
 
   async function newTripOffer(cardSelected: string, priceOffer: number) {
-    dispatchTripCustomer({type: 'update', field: 'isLoading', arg: true});
-    const getPlaces = await AsyncStorage.getItem('lastPlaces');
-    let places = [];
-    if (getPlaces) {
-      const oldPlaces = JSON.parse(getPlaces);
-      if (oldPlaces.length >= 3) {
-        oldPlaces.shift();
-      }
-      places = [...oldPlaces, destination];
-      await AsyncStorage.setItem('lastPlaces', JSON.stringify(places));
-    } else if (!getPlaces) {
-      places = [destination];
-      await AsyncStorage.setItem('lastPlaces', JSON.stringify(places));
-    }
+    dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: true });
+
+    savePlace(destination)
     const discount = {
       oldPrice: selectedOptionTravel.price,
       userDiscountCouponId: selectedCoupon.id,
@@ -851,10 +1027,10 @@ export const TripProvider = ({children}: TripContextChildren) => {
           tripTypeId: selectedOptionTravel.tripTypeId,
           tripPaymentFormId: selectedPaymentMethod?.idTripPaymentForm,
           waypoints,
-          tolls: [],
+          tolls: Helper.getTollIds(stateTripCustomer.calculateAllData?.tolls),
           cardId:
             selectedPaymentMethod?.paymentFormTypeId === '3' &&
-            cardSelected !== ''
+              cardSelected !== ''
               ? cardSelected
               : null,
           schedule: null,
@@ -868,26 +1044,36 @@ export const TripProvider = ({children}: TripContextChildren) => {
             Object.keys(selectedCoupon).length > 0 && verifyCardOnCoupon
               ? discount
               : null,
-          isFavorite: selectedFavorite || false,
           distance,
           estimatedTripTime,
           isOffer: true,
           oldPrice: selectedOptionTravel.price,
+          cashback:
+            selectedOptionTravel.cashback !== null
+              ? selectedOptionTravel.cashback
+              : '',
         },
       ],
     };
 
-    const {data} = await apiMain.post('Customer/NewTrip', payload);
+    const { data } = await apiMain.post('Customer/NewTrip', payload);
 
     if (!data.status) {
-      dispatchTripCustomer({type: 'update', field: 'isLoading', arg: false});
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
       customToast(data?.data?.message || data?.message, 'error');
-
       return;
     }
-    dispatchTripCustomer({type: 'newTripSuccess', arg: data.data});
+
+    dispatchTripCustomer({ type: 'clearSimulationData' });
+    dispatchTripCustomer({ type: 'newTripSuccess', arg: data.data });
     setLastPlaceSelected({});
     await AsyncStorage.setItem('trip', JSON.stringify(data.data));
+
+    const tripStatus = data.data?.status || STATUS_SEARCHING;
+    const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+    if (data.data?.tripReference) {
+      emitTripStatusChange(data.data.tripReference, tripStatus, configCityId);
+    }
   }
 
   async function refusedOffer(tripBidId: string) {
@@ -939,19 +1125,8 @@ export const TripProvider = ({children}: TripContextChildren) => {
       field: 'isLoading',
       arg: true,
     });
-    const getPlaces = await AsyncStorage.getItem('lastPlaces');
-    let places = [];
-    if (getPlaces) {
-      const oldPlaces = JSON.parse(getPlaces);
-      if (oldPlaces.length >= 3) {
-        oldPlaces.shift();
-      }
-      places = [...oldPlaces, destination];
-      await AsyncStorage.setItem('lastPlaces', JSON.stringify(places));
-    } else if (!getPlaces) {
-      places = [destination];
-      await AsyncStorage.setItem('lastPlaces', JSON.stringify(places));
-    }
+
+    savePlace(destination)
     const discount = {
       oldPrice: selectedOptionTravel.price,
       userDiscountCouponId: selectedCoupon.id,
@@ -969,7 +1144,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
       tripTypeId: selectedOptionTravel.tripTypeId,
       tripPaymentFormId: selectedPaymentMethod?.idTripPaymentForm,
       waypoints,
-      tolls: [],
+      tolls: Helper.getTollIds(stateTripCustomer.calculateAllData?.tolls),
       cardId:
         selectedPaymentMethod?.paymentFormTypeId === '3' && cardSelected !== ''
           ? cardSelected
@@ -978,18 +1153,21 @@ export const TripProvider = ({children}: TripContextChildren) => {
       scheduleISO: null,
       price: !price ? selectedOptionTravel.price : price,
       priceId: selectedOptionTravel.idPrice,
-      favorites: selectedFavorite || [],
+      favorites: selectedFavoriteRef.current || [],
       multiplierDynamic: Number(selectedOptionTravel.priceDynamicValue) || 0,
       tripDiscountCoupon:
         Object.keys(selectedCoupon).length > 0 && verifyCardOnCoupon
           ? discount
           : null,
-      isFavorite: selectedFavorite || false,
       distance,
       estimatedTripTime,
+      cashback:
+        selectedOptionTravel.cashback !== null
+          ? selectedOptionTravel.cashback
+          : '',
     };
 
-    const {data} = await apiMain.post('KnobTrip/Init', payload);
+    const { data } = await apiMain.post('KnobTrip/Init', payload);
 
     if (!data.status) {
       dispatchTripCustomer({
@@ -1000,9 +1178,15 @@ export const TripProvider = ({children}: TripContextChildren) => {
       customToast(data.errors ? data.errors.message : data.message, 'error');
       return;
     }
-    dispatchTripCustomer({type: 'newTripSuccess', arg: data.data});
+    dispatchTripCustomer({ type: 'newTripSuccess', arg: data.data });
     setLastPlaceSelected({});
     await AsyncStorage.setItem('trip', JSON.stringify(data.data));
+
+    const tripStatus = data.data?.status || STATUS_SEARCHING;
+    const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+    if (data.data?.tripReference) {
+      emitTripStatusChange(data.data.tripReference, tripStatus, configCityId);
+    }
   }
 
   // trip with schedule
@@ -1030,29 +1214,34 @@ export const TripProvider = ({children}: TripContextChildren) => {
           tripTypeId: selectedOptionTravel.tripTypeId,
           tripPaymentFormId: selectedPaymentMethod?.idTripPaymentForm,
           waypoints,
-          tolls: [],
+          tolls: Helper.getTollIds(stateTripCustomer.calculateAllData?.tolls),
           schedule,
           scheduleISO,
           price: !price ? selectedOptionTravel.price : price,
           priceId: selectedOptionTravel.idPrice,
-          favorites: selectedFavorite || [],
+          favorites: selectedFavoriteRef.current || [],
           multiplierDynamic:
             Number(selectedOptionTravel.priceDynamicValue) || 0,
           tripDiscountCoupon:
             Object.keys(selectedCoupon).length > 0 && verifyCardOnCoupon
               ? discount
               : null,
-          isFavorite: selectedFavorite || false,
           distance,
           estimatedTripTime,
+          cashback:
+            selectedOptionTravel.cashback !== null
+              ? selectedOptionTravel.cashback
+              : '',
         },
       ],
     };
 
-    const {data} = await apiMain.post('Customer/NewTrip', payload);
+    const { data } = await apiMain.post('Customer/NewTrip', payload);
     if (!data.status) {
       return customToast(data.message, 'warning');
     }
+
+    dispatchTripCustomer({ type: "clearSimulationData" });
     dispatchTripCustomer({
       type: 'newTripScheduleSuccess',
       arg: {
@@ -1063,6 +1252,13 @@ export const TripProvider = ({children}: TripContextChildren) => {
     });
     setLastPlaceSelected({});
     await AsyncStorage.setItem('trip', JSON.stringify(data.data));
+
+    const tripStatus = data.data?.status || STATUS_SCHEDULED;
+    const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+    if (data.data?.tripReference) {
+      emitTripStatusChange(data.data.tripReference, tripStatus, configCityId);
+    }
+
     customToast(translate('schedule.toast_sucess'), 'success');
 
     return data.data;
@@ -1074,35 +1270,10 @@ export const TripProvider = ({children}: TripContextChildren) => {
     tripItem,
     priceOffer: number | null = null,
   ) {
-    dispatchTripCustomer({type: 'update', field: 'isLoading', arg: true});
+    dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: true });
 
-    const getPlaces = await AsyncStorage.getItem('lastPlaces');
-    let places = [];
-    if (getPlaces) {
-      const oldPlaces = JSON.parse(getPlaces);
-      if (oldPlaces.length >= 3) {
-        oldPlaces.shift();
-      }
-      places = [...oldPlaces, destination];
-      await AsyncStorage.setItem('lastPlaces', JSON.stringify(places));
-    } else if (!getPlaces) {
-      places = [destination];
-      await AsyncStorage.setItem('lastPlaces', JSON.stringify(places));
-    }
+    savePlace(destination)
     // guardando todos os lugares clicados para o historico de lugares
-
-    const getPlacesAll = await AsyncStorage.getItem('allPlaces');
-    const allPlaces = JSON.parse(getPlacesAll);
-
-    if (allPlaces) {
-      const findPlace = allPlaces.find(place => place.id === destination.id);
-      if (!findPlace) {
-        allPlaces.push(destination);
-        await AsyncStorage.setItem('allPlaces', JSON.stringify(allPlaces));
-      }
-    } else {
-      await AsyncStorage.setItem('allPlaces', JSON.stringify([destination]));
-    }
     const payload = {
       stdObject: [
         {
@@ -1126,21 +1297,20 @@ export const TripProvider = ({children}: TripContextChildren) => {
           tripTypeId: selectedOptionTravel.tripTypeId,
           tripPaymentFormId: selectedPaymentMethod?.idTripPaymentForm,
           waypoints,
-          tolls: [],
+          tolls: Helper.getTollIds(stateTripCustomer.calculateAllData?.tolls),
           cardId:
             selectedPaymentMethod?.paymentFormTypeId === '3' &&
-            cardSelected !== ''
+              cardSelected !== ''
               ? cardSelected
               : null,
           schedule: null,
           scheduleISO: null,
           price: !priceOffer ? selectedOptionTravel.price : priceOffer,
           priceId: selectedOptionTravel.idPrice,
-          favorites: selectedFavorite || [],
+          favorites: selectedFavoriteRef.current || [],
           multiplierDynamic:
             Number(selectedOptionTravel.priceDynamicValue) || 0,
           tripDiscountCoupon: null,
-          isFavorite: selectedFavorite || false,
           distance,
           estimatedTripTime,
           isOffer: Boolean(priceOffer),
@@ -1149,17 +1319,23 @@ export const TripProvider = ({children}: TripContextChildren) => {
       ],
     };
 
-    const {data} = await apiMain.post('Customer/NewTrip', payload);
+    const { data } = await apiMain.post('Customer/NewTrip', payload);
 
     if (!data.status) {
-      dispatchTripCustomer({type: 'update', field: 'isLoading', arg: false});
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
       customToast(data.message, 'error');
       return;
     }
 
-    dispatchTripCustomer({type: 'newTripSuccess', arg: data.data});
+    dispatchTripCustomer({ type: 'newTripSuccess', arg: data.data });
     setLastPlaceSelected({});
     await AsyncStorage.setItem('trip', JSON.stringify(data.data));
+
+    const tripStatus = data.data?.status || STATUS_SEARCHING;
+    const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+    if (data.data?.tripReference) {
+      emitTripStatusChange(data.data.tripReference, tripStatus, configCityId);
+    }
   }
 
   async function getAllTypeDelivery() {
@@ -1187,7 +1363,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
   }
 
   async function getTrips(status: string | null = null, page = 1, setDataPage) {
-    const {data} = await apiMain.post('Customer/GetTrips', {
+    const { data } = await apiMain.post('Customer/GetTrips', {
       customerId: user.idCustomer,
       status,
       page,
@@ -1212,7 +1388,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
     status: string = STATUS_CANCELED,
     cancellationReasonsId: number | null = null,
   ) {
-    dispatchTripCustomer({type: 'update', field: 'isLoading', arg: true});
+    dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: true });
 
     const payload = {
       stdObject: [
@@ -1226,31 +1402,26 @@ export const TripProvider = ({children}: TripContextChildren) => {
       ],
     };
 
-    const {data} = await apiMain.post('Customer/CancelTrip', payload);
+    const { data } = await apiMain.post('Customer/CancelTrip', payload);
 
     if (data.status) {
-      dispatchTripCustomer({type: 'update', field: 'isLoading', arg: false});
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
+
+      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      emitTripStatusChange(tripReference, 'removed', configCityId);
+
+      const currentLocation = userDriverFind?.latitude && userDriverFind?.longitude
+        ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+        : undefined;
+      emitDriverLocation(userDriverFind, currentLocation, cityConfig);
 
       customToast(translate('service.toast_sucess'), 'success');
       AsyncStorage.removeItem('tripSchedule');
       navigation.navigate('InitalServiceGetLight');
     } else {
-      dispatchTripCustomer({type: 'update', field: 'isLoading', arg: false});
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
 
-      showMessage({
-        message: data.message,
-        type: 'info',
-        position: 'bottom',
-        icon: 'auto',
-        duration: 4000,
-        style: {
-          height: 80,
-          alignItems: 'center',
-        },
-        titleStyle: {
-          fontSize: 16,
-        },
-      });
+      customToast(data.message, 'info');
     }
   }
 
@@ -1265,7 +1436,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
         },
       ],
     };
-    const {data} = await apiMain.post('Customer/CancelTrip', payload);
+    const { data } = await apiMain.post('Customer/CancelTrip', payload);
 
     if (data.status) {
       const listTripPartner = JSON.parse(
@@ -1273,10 +1444,14 @@ export const TripProvider = ({children}: TripContextChildren) => {
       );
 
       const filterTrips = listTripPartner?.filter(
-        (trip: {tripRefernce: string}) => trip.tripRefernce !== tripReference,
+        (trip: { tripRefernce: string }) => trip.tripRefernce !== tripReference,
       );
 
       AsyncStorage.setItem('tripPartnerList', JSON.stringify(filterTrips));
+
+      // Emite evento trip.status.change quando cliente cancela viagem parceiro
+      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      emitTripStatusChange(tripReference, 'removed', configCityId);
     }
   }
 
@@ -1288,11 +1463,10 @@ export const TripProvider = ({children}: TripContextChildren) => {
     const tripCancelReference = tripReference || trip.tripReference;
 
     if (!tripCancelReference) {
-      // source.cancel('Cancelado pelo usuário');
-      customToast('Cancelado pelo usuário', 'success');
-      return;
+      customToast(translate('trip.text_canceled_by_user'), 'success');
+      return true;
     }
-    dispatchTripCustomer({type: 'update', field: 'isLoading', arg: true});
+    dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: true });
 
     const payload = {
       stdObject: [
@@ -1306,111 +1480,170 @@ export const TripProvider = ({children}: TripContextChildren) => {
       ],
     };
 
-    const {data} = await apiMain.post('Customer/CancelTrip', payload);
+    const { data } = await apiMain.post('Customer/CancelTrip', payload);
+
+    try {
+      const statusCheck = await apiMain.get<ApiResponse<TripFinishStatus>>(
+        'Trip/Status',
+        { params: { tripReference: tripCancelReference } },
+      );
+      const currentTripStatus = statusCheck.data?.data?.status;
+
+      if (
+        [
+          STATUS_ACCEPTED,
+          STATUS_PRE_ACCEPTED,
+          STATUS_BOARDING,
+          STATUS_IN_PROGRESS,
+        ].includes(currentTripStatus)
+      ) {
+        customToast(translate('trip.driver_already_accepted'), 'warning');
+        await handleTripStateChange(tripCancelReference);
+        return false;
+      }
+    } catch (checkError) {
+      console.error('Failed to verify trip status after cancel', checkError);
+    }
+
     if (data.status) {
+      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      emitTripStatusChange(tripCancelReference, 'removed', configCityId);
+
       await AsyncStorage.removeItem('trip');
-      dispatchTripCustomer({type: 'cancelTrip'});
+      dispatchTripCustomer({ type: 'cancelTrip' });
       clearTrip();
       setLastPlaceSelected({});
-      navigation.navigate('TripRoutes', {screen: 'Home'});
-    } else {
-      dispatchTripCustomer({type: 'update', field: 'isLoading', arg: false});
 
-      navigation.navigate('TripRoutes', {screen: 'Home'});
+      // Limpar dados do PIX quando a viagem é cancelada
+      await clearPixCache();
+
+      navigation.navigate('TripRoutes', { screen: 'Home', params: { pixCacheAction: 'cancel' } });
+      return true;
+    } else {
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
+
+      navigation.navigate('TripRoutes', { screen: 'Home', params: { pixCacheAction: 'cancel' } });
 
       await AsyncStorage.removeItem('trip');
-      showMessage({
-        message: data.message,
-        type: 'info',
-        position: 'bottom',
-        icon: 'auto',
-        duration: 4000,
-        style: {
-          height: 80,
-          alignItems: 'center',
-        },
-        titleStyle: {
-          fontSize: 16,
-        },
-      });
+
+      // Limpar dados do PIX mesmo em caso de erro no cancelamento
+      await clearPixCache();
+      customToast(data.message, 'info');
+      return false;
     }
   }
 
   async function checkIfHaveCancellationFee() {
-    dispatchTripCustomer({type: 'update', field: 'isLoading', arg: true});
+    dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: true });
 
-    const {data} = await apiMain.post('customer/checkcancellationfee', {
+    const { data } = await apiMain.post('customer/checkcancellationfee', {
       tripReference: trip.tripReference,
     });
-    dispatchTripCustomer({type: 'update', field: 'isLoading', arg: false});
+    dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
     return data;
   }
-  // TODO essa funcao ta comentada pq ela chama 2 requisicoes em handleTripStateChange, justamente pq ela e chamada aqui e na home principal
-  // const [tripFirebase, setTripFirebase] = useState()
-  // useEffect (() => {
-  //   ( async() => {
-  //     TripCollection.checkTripAccepted(
-  //       user.idUser,
-  //       STATUS_ACCEPTED,
-  //       async (trip,type) => {
-  //         if (type === 'added' || type === 'modified') {
-  //           setTrip(trip);
-  //           setTripFirebase(tripFirebase);
-  //           await AsyncStorage.setItem('trip', JSON.stringify(trip));
-  //           handleTripStateChange()
-  //         }
-  //       }
-  //     )
-  //   })()
 
-  // },[])
-
-  async function handleTripStateChange(tripReference = null) {
+  async function handleTripStateChange(
+    tripReference?: string,
+    onTripCancel?: () => void
+  ): Promise<void> {
     const tripLocal = await AsyncStorage.getItem('trip');
-    let type = '';
-    if (tripLocal !== null) {
-      const {tripReference: tripReferenceState} =
-        tripReference || JSON.parse(tripLocal);
+    const tripObject: TripProps = tripLocal ? JSON.parse(tripLocal) : null;
 
-      const tripObject = JSON.parse(tripLocal);
+    tripReference = tripReference ?? tripObject?.tripReference;
 
-      if (tripObject.schedule !== null) {
-        dispatchTripCustomer({
-          type: 'update',
-          field: 'tripType',
-          arg: 'schedule',
-        });
+    if (tripReference) {
+      let type = '';
 
-        type = 'schedule';
-      }
+      dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: true });
 
       try {
-        dispatchTripCustomer({
-          type: 'update',
-          field: 'isLoading',
-          arg: true,
+        const response = await apiMain.post<ApiResponse<TripProps>>('trip/get', {
+          stdObject: [{ tripReference }],
         });
-        const {
-          data: {data},
-        } = await apiMain.post('trip/get', {
-          stdObject: [{tripReference: tripReferenceState}],
-        });
-        dispatchTripCustomer({
-          type: 'update',
-          field: 'isLoading',
-          arg: false,
-        });
+
+        if (!response.data?.status) return;
+
+        const data = response.data?.data;
+
+        if ([STATUS_ACCEPTED].includes(data.status)) {
+          dispatchTripCustomer({ type: 'clearSimulationData' });
+        }
+
+        if (data?.schedule !== null) {
+          dispatchTripCustomer({ type: 'update', field: 'tripType', arg: 'schedule' });
+          type = 'schedule';
+        }
+
         if (
           data.status === STATUS_CANCELED ||
           data.status === STATUS_NOT_ANSWERED ||
           data.status === STATUS_BACK_OFF
         ) {
-          if (data?.canceledBy === 'driver') {
-            await initNewTripAfterCancel(data);
+          const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+          if (data?.tripReference) {
+            emitTripStatusChange(data.tripReference, 'removed', configCityId);
+          }
+
+          if (
+            data?.canceledBy === 'driver' &&
+            data.customerCancellationFee === null
+          ) {
+            await AsyncStorage.removeItem("waitingTimer");
+            await initNewTripAfterCancel(data, true);
             return;
           }
 
+          if (
+            data?.timeToExpireTrip === 0 &&
+            data?.canceledBy === 'customer' &&
+            data.status !== STATUS_BACK_OFF &&
+            data.status !== STATUS_CANCELED &&
+            cityConfig?.enableTripSuggestion === '1'
+          ) {
+            await AsyncStorage.removeItem('trip');
+
+            navigation.navigate('TripRoutes', { screen: 'SuggestionTrips' });
+
+            dispatchTripCustomer({
+              type: 'update',
+              field: 'changeRoutePreview',
+              arg: {},
+            });
+            return;
+          }
+
+          if (
+            data?.canceledBy === 'driver' &&
+            data.customerCancellationFee !== null
+          ) {
+            await AsyncStorage.removeItem("waitingTimer");
+            dispatchTripCustomer({
+              type: 'update',
+              field: 'timeExceededFee',
+              arg: {
+                title: data.customerCancellationFee.title,
+                description: data.customerCancellationFee.description,
+                show: true,
+              },
+            });
+
+            dispatchTripCustomer({
+              type: 'update',
+              field: 'changeRoutePreview',
+              arg: {},
+            });
+
+            clearTrip();
+            navigation.navigate('TripRoutes', {
+              screen: 'Home',
+              params: { noUnsubscribe: true, pixCacheAction: 'cancel' },
+            });
+          }
+
           await AsyncStorage.removeItem('trip');
+
+          if (onTripCancel) onTripCancel();
 
           dispatchTripCustomer({
             type: 'update',
@@ -1418,6 +1651,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
             arg: {},
           });
           if (data?.canceledBy === 'admin') {
+            await AsyncStorage.removeItem("waitingTimer");
             customToast(
               translate('finishTrip.text_trip_cancelled_by_false'),
               'warning',
@@ -1426,13 +1660,17 @@ export const TripProvider = ({children}: TripContextChildren) => {
           clearTrip();
           navigation.navigate('TripRoutes', {
             screen: 'Home',
-            params: {noUnsubscribe: true},
+            params: { noUnsubscribe: true, pixCacheAction: 'cancel' },
           });
 
           return;
         }
         if (data.status === STATUS_FINISHED) {
+          await AsyncStorage.removeItem("waitingTimer");
           await AsyncStorage.removeItem('trip');
+
+          if (onTripCancel) onTripCancel();
+
           dispatchTripCustomer({
             type: 'update',
             field: 'completedTripData',
@@ -1445,7 +1683,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
           });
           navigation.navigate('TripRoutes', {
             screen: 'Home',
-            params: {noUnsubscribe: true},
+            params: { noUnsubscribe: true },
           });
           return;
         }
@@ -1459,17 +1697,26 @@ export const TripProvider = ({children}: TripContextChildren) => {
           field: 'hideTravelOptions',
           arg: true,
         });
+        // Definir loadingTrip como false quando a viagem entra em status de busca
+        if (data.status === STATUS_SEARCHING) {
+          dispatchTripCustomer({
+            type: 'update',
+            field: 'loadingTrip',
+            arg: false,
+          });
+        }
         if (data?.status === STATUS_SCHEDULED) {
-          checkTripScheduleAccepted(tripObject?.tripReference);
+          // Método transferido para Home
           return;
         }
         if (
           data.status === STATUS_ACCEPTED ||
+          data.status === STATUS_PRE_ACCEPTED ||
           data.status === STATUS_BOARDING ||
           (data.status === STATUS_IN_PROGRESS && type === 'schedule') ||
           data.status === STATUS_IN_PROGRESS ||
           data.status === STATUS_SEARCHING ||
-          data.status === STATUS_SEARCHING_FAVORITE
+          data.status === STATUS_SEARCHING_DRIVER_OFFER
         ) {
           navigation.navigate('TripRoutes', {
             screen: 'Trip',
@@ -1487,23 +1734,35 @@ export const TripProvider = ({children}: TripContextChildren) => {
           arg: data.origin,
         });
         if (type !== 'schedule') {
-          navigation.navigate('TripRoutes', {screen: 'Trip'});
+          navigation.navigate('TripRoutes', { screen: 'Trip' });
         }
       } catch (error) {
-        console.log({error});
+        console.log({ error });
+      } finally {
+        dispatchTripCustomer({ type: 'update', field: 'isLoading', arg: false });
       }
     }
 
     setTimeout(() => {
-      dispatchTripCustomer({type: 'clearTrip'});
-      socketRouteTrip.current = null;
+      dispatchTripCustomer({ type: 'clearTrip' });
+      storageFirstPolyline.current = null;
+      overviewPolylinesRef.current.clear();
+      socket?.off(`location-${trip.tripReference}`, handleTripRouteListener);
     }, 200);
   }
 
   const clearTrip = () => {
-    setTimeout(() => {
-      dispatchTripCustomer({type: 'clearTrip'});
+    setTimeout(async () => {
+      dispatchTripCustomer({ type: 'clearTrip' });
       socketRouteTrip.current = null;
+      storageFirstPolyline.current = null;
+      overviewPolylinesRef.current.clear();
+
+      await AsyncStorage.removeItem('trip');
+
+      // Limpar dados do PIX quando limpar a viagem
+      await clearPixCache();
+      socket?.off(`location-${trip.tripReference}`, handleTripRouteListener);
     }, 200);
   };
 
@@ -1581,17 +1840,17 @@ export const TripProvider = ({children}: TripContextChildren) => {
         field: 'isLoading',
         arg: false,
       });
-      return console.log(error);
+      return console.error(error);
     }
   };
 
-  const getStatus = async status => {};
+  const getStatus = async status => { };
 
   const createTrip = async (payload: any) => {
     dispatchTripCustomer({
       type: 'update',
       field: 'trip',
-      arg: {...trip, status: STATUS_SEARCHING},
+      arg: { ...trip, status: STATUS_SEARCHING },
     });
 
     Helper.timeout(1500).then(() => {
@@ -1601,7 +1860,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
         arg: translate('trip.status_search_searching'),
       });
     });
-    const {data} = await apiMain.post('Customer/NewTrip', payload);
+    const { data } = await apiMain.post('Customer/NewTrip', payload);
     dispatchTripCustomer({
       type: 'update',
       field: 'text',
@@ -1609,74 +1868,135 @@ export const TripProvider = ({children}: TripContextChildren) => {
     });
 
     if (!data.status) {
-      dispatchTripCustomer({type: 'newTripError'});
+      dispatchTripCustomer({ type: 'newTripError' });
       navigation.navigate('TripRoutes', {
         screen: 'Home',
       });
       customToast(data.message, 'error');
       return;
     }
-    dispatchTripCustomer({type: 'newTripSuccess', arg: data.data});
+    dispatchTripCustomer({ type: 'newTripSuccess', arg: data.data });
     setLastPlaceSelected({});
     await AsyncStorage.setItem('trip', JSON.stringify(data.data));
-  };
 
-  const initNewTripAfterCancel = async (trip: TripProps, showAlert = true) => {
-    try {
-      showAlert
-        ? customToast(
-            'Sua corrida foi cancelada pelo motorista, estamos redistribuindo sua corrida',
-            'warning',
-          )
-        : null;
-      const payload = {
-        stdObject: [
-          {
-            userId: parseInt(trip?.userId, 10),
-            tripTypeId: trip?.tripTypeId,
-            tripPaymentFormId: trip?.tripPaymentFormId,
-            origin: {
-              address: trip?.origin.address,
-              latitude: parseFloat(trip?.origin.latitude),
-              longitude: parseFloat(trip?.origin.longitude),
-            },
-            destination: {
-              address: trip?.destination.name,
-              latitude: parseFloat(trip?.destination.latitude),
-              longitude: parseFloat(trip?.destination.longitude),
-            },
-            priceId: trip?.priceId,
-            distance: parseFloat(trip?.distance),
-            estimatedTripTime: parseFloat(trip?.estimatedTripTime),
-            schedule: null,
-            waypoints: trip?.tripWayPoints.map(item => {
-              return {
-                lat: parseFloat(item.latitude),
-                lng: parseFloat(item.longitude),
-                neighborhood: item.neighborhood,
-                address: item.address,
-                latitude: parseFloat(item.latitude),
-                longitude: parseFloat(item.longitude),
-                obs: item.obs,
-              };
-            }),
-            price: trip?.price,
-            tripDiscountCoupon: {
-              oldPrice: trip?.tripDiscountCoupon?.oldPrice,
-              userDiscountCouponId:
-                trip?.tripDiscountCoupon?.userDiscountCouponId,
-            },
-            isOffer: trip?.isOffer ? 0 : 1,
-          },
-        ],
-      };
-      await createTrip(payload);
-      !showAlert ? navigation.navigate('TripRoutes', {screen: 'Trip'}) : null;
-    } catch (error) {
-      dispatchTripCustomer({type: 'newTripError'});
-      customToast(JSON.stringify(error), 'error');
+    // Definir loadingTrip como false após a viagem ser criada com sucesso
+    dispatchTripCustomer({
+      type: 'update',
+      field: 'loadingTrip',
+      arg: false,
+    });
+    const tripStatus = data.data?.status || STATUS_SEARCHING;
+    const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+    if (data.data?.tripReference) {
+      emitTripStatusChange(data.data.tripReference, tripStatus, configCityId);
     }
   };
+
+  const verifyPaymentFormTrip = async (newTrip) => {
+    const card = await AsyncStorage.getItem("cardSelected");
+    const cardId = card ? JSON.parse(card)?.idCard : null;
+
+    if (
+      (newTrip?.tripPaymentFormId == CREDIT_CARD_APP ||
+        newTrip?.tripPaymentFormId == PAYMENT_CARD_DEBIT) &&
+      cardId
+    ) {
+      newTrip.cardId = cardId;
+    }
+
+    return newTrip;
+  };
+
+  const initNewTripAfterCancel = useCallback(async (
+    trip: TripProps,
+    showAlert: boolean = true,
+  ) => {
+    const hasRecalculatedPrice = !!trip?.recalculatedPrice;
+    const oldPrice = trip?.recalculatedPrice?.oldPrice;
+    const price = hasRecalculatedPrice ? oldPrice : trip?.price;
+
+    try {
+      const isPixTrip =
+        trip?.tripPaymentFormTypeId == PIX_WEB ||
+        trip?.tripPaymentFormTypeId == PIX;
+
+      if (isPixTrip) {
+        dispatchTripCustomer({ type: 'update', field: 'changeRoutePreview', arg: {} });
+
+        clearTrip();
+
+        navigation.navigate('TripRoutes', {
+          screen: 'Home',
+          params: { noUnsubscribe: true, pixCacheAction: 'cancel' },
+        });
+
+        return customToast(
+          translate('trip.text_canceled_by_driver'),
+          'warning',
+        );
+      }
+
+      if (showAlert) {
+        customToast(
+          translate('trip.text_canceled_by_driver_redistributing'),
+          'warning',
+        );
+      }
+
+      let tripPayload = {
+        userId: parseInt(trip?.userId, 10),
+        tripTypeId: trip?.tripTypeId,
+        tripPaymentFormId: trip?.tripPaymentFormId,
+        origin: {
+          address: trip?.origin.address,
+          latitude: parseFloat(trip?.origin.latitude),
+          longitude: parseFloat(trip?.origin.longitude),
+        },
+        destination: {
+          address: trip?.destination.name,
+          latitude: parseFloat(trip?.destination.latitude),
+          longitude: parseFloat(trip?.destination.longitude),
+        },
+        priceId: trip?.priceId,
+        distance: parseFloat(trip?.distance),
+        estimatedTripTime: parseFloat(trip?.estimatedTripTime),
+        schedule: null,
+        waypoints: trip?.tripWayPoints.map(item => ({
+          lat: parseFloat(item.latitude),
+          lng: parseFloat(item.longitude),
+          neighborhood: item.neighborhood,
+          address: item.address,
+          latitude: parseFloat(item.latitude),
+          longitude: parseFloat(item.longitude),
+          obs: item.obs,
+        })),
+        price,
+        tolls: Helper.getTollIds(trip?.tolls),
+        tripDiscountCoupon: {
+          oldPrice: trip?.tripDiscountCoupon?.oldPrice,
+          userDiscountCouponId:
+            trip?.tripDiscountCoupon?.userDiscountCouponId,
+        },
+        isOffer: trip?.isOffer ? 0 : 1,
+      };
+
+      tripPayload = await verifyPaymentFormTrip(tripPayload);
+
+      const payload = {
+        stdObject: [tripPayload],
+      };
+
+      await createTrip(payload);
+
+      if (!showAlert) {
+        navigation.navigate('TripRoutes', { screen: 'Trip' });
+      }
+    } catch (error) {
+      dispatchTripCustomer({ type: 'newTripError' });
+      customToast(error?.message, 'error');
+    }
+  }, []);
+
 
   const getCancellationReasons = async () => {
     try {
@@ -1699,6 +2019,19 @@ export const TripProvider = ({children}: TripContextChildren) => {
       return console.log(error);
     }
   };
+
+  const getWaitingTimer = async (cityId: string, tripTypeId: number) => {
+    try {
+      const { data } = await apiMain.post('price/getWaitingTimeFees', {
+        cityId,
+        tripTypeId,
+      });
+
+      if (!data.status) return;
+      return data?.data;
+
+    } catch (error) { console.log(error) }
+  }
 
   const value = useMemo(
     () => ({
@@ -1733,6 +2066,8 @@ export const TripProvider = ({children}: TripContextChildren) => {
       stateTripCustomer,
       dispatchTripCustomer,
       cancelParterTripByCustomer,
+      showModalNoCity,
+      getWaitingTimer
     }),
     [
       shareTrip,
@@ -1766,6 +2101,8 @@ export const TripProvider = ({children}: TripContextChildren) => {
       stateTripCustomer,
       dispatchTripCustomer,
       cancelParterTripByCustomer,
+      showModalNoCity,
+      getWaitingTimer
     ],
   );
 

@@ -1,12 +1,12 @@
 import {useBubbleButton} from '@704apps/react-native-bubble-button';
 import {TouchableOpacityProps} from 'react-native';
-import {useTheme} from 'styled-components';
+import {useTheme} from 'styled-components/native';
 import {Container, Loading, Text} from './styles';
 
 interface Props extends TouchableOpacityProps {
   title: string;
   loading?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
   enabled?: boolean;
   inverted?: boolean;
 }

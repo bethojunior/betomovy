@@ -11,12 +11,14 @@ interface CalendarProps {
   dateSelected: string;
   onDaySelected: (day: string) => void;
   onMinToday?: boolean;
+  allowFuture?: boolean;
 }
 
 export function Calendar({
   dateSelected,
   onDaySelected,
   onMinToday,
+  allowFuture,
 }: CalendarProps) {
   const theme = useTheme();
   const [selectedDate, setSelectedDate] = useState({});
@@ -27,9 +29,7 @@ export function Calendar({
   LocaleConfig.locales['fr-fr'] = frFR;
 
   const vefifyLocale = () => {
-    console.log(I18n.locale);
     if (I18n.locale === 'pt_BR') {
-      console.log('oi1');
       LocaleConfig.defaultLocale = 'pt-br';
     } else if (I18n.defaultLocale === 'en_US') {
       LocaleConfig.defaultLocale = 'en-us';
@@ -110,14 +110,18 @@ export function Calendar({
             ? convertUSDate(
                 new Date(new Date().setDate(new Date().getDate() + 41)),
               )
-            : convertUSDate(new Date())
+            : allowFuture
+              ? undefined
+              : convertUSDate(new Date())
         }
         minDate={
           onMinToday
             ? convertUSDate(
                 new Date(new Date().setDate(new Date().getDate() + 31)),
               )
-            : undefined
+            : allowFuture
+              ? convertUSDate(new Date())
+              : undefined
         }
         markedDates={selectedDate}
         markingType="multi-dot"

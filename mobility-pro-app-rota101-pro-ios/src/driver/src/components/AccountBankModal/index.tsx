@@ -1,4 +1,4 @@
-import {Platform, Text, View} from 'react-native';
+import {Platform, ScrollView, Text, View} from 'react-native';
 import {useEffect, useState} from 'react';
 import SearchableDropdown from 'react-native-searchable-dropdown';
 import {RFValue} from 'react-native-responsive-fontsize';
@@ -9,16 +9,21 @@ import Preload from '../Preload';
 import theme from '../../styles/theme';
 import {useBank} from '../../context/bank';
 import InputFrame from '../form/InputFrame';
-import {ButtonMode, Section, TextButtonMode, Title} from './styles';
+import {ButtonMode, Input, Section, TextButtonMode, Title} from './styles';
 import {translate} from '../../../../client/locales';
 import {AccountInfo, BankProps} from '../../context/bank/types';
-import { useTheme } from 'styled-components';
+import {useTheme} from 'styled-components';
+import {TextInputMask} from 'react-native-masked-text';
+import Helper from '../../../../client/utils/Helper';
 
 interface Props {
   visible: boolean;
   setVisible: (value: boolean) => void;
   accountInfo: AccountInfo;
   getInfoAccount: () => void;
+  modeEdit: boolean;
+  setModeEdit: (value: boolean) => void;
+  onDismiss?: () => void;
 }
 
 interface BankFormattedProps {
@@ -33,10 +38,12 @@ const AccountBankModal = ({
   setVisible,
   accountInfo,
   getInfoAccount,
+  modeEdit,
+  setModeEdit,
+  onDismiss,
 }: Props) => {
   const {getBanksList, editAccount, createAccount} = useBank();
   const [loading, setLoading] = useState(false);
-  const [modeEdit, setModeEdit] = useState(false);
   const [banksFormatted, setBanksFormatted] = useState<BankFormattedProps[]>(
     [],
   );
@@ -68,7 +75,7 @@ const AccountBankModal = ({
       setTextError(translate('schedule.toast_warning'));
       return setError(true);
     }
-    if (accountInfoEdit.typeAccount === '') {
+    if (accountInfoEdit.typeAccount === '' || accountInfoEdit.typeAccount === undefined ) {
       setTextError(translate('account_driver_modal.alert_error_type_account'));
       return setError(true);
     }
@@ -151,7 +158,24 @@ const AccountBankModal = ({
     getBanks();
   }, []);
 
-  const { colors } = useTheme();
+  const handleOnBlurCEP = () => {
+    if (accountInfoEdit.zipCode.length === 8) {
+      fetch(`https://viacep.com.br/ws/${accountInfoEdit.zipCode}/json/`)
+        .then(response => response.json())
+        .then(data => {
+          setAccountInfoEdit({
+            ...accountInfoEdit,
+            street: data?.logradouro,
+            city: data?.localidade,
+            complement: data?.complemento || '',
+            state: data?.uf,
+            neighborhood: data?.bairro,
+          });
+        });
+    }
+  };
+
+  const {colors} = useTheme();
 
   return (
     <>
@@ -190,244 +214,388 @@ const AccountBankModal = ({
             </TextButtonMode>
           </ButtonMode>
         }
+        onDismiss={onDismiss}
       >
         <>
-          <View pointerEvents={modeEdit ? 'auto' : 'none'}>
-            <View>
-              <Title modeEdit={modeEdit}>
-                {translate('account_driver_modal.name').concat(' * ')}
-              </Title>
-              <InputFrame
+          <View>
+            <Title modeEdit={modeEdit}>
+              {translate('account_driver_modal.bank').concat(' * ')}
+            </Title>
+            {banksFormatted && banksFormatted.length > 0 && (
+              <SearchableDropdown
                 editable={modeEdit}
-                value={accountInfoEdit?.holderName}
-                keyboradType={'default'}
-                setValue={e =>
+                onItemSelect={(item: BankFormattedProps) => {
                   setAccountInfoEdit({
                     ...accountInfoEdit,
-                    holderName: e,
-                  })
-                }
+                    bankName: item.name,
+                    bankId: item.id,
+                  });
+                }}
+                selectedItems={{
+                  id: accountInfoEdit?.bankId,
+                  name: accountInfoEdit?.bankName,
+                }}
+                itemStyle={{
+                  padding: 10,
+                  marginTop: 2,
+                  backgroundColor: theme.colors.background_white,
+                  borderColor: theme.colors.white,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                }}
+                itemTextStyle={{color: '#222'}}
+                itemsContainerStyle={{maxHeight: 140}}
+                items={banksFormatted}
+                defaultIndex={defaultBank()}
+                resetValue={false}
+                textInputProps={{
+                  underlineColorAndroid: 'transparent',
+                  style: {
+                    borderWidth: modeEdit ? 1 : 0,
+                    borderColor: theme.colors.secondary,
+                    borderRadius: 5,
+                    marginTop: 5,
+                    marginBottom: 5,
+                    padding: 5,
+                    color: theme.colors.secondary,
+                  },
+                  onTextChange: (item: string) => {
+                    setSearchBank(item);
+                  },
+                }}
+                listProps={{
+                  nestedScrollEnabled: true,
+                }}
               />
-            </View>
-            <View>
-              <Title modeEdit={modeEdit}>
-                {translate('account_driver_modal.document').concat(' * ')}
-              </Title>
-              <InputFrame
-                editable={modeEdit}
-                value={accountInfoEdit?.document}
-                keyboradType={'numeric'}
-                setValue={e =>
-                  setAccountInfoEdit({
-                    ...accountInfoEdit,
-                    document: e,
-                  })
-                }
-              />
-            </View>
-            <Section>
-              <View style={{width: '50%'}}>
+            )}
+          </View>
+          <ScrollView>
+            <View pointerEvents={modeEdit ? 'auto' : 'none'}>
+              <View>
                 <Title modeEdit={modeEdit}>
-                  {translate('account_driver_modal.number_account').concat(
-                    ' * ',
-                  )}
+                  {translate('account_driver_modal.name').concat(' * ')}
                 </Title>
                 <InputFrame
                   editable={modeEdit}
-                  value={accountInfoEdit?.numberAccount}
+                  value={accountInfoEdit?.holderName}
+                  keyboradType={'default'}
+                  setValue={e =>
+                    setAccountInfoEdit({
+                      ...accountInfoEdit,
+                      holderName: e,
+                    })
+                  }
+                />
+              </View>
+              <View>
+                <Title modeEdit={modeEdit}>
+                  {translate('account_driver_modal.document').concat(' * ')}
+                </Title>
+                <InputFrame
+                  editable={modeEdit}
+                  value={accountInfoEdit?.document}
                   keyboradType={'numeric'}
                   setValue={e =>
                     setAccountInfoEdit({
                       ...accountInfoEdit,
-                      numberAccount: e,
+                      document: e,
+                    })
+                  }
+                />
+              </View>
+              <Section>
+                <View style={{width: '50%'}}>
+                  <Title modeEdit={modeEdit}>
+                    {translate('account_driver_modal.number_account').concat(
+                      ' * ',
+                    )}
+                  </Title>
+                  <InputFrame
+                    editable={modeEdit}
+                    value={accountInfoEdit?.numberAccount}
+                    keyboradType={'numeric'}
+                    setValue={e =>
+                      setAccountInfoEdit({
+                        ...accountInfoEdit,
+                        numberAccount: e,
+                      })
+                    }
+                  />
+                </View>
+                <Section
+                  style={{
+                    width: '45%',
+                  }}
+                >
+                  <View>
+                    <Title modeEdit={modeEdit}>
+                      {translate('account_driver_modal.digit').concat(' * ')}
+                    </Title>
+                    <InputFrame
+                      editable={modeEdit}
+                      value={accountInfoEdit?.numberAccountDigit}
+                      keyboradType={'numeric'}
+                      setValue={e =>
+                        setAccountInfoEdit({
+                          ...accountInfoEdit,
+                          numberAccountDigit: e,
+                        })
+                      }
+                    />
+                  </View>
+                  <View style={{paddingLeft: 5, paddingRight: 5}}>
+                    <Title modeEdit={modeEdit}>
+                      {translate('account_driver_modal.agency').concat(' * ')}
+                    </Title>
+                    <InputFrame
+                      editable={modeEdit}
+                      value={accountInfoEdit?.agency}
+                      keyboradType={'numeric'}
+                      setValue={e =>
+                        setAccountInfoEdit({
+                          ...accountInfoEdit,
+                          agency: e,
+                        })
+                      }
+                    />
+                  </View>
+                  <View>
+                    <Title modeEdit={modeEdit}>
+                      {translate('account_driver_modal.op').concat(' * ')}
+                    </Title>
+                    <InputFrame
+                      editable={modeEdit}
+                      value={accountInfoEdit?.op}
+                      keyboradType={'numeric'}
+                      setValue={e =>
+                        setAccountInfoEdit({
+                          ...accountInfoEdit,
+                          op: e,
+                        })
+                      }
+                    />
+                  </View>
+                </Section>
+              </Section>
+              <View>
+                <Title style={{marginBottom: 5}} modeEdit={modeEdit}>
+                  {translate('account_driver_modal.type_account').concat(' * ')}
+                </Title>
+                {modeEdit ? (
+                  <View
+                    style={{
+                      width: '100%',
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      borderColor: colors.secondary,
+                      overflow: 'hidden',
+                      height: RFValue(35),
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Picker
+                      itemStyle={{
+                        fontSize: RFValue(12),
+                        color: theme.colors.secondary,
+                        backgroundColor: lighten(
+                          0.1,
+                          theme.colors.background_global,
+                        ),
+                        width: '110%',
+                        marginLeft: Platform.OS === 'ios' ? -20 : 0,
+                      }}
+                      selectedValue={accountInfoEdit?.typeAccount}
+                      onValueChange={value =>
+                        setAccountInfoEdit({
+                          ...accountInfoEdit,
+                          typeAccount: value,
+                        })
+                      }
+                    >
+                      <Picker.Item
+                        label={translate('account_driver_modal.type_account')}
+                        value=""
+                        color={colors.secondary}
+                      />
+                      <Picker.Item
+                        label={translate('account_driver_modal.type_checking')}
+                        value="corrente"
+                        color={colors.secondary}
+                      />
+                      <Picker.Item
+                        label={translate('account_driver_modal.type_savings')}
+                        value="poupanca"
+                        color={colors.secondary}
+                      />
+                    </Picker>
+                  </View>
+                ) : (
+                  <Text>
+                    {/* {translate('account_driver_modal.text_account').concat(
+                      ' * ',
+                    )} */}
+                    {accountInfoEdit.typeAccount}
+                  </Text>
+                )}
+              </View>
+              <View>
+                <Title style={{marginTop: 5}} modeEdit={modeEdit}>
+                  {translate('account_driver_modal.pix')}
+                </Title>
+                <InputFrame
+                  editable={modeEdit}
+                  value={accountInfoEdit?.pix}
+                  keyboradType={'default'}
+                  setValue={e =>
+                    setAccountInfoEdit({
+                      ...accountInfoEdit,
+                      pix: e,
                     })
                   }
                 />
               </View>
               <Section
                 style={{
-                  width: '45%',
+                  width: '48%',
                 }}
               >
-                <View>
+                <View style={{marginRight: 10, width: '100%'}}>
                   <Title modeEdit={modeEdit}>
-                    {translate('account_driver_modal.digit').concat(' * ')}
+                    {'Data de nascimento'.concat(' * ')}
                   </Title>
-                  <InputFrame
-                    editable={modeEdit}
-                    value={accountInfoEdit?.numberAccountDigit}
-                    keyboradType={'numeric'}
-                    setValue={e =>
+                  <Input
+                    type="datetime"
+                    options={{
+                      format: 'DD/MM/YYYY',
+                    }}
+                    value={Helper.formatDateBr(accountInfoEdit?.dateOfBirth)}
+                    onChangeText={e =>
                       setAccountInfoEdit({
                         ...accountInfoEdit,
-                        numberAccountDigit: e,
+                        dateOfBirth: e,
                       })
                     }
                   />
                 </View>
-                <View style={{paddingLeft: 5, paddingRight: 5}}>
-                  <Title modeEdit={modeEdit}>
-                    {translate('account_driver_modal.agency').concat(' * ')}
-                  </Title>
+
+                <View
+                  style={{
+                    width: '100%',
+                  }}
+                >
+                  <Title modeEdit={modeEdit}>{'CEP'.concat(' * ')}</Title>
                   <InputFrame
                     editable={modeEdit}
-                    value={accountInfoEdit?.agency}
+                    value={accountInfoEdit?.zipCode}
+                    onBlur={handleOnBlurCEP}
                     keyboradType={'numeric'}
                     setValue={e =>
                       setAccountInfoEdit({
                         ...accountInfoEdit,
-                        agency: e,
-                      })
-                    }
-                  />
-                </View>
-                <View>
-                  <Title modeEdit={modeEdit}>
-                    {translate('account_driver_modal.op').concat(' * ')}
-                  </Title>
-                  <InputFrame
-                    editable={modeEdit}
-                    value={accountInfoEdit?.op}
-                    keyboradType={'numeric'}
-                    setValue={e =>
-                      setAccountInfoEdit({
-                        ...accountInfoEdit,
-                        op: e,
+                        zipCode: e,
                       })
                     }
                   />
                 </View>
               </Section>
-            </Section>
-            <View>
-              <Title modeEdit={modeEdit}>
-                {translate('account_driver_modal.bank').concat(' * ')}
-              </Title>
-              {banksFormatted && banksFormatted.length > 0 && (
-                <SearchableDropdown
-                  editable={modeEdit}
-                  onItemSelect={(item: BankFormattedProps) => {
-                    setAccountInfoEdit({
-                      ...accountInfoEdit,
-                      bankName: item.name,
-                      bankId: item.id,
-                    });
-                  }}
-                  selectedItems={{
-                    id: accountInfoEdit?.bankId,
-                    name: accountInfoEdit?.bankName,
-                  }}
-                  itemStyle={{
-                    padding: 10,
-                    marginTop: 2,
-                    backgroundColor: theme.colors.background_white,
-                    borderColor: theme.colors.white,
-                    borderWidth: 1,
-                    borderRadius: 5,
-                  }}
-                  itemTextStyle={{color: '#222'}}
-                  itemsContainerStyle={{maxHeight: 140}}
-                  items={banksFormatted}
-                  defaultIndex={defaultBank()}
-                  resetValue={false}
-                  textInputProps={{
-                    underlineColorAndroid: 'transparent',
-                    style: {
-                      borderWidth: modeEdit ? 1 : 0,
-                      borderColor: theme.colors.secondary,
-                      borderRadius: 5,
-                      marginTop: 5,
-                      marginBottom: 5,
-                      padding: 5,
-                      color: theme.colors.secondary,
-                    },
-                    onTextChange: (item: string) => {
-                      setSearchBank(item);
-                    },
-                  }}
-                  listProps={{
-                    nestedScrollEnabled: true,
-                  }}
-                />
-              )}
-            </View>
-            <View>
-              <Title style={{marginBottom: 5}} modeEdit={modeEdit}>
-                {translate('account_driver_modal.type_account').concat(' * ')}
-              </Title>
-              {modeEdit ? (
+
+              <Section
+                style={{
+                  width: '48%',
+                }}
+              >
+                <View style={{marginRight: 10, width: '100%'}}>
+                  <Title modeEdit={modeEdit}>{'Endereço '.concat(' * ')}</Title>
+                  <InputFrame
+                    editable={modeEdit}
+                    value={accountInfoEdit?.street}
+                    keyboradType={'default'}
+                    setValue={e =>
+                      setAccountInfoEdit({
+                        ...accountInfoEdit,
+                        street: e,
+                      })
+                    }
+                  />
+                </View>
+
                 <View
                   style={{
                     width: '100%',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    borderColor: colors.secondary,
-                    overflow: 'hidden',
-                    height: RFValue(35),
-                    alignSelf: 'center',
-                    justifyContent: 'center',
                   }}
                 >
-                  <Picker
-                    itemStyle={{
-                      fontSize: RFValue(12),
-                      color: theme.colors.secondary,
-                      backgroundColor: lighten(
-                        0.1,
-                        theme.colors.background_global,
-                      ),
-                      width: '110%',
-                      marginLeft: Platform.OS === 'ios' ? -20 : 0,
-                    }}
-                    selectedValue={accountInfoEdit?.typeAccount}
-                    onValueChange={value =>
+                  <Title modeEdit={modeEdit}>{'Nº'.concat(' * ')}</Title>
+                  <InputFrame
+                    editable={modeEdit}
+                    value={accountInfoEdit?.number}
+                    keyboradType={'numeric'}
+                    setValue={e =>
                       setAccountInfoEdit({
                         ...accountInfoEdit,
-                        typeAccount: value,
+                        number: e,
                       })
                     }
-                  >
-                    <Picker.Item
-                      label={translate('account_driver_modal.type_account')}
-                      value=""
-                      color={colors.secondary}
-                    />
-                    <Picker.Item
-                      label={translate('account_driver_modal.type_checking')}
-                      value="corrente"
-                      color={colors.secondary}
-                    />
-                    <Picker.Item
-                      label={translate('account_driver_modal.type_savings')}
-                      value="poupanca"
-                      color={colors.secondary}
-                    />
-                  </Picker>
+                  />
                 </View>
-              ) : (
-                <Text>
-                  {translate('account_driver_modal.text_account').concat(' * ')}{' '}
-                  {accountInfoEdit.typeAccount}
-                </Text>
-              )}
+              </Section>
+
+              <Section
+                style={{
+                  width: '48%',
+                }}
+              >
+                <View style={{marginRight: 10, width: '100%'}}>
+                  <Title modeEdit={modeEdit}>{'Cidade '.concat(' * ')}</Title>
+                  <InputFrame
+                    editable={modeEdit}
+                    value={accountInfoEdit?.city}
+                    keyboradType={'default'}
+                    setValue={e =>
+                      setAccountInfoEdit({
+                        ...accountInfoEdit,
+                        city: e,
+                      })
+                    }
+                  />
+                </View>
+
+                <View
+                  style={{
+                    width: '100%',
+                  }}
+                >
+                  <Title modeEdit={modeEdit}>{'Estado'.concat(' * ')}</Title>
+                  <InputFrame
+                    editable={modeEdit}
+                    value={accountInfoEdit?.state}
+                    keyboradType={'default'}
+                    setValue={e =>
+                      setAccountInfoEdit({
+                        ...accountInfoEdit,
+                        state: e,
+                      })
+                    }
+                  />
+                </View>
+              </Section>
+
+              <View style={{marginRight: 10, width: '100%'}}>
+                <Title modeEdit={modeEdit}>{'Complemento '}</Title>
+                <InputFrame
+                  editable={modeEdit}
+                  value={accountInfoEdit?.complement}
+                  keyboradType={'default'}
+                  setValue={e =>
+                    setAccountInfoEdit({
+                      ...accountInfoEdit,
+                      complement: e,
+                    })
+                  }
+                />
+              </View>
             </View>
-            <View>
-              <Title style={{marginTop: 5}} modeEdit={modeEdit}>
-                {translate('account_driver_modal.pix')}
-              </Title>
-              <InputFrame
-                editable={modeEdit}
-                value={accountInfoEdit?.pix}
-                keyboradType={'default'}
-                setValue={e =>
-                  setAccountInfoEdit({
-                    ...accountInfoEdit,
-                    pix: e,
-                  })
-                }
-              />
-            </View>
-          </View>
+          </ScrollView>
         </>
       </ModalFrame>
     </>

@@ -87,6 +87,8 @@ export const ProgressBar = () => {
     return () => clearInterval(inteval);
   }, [timeInPercent]);
 
+  const timerWaiting = Helper.transformSecondsToMinutes(showTimeLeft());
+
   return (
     <ProgressContainer>
       <ProgressBarrer width={timeInPercent} />
@@ -97,7 +99,7 @@ export const ProgressBar = () => {
           <TextTime>
             {translate('statusTrip.title_time_wait_customer')}
           </TextTime>
-          <Time>{Helper.transformSecondsToMinutes(showTimeLeft())}</Time>
+          <Time>{timerWaiting}</Time>
         </CotentTime>
       )}
     </ProgressContainer>

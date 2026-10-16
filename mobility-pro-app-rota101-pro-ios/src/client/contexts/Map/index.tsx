@@ -1,17 +1,15 @@
 import {
   createContext,
   PropsWithChildren,
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
-import {mapService} from './services';
-import {MapContextProps} from './types';
+import { mapService } from './services';
+import { MapContextProps } from './types';
 
 const MapContext = createContext({} as MapContextProps);
-export const MapProvider = ({children}: PropsWithChildren) => {
+export const MapProvider = ({ children }: PropsWithChildren) => {
   const [drivers, setDrivers] = useState([]);
 
   const getOnlineDrivers = async (lat: number, lng: number) => {

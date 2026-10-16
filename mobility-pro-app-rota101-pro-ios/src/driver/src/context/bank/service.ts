@@ -2,6 +2,7 @@ import {useCallback} from 'react';
 import {customToast} from '../../../../utils/FlashMessage';
 import apiMain from '../../api/apiMain';
 import {AccountInfo} from './types';
+import Helper from '../../../../client/utils/Helper';
 
 export const BankService = () => {
   const getLatestTransactions = useCallback(
@@ -23,6 +24,32 @@ export const BankService = () => {
     [apiMain],
   );
 
+  const verifyCurrentAdquirer = async () => {
+    const {data} = await apiMain.get('Adquirer/CurrentAdquirer');
+
+    if (!data?.status) {
+      return data?.message;
+    }
+
+    return data?.data;
+  };
+
+  const verifyPaymentPixCode = async idPix => {
+    const {data} = await apiMain.post('DriverCredit/ShowCreditPix', {
+      transactionId: idPix,
+    });
+
+    return data;
+  };
+
+  const generatePixCode = async value => {
+    const {data} = await apiMain.post('DriverCredit/AddViaPix', {
+      amount: value,
+    });
+
+    return data;
+  };
+
   const getCoinType = useCallback(async () => {
     const {data} = await apiMain.get('Balance/GetTypes');
 
@@ -34,7 +61,7 @@ export const BankService = () => {
   }, [apiMain]);
 
   const getAccount = useCallback(
-    async (driverId: string) => {
+    async (driverId: Number) => {
       const {data} = await apiMain.post('Driver/FindWithAccountInfo', {
         stdObject: [
           {
@@ -124,19 +151,24 @@ export const BankService = () => {
       const {data} = await apiMain.post('BankAccount/Edit', {
         stdObject: [
           {
+            idBankAccount: Number(idBankAccount),
+            userId: Number(userId),
+            driverId: Number(driverId),
             agency: account.agency,
             agencyDigit: account.agencyDigit,
-            bankId: Number(account.bankId),
-            driverId: Number(driverId),
+            bankId: account?.bankId ? Number(account.bankId) : undefined,
             document: account.document,
             holderName: account.holderName,
-            idBankAccount: Number(idBankAccount),
             numberAccount: account.numberAccount,
             numberAccountDigit: account.numberAccountDigit,
             op: account.op,
             pix: account.pix,
             typeAccount: account.typeAccount,
-            userId: Number(userId),
+            ...account,
+            neighborhood: account?.neighborhood || 'Bairro',
+            dateOfBirth: account.dateOfBirth?.includes('-')
+              ? account?.dateOfBirth
+              : Helper.formatDateApiDefault(account?.dateOfBirth),
           },
         ],
       });
@@ -153,7 +185,7 @@ export const BankService = () => {
           {
             agency: account.agency,
             agencyDigit: account.agencyDigit,
-            bankId: Number(account.bankId),
+            bankId: account?.bankId ? Number(account.bankId) : undefined,
             driverId: Number(driverId),
             document: account.document,
             holderName: account.holderName,
@@ -163,10 +195,12 @@ export const BankService = () => {
             pix: account.pix,
             typeAccount: account.typeAccount,
             userId: Number(userId),
+            ...account,
+            neighborhood: account?.neighborhood || 'Bairro',
+            dateOfBirth: Helper.formatDateApiDefault(account?.dateOfBirth),
           },
         ],
       });
-
       return data;
     },
     [apiMain],
@@ -198,5 +232,8 @@ export const BankService = () => {
     editAccount,
     createAccount,
     requestWithdraw,
+    verifyCurrentAdquirer,
+    verifyPaymentPixCode,
+    generatePixCode,
   };
 };

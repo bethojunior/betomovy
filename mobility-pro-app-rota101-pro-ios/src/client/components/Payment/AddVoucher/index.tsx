@@ -1,25 +1,18 @@
-import {FC, useCallback, useEffect, useState} from 'react';
-import {useForm} from 'react-hook-form';
-import {Platform, ScrollView, View} from 'react-native';
-import {Entypo} from '@expo/vector-icons';
+import { FC, useEffect, useState } from 'react';
+import { ScrollView } from 'react-native';
+import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
+import { translate } from '../../../locales';
+import Helper from '../../../utils/Helper';
+import { getCoinType } from '../../../utils/money';
+import { CardCart } from '../../CardCart';
+import { CardPix } from '../../CardPix';
 import ModalFrame from '../../form/Modal';
 import {
-  ContainerCard,
   Content,
-  ContentButton,
-  ContentSelectCard,
+  PaymentMethodLabel,
   SubTitle,
   Title,
 } from './styles';
-import Helper from '../../../utils/Helper';
-import {getCoinType} from '../../../utils/money';
-import Preload from '../../Preload';
-import {translate} from '../../../locales';
-import {usePaymentForm} from '../../../contexts/paymentForms';
-import theme from '../../../styles/theme';
-import {If} from '../../If';
-import {TextEdit} from '../../TextEdit';
-import {CardCart} from '../../CardCart';
 
 interface VoucherSelected {
   amount: string;
@@ -30,7 +23,7 @@ interface VoucherSelected {
   value: string;
 }
 
-interface ArrayCard extends Array<ListCard> {}
+interface ArrayCard extends Array<ListCard> { }
 
 interface ListCard {
   birthDate: string;
@@ -52,6 +45,9 @@ interface Props {
   voucherSelected: VoucherSelected | undefined;
 }
 
+const TYPE_CARD = 1;
+const TYPE_PIX = 4;
+
 const AddVoucher: FC<Props> = ({
   visible,
   setVisible,
@@ -59,123 +55,91 @@ const AddVoucher: FC<Props> = ({
   listCard,
   voucherSelected,
 }) => {
-  const TYPE_CARD = 1;
-  const [cardSelected, setCardSelected] = useState<any>();
-  const [loading, setLoading] = useState(false);
-  const [visibleSecondModal, setVisibleSecondModal] = useState(false);
+  const { navigate }: NavigationProp<ParamListBase> = useNavigation();
 
-  const {addVoucher} = usePaymentForm();
-
-  const {reset} = useForm();
+  const [cardSelected, setCardSelected] = useState<string>('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<number>(TYPE_CARD);
 
   useEffect(() => {
+    if (!visible) return;
+
     if (listCard.length > 0) {
       setCardSelected(listCard[0].idCard);
-    }
-  }, [listCard]);
-
-  const insertVoucher = useCallback(async () => {
-    if (Platform.OS === 'ios') {
-      setVisible(false);
+      setSelectedPaymentMethod(TYPE_CARD);
     } else {
-      setLoading(true);
+      setCardSelected('');
+      setSelectedPaymentMethod(TYPE_PIX);
     }
+  }, [listCard, visible]);
 
-    const response = {
-      amount: voucherSelected?.amount,
-      paymentFormId: TYPE_CARD,
-      value: voucherSelected?.value,
-      cardId: cardSelected,
-      mpToken: null,
-    };
+  const clearSelected = () => {
+    setCardSelected('');
+    setSelectedPaymentMethod(TYPE_CARD);
+  }
 
-    await addVoucher(response);
-    setLoading(false);
-    updateList();
+  const handleClose = () => {
     setVisible(false);
-  }, [addVoucher, cardSelected, updateList, voucherSelected]);
+    clearSelected();
+    // updateList();
+  };
 
-  const findCartByIdCard = (idCard: string) => {
-    const cardResponse = listCard.find((item: any) => item.idCard === idCard);
-    return cardResponse && cardResponse.number.substr(-4);
+  const handleSetCardSelected = (idCard: string) => {
+    setCardSelected(idCard);
+    setSelectedPaymentMethod(TYPE_CARD);
+  };
+
+  const handleConfirm = () => {
+    setVisible(false);
+    clearSelected();
+    navigate('VoucherPayment', {
+      voucherSelected,
+      selectedPaymentMethod,
+      cardId: selectedPaymentMethod === TYPE_CARD ? cardSelected : null,
+    });
   };
 
   return (
-    <>
-      <Preload visible={loading} />
-      <ModalFrame
-        visible={visible}
-        setVisible={setVisible}
-        onPressConfirm={!visibleSecondModal ? insertVoucher : null}
-        hideConfirm={visibleSecondModal}
-        error={false}
-        textError=""
-        onClose={() => {
-          if (visibleSecondModal) {
-            return setVisibleSecondModal(false);
-          }
-          setVisible(false);
-          reset();
-        }}
-      >
-        <Content>
-          <If condition={!visibleSecondModal}>
-            <View>
-              <SubTitle>{translate('paymentPage.title_balance')}</SubTitle>
-              <Title>
-                {getCoinType()}
-                {Helper.maskMoney(Number(voucherSelected?.value))}
-              </Title>
-            </View>
+    <ModalFrame
+      visible={visible}
+      setVisible={setVisible}
+      onPressConfirm={handleConfirm}
+      hideConfirm={false}
+      error={false}
+      textError=""
+      onClose={handleClose}
+    >
+      <Content>
+        <SubTitle>{translate('paymentPage.title_balance')}</SubTitle>
+        <Title>
+          {getCoinType()}
+          {Helper.maskMoney(Number(voucherSelected?.value))}
+        </Title>
 
-            <ContentSelectCard>
-              <ContentButton
-                mode="text"
-                onPress={() => setVisibleSecondModal(true)}
-              >
-                <TextEdit color={theme.colors.primary} size="small">
-                  {translate('paymentPage.text_payment_methods')}
-                </TextEdit>
-                <Entypo name="select-arrows" color={theme.colors.primary} />
-              </ContentButton>
-              <View
-                style={{
-                  alignItems: 'center',
-                }}
-              >
-                <TextEdit color={theme.colors.primary} size="small">
-                  ****{findCartByIdCard(cardSelected)}
-                </TextEdit>
-              </View>
-            </ContentSelectCard>
-          </If>
-          <If condition={visibleSecondModal}>
-            <ContainerCard>
-              <TextEdit>
-                {translate('paymentPage.text_payment_methods')}
-              </TextEdit>
-              <ScrollView
-                style={{
-                  marginVertical: 10,
-                }}
-              >
-                {listCard.map((item: any) => {
-                  return (
-                    <CardCart
-                      key={item.idCard}
-                      card={item}
-                      setVisibleSecondModal={setVisibleSecondModal}
-                      selectedCard={cardSelected}
-                      setCardSelected={setCardSelected}
-                    />
-                  );
-                })}
-              </ScrollView>
-            </ContainerCard>
-          </If>
-        </Content>
-      </ModalFrame>
-    </>
+        <PaymentMethodLabel>
+          {translate('paymentPage.text_payment_methods')}
+        </PaymentMethodLabel>
+
+        <ScrollView style={{ marginVertical: 8 }}>
+          {listCard.map((item: any) => (
+            <CardCart
+              key={item.idCard}
+              card={item}
+              setVisibleSecondModal={() => {}}
+              selectedCard={cardSelected}
+              setCardSelected={handleSetCardSelected}
+            />
+          ))}
+          <CardPix
+            selected={selectedPaymentMethod === TYPE_PIX}
+            onSelectPix={() => {
+              setSelectedPaymentMethod(TYPE_PIX);
+              setCardSelected('');
+            }}
+            setVisibleSecondModal={() => {}}
+          />
+        </ScrollView>
+      </Content>
+    </ModalFrame>
   );
 };
 

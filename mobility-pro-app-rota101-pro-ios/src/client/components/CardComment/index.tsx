@@ -1,32 +1,43 @@
-import {Alert, View} from 'react-native';
+import {Alert} from 'react-native';
+import {useEffect, useState} from 'react';
+import {AntDesign, Ionicons} from '@expo/vector-icons';
+import {RFValue} from 'react-native-responsive-fontsize';
 import StarRatings from '../StarRatings';
 import {
   BackgroundTip,
-  ButtonAction,
   CommentBox,
+  CommentLabel,
   Container,
   ContainerButtons,
-  ContainerImage,
-  DriverRating,
-  DriverRatingContainer,
+  DecisionActionsRow,
+  DecisionIconButton,
+  DecisionLabel,
+  DecisionRow,
+  Divider,
+  DriverInfo,
+  DriverRatingBadge,
+  DriverRatingText,
+  FavoriteButton,
+  FavoriteButtonText,
   Header,
   ImageProfile,
+  ImageProfileButton,
   NameUser,
-  TextButton,
+  PhotoColumn,
+  StarsCaption,
+  TipButton,
+  TipButtonText,
 } from './styles';
-
-import {AntDesign} from '@expo/vector-icons';
-import {DecisionsActions} from '../DecisionActions';
-import {lighten} from 'polished';
 import theme from '../../styles/theme';
 import {translate} from '../../locales';
-import {useEffect, useState} from 'react';
 import {useTrip} from '../../contexts/Trip';
 import {AnimatedSlideY} from '../AnimatedSlideY';
 import {CardTip} from '../CardTip';
 import {If} from '../If';
+import {ImageExpanded} from '../ImageExpanded';
 import {useFavorite} from '../../contexts/favorite';
 import {useAuth} from '../../../context/auth';
+import {useAppConfig} from '../../hooks/useAppConfig';
 
 interface CardCommentProps {
   trip: any;
@@ -34,32 +45,31 @@ interface CardCommentProps {
   setStates: any;
 }
 
-let heightMax = 0;
+type DecisionValue = 'confirmed' | 'reproved' | null;
 
-export const CardComment = ({
-  trip,
-  onPressInput,
-  setStates,
-}: CardCommentProps) => {
+export const CardComment = ({trip, onPressInput, setStates}: CardCommentProps) => {
   const {dispatchTripCustomer, stateTripCustomer} = useTrip();
   const {addFavorites, favorites} = useFavorite();
   const {user} = useAuth();
-  const star = '5';
+  const {isTipEnabled} = useAppConfig();
 
   const {commentFinish} = stateTripCustomer;
   const [valueTip, setValueTip] = useState(0);
   const [isDriverFavorited, setIsDriverFavorited] = useState<boolean>(false);
   const [activeTip, setActiveTip] = useState(false);
+  const [photoDecision, setPhotoDecision] = useState<DecisionValue>(null);
+  const [serviceDecision, setServiceDecision] = useState<DecisionValue>(null);
+  const [modalImage, setModalImage] = useState(false);
+
+  const resetDefaultStars = () => {
+    dispatchTripCustomer({type: 'update', field: 'defaultRating', arg: 5});
+  };
 
   const checkDriverIsFavorited = () => {
     const isDriverExists = favorites?.filter(
       data => data.idDriver === trip?.driver?.idDriver,
     );
-    if (isDriverExists.length > 0) {
-      setIsDriverFavorited(true);
-    } else {
-      setIsDriverFavorited(false);
-    }
+    setIsDriverFavorited(isDriverExists.length > 0);
   };
 
   const addFavorite = async () => {
@@ -67,11 +77,7 @@ export const CardComment = ({
       translate('detailsTrip.add_favorite'),
       translate('detailsTrip.favorite'),
       [
-        {
-          text: translate('detailsTrip.text_button_no'),
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
+        {text: translate('detailsTrip.text_button_no'), style: 'cancel'},
         {
           text: translate('detailsTrip.text_button_yes'),
           onPress: async () => {
@@ -84,67 +90,94 @@ export const CardComment = ({
     );
   };
 
-  const handleReprovedPhoto = (e?: string) => {
-    if (e === 'reproved') {
-      dispatchTripCustomer({
-        type: 'update',
-        field: 'photoFinishDecision',
-        arg: true,
-      });
-      return;
-    }
-
+  const togglePhotoDecision = (value: DecisionValue) => {
+    const nextValue = photoDecision === value ? null : value;
+    setPhotoDecision(nextValue);
     dispatchTripCustomer({
       type: 'update',
       field: 'photoFinishDecision',
-      arg: null,
+      arg: nextValue === 'reproved' ? true : null,
     });
   };
 
   useEffect(() => {
+    resetDefaultStars();
     checkDriverIsFavorited();
   }, []);
 
   return (
     <>
-      <Container
-        onLayout={event => {
-          const {height} = event.nativeEvent.layout;
-          heightMax = height;
-        }}
-      >
+      <Container>
         <Header>
-          <ContainerImage>
-            <ImageProfile
-              source={{
-                uri: trip?.driver?.profilePicture,
-              }}
-            />
-          </ContainerImage>
-          <View>
+          <PhotoColumn>
+            <ImageProfileButton activeOpacity={0.8} onPress={() => setModalImage(true)}>
+              <ImageProfile source={{uri: trip?.driver?.profilePicture}} />
+            </ImageProfileButton>
+            <DriverRatingBadge>
+              <DriverRatingText>
+                {parseFloat(trip?.driver?.rating).toFixed(1).replace('.', ',')}
+              </DriverRatingText>
+              <AntDesign name="star" size={RFValue(10)} color={theme.colors.border_green} />
+            </DriverRatingBadge>
+          </PhotoColumn>
+          <DriverInfo>
             <NameUser>{trip?.driver?.name}</NameUser>
             <StarRatings />
-          </View>
-          <DriverRatingContainer>
-            <DriverRating>
-              {parseFloat(trip?.driver?.rating).toFixed(1).replace('.', ',')}
-            </DriverRating>
-            <AntDesign name="star" size={10} color="orange" />
-          </DriverRatingContainer>
+            <StarsCaption>{translate('finishTrip.tap_stars_to_rate')}</StarsCaption>
+          </DriverInfo>
         </Header>
-        <DecisionsActions
-          text={translate('finishTrip.does_the_collaborators_photo_match')}
-          onPressAction={handleReprovedPhoto}
-        />
-        <DecisionsActions text={translate('finishTrip.service')} />
-        <DecisionsActions
-          text={translate('finishTrip.praise_or_Criticize')}
-          noActions
-        />
+
+        <Divider />
+
+        <DecisionRow>
+          <DecisionLabel>{translate('finishTrip.does_the_collaborators_photo_match')}</DecisionLabel>
+          <DecisionActionsRow>
+            <DecisionIconButton activeOpacity={0.7} onPress={() => togglePhotoDecision('confirmed')}>
+              <Ionicons
+                name={photoDecision === 'confirmed' ? 'checkmark-circle' : 'checkmark-circle-outline'}
+                size={RFValue(28)}
+                color={theme.colors.border_green}
+              />
+            </DecisionIconButton>
+            <DecisionIconButton activeOpacity={0.7} onPress={() => togglePhotoDecision('reproved')}>
+              <Ionicons
+                name={photoDecision === 'reproved' ? 'close-circle' : 'close-circle-outline'}
+                size={RFValue(28)}
+                color={theme.colors.red}
+              />
+            </DecisionIconButton>
+          </DecisionActionsRow>
+        </DecisionRow>
+
+        <DecisionRow>
+          <DecisionLabel>{translate('finishTrip.service')}</DecisionLabel>
+          <DecisionActionsRow>
+            <DecisionIconButton
+              activeOpacity={0.7}
+              onPress={() => setServiceDecision(current => (current === 'confirmed' ? null : 'confirmed'))}
+            >
+              <Ionicons
+                name={serviceDecision === 'confirmed' ? 'checkmark-circle' : 'checkmark-circle-outline'}
+                size={RFValue(28)}
+                color={theme.colors.border_green}
+              />
+            </DecisionIconButton>
+            <DecisionIconButton
+              activeOpacity={0.7}
+              onPress={() => setServiceDecision(current => (current === 'reproved' ? null : 'reproved'))}
+            >
+              <Ionicons
+                name={serviceDecision === 'reproved' ? 'close-circle' : 'close-circle-outline'}
+                size={RFValue(28)}
+                color={theme.colors.red}
+              />
+            </DecisionIconButton>
+          </DecisionActionsRow>
+        </DecisionRow>
+
+        <CommentLabel>{translate('finishTrip.praise_or_Criticize')}</CommentLabel>
         <CommentBox
-          multiline
           onFocus={() => onPressInput()}
-          placeholderTextColor={lighten(0.2, theme.colors.secondary)}
           returnKeyType="done"
           returnKeyLabel="done"
           numberOfLines={2}
@@ -152,50 +185,46 @@ export const CardComment = ({
           onChangeText={text => setStates({comment: text})}
           defaultValue={commentFinish}
         />
+
         <ContainerButtons>
-          <ButtonAction
-            bg="#E8A803"
-            onPress={async () => {
-              await addFavorite();
-            }}
-            disabled={isDriverFavorited}
-          >
-            <TextButton>
+          <FavoriteButton activeOpacity={0.7} onPress={addFavorite} disabled={isDriverFavorited}>
+            <Ionicons
+              name={isDriverFavorited ? 'heart' : 'heart-outline'}
+              size={RFValue(16)}
+              color={theme.colors.red}
+            />
+            <FavoriteButtonText>
               {isDriverFavorited
                 ? translate('favorites.text_button_isfavorited')
                 : translate('favorites.text_button_favorite')}
-            </TextButton>
-          </ButtonAction>
+            </FavoriteButtonText>
+          </FavoriteButton>
 
-          <ButtonAction
-            bg="#0395E8"
-            onPress={() => {
-              setActiveTip(!activeTip);
-            }}
-          >
-            <TextButton>{translate('tipClient.tip_worth')}</TextButton>
-          </ButtonAction>
+          <If condition={isTipEnabled}>
+            <TipButton activeOpacity={0.7} onPress={() => setActiveTip(!activeTip)}>
+              <TipButtonText>{translate('tipClient.tip_worth')}</TipButtonText>
+            </TipButton>
+          </If>
         </ContainerButtons>
       </Container>
 
-      <BackgroundTip>
-        <AnimatedSlideY
-          containerStyle={{
-            backgroundColor: theme.colors.white_light,
-            borderBottomLeftRadius: 20,
-            borderBottomRightRadius: 20,
-            borderTopLeftRadius: 5,
-            borderTopRightRadius: 5,
-          }}
-          showAddress={activeTip}
-        >
-          <CardTip
-            setValueTip={setValueTip}
-            valueTip={valueTip}
-            image={trip?.driver?.profilePicture}
-          />
-        </AnimatedSlideY>
-      </BackgroundTip>
+      <If condition={isTipEnabled}>
+        <BackgroundTip>
+          <AnimatedSlideY containerStyle={{}} showAddress={activeTip}>
+            <CardTip
+              setValueTip={setValueTip}
+              valueTip={valueTip}
+              image={trip?.driver?.profilePicture}
+            />
+          </AnimatedSlideY>
+        </BackgroundTip>
+      </If>
+
+      <ImageExpanded
+        modalImage={modalImage}
+        setModalImage={setModalImage}
+        source={trip?.driver?.profilePicture}
+      />
     </>
   );
 };

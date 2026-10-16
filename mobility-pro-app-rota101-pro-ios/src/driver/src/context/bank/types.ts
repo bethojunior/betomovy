@@ -40,6 +40,9 @@ export interface LastTransactionProps {
   summary: string;
   tripReference: string;
   value: string;
+  observation?: string | null;
+  reason?: string | null;
+  paymentFormName?: string | null;
 }
 
 export interface CoinTypes {
@@ -64,8 +67,17 @@ export interface AccountInfo {
   numberAccountDigit: string;
   op: string;
   pix: string;
+  pixType?: string;
   typeAccount?: string;
   bankId?: string;
+  dateOfBirth?: string;
+  zipCode?: string;
+  street?: string;
+  number?: string;
+  complement?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
 }
 
 export interface DriverInfoProps {

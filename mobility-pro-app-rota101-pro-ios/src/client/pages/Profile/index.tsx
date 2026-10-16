@@ -1,5 +1,4 @@
-// @ts-nocheck
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {
   ImageBackground,
   View,
@@ -10,10 +9,10 @@ import {
   Platform,
   Share,
   Linking,
+  Alert,
 } from 'react-native';
-import {Avatar} from 'react-native-elements';
 import Icon from '@expo/vector-icons/AntDesign';
-import {FontAwesome5, EvilIcons} from '@expo/vector-icons';
+import { FontAwesome5, EvilIcons, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import Icon1 from '@expo/vector-icons/FontAwesome';
 import {
   NavigationProp,
@@ -22,30 +21,41 @@ import {
 } from '@react-navigation/native';
 import * as Application from 'expo-application';
 import ArrowIcon from '@expo/vector-icons/Fontisto';
-import imageUser from '../../assets/images/user.png';
 import iconGuest from '../../assets/images/shopping.png';
+import { AvatarProfile } from '../../../components/AvatarProfile';
 import ButtonOptionCustom from '../../components/form/ButtonOptionCustom';
 import OptionSignInModal from '../../components/OptionSignInModal';
 import ImageRoute from '../../assets/images/rotas.png';
 import ImageWallet from '../../assets/images/wallet.png';
-import {translate} from '../../locales';
-import {Container, SimpleText, styles} from './styles';
-import {If} from '../../components/If';
-import {customToast} from '../../../utils/FlashMessage';
-import {useAuth} from '../../../context/auth';
-import {OptionsProps} from '../../contexts/menu/types';
-import {useMenu} from '../../contexts/menu';
+import { translate } from '../../locales';
+import { Container, SimpleText, styles, VersionContainer } from './styles';
+import { If } from '../../components/If';
+import { customToast } from '../../../utils/FlashMessage';
+import { useAuth } from '../../../context/auth';
+import { OptionsProps } from '../../contexts/menu/types';
+import { useMenu } from '../../contexts/menu';
 import Preload from '../../components/Preload';
 import Helper from '../../utils/Helper';
 import theme from '../../styles/theme';
+import { UserDriverService } from '../../../driver/src/context/userDriver/service';
+import { LinkExternalActionType } from '../../../constants/LinkExternal';
+import { userIndicationService } from '../../contexts/userIndication/services';
+import { AppsId } from '../../../context/ConfigGlobal/constants';
+import { useLocal } from '../../contexts/local';
 
-export default function Profile({route}) {
-  const {signOut, user, isGuest, generalSettings} = useAuth();
-  const {navigate}: NavigationProp<ParamListBase> = useNavigation();
+import { buildApp } from '../../../constantBuild/config';
+import { RFValue } from 'react-native-responsive-fontsize';
+
+export default function Profile({ route }) {
+  const { signOut, user, isGuest, generalSettings } = useAuth();
+  const { navigate }: NavigationProp<ParamListBase> = useNavigation();
+  const { position } = useLocal();
   const [loading, setLoading] = useState(false);
-  const {getMenuOptions, optionsMenu, setOptionsMenu, externalLink} = useMenu();
+  const { getMenuOptions, optionsMenu, setOptionsMenu, externalLink } = useMenu();
   const sizeIcon = 25;
   const version = Application.nativeApplicationVersion;
+  const service = UserDriverService();
+
 
   function handleSignOut() {
     signOut();
@@ -53,13 +63,18 @@ export default function Profile({route}) {
 
   const onShare = async () => {
     try {
+      const { data } = await userIndicationService.sharing({
+        userId: user.idUser,
+        phone: null,
+        appId: Number(AppsId['CLIENTE FINAL']),
+        formOfSharing: 'whatsapp',
+        location: {
+          latitude: position?.latitude || 0,
+          longitude: position?.longitude || 0,
+        },
+      });
       const result = await Share.share({
-        message: `${
-          generalSettings.find(item => item.key === 'appSharingCustomerMessage')
-            .value
-        } ${generalSettings
-          .find(item => item.key === 'link_customer_pre_register')
-          .value.replace('{userId}', user.idUser)}`,
+        message: `${data?.data?.message}`,
       });
 
       if (result.action === Share.sharedAction) {
@@ -72,7 +87,7 @@ export default function Profile({route}) {
         // dismissed
       }
     } catch (error) {
-      customToast('Erro ao Compartilhar', 'error');
+      customToast(translate('toast.text_share_error'), 'danger');
     }
   };
 
@@ -112,27 +127,55 @@ export default function Profile({route}) {
     Linking.openURL(url || '');
   };
 
+  const clickLinkExternal = (url, idMenuAction) => {
+    if (externalLink.id !== '') {
+      service.addAds(Number(externalLink.id));
+    }
+    if (!idMenuAction) {
+      return openLink(url);
+    }
+    const publicity = {
+      banner: externalLink?.linkImage,
+      description: externalLink?.textImage,
+      link: externalLink?.link,
+      typeAction: idMenuAction,
+      buttonCta: externalLink?.buttonCta || null,
+      buttonsActions: externalLink?.buttonsActions || null,
+      id: externalLink?.id,
+    };
+    switch (Number(idMenuAction)) {
+      case LinkExternalActionType.ONLY_NAVIGATION:
+        return openLink(url);
+        break;
+      case LinkExternalActionType.OPEN_WEBVIEW:
+        navigate('Publicity', {
+          publicity,
+        });
+        break;
+      case LinkExternalActionType.OPEN_INTERACT_IMAGE:
+        navigate('Publicity', {
+          publicity,
+        });
+        break;
+    }
+  };
+
   return (
     <Container>
       <Preload visible={loading} />
-      <If condition={verifyOptions(optionsMenu, 'client_profile')}>
-        <ButtonOptionCustom
-          icon={
-            <Avatar
-              size="large"
-              rounded
-              source={user != null ? {uri: user.profileImageLink} : imageUser}
-            />
-          }
-          title={user != null && Helper.maskNames(user.nameUser.trim())}
-          subtitle={translate('profile.text_subtitle_edit_profile')}
-          onPress={() => {
-            navigate('MyProfile');
-          }}
-        />
-      </If>
 
-      <ScrollView style={styles.content}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <If condition={verifyOptions(optionsMenu, 'client_profile')}>
+          <ButtonOptionCustom
+            icon={<AvatarProfile uri={user?.profileImageLink} />}
+            title={user != null && Helper.maskNames(user?.nameUser?.trim())}
+            subtitle={translate('profile.text_subtitle_edit_profile')}
+            onPress={() => {
+              navigate('MyProfile');
+            }}
+          />
+        </If>
+
         <If
           condition={
             routeIf !== 'Delivery' &&
@@ -160,6 +203,21 @@ export default function Profile({route}) {
             icon={<Image style={styles.image} source={ImageWallet} />}
             onPress={() => {
               navigate('PaymentPage');
+            }}
+          />
+        </If>
+
+        <If
+          condition={
+            routeIf !== 'Delivery' &&
+            verifyOptions(optionsMenu, 'client_payment')
+          }
+        >
+          <ButtonOptionCustom
+            title={translate('paymentPage.title_cuopon')}
+            icon={<Ionicons size={RFValue(sizeIcon)} name="ticket" />}
+            onPress={() => {
+              navigate('CouponsMobility');
             }}
           />
         </If>
@@ -197,7 +255,7 @@ export default function Profile({route}) {
         >
           <ButtonOptionCustom
             title={translate('appRoutes.title_coupons')}
-            icon={<Icon size={sizeIcon} name="tagso" />}
+            icon={<Icon size={sizeIcon} name="tags" />}
             onPress={() => {
               navigate('Coupons');
             }}
@@ -216,7 +274,7 @@ export default function Profile({route}) {
         >
           <ButtonOptionCustom
             title={translate('profile.text_title_favorite_drivers')}
-            icon={<Icon size={sizeIcon} name="staro" />}
+            icon={<Icon size={sizeIcon} name="star" />}
             onPress={() => {
               navigate('Favorites');
             }}
@@ -255,9 +313,11 @@ export default function Profile({route}) {
         />
         {/* </If> */}
 
-        <If condition={Object.keys(externalLink || {}).length > 0}>
+        <If
+          condition={externalLink && Object.keys(externalLink || {}).length > 0}
+        >
           <ButtonOptionCustom
-            title={externalLink.description}
+            title={externalLink?.description}
             icon={
               <EvilIcons
                 size={sizeIcon}
@@ -265,9 +325,22 @@ export default function Profile({route}) {
                 color={theme.colors.secondary}
               />
             }
-            onPress={() => openLink(externalLink.link)}
+            onPress={() =>
+              clickLinkExternal(
+                externalLink?.link,
+                externalLink?.menuAppTypeAction,
+              )
+            }
           />
         </If>
+
+        {__DEV__ && (
+          <ButtonOptionCustom
+            icon={<MaterialIcons name="developer-mode" size={25} color={theme.colors.secondary} />}
+            title="Desenvolvedor"
+            onPress={() => navigate('DevMenu')}
+          />
+        )}
 
         <ButtonOptionCustom
           title={translate('profile.text_title_sign_out')}
@@ -275,15 +348,18 @@ export default function Profile({route}) {
           onPress={() => handleSignOut()}
         />
       </ScrollView>
-      <SimpleText style={styles.versionNumber}>{version}</SimpleText>
+
+      <VersionContainer>
+        <SimpleText>{translate('commom.version')}: {version}</SimpleText>
+      </VersionContainer>
     </Container>
   );
 }
 
 function Guest() {
-  const {navigate}: NavigationProp<ParamListBase> = useNavigation();
+  const { navigate }: NavigationProp<ParamListBase> = useNavigation();
   const [visible, setVisible] = useState(false);
-  const {disablePhoneLogin} = useAuth();
+  const { disablePhoneLogin } = useAuth();
 
   return (
     <>

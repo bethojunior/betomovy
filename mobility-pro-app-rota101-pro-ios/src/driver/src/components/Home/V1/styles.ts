@@ -25,7 +25,7 @@ export const ViewPanic = styled.View`
   z-index: 1;
 `;
 
-export const ContentButton = styled.TouchableOpacity<{
+export const ContentButton = styled.View<{
   bottom?: string | number;
 }>`
   align-items: center;

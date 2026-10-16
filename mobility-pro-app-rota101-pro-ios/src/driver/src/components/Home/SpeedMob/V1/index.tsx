@@ -1,23 +1,23 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeHeaderTopSpeedMob from '../../../HomeHeaderTop/SpeedMob';
-import {useBubbleButton} from '@704apps/react-native-bubble-button';
+import { useBubbleButton } from '@704apps/react-native-bubble-button';
 
-import {useUserDriver} from '../../../../context/userDriver';
-import {useLocalProvider} from '../../../../context/local';
-import {useTripProvider} from '../../../../context/Trip';
+import { useUserDriver } from '../../../../context/userDriver';
+import { useLocalProvider } from '../../../../context/local';
+import { useTripProvider } from '../../../../context/Trip';
 
-import {SimpleLineIcons} from '@expo/vector-icons';
+import { SimpleLineIcons } from '@expo/vector-icons';
 
-import {ButtonV2} from '../../../ButtonOnAndOff';
+import { ButtonV2 } from '../../../ButtonOnAndOff';
 
-import {translate} from '../../../../../../client/locales';
+import { translate } from '../../../../../../client/locales';
 
-import {TextEdit} from '../../../TextEdit';
+import { TextEdit } from '../../../TextEdit';
 
 import theme from '../../../../styles/theme';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { RFValue } from 'react-native-responsive-fontsize';
 
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 import {
   ContentButton,
@@ -27,32 +27,33 @@ import {
   Icon,
 } from './styles';
 
-import {useState} from 'react';
+import { useState } from 'react';
 
-import {UseContextBattery} from '../../../../../../context/Battery';
-import {customToast} from '../../../../../../utils/FlashMessage';
-import {useBattery} from '../../../../hooks/battery';
-import {BatteryState} from 'expo-battery';
+import { customToast } from '../../../../../../utils/FlashMessage';
+import { useBattery } from '../../../../hooks/battery';
+import { BatteryState } from 'expo-battery';
+import { useDriverHours } from '../../../../hooks/useDriverHours';
+import { ModalHorasLimites } from '../../../ModalHorasLimites';
 
 interface V1SpeedMobProps {
   setOn: () => void;
   setModalVisible: (value: boolean) => void;
 }
 
-export default function V1SpeedMob({setOn, setModalVisible}: V1SpeedMobProps) {
-  const {navigate} = useNavigation();
-  const {hideBubble} = useBubbleButton();
-  const {userDriverFind, toogleDriverStatus} = useUserDriver();
-  const {location, setLocation} = useLocalProvider();
-  const {dispatchTrip, stateTrip} = useTripProvider();
-  const {levelBatteryMin} = UseContextBattery()
-
+export default function V1SpeedMob({ setOn, setModalVisible }: V1SpeedMobProps) {
+  const { hideBubble } = useBubbleButton();
+  const { userDriverFind, toogleDriverStatus } = useUserDriver();
+  const { location, setLocation } = useLocalProvider();
+  const dispatchTrip: any = useTripProvider(
+    (context: any) => context.dispatchTrip,
+  );
   const [initLocationX, setInitLocationX] = useState(0);
 
-  const {battery} = useBattery();
+  const { battery, levelBatteryMin } = useBattery();
+
+  const { checkHorasLimites, shouldShowModal, closeModal, getDriverHours } = useDriverHours();
 
   const setOff = async () => {
-    //ALTERA O MOTORISTA PARA O MODO DISPONÍVEL
     userDriverFind.status = 'desligado';
     const locationStorage = await AsyncStorage.getItem('lastPosition');
     if (!location || Object.keys(location).length === 0) {
@@ -78,11 +79,17 @@ export default function V1SpeedMob({setOn, setModalVisible}: V1SpeedMobProps) {
     });
     await hideBubble();
 
-    dispatchTrip({type: 'update', field: 'trip', arg: {}});
+    dispatchTrip({ type: 'update', field: 'trip', arg: {} });
     setModalVisible(false);
   };
 
-  const handleSetOn = () => {
+  const handleSetOn = async () => {
+    await getDriverHours();
+    const podeFicarOnline = checkHorasLimites();
+    if (!podeFicarOnline) {
+      return;
+    }
+
     if (
       battery?.level &&
       battery?.level < levelBatteryMin &&
@@ -126,6 +133,12 @@ export default function V1SpeedMob({setOn, setModalVisible}: V1SpeedMobProps) {
           setOn={handleSetOn}
         />
       </ContentButton>
+
+      {/* Modal de Horas Limites */}
+      <ModalHorasLimites
+        visible={shouldShowModal}
+        onClose={closeModal}
+      />
     </>
   );
 }

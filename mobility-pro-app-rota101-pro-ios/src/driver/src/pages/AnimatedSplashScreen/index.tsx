@@ -1,45 +1,102 @@
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
-import {Container} from './styles';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useEffect, useRef, useState } from 'react';
+import { Container, VersionText } from './styles';
+import { Platform, Text } from 'react-native';
+import Constants from 'expo-constants';
 
 import AnimatedLottieView from 'lottie-react-native';
-import {useUserDriver} from '../../context/userDriver';
-import {If} from '../../components/If';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {useAuth} from '../../../../context/auth';
-import {useLocal} from '../../hooks/location';
-import {useLocalProvider} from '../../context/local';
+import { useBubbleButton } from '@704apps/react-native-bubble-button';
+import { useUserDriver } from '../../context/userDriver';
+import { If } from '../../components/If';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useAuth } from '../../../../context/auth';
+import { useLocalProvider } from '../../context/local';
+import { AlertLocationRefused } from '../../components/AlertLocationRefused';
+import { useNetwork } from '~/context/ConfigGlobal';
+import { useBackgroundLocationPermission } from '../../hooks/useBackgroundLocationPermission';
+import { useDriverStatus } from '../../hooks/useDriverStatus';
+
+const SPLASH_MAX_WAIT_MS = 12000;
 
 const AnimatedSplashScreen = () => {
-  const {navigate}: NavigationProp<ParamListBase> = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [isVisible, setisVisible] = useState(true);
-  const {location} = useLocalProvider();
-  const {userDriverFind} = useUserDriver();
-  const {cityConfig} = useAuth();
+  const { location } = useLocalProvider();
+  const { userDriverFind, getDriverFind } = useUserDriver();
+  const { cityConfig, getConfigByPosition } = useAuth();
   const [firstLoading, setFirstLoading] = useState(false);
+  const appVersion = Constants.manifest?.version || Constants.expoConfig?.version;
+  const { itsNetwork: network } = useNetwork();
+  const prevNetworkRef = useRef<boolean | null>(null);
+  const { checkBackgroundLocationPermission } = useBackgroundLocationPermission();
+  const { checkPermission: checkOverlayPermission } = useBubbleButton();
+  const { isOnline } = useDriverStatus();
+
+  const handleNavigation = async () => {
+    const hasLocationPermission = await checkBackgroundLocationPermission();
+    if (!hasLocationPermission) {
+      navigation.reset({ index: 0, routes: [{ name: 'BackgroundLocationPermission' }] });
+      return;
+    }
+
+    if (Platform.OS === 'android' && isOnline) {
+      const hasOverlayPermission = await checkOverlayPermission();
+      if (!hasOverlayPermission) {
+        navigation.reset({ index: 0, routes: [{ name: 'OverlayPermission' }] });
+        return;
+      }
+    }
+
+    navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+  };
 
   useEffect(() => {
-    if (
-      !firstLoading &&
+    if (firstLoading || !location?.coords?.latitude) return;
+
+    const hasData =
       userDriverFind &&
       Object.keys(userDriverFind).length > 0 &&
       cityConfig &&
-      Object.keys(cityConfig).length > 0 &&
-      location?.coords?.latitude
-    ) {
+      Object.keys(cityConfig).length > 0;
+
+    if (hasData || network === false) {
       setFirstLoading(true);
-      navigate('Home');
+      handleNavigation();
       setisVisible(false);
     }
-  }, [userDriverFind, cityConfig, location]);
+  }, [userDriverFind, cityConfig, location, network]);
+
+  useEffect(() => {
+    if (firstLoading || !location?.coords?.latitude) return;
+
+    const fallback = setTimeout(() => {
+      setFirstLoading(true);
+      handleNavigation();
+      setisVisible(false);
+    }, SPLASH_MAX_WAIT_MS);
+
+    return () => clearTimeout(fallback);
+  }, [firstLoading, location]);
+
+  useEffect(() => {
+    const networkJustCameBack = network && prevNetworkRef.current === false;
+    prevNetworkRef.current = network ?? null;
+
+    if (!networkJustCameBack) return;
+
+    if (!userDriverFind || Object.keys(userDriverFind).length === 0) {
+      getDriverFind();
+    }
+    if ((!cityConfig || Object.keys(cityConfig).length === 0) && location?.coords) {
+      getConfigByPosition(location.coords);
+    }
+  }, [network]);
 
   return (
     <If condition={isVisible}>
+      <AlertLocationRefused />
       <Container>
+        <VersionText>VERSÃO: {appVersion}</VersionText>
         <AnimatedLottieView
           autoPlay
           loop

@@ -1,14 +1,25 @@
-import {View} from 'react-native';
+import { View } from 'react-native';
+import { ContainerPressable, Input } from './styles';
+import { translate } from '../../locales';
+import { buildAddressFieldAccessibilityLabel } from '../../utils/trip-route-accessibility';
 
-import {ContainerPressable, Input} from './styles';
-import {translate} from '../../locales';
+const ADDRESS_DISPLAY_THRESHOLD = 40;
 
-interface Props {
+type InputAddressProps = {
   placeholder?: string;
-  value: string;
+  value?: string;
   onPress: () => void;
   disabled?: boolean;
   activeOpacity?: boolean;
+  semanticPrefix?: string;
+};
+
+function formatAddressForDisplay(value: string | null | undefined): string {
+  const raw = value == null ? '' : String(value);
+  if (raw.length > ADDRESS_DISPLAY_THRESHOLD) {
+    return `${raw.substring(0, ADDRESS_DISPLAY_THRESHOLD)}...`;
+  }
+  return raw;
 }
 
 function InputAddress({
@@ -17,15 +28,27 @@ function InputAddress({
   placeholder = translate('trip.input_address_placeholder_text'),
   disabled,
   activeOpacity,
-}: Props) {
-  const addressFormatted = (address: string) => {
-    if (address && address.length > 40) {
-      return `${address.substring(0, 45)}...`;
+  semanticPrefix,
+}: InputAddressProps) {
+  const a11yPressableProps =
+    semanticPrefix !== undefined
+      ? {
+          accessible: true as const,
+          accessibilityLabel: buildAddressFieldAccessibilityLabel(
+            semanticPrefix,
+            value ?? '',
+          ),
+        }
+      : {};
+
+  const handlePress = () => {
+    if (!disabled && onPress) {
+      onPress();
     }
-    return value;
   };
+
   return (
-    <ContainerPressable onPress={onPress}>
+    <ContainerPressable onPress={handlePress} {...a11yPressableProps}>
       <View
         pointerEvents={disabled ? 'box-none' : 'none'}
         style={{
@@ -34,7 +57,7 @@ function InputAddress({
       >
         <Input
           activeOpacity={activeOpacity}
-          value={addressFormatted(value)}
+          value={formatAddressForDisplay(value)}
           placeholder={placeholder}
           editable={false}
           disabled={disabled || false}

@@ -4,6 +4,7 @@ import {lighten, shade} from 'polished';
 import {RFValue} from 'react-native-responsive-fontsize';
 import styled, {css} from 'styled-components/native';
 import themeCss from '../../../../styles/theme';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 export const Container = styled.View`
   display: flex;
@@ -155,7 +156,7 @@ export const OptionalButtonText = styled.Text`
   font-weight: bold;
 `;
 
-export const ContainerFlatList = styled.SafeAreaView`
+export const ContainerFlatList = styled(SafeAreaView)`
   display: flex;
   flex-wrap: wrap;
   width: 100%;

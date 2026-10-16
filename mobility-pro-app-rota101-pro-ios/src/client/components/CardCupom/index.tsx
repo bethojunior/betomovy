@@ -1,77 +1,74 @@
-import {View} from 'react-native';
 import {useEffect, useState} from 'react';
-import {
-  ContainerCard,
-  ContainerTag,
-  Content,
-  CupomData,
-  PriceCupon,
-  Image,
-} from './styles';
+import {ContainerCard, PaymentFormCaption} from './styles';
+import {CouponCard} from './CouponCard';
+import {CouponImage} from './CouponImage';
+import {CouponStub} from './CouponStub';
+import {CouponInfo} from './CouponInfo';
+import {CouponDiscountBadge} from './CouponDiscountBadge';
+import {CouponDetails} from './CouponDetails';
+import {CouponPrice} from './CouponPrice';
+import {CouponValidity} from './CouponValidity';
 import Coupom from '../../assets/images/coupon.png';
-import {CheckBox} from '../CheckBox';
-import {TextEdit} from '../TextEdit';
-import theme from '../../styles/theme';
-import {Coupon} from '../../modules/mobility/pages/CouponTripContent';
 import {useTrip} from '../../contexts/Trip';
 import Helper from '../../utils/Helper';
 import {useAuth} from '../../../context/auth';
 import {translate} from '../../locales';
+import {
+  buildCouponDetailItems,
+  formatDateEnd,
+  isCouponDisabled,
+  isDisabledByPaymentForm,
+  resolveDiscountLabel,
+  resolveFinalPrice,
+} from './couponFormatters';
+import {Coupon} from '../../modules/mobility/pages/CouponTripContent/types';
+import {CardCupomProps} from './types';
 
-interface Props {
-  coupon: Coupon;
-  selectedCoupon: any;
-  setSelectedCoupon: any;
-  checked: boolean;
-  setChecked: any;
-}
-
+/**
+ * Item selecionável de cupom, com aparência de ticket (canhoto destacável +
+ * recortes semicirculares + divisória tracejada). Só orquestra estado/seleção
+ * e monta os dados pros componentes visuais — cálculo de desconto e
+ * formatação ficam em couponFormatters.ts, layout fica no CouponCard.
+ */
 export const CardCupom = ({
   coupon,
   selectedCoupon,
   setSelectedCoupon,
   checked,
   setChecked,
-}: Props) => {
+}: CardCupomProps) => {
   const {stateTripCustomer} = useTrip();
   const {selectedOptionTravel, selectedPaymentMethod} = stateTripCustomer;
   const [disabled, setDisabled] = useState(false);
   const {cityConfig} = useAuth();
 
-  function calculateDiscountByCoupon(price, coupon) {
-    let discount = 0;
-    if (coupon.valueType === '%') {
-      discount = price * (parseFloat(coupon.value) / 100);
-      if (discount > parseFloat(coupon.maxDiscountValue))
-        discount = parseFloat(coupon.maxDiscountValue);
-    } else {
-      discount = coupon.value;
-    }
+  const isSelected = checked && selectedCoupon?.id == coupon?.id;
 
-    if (discount >= parseFloat(coupon.limitedTo))
-      discount = parseFloat(coupon.limitedTo);
-
-    const newValue = price - discount;
-
-    if (newValue <= 0) return 0;
-
-    return newValue;
-  }
+  // @ts-ignore
+  const price = parseFloat(selectedOptionTravel?.price);
+  const currency = cityConfig?.typeMoney ?? '';
+  const finalPrice = `${currency}${Helper.maskMoney(resolveFinalPrice(price, coupon))}`;
+  const discountLabel = resolveDiscountLabel(price, coupon, currency);
+  const detailItems = buildCouponDetailItems(coupon, currency);
+  const validUntilDate = formatDateEnd(coupon?.dateEnd);
+  const disabledByPaymentForm = isDisabledByPaymentForm(coupon, selectedPaymentMethod?.name);
 
   useEffect(() => {
-    if (
-      // @ts-ignore
-      parseFloat(selectedOptionTravel.price) <= parseFloat(coupon.fromValue) ||
-      // @ts-ignore
-      parseFloat(selectedOptionTravel.price) >= parseFloat(coupon.limitedTo) ||
-      (coupon.tripPaymentForm &&
-        coupon.tripPaymentForm !== selectedPaymentMethod.name)
-    ) {
-      setDisabled(true);
-    } else {
-      setDisabled(false);
-    }
+    // @ts-ignore
+    setDisabled(isCouponDisabled(parseFloat(selectedOptionTravel.price), coupon, selectedPaymentMethod?.name));
   }, [coupon, selectedOptionTravel]);
+
+  const detailsSlot = (
+    <>
+      <CouponDetails items={detailItems} />
+      {disabledByPaymentForm && (
+        <PaymentFormCaption>
+          {translate('coupon.valid_only_for_payment')}
+          {coupon.tripPaymentForm}
+        </PaymentFormCaption>
+      )}
+    </>
+  );
 
   return (
     <ContainerCard
@@ -80,54 +77,22 @@ export const CardCupom = ({
       onPress={() => {
         if (selectedCoupon?.id == coupon?.id) {
           setChecked(false);
-          return setSelectedCoupon({});
+          return setSelectedCoupon({} as Coupon);
         }
         setSelectedCoupon(coupon);
         setChecked(true);
       }}
     >
-      <View pointerEvents={disabled ? 'box-only' : 'none'}>
-        <CheckBox
-          checked={checked && selectedCoupon?.id == coupon?.id}
-          onCheck={() => {
-            setSelectedCoupon(coupon);
-          }}
-        />
-      </View>
-
-      <Content disabled={disabled}>
-        <CupomData>
-          <ContainerTag>
-            <Image source={Coupom} />
-            <TextEdit size="small" color={theme.colors.background_global}>
-              {coupon?.code}
-            </TextEdit>
-          </ContainerTag>
-          <TextEdit size="small" color={theme.colors.background_global}>
-            {translate('coupon.valid_for_amounts_from')}{' '}
-            {cityConfig?.typeMoney + coupon?.fromValue} até{' '}
-            {cityConfig?.typeMoney + coupon?.limitedTo}
-          </TextEdit>
-          <TextEdit size="small" color={theme.colors.background_global}>
-            {translate('coupon.coupon_value')}{' '}
-            {`${String(coupon?.valueType)} ${coupon?.value}`}
-          </TextEdit>
-          <TextEdit size="small" color={theme.colors.background_global}>
-            {translate('coupon.valid_for_races_in')}{' '}
-            {coupon?.tripPaymentForm ?? coupon?.gender}
-          </TextEdit>
-        </CupomData>
-        <PriceCupon>
-          {cityConfig?.typeMoney +
-            Helper.maskMoney(
-              calculateDiscountByCoupon(
-                // @ts-ignore
-                parseFloat(selectedOptionTravel?.price),
-                coupon,
-              ),
-            )}
-        </PriceCupon>
-      </Content>
+      <CouponCard
+        disabled={disabled}
+        selected={isSelected}
+        stub={<CouponStub image={<CouponImage source={Coupom} />} code={coupon?.code} />}
+        code={<CouponInfo code={coupon?.code} />}
+        price={<CouponPrice price={finalPrice} />}
+        discountBadge={<CouponDiscountBadge label={discountLabel} />}
+        details={detailsSlot}
+        validity={<CouponValidity date={validUntilDate} />}
+      />
     </ContainerCard>
   );
 };

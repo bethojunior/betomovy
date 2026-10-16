@@ -1,261 +1,202 @@
-import {Camera} from 'expo-camera';
-import * as MediaLibrary from 'expo-media-library';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Location from 'expo-location';
+import { Fragment, useEffect, useState } from 'react';
+import Feather from '@expo/vector-icons/Feather';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { ScrollView } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useTheme } from 'styled-components/native';
 
-import {useState, useEffect} from 'react';
+import { Container } from './styles';
+import { PermissionStep } from './steps/PermissionStep';
+import { TermsStep } from './steps/TermsStep';
+import { useOnboardingSteps } from './useOnboardingSteps';
+import { useOnboardingPermissions } from './useOnboardingPermissions';
 
-import {
-  Container,
-  ContentSpeedMob,
-  ImageSpeedMob,
-  TextNoticeTermsSpeedMob,
-  ButtonNextTermsSpeedMob,
-  TextButtonTermsSpeedMob,
-  ContentLocalizationSpeedMob,
-  DescriptionLocalizationSpeedMob,
-  TitleLocalizationSpeedMob,
-  ContentButtonsLocalizationSpeedMob,
-  ButtonLocalizationSpeedMob,
-  TextOkPermissionConcluded,
-  TitlePermissionsConcluded,
-} from './styles';
-
-import pathWelcomeImage from '../../../../assets/logo.png';
-import pathConcludedImage from '../../../../assets/logo.png';
-import {useAuth} from '../../../context/auth';
-import {useLocal} from '../../contexts/local';
-import Preload from '../../components/Preload';
-import {translate} from '../../locales';
-import {CheckBox} from '../../components/CheckBox';
-import {Modal, Platform} from 'react-native';
-import {nameApp} from '../../../constantBuild/config';
-import TermsBox from '../../components/TermsBox';
+import { If } from '../../components/If';
+import { translate } from '../../locales';
+import { buildApp, nameApp } from '../../../constantBuild/config';
 import apiMain from '../../api/apiMain';
-
+import { useModules } from '../../contexts/modules';
+import { useTerms } from '../../../context/terms';
 import TermsCheckSpeedMob from '../SpeedMob/TermsCheckSpeedMob';
 
-import {useModules} from '../../contexts/modules';
+export default function TermsOfUseLocation() {
+  const { init } = useModules();
+  const { acceptTerms } = useTerms();
+  const theme = useTheme();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const { APP_PARTNER } = buildApp();
 
-interface Props {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-}
+  const { steps, stepWidth, scrollRef, goToNextStep } = useOnboardingSteps();
+  const {
+    requestLocationPermission,
+    requestContactsPermission,
+    requestCameraPermission,
+    requestMicrophonePermission,
+  } = useOnboardingPermissions();
 
-export default function TermsOfUseLocation({visible, setVisible}: Props) {
-  const {init} = useModules();
-
-  const {getPermissionLocal} = useAuth();
-  const {setPosition} = useLocal();
-
-  const [loading, setLoading] = useState<boolean>(false);
-  const [localizationAceppted, setLocalizationAceppted] =
-    useState<boolean>(false);
-
-  const [checkTerms, setCheckTerms] = useState<boolean>(false);
-  const [stepWelcomeSpeedMob, setStepWelcomeSpeedMob] = useState<number>(1);
-  const [descriptionTerms, setDescriptionTerms] = useState<string>('');
-
-  const handleCheckTerms = () => {
-    if (checkTerms) {
-      setCheckTerms(false);
-    } else {
-      setCheckTerms(true);
-    }
-  };
-
-  const handleRedirectLogin = async () => {
-    await AsyncStorage.setItem('@mobility:AcceptTerms', 'true');
-    setVisible(false);
-  };
-
-  const getLocation = async () => {
-    setLoading(true);
-    getPermissionLocal().then(() => {
-      Location.getLastKnownPositionAsync()
-        .then(location => {
-          setLoading(false);
-          if (location) {
-            setPosition({
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            });
-          } else {
-            setLoading(false);
-            Location.getCurrentPositionAsync({accuracy: 1}).then(({coords}) => {
-              setPosition({
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-              });
-            });
-          }
-        })
-        .catch(error => {
-          setLoading(false);
-          console.log(error);
-        });
-    });
-    setLoading(false);
-  };
-
-  const getPerms = async () => {
-    const permissions = JSON.parse(await AsyncStorage.getItem('permissions'));
-    const {status} = await MediaLibrary.requestPermissionsAsync();
-    await Camera.requestCameraPermissionsAsync();
-    await Camera.requestMicrophonePermissionsAsync();
-
-    if (status !== 'granted') {
-      return Camera.requestCameraPermissionsAsync();
-    }
-
-    permissions.gallery = true;
-    await AsyncStorage.setItem('permissions', JSON.stringify(permissions));
-  };
-
-  const getTextTerms = async () => {
-    setLoading(true);
-    try {
-      const responseTerms = await apiMain.get(
-        'termsUsePolicy/findByType?type=customer',
-      );
-      setDescriptionTerms(responseTerms.data.data.description);
-    } catch (error) {
-      console.log(error);
-    }
-    setLoading(false);
-  };
-  const handleNextSpeedMob = async () => {
-    if (stepWelcomeSpeedMob === 1) {
-      await getPerms();
-    }
-
-    setStepWelcomeSpeedMob(stepWelcomeSpeedMob + 1);
-  };
+  const [loading, setLoading] = useState(false);
+  const [checkTerms, setCheckTerms] = useState(false);
+  const [descriptionTerms, setDescriptionTerms] = useState('');
+  const [isRequestingPermission, setIsRequestingPermission] = useState(false);
 
   useEffect(() => {
+    const getTextTerms = async () => {
+      setLoading(true);
+      try {
+        const response = await apiMain.get('termsUsePolicy/findByType?type=partner');
+        setDescriptionTerms(response.data.data.description);
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     getTextTerms();
   }, []);
 
-  useEffect(() => {
-    if (stepWelcomeSpeedMob === 2 && Platform.OS === 'ios') {
-      setLocalizationAceppted(true);
-      handleNextSpeedMob();
+  const finishOnboarding = () => {
+    acceptTerms(true);
+
+    if (APP_PARTNER) {
+      navigation.navigate('SelectAppPartners', { replace: true });
+      return;
     }
-    (async () => {
-      if (stepWelcomeSpeedMob === 3 && localizationAceppted) {
-        await getLocation();
-      }
-    })();
-  }, [stepWelcomeSpeedMob]);
 
-  const acepptLocalization = localizationAceppted === true;
+    navigation.navigate('SignIn', { replace: true });
+  };
+
+  const handleAcceptLocation = async () => {
+    setIsRequestingPermission(true);
+    try {
+      await requestLocationPermission();
+      goToNextStep();
+    } finally {
+      setIsRequestingPermission(false);
+    }
+  };
+
+  const handleAcceptContacts = async () => {
+    setIsRequestingPermission(true);
+    try {
+      await requestContactsPermission();
+      goToNextStep();
+    } finally {
+      setIsRequestingPermission(false);
+    }
+  };
+
+  const handleAcceptCamera = async () => {
+    setIsRequestingPermission(true);
+    try {
+      await requestCameraPermission();
+      goToNextStep();
+    } finally {
+      setIsRequestingPermission(false);
+    }
+  };
+
+  const handleAcceptMicrophone = async () => {
+    setIsRequestingPermission(true);
+    try {
+      await requestMicrophonePermission();
+      goToNextStep();
+    } finally {
+      setIsRequestingPermission(false);
+    }
+  };
+
+  const handleAcceptTerms = () => {
+    finishOnboarding();
+  };
+
   return (
-    <>
-      <Modal
-        visible={visible}
-        onRequestClose={() => {
-          setVisible(false);
-        }}
-      >
-        {init !== 'Speedmob' && (
-          <Container>
-            <Preload visible={loading} />
-            <ContentSpeedMob>
-              {stepWelcomeSpeedMob === 1 && (
-                <>
-                  <ImageSpeedMob source={pathWelcomeImage} />
-                  <TextNoticeTermsSpeedMob>
-                    {translate('welcomeSpeedmob.text_notice_terms')}
-                  </TextNoticeTermsSpeedMob>
-                  {descriptionTerms && (
-                    <TermsBox contentTerms={descriptionTerms} />
-                  )}
-                  <CheckBox
-                    colorText="#000000"
-                    checked={checkTerms}
-                    title={translate('welcomeSpeedmob.title_checkbox')}
-                    onCheck={handleCheckTerms}
-                  />
-                  <ButtonNextTermsSpeedMob
-                    disabled={!checkTerms}
-                    isDisabled={!checkTerms}
-                    onPress={handleNextSpeedMob}
-                  >
-                    <TextButtonTermsSpeedMob>
-                      {translate('welcomeSpeedmob.text_button_next')}
-                    </TextButtonTermsSpeedMob>
-                  </ButtonNextTermsSpeedMob>
-                </>
-              )}
-              {stepWelcomeSpeedMob === 2 && (
-                <>
-                  <ImageSpeedMob source={pathWelcomeImage} />
-                  <ContentLocalizationSpeedMob>
-                    <TitleLocalizationSpeedMob>
-                      {translate('welcomeSpeedmob.title_localization')}
-                    </TitleLocalizationSpeedMob>
-                    <DescriptionLocalizationSpeedMob>
-                      {translate(
-                        'welcomeSpeedmob.description_localization_1',
-                      )?.replace('SpeedMob', nameApp)}
-                    </DescriptionLocalizationSpeedMob>
-                    <DescriptionLocalizationSpeedMob>
-                      {translate('welcomeSpeedmob.description_localization_2')}
-                    </DescriptionLocalizationSpeedMob>
-                    <ContentButtonsLocalizationSpeedMob>
-                      <ButtonLocalizationSpeedMob
-                        refuse={true}
-                        onPress={() => {
-                          setLocalizationAceppted(true);
-                          handleNextSpeedMob();
-                        }}
-                      >
-                        {translate('welcomeSpeedmob.text_button_refuse_terms')}
-                      </ButtonLocalizationSpeedMob>
-                      <ButtonLocalizationSpeedMob
-                        onPress={() => {
-                          setLocalizationAceppted(true);
-                          handleNextSpeedMob();
-                        }}
-                      >
-                        {translate('welcomeSpeedmob.text_button_next')}
-                      </ButtonLocalizationSpeedMob>
-                    </ContentButtonsLocalizationSpeedMob>
-                  </ContentLocalizationSpeedMob>
-                </>
-              )}
+    <Fragment>
+      {init !== 'Speedmob' && (
+        <Container>
+          <ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            scrollEnabled={false}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1 }}
+          >
+            <If condition={steps.includes('localization')}>
+              <PermissionStep
+                width={stepWidth}
+                icon={<Feather name="map-pin" size={RFValue(28)} color={theme.colors.secondary} />}
+                title={translate('welcomeSpeedmob.title_localization')}
+                descriptions={[
+                  translate('welcomeSpeedmob.description_localization_1')?.replace(
+                    'SpeedMob',
+                    nameApp,
+                  ),
+                  translate('welcomeSpeedmob.description_localization_2'),
+                ]}
+                buttonTitle={translate('welcomeSpeedmob.text_button_next')}
+                onPress={handleAcceptLocation}
+                loading={isRequestingPermission}
+              />
+            </If>
 
-              {stepWelcomeSpeedMob === 3 && (
-                <>
-                  <TitlePermissionsConcluded>
-                    {translate('welcomeSpeedmob.title_permissions_concluded')}
-                  </TitlePermissionsConcluded>
-                  <TextOkPermissionConcluded>
-                    {translate('welcomeSpeedmob.text_permissions_concluded')}
-                  </TextOkPermissionConcluded>
-                  <ImageSpeedMob source={pathConcludedImage} />
-                  <ButtonNextTermsSpeedMob
-                    disabled={!checkTerms}
-                    isDisabled={!checkTerms}
-                    onPress={() =>
-                      acepptLocalization
-                        ? handleRedirectLogin()
-                        : handleNextSpeedMob()
-                    }
-                  >
-                    <TextButtonTermsSpeedMob>
-                      {acepptLocalization
-                        ? translate('welcomeSpeedmob.text_button_finalize')
-                        : translate('welcomeSpeedmob.text_button_next')}
-                    </TextButtonTermsSpeedMob>
-                  </ButtonNextTermsSpeedMob>
-                </>
-              )}
-            </ContentSpeedMob>
-          </Container>
-        )}
-        {init === 'Speedmob' && <TermsCheckSpeedMob setVisible={setVisible} />}
-      </Modal>
-    </>
+            <PermissionStep
+              width={stepWidth}
+              icon={
+                <Feather name="users" size={RFValue(28)} color={theme.colors.secondary} />
+              }
+              title={translate('welcomeSpeedmob.title_contacts')}
+              descriptions={[
+                translate('welcomeSpeedmob.description_contacts_1'),
+                translate('welcomeSpeedmob.description_contacts_2'),
+              ]}
+              buttonTitle={translate('welcomeSpeedmob.text_button_next')}
+              onPress={handleAcceptContacts}
+              loading={isRequestingPermission}
+            />
+
+            <PermissionStep
+              width={stepWidth}
+              icon={
+                <Feather name="camera" size={RFValue(28)} color={theme.colors.secondary} />
+              }
+              title={translate('welcomeSpeedmob.title_camera')}
+              descriptions={[
+                translate('welcomeSpeedmob.description_camera_1'),
+                translate('welcomeSpeedmob.description_camera_2'),
+              ]}
+              buttonTitle={translate('welcomeSpeedmob.text_button_next')}
+              onPress={handleAcceptCamera}
+              loading={isRequestingPermission}
+            />
+
+            <PermissionStep
+              width={stepWidth}
+              icon={
+                <Feather name="mic" size={RFValue(28)} color={theme.colors.secondary} />
+              }
+              title={translate('welcomeSpeedmob.title_microphone')}
+              descriptions={[
+                translate('welcomeSpeedmob.description_microphone_1'),
+                translate('welcomeSpeedmob.description_microphone_2'),
+              ]}
+              buttonTitle={translate('welcomeSpeedmob.text_button_next')}
+              onPress={handleAcceptMicrophone}
+              loading={isRequestingPermission}
+            />
+
+            <TermsStep
+              width={stepWidth}
+              loading={loading}
+              checkTerms={checkTerms}
+              descriptionTerms={descriptionTerms}
+              onCheckTerms={() => setCheckTerms((prev) => !prev)}
+              onAcceptTerms={handleAcceptTerms}
+            />
+          </ScrollView>
+        </Container>
+      )}
+      {init === 'Speedmob' && <TermsCheckSpeedMob />}
+    </Fragment>
   );
 }

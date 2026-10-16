@@ -13,6 +13,7 @@ export const Label = styled.Text<LabelProps>`
   font-family: ${({theme}) => theme.fonts.bold};
   color: ${({theme, color}) => (color ? color : theme.colors.primary)};
   margin-top: 10px;
+  margin-bottom: 6px;
 
   ${Platform.OS === 'ios' &&
   css`

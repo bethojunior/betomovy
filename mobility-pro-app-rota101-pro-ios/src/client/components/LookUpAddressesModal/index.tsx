@@ -1,7 +1,7 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {AntDesign, MaterialIcons, Ionicons} from '@expo/vector-icons';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AntDesign, MaterialIcons, Ionicons } from '@expo/vector-icons';
 
-import {Alert, View} from 'react-native';
+import { Alert, View } from 'react-native';
 import InputAddress from '../InputAddress';
 import SearchAddressModal from '../SearchAddressModal';
 import {
@@ -21,15 +21,16 @@ import {
   StopIcon,
   WaypointContainer,
 } from './styles';
-import {useLocal} from '../../contexts/local';
-import {useTrip} from '../../contexts/Trip';
-import {useAuth} from '../../../context/auth';
-import {If} from '../If';
+import { useLocal } from '../../contexts/local';
+import { useTrip } from '../../contexts/Trip';
+import { useAuth } from '../../../context/auth';
+import { If } from '../If';
 import theme from '../../styles/theme';
-import {translate} from '../../locales';
-import {ButtonTextAction} from '../ButtonTextAction';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { translate } from '../../locales';
+import { ButtonTextAction } from '../ButtonTextAction';
+import { RFValue } from 'react-native-responsive-fontsize';
 import Helper from '../../utils/Helper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LookUpAddressesModal({
   onBack,
@@ -39,12 +40,14 @@ export default function LookUpAddressesModal({
   voice,
   handleBackButtonOnAddress,
   typeAddress,
+  isTripNoDestinationAnother,
+  setIsTripNoDestinationAnother,
 }) {
-  const {placeUser, lastPlaceSelected} = useLocal();
-  const {stateTripCustomer, dispatchTripCustomer} = useTrip();
-  const {origin, destination, waypoints, waypointQuantities} =
+  const { placeUser, lastPlaceSelected } = useLocal();
+  const { stateTripCustomer, dispatchTripCustomer } = useTrip();
+  const { origin, destination, waypoints, waypointQuantities } =
     stateTripCustomer;
-  const {cityConfig, generalSettings} = useAuth();
+  const { cityConfig, generalSettings } = useAuth();
   const searchAddressModal = useRef(null);
   const [showWaypointInputAddButton, setShowWaypointInputAddButton] =
     useState(true);
@@ -57,7 +60,8 @@ export default function LookUpAddressesModal({
       street: origin?.street || null,
       type: origin?.type,
     };
-    await onComplete({origin, destination, waypoints});
+    await AsyncStorage.setItem('@app:tripNoDestination', JSON.stringify(true));
+    await onComplete({ origin, destination, waypoints });
   };
 
   const buttonsActive = [
@@ -75,7 +79,7 @@ export default function LookUpAddressesModal({
           style={{
             marginRight: RFValue(5),
           }}
-          name="car"
+          name="flag"
           size={RFValue(18)}
           color={theme.colors.secondary}
         />
@@ -84,7 +88,23 @@ export default function LookUpAddressesModal({
   ];
 
   useEffect(() => {
-    if (lastPlaceSelected) {
+    if (!origin.address && placeUser?.address) {
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'origin',
+        arg: {
+          address: placeUser.address,
+          latitude: placeUser.latitude,
+          longitude: placeUser.longitude,
+          street: placeUser.street || null,
+          type: placeUser.type,
+        },
+      });
+    }
+  }, [origin, placeUser?.address]);
+
+  useEffect(() => {
+    if (lastPlaceSelected && Object.keys(lastPlaceSelected).length > 0) {
       dispatchTripCustomer({
         type: 'update',
         field: 'destination',
@@ -112,7 +132,10 @@ export default function LookUpAddressesModal({
         });
       }
 
-      if (waypointQuantities === parseInt(cityConfig.quantityTripWayPoints))
+      if (
+        waypointQuantities ===
+        (parseInt(cityConfig?.quantityTripWayPoints) || 3)
+      )
         setShowWaypointInputAddButton(true);
     },
     [waypointQuantities, waypoints],
@@ -130,11 +153,14 @@ export default function LookUpAddressesModal({
       field: 'waypoints',
       arg: [
         ...waypoints,
-        {id: `waypoint-${new Date().getTime()}`, address: ''},
+        { id: `waypoint-${new Date().getTime()}`, address: '' },
       ],
     });
 
-    if (waypointQuantities + 1 === parseInt(cityConfig.quantityTripWayPoints))
+    if (
+      waypointQuantities + 1 ===
+      (parseInt(cityConfig.quantityTripWayPoints) || 3)
+    )
       setShowWaypointInputAddButton(false);
   }, [waypointQuantities, waypoints]);
 
@@ -164,7 +190,22 @@ export default function LookUpAddressesModal({
       const addressAlreadyAdded =
         handlesAlreadyAddedAddressValidation(addressResult);
 
-      if (addressAlreadyAdded) {
+      if (type.startsWith('waypoint')) {
+        if (waypoints.length > 0) {
+          const isSameAsOrigin =
+            origin.latitude === addressResult.latitude &&
+            origin.longitude === addressResult.longitude;
+
+          if (isSameAsOrigin) {
+            return Alert.alert(
+              'Atenção',
+              'Endereço do waypoint não pode ser igual ao da origem!',
+            );
+          }
+        }
+      }
+
+      if (waypoints.length <= 0 && addressAlreadyAdded) {
         return Alert.alert('Atenção', 'Endereço já adicionado!');
       }
 
@@ -215,7 +256,7 @@ export default function LookUpAddressesModal({
           }),
       };
 
-      const attribute = type.split('-')[0];
+      const attribute = type?.split('-')[0];
 
       addressesTypes[attribute](addressResult, type);
     },
@@ -237,7 +278,7 @@ export default function LookUpAddressesModal({
       return;
     }
 
-    if (onComplete) onComplete({origin, destination, waypoints});
+    if (onComplete) onComplete({ origin, destination, waypoints });
   }, [origin, destination, waypoints, waypointQuantities]);
 
   useEffect(() => {
@@ -277,7 +318,8 @@ export default function LookUpAddressesModal({
       typeAddress === 'origin'
     ) {
       return 'origin';
-    } else if (waypoints.length > 0 && dataWaypoint) {
+    }
+    if (waypoints.length > 0 && dataWaypoint) {
       if (dataWaypoint?.address === '' || typeAddress === 'waypoint') {
         return 'waypoint';
       }
@@ -290,6 +332,13 @@ export default function LookUpAddressesModal({
     }
   }, [origin, destination, typeAddress, waypoints]);
 
+  useEffect(() => {
+    if (isTripNoDestinationAnother) {
+      searchAddressModal.current.setTypeOfAddress('origin');
+      searchAddressModal.current.show();
+    }
+  }, [isTripNoDestinationAnother]);
+
   return (
     <If condition={visible}>
       <View>
@@ -298,12 +347,14 @@ export default function LookUpAddressesModal({
             handleAddressSelected(addressResult, type);
           }}
           handleBackButtonOnAddress={handleBackButtonOnAddress}
+          setTripNoDestinationAnother={setIsTripNoDestinationAnother}
+          tripNoDestinationAnother={isTripNoDestinationAnother}
           ref={searchAddressModal}
         />
         <Container>
           <Content>
             <ButtonBack onPress={onBack}>
-              <AntDesign name="arrowleft" size={30} color="black" />
+              <AntDesign name="arrow-left" size={30} color="black" />
             </ButtonBack>
             <ContentInputIcon>
               <ContentIcons>
@@ -329,6 +380,7 @@ export default function LookUpAddressesModal({
                   placeholder={translate(
                     'trip.input_address_placeholer_origin',
                   )}
+                  semanticPrefix={translate('trip.a11y_origin')}
                 />
                 {Boolean(waypoints.length) &&
                   waypoints.map((waypoint, index) => (
@@ -342,6 +394,9 @@ export default function LookUpAddressesModal({
                           );
                           searchAddressModal.current.show();
                         }}
+                        semanticPrefix={translate('trip.a11y_waypoint', {
+                          n: index + 1,
+                        })}
                       />
                       <DeleteWaypointButtonContainer>
                         <DeleteWaypointButton
@@ -370,6 +425,7 @@ export default function LookUpAddressesModal({
                     placeholder={translate(
                       'trip.input_address_placeholder_text',
                     )}
+                    semanticPrefix={translate('trip.a11y_destination')}
                   />
                   {showWaypointInputAddButton && (
                     <DeleteWaypointButtonContainer>

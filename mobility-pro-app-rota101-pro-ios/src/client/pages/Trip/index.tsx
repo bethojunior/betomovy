@@ -1,20 +1,16 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView from 'react-native-maps';
-import {useNavigation} from '@react-navigation/native';
-import {FontAwesome, MaterialIcons} from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 
-import {Button} from 'react-native-paper';
-import {BackHandler} from 'react-native';
-import {debounce} from 'lodash';
-import {useTrip} from '../../contexts/Trip';
-import {useLocal} from '../../contexts/local';
+import { BackHandler } from 'react-native';
+import { useTrip } from '../../contexts/Trip';
+import { useLocal } from '../../contexts/local';
 import LookUpAddressesModal from '../../components/LookUpAddressesModal';
 import TravelOptions from '../../components/TravelOptions';
 
-import mapStyle from '../../styles/map.json';
 import {
-  CardContainer,
   Container,
   ContainerAlertPanic,
   ContainerButtonFloat,
@@ -22,19 +18,19 @@ import {
   ContainerPanic,
   ViewPanic,
 } from './styles';
+import { DestinationCard } from '../../components/DestinationCard';
 import TripContent from '../../components/TripContent';
 import Preload from '../../components/Preload';
 import theme from '../../styles/theme';
-import {If} from '../../components/If';
-import {ModalDataDriver} from '../../components/ModalDataDriver';
-import {TextEdit} from '../../components/TextEdit';
-import apiMain from '../../api/apiMain';
-import {CardPanic} from '../../components/CardPanic';
-import {usePanic} from '../../contexts/Panic';
-import {translate} from '../../locales';
-import {ModalWho} from '../../components/ModalWho';
-import {useAuth} from '../../../context/auth';
-import {usePaymentForm} from '../../contexts/paymentForms';
+import { If } from '../../components/If';
+import { ModalDataDriver } from '../../components/ModalDataDriver';
+import { TextEdit } from '../../components/TextEdit';
+import { CardPanic } from '../../components/CardPanic';
+import { usePanic } from '../../contexts/Panic';
+import { translate } from '../../locales';
+import { ModalWho } from '../../components/ModalWho';
+import { useAuth } from '../../../context/auth';
+import { usePaymentForm } from '../../contexts/paymentForms';
 import {
   STATUS_BOARDING,
   STATUS_FINISHED,
@@ -44,12 +40,23 @@ import {
   STATUS_ACCEPTED,
 } from '../../constants/trip';
 import Helper from '../../utils/Helper';
-import {FloatButton} from '../../components/FloatButton';
-import {ProgressBar} from '../../components/ProgressBar';
-import {ModalOfferNewTripType} from '../../components/ModalOfferNewTripType';
-import {DestinationFree} from './types';
+import { FloatButton } from '../../components/FloatButton';
+import { ProgressBar } from '../../components/ProgressBar';
+import { ModalOfferNewTripType } from '../../components/ModalOfferNewTripType';
+import { DestinationFree } from './types';
 import TripMap from '../../components/TripMap';
-import {CardNoCity} from '../../components/CardNoCity';
+import TripRouteSemanticsView from '../../components/TripRouteSemanticsView';
+import {
+  formatDistanceForAccessibility,
+  shouldRenderTripRouteSemantics,
+} from '../../utils/trip-route-accessibility';
+import { ModalAlert } from '../../../driver/src/components/ModalAlert';
+import { Audio } from 'expo-av';
+import { useAddressGeocoding } from '~/hooks/useAddressGeocoding';
+
+const MAP_PITCH = 0;
+const MAP_ZOOM = 20;
+const MAP_ALTITUDE = 500; // iOS: altitude equivalente ao zoom 20 no Android
 
 interface TypeProps {
   id: string;
@@ -57,23 +64,30 @@ interface TypeProps {
   statusId: string;
 }
 
-export default function Trip({route}) {
+export default function Trip({ route }) {
   const mapRef = useRef<MapView | null>(null);
   const timeoutsRef = useRef([]);
   const animationInterval = useRef(null);
-  const {position} = useLocal();
-  const {partner, generalSettings} = useAuth();
-  const {getListProblems} = usePanic();
-  const {getCurrentBalanceVoucher} = usePaymentForm();
+  const {
+    address: destinationFree,
+    loading: loadingAddress,
+    error: errorMapText,
+    fetchAddress,
+    cancelFetch,
+    setAddress: setDestinationFree,
+  } = useAddressGeocoding();
+  const { position, setLastPlaceSelected } = useLocal();
+  const { partner, generalSettings, user } = useAuth();
+  const { getListProblems } = usePanic();
+  const { getCurrentBalanceVoucher } = usePaymentForm();
   const [typesProblems, setTypesProblems] = useState<TypeProps[]>([]);
-  const [loadingAddress, setLoadingAddress] = useState(false);
   const [modalDriverData, setModalDriverData] = useState(false);
   const [monitoringAnimation, setMonitoringAnimation] = useState(false);
   const [visibleProtect, setVisibleProtect] = useState(false);
   const [visibleAlertProtect, setVisibleAlertProtect] = useState(false);
   const [visibleWho, setVisibleWho] = useState(false);
   const [visibleArrow, setVisibleArrow] = useState(false);
-  const [region, setRegion] = useState(
+  const [region] = useState(
     position
       ? {
           latitude: position.latitude,
@@ -87,10 +101,9 @@ export default function Trip({route}) {
   const [visibleOptionTravel, setVisibleOptionTravel] = useState<boolean>(true);
 
   const [firstLoad, setFirstLoad] = useState(false);
-  const [destinationFree, setDestinationFree] = useState<DestinationFree>();
   const [valueVoucher, setValueVoucher] = useState(0);
   const countClick = useRef(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading] = useState<boolean>(false);
   const [typeAddress, setTypeAddress] = useState<string>('');
   const [regionChangeMap, setRegionChangeMap] = useState({
     latitude: position?.latitude,
@@ -98,10 +111,14 @@ export default function Trip({route}) {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+  const [isTripNoDestinationAnother, setIsTripNoDestinationAnother] = useState<
+    boolean | null
+  >(null);
 
   const {
     calculateAll,
     getTripPaymentMethods,
+    clearTrip,
     stateTripCustomer,
     dispatchTripCustomer,
   } = useTrip();
@@ -113,7 +130,6 @@ export default function Trip({route}) {
     polylineCoordinates,
     hideTravelOptions,
     visibleLookUpAddressesModal,
-    isLoading,
     trip,
     lastDestination,
     lastPolylineCoordinates,
@@ -121,14 +137,19 @@ export default function Trip({route}) {
     lastOrigin,
     loadingTrip,
     offerOtherTypeTrip,
-    tripPartnerList,
+    showModalScheduled,
   } = stateTripCustomer;
 
-  const navigation = useNavigation();
-  const lastTripPartner = tripPartnerList[tripPartnerList?.length - 1];
+  const navigation = useNavigation<any>();
+  const isPixConfirmedReturn = useMemo(
+    () => route?.params?.pixResult === 'confirmed',
+    [route?.params?.pixResult],
+  );
 
   const handleAddressesCapture = useCallback(
-    async ({origin, destination: destiny, waypoints}) => {
+    async ({ origin, destination: destiny, waypoints }) => {
+      if (isPixConfirmedReturn) return;
+
       calculateAll(origin, destiny, waypoints);
       getTripPaymentMethods();
       dispatchTripCustomer({
@@ -151,16 +172,23 @@ export default function Trip({route}) {
         arg: false,
       });
     },
-    [],
+    [
+      calculateAll,
+      getTripPaymentMethods,
+      dispatchTripCustomer,
+      partner,
+      isPixConfirmedReturn,
+    ],
   );
 
-  const handleBack = useCallback(results => {
+  const handleBack = useCallback((results) => {
     if (navigation.canGoBack()) navigation.goBack();
   }, []);
 
   const handleMyLocation = useCallback(() => {
     if (trip && Object.keys(trip).length > 0) {
       mapRef?.current?.fitToCoordinates(polylineCoordinates, {
+        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
         animated: true,
       });
       return;
@@ -171,16 +199,21 @@ export default function Trip({route}) {
         latitude: position.latitude,
         longitude: position.longitude,
       },
-      zoom: 19,
+      zoom: MAP_ZOOM,
+      altitude: MAP_ALTITUDE,
       heading: 0,
-      pitch: 90,
+      pitch: MAP_PITCH,
     });
   }, [position, destination, trip, polylineCoordinates]);
 
   const clearAndReturn = async () => {
-    await dispatchTripCustomer({type: 'clearTrip'});
+    await dispatchTripCustomer({ type: 'clearTrip' });
     await AsyncStorage.removeItem('trip');
-    navigation.navigate('TripRoutes', {screen: 'Home'});
+
+    navigation.navigate('TripRoutes', {
+      screen: 'Home',
+      params: { noUnsubscribe: true, pixCacheAction: 'cancel' },
+    });
   };
 
   const animateToOrigin = async () => {
@@ -190,18 +223,22 @@ export default function Trip({route}) {
           latitude: lastOrigin.latitude || 0,
           longitude: lastOrigin.longitude || 0,
         },
-        zoom: 20,
+        zoom: MAP_ZOOM,
+        altitude: MAP_ALTITUDE,
         heading: 0,
-        pitch: 90,
+        pitch: MAP_PITCH,
       },
-      {duration: 500},
+      { duration: 500 },
     );
   };
 
   const animateToPolyline = async () => {
-    await mapRef.current?.fitToCoordinates(lastPolylineCoordinates, {
-      animated: true,
-    });
+    if (lastPolylineCoordinates && lastPolylineCoordinates.length > 0) {
+      await mapRef.current?.fitToCoordinates(lastPolylineCoordinates, {
+        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+        animated: true,
+      });
+    }
   };
 
   const animateToDestination = async () => {
@@ -211,11 +248,12 @@ export default function Trip({route}) {
           latitude: lastDestination.latitude || 0,
           longitude: lastDestination.longitude || 0,
         },
-        zoom: 20,
+        zoom: MAP_ZOOM,
+        altitude: MAP_ALTITUDE,
         heading: 0,
-        pitch: 90,
+        pitch: MAP_PITCH,
       },
-      {duration: 500},
+      { duration: 500 },
     );
   };
 
@@ -265,28 +303,29 @@ export default function Trip({route}) {
   }, [trip, monitoringAnimation]);
 
   useEffect(() => {
-    if (polylineCoordinates) {
-      if (
-        ![STATUS_FINISHED, STATUS_IN_PROGRESS, STATUS_ACCEPTED].includes(
-          trip.status,
-        )
-      ) {
+    if (polylineCoordinates && polylineCoordinates.length > 0) {
+      if (![STATUS_FINISHED, STATUS_IN_PROGRESS, STATUS_ACCEPTED].includes(trip.status)) {
         mapRef?.current?.animateCamera({
           center: {
             latitude: Number(lastDestination?.latitude) || 0,
             longitude: Number(lastDestination?.longitude) || 0,
           },
-          zoom: 19,
+          zoom: MAP_ZOOM,
+          altitude: MAP_ALTITUDE,
           heading: 0,
-          pitch: 90,
+          pitch: MAP_PITCH,
         });
         setTimeout(() => {
           mapRef.current?.fitToCoordinates(polylineCoordinates, {
+            edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
             animated: true,
           });
         }, 1500);
       } else {
-        animateToPolyline();
+        mapRef.current?.fitToCoordinates(polylineCoordinates, {
+          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+          animated: true,
+        });
         clearAllTimeouts();
       }
     }
@@ -298,6 +337,7 @@ export default function Trip({route}) {
       field: 'hideTravelOptions',
       arg: true,
     });
+
     if (trip && trip.status && trip?.status !== STATUS_SCHEDULED) {
       dispatchTripCustomer({
         type: 'update',
@@ -306,12 +346,14 @@ export default function Trip({route}) {
       });
     } else {
       if (trip?.status === STATUS_SCHEDULED) {
-        dispatchTripCustomer({type: 'scheduledTrip'});
+        dispatchTripCustomer({ type: 'scheduledTrip' });
       }
+
+      const isVisibleLookUpAddressesModal = isPixConfirmedReturn === false;
       dispatchTripCustomer({
         type: 'update',
         field: 'visibleLookUpAddressesModal',
-        arg: true,
+        arg: isVisibleLookUpAddressesModal,
       });
     }
 
@@ -324,26 +366,16 @@ export default function Trip({route}) {
         dispatchTripCustomer({
           type: 'update',
           field: 'selectedPaymentMethod',
-          arg: JSON.parse(lastSelectedPaymentMethod),
+          arg: JSON.parse(lastSelectedPaymentMethod || '{}'),
         });
       }
     }
 
     getSelectedPaymentMethod();
-  }, [trip]);
-
-  const handleDestinationPerson = useCallback(async (position, setLoading) => {
-    const {
-      data: {data},
-    } = await apiMain.get(
-      `geocoding/search?latlng=${position.latitude},${position.longitude}`,
-    );
-    setDestinationFree(data);
-    setLoadingAddress(false);
-    return data;
-  }, []);
+  }, [trip?.tripReference, trip?.status]);
 
   const handleSelectAddress = (datas: DestinationFree) => {
+    if (!datas) return;
     if (typeAddress === 'origin') {
       dispatchTripCustomer({
         type: 'update',
@@ -360,9 +392,7 @@ export default function Trip({route}) {
       return;
     }
     if (waypoints.length > 0) {
-      const dataWaypoint = waypoints.find(
-        item => item?.id && item.address === '',
-      );
+      const dataWaypoint = waypoints.find((item) => item?.id && item.address === '');
       if (!dataWaypoint) {
         dispatchTripCustomer({
           type: 'update',
@@ -381,7 +411,7 @@ export default function Trip({route}) {
         type: 'update',
         field: 'waypoints',
         arg: [
-          ...waypoints.map(waypoint => {
+          ...waypoints.map((waypoint) => {
             if (waypoint.id === dataWaypoint.id)
               return {
                 ...waypoint,
@@ -411,27 +441,15 @@ export default function Trip({route}) {
     }
   };
 
-  const loadingDestinationFree = async region => {
-    setLoadingAddress(true);
-    // timeout
-    if (Object.keys(destination).length > 0) {
-      setLoadingAddress(false);
-      return;
-    }
+  const loadingDestinationFree = (region) => {
+    if (Object.keys(destination).length > 0) return;
+
     if (!destinationPerson) {
       setDestinationFree(origin);
-      setLoadingAddress(false);
       return;
     }
-    setTimeout(() => {
-      handleDestinationPerson(region, setLoadingAddress)
-        .then(() => {
-          setLoadingAddress(false);
-        })
-        .finally(() => {
-          setLoadingAddress(false);
-        });
-    }, 1000);
+
+    fetchAddress(region);
   };
 
   const listProblems = async () => {
@@ -442,16 +460,17 @@ export default function Trip({route}) {
     setTypesProblems(response.data);
   };
 
-  const handleChangeRegionMap = debounce(region => {
+  const handleChangeRegionMap = (region) => {
+    cancelFetch();
     setRegionChangeMap(region);
-  }, 10);
+  };
 
   const isTripPartner = async () => {
     const tripPartner = JSON.parse(
-      await AsyncStorage.getItem('tripPartnerList'),
+      (await AsyncStorage.getItem('tripPartnerList')) || '{}',
     );
 
-    return tripPartner?.find(({tripReference}) => {
+    return tripPartner?.find(({ tripReference }) => {
       if (tripReference === trip.tripReference) {
         return setVisibleArrow(true);
       }
@@ -474,23 +493,48 @@ export default function Trip({route}) {
     getCurrentSaldVoucher();
   }, []);
 
+  const clearAllState = useCallback(() => {
+    setLastPlaceSelected({});
+    setIsTripNoDestinationAnother(null);
+
+    AsyncStorage.removeItem('@app:tripNoDestination');
+    AsyncStorage.removeItem('@app:tripNoDestinationAnother');
+
+    dispatchTripCustomer({ type: 'clearTrip' });
+    dispatchTripCustomer({
+      type: 'update',
+      field: 'inputWho',
+      arg: { name: '', phone: '' },
+    });
+  }, [setLastPlaceSelected, dispatchTripCustomer]);
+
   useEffect(() => {
-    if (Object.keys(trip).length > 0) {
-      BackHandler.addEventListener('hardwareBackPress', () => {
-        return true;
-      });
-    } else {
-      BackHandler.addEventListener('hardwareBackPress', () => {
-        navigation.navigate('TripRoutes', {screen: 'Home'});
-        return true;
-      });
-    }
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (Object.keys(trip).length === 0) {
+        navigation.navigate('TripRoutes', { screen: 'Home' });
+      }
+      return true;
+    });
+    return () => subscription.remove();
   }, [trip]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      const state = navigation.getState();
+      const nextRoute = state?.routes?.[state.index]?.name;
+      if (nextRoute === 'TripPixPayment') return;
+
+      if (Object.keys(trip).length === 0) {
+        clearAllState();
+      }
+    });
+    return unsubscribe;
+  }, [navigation, trip, clearAllState]);
 
   useEffect(() => {
     if (destinationPerson) {
       mapRef?.current?.animateCamera({
-        pitch: 0,
+        pitch: MAP_PITCH,
       });
     }
   }, [destinationPerson]);
@@ -509,8 +553,8 @@ export default function Trip({route}) {
     return Object.keys(origin).length > 0
       ? Number(origin[param])
       : Number(lastOrigin[param])
-      ? Number(lastOrigin[param])
-      : position[param];
+        ? Number(lastOrigin[param])
+        : position[param];
   };
 
   const handleBackButtonOnAddress = (type: string) => {
@@ -519,12 +563,49 @@ export default function Trip({route}) {
     return type;
   };
 
+  const handleCloseModalScheduled = () => {
+    dispatchTripCustomer({
+      type: 'update',
+      field: 'showModalScheduled',
+      arg: false,
+    });
+  };
+
+  const mountSong = async () => {
+    const { sound } = await Audio.Sound.createAsync(
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require('../../assets/songs/scheduledTrip.mp3'),
+    );
+    return sound;
+  };
+
+  useEffect(() => {
+    if (!showModalScheduled) return;
+
+    let soundRef: Audio.Sound | null = null;
+
+    mountSong().then(async (sound) => {
+      soundRef = sound;
+      Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: true,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+      await sound?.playAsync();
+    });
+
+    return () => {
+      soundRef?.unloadAsync();
+    };
+  }, [showModalScheduled]);
+
   return (
     <>
-      <CardNoCity onPress={handleBack} />
       <Container>
         <Preload visible={loading} />
-        <If condition={visibleLookUpAddressesModal}>
+        <If condition={visibleLookUpAddressesModal && !isPixConfirmedReturn}>
           <LookUpAddressesModal
             onBack={handleBack}
             onComplete={handleAddressesCapture}
@@ -533,8 +614,20 @@ export default function Trip({route}) {
             handleBackButtonOnAddress={handleBackButtonOnAddress}
             voice={route?.params?.voice}
             typeAddress={typeAddress}
+            isTripNoDestinationAnother={isTripNoDestinationAnother}
+            setIsTripNoDestinationAnother={setIsTripNoDestinationAnother}
           />
         </If>
+
+        <ModalAlert
+          icon="info"
+          title={`${translate('service.title_schedule_compliments')} ${
+            user?.nameUser?.split(' ')[0]
+          }. ${translate('service.title_schedule_modal')}`}
+          body={translate('service.text_schedule_client_modal')}
+          visibleModal={showModalScheduled}
+          handleSubmissModal={handleCloseModalScheduled}
+        />
 
         {position && (
           <>
@@ -548,50 +641,35 @@ export default function Trip({route}) {
               region={region}
               handleChangeRegionMap={handleChangeRegionMap}
               loadingDestinationFree={loadingDestinationFree}
-              mapStyle={mapStyle}
               trip={trip}
               switchsTrue={switchsTrue}
               regionChangeMap={regionChangeMap}
               hideTravelOptions={hideTravelOptions}
               destinationPerson={destinationPerson}
-              destination={destination}
               waypoints={waypoints}
+              pitch={MAP_PITCH}
+              zoom={MAP_ZOOM}
+              altitude={MAP_ALTITUDE}
             />
+            {shouldRenderTripRouteSemantics(origin?.address, destination?.address) && (
+              <TripRouteSemanticsView
+                originAddress={origin?.address ?? ''}
+                destinationAddress={destination?.address ?? ''}
+                distanceLabel={formatDistanceForAccessibility(distance, generalSettings)}
+              />
+            )}
             <ProgressBar visible={trip?.status == STATUS_BOARDING} />
-            <If
-              condition={
-                regionChangeMap?.latitude !== undefined && hideTravelOptions
-              }
-            >
-              <CardContainer>
-                <If condition={destinationPerson}>
-                  <Button
-                    style={{
-                      width: '100%',
-                      padding: 5,
-                    }}
-                    onPress={() => handleSelectAddress(destinationFree)}
-                    disabled={loadingAddress}
-                  >
-                    <TextEdit color={theme.colors.primaryText} size="medium">
-                      {loadingAddress ? '...' : destinationFree?.address}
-                    </TextEdit>
-                  </Button>
-                </If>
-                <If condition={destinationPerson === false && !loadingTrip}>
-                  <Button
-                    style={{
-                      width: '100%',
-                      padding: 5,
-                    }}
-                    onPress={() => setDestinationPerson(true)}
-                  >
-                    <TextEdit color={theme.colors.primaryText} size="medium">
-                      {translate('trip.text_set_location_on_map')}
-                    </TextEdit>
-                  </Button>
-                </If>
-              </CardContainer>
+            <If condition={regionChangeMap?.latitude !== undefined && hideTravelOptions}>
+              <DestinationCard
+                destinationPerson={destinationPerson}
+                loadingTrip={loadingTrip}
+                loadingAddress={loadingAddress}
+                errorMessage={errorMapText}
+                address={destinationFree?.address}
+                onConfirmAddress={() => handleSelectAddress(destinationFree)}
+                onRetry={() => loadingDestinationFree(regionChangeMap)}
+                onSetLocationOnMap={() => setDestinationPerson(true)}
+              />
             </If>
 
             <If condition={distance && trip && !trip.driver}>
@@ -635,7 +713,7 @@ export default function Trip({route}) {
                 <If
                   condition={
                     generalSettings.find(
-                      item => item?.key === 'enable_security_button_options',
+                      (item) => item?.key === 'enable_security_button_options',
                     )?.value === '1' &&
                     hideTravelOptions &&
                     !visibleLookUpAddressesModal &&
@@ -673,21 +751,19 @@ export default function Trip({route}) {
                       <ContainerAlertPanic
                         from={{
                           opacity: 0,
-                          transform: [{translateY: -20}],
+                          transform: [{ translateY: -20 }],
                         }}
                         animate={{
                           opacity: 1,
-                          transform: [{translateY: 0}],
+                          transform: [{ translateY: 0 }],
                         }}
                         exit={{
                           opacity: 0,
-                          transform: [{translateY: -20}],
+                          transform: [{ translateY: -20 }],
                         }}
                       >
                         <TextEdit size="small">
-                          {translate(
-                            'panic.text_two_taps_activate_security_alert',
-                          )}
+                          {translate('panic.text_two_taps_activate_security_alert')}
                         </TextEdit>
                       </ContainerAlertPanic>
                     </If>
@@ -697,36 +773,33 @@ export default function Trip({route}) {
             </If>
           </>
         )}
-        <ModalOfferNewTripType
-          setVisibleTravelOption={setVisibleOptionTravel}
-        />
+        <ModalOfferNewTripType setVisibleTravelOption={setVisibleOptionTravel} />
         <TravelOptions
           hide={hideTravelOptions}
           setVisibleOptionTravel={setVisibleOptionTravel}
           visibleOptionTravel={visibleOptionTravel}
           valueVoucher={valueVoucher}
+          setIsTripNoDestinationAnother={setIsTripNoDestinationAnother}
         />
         <If
           condition={
-            hideTravelOptions &&
-            !visibleLookUpAddressesModal &&
-            !offerOtherTypeTrip
+            hideTravelOptions && !visibleLookUpAddressesModal && !offerOtherTypeTrip
           }
         >
           <TripContent setModalDriverData={setModalDriverData} />
         </If>
-        <Preload visible={isLoading} />
-        <ModalDataDriver
-          visible={modalDriverData}
-          setVisible={setModalDriverData}
-        />
+        <ModalDataDriver visible={modalDriverData} setVisible={setModalDriverData} />
         <If condition={visibleProtect}>
           <ViewPanic>
             <CardPanic data={typesProblems} setVisible={setVisibleProtect} />
           </ViewPanic>
         </If>
 
-        <ModalWho visible={visibleWho} setVisible={setVisibleWho} />
+        <ModalWho
+          visible={visibleWho}
+          setVisible={setVisibleWho}
+          setIsTripNoDestinationAnother={setIsTripNoDestinationAnother}
+        />
       </Container>
     </>
   );

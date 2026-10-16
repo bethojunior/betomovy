@@ -19,7 +19,7 @@ export default function OrderLocal(props) {
       </Text>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('Local');
+          navigation?.navigate('Local');
         }}
       >
         <View style={styles.btnLocation}>
@@ -30,7 +30,7 @@ export default function OrderLocal(props) {
             color="black"
           />
           <View style={styles.contentLocal}>
-            <Text style={styles.titleLocal} numberOfLines={1}>
+            <Text style={styles.titleLocal} numberOfLines={2}>
               {placeSelected
                 ? placeSelected.address
                 : translate('orderLocal.text_inform_the_delivery_location')}

@@ -1,8 +1,10 @@
 import React, {useState, FC, useEffect} from 'react';
 import {Alert, Modal, Text, ToastAndroid} from 'react-native';
+import I18n from "i18n-js";
 import {
   Content,
   ModalContent,
+  
   ContentButton,
   Button,
   Input,
@@ -14,10 +16,11 @@ import apiMain from '../../api/apiMain';
 import {translate} from '../../locales';
 import theme from '../../styles/theme';
 import {useAuth} from '../../../context/auth';
+import { formatPhone } from '../../utils/formatPhone';
 
 type Props = {
   visible: boolean;
-  setVisible(boolean: boolean): () => void;
+  setVisible: (visible: boolean) => void;
   currentPhone: string;
 };
 
@@ -33,23 +36,31 @@ const ChangePhoneNumberModal: FC<Props> = ({
 
   const {user, setUser} = useAuth();
 
+  const locale = I18n.locale;
+
   useEffect(() => {
-    setPhone(currentPhone);
+    setPhone(formatPhone(currentPhone, false));
   }, [currentPhone]);
 
   const updatePhone = () => {
-    if (phone === '') {
+    const unmaskedPhone = formatPhone(phone, false);
+
+    if (unmaskedPhone === '') {
       setTextError(translate('changePhone.text_empty'));
       return setError(true);
+    }else {
+      setError(false);
     }
 
-    if (phone.length < 9) {
+    if (locale === 'pt_BR' && unmaskedPhone.length < 11) {
       setTextError(translate('changePhone.text_min_size'));
       return setError(true);
+    }else {
+      setError(false);
     }
 
     setLoading(true);
-    apiMain.post('Customer/EditProfile', {phone}).then(result => {
+    apiMain.post('Customer/EditProfile', {phone: unmaskedPhone}).then(result => {
       setLoading(false);
       if (!result.data.status) {
         return Alert.alert(
@@ -58,8 +69,7 @@ const ChangePhoneNumberModal: FC<Props> = ({
         );
       }
 
-      user.phone = phone;
-      setUser(user);
+      setUser({ ...user, phone: unmaskedPhone });
       setVisible(false);
       return ToastAndroid.showWithGravity(
         translate('changePhone.text_status_success'),
@@ -73,6 +83,7 @@ const ChangePhoneNumberModal: FC<Props> = ({
   return (
     <>
       <Preload visible={loading} />
+      
       <Modal
         animationType="slide"
         transparent
@@ -88,8 +99,8 @@ const ChangePhoneNumberModal: FC<Props> = ({
             <Input
               autoCapitalize="characters"
               keyboardType="numeric"
-              value={phone}
-              onChangeText={(text: string) => setPhone(text)}
+              value={formatPhone(phone)}
+              onChangeText={(text: string) => setPhone(formatPhone(text, false))}
               style={{
                 padding: 5,
                 color: theme.colors.secondary,

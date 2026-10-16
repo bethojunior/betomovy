@@ -1,162 +1,187 @@
-import React, {useState, FC} from 'react';
-import {Alert, Modal, Text, ToastAndroid} from 'react-native';
+import React, {useState} from 'react';
+import {ActivityIndicator} from 'react-native';
+import Feather from '@expo/vector-icons/Feather';
+import {BottomSheetModal} from '../BottomSheetModal';
 import {
-  Content,
-  ModalContent,
-  Input,
-  Button,
+  CancelButton,
+  CancelButtonText,
+  ConfirmButton,
+  ConfirmButtonText,
   ContentButton,
+  EyeButton,
+  FieldLabel,
+  Input,
+  InputContainer,
+  ScrollContent,
   TextError,
-  SimpleText,
+  Title,
+  TitleRow,
 } from './styles';
-import apiMain from '../../api/apiMain';
-import Preload from '../Preload';
 import {translate} from '../../locales';
 import theme from '../../styles/theme';
+import {customToast} from '../../../utils/FlashMessage';
+import {useKeyboardHeight} from '../../../common/hooks/useKeyboardHeight';
+import {ChangePasswordModalProps} from './types';
 
-type Props = {
-  visible: boolean;
-  setVisible(boolean: boolean): () => void;
-  email: string;
-};
+const MIN_PASSWORD_LENGTH = 6;
 
-const ChangePasswordModal: FC<Props> = ({visible, setVisible, email}) => {
+/**
+ * Bottom sheet de troca de senha, compartilhado entre cliente e motorista.
+ * A validação e a UI ficam aqui; cada app injeta suas próprias chamadas
+ * de API via onCheckCurrentPassword/onUpdatePassword.
+ */
+const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
+  visible,
+  setVisible,
+  onCheckCurrentPassword,
+  onUpdatePassword,
+}) => {
+  const keyboardHeight = useKeyboardHeight();
   const [loading, setLoading] = useState(false);
-  const [currentPassoword, setCurrentPassoword] = useState('');
-  const [newPassoword, setNewPassoword] = useState('');
-  const [confirmPassoword, setConfirmPassoword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(false);
   const [textError, setTextError] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const updatePassword = () => {
-    if (
-      currentPassoword === '' ||
-      newPassoword === '' ||
-      confirmPassoword === ''
-    ) {
+  const resetFields = () => {
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setError(false);
+  };
+
+  const handleClose = () => {
+    setVisible(false);
+    resetFields();
+  };
+
+  const handleConfirm = async () => {
+    if (loading) return;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
       setTextError(translate('changePassword.text_empty'));
       return setError(true);
     }
 
-    if (confirmPassoword !== newPassoword) {
+    if (newPassword !== confirmPassword) {
       setTextError(translate('changePassword.text_dont_match'));
       return setError(true);
     }
 
-    setLoading(true);
-    apiMain
-      .post('Customer/CheckPassword', {password: currentPassoword})
-      .then(result => {
-        if (!result.data.status) {
-          setLoading(false);
-          setTextError(translate('changePassword.text_invalid'));
-          return setError(true);
-        }
-
-        return '';
-      });
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      setTextError(translate('driverProfile.text_min_password'));
+      return setError(true);
+    }
 
     setError(false);
-    apiMain
-      .post('Customer/UpdatePassword', {
-        password: newPassoword,
-        email,
-        withoutCode: true,
-      })
-      .then(result => {
-        setLoading(false);
-        if (!result.data.status) {
-          return Alert.alert(
-            translate('changePassword.title_status_error'),
-            translate('changePassword.text_status_error'),
-          );
-        }
+    setLoading(true);
 
-        setVisible(false);
-        setCurrentPassoword('');
-        setNewPassoword('');
-        setConfirmPassoword('');
-        return ToastAndroid.showWithGravity(
-          translate('changePassword.text_status_success'),
-          ToastAndroid.LONG,
-          ToastAndroid.BOTTOM,
-        );
-      });
+    const isCurrentPasswordValid = await onCheckCurrentPassword(currentPassword);
+    if (!isCurrentPasswordValid) {
+      setLoading(false);
+      setTextError(translate('changePassword.text_invalid'));
+      return setError(true);
+    }
 
-    return '';
+    const result = await onUpdatePassword(newPassword);
+    setLoading(false);
+
+    if (!result?.status) {
+      customToast(
+        result?.message || translate('changePassword.text_status_error'),
+        'danger',
+      );
+      return;
+    }
+
+    handleClose();
+    customToast(translate('changePassword.text_status_success'), 'success');
   };
 
   return (
-    <>
-      <Preload visible={loading} />
-      <Modal
-        animationType="slide"
-        transparent
-        visible={visible}
-        onRequestClose={() => {
-          setVisible(false);
-          setCurrentPassoword('');
-          setNewPassoword('');
-          setConfirmPassoword('');
-        }}
-      >
-        <Content>
-          <ModalContent style={{padding: 20}}>
-            {error && <TextError>{textError}</TextError>}
+    <BottomSheetModal visible={visible} onRequestClose={handleClose}>
+      <ScrollContent keyboardHeight={keyboardHeight}>
+        <TitleRow>
+          <Feather name="lock" size={18} color={theme.colors.primary} />
+          <Title>{translate('changePassword.title')}</Title>
+        </TitleRow>
 
-            <SimpleText>
-              {translate('changePassword.text_current_password')}
-            </SimpleText>
-            <Input
-              autoCapitalize="characters"
-              secureTextEntry
-              value={currentPassoword}
-              onChangeText={(text: string) => setCurrentPassoword(text)}
-              style={{padding: 5, color: theme.colors.secondary}}
+        {error && <TextError>{textError}</TextError>}
+
+        <FieldLabel>{translate('changePassword.text_current_password')}</FieldLabel>
+        <InputContainer>
+          <Input
+            autoCapitalize="none"
+            secureTextEntry={!showCurrentPassword}
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+          />
+          <EyeButton onPress={() => setShowCurrentPassword(current => !current)}>
+            <Feather
+              name={showCurrentPassword ? 'eye-off' : 'eye'}
+              size={18}
+              color={theme.colors.grayLight}
             />
-            <SimpleText>
-              {translate('changePassword.text_new_password')}
-            </SimpleText>
-            <Input
-              autoCapitalize="characters"
-              secureTextEntry
-              value={newPassoword}
-              onChangeText={(text: string) => setNewPassoword(text)}
-              style={{padding: 5, color: theme.colors.secondary}}
+          </EyeButton>
+        </InputContainer>
+
+        <FieldLabel>{translate('changePassword.text_new_password')}</FieldLabel>
+        <InputContainer>
+          <Input
+            autoCapitalize="none"
+            secureTextEntry={!showNewPassword}
+            value={newPassword}
+            onChangeText={setNewPassword}
+          />
+          <EyeButton onPress={() => setShowNewPassword(current => !current)}>
+            <Feather
+              name={showNewPassword ? 'eye-off' : 'eye'}
+              size={18}
+              color={theme.colors.grayLight}
             />
-            <SimpleText>
-              {translate('changePassword.text_confirm_new_password')}
-            </SimpleText>
-            <Input
-              autoCapitalize="characters"
-              secureTextEntry
-              value={confirmPassoword}
-              onChangeText={(text: string) => setConfirmPassoword(text)}
-              style={{padding: 5, color: theme.colors.secondary}}
+          </EyeButton>
+        </InputContainer>
+
+        <FieldLabel>{translate('changePassword.text_confirm_new_password')}</FieldLabel>
+        <InputContainer>
+          <Input
+            autoCapitalize="none"
+            secureTextEntry={!showConfirmPassword}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+          <EyeButton onPress={() => setShowConfirmPassword(current => !current)}>
+            <Feather
+              name={showConfirmPassword ? 'eye-off' : 'eye'}
+              size={18}
+              color={theme.colors.grayLight}
             />
-            <ContentButton>
-              <Button
-                onPress={() => {
-                  setVisible(false);
-                  setCurrentPassoword('');
-                  setNewPassoword('');
-                  setConfirmPassoword('');
-                }}
-              >
-                <SimpleText>{translate('buttonModal.cancel')}</SimpleText>
-              </Button>
-              <Button
-                onPress={() => {
-                  updatePassword();
-                }}
-              >
-                <SimpleText>{translate('buttonModal.confirm')}</SimpleText>
-              </Button>
-            </ContentButton>
-          </ModalContent>
-        </Content>
-      </Modal>
-    </>
+          </EyeButton>
+        </InputContainer>
+
+        <ContentButton>
+          <CancelButton onPress={handleClose} activeOpacity={0.7}>
+            <Feather name="x" size={16} color={theme.colors.secondary} />
+            <CancelButtonText>{translate('buttonModal.cancel')}</CancelButtonText>
+          </CancelButton>
+
+          <ConfirmButton onPress={handleConfirm} disabled={loading} activeOpacity={0.7}>
+            {loading ? (
+              <ActivityIndicator size="small" color={theme.colors.white} />
+            ) : (
+              <>
+                <Feather name="check" size={16} color={theme.colors.white} />
+                <ConfirmButtonText>{translate('buttonModal.confirm')}</ConfirmButtonText>
+              </>
+            )}
+          </ConfirmButton>
+        </ContentButton>
+      </ScrollContent>
+    </BottomSheetModal>
   );
 };
 

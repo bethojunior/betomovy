@@ -27,7 +27,11 @@ export const TitlePage = styled.Text<{ colorText: string }>`
     text-align: center;
 `
 
-export const TextArea = styled.TextInput`
+export const TextArea = styled.TextInput.attrs({
+  multiline: true,
+  textAlignVertical: 'top',
+})`
+  height: 300px;
   background-color: ${({theme}) => theme.colors.border_white_light};
   border-radius: 10px;
   text-align: justify;

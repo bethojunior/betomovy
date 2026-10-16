@@ -54,7 +54,7 @@ export const routeService = () => {
       });
       return result.data;
     } catch (error) {
-      return customToast('pageRoutes.text_error_offer', 'danger');
+      return customToast(translate('pageRoutes.text_error_offer'), 'danger');
     }
   };
 
@@ -66,7 +66,7 @@ export const routeService = () => {
       });
       return result.data;
     } catch (error) {
-      return customToast('pageRoutes.text_error_cancel', 'danger');
+      return customToast(translate('pageRoutes.text_error_cancel'), 'danger');
     }
   };
   return {newRoutes, released, offered, request, offer, cancel};

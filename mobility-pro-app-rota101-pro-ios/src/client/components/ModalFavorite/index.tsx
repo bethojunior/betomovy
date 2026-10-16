@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {useTheme} from 'styled-components';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import { View } from 'react-native';
+import { useTheme } from 'styled-components/native';
 import {
   ButtonConfirm,
   Card,
@@ -11,81 +11,106 @@ import {
   Content,
   Image,
 } from './styles';
-import {TextEdit} from '../TextEdit';
-import {useFavorite} from '../../contexts/favorite';
+import { TextEdit } from '../TextEdit';
+import { useFavorite } from '../../contexts/favorite';
 import theme from '../../styles/theme';
-import {useTrip} from '../../contexts/Trip';
-import {If} from '../If';
-import Helper from '../../utils/Helper';
-import {translate} from '../../locales';
-import {buildApp} from '../../../constantBuild/config';
+import { useTrip } from '../../contexts/Trip';
+import { If } from '../If';
+import { translate } from '../../locales';
+import { buildApp } from '../../../constantBuild/config';
+import { useStoragePictures } from '../../../driver/src/hooks/useStoragePictures';
+import { getAvailableFavorites } from '../../utils/favoriteDrivers';
 
 interface Props {
-  onPressConfirm?: () => void;
+  onPressConfirm?: (data: Array<string | number>) => void;
   loading: boolean;
 }
 
-export const ModalFavorite = ({onPressConfirm, loading}: Props) => {
+export const ModalFavorite = ({ onPressConfirm, loading }: Props) => {
   const [text, setText] = useState(translate('favoriteOnDriver.call_favorite'));
 
-  const {favorites, getFavorites} = useFavorite();
-  const {dispatchTripCustomer} = useTrip();
-  const [selecteds, setSelecteds] = useState([]);
+  const { colors } = useTheme();
+  const { favorites, getFavorites } = useFavorite();
+  const { dispatchTripCustomer, stateTripCustomer } = useTrip();
 
-  const listFavorites = async () => {
-    await getFavorites();
+  const { selectedOptionTravel, selectedFavorite } = stateTripCustomer;
+  const selectedDrivers = selectedFavorite ?? [];
+
+  const setSelectedDrivers = (idDrivers: Array<number | string>) => {
+    dispatchTripCustomer({
+      type: 'update',
+      field: 'selectedFavorite',
+      arg: idDrivers,
+    });
   };
 
+  // Trava o tipo de viagem quando o modal abre para evitar mudanças
+  const lockedTripType = useRef(selectedOptionTravel?.tripTypeId);
+  const lockedTripTypeData = useRef(selectedOptionTravel);
+
   useEffect(() => {
-    listFavorites();
+    // Trava o tipo na primeira renderização
+    if (!lockedTripType.current && selectedOptionTravel?.tripTypeId) {
+      lockedTripType.current = selectedOptionTravel.tripTypeId;
+      lockedTripTypeData.current = selectedOptionTravel;
+    }
+  }, []);
+
+  const { getStoragePictureSpecific } = useStoragePictures();
+
+  const getValidFavorites = () => {
+    // Usa o tipo TRAVADO ao invés do atual para evitar mudanças
+    const tripTypeToUse = lockedTripTypeData.current || selectedOptionTravel;
+    return getAvailableFavorites(favorites, tripTypeToUse?.tripTypeId);
+  };
+
+  const validFavorites = useMemo(() => getValidFavorites(), [favorites]);
+  const hasValidFavorites = validFavorites.length > 0;
+
+  useEffect(() => {
+    const validSelection = selectedDrivers.filter(id =>
+      validFavorites.some(item => item.idDriver === id),
+    );
+
+    if (validSelection.length === 0 && validFavorites[0]?.idDriver) {
+      setSelectedDrivers([validFavorites[0].idDriver]);
+    } else if (validSelection.length !== selectedDrivers.length) {
+      setSelectedDrivers(validSelection);
+    }
+
+    getFavorites();
   }, []);
 
   const handleFavorite = item => {
-    if (selecteds?.includes(item?.idDriver)) {
-      const newArray = selecteds?.filter(
-        favorite => favorite !== item?.idDriver,
-      );
-      return setSelecteds(newArray);
+    // Toggle: adiciona ou remove o motorista da seleção
+    if (selectedDrivers.includes(item.idDriver)) {
+      setSelectedDrivers(selectedDrivers.filter(id => id !== item.idDriver));
+    } else {
+      setSelectedDrivers([...selectedDrivers, item.idDriver]);
     }
-
-    return setSelecteds(prev => [...prev, item.idDriver]);
   };
 
   useEffect(() => {
     if (
       favorites.length > 0 &&
-      favorites.filter(
-        (item: {statusDriver: string}) => item.statusDriver === 'disponivel',
-      ).length === 0
+      selectedOptionTravel?.tripTypeId &&
+      validFavorites.length === 0
     ) {
       setText(translate('favoriteOnDriver.no_favorite_drivers_found'));
-    } else if (favorites.length > 0) {
-      const favoritesOnline: [
-        {
-          idDriver: number;
-        },
-      ] = favorites.filter(
-        (item: {statusDriver: string}) => item.statusDriver === 'disponivel',
-      );
-      if (favoritesOnline.length > 0) {
-        favoritesOnline.map(item => {
-          handleFavorite(item);
-        });
-      }
     }
-  }, []);
+  }, [favorites, selectedOptionTravel?.tripTypeId, validFavorites]);
 
-  useEffect(() => {
-    if (selecteds?.length > 0) {
-      dispatchTripCustomer({
-        type: 'update',
-        field: 'selectedFavorite',
-        arg: [...selecteds],
-      });
-    }
-  }, [selecteds]);
 
-  const {colors} = useTheme();
+  const handleConfirm = () => {
+    // Mantém só os motoristas que ainda estão na lista após refetch;
+    // array vazio = busca aleatória
+    const validSelection = selectedDrivers.filter(id =>
+      validFavorites.some(item => item.idDriver === id),
+    );
+
+    setSelectedDrivers(validSelection);
+    onPressConfirm?.(validSelection);
+  };
 
   return (
     <Container
@@ -113,63 +138,64 @@ export const ModalFavorite = ({onPressConfirm, loading}: Props) => {
         centralized={
           favorites.length > 0 &&
           favorites?.filter(
-            (item: {statusDriver: string}) =>
+            (item: { statusDriver: string }) =>
               item?.statusDriver === 'disponivel',
           ).length === 0
         }
       >
         <TextEdit color={colors.secondary}>{text}</TextEdit>
       </ContainerHeader>
-      <If condition={favorites.length > 0}>
+      <If condition={hasValidFavorites}>
         <ContainerCard>
           <Content>
-            {favorites.length > 0 &&
-              favorites
-                .filter(item => item.statusDriver === 'disponivel')
-                .map((item, index) => (
-                  <Card
-                    key={index}
-                    onPress={() => handleFavorite(item)}
-                    selected={selecteds?.includes(item?.idDriver)}
-                    activeOpacity={0.8}
-                  >
-                    <Image
-                      source={{
-                        uri: buildApp().HOST_IMAGE_DRIVER + item?.driverImage,
-                      }}
-                    />
-                    <View>
-                      <TextEdit
-                        color={
-                          selecteds?.includes(item?.idDriver)
-                            ? theme.colors.background_global
-                            : theme.colors.secondary
-                        }
-                      >
-                        {item?.plate}
-                      </TextEdit>
-                      <TextEdit
-                        color={
-                          selecteds?.includes(item?.idDriver)
-                            ? theme.colors.background_global
-                            : theme.colors.secondary
-                        }
-                      >
-                        {item?.driverNickname}
-                      </TextEdit>
-                    </View>
-                  </Card>
-                ))}
+            {(() => {
+              return validFavorites.map((item, index) => (
+                <Card
+                  key={index}
+                  onPress={() => handleFavorite(item)}
+                  selected={selectedDrivers.includes(item?.idDriver)}
+                  activeOpacity={0.8}
+                >
+                  <Image
+                    source={{
+                      uri:
+                        getStoragePictureSpecific('driver') + item?.driverImage ||
+                        buildApp().HOST_IMAGE_DRIVER + item?.driverImage,
+                    }}
+                  />
+                  <View>
+                    <TextEdit
+                      color={
+                        selectedDrivers.includes(item?.idDriver)
+                          ? theme.colors.primaryText
+                          : theme.colors.secondary
+                      }
+                    >
+                      {item?.plate}
+                    </TextEdit>
+                    <TextEdit
+                      color={
+                        selectedDrivers.includes(item?.idDriver)
+                          ? theme.colors.primaryText
+                          : theme.colors.secondary
+                      }
+                    >
+                      {item?.driverNickname}
+                    </TextEdit>
+                  </View>
+                </Card>
+              ));
+            })()}
           </Content>
         </ContainerCard>
-        <ContainerButton>
-          <ButtonConfirm onPress={onPressConfirm} disabled={loading}>
-            <TextEdit size="large" color={theme.colors.primaryText}>
-              {translate('tripPreAccepted.text_continue')}
-            </TextEdit>
-          </ButtonConfirm>
-        </ContainerButton>
       </If>
+      <ContainerButton>
+        <ButtonConfirm onPress={handleConfirm} disabled={loading}>
+          <TextEdit size="large" color={theme.colors.primaryText}>
+            {translate('tripPreAccepted.text_continue')}
+          </TextEdit>
+        </ButtonConfirm>
+      </ContainerButton>
     </Container>
   );
 };

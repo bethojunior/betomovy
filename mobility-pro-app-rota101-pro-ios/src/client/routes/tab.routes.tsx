@@ -1,20 +1,20 @@
 /* eslint-disable default-case */
 // @ts-nocheck
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Avatar} from 'react-native-elements';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Avatar } from 'react-native-elements';
 import HomeDelivery from '../modules/delivery/pages/Home';
 import Profile from '../pages/Profile';
 import Requests from '../modules/delivery/pages/Requests';
-import {TabbarProvider, useTabbar} from '../contexts/tabBar';
+import { TabbarProvider, useTabbar } from '../contexts/tabBar/index.js';
 import TabIconWithBadge from '../components/TabIconWithBadge';
-import {useOrderService} from '../contexts/orderService';
+import { useOrderService } from '../contexts/orderService';
 import imageUser from '../assets/images/user.png';
-import {translate} from '../locales';
-import {useAuth} from '../../context/auth';
+import { translate } from '../locales';
+import { useAuth } from '../../context/auth';
 import theme from '../styles/theme';
 
-const {Navigator, Screen} = createBottomTabNavigator();
+const { Navigator, Screen } = createBottomTabNavigator();
 
 function TabRoutes() {
   return (
@@ -27,25 +27,25 @@ function TabRoutes() {
 }
 
 function AppRoutes() {
-  const {ordersActive} = useOrderService();
-  const {user} = useAuth();
-  const {visible} = useTabbar();
+  const { ordersActive } = useOrderService();
+  const { user } = useAuth();
+  const { visible } = useTabbar();
   return (
     <Navigator
-      initialRouteName="HomeDelivery"
-      screenOptions={({route}) => ({
-        tabBarIcon: ({focused, color, size}) => {
+      initialRouteName="Home"
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
           switch (route.name) {
             case 'Home': {
-              iconName = 'ios-home';
+              iconName = 'home';
               break;
             }
             case 'Requests': {
               return (
                 <TabIconWithBadge
-                  name="ios-list"
+                  name="list"
                   badgeCount={ordersActive.length}
                   color={color}
                   size={size}
@@ -57,13 +57,13 @@ function AppRoutes() {
                 <Avatar
                   rounded
                   source={
-                    user != null ? {uri: user.profileImageLink} : imageUser
+                    user != null ? { uri: user.profileImageLink } : imageUser
                   }
                   containerStyle={{
                     borderColor: color,
                     borderWidth: focused ? 2 : 0,
-                    marginTop: 20,
                   }}
+                  size={size}
                 />
               );
             }
@@ -71,31 +71,31 @@ function AppRoutes() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.grayLight,
+        tabBarStyle: {
+          backgroundColor: theme.colors.background_global,
+          display: visible ? 'flex' : 'none',
+        },
       })}
-      tabBarOptions={{
-        activeTintColor: theme.colors.primary,
-        inactiveTintColor: theme.colors.grayLight,
-        inactiveBackgroundColor: theme.colors.background_global,
-        activeBackgroundColor: theme.colors.background_global,
-      }}
     >
       <Screen
         name="Home"
         component={HomeDelivery}
         options={{
           title: translate('tabRoutes.title_home'),
-          tabBarVisible: visible,
+          headerShown: false,
         }}
       />
       <Screen
         name="Requests"
         component={Requests}
-        options={{title: translate('tabRoutes.title_orders')}}
+        options={{ title: translate('tabRoutes.title_orders') }}
       />
       <Screen
         name="Profile"
         component={Profile}
-        initialParams={{title: 'Delivery'}}
+        initialParams={{ title: 'Delivery' }}
       />
     </Navigator>
   );

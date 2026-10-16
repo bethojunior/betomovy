@@ -1,269 +1,393 @@
-import {useState} from 'react';
-import {View, Modal} from 'react-native';
-import {useTheme} from 'styled-components';
-import {AntDesign, Feather} from '@expo/vector-icons';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import * as ImageManipulator from 'expo-image-manipulator';
+import { useState } from 'react';
+import { Linking, Platform, Pressable } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from 'styled-components/native';
+import { Feather } from '@expo/vector-icons';
 import {
   Ball,
-  ButtonEdit,
+  AvatarRow,
+  AvatarWrapper,
+  CameraBadge,
+  Card,
   Container,
-  ContainerModal,
-  ContentOptions,
-  ContentOptionsButtons,
-  ContentOptionsText,
+  CountBadgeText,
+  DangerRow,
+  DangerSubtitle,
+  DangerTextGroup,
+  DangerTitle,
   DriverName,
-  Exit,
-  Header,
-  ImageContent,
-  InfoContent,
   ItemTripType,
   ListTypeContent,
-  Photo,
+  ScrollContent,
+  SectionTitle,
+  SectionTitleRow,
   SimpleText,
-  TitleTripType,
-  TripTypeContent,
+  SupportLinkText,
+  SupportRow,
+  SupportText,
+  SupportTextGroup,
+  TripTypesList,
+  UserInfo,
 } from './styles';
 import apiMainDriver from '../../api/apiMain';
-import {FaceDetectorScreen} from '../../components/FaceDetectorModal';
-import EditProfileModal from '../../components/Modal/EditProfileModal';
-import {useUserDriver} from '../../context/userDriver';
-import Preload from '../../../../client/components/Preload';
-import {useAuth} from '../../../../context/auth';
-import {buildApp} from '../../../../constantBuild/config';
-import {customToast} from '../../../../utils/FlashMessage';
-import {Button} from '../../components/Button';
+import { useUserDriver } from '../../context/userDriver';
+import { useAuth } from '../../../../context/auth';
+import { buildApp } from '../../../../constantBuild/config';
+import { customToast } from '../../../../utils/FlashMessage';
 import Helper from '../../utils/Helper';
 
-import {uploadDocument} from '../../utils/pdf/upload';
-import {translate} from '../../../../client/locales';
-import {resizeImage} from '../../utils/image';
+import { translate } from '../../../../client/locales';
+import { resizeImage } from '../../../../utils/image';
+import { useStoragePictures } from '../../hooks/useStoragePictures';
+import { useKeyboardHeight } from '../../../../common/hooks/useKeyboardHeight';
+import { formatPhone } from '../../../../client/utils/formatPhone';
+import { getProfileImageUrl } from '../../utils/imageUrl';
+import { ModalSelectPhotoProfile } from '../../../../components/ModalSelectPhotoProfile';
+import { AvatarProfile } from '../../../../components/AvatarProfile';
+import { EditableItemProfile } from '../../../../client/components/EditableItemProfile';
+import ChangePasswordModal from '../../../../client/components/ChangePasswordModal';
+import DeleteAccountModal from '../../../../client/components/DeleteAccountModal';
+import { useDeleteAccount } from '../../hooks/useDeleteAccount';
+import { useSupportNumber } from '../../../../hooks/useSupportNumber';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function Profile() {
-  const [modalFaceDetector, setModalFaceDetector] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
-  const [capturedImage, setCapturedImage] = useState(null);
-  const [editModal, setEditModal] = useState(false);
-  const [typeEdit, setTypeEdit] = useState<'email' | 'password' | 'phone'>();
-  const [loading, setLoading] = useState(false);
+  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [imageKey, setImageKey] = useState(0);
 
-  const {userDriverFind} = useUserDriver();
-  const {userDriver, generalSettings} = useAuth();
-  const {colors} = useTheme();
+  const { userDriverFind, setUserDriverFind } = useUserDriver();
+  const { userDriver, setUserDriver } = useAuth();
+  const { getSupportNumberFormatted } = useSupportNumber();
+  const supportNumber = getSupportNumberFormatted();
+  const theme = useTheme();
+  const { getStoragePictureSpecific } = useStoragePictures();
+  const keyboardHeight = useKeyboardHeight();
+  const { postExcludeAccount, loading: deleteLoading } = useDeleteAccount();
 
-  async function sendPhotoRecognition(uri) {
-    setModalEdit(false);
-    setLoading(true);
-    resizeImage(uri, 512, 512).then(result => {
-      async function updatePhoto() {
-        const locaUri = result.uri;
-        const filename = locaUri.split('/').pop();
-
-        // Infer the type of the image
-        const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : `image`;
-
-        const formData = new FormData();
-        formData.append('driverId', userDriverFind.idDriver);
-        // @ts-ignore
-        formData.append('photo', {
-          uri: result.uri,
-          type,
-          name: filename,
-        });
-        const {
-          data: {status},
-        } = await apiMainDriver.post('Driver/EditProfileImage', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        setLoading(false);
-
-        if (!status) {
-          customToast('Erro ao atualizar sua foto, tente novamente', 'danger');
-        }
-
-        customToast('Foto enviada para avaliação, aguarde', 'success');
-      }
-      setModalFaceDetector(false);
-      updatePhoto();
-    });
-  }
-
-  const handleEditPhoto = (conditional: string) => {
-    switch (conditional) {
-      case '1':
-        return setModalEdit(true);
-      case '0':
-        return setModalFaceDetector(true);
-      default:
-        return setModalFaceDetector(true);
-    }
+  const IMAGE_RULES = {
+    maxSizeBytes: 10 * 1024 * 1024, // 10MB
+    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/heic', 'image/heif'],
+    minWidth: 50,
+    minHeight: 50,
+    maxWidth: 8000,
+    maxHeight: 8000
   };
 
-  const onGallery = async () => {
-    setModalEdit(false);
-    const response = await uploadDocument('image/*');
-    if (response.type === 'cancel') return;
-    const manipulatedImage = await resizeImage(response.uri, 512, 512);
-    const filename = manipulatedImage.uri.split('/').pop();
-    const match = /\.(\w+)$/.exec(filename);
-    const typeImage = match ? `image/${match[1]}` : `image`;
+  async function validateImage(asset: any) {
+    const errors: string[] = [];
+    const size = asset?.fileSize || asset?.size;
 
-    setCapturedImage({
-      uri: manipulatedImage.uri,
-      type: typeImage,
+    if (size && size > IMAGE_RULES.maxSizeBytes) {
+      errors.push(`Imagem muito grande. Máximo: ${IMAGE_RULES.maxSizeBytes / (1024 * 1024)}MB`);
+    }
+
+    if (asset?.mimeType && !IMAGE_RULES.allowedTypes.includes(asset.mimeType.toLowerCase())) {
+      errors.push('Formato não suportado. Use: JPG, JPEG ou PNG');
+    }
+
+    if (asset?.width && asset?.height) {
+      if (asset.width < IMAGE_RULES.minWidth || asset.height < IMAGE_RULES.minHeight) {
+        errors.push(`Imagem muito pequena. Mínimo: ${IMAGE_RULES.minWidth}x${IMAGE_RULES.minHeight}px`);
+      }
+      if (asset.width > IMAGE_RULES.maxWidth || asset.height > IMAGE_RULES.maxHeight) {
+        errors.push(`Imagem muito grande. Máximo: ${IMAGE_RULES.maxWidth}x${IMAGE_RULES.maxHeight}px`);
+      }
+    }
+
+    return errors;
+  }
+
+  async function sendPhotoRecognition(uri: string, asset: any) {
+    setModalEdit(false);
+    setUploadingPhoto(true);
+
+    try {
+      const validationErrors = await validateImage(asset);
+      if (validationErrors.length > 0) {
+        customToast(validationErrors.join('\n'), 'danger');
+        return;
+      }
+
+      let imageToUpload = uri;
+      try {
+        const result = await resizeImage(uri, 400, 400);
+        if (result?.uri) {
+          imageToUpload = result.uri;
+        }
+      } catch (resizeErr) {
+        console.warn('Falha ao redimensionar foto, utilizando uri original:', resizeErr);
+      }
+
+      await updatePhoto(imageToUpload);
+    } catch (error: any) {
+      console.error('Erro ao atualizar foto:', error);
+      if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
+        customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
+      } else if (error?.response?.status === 413) {
+        customToast(translate('toast.text_image_too_large'), 'danger');
+      } else {
+        customToast(error?.response?.data?.message || error?.message || translate('toast.text_photo_update_error'), 'danger');
+      }
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }
+
+  async function updatePhoto(imageUri: string) {
+    const filename = (imageUri?.split('/').pop() || 'photo.jpg').split('?')[0];
+
+    const match = /\.(\w+)$/.exec(filename);
+    const ext = match ? match[1].toLowerCase() : 'jpg';
+    let type = 'image/jpeg';
+    if (ext === 'png') type = 'image/png';
+    else if (ext === 'webp') type = 'image/webp';
+
+    const fileUri = Platform.OS === 'ios'
+      ? (imageUri.startsWith('file://') ? imageUri : `file://${imageUri}`)
+      : imageUri;
+
+    const formData = new FormData();
+    formData.append('driverId', userDriverFind.idDriver);
+    // @ts-ignore
+    formData.append('photo', {
+      uri: fileUri,
+      type,
       name: filename,
     });
 
-    await sendPhotoRecognition(manipulatedImage.uri);
+    const response = await apiMainDriver.post(
+      'Driver/EditProfileImage',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+        timeout: 120000,
+      },
+    );
+
+    const { data } = response;
+    const { status } = data;
+
+    if (status) {
+      setImageKey(Date.now());
+      customToast(translate('toast.text_photo_change_request_sent'), 'success');
+    } else {
+      throw new Error(data.message || 'Upload falhou');
+    }
+  }
+
+  const handleEditPhoto = () => {
+    setModalEdit(true);
   };
+
+  const tripTypes = userDriverFind?.tripTypes || [];
 
   return (
     <>
-      <Preload visible={loading} />
       <Container>
-        <InfoContent>
-          <Header>
-            <TouchableOpacity
-              onPress={() =>
-                handleEditPhoto(
-                  generalSettings.find(
-                    item => item.key === 'enable_driver_open_gallery',
-                  ).value,
-                )
-              }
-            >
-              <Photo>
-                <ImageContent
-                  source={
-                    userDriverFind != null && {
-                      uri: `${buildApp().HOST_IMAGE_DRIVER}${
-                        userDriverFind?.profileImage
-                      }`,
-                    }
-                  }
-                />
-                <Feather name="edit" style={{position: 'absolute'}} />
-              </Photo>
-            </TouchableOpacity>
-            <View style={{margin: 30}}>
-              <DriverName>
-                {Helper.maskNames(userDriverFind?.name.trim())}
-              </DriverName>
-              <SimpleText>{userDriverFind.document || ''}</SimpleText>
-            </View>
-          </Header>
-          <View style={{marginTop: 40}}>
-            <ButtonEdit
-              activeOpacity={0.5}
-              onPress={() => {
-                setTypeEdit('email');
-                setEditModal(true);
-              }}
-            >
-              <SimpleText>Email:</SimpleText>
-              <View style={{flexDirection: 'row'}}>
-                <SimpleText>{userDriver?.email || ''}</SimpleText>
-                <Feather
-                  style={{marginLeft: 5, alignSelf: 'center'}}
-                  color={colors.secondary}
-                  name="edit"
-                />
-              </View>
-            </ButtonEdit>
-            <ButtonEdit
-              activeOpacity={0.5}
-              onPress={() => {
-                setTypeEdit('phone');
-                setEditModal(true);
-              }}
-            >
-              <SimpleText>Telefone:</SimpleText>
-              <View style={{flexDirection: 'row'}}>
-                <SimpleText>{userDriverFind.phone || ''}</SimpleText>
-                <Feather
-                  style={{marginLeft: 5, alignSelf: 'center'}}
-                  color={colors.secondary}
-                  name="edit"
-                />
-              </View>
-            </ButtonEdit>
-            <ButtonEdit
-              activeOpacity={0.5}
-              onPress={() => {
-                setTypeEdit('password');
-                setEditModal(true);
-              }}
-            >
-              <SimpleText>Senha:</SimpleText>
-              <View style={{flexDirection: 'row'}}>
-                <SimpleText>******</SimpleText>
-                <Feather
-                  style={{marginLeft: 5, alignSelf: 'center'}}
-                  color={colors.secondary}
-                  name="edit"
-                />
-              </View>
-            </ButtonEdit>
-          </View>
-          <TripTypeContent>
-            <TitleTripType>
-              {translate('myProfile.title_trip_type')}
-            </TitleTripType>
+        <ScrollContent showsVerticalScrollIndicator={false} keyboardHeight={keyboardHeight}>
+          <Card>
+            <AvatarRow>
+              <Pressable onPress={handleEditPhoto}>
+                <AvatarWrapper>
+                  <AvatarProfile
+                    key={`driver-photo-${imageKey}`}
+                    uri={getProfileImageUrl(
+                      userDriverFind?.profileImage,
+                      getStoragePictureSpecific('driver'),
+                      buildApp().HOST_IMAGE_DRIVER
+                    )}
+                    loading={uploadingPhoto}
+                    showPreloadOverlay
+                    size={RFValue(88)}
+                    borderColor={theme.colors.primary}
+                    borderWidth={RFValue(1.5)}
+                  />
+                  {!uploadingPhoto && (
+                    <CameraBadge>
+                      <Feather name="camera" size={RFValue(11)} color={theme.colors.primaryText} />
+                    </CameraBadge>
+                  )}
+                </AvatarWrapper>
+              </Pressable>
 
-            {userDriverFind?.tripTypes?.map(type => {
-              return (
-                <ListTypeContent key={type.tripTypeId}>
-                  <Ball />
-                  <ItemTripType> {type.tripType}</ItemTripType>
-                </ListTypeContent>
+              <UserInfo>
+                <DriverName>
+                  {Helper.maskNames(userDriverFind?.name?.trim())}
+                </DriverName>
+                <SimpleText>{userDriverFind.document || ''}</SimpleText>
+              </UserInfo>
+            </AvatarRow>
+          </Card>
+
+          <Card>
+            <SectionTitleRow>
+              <SectionTitle>{translate('driverProfile.account_data')}</SectionTitle>
+            </SectionTitleRow>
+
+            <EditableItemProfile
+              icon="mail-outline"
+              label={translate('myProfile.text_email')}
+              value={userDriver?.email || ''}
+              keyboardType="email-address"
+              validate={value => {
+                if (!value) return translate('driverProfile.text_empty_field');
+                if (!Helper.isEmailValid(value)) return translate('changeEmail.text_invalid');
+                return null;
+              }}
+              onSave={async email => {
+                const result = await apiMainDriver.post('driver/edit', {
+                  stdObject: [{ email, driverId: userDriverFind.idDriver, idUser: userDriverFind.userId }],
+                });
+                return { status: result.data.status, message: result.data.message };
+              }}
+              onSaved={email => setUserDriver({ ...userDriver, email })}
+            />
+
+            <EditableItemProfile
+              icon="call-outline"
+              label={translate('myProfile.text_phone')}
+              value={formatPhone(userDriverFind.phone || '')}
+              keyboardType="phone-pad"
+              formatValue={text => formatPhone(text, true)}
+              parseInput={masked => formatPhone(masked, false)}
+              validate={raw => {
+                if (!raw) return translate('driverProfile.text_empty_field');
+                if (raw.length < 11) return translate('changePhone.text_min_size');
+                return null;
+              }}
+              onSave={async phone => {
+                const result = await apiMainDriver.post('driver/edit', {
+                  stdObject: [{ phone, driverId: userDriverFind.idDriver, idUser: userDriverFind.userId }],
+                });
+                return { status: result.data.status, message: result.data.message };
+              }}
+              onSaved={phone => setUserDriverFind({ ...userDriverFind, phone })}
+            />
+
+            <EditableItemProfile
+              variant="reveal"
+              icon="lock-closed-outline"
+              label={translate('myProfile.text_password')}
+              maskedValue="********"
+              onReveal={async () => {
+                try {
+                  const lastLogin = await AsyncStorage.getItem('lastLogin');
+                  if (!lastLogin) return '********';
+                  const { email: loginEmail, password } = JSON.parse(lastLogin);
+                  return loginEmail === userDriver?.email ? password || '********' : '********';
+                } catch (error) {
+                  return '********';
+                }
+              }}
+              secondaryAction={{
+                label: translate('viewPassword.edit_password'),
+                onPress: () => setPasswordModalVisible(true),
+              }}
+            />
+          </Card>
+
+          {tripTypes.length > 0 && (
+            <Card>
+              <SectionTitleRow>
+                <SectionTitle>{translate('myProfile.title_trip_type')}</SectionTitle>
+                <CountBadgeText>{tripTypes.length}</CountBadgeText>
+              </SectionTitleRow>
+
+              <TripTypesList>
+                {tripTypes.map((type, index) => (
+                  <ListTypeContent key={type.tripTypeId} isLast={index === tripTypes.length - 1}>
+                    <Ball />
+                    <ItemTripType>{type.tripType}</ItemTripType>
+                  </ListTypeContent>
+                ))}
+              </TripTypesList>
+            </Card>
+          )}
+
+          <Card>
+            <DangerRow
+              activeOpacity={0.8}
+              onPress={() => setDeleteModalVisible(true)}
+            >
+              <Feather name="trash-2" size={RFValue(20)} color={theme.colors.red} />
+              <DangerTextGroup>
+                <DangerTitle>{translate('exclude.delete_account')}</DangerTitle>
+                <DangerSubtitle>{translate('exclude.delete_account_subtitle')}</DangerSubtitle>
+              </DangerTextGroup>
+              <Feather name="chevron-right" size={RFValue(18)} color={theme.colors.grayLight} />
+            </DangerRow>
+          </Card>
+
+          {!!supportNumber && (
+            <Card>
+              <SupportRow
+                activeOpacity={0.8}
+                onPress={() => Linking.openURL(`https://wa.me/${supportNumber}/`)}
+              >
+                <Feather name="headphones" size={RFValue(20)} color={theme.colors.icon_gray} />
+                <SupportTextGroup>
+                  <SupportText>
+                    {translate('support.text_support_before')}
+                    <SupportLinkText>
+                      {' '}{translate('support.text_support_link')}
+                    </SupportLinkText>
+                    {translate('support.text_support_after')}
+                  </SupportText>
+                </SupportTextGroup>
+              </SupportRow>
+            </Card>
+          )}
+        </ScrollContent>
+
+        <ChangePasswordModal
+          visible={passwordModalVisible}
+          setVisible={setPasswordModalVisible}
+          onCheckCurrentPassword={async currentPassword => {
+            const result = await apiMainDriver.post('Driver/CheckPassword', {
+              password: currentPassword,
+            });
+            return !!result.data.status;
+          }}
+          onUpdatePassword={async newPassword => {
+            const result = await apiMainDriver.post('driver/edit', {
+              stdObject: [
+                {
+                  password: newPassword,
+                  driverId: userDriverFind.idDriver,
+                  idUser: userDriverFind.userId,
+                },
+              ],
+            });
+
+            if (result.data.status) {
+              AsyncStorage.setItem(
+                'lastLogin',
+                JSON.stringify({ email: userDriver?.email, password: newPassword }),
               );
-            })}
-          </TripTypeContent>
-        </InfoContent>
-        <EditProfileModal
-          visible={editModal}
-          setVisible={setEditModal}
-          type={typeEdit}
-        />
-        <Modal visible={modalEdit} transparent>
-          <ContainerModal>
-            <ContentOptions>
-              <ContentOptionsText>
-                {translate('myProfile.do_you_want_to_use_camera_or_gallery')}
-              </ContentOptionsText>
+            }
 
-              <ContentOptionsButtons>
-                <Button
-                  title={translate('myProfile.text_cam')}
-                  onPress={() => setModalFaceDetector(true)}
-                  small
-                />
-                <Button
-                  title={translate('myProfile.text_gallery')}
-                  onPress={() => onGallery()}
-                  small
-                />
-              </ContentOptionsButtons>
-              <Exit onPress={() => setModalEdit(false)} activeOpacity={1}>
-                <AntDesign
-                  name="closecircleo"
-                  size={22}
-                  color={colors.primary}
-                  onPress={() => setModalEdit(false)}
-                />
-              </Exit>
-            </ContentOptions>
-          </ContainerModal>
-        </Modal>
-        <FaceDetectorScreen
-          visible={modalFaceDetector}
-          onClose={() => setModalFaceDetector(false)}
-          sendPhoto={() => sendPhotoRecognition(capturedImage.uri)}
-          setImage={setCapturedImage}
+            return { status: result.data.status, message: result.data.message };
+          }}
+        />
+
+        <DeleteAccountModal
+          visible={deleteModalVisible}
+          onClose={() => setDeleteModalVisible(false)}
+          onConfirm={postExcludeAccount}
+          loading={deleteLoading}
+        />
+
+        <ModalSelectPhotoProfile
+          visible={modalEdit}
+          setVisible={() => setModalEdit(false)}
+          sendPhoto={(asset) => sendPhotoRecognition(asset?.uri, asset)}
+          configKey="enable_driver_open_gallery"
         />
       </Container>
     </>

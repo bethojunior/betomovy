@@ -14,7 +14,6 @@ interface ContainerProps {
 export const Container = styled.View<ContainerProps>`
   flex-direction: row;
   align-items: center;
-  padding-left: ${({theme}) => theme.spacing.large}px;
   width: 100%;
   border-bottom-width: ${({theme}) => theme.borderWidth.medium}px;
   border-bottom-color: ${({theme, color}) =>
@@ -33,7 +32,7 @@ export const Content = styled(TextInput).attrs(({theme}) => ({
 }))<InputProps>`
   font-family: ${({theme}) => theme.fonts.regular};
   color: ${({theme, color}) => (color ? color : theme.colors.primary)};
-  font-size: ${({theme}) => theme.fontSizes.smalls}px;
+  font-size: ${({theme}) => theme.fontSizes.medium}px;
   margin-left: ${({icon}) => (icon ? RFValue(7) : RFValue(1))}px;
   width: 85%;
   text-decoration: none;

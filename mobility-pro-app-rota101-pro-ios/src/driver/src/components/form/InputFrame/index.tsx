@@ -1,14 +1,15 @@
-import React, {FC} from 'react';
-import {KeyboardTypeOptions} from 'react-native';
-import {Input} from './styles';
+import { FC } from 'react';
+import { BlurEvent, KeyboardTypeOptions, TextInput } from 'react-native';
+import { styles } from './styles';
 
 type Props = {
   value: string | undefined;
   keyboradType: KeyboardTypeOptions | undefined;
   setValue(boolean: string): void;
-  textAlign?: 'left' | 'right' | 'center' | undefined;
+  textAlign?: 'left' | 'right' | 'center';
   editable?: boolean;
   maxLength?: number;
+  onBlur?(e: BlurEvent): any;
 };
 
 const InputFrame: FC<Props> = ({
@@ -18,16 +19,23 @@ const InputFrame: FC<Props> = ({
   textAlign,
   editable,
   maxLength,
+  onBlur,
 }) => {
   return (
-    <Input
+    <TextInput
       editable={editable}
-      textAlign={textAlign}
       autoCapitalize="characters"
+      underlineColorAndroid="transparent"
       keyboardType={keyboradType}
       value={value}
       onChangeText={(text: string) => setValue(text)}
-      maxLength={maxLength ? maxLength : null}
+      onBlur={onBlur}
+      maxLength={maxLength ?? undefined}
+      style={[
+        styles.input,
+        { borderWidth: editable ? 1 : 0 },
+        { textAlign: textAlign ?? 'left' },
+      ]}
     />
   );
 };

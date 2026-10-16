@@ -9,7 +9,6 @@ import * as Location from 'expo-location';
 import { Audio } from 'expo-av';
 import { useTheme } from 'styled-components';
 import * as Notifications from 'expo-notifications';
-import * as MediaLibrary from 'expo-media-library';
 import { useNavigation } from '@react-navigation/native';
 import {
   Content,
@@ -38,7 +37,6 @@ export const ConfigSpeedMob = () => {
   const [optionFlashLight, setOptionFlashLight] = useState(false);
   const [permissions, setPermissions] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const navigation = useNavigation();
 
   const {
@@ -62,22 +60,22 @@ export const ConfigSpeedMob = () => {
   };
 
   const updateStorage = async (type: string, status: string) => {
+    const _permissions = { ...permissions };
     if (status === 'denied') {
-      permissions[type] = status;
+      _permissions[type] = status;
       customToast(
         translate('configPage.text_permission_denied_perma'),
         'warning',
       );
     } else if (status !== 'granted') {
-      permissions[type] = false;
+      _permissions[type] = false;
       customToast(translate('configPage.text_permission_denied'), 'warning');
     } else {
-      permissions[type] = true;
+      _permissions[type] = true;
       customToast(translate('configPage.text_permission_success'), 'success');
     }
 
-    await AsyncStorage.setItem('permissions', JSON.stringify(permissions));
-    setPermissions(JSON.parse(await AsyncStorage.getItem('permissions')));
+    setPermissions(_permissions);
   };
 
   useEffect(() => {
@@ -86,7 +84,6 @@ export const ConfigSpeedMob = () => {
       await getChooseDriverPaymentForm();
       await getImpositionPaymentForm();
       await getAppSettings();
-      setPermissions(JSON.parse(await AsyncStorage.getItem('permissions')));
       setLoading(false);
     };
 
@@ -110,7 +107,7 @@ export const ConfigSpeedMob = () => {
   const changePaymentForm = async (state: boolean, id: number) => {
     if (listImposition.some(el => el.tripPaymentFormId === id)) {
       return customToast(
-        'DQWDQW',
+        translate('configPage.text_payment_form_imposition'),
         'warning',
       );
     }
@@ -166,218 +163,204 @@ export const ConfigSpeedMob = () => {
         <ActivityIndicator size="large" color={theme.colors.primary} />
       ) : (
         <>
-            
-              <ScrollView>
-                <Content>
-                  <Header>
-                    <Feather
-                      name="settings"
-                      size={20}
-                      color={colors.background_global}
-                    />
-                    <Title>{translate('configPage.title_mode_accept')}</Title>
-                  </Header>
-                  <View>
-                    <Section>
-                      <SubTitle>
-                        {translate('configPage.text_click_to_accept')}
-                      </SubTitle>
+          <ScrollView>
+            <Content>
+              <Header>
+                <Feather
+                  name="settings"
+                  size={20}
+                  color={colors.background_global}
+                />
+                <Title>{translate('configPage.title_mode_accept')}</Title>
+              </Header>
+              <View>
+                <Section>
+                  <SubTitle>
+                    {translate('configPage.text_click_to_accept')}
+                  </SubTitle>
+                  <Switch
+                    color={theme.colors.primary}
+                    value={optionClick}
+                    onValueChange={e => {
+                      setOptionClick(e);
+                      changeAcceptMode('enableClick', e);
+                    }}
+                  />
+                </Section>
+                <Section>
+                  <SubTitle>
+                    {translate('configPage.text_drag_to_accept')}
+                  </SubTitle>
+                  <Switch
+                    color={theme.colors.primary}
+                    value={optionTouch}
+                    onValueChange={e => {
+                      setOptionTouch(e);
+                      changeAcceptMode('enableTouch', e);
+                    }}
+                  />
+                </Section>
+                <Section removeBorder>
+                  <SubTitle>Ligar lanterna ao sinalizar chegada</SubTitle>
+                  <Switch
+                    color={theme.colors.primary}
+                    value={optionFlashLight}
+                    onValueChange={e => {
+                      setOptionFlashLight(e);
+                      changeAcceptMode('enableFlashLight', e, false);
+                    }}
+                  />
+                </Section>
+              </View>
+            </Content>
+            <Content>
+              <Header>
+                <Feather
+                  name="settings"
+                  size={20}
+                  color={colors.background_global}
+                />
+                <Title>{translate('configPage.title_permissions_app')}</Title>
+              </Header>
+              <Section>
+                <SubTitle>
+                  {translate('configPage.text_acess_localization')}
+                </SubTitle>
+                <Button
+                  disabled={permissions?.location !== false}
+                  onPress={async () => {
+                    const { status } =
+                      await Location.getForegroundPermissionsAsync();
+                    await updateStorage('location', status);
+                  }}
+                >
+                  <ButtonText disabled={permissions?.location !== false}>
+                    {translate(`configPage.text_${permissions?.location}`) ||
+                      translate('configPage.text_false')}
+                  </ButtonText>
+                </Button>
+              </Section>
+              <Section>
+                <SubTitle>
+                  {translate('configPage.text_acess_localization_background')}
+                </SubTitle>
+                <Button
+                  disabled={permissions?.locationBackground !== false}
+                  onPress={async () => {
+                    const { status } =
+                      await Location.requestBackgroundPermissionsAsync();
+                    updateStorage('locationBackground', status);
+                  }}
+                >
+                  <ButtonText
+                    disabled={permissions?.locationBackground !== false}
+                  >
+                    {translate(
+                      `configPage.text_${permissions?.locationBackground}`,
+                    ) || translate('configPage.text_false')}
+                  </ButtonText>
+                </Button>
+              </Section>
+              <Section>
+                <SubTitle>
+                  {translate('configPage.text_acess_galery')}  (Xiaomi)
+                </SubTitle>
+              </Section>
+              <Section>
+                <SubTitle>
+                  {translate('configPage.text_acess_camera')}
+                </SubTitle>
+                <Button
+                  disabled={permissions?.camera !== false}
+                  onPress={async () => {
+                    const { status } =
+                      await Camera.requestCameraPermissionsAsync();
+                    updateStorage('camera', status);
+                  }}
+                >
+                  <ButtonText disabled={permissions?.camera !== false}>
+                    {translate(`configPage.text_${permissions?.camera}`) ||
+                      translate('configPage.text_false')}
+                  </ButtonText>
+                </Button>
+              </Section>
+              <Section>
+                <SubTitle>
+                  {translate('configPage.text_acess_audio')}
+                </SubTitle>
+                <Button
+                  disabled={permissions?.audio !== false}
+                  onPress={async () => {
+                    const { status } = await Audio.requestPermissionsAsync();
+                    updateStorage('audio', status);
+                  }}
+                >
+                  <ButtonText disabled={permissions?.audio !== false}>
+                    {translate(`configPage.text_${permissions?.audio}`) ||
+                      translate('configPage.text_false')}
+                  </ButtonText>
+                </Button>
+              </Section>
+              <Section removeBorder>
+                <SubTitle>
+                  {translate('configPage.text_acess_notification')}
+                </SubTitle>
+                <Button
+                  disabled={permissions?.notification !== false}
+                  onPress={async () => {
+                    const { status } =
+                      await Notifications.getPermissionsAsync();
+                    updateStorage('notification', status);
+                  }}
+                >
+                  <ButtonText disabled={permissions?.notification !== false}>
+                    {translate(
+                      `configPage.text_${permissions?.notification}`,
+                    ) || translate('configPage.text_false')}
+                  </ButtonText>
+                </Button>
+              </Section>
+            </Content>
+            <Content>
+              <Header>
+                <Feather
+                  name="settings"
+                  size={20}
+                  color={colors.background_global}
+                />
+                <Title>{translate('configPage.title_payment_form')}</Title>
+              </Header>
+              <View>
+                {listPaymentForm?.map((item, index) => {
+                  return (
+                    <Section
+                      removeBorder={index === listPaymentForm.length - 1}
+                      key={index}
+                    >
+                      <SubTitle>{item.name}</SubTitle>
                       <Switch
+                        value={
+                          listChooseDriver?.some(
+                            el =>
+                              el.tripPaymentFormId === item.idTripPaymentForm,
+                          ) ||
+                          listImposition?.some(
+                            el =>
+                              el.tripPaymentFormId === item.idTripPaymentForm,
+                          )
+                        }
                         color={theme.colors.primary}
-                        value={optionClick}
                         onValueChange={e => {
-                          setOptionClick(e);
-                          changeAcceptMode('enableClick', e);
+                          changePaymentForm(e, item.idTripPaymentForm);
                         }}
                       />
                     </Section>
-                    <Section>
-                      <SubTitle>
-                        {translate('configPage.text_drag_to_accept')}
-                      </SubTitle>
-                      <Switch
-                        color={theme.colors.primary}
-                        value={optionTouch}
-                        onValueChange={e => {
-                          setOptionTouch(e);
-                          changeAcceptMode('enableTouch', e);
-                        }}
-                      />
-                    </Section>
-                    <Section removeBorder>
-                      <SubTitle>Ligar lanterna ao sinalizar chegada</SubTitle>
-                      <Switch
-                        color={theme.colors.primary}
-                        value={optionFlashLight}
-                        onValueChange={e => {
-                          setOptionFlashLight(e);
-                          changeAcceptMode('enableFlashLight', e, false);
-                        }}
-                      />
-                    </Section>
-                  </View>
-                </Content>
-                <Content>
-                  <Header>
-                    <Feather
-                      name="settings"
-                      size={20}
-                      color={colors.background_global}
-                    />
-                    <Title>{translate('configPage.title_permissions_app')}</Title>
-                  </Header>
-                  <Section>
-                    <SubTitle>
-                      {translate('configPage.text_acess_localization')}
-                    </SubTitle>
-                    <Button
-                      disabled={permissions?.location !== false}
-                      onPress={async () => {
-                        const { status } =
-                          await Location.getForegroundPermissionsAsync();
-                        await updateStorage('location', status);
-                      }}
-                    >
-                      <ButtonText disabled={permissions?.location !== false}>
-                        {translate(`configPage.text_${permissions?.location}`) ||
-                          translate('configPage.text_false')}
-                      </ButtonText>
-                    </Button>
-                  </Section>
-                  <Section>
-                    <SubTitle>
-                      {translate('configPage.text_acess_localization_background')}
-                    </SubTitle>
-                    <Button
-                      disabled={permissions?.locationBackground !== false}
-                      onPress={async () => {
-                        const { status } =
-                          await Location.requestBackgroundPermissionsAsync();
-                        updateStorage('locationBackground', status);
-                      }}
-                    >
-                      <ButtonText
-                        disabled={permissions?.locationBackground !== false}
-                      >
-                        {translate(
-                          `configPage.text_${permissions?.locationBackground}`,
-                        ) || translate('configPage.text_false')}
-                      </ButtonText>
-                    </Button>
-                  </Section>
-                  <Section>
-                    <SubTitle>
-                      {translate('configPage.text_acess_galery')}  (Xiaomi)
-                    </SubTitle>
-                    <Button
-                      disabled={permissions?.gallery !== false}
-                      onPress={async () => {
-                        const { status } =
-                          await MediaLibrary.requestPermissionsAsync();
-                        updateStorage('gallery', status);
-                      }}
-                    >
-                      <ButtonText disabled={permissions?.gallery !== false}>
-                        {translate(`configPage.text_${permissions?.gallery}`) ||
-                          translate('configPage.text_false')}
-                      </ButtonText>
-                    </Button>
-                  </Section>
-                  <Section>
-                    <SubTitle>
-                      {translate('configPage.text_acess_camera')}
-                    </SubTitle>
-                    <Button
-                      disabled={permissions?.camera !== false}
-                      onPress={async () => {
-                        const { status } =
-                          await Camera.requestCameraPermissionsAsync();
-                        updateStorage('camera', status);
-                      }}
-                    >
-                      <ButtonText disabled={permissions?.camera !== false}>
-                        {translate(`configPage.text_${permissions?.camera}`) ||
-                          translate('configPage.text_false')}
-                      </ButtonText>
-                    </Button>
-                  </Section>
-                  <Section>
-                    <SubTitle>
-                      {translate('configPage.text_acess_audio')}
-                    </SubTitle>
-                    <Button
-                      disabled={permissions?.audio !== false}
-                      onPress={async () => {
-                        const { status } = await Audio.requestPermissionsAsync();
-                        updateStorage('audio', status);
-                      }}
-                    >
-                      <ButtonText disabled={permissions?.audio !== false}>
-                        {translate(`configPage.text_${permissions?.audio}`) ||
-                          translate('configPage.text_false')}
-                      </ButtonText>
-                    </Button>
-                  </Section>
-                  <Section removeBorder>
-                    <SubTitle>
-                      {translate('configPage.text_acess_notification')}
-                    </SubTitle>
-                    <Button
-                      disabled={permissions?.notification !== false}
-                      onPress={async () => {
-                        const { status } =
-                          await Notifications.getPermissionsAsync();
-                        updateStorage('notification', status);
-                      }}
-                    >
-                      <ButtonText disabled={permissions?.notification !== false}>
-                        {translate(
-                          `configPage.text_${permissions?.notification}`,
-                        ) || translate('configPage.text_false')}
-                      </ButtonText>
-                    </Button>
-                  </Section>
-                </Content>
-                <Content>
-                  <Header>
-                    <Feather
-                      name="settings"
-                      size={20}
-                      color={colors.background_global}
-                    />
-                    <Title>{translate('configPage.title_payment_form')}</Title>
-                  </Header>
-                  <View>
-                    {listPaymentForm?.map((item, index) => {
-                      return (
-                        <Section
-                          removeBorder={index === listPaymentForm.length - 1}
-                          key={index}
-                        >
-                          <SubTitle>{item.name}</SubTitle>
-                          <Switch
-                            value={
-                              listChooseDriver?.some(
-                                el =>
-                                  el.tripPaymentFormId === item.idTripPaymentForm,
-                              ) ||
-                              listImposition?.some(
-                                el =>
-                                  el.tripPaymentFormId === item.idTripPaymentForm,
-                              )
-                            }
-                            color={theme.colors.primary}
-                            onValueChange={e => {
-                              changePaymentForm(e, item.idTripPaymentForm);
-                            }}
-                          />
-                        </Section>
-                      );
-                    })}
-                  </View>
-                </Content>
-              </ScrollView>
-            </>
+                  );
+                })}
+              </View>
+            </Content>
+          </ScrollView>
+        </>
       )}
     </View>
   );

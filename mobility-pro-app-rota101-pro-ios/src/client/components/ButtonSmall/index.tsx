@@ -1,5 +1,5 @@
 import React from 'react';
-import {ConfirmButton, ConfirmButtonText} from './styles';
+import { ConfirmButton, ConfirmButtonText } from './styles';
 
 interface ButtonSmallProps {
   title: string;
@@ -7,7 +7,7 @@ interface ButtonSmallProps {
   loading: boolean;
 }
 
-export function ButtonSmall({title, loading, onPress}: ButtonSmallProps) {
+export function ButtonSmall({ title, loading, onPress }: ButtonSmallProps) {
   return (
     <ConfirmButton onPress={onPress} disabled={loading} activeOpacity={0.8}>
       <ConfirmButtonText>{title}</ConfirmButtonText>

@@ -3,7 +3,7 @@ export const mapAubergine = [
     elementType: 'geometry',
     stylers: [
       {
-        color: '#1d2c4d',
+        color: '#242f3e',
       },
     ],
   },
@@ -11,7 +11,7 @@ export const mapAubergine = [
     elementType: 'labels.text.fill',
     stylers: [
       {
-        color: '#8ec3b9',
+        color: '#746855',
       },
     ],
   },
@@ -19,85 +19,34 @@ export const mapAubergine = [
     elementType: 'labels.text.stroke',
     stylers: [
       {
-        color: '#1a3646',
+        color: '#242f3e',
       },
     ],
   },
   {
-    featureType: 'administrative.country',
-    elementType: 'geometry.stroke',
-    stylers: [
-      {
-        color: '#4b6878',
-      },
-    ],
-  },
-  {
-    featureType: 'administrative.land_parcel',
+    featureType: 'administrative.locality',
     elementType: 'labels.text.fill',
     stylers: [
       {
-        color: '#64779e',
+        color: '#d59563',
       },
     ],
-  },
-  {
-    featureType: 'administrative.province',
-    elementType: 'geometry.stroke',
-    stylers: [
-      {
-        color: '#4b6878',
-      },
-    ],
-  },
-  {
-    featureType: 'landscape.man_made',
-    elementType: 'geometry.stroke',
-    stylers: [
-      {
-        color: '#334e87',
-      },
-    ],
-  },
-  {
-    featureType: 'landscape.natural',
-    elementType: 'geometry',
-    stylers: [
-      {
-        color: '#023e58',
-      },
-    ],
-  },
-  {
-    featureType: 'poi',
-    stylers: [
-      {visibility: 'off'}
-    ]
   },
   {
     featureType: 'poi',
     elementType: 'labels.text.fill',
     stylers: [
       {
-        color: '#6f9ba5',
-      },
-    ],
-  },
-  {
-    featureType: 'poi',
-    elementType: 'labels.text.stroke',
-    stylers: [
-      {
-        color: '#1d2c4d',
+        color: '#d59563',
       },
     ],
   },
   {
     featureType: 'poi.park',
-    elementType: 'geometry.fill',
+    elementType: 'geometry',
     stylers: [
       {
-        color: '#023e58',
+        color: '#263c3f',
       },
     ],
   },
@@ -106,7 +55,7 @@ export const mapAubergine = [
     elementType: 'labels.text.fill',
     stylers: [
       {
-        color: '#3C7680',
+        color: '#6b9a76',
       },
     ],
   },
@@ -115,7 +64,16 @@ export const mapAubergine = [
     elementType: 'geometry',
     stylers: [
       {
-        color: '#304a7d',
+        color: '#38414e',
+      },
+    ],
+  },
+  {
+    featureType: 'road',
+    elementType: 'geometry.stroke',
+    stylers: [
+      {
+        color: '#212a37',
       },
     ],
   },
@@ -124,16 +82,7 @@ export const mapAubergine = [
     elementType: 'labels.text.fill',
     stylers: [
       {
-        color: '#98a5be',
-      },
-    ],
-  },
-  {
-    featureType: 'road',
-    elementType: 'labels.text.stroke',
-    stylers: [
-      {
-        color: '#1d2c4d',
+        color: '#9ca5b3',
       },
     ],
   },
@@ -142,7 +91,7 @@ export const mapAubergine = [
     elementType: 'geometry',
     stylers: [
       {
-        color: '#2c6675',
+        color: '#746855',
       },
     ],
   },
@@ -151,7 +100,7 @@ export const mapAubergine = [
     elementType: 'geometry.stroke',
     stylers: [
       {
-        color: '#255763',
+        color: '#1f2835',
       },
     ],
   },
@@ -160,52 +109,25 @@ export const mapAubergine = [
     elementType: 'labels.text.fill',
     stylers: [
       {
-        color: '#b0d5ce',
-      },
-    ],
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'labels.text.stroke',
-    stylers: [
-      {
-        color: '#023e58',
+        color: '#f3d19c',
       },
     ],
   },
   {
     featureType: 'transit',
-    elementType: 'labels.text.fill',
+    elementType: 'geometry',
     stylers: [
       {
-        color: '#98a5be',
-      },
-    ],
-  },
-  {
-    featureType: 'transit',
-    elementType: 'labels.text.stroke',
-    stylers: [
-      {
-        color: '#1d2c4d',
-      },
-    ],
-  },
-  {
-    featureType: 'transit.line',
-    elementType: 'geometry.fill',
-    stylers: [
-      {
-        color: '#283d6a',
+        color: '#2f3948',
       },
     ],
   },
   {
     featureType: 'transit.station',
-    elementType: 'geometry',
+    elementType: 'labels.text.fill',
     stylers: [
       {
-        color: '#3a4762',
+        color: '#d59563',
       },
     ],
   },
@@ -214,7 +136,7 @@ export const mapAubergine = [
     elementType: 'geometry',
     stylers: [
       {
-        color: '#0e1626',
+        color: '#17263c',
       },
     ],
   },
@@ -223,7 +145,16 @@ export const mapAubergine = [
     elementType: 'labels.text.fill',
     stylers: [
       {
-        color: '#4e6d70',
+        color: '#515c6d',
+      },
+    ],
+  },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.stroke',
+    stylers: [
+      {
+        color: '#17263c',
       },
     ],
   },

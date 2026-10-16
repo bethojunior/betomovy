@@ -24,7 +24,7 @@ export const CardProblem = ({item, onPress}: Props) => {
         {translate(`typeReports.type_${item?.id}`)}
       </TextEdit>
       <Ionicons
-        name="ios-arrow-forward"
+        name="arrow-forward"
         size={RFValue(24)}
         color={colors.primaryText}
       />

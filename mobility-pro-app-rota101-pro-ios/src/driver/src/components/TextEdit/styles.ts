@@ -4,11 +4,11 @@ import themeCss from '../../styles/theme';
 interface TextProps {
   color?: string;
   size?: 'small' | 'medium' | 'large';
-  transform?: string;
+  change?: string;
 }
 
 export const Text = styled.Text<TextProps>`
-  text-transform: ${props => props.transform || 'none'};
+  text-transform: ${props => props.change || 'none'};
   font-size: ${({size}) => {
     switch (size) {
       case 'small':

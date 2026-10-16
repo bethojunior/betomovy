@@ -1,8 +1,7 @@
-import {Alert, NativeModules} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {useEffect, useState} from 'react';
-import {Container, Content, ContentButton} from './styles';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useEffect, useState } from 'react';
+import { Container, Content, ContentButton } from './styles';
 
 import Brazil from '../../assets/languagesIcons/brazil.svg';
 import France from '../../assets/languagesIcons/france.svg';
@@ -10,27 +9,52 @@ import Spain from '../../assets/languagesIcons/spain.svg';
 import Portugal from '../../assets/languagesIcons/portugal.svg';
 import UnitedStates from '../../assets/languagesIcons/unitedStates.svg';
 import Angola from '../../assets/languagesIcons/angola.svg';
-import {LanguageItem} from '../../components/LanguageItem';
-import I18n, {translate} from '../../../../client/locales';
-import {Button} from '../../components/Button';
-import {Dialog} from '../../components/Dialog';
-import * as Updates from 'expo-updates';
+import { LanguageItem } from '../../components/LanguageItem';
+import I18n, { translate, setLanguageToI18n } from '../../../../client/locales';
+import { Button } from '../../components/Button';
+import { Dialog } from '../../components/Dialog';
+import { customToast } from '../../../../utils/FlashMessage';
+import { useNavigation } from '@react-navigation/native';
+
 
 export function Languages() {
   const [languageSelected, setLanguageSelected] = useState('');
   const [dialogVisible, setDialogVisible] = useState(false);
+  const navigation = useNavigation()
 
   const handleLanguage = async (locale: string) => {
-    await AsyncStorage.setItem('@language', locale);
-    await Updates.reloadAsync();
+    try {
+      if (locale === I18n.locale) {
+        customToast(translate('toast.text_language_already_active'), 'info');
+        setDialogVisible(false);
+        return;
+      }
+
+      await AsyncStorage.setItem('@language', locale);
+      await setLanguageToI18n();
+      setDialogVisible(false);
+      customToast(translate('toast.text_language_changed_success'), 'success');
+
+      setTimeout(() => {
+        navigation.navigate('Home');
+      }, 1500);
+    } catch (error) {
+      console.error('Erro ao alterar idioma:', error);
+      customToast(translate('toast.text_language_change_error'), 'danger');
+    }
   };
 
-  const setLanguage = async (language: string) => {
+  const setLanguage = (language: string) => {
     setLanguageSelected(language);
   };
 
   useEffect(() => {
     setLanguageSelected(I18n.locale);
+
+    if (I18n.locale === 'language_not_found') {
+      I18n.locale = 'en_US';
+      customToast(translate('toast.text_language_not_tracked'), 'warning');
+    }
   }, []);
 
   return (
@@ -70,20 +94,16 @@ export function Languages() {
 
         <LanguageItem
           name="Português - AO"
-          onPress={() =>
-            Alert.alert('Em breve', 'Ainda não disponível para sua localidade')
-          }
-          selected={false}
+          onPress={() => setLanguage('pt_AO')}
+          selected={languageSelected === 'pt_AO'}
         >
           <Angola height={RFValue(50)} width={RFValue(50)} />
         </LanguageItem>
 
         <LanguageItem
           name="Português - PT"
-          onPress={() =>
-            Alert.alert('Em breve', 'Ainda não disponível para sua localidade')
-          }
-          selected={false}
+          onPress={() => setLanguage('pt_PT')}
+          selected={languageSelected === 'pt_PT'}
         >
           <Portugal height={RFValue(50)} width={RFValue(50)} />
         </LanguageItem>
@@ -92,7 +112,13 @@ export function Languages() {
       <ContentButton>
         <Button
           title={translate('driver_language.text_button_select')}
-          onPress={() => setDialogVisible(true)}
+          onPress={() => {
+            if (languageSelected === I18n.locale) {
+              customToast(translate('toast.text_select_different_language'), 'warning');
+              return;
+            }
+            setDialogVisible(true);
+          }}
         />
       </ContentButton>
 

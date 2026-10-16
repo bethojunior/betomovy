@@ -1,8 +1,9 @@
 import {shade} from 'polished';
 import {RFValue} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
-export const Container = styled.SafeAreaView``;
+export const Container = styled(SafeAreaView)``;
 
 export const Content = styled.View`
   background-color: ${({theme}) => shade(0.05, theme.colors.background_global)};

@@ -29,6 +29,7 @@ import {useAuth} from '../../../../../context/auth';
 import theme from '../../../../styles/theme';
 import {customToast} from '../../../../../utils/FlashMessage';
 import {buildApp} from '../../../../../constantBuild/config';
+import {useStoragePictures} from '../../../../../driver/src/hooks/useStoragePictures';
 
 export function Favorites() {
   const {
@@ -48,6 +49,7 @@ export function Favorites() {
     await getFavorites();
     setLoading(false);
   }, [loading, getFavorites]);
+  const {getStoragePictureSpecific} = useStoragePictures();
 
   useEffect(() => {
     getListFavorites();
@@ -147,7 +149,10 @@ export function Favorites() {
           <Content>
             <Image
               source={{
-                uri: `${buildApp().HOST_IMAGE_DRIVER}${driver.profileImage}`,
+                uri: `${
+                  getStoragePictureSpecific('driver') ||
+                  buildApp().HOST_IMAGE_DRIVER
+                }${driver.profileImage}`,
               }}
             />
           </Content>

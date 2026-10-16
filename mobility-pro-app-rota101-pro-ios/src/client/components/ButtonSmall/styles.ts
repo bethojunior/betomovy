@@ -1,8 +1,8 @@
+import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 
 export const ConfirmButton = styled.TouchableOpacity`
   background-color: ${({theme}) => theme.colors.primary};
-  padding: ${({theme}) => theme.spacing.large}px 0;
   border-radius: 5px;
   flex: 1;
   justify-content: center;
@@ -11,7 +11,7 @@ export const ConfirmButton = styled.TouchableOpacity`
 export const ConfirmButtonText = styled.Text`
   color: ${({theme}) => theme.colors.primaryText};
   text-align: center;
-  font-size: 20px;
+  font-size: ${RFValue(20)}px;
 `;
 
 export const OptionalButton = styled.TouchableOpacity`

@@ -17,6 +17,7 @@ interface InputProps {
   onSubmitEditing?: () => void;
   multiline?: boolean;
   numberOfLines?: number;
+  onChangeText?: (value: string) => void;
 }
 
 const InputForm: FC<InputProps> = ({

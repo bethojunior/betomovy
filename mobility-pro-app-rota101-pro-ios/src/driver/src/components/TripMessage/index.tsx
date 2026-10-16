@@ -1,16 +1,15 @@
 // @ts-nocheck
-import React, {useEffect, useState} from 'react';
-import {Audio} from 'expo-av';
-import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { Audio } from 'expo-av';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import * as Speech from 'expo-speech';
 
 import RenderHtml from 'react-native-render-html';
-import {Dimensions, Platform, View} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { Platform, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
 import {
-  Message,
+  MessageContentFooter,
   MessageAudioContainer,
   MessageReceivedContainer,
   MessageSentContainer,
@@ -20,49 +19,51 @@ import {
   AudioTime,
   ControlButtonAudio,
   ContainerAudio,
+  DeliveryStatusText,
   HeaderSentContainer,
 } from './styles';
 import theme from '../../styles/theme';
-import {ButtonSend, ButtonSendStar} from '../ButtonIcon/styles';
-import {useTripProvider} from '../../context/Trip';
-import {IfLoaderInsideScreen} from '../IfLoaderInsideScreen';
-import {buildApp} from '../../../../constantBuild/config';
+import { ButtonSend, ButtonSendStar } from '../ButtonIcon/styles';
+import { useTripProvider } from '../../context/Trip';
+import { buildApp } from '../../../../constantBuild/config';
 import Helper from '../../utils/Helper';
+import { useStoragePictures } from '../../hooks/useStoragePictures';
+import { translate } from '../../../../client/locales';
+
+const colorTextReceive = theme.colors.black;
+const colorTextSend = theme.colors.black;
 
 export default function TripMessage({
   message,
-  preview,
+  preview = false,
   timeSendInSeconds,
-  reiceved,
+  reiceved = false,
   isAudio,
   data,
   speakUnicMessage,
-  setMonitoring,
+  onFavoriteMessage = async (_message) => { },
   tripReference,
+  deliveryStatus = undefined,
+  onRetry = undefined,
 }) {
   const [audioTime, setAudioTime] = useState([0]);
   const [audioDuration, setAudioDuration] = useState();
   const [audio, setAudio] = useState();
   const [playing, setPlaying] = useState(false);
-  const [loadingStar, setLoadingStar] = useState(false);
   const [paused, setPaused] = useState(false);
   const [disabled, setDisabled] = useState(false);
-  const {stateTrip} = useTripProvider();
   const [intervalReference, setIntervalReference] = useState();
-  const [iconName, setIconName] = useState(
-    data.viewed ? 'checkmark-done' : 'checkmark',
-  );
-
-  useEffect(() => {
-    setIconName(data.viewed ? 'checkmark-done' : 'checkmark');
-  }, [data.viewed]);
+  const { getStorage } = useStoragePictures();
+  const { width } = useWindowDimensions();
 
   const handleLoadingSound = async () => {
+    const url = `${getStorage()}chat/trip/`;
     const source = {
-      uri: `${buildApp().HOST_AUDIO_MESSAGE + tripReference}/${message || ''}`,
+      uri: `${(url || buildApp().HOST_AUDIO_MESSAGE) + tripReference}/${message || ''
+        }`,
     };
 
-    const {sound} = await Audio.Sound.createAsync(source);
+    const { sound } = await Audio.Sound.createAsync(source);
     return sound;
   };
 
@@ -151,22 +152,35 @@ export default function TripMessage({
   }, [audioTime, audioDuration]);
 
   const returnMessageWithSource = (message: string, color: string) => {
-    const source = {
-      html: `<div style='color:${color}; max-width:${'250px'};'>${message}</div>`,
-    };
     return (
       <RenderHtml
-        contentWidth={Dimensions.get('window').width}
-        source={source}
+        contentWidth={width}
+        source={{ html: `<p>${message}</p>` }}
+        tagsStyles={{
+          p: { color, fontSize: RFValue(11), fontWeight: 'medium', lineHeight: RFValue(14) },
+        }}
       />
     );
   };
+
+  const statusIcon =
+    deliveryStatus === 'sending'
+      ? 'time-outline'
+      : deliveryStatus === 'error'
+        ? 'alert-circle-outline'
+        : null;
+
+  const statusIconColor =
+    deliveryStatus === 'error' ? theme.colors.red : theme.colors.primaryText;
+
+  const statusText = data.viewed
+    ? translate('trip.chat.status_read')
+    : translate('trip.chat.status_sent');
 
   return reiceved ? (
     <MessageReceivedContainer>
       <MesssageContent messageReceived>
         <ContainerAudio>
-          <ShippingDate messageReceived timeSendInSeconds={timeSendInSeconds} />
           {!isAudio && !data?.message?.includes('<b>') && (
             <ButtonSend
               onPress={() => {
@@ -216,10 +230,10 @@ export default function TripMessage({
               </ControlButtonAudio>
               <MultiSlider
                 sliderLength={160}
-                containerStyle={{height: 12}}
+                containerStyle={{ height: 12 }}
                 values={audioTime}
-                selectedStyle={{backgroundColor: theme.colors.primary}}
-                markerStyle={{backgroundColor: theme.colors.primary}}
+                selectedStyle={{ backgroundColor: theme.colors.primary }}
+                markerStyle={{ backgroundColor: theme.colors.primary }}
                 onValuesChangeStart={sliderValuesChangeStart}
                 onValuesChange={sliderValuesChange}
                 onValuesChangeFinish={sliderValuesChangeFinish}
@@ -242,70 +256,27 @@ export default function TripMessage({
               </AudioTime>
             </AudioTimeContainer>
           </>
-        ) : (
-          <Message messageReceived>
-            {returnMessageWithSource(message, theme.colors.primary)}
-          </Message>
-        )}
-        <Ionicons
-          size={24}
-          color={theme.colors.primary}
-          style={{marginLeft: 'auto'}}
-        />
+        ) : returnMessageWithSource(message, colorTextReceive)}
+        <ShippingDate messageReceived timeSendInSeconds={timeSendInSeconds} />
       </MesssageContent>
     </MessageReceivedContainer>
   ) : (
     <MessageSentContainer preview={preview}>
       <MesssageContent>
-        <HeaderSentContainer>
-          <IfLoaderInsideScreen loading={loadingStar}>
-            {!isAudio && (
-              <ButtonSendStar
-                onPress={async () => {
-                  setLoadingStar(true);
-                  const savedMessages = await AsyncStorage.getItem(
-                    'savedMessages',
-                  );
-                  let savedMessagesArray = [];
-                  if (savedMessages) {
-                    const oldSavedMessages = JSON.parse(savedMessages);
-                    const isValuesExists = oldSavedMessages.filter(
-                      datas => datas.message === data.message,
-                    );
-                    if (isValuesExists.length > 0) {
-                      setLoadingStar(false);
-                      return;
-                    }
-                    if (oldSavedMessages.length >= 3) {
-                      oldSavedMessages.shift();
-                    }
-                    savedMessagesArray = [...oldSavedMessages, data];
-                    await AsyncStorage.setItem(
-                      'savedMessages',
-                      JSON.stringify(savedMessagesArray),
-                    );
-                  } else {
-                    savedMessagesArray = [data];
-                    await AsyncStorage.setItem(
-                      'savedMessages',
-                      JSON.stringify(savedMessagesArray),
-                    );
-                  }
-                  setMonitoring(true);
-                  setLoadingStar(false);
-                }}
-              >
-                <MaterialCommunityIcons
-                  name="message-star-outline"
-                  size={20}
-                  color={theme.colors.primaryText}
-                />
-              </ButtonSendStar>
-            )}
-          </IfLoaderInsideScreen>
-
-          <ShippingDate timeSendInSeconds={timeSendInSeconds} />
-        </HeaderSentContainer>
+        {!isAudio && (
+          <HeaderSentContainer>
+            <ButtonSendStar
+              accessibilityLabel={translate('trip.chat.favorite_message_a11y')}
+              onPress={() => onFavoriteMessage(message)}
+            >
+              <MaterialCommunityIcons
+                name="message-star-outline"
+                size={20}
+                color={colorTextSend}
+              />
+            </ButtonSendStar>
+          </HeaderSentContainer>
+        )}
         {isAudio ? (
           <>
             <MessageAudioContainer>
@@ -320,22 +291,22 @@ export default function TripMessage({
                   <Ionicons
                     name="pause"
                     size={24}
-                    color={theme.colors.primaryText}
+                    color={colorTextSend}
                   />
                 ) : (
                   <Ionicons
                     name="play"
                     size={24}
-                    color={theme.colors.primaryText}
+                    color={colorTextSend}
                   />
                 )}
               </ControlButtonAudio>
               <MultiSlider
                 sliderLength={160}
-                containerStyle={{height: 24}}
+                containerStyle={{ height: 24 }}
                 values={audioTime}
-                selectedStyle={{backgroundColor: theme.colors.primaryText}}
-                markerStyle={{backgroundColor: theme.colors.primaryText}}
+                selectedStyle={{ backgroundColor: theme.colors.primaryText }}
+                markerStyle={{ backgroundColor: theme.colors.primaryText }}
                 onValuesChangeStart={sliderValuesChangeStart}
                 onValuesChange={sliderValuesChange}
                 onValuesChangeFinish={sliderValuesChangeFinish}
@@ -358,23 +329,28 @@ export default function TripMessage({
               </AudioTime>
             </AudioTimeContainer>
           </>
-        ) : (
-          <Message>
-            {returnMessageWithSource(message, theme.colors.primaryText)}
-          </Message>
-        )}
-        <Ionicons
-          name={iconName}
-          size={24}
-          color={theme.colors.primaryText}
-          style={{marginLeft: 'auto'}}
-        />
+        ) : returnMessageWithSource(message, colorTextSend)}
+        <MessageContentFooter>
+          <ShippingDate timeSendInSeconds={timeSendInSeconds} messageReceived={false} />
+          <TouchableOpacity disabled={deliveryStatus !== 'error'} onPress={onRetry}>
+            {statusIcon ? (
+              <Ionicons
+                name={statusIcon}
+                size={RFValue(14)}
+                color={statusIconColor}
+                style={{ alignSelf: "flex-end" }}
+              />
+            ) : (
+              <DeliveryStatusText>{statusText}</DeliveryStatusText>
+            )}
+          </TouchableOpacity>
+        </MessageContentFooter>
       </MesssageContent>
     </MessageSentContainer>
   );
 }
 
-function ShippingDate({timeSendInSeconds, messageReceived}) {
+function ShippingDate({ timeSendInSeconds, messageReceived }) {
   return (
     <ShippingDateText messageReceived={messageReceived}>
       {Helper.formatSecondsToDate(timeSendInSeconds)}

@@ -1,19 +1,11 @@
-import { Container, TextTerms } from "./styles";
-
-import { ScrollView } from "react-native";
+import { Container, CustomScrollView, TextTerms } from "./styles";
 
 interface TermsBoxProps {
-    contentTerms: string;
+  contentTerms: string;
 }
 
 export default function TermsBox({ contentTerms }: TermsBoxProps) {
-    return (
-        <Container>
-            <ScrollView>
-                <TextTerms>
-                    {contentTerms}
-                </TextTerms>
-            </ScrollView>
-        </Container>
-    )
+  return (
+    <TextTerms>{contentTerms}</TextTerms>
+  )
 }

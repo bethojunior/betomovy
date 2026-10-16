@@ -9,14 +9,14 @@ import {
 } from './styles';
 import {Text, View} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import Slider from '@react-native-community/slider';
+import Slider from '@react-native-community/slider';
 
 const key = 'mapSettings';
 
 export function useMapSettings() {
   const [speedToMoveCamera, setSpeedToMoveCamera] = useState(2);
   const [metersToMoveCamera, setMetersToMoveCamera] = useState(0);
-  const [zoomInTrip, setZoomInTrip] = useState(18);
+  const [zoomInTrip, setZoomInTrip] = useState(16);
   const [zoomOutTrip, setZoomOutTrip] = useState(13);
   const [pitch, setPitch] = useState(65);
   const [outPitch, setOutPitch] = useState(0);
@@ -198,6 +198,16 @@ export const MapSettingComponent = ({
       >
         {title}
       </Text>
+      <Slider
+        style={{width: 200, height: 40}}
+        minimumValue={minimumValue}
+        maximumValue={maximumValue}
+        value={value}
+        onValueChange={setValue}
+        step={1}
+        minimumTrackTintColor="#fff"
+        maximumTrackTintColor="#fff"
+      />
     </>
   );
 

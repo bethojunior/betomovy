@@ -1,6 +1,6 @@
-import {useTripProvider} from '../../context/Trip';
-import {useUserDriver} from '../../context/userDriver';
-import {If} from '../If';
+import { useTripProvider } from '../../context/Trip';
+import { useUserDriver } from '../../context/userDriver';
+import { If } from '../If';
 import ModalCallTrip from '../Modal/ModalCallTrip';
 
 export const ModalCallTripComponent = ({
@@ -9,8 +9,9 @@ export const ModalCallTripComponent = ({
   setPreloadVisible,
 }) => {
   const {userDriverFind} = useUserDriver();
-  const {stateTrip} = useTripProvider();
-  const {callDriverModal} = stateTrip;
+  const callDriverModal: any = useTripProvider(
+    (context: any) => context.stateTrip.callDriverModal,
+  );
   return (
     <If condition={callDriverModal}>
       <ModalCallTrip

@@ -1,128 +1,157 @@
-import {Platform} from 'react-native';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { rgba } from 'polished';
+import { Dimensions } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
+import { Button } from '../Button';
 
-export const Container = styled.SafeAreaView`
-  /* margin-top: ${Platform.OS === 'ios' ? '40' : '0'}px; */
+const MAX_SHEET_HEIGHT = Dimensions.get('window').height * 0.88;
+
+export const Wrapper = styled.View`
+  max-height: ${MAX_SHEET_HEIGHT}px;
+`;
+
+export const HeaderRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.medium}px;
+  padding: 0 ${({ theme }) => theme.spacing.large}px ${({ theme }) => theme.spacing.large}px;
+`;
+
+export const BackButton = styled.TouchableOpacity`
+  width: ${RFValue(32)}px;
+  height: ${RFValue(32)}px;
+  border-radius: ${RFValue(16)}px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.white};
+`;
+
+export const HeaderTextGroup = styled.View`
   flex: 1;
 `;
 
-export const Content = styled.View`
-  background-color: ${({theme}) => theme.colors.background_global};
+export const HeaderTitle = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.large}px;
+  font-family: MavenPro_700Bold;
+  color: ${({ theme }) => theme.colors.secondary};
 `;
 
-export const ContentInputIcon = styled.View`
+export const HeaderSubtitle = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  color: ${({ theme }) => theme.colors.text_gray};
+  margin-top: ${({ theme }) => theme.spacing.small}px;
+`;
+
+export const Content = styled.ScrollView.attrs(({ theme }) => ({
+  showsVerticalScrollIndicator: false,
+  contentContainerStyle: {
+    paddingHorizontal: theme.spacing.large,
+  },
+}))``;
+
+export const RouteCard = styled.View`
   flex-direction: row;
-  width: 100%;
-  padding: 10px;
-  border: 1px solid transparent;
-  border-bottom-color: ${({theme}) => theme.colors.border_white_light};
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: ${({ theme }) => theme.borderRadius.large}px;
+  padding: ${({ theme }) => theme.spacing.large}px;
 `;
 
-export const ContentInputs = styled.View`
-  margin-left: 10px;
-  width: 85%;
+export const TimelineRow = styled.View`
+  flex-direction: row;
 `;
 
-export const ButtonBack = styled.TouchableOpacity`
-  margin: 10px 15px 0;
-  max-width: 8%;
-`;
-
-export const ContentIcons = styled.View`
-  width: 10px;
+export const MarkerColumn = styled.View`
+  width: ${RFValue(16)}px;
   align-items: center;
+  padding-top: ${RFValue(14)}px;
+  margin-right: ${({ theme }) => theme.spacing.medium}px;
 `;
 
-export const OriginIcon = styled.View`
-  height: 8px;
-  width: 8px;
-  margin-top: 20px;
-  margin-bottom: 5px;
-  border-radius: 50px;
-  background-color: ${({theme}) => theme.colors.secondary};
+export const OriginBall = styled.View`
+  width: ${RFValue(10)}px;
+  height: ${RFValue(10)}px;
+  border-radius: ${RFValue(5)}px;
+  background-color: ${({ theme }) => theme.colors.marker_origin};
 `;
 
-export const DestinationIcon = styled.View`
-  height: 8px;
-  width: 8px;
-  margin-top: 5px;
-  margin-bottom: 20px;
-  background-color: ${({theme}) => theme.colors.secondary};
+export const WaypointBall = styled.View`
+  width: ${RFValue(10)}px;
+  height: ${RFValue(10)}px;
+  border-radius: ${RFValue(5)}px;
+  background-color: ${({ theme }) => theme.colors.marker_waypoint};
 `;
 
-export const SeparateIcon = styled.View`
+export const DestinationSquare = styled.View`
+  width: ${RFValue(10)}px;
+  height: ${RFValue(10)}px;
+  background-color: ${({ theme }) => theme.colors.marker_destination};
+`;
+
+export const MarkerLine = styled.View`
   width: 1px;
-  background-color: ${({theme}) => theme.colors.secondary};
+  flex: 1;
+  min-height: ${RFValue(28)}px;
+  border-left-width: 1px;
+  border-color: ${({ theme }) => theme.colors.border};
+  border-style: dashed;
+  margin: ${RFValue(4)}px 0;
+`;
+
+export const InputsColumn = styled.View`
   flex: 1;
 `;
 
-export const StopIcon = styled.View`
-  height: 8px;
-  width: 8px;
-  border-radius: 50px;
-  background-color: ${({theme}) => theme.colors.secondary};
-`;
-
-export const WaypointContainer = styled.View`
+export const AddressRow = styled.View`
+  flex: 1;
   flex-direction: row;
-  justify-content: space-between;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.small}px;
 `;
 
-export const DeleteWaypointButtonContainer = styled.View`
+export const AddressInputWrapper = styled.View`
+  flex: 1;
+`;
+
+export const RoundIconButton = styled.TouchableOpacity<{ variant: 'add' | 'remove' | 'help' }>`
+  width: ${RFValue(28)}px;
+  height: ${RFValue(28)}px;
+  border-radius: ${RFValue(14)}px;
   align-items: center;
   justify-content: center;
+  margin-bottom: ${({ theme }) => theme.spacing.large}px;
+  background-color: ${({ theme, variant }) =>
+    variant === 'add' ? rgba(theme.colors.primary, 0.1) : theme.colors.background_white_light};
 `;
 
-export const DeleteWaypointButton = styled.TouchableOpacity`
-  padding: 10px;
-`;
-
-export const DestinationAddressContainer = styled.View`
+export const OriginHelpCard = styled.View`
   flex-direction: row;
-  justify-content: space-between;
+  align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing.small}px;
+  background-color: ${({ theme }) => rgba(theme.colors.primary, 0.08)};
+  border-radius: ${({ theme }) => theme.borderRadius.medium}px;
+  padding: ${({ theme }) => theme.spacing.medium}px;
+  margin-top: ${({ theme }) => theme.spacing.small}px;
+  margin-bottom: ${({ theme }) => theme.spacing.large}px;
 `;
 
-export const WaypointInputAddButtonContainer = styled.View`
-  align-items: center;
-  margin-left: ${RFValue(5)}px;
-  justify-content: center;
+export const OriginHelpText = styled.Text`
+  flex: 1;
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  color: ${({ theme }) => theme.colors.secondary};
 `;
 
-export const WaypointInputAddButton = styled.TouchableOpacity`
-  border-radius: 50px;
-  background-color: ${({theme}) => theme.colors.primary};
-  padding: 10px;
+export const Footer = styled.View`
+  padding: ${({ theme }) => theme.spacing.large}px;
 `;
 
-export const ButtonConfirm = styled.TouchableOpacity`
-  background-color: ${({theme}) => theme.colors.primary};
-  padding: 15px;
-  align-items: center;
-  justify-content: center;
-  margin: 30px 10px;
-  border-radius: 10px;
-`;
-
-export const ContainerNewValue = styled.View`
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  justify-content: flex-end;
-  background-color: ${({theme}) => theme.colors.background_black_light};
-`;
+export const ButtonConfirm = styled(Button)``;
 
 export const ContentChangePrice = styled.View`
-  background-color: ${({theme}) => theme.colors.background_global};
   width: 100%;
-  min-height: 200px;
-  padding: 10px;
+  gap: ${({ theme }) => theme.spacing.medium}px;
 `;
 
 export const ContentText = styled.View`
   align-items: center;
-  height: 50px;
-  flex-direction: column;
-  justify-content: space-between;
+  gap: ${({ theme }) => theme.spacing.small}px;
 `;

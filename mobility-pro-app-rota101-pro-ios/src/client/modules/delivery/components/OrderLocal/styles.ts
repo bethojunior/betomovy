@@ -28,10 +28,12 @@ export const styles = StyleSheet.create({
   contentLocal: {
     flex: 1,
     flexDirection: 'column',
+    flexShrink: 1,
   },
   titleLocal: {
     fontSize: 16,
     marginRight: 10,
+    flexWrap: 'wrap',
   },
   subtitleLocal: {
     fontSize: 13,

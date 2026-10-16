@@ -184,8 +184,9 @@ export default function AccountSpeedMob() {
         visible={modalInfoAccount}
         setVisible={setModalInfoAccount}
         accountInfo={accountInfo}
-        getInfoAccount={getAccountAsync}
-      />
+        getInfoAccount={getAccountAsync} modeEdit={false} setModeEdit={function (value: boolean): void {
+          throw new Error('Function not implemented.');
+        } }      />
 
       <ModalTransference
         visible={transferenceOn}

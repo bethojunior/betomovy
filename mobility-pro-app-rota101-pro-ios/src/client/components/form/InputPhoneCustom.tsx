@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, {useState} from 'react';
 import {View, StyleSheet, TextInput} from 'react-native';
 import {TextInputMask} from 'react-native-masked-text';

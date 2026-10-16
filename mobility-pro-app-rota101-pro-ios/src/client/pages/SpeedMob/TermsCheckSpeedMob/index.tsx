@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { Camera } from 'expo-camera';
-import * as MediaLibrary from 'expo-media-library';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 
@@ -38,6 +37,9 @@ import pathConcludedImage from '../../../../../assets/permission-concluded-speed
 import pathArchitetureImage from '../../../../../assets/architecture-and-city-speedmob.png';
 
 import theme from '../../../styles/theme';
+import { storage } from '../../../../common/services/mmkv/storage';
+import { useTerms } from '../../../../context/terms';
+import { useNavigation } from '@react-navigation/native';
 
 interface FranchiseHostsProps {
   hostLink: string;
@@ -83,18 +85,16 @@ interface PositionUserProps {
   speed: number;
 }
 
-interface TermsCheckSpeedMobProps{
-  setVisible: (data: boolean) => void;
-}
-
-export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProps) {
-  const {getPermissionLocal} = useAuth();
-  const {position, setPosition} = useLocal();
+export default function TermsCheckSpeedMob() {
+  const { getPermissionLocal } = useAuth();
+  const { position, setPosition } = useLocal();
+  const { termsAccepted, acceptTerms } = useTerms();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [localizationAceppted, setLocalizationAceppted] =
     useState<boolean>(false);
   const [location, setLocation] = useState(null);
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const [positionUser, setPositionUser] = useState<PositionUserProps>();
   const [checkTerms, setCheckTerms] = useState<boolean>(false);
@@ -117,16 +117,6 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
 
   const [descriptionTerms, setDescriptionTerms] = useState<string>('');
 
-  const verifyAcceptSpeedMob = async () => {
-    const response = await AsyncStorage.getItem('@speedmob:AcceptTerms');
-    if (!response) {
-      setVisible(true);
-      return;
-    }
-    setVisible(false);
-    return;
-  };
-
   const handleCheckTerms = () => {
     if (checkTerms) {
       setCheckTerms(false);
@@ -137,13 +127,12 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
 
   const handleRedirectLogin = async () => {
     setLoading(true);
-    try{
+    try {
       const { granted: permissionLocation } = await Location.getForegroundPermissionsAsync();
-      const { granted: permissionsLibrary } = await MediaLibrary.getPermissionsAsync();
 
-      if(!permissionLocation || !permissionsLibrary){
+      if (!permissionLocation) {
         await getPermissionLocal().then(() => {
-          Location.getLastKnownPositionAsync({accuracy: 1})
+          Location.getLastKnownPositionAsync({ accuracy: 1 })
             .then(location => {
               setLoading(false);
               if (location) {
@@ -154,7 +143,7 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
                 });
               } else {
                 setLoading(false);
-                Location.getCurrentPositionAsync({accuracy: 1}).then(({coords}) => {
+                Location.getCurrentPositionAsync({ accuracy: 1 }).then(({ coords }) => {
                   setPositionUser(location.coords);
                   setPosition({
                     latitude: coords.latitude,
@@ -170,7 +159,7 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
         });
 
         await getPerms();
-      }else{
+      } else {
         if (listDataFranchises.length === 1) {
           const host = listDataFranchises[0].franchiseHosts.find(
             data => data.hostName === 'taxiReturnApi',
@@ -183,11 +172,11 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
             '@speedmob:franchiseApp',
             JSON.stringify(listDataFranchises[0].franchiseApp),
           );
-    
+
           apiMain.defaults.baseURL = host.hostLink;
           apiMainDriver.defaults.baseURL = host.hostLink;
         }
-    
+
         if (franchiseSelected) {
           const host = franchiseSelected.franchiseHosts.find(
             data => data.hostName === 'taxiReturnApi',
@@ -200,17 +189,17 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
             '@speedmob:franchiseApp',
             JSON.stringify(franchiseSelected.franchiseApp),
           );
-    
+
           apiMain.defaults.baseURL = host.hostLink;
           apiMainDriver.defaults.baseURL = host.hostLink;
         }
-    
-        await AsyncStorage.setItem('@speedmob:AcceptTerms', 'true');
+
+        acceptTerms(true);
         setLoading(false);
-        setVisible(false);
+        navigation.navigate('SignIn', { replace: true });
       }
-    }catch(error){
-        console.log(error)
+    } catch (error) {
+      console.log(error)
     }
     setLoading(false);
   };
@@ -218,7 +207,7 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
   const getLocation = async () => {
     setLoading(true);
     getPermissionLocal().then(() => {
-      Location.getLastKnownPositionAsync({accuracy: 1})
+      Location.getLastKnownPositionAsync({ accuracy: 1 })
         .then(location => {
           setLoading(false);
           if (location) {
@@ -229,7 +218,7 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
             });
           } else {
             setLoading(false);
-            Location.getCurrentPositionAsync({accuracy: 1}).then(({coords}) => {
+            Location.getCurrentPositionAsync({ accuracy: 1 }).then(({ coords }) => {
               setPositionUser(location.coords);
               setPosition({
                 latitude: coords.latitude,
@@ -247,25 +236,16 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
   };
 
   const getPerms = async () => {
-    const permissions = JSON.parse(await AsyncStorage.getItem('permissions'));
-    const {status} = await MediaLibrary.requestPermissionsAsync();
     await Camera.requestCameraPermissionsAsync();
     await Camera.requestMicrophonePermissionsAsync();
-
-    if (status !== 'granted') {
-      return Camera.requestCameraPermissionsAsync();
-    }
-
-    permissions.gallery = true;
-    await AsyncStorage.setItem('permissions', JSON.stringify(permissions));
   };
 
   const getTextTerms = async () => {
     setLoading(true);
-    try{
-      const responseTerms = await apiMain.get('termsUsePolicy/findByType?type=customer');
+    try {
+      const responseTerms = await apiMain.get('termsUsePolicy/findByType?type=partner');
       setDescriptionTerms(responseTerms.data.data.description);
-    }catch(error){
+    } catch (error) {
       console.log(error);
     }
     setLoading(false);
@@ -391,24 +371,20 @@ export default function TermsCheckSpeedMob({ setVisible }:TermsCheckSpeedMobProp
 
   useEffect(() => {
     const getConfigFranchiseSelected = async () => {
-      try{
-        if(franchiseSelected){
+      try {
+        if (franchiseSelected) {
           theme.colors.primary = franchiseSelected.franchiseApp[1].primary_color;
           theme.colors.background_global = franchiseSelected.franchiseApp[1].secondary_color;
           theme.colors.secondary = franchiseSelected.franchiseApp[1].text_color;
           theme.images.logo = franchiseSelected.franchiseApp[1].logo;
         }
-      }catch(error){
+      } catch (error) {
         console.log(error);
       }
     }
 
     getConfigFranchiseSelected();
   }, [franchiseSelected]);
-
-  useEffect(() => {
-    verifyAcceptSpeedMob();
-  }, []);
 
   const isSelectCity = localizationAceppted === false || location === null;
 

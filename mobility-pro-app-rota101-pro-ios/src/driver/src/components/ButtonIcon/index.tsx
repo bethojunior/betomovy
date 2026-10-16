@@ -1,5 +1,5 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import {ButtonSend} from './styles';
+import { JSX } from 'react';
 
 interface Props {
   icon: JSX.Element;

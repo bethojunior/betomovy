@@ -1,6 +1,7 @@
 import theme from '../../styles/theme';
-import {If} from '../If';
-import {TextEdit} from '../TextEdit';
+import { If } from '../If';
+import { TextEdit } from '../TextEdit';
+import { Ionicons } from '@expo/vector-icons';
 import {
   AlertContainer,
   ButtonOk,
@@ -9,7 +10,8 @@ import {
   Title,
 } from './styles';
 
-import {useTheme} from 'styled-components';
+import { useTheme } from 'styled-components';
+import { TouchableOpacity } from 'react-native';
 
 interface Props {
   visible: boolean;
@@ -19,6 +21,7 @@ interface Props {
   callBack?: () => void;
   textButton?: string;
   children?: React.ReactNode;
+  closeButton?: boolean;
 }
 
 export const SwalAlert = ({
@@ -29,13 +32,28 @@ export const SwalAlert = ({
   callBack,
   textButton,
   children,
+  closeButton,
 }: Props) => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   return (
     <If condition={visible}>
       <Container>
         <AlertContainer>
+          <If condition={closeButton}>
+            <TouchableOpacity
+              style={{
+                alignSelf: 'flex-end',
+                padding: 5,
+                marginBottom: 10,
+              }}
+              onPress={() => {
+                setVisible && setVisible(false);
+              }}
+            >
+              <Ionicons name="close" size={24} color={colors.red} />
+            </TouchableOpacity>
+          </If>
           <If condition={title}>
             <Title>{title || ''}</Title>
           </If>
@@ -43,7 +61,7 @@ export const SwalAlert = ({
           <ContainerText>
             <TextEdit color={colors.secondary}>{description}</TextEdit>
           </ContainerText>
-          <If condition={setVisible || callBack}>
+          <If condition={closeButton ? false : setVisible || callBack}>
             <ButtonOk
               onPress={() => {
                 setVisible && setVisible(false);

@@ -1,55 +1,53 @@
 import { useEffect, useState } from 'react';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { VictoryPie } from 'victory-native';
-import { useTheme } from 'styled-components';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Alert, Modal } from 'react-native';
+import { useTheme } from 'styled-components/native';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import { subDays } from 'date-fns';
-import { Chip, Divider } from 'react-native-paper';
-import { CardTransfer } from '../../components/CardTransfer';
-import { If } from '../../components/If';
-import { PaginationTransferSelect } from '../../components/PaginationTransferSelect';
+
+import { TransactionList } from '../../components/TransactionList';
+import { FilterFooter } from '../../../../client/components/FilterFooter';
+import {
+  FilterOptionLabel,
+  FilterOptionRadio,
+  FilterOptionRadioDot,
+  FilterOptionRow,
+  FilterOptionsList,
+} from '../../../../client/components/FilterFooter/styles';
+import { BottomSheetModal } from '../../../../client/components/BottomSheetModal';
+import { SheetHeader } from '../../../../client/components/SheetHeader';
 import Preload from '../../components/Preload';
 import { useBank } from '../../context/bank';
-import {
-  DriverInfoProps,
-  LastTransactionProps,
-  Pagination,
-} from '../../context/bank/types';
+import { DriverInfoProps, Pagination } from '../../context/bank/types';
+import { SummaryCarousel } from './components/SummaryCarousel';
 
 import {
-  ButtonDate,
-  ButtonDateText,
-  ButtonExit,
-  Chart,
+  CalendarSheetContent,
+  Card,
   Container,
-  ContainerCard,
-  ContainerGraphic,
-  ContainerValue,
-  Content,
-  ContentInfo,
-  ContentModalDate,
-  DateContainer,
-  DateText,
-  Exit,
-  Filters,
-  Info,
-  InfoText,
-  InfoValue,
-  Text,
-  TextExit,
-  TextSize,
-  Value,
+  DateButton,
+  DateButtonText,
+  DateRow,
+  DaysChip,
+  DaysChipRow,
+  DaysChipText,
+  EmptyText,
+  MovementsTitle,
+  PeriodLabel,
 } from './styles';
-import { moneyMask } from '../../utils/money';
 import { convertDate, convertUSDate } from '../../utils/FormatDate';
 import { Calendar } from '../../components/Calendar';
 import { translate } from '../../../../client/locales';
-import Helper from '../../utils/Helper';
-import { shade } from 'polished';
-import theme from '../../../../client/styles/theme';
+import { customToast } from '../../../../utils/FlashMessage';
+
+const FLOW_OPTIONS = [
+  { label: translate('pagination_transfer.not_filter'), value: '' },
+  { label: translate('pagination_transfer.entries'), value: 'entrada' },
+  { label: translate('pagination_transfer.outings'), value: 'saida' },
+];
+
+const DAY_PRESETS = [7, 15, 30];
+
+type DateField = 'start' | 'end' | null;
 
 export function Extract() {
   const { getTransactions } = useBank();
@@ -64,8 +62,8 @@ export function Extract() {
   const [startDate, setStartDate] = useState(
     convertUSDate(subDays(Date.now(), 30)),
   );
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalEnd, setModalEnd] = useState(false);
+  const [activeDays, setActiveDays] = useState<number | null>(30);
+  const [activeDateField, setActiveDateField] = useState<DateField>(null);
 
   const getTransactionsAsync = async () => {
     setLoading(true);
@@ -88,12 +86,12 @@ export function Extract() {
     setLoading(false);
   };
 
-  function handleDateSelect(day) {
+  const closeDateSheet = () => setActiveDateField(null);
+
+  function handleDateSelect(day: string) {
     if (new Date(day).getTime() > new Date(endDate).getTime()) {
-      return Alert.alert(
-        'Data inválida',
-        'A data inicial não pode ser maior que a data final.',
-      );
+      customToast(translate('driver_extract.alert_invalid_date'), 'danger');
+      return false;
     }
 
     if (
@@ -102,25 +100,22 @@ export function Extract() {
       60
     ) {
       setStartDate(endDate);
-
-      return Alert.alert(
-        'Data inválida',
-        'O período não pode ser maior que 60 dias, selecione outra data.',
-      );
+      customToast(translate('driver_extract.alert_invalid_range'), 'danger');
+      return false;
     }
 
+    setActiveDays(null);
     setStartDate(day);
-    setModalVisible(false);
+    setPage(1);
+    closeDateSheet();
 
     return true;
   }
 
-  function handleDateSelectEnd(day) {
+  function handleDateSelectEnd(day: string) {
     if (new Date(day).getTime() < new Date(startDate).getTime()) {
-      return Alert.alert(
-        'Data inválida',
-        'A data inicial não pode ser maior que a data final.',
-      );
+      customToast(translate('driver_extract.alert_invalid_date'), 'danger');
+      return false;
     }
 
     if (
@@ -128,226 +123,132 @@ export function Extract() {
       (1000 * 60 * 60 * 24) >
       60
     ) {
-      return Alert.alert(
-        'Data inválida',
-        'O período não pode ser maior que 60 dias, selecione outra data.',
-      );
+      customToast(translate('driver_extract.alert_invalid_range'), 'danger');
+      return false;
     }
 
+    setActiveDays(null);
     setEndDate(day);
-    setModalEnd(false);
+    setPage(1);
+    closeDateSheet();
 
     return true;
   }
 
-  const handleDays = (days: number) => {
-    setStartDate(convertUSDate(subDays(Date.now(), days)));
-    setEndDate(convertUSDate(new Date()));
+  const handleDaySelected = (day: string) => {
+    if (activeDateField === 'start') {
+      handleDateSelect(day);
+      return;
+    }
+    handleDateSelectEnd(day);
   };
 
-  const color = [
-    shade(0.07, theme.colors.background_global),
-    theme.colors.background_global
-  ];
+  const handleDays = (days: number) => {
+    setActiveDays(days);
+    setStartDate(convertUSDate(subDays(Date.now(), days)));
+    setEndDate(convertUSDate(new Date()));
+    setPage(1);
+  };
 
   useEffect(() => {
     getTransactionsAsync();
   }, [page, selectedValue, startDate, endDate]);
 
+  const selectedFlowOption = FLOW_OPTIONS.find((option) => option.value === selectedValue);
+  const filterButtonLabel =
+    selectedFlowOption && selectedValue !== '' ? selectedFlowOption.label : translate('driver_extract.filter');
+
   return (
     <Container>
       <Preload visible={loading} />
-      <ContainerGraphic>
-        <Chart>
-          <VictoryPie
-            data={
-              Number(balance?.total_credit) || Number(balance?.total_debit) > 0
-                ? [
-                  { x: 'Saidas', y: balance?.total_debit },
-                  { x: 'Entradas', y: balance?.total_credit },
-                ]
-                : [
-                  { x: 'Entradas', y: 50 },
-                  { x: 'Saidas', y: 50 },
-                ]
-            }
-            style={{
-              labels: {
-                display: 'none',
-              },
-            }}
-            colorScale={[colors.secondary, colors.primary]}
-            innerRadius={15}
-            padAngle={0}
-            width={RFValue(105)}
-            height={RFValue(105)}
-            padding={{ top: 0, bottom: 0, left: 0, right: 0 }}
-          />
-        </Chart>
 
-        <ContainerValue>
-          <Text>{translate('driver_extract.subTitle')}</Text>
-          <Value>R$ {moneyMask(parseFloat(balance?.balance || '0'))}</Value>
-        </ContainerValue>
-      </ContainerGraphic>
-
-      <ContentInfo>
-        <Info>
-          <FontAwesome
-            name="circle"
-            size={12}
-            color={colors.primary}
-            style={{
-              marginRight: 8,
-            }}
-          />
-          <InfoText>{translate('driver_extract.entries')} </InfoText>
-          <InfoValue>
-            R$ {moneyMask(parseFloat(balance?.total_credit || '0'))}
-          </InfoValue>
-        </Info>
-
-        <Info>
-          <FontAwesome
-            name="circle"
-            size={12}
-            color={colors.secondary}
-            style={{
-              marginRight: 8,
-            }}
-          />
-          <InfoText>{translate('driver_extract.outings')} </InfoText>
-          <InfoValue>
-            R$ {moneyMask(parseFloat(balance?.total_debit || '0'))}
-          </InfoValue>
-        </Info>
-      </ContentInfo>
-
-      <Divider />
-
-      <DateText>{translate('driver_extract.select_preiod')}</DateText>
-
-      <DateContainer>
-        <ButtonDate onPress={() => setModalVisible(true)}>
-          <ButtonDateText>{convertDate(startDate)}</ButtonDateText>
-          <Fontisto name="calendar" size={12} color={colors.secondary} />
-        </ButtonDate>
-
-        <Fontisto name="arrow-right-l" size={12} color={colors.secondary} />
-
-        <ButtonDate onPress={() => setModalEnd(true)}>
-          <ButtonDateText>{convertDate(endDate)}</ButtonDateText>
-          <Fontisto name="calendar" size={12} color={colors.secondary} />
-        </ButtonDate>
-      </DateContainer>
-
-      <Filters>
-        <Chip
-          onPress={() => handleDays(7)}
-          style={{ backgroundColor: colors.primary }}
-          textStyle={{ color: colors.white, fontWeight: 'bold' }}
-        >
-          7 {translate('driver_extract.days')}
-        </Chip>
-
-        <Chip
-          onPress={() => handleDays(15)}
-          style={{ backgroundColor: colors.primary }}
-          textStyle={{ color: colors.white, fontWeight: 'bold' }}
-        >
-          15 {translate('driver_extract.days')}
-        </Chip>
-
-        <Chip
-          onPress={() => handleDays(30)}
-          style={{ backgroundColor: colors.primary }}
-          textStyle={{ color: colors.white, fontWeight: 'bold' }}
-        >
-          30 {translate('driver_extract.days')}
-        </Chip>
-      </Filters>
-
-      <Divider />
-
-      <Content>
-        <ContainerCard>
-          {transactions.length > 0 &&
-            !loading &&
-            transactions.map((item: LastTransactionProps, index) => (
-              <CardTransfer
-                data={item}
-                key={index}
-                color={item.color}
-                background={
-                  Helper.assignColorByGroup(
-                    item.tripReference,
-                    transactions,
-                    color
-                  )
-                }
-              />
-            ))}
-          <If condition={transactions.length === 0 && !loading}>
-            <TextSize>Nenhuma movimentação realizada</TextSize>
-          </If>
-        </ContainerCard>
-      </Content>
-
-      <PaginationTransferSelect
-        dataPage={dataPage}
-        page={page}
-        setPage={setPage}
-        selectedValue={selectedValue}
-        setSelectedValue={setSelectedValue}
+      <SummaryCarousel
+        totalCredit={parseFloat(balance?.total_credit || '0')}
+        totalDebit={parseFloat(balance?.total_debit || '0')}
       />
 
-      <Modal visible={modalVisible}>
-        <ContentModalDate>
-          <Exit>
-            <ButtonExit
-              activeOpacity={0.7}
-              onPress={() => setModalVisible(false)}
-            >
-              <MaterialIcons
-                name="arrow-back-ios"
-                size={20}
-                color={colors.primary}
-              />
+      <Card>
+        <PeriodLabel>{translate('driver_extract.select_preiod')}</PeriodLabel>
 
-              <TextExit>VOLTAR</TextExit>
-            </ButtonExit>
-          </Exit>
+        <DateRow>
+          <DateButton activeOpacity={0.7} onPress={() => setActiveDateField('start')}>
+            <Fontisto name="calendar" size={RFValue(12)} color={colors.secondary} />
+            <DateButtonText>{convertDate(startDate)}</DateButtonText>
+          </DateButton>
 
+          <Fontisto name="arrow-right-l" size={RFValue(12)} color={colors.text_gray} />
+
+          <DateButton activeOpacity={0.7} onPress={() => setActiveDateField('end')}>
+            <Fontisto name="calendar" size={RFValue(12)} color={colors.secondary} />
+            <DateButtonText>{convertDate(endDate)}</DateButtonText>
+          </DateButton>
+        </DateRow>
+
+        <DaysChipRow>
+          {DAY_PRESETS.map((days) => (
+            <DaysChip key={days} active={activeDays === days} activeOpacity={0.7} onPress={() => handleDays(days)}>
+              <DaysChipText active={activeDays === days}>
+                {days} {translate('driver_extract.days')}
+              </DaysChipText>
+            </DaysChip>
+          ))}
+        </DaysChipRow>
+      </Card>
+
+      <MovementsTitle>{translate('driver_extract.latest_movements')}</MovementsTitle>
+
+      {transactions.length === 0 && !loading ? (
+        <EmptyText>{translate('account.not_movement')}</EmptyText>
+      ) : (
+        <TransactionList transactions={transactions} />
+      )}
+
+      <FilterFooter
+        page={page}
+        dataPage={dataPage}
+        setPage={setPage}
+        filterButtonLabel={filterButtonLabel}
+        filterTitle={translate('driver_extract.filter')}
+        renderFilterContent={(close) => (
+          <FilterOptionsList>
+            {FLOW_OPTIONS.map((option) => {
+              const isSelected = selectedValue === option.value;
+
+              return (
+                <FilterOptionRow
+                  key={option.value}
+                  selected={isSelected}
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setSelectedValue(option.value);
+                    setPage(1);
+                    close();
+                  }}
+                >
+                  <FilterOptionRadio selected={isSelected}>
+                    {isSelected && <FilterOptionRadioDot />}
+                  </FilterOptionRadio>
+                  <FilterOptionLabel selected={isSelected}>{option.label}</FilterOptionLabel>
+                </FilterOptionRow>
+              );
+            })}
+          </FilterOptionsList>
+        )}
+      />
+
+      <BottomSheetModal visible={activeDateField !== null} onRequestClose={closeDateSheet}>
+        <SheetHeader
+          title={translate(activeDateField === 'end' ? 'driver_extract.end_date' : 'driver_extract.start_date')}
+          onClose={closeDateSheet}
+        />
+
+        <CalendarSheetContent>
           <Calendar
-            dateSelected={startDate}
-            onDaySelected={day => {
-              handleDateSelect(day);
-            }}
+            dateSelected={activeDateField === 'end' ? endDate : startDate}
+            onDaySelected={handleDaySelected}
           />
-        </ContentModalDate>
-      </Modal>
-
-      <Modal visible={modalEnd}>
-        <Exit>
-          <ButtonExit activeOpacity={0.7} onPress={() => setModalEnd(false)}>
-            <MaterialIcons
-              name="arrow-back-ios"
-              size={20}
-              color={colors.primary}
-            />
-
-            <TextExit>VOLTAR</TextExit>
-          </ButtonExit>
-        </Exit>
-        <ContentModalDate>
-          <Calendar
-            dateSelected={endDate}
-            onDaySelected={day => {
-              handleDateSelectEnd(day);
-            }}
-          />
-        </ContentModalDate>
-      </Modal>
+        </CalendarSheetContent>
+      </BottomSheetModal>
     </Container>
   );
 }

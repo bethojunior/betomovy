@@ -37,7 +37,9 @@ export const ModalCancellationReasons = ({
   const [listReasons, setListReasons] = useState([]);
   const [idSelected, setIdSelected] = useState(0);
 
-  const {getCancellationReasons} = useTripProvider();
+  const getCancellationReasons: any = useTripProvider(
+    (context: any) => context.getCancellationReasons,
+  );
   const {colors} = useTheme();
 
   useEffect(() => {
@@ -133,7 +135,9 @@ export const ModalCancellationReasons = ({
                   setIdSelected(0);
                 }}
               >
-                <TextEdit color={theme.colors.primaryText}>{translate('dialog.confirm')}</TextEdit>
+                <TextEdit color={theme.colors.primaryText}>
+                  {translate('dialog.confirm')}
+                </TextEdit>
               </ButtonConfirm>
             </If>
           </ContainerButton>

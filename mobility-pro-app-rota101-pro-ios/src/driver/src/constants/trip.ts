@@ -13,7 +13,7 @@ export const STATUS_FINISHED = 'finished';
 export const STATUS_BOARDING_TRIP = 'boarding';
 export const STATUS_FINISH_TRIP = 'finished';
 export const STATUS_GET_BID_BY_DRIVERS = 'get_bid_by_drivers';
-export const STATUS_SEARCHING_FAVORITE = 'searching_favorite';
+export const STATUS_WAITING = 'waiting';
 
 export const STATUS_SITUATION_RELEASED = 1; // 'CORRIDA LIBERADA'
 export const STATUS_ANALISYS = 2; // 'CORRIDA EM ANALISE

@@ -576,10 +576,13 @@ export const AuthProvider = ({ children }: any) => {
   const loginDriver = useCallback(
     async (email: string, password: string, keyAppPartner?: string): Promise<boolean> => {
       try {
+        const effectiveDeviceToken =
+          deviceToken || (await AsyncStorage.getItem('deviceToken')) || '1234';
+
         const response = await service.loginDriver({
           email,
           password,
-          deviceToken,
+          deviceToken: effectiveDeviceToken,
           keyAppPartner: keyAppPartner ?? null,
         });
         if (response.status === false) {
@@ -605,11 +608,16 @@ export const AuthProvider = ({ children }: any) => {
         );
 
         return true;
-      } catch (error) {
+      } catch (error: any) {
+        console.error('Erro em loginDriver:', error);
+        customToast(
+          error?.response?.data?.message || error?.message || 'Erro ao conectar ao servidor do motorista.',
+          'danger',
+        );
         return false;
       }
     },
-    [],
+    [deviceToken],
   );
 
   const listCategories = useCallback(async () => {
@@ -626,29 +634,40 @@ export const AuthProvider = ({ children }: any) => {
     async ({ email, password, setModal, keyAppPartner }: AuthenticateLoginData) => {
       setLoading(true);
 
-      if (driverSelected) {
-        await loginDriver(email, password, keyAppPartner);
-        return setLoading(false);
-      }
+      try {
+        if (driverSelected) {
+          await loginDriver(email, password, keyAppPartner);
+          return;
+        }
 
-      const response = await service.loginCustomer({
-        email,
-        password,
-        deviceToken,
-        keyAppPartner: keyAppPartner ?? null,
-      });
-      if (!response.status) {
-        customToast(response.message, 'danger');
-        if (setModal) setModal(true);
-        setLoading(false);
-      } else {
-        await signIn(response.data);
-        await AsyncStorage.setItem('lastLogin', JSON.stringify({ email, password }));
-        await AsyncStorage.setItem('account', JSON.stringify(response.data));
+        const effectiveDeviceToken =
+          deviceToken || (await AsyncStorage.getItem('deviceToken')) || '1234';
+
+        const response = await service.loginCustomer({
+          email,
+          password,
+          deviceToken: effectiveDeviceToken,
+          keyAppPartner: keyAppPartner ?? null,
+        });
+        if (!response.status) {
+          customToast(response.message, 'danger');
+          if (setModal) setModal(true);
+        } else {
+          await signIn(response.data);
+          await AsyncStorage.setItem('lastLogin', JSON.stringify({ email, password }));
+          await AsyncStorage.setItem('account', JSON.stringify(response.data));
+        }
+      } catch (error: any) {
+        console.error('Erro em authenticateLogin:', error);
+        customToast(
+          error?.response?.data?.message || error?.message || 'Erro ao realizar login.',
+          'danger',
+        );
+      } finally {
         setLoading(false);
       }
     },
-    [signIn, loginDriver, deviceToken],
+    [driverSelected, signIn, loginDriver, deviceToken],
   );
 
   const showExpiredSessionAlert = useCallback((onConfirm: () => void) => {

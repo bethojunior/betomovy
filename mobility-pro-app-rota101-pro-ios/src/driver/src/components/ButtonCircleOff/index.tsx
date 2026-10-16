@@ -1,7 +1,7 @@
-import {TouchableOpacityProps} from 'react-native';
-import {useTheme} from 'styled-components';
+import { TouchableOpacityProps } from 'react-native';
+import { useTheme } from 'styled-components/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import {Container, Content, Loading, styles} from './styles';
+import { Container, Content, Loading, styles } from './styles';
 
 interface Props extends TouchableOpacityProps {
   loading?: boolean;
@@ -22,21 +22,19 @@ export function ButtonCircleOff({
 
   return (
     <Container
+      disabled={loading}
       enabled={enabled}
       style={styles.shadow}
       onPress={enabled ? onPress : () => {}}
-      activeOpacity={0.9}
+      activeOpacity={0.6}
       {...rest}
     >
       <Content>
-        <MaterialCommunityIcons
-          name={iconName}
-          size={42}
-          color={theme.colors.white}
-        />
         {loading ? (
-          <Loading size={'small'} color={theme.colors.primary} />
-        ) : null}
+          <Loading size={'small'} color={theme.colors.white} />
+        ) : (
+          <MaterialCommunityIcons name={iconName} size={42} color={theme.colors.white} />
+        )}
       </Content>
     </Container>
   );

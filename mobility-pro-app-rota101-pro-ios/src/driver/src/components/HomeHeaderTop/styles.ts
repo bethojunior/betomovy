@@ -33,7 +33,7 @@ export const ContentImage = styled.TouchableOpacity`
 `;
 
 export const Avatar = styled.Image.attrs({
-  resizeMode: 'stretch',
+  resizeMode: 'cover',
 })`
   background: ${({theme}) => theme.colors.white};
   height: ${RFValue(60)}px;

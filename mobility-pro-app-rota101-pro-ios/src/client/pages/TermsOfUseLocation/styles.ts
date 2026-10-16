@@ -1,11 +1,13 @@
 import {Dimensions, TouchableOpacity} from 'react-native';
 import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
+import {Button} from '../../components/Button';
+import {rgba} from 'polished';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-interface ButtonLocalizationSpeedMobProps{
+interface ButtonLocalizationSpeedMobProps {
   refuse?: boolean;
 }
 
@@ -64,31 +66,45 @@ export const TextButtonGuest = styled.Text`
 
 export const ContentSpeedMob = styled.View`
   flex: 1;
-  align-items: center;
   justify-content: center;
-  padding: 0 20px;
+  padding: 20px 20px 0 20px;
+`;
+
+export const ContentPage = styled.View``;
+
+export const ContentPageScroll = styled.ScrollView.attrs({
+  contentContainerStyle: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: RFValue(20),
+    paddingTop: RFValue(20),
+  },
+})``;
+
+export const ContentPageFooter = styled.View`
+  gap: ${RFValue(16)}px;
+  padding: ${RFValue(20)}px;
+  border-top-width: 0.5px;
+  border-top-color: ${({theme}) => rgba(theme.colors.light_gray, 0.4)};
 `;
 
 export const ImageSpeedMob = styled.Image`
   margin-bottom: 10px;
   max-width: 200px;
   max-height: 200px;
+  border-radius: 4px;
 `;
 
 export const TextNoticeTermsSpeedMob = styled.Text`
-  font-size: ${RFValue(16)}px;
-  text-align: justify;
-  margin: 10px 0;
+  font-size: ${({theme}) => theme.fontSizes.medium}px;
+  line-height: ${RFValue(20)}px;
+  margin-bottom: 20px;
 `;
 
-export const ButtonNextTermsSpeedMob = styled.TouchableOpacity<{
+export const ButtonNextTermsSpeedMob = styled(Button)<{
   isDisabled: boolean;
 }>`
-  width: 100%;
-  background-color: ${({theme}) => theme.colors.blue_terms_button_speedmob};
-  border-radius: 8px;
-  padding: 8px 12px;
-  margin: 20px 0;
+  margin: 0;
   opacity: ${props => (props.isDisabled ? 0.5 : 1)};
 `;
 
@@ -98,17 +114,17 @@ export const TextButtonTermsSpeedMob = styled.Text`
   text-align: center;
 `;
 
-export const ContentLocalizationSpeedMob = styled.View``;
-
-export const TitleLocalizationSpeedMob = styled.Text`
-  font-size: 23px;
-  text-align: center;
+export const ContentLocalizationSpeedMob = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const DescriptionLocalizationSpeedMob = styled.Text`
-  font-size: 18px;
-  text-align: center;
-  margin: 10px 0;
+  font-size: ${RFValue(14)}px;
+  line-height: ${RFValue(20)}px;
+  text-align: justify;
+  margin-bottom: 10px;
 `;
 
 export const ContentButtonsLocalizationSpeedMob = styled.View`
@@ -118,11 +134,7 @@ export const ContentButtonsLocalizationSpeedMob = styled.View`
   margin-bottom: 25px;
 `;
 
-export const ButtonLocalizationSpeedMob = styled.Text<ButtonLocalizationSpeedMobProps>`
-  font-size: 22px;
-  color: ${({theme, refuse}) => refuse ? theme.colors.red : theme.colors.blue_terms_button_speedmob};
-  font-weight: bold;
-`
+export const ButtonLocalizationSpeedMob = styled(Button)``;
 
 export const TitlePermissionsConcluded = styled.Text`
   font-size: 35px;
@@ -136,7 +148,7 @@ export const TitlePermissionsConcluded = styled.Text`
 
 export const TextOkPermissionConcluded = styled.Text`
   font-size: 60px;
-  text-align: center; 
+  text-align: center;
   color: ${({theme}) => theme.colors.blue_water};
   font-weight: bold;
   position: relative;
@@ -148,4 +160,16 @@ export const ContentSelect = styled.View`
   width: 100%;
   border: 1px solid ${({theme}) => theme.colors.black};
   margin: 10px 0;
+`;
+
+export const Title = styled.Text`
+  font-size: ${RFValue(30)}px;
+  color: ${({theme}) => theme.colors.secondary};
+  margin-bottom: ${RFValue(28)}px;
+`;
+
+export const TitleLocalizationSpeedMob = styled(Title)`
+  margin-top: ${RFValue(16)}px;
+  font-size: ${RFValue(27)}px;
+  text-align: center;
 `;

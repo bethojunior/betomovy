@@ -1,22 +1,20 @@
-import {FontAwesome} from '@expo/vector-icons';
-import {TextEdit} from '../TextEdit';
-import {ButtonPanic, ContainerPanic} from './styles';
+import { FontAwesome } from '@expo/vector-icons';
+import { TextEdit } from '../TextEdit';
+import { ButtonPanic, ContainerPanic } from './styles';
 import theme from '../../styles/theme';
-import {translate} from '../../../../client/locales';
+import { translate } from '../../../../client/locales';
 
 interface Props {
   setVisible?: (value: boolean) => void;
   setVisibleNegativateModal?: (data: boolean) => void;
   visibleNegativateModal?: boolean;
   visible?: boolean;
-  hasPublicity: boolean;
   isNegativate: boolean;
 }
 
 export const ButtonDoorHandle = ({
   setVisible,
   visible,
-  hasPublicity,
   isNegativate,
   setVisibleNegativateModal,
   visibleNegativateModal,
@@ -29,7 +27,7 @@ export const ButtonDoorHandle = ({
   };
 
   return (
-    <ContainerPanic hasPublicity={hasPublicity}>
+    <ContainerPanic>
       <ButtonPanic onPress={handleOpenDoor} activeOpacity={0.8}>
         <FontAwesome
           name="qrcode"
@@ -39,7 +37,7 @@ export const ButtonDoorHandle = ({
           }}
         />
         <TextEdit
-          transform="uppercase"
+          change="uppercase"
           size="small"
           color={theme.colors.primaryText}
         >

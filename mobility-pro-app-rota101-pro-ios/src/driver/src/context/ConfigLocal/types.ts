@@ -16,7 +16,6 @@ export interface InitialStateProps {
   payloadInScreen: number;
   secondsToRedirect: number;
   showConfigMap: number;
-  metersToCut: number;
   cachePolylineOn: number;
 }
 

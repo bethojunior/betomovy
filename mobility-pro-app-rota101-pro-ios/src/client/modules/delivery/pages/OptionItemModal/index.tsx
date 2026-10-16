@@ -2,6 +2,7 @@
 
 import React from 'react';
 import {Modal, View, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {AntDesign} from '@expo/vector-icons';
 import Colors from '../../../../components/Colors';
 
@@ -29,7 +30,7 @@ export default function OptionItemModal(props) {
         >
           <View style={styles.overlayModal} />
         </TouchableOpacity>
-        <View style={styles.modalView}>
+        <SafeAreaView edges={['bottom']} style={styles.modalView}>
           <TouchableOpacity
             onPress={() => {
               onClose();
@@ -42,8 +43,10 @@ export default function OptionItemModal(props) {
           </Text>
           <TouchableOpacity
             onPress={() => {
+              if (onEditItem) {
+                onEditItem();
+              }
               onClose();
-              onEditItem();
             }}
           >
             <View style={styles.btnOptionItem}>
@@ -54,8 +57,10 @@ export default function OptionItemModal(props) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
+              if (onRemove) {
+                onRemove();
+              }
               onClose();
-              onRemove();
             }}
           >
             <View style={styles.btnOptionItem}>
@@ -64,7 +69,7 @@ export default function OptionItemModal(props) {
               </Text>
             </View>
           </TouchableOpacity>
-        </View>
+        </SafeAreaView>
       </View>
     </Modal>
   );

@@ -1,4 +1,5 @@
 import {View, Text, DeviceEventEmitter, Platform} from 'react-native';
+import {translate} from '../../../../client/locales';
 import {BluetoothScanner} from '../../components/BluetoothScanner';
 import {ButtonSend, Container, ContainerCamera} from './style';
 import {CameraComponent, RefCamera} from '../../components/Camera';
@@ -8,7 +9,7 @@ import theme from '../../styles/theme';
 import {IfLoaderInsideScreen} from '../../components/IfLoaderInsideScreen';
 import Preload from '../../components/Preload';
 import {customToast} from '../../../../utils/FlashMessage';
-import {VolumeManager} from 'react-native-volume-manager';
+// import {VolumeManager} from 'react-native-volume-manager';
 
 export const ButtonTestPanic = () => {
   const cameraRef = useRef<RefCamera>(null);
@@ -20,7 +21,7 @@ export const ButtonTestPanic = () => {
         setLoading(true);
         const videoUri = await cameraRef.current.sendVideoPanic();
         setLoading(false);
-        customToast('Seu alerta foi enviado com sucesso!', 'success');
+        customToast(translate('panicButton.text_alert_sent_success'), 'success');
         return videoUri;
       }
       setLoading(false);
@@ -32,39 +33,39 @@ export const ButtonTestPanic = () => {
 
   const trackRefClick = useRef(0);
 
-  useEffect(() => {
-    if (Platform.OS === 'ios') return;
+  // useEffect(() => {
+  //   if (Platform.OS === 'ios') return;
 
-    let volumeWasMax = false;
-    let resetTimeout;
+  //   let volumeWasMax = false;
+  //   let resetTimeout;
 
-    const volumeEmitter = DeviceEventEmitter.addListener(
-      'onVolumeButtonPressed',
-      async result => {
-        const volumeUp = result?.type === 'VOLUME_UP_PRESSED';
-        const volumeActual = await VolumeManager.getVolume();
-        if (Number(volumeActual?.volume) === 1 && volumeUp) {
-          volumeWasMax = true;
+  //   const volumeEmitter = DeviceEventEmitter.addListener(
+  //     'onVolumeButtonPressed',
+  //     async result => {
+  //       const volumeUp = result?.type === 'VOLUME_UP_PRESSED';
+  //       const volumeActual = await VolumeManager.getVolume();
+  //       if (Number(volumeActual?.volume) === 1 && volumeUp) {
+  //         volumeWasMax = true;
 
-          if (trackRefClick.current === 0) {
-            trackRefClick.current = 1;
-            resetTimeout = setTimeout(() => {
-              trackRefClick.current = 0;
-            }, 1000);
-          } else {
-            customToast('Seu botão de panico foi acionado', 'success');
-            trackRefClick.current = 0;
-            await handleCamTakeVideo();
-          }
-        }
-      },
-    );
+  //         if (trackRefClick.current === 0) {
+  //           trackRefClick.current = 1;
+  //           resetTimeout = setTimeout(() => {
+  //             trackRefClick.current = 0;
+  //           }, 1000);
+  //         } else {
+  //           customToast('Seu botão de panico foi acionado', 'success');
+  //           trackRefClick.current = 0;
+  //           await handleCamTakeVideo();
+  //         }
+  //       }
+  //     },
+  //   );
 
-    return () => {
-      if (resetTimeout) clearTimeout(resetTimeout);
-      if (volumeEmitter) volumeEmitter?.remove();
-    };
-  }, []);
+  //   return () => {
+  //     if (resetTimeout) clearTimeout(resetTimeout);
+  //     if (volumeEmitter) volumeEmitter?.remove();
+  //   };
+  // }, []);
 
   return (
     <Container>

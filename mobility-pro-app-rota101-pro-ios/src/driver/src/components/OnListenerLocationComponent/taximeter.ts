@@ -1,8 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapService from '../../../../client/services/mapService';
+import { storage } from '~/common/services/mmkv/storage';
 
-export const setRouteTraveled = async location => {
-  const routeTraveled = await AsyncStorage.getItem('routeTraveledTaximeter');
+export const setRouteTraveled = location => {
+  const routeTraveled = storage.getItem('routeTraveledTaximeter', 'string');
 
   if (routeTraveled === null) {
     const initialRoute = [
@@ -12,12 +12,10 @@ export const setRouteTraveled = async location => {
       },
     ];
 
-    await AsyncStorage.setItem(
+    storage.setItem(
       'routeTraveledTaximeter',
       String(MapService.encondePolyline(initialRoute)),
     );
-
-    // kmRef.current = 0;
   } else {
     const routeDecoded = MapService.decodePolyline(routeTraveled);
 
@@ -26,21 +24,11 @@ export const setRouteTraveled = async location => {
       longitude: location?.longitude,
     });
 
-    await AsyncStorage.setItem(
+    storage.setItem(
       'routeTraveledTaximeter',
-      String(MapService.encondePolyline(routeDecoded)),
+      MapService.encondePolyline(routeDecoded),
     );
-    // await getKmRouteTraveled(); // @TODO - TESTAR SE
   }
 
   return '';
-};
-
-export const setTimeTraveled = async () => {
-  const paused = await AsyncStorage.getItem('taximeterIsPause');
-  const timeOut = await AsyncStorage.getItem('TX-timeBg');
-
-  if ((paused == 'false' && !timeOut) || (!paused && !timeOut)) {
-    AsyncStorage.setItem('TX-timeBg', JSON.stringify(new Date()));
-  }
 };

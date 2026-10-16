@@ -1,16 +1,19 @@
 // @ts-nocheck
-import {useEffect, useState} from 'react';
-import {Alert, TouchableOpacity} from 'react-native';
+import { useEffect, useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import Feather from '@expo/vector-icons/Feather';
-import {Ionicons} from '@expo/vector-icons';
-import {useNavigation} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import apiMain from '../../../api/apiMain';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import ChangePasswordModal from '../../../components/ChangePasswordModal';
+import DeleteAccountModal from '../../../components/DeleteAccountModal';
+import { useDeleteAccount } from '../../../hooks/useDeleteAccount';
+import { customToast } from '../../../../utils/FlashMessage';
+import apiMain from '../../../api/apiMain';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {translate} from '../../../locales';
+import { translate } from '../../../locales';
 import {
   ButtonPhoto,
   Container,
@@ -28,131 +31,116 @@ import {
 } from './styles';
 import ChangePhoneNumberModal from '../../../components/ChangePhoneNumberModal';
 import ChangeEmailModal from '../../../components/ChangeEmailModal';
-import {BiometriaSwitch} from '../../../components/BiometriaSwitch';
-import {ItemProfile} from '../../../components/ItemProfile';
+import { BiometriaSwitch } from '../../../components/BiometriaSwitch';
+import { ItemProfile } from '../../../components/ItemProfile';
 import Preload from '../../../components/Preload';
-import {useAuth} from '../../../../context/auth';
+import { useAuth } from '../../../../context/auth';
+import { useProfilePhotoUpload } from '../../../hooks/useProfilePhotoUpload';
+import { resizeImage } from '../../../../utils/image';
 
 import theme from '../../../styles/theme';
 
 export default function MyProfileSpeedMob() {
-  const {navigate, goBack} = useNavigation();
+  const { navigate, goBack } = useNavigation();
 
-  const {user, updateDataUser} = useAuth();
+  const { user } = useAuth();
 
   const [uriProfile, setUriProfile] = useState(null);
   const [modalPasswordVisible, setModalPasswordVisible] = useState(false);
   const [modalPhoneVisible, setModalPhoneVisible] = useState(false);
   const [modalEmailVisible, setModalEmailVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const { postExcludeAccount, loading: deleteLoading } = useDeleteAccount();
   const [loading, setLoading] = useState<boolean>(false);
+  const [imageKey, setImageKey] = useState(0);
+
+  const { uploadProfileImage } = useProfilePhotoUpload();
 
   useEffect(() => {
     setUriProfile(user.profileImageLink);
-  }, []);
+  }, [user.profileImageLink]);
 
-  // eslint-disable-next-line consistent-return
   async function sendPhoto() {
-    if (Platform.OS !== 'web') {
-      const {status} = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        return Alert.alert(
-          translate('myProfile.message_alert_camera_permission'),
-        );
+    try {
+      const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        customToast(translate('toast.text_camera_permission_required'), 'warning');
+        return;
+      }
+
+      const options = {
+        quality: 1,
+        allowsEditing: true,
+      };
+
+      const cameraResult = await ImagePicker.launchCameraAsync(options);
+
+      if (cameraResult.canceled || !cameraResult.assets || !cameraResult.assets[0]) {
+        return;
+      }
+
+      const asset = cameraResult.assets[0];
+      let imageToUpload = asset.uri;
+      try {
+        const result = await resizeImage(asset.uri, 400, 400);
+        if (result?.uri) {
+          imageToUpload = result.uri;
+        }
+      } catch (resizeErr) {
+        console.warn('Falha ao redimensionar foto:', resizeErr);
+      }
+
+      setUriProfile(imageToUpload);
+      await uploadProfileImage(imageToUpload, {
+        onSuccess: serverUrl => {
+          setUriProfile(serverUrl);
+          setImageKey(Date.now());
+          customToast(translate('toast.text_photo_updated_success'), 'success');
+        },
+      });
+    } catch (error: any) {
+      console.error('Erro ao atualizar foto:', error);
+      if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
+        customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
+      } else if (error?.response?.status === 413) {
+        customToast(translate('toast.text_image_too_large'), 'danger');
+      } else {
+        customToast(error?.response?.data?.message || error?.message || translate('toast.text_photo_update_error'), 'danger');
       }
     }
-
-    const options = {
-      storageOptions: {
-        skipBackup: false,
-        path: 'images',
-      },
-      quality: 1,
-      aspect: [4, 4],
-      allowsEditing: true,
-      maxWidth: 250,
-      maxHeight: 250,
-    };
-
-    ImagePicker.launchCameraAsync(options).then(response => {
-      if (response.didCancel || response.error) return;
-
-      resizeImage(response.uri).then(result => {
-        async function updatePhoto() {
-          const locaUri = result.uri;
-          setUriProfile(result.uri);
-          const filename = locaUri.split('/').pop();
-
-          // Infer the type of the image
-          const match = /\.(\w+)$/.exec(filename);
-          const type = match ? `image/${match[1]}` : `image`;
-
-          const formData = new FormData();
-          formData.append('customerId', user.idCustomer);
-          formData.append('photo', {
-            uri: result.uri,
-            type,
-            name: filename,
-          });
-          const {
-            data: {status},
-          } = await apiMain.post('Customer/UpdateProfileImage', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-
-          if (status) {
-            updateDataUser();
-          }
-        }
-
-        updatePhoto();
-      });
-    });
   }
 
-  async function resizeImage(uri) {
-    const manipResult = await ImageManipulator.manipulateAsync(
-      uri,
-      [{resize: {width: 400, height: 400}}],
-      {compress: 1, format: ImageManipulator.SaveFormat.PNG},
-    );
-
-    return manipResult;
-  }
-
-  async function sendPhotoRecognition(uri) {
-    resizeImage(uri).then(result => {
-      async function updatePhoto() {
-        const locaUri = result.uri;
-        setUriProfile(result.uri);
-        const filename = locaUri.split('/').pop();
-
-        // Infer the type of the image
-        const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : `image`;
-
-        const formData = new FormData();
-        formData.append('customerId', user.idCustomer);
-        formData.append('photo', {
-          uri: result.uri,
-          type,
-          name: filename,
-        });
-        const {
-          data: {status},
-        } = await apiMain.post('Customer/UpdateProfileImage', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        if (status) {
-          updateDataUser();
+  async function sendPhotoRecognition(uri: string) {
+    try {
+      let imageToUpload = uri;
+      try {
+        const result = await resizeImage(uri, 400, 400);
+        if (result?.uri) {
+          imageToUpload = result.uri;
         }
+      } catch (resizeErr) {
+        console.warn('Falha ao redimensionar foto:', resizeErr);
       }
-      updatePhoto();
-    });
+
+      setUriProfile(imageToUpload);
+      await uploadProfileImage(imageToUpload, {
+        onSuccess: serverUrl => {
+          setUriProfile(serverUrl);
+          setImageKey(Date.now());
+          customToast(translate('toast.text_photo_updated_success'), 'success');
+        },
+      });
+    } catch (error: any) {
+      console.error('Erro ao atualizar foto:', error);
+      if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
+        customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
+      } else if (error?.response?.status === 413) {
+        customToast(translate('toast.text_image_too_large'), 'danger');
+      } else {
+        customToast(error?.response?.data?.message || error?.message || translate('toast.text_photo_update_error'), 'danger');
+      }
+    }
   }
 
   return (
@@ -180,19 +168,19 @@ export default function MyProfileSpeedMob() {
             >
               <Photo>
                 <PhotoProfile
-                  // eslint-disable-next-line global-require
+                  key={`photo-speedmob-${imageKey}`}
                   defaultSource={require('../../../assets/images/preuser.png')}
                   source={
                     uriProfile
                       ? {
-                          uri: uriProfile,
-                        }
+                        uri: uriProfile,
+                      }
                       : null
                   }
                 />
                 <Feather
                   name="edit"
-                  style={{position: 'absolute'}}
+                  style={{ position: 'absolute' }}
                   color={theme.colors.background_global}
                 />
               </Photo>
@@ -242,26 +230,49 @@ export default function MyProfileSpeedMob() {
           </ContentSwitch>
 
           <TouchableOpacity
-            onPress={() => {
-              navigate('ContactUs', {
-                name: translate('exclude.delete_my_account'),
-                exclude: true,
-              });
-            }}
+            onPress={() => setDeleteModalVisible(true)}
             activeOpacity={0.8}
           >
             <ItemProfile
               label={translate('exclude.delete_account')}
-              onPress={() => {}}
+              onPress={() => { }}
               textValue={''}
             />
           </TouchableOpacity>
         </Body>
 
         <ChangePasswordModal
-          email={user.email}
           visible={modalPasswordVisible}
           setVisible={setModalPasswordVisible}
+          onCheckCurrentPassword={async currentPassword => {
+            const result = await apiMain.post('Customer/CheckPassword', {
+              password: currentPassword,
+            });
+            return !!result.data.status;
+          }}
+          onUpdatePassword={async newPassword => {
+            const result = await apiMain.post('Customer/UpdatePassword', {
+              password: newPassword,
+              email: user.email,
+              withoutCode: true,
+            });
+
+            if (result.data.status) {
+              AsyncStorage.setItem(
+                'lastLogin',
+                JSON.stringify({ email: user.email, password: newPassword }),
+              );
+            }
+
+            return { status: result.data.status, message: result.data.message };
+          }}
+        />
+
+        <DeleteAccountModal
+          visible={deleteModalVisible}
+          onClose={() => setDeleteModalVisible(false)}
+          onConfirm={postExcludeAccount}
+          loading={deleteLoading}
         />
         <ChangePhoneNumberModal
           currentPhone={user.phone}

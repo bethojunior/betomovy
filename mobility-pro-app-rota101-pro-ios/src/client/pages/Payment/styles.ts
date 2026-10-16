@@ -1,5 +1,7 @@
 import styled from 'styled-components/native';
 import {mix} from 'polished';
+import { Button as BaseButton } from '~/client/components/Button';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export const ScrollContent = styled.ScrollView`
   background-color: ${({theme}) => theme.colors.background_global};
@@ -16,14 +18,12 @@ export const Title = styled.Text`
   margin-top: 10px;
 `;
 
-export const Button = styled.TouchableOpacity`
-  background-color: ${({theme}) => theme.colors.primary};
-  width: 30%;
-  align-items: center;
-  align-self: flex-end;
-  padding: 10px;
-  border-radius: 5px;
-  margin-top: 20px;
+export const Button = styled(BaseButton).attrs((props) => ({
+  textSize: 12,
+  ...props
+}))`
+  height: ${RFValue(32)}px;
+  margin-top: 10px;
 `;
 
 export const CardContent = styled.TouchableOpacity`
@@ -101,4 +101,10 @@ export const TitleDeleteCard = styled.Text`
 
 export const SimpleText = styled.Text`
   color: ${({theme}) => theme.colors.secondary};
+`;
+
+export const VoucherSectionContainer = styled.View`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 `;

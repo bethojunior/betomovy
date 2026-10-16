@@ -4,13 +4,14 @@ import theme from '../../styles/theme';
 interface SwitchProps {
   value: boolean;
   enabled?: boolean;
+  trackColorOn?: string;
   onValueChange: (value: boolean) => void | Promise<void>;
 }
 
-export function Switch({value, onValueChange, enabled}: SwitchProps) {
+export function Switch({value, onValueChange, enabled, trackColorOn}: SwitchProps) {
   return (
     <SwitchPaper
-      trackColor={{true: theme.colors.primary, false: theme.colors.secondary}}
+      trackColor={{true: trackColorOn || theme.colors.primary, false: theme.colors.secondary}}
       value={value}
       enabled={enabled}
       onValueChange={onValueChange}

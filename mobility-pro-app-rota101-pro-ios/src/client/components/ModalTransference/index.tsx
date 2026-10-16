@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {
   Asterisk,
   ContentTransferModal,
@@ -35,7 +35,23 @@ export const ModalTransference = ({
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState('0,00');
 
-  const {cityConfig} = useAuth();
+  const {cityConfig, generalSettings} = useAuth();
+
+
+  const getGeneralSettingsValue = (key: string) => {
+    const setting = generalSettings?.find(item => item.key === key);
+    return setting ? setting.value : undefined;
+  };
+
+  const minimumWithdrawValue = getGeneralSettingsValue('minimum_value_for_partner_withdraw') || '0.00';
+
+  useEffect(() => {
+    if (!generalSettings || generalSettings.length === 0) {
+      console.error('generalSettings is empty or undefined');
+    } else {
+      const keys = generalSettings.map(setting => setting.key);
+    }
+  }, [generalSettings]);
 
   const handleWithDraw = async (amount: string) => {
     const amountNumber = Number(amount.replace(/[^0-9]/g, '')) / 100;
@@ -44,8 +60,9 @@ export const ModalTransference = ({
       return customToast(translate('transfer.empty_value'), 'warning');
     }
 
-    if (amountNumber < 20) {
-      return customToast(translate('transfer.min_value'), 'warning');
+    if (amountNumber < Number(minimumWithdrawValue)) {
+      const minValueMessage = `${translate('transfer.min_value')} ${coinTypePerApi(cityConfig?.typeMoney)} ${minimumWithdrawValue}`;
+      return customToast(minValueMessage, 'warning');
     }
 
     if (amountNumber > currentSald) {
@@ -56,7 +73,8 @@ export const ModalTransference = ({
     const response = await makeWithdraw(amountNumber);
     if (!response.status) {
       setLoading(false);
-      return customToast(translate('transfer.error_transfer'), 'danger');
+      const minValueMessage = `${translate('transfer.min_value')} ${coinTypePerApi(cityConfig?.typeMoney)} ${minimumWithdrawValue}`;
+      return customToast(minValueMessage, 'danger');
     }
     setValue('0,00');
     setLoading(false);
@@ -116,7 +134,7 @@ export const ModalTransference = ({
           <Asterisk>* </Asterisk>
           <TextObservation>
             {translate('transfer.text_min_value')}{' '}
-            {coinTypePerApi(cityConfig?.typeMoney)}
+            {coinTypePerApi(cityConfig?.typeMoney)} {minimumWithdrawValue}
           </TextObservation>
         </ObservationContent>
         <ObservationContent>

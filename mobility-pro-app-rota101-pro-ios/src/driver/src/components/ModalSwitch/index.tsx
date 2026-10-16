@@ -1,16 +1,21 @@
-import {Modal} from 'react-native';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {translate} from '../../../../client/locales';
+import { Modal } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { translate } from '../../../../client/locales';
 import theme from '../../styles/theme';
-import {AntDesign} from '@expo/vector-icons';
-import {Button} from '../Button';
+import { AntDesign } from '@expo/vector-icons';
+import { Button } from '../Button';
 import {
   ContainerModal,
   ContentOptions,
   ContentOptionsButtons,
-  ContentOptionsText,
+  Title,
   Exit,
+  Subtitle,
+  OptionButton,
+  OptionText,
+  SubmitButton,
 } from './styles';
+import { useState } from 'react';
 
 interface Props {
   modalEdit: boolean;
@@ -18,6 +23,7 @@ interface Props {
   onClickButton1?: () => void;
   onClickButton2?: () => void;
   title: string;
+  subtitle?: string;
   textButtons: {
     button1: string;
     button2: string;
@@ -30,30 +36,42 @@ export const ModalSwitch = ({
   onClickButton1,
   onClickButton2,
   title,
+  subtitle,
   textButtons,
 }: Props) => {
+  const [option, setOption] = useState<number>(1);
+
+  function onSubmit() {
+    if (option === 1 && onClickButton1) {
+      onClickButton1();
+    } else if (option === 2 && onClickButton2) {
+      onClickButton2();
+    }
+  }
+
   return (
     <Modal visible={modalEdit} transparent>
       <ContainerModal>
         <ContentOptions>
-          <ContentOptionsText>{title}</ContentOptionsText>
+          <Title>{title}</Title>
+          {subtitle && <Subtitle>{subtitle}</Subtitle>}
 
           <ContentOptionsButtons>
-            <Button
-              title={textButtons?.button1}
-              onPress={onClickButton1}
-              small
-            />
-            <Button
-              title={textButtons?.button2}
-              onPress={onClickButton2}
-              small
-            />
+            <OptionButton onPress={() => setOption(1)} active={option === 1}>
+              <OptionText active={option === 1}>{textButtons?.button1}</OptionText>
+            </OptionButton>
+
+            <OptionButton onPress={() => setOption(2)} active={option === 2}>
+              <OptionText active={option === 2}>{textButtons?.button2}</OptionText>
+            </OptionButton>
           </ContentOptionsButtons>
+
+          <SubmitButton title={translate('modalSwitch.submit_button')} onPress={onSubmit} />
+
           <Exit onPress={() => setModalEdit(false)} activeOpacity={1}>
             <AntDesign
-              name="closecircleo"
-              size={RFValue(22)}
+              name="close-circle"
+              size={RFValue(24)}
               color={theme.colors.primary}
               onPress={() => setModalEdit(false)}
             />

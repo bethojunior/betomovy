@@ -1,8 +1,6 @@
 export const mapLight = [
   {
-      "featureType": "poi",
-      "stylers": [
-          {"visibility": "off"}
-      ]
-  }
-]
+    featureType: 'poi',
+    stylers: [{visibility: 'off'}],
+  },
+];

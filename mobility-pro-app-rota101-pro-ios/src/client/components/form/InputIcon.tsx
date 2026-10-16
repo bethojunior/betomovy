@@ -40,7 +40,8 @@ function TextInputCustom(props) {
     <TextInput
       {...verifyInputProps(inputProps)}
       {...props}
-      style={styles.inputSearch}
+      style={[styles.inputSearch, {color: theme.colors.text_gray || theme.colors.black}]}
+      placeholderTextColor={theme.colors.text_gray || '#999'}
     />
   );
 }

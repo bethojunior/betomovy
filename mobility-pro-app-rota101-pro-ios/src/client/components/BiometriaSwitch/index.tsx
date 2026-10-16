@@ -1,9 +1,11 @@
 // @ts-nocheck
 import {useState} from 'react';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import {RFValue} from 'react-native-responsive-fontsize';
 
 import {useFocusEffect} from '@react-navigation/native';
 import {useTheme} from 'styled-components';
-import {Item, ItemRow, Loading, SwitchContainer} from './styles';
+import {Item, ItemRow, Loading, SwitchContainer, TextGroup} from './styles';
 
 import {Switch} from '../Switch';
 
@@ -72,12 +74,16 @@ export function BiometriaSwitch() {
 
   return show ? (
     <ItemRow>
-      <Item>{translate('myProfile.biometry')}</Item>
+      <Ionicons name="finger-print-outline" size={RFValue(18)} color={colors.icon_gray} />
+      <TextGroup>
+        <Item>{translate('myProfile.biometry')}</Item>
+      </TextGroup>
       <SwitchContainer>
         {loading ? <Loading size="small" color={colors.primary} /> : null}
         <Switch
           enabled={!loading}
           value={isSwitchOn}
+          trackColorOn={colors.primary}
           onValueChange={onToggleSwitch}
         />
       </SwitchContainer>

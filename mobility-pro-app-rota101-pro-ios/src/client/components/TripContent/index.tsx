@@ -1,127 +1,115 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
-import {Audio} from 'expo-av';
-import {ActivityIndicator, View, BackHandler} from 'react-native';
-import {useDynamicAnimation} from 'moti';
+import { useNavigation } from '@react-navigation/native';
+import { Audio } from 'expo-av';
+import { ActivityIndicator } from 'react-native';
 import DriverSearch from '../DriverSearch';
 import TripContentInProgress from '../TripContentInProgress';
-import {useTrip} from '../../contexts/Trip';
+import { useTrip } from '../../contexts/Trip';
 
-import {Container} from './styles';
+import { Container, LoadingContainer } from './styles';
 import {
   STATUS_ACCEPTED,
   STATUS_SCHEDULED,
   STATUS_SEARCHING,
   STATUS_SEARCHING_DRIVER_OFFER,
-  STATUS_SEARCHING_FAVORITE,
 } from '../../constants/trip';
-import {ModalOfferTrip} from '../ModalOfferTrip';
+import { ModalOfferTrip } from '../ModalOfferTrip';
 import theme from '../../styles/theme';
-import {NotificationModalMessage} from '../ModalMessage';
-import {If} from '../If';
-import {useAuth} from '../../../context/auth';
-import Push from '../../services/push';
-import {translate} from '../../locales';
-import {TripRealtime} from '../../services/realtime/TripRealtime';
-import {ChatRealtime} from '../../services/realtime/ChatRealtime';
-import {MONEY_IN_LOCAL} from '../../constants/paymentFormType';
-import apiMain from '../../api/apiMain';
-import {TripProps} from '../../contexts/Trip/types';
+import { MessageProps, NotificationMessage } from '~/components/NotificationMessage';
+import { buildApp } from '../../../constantBuild/config';
+import { useAuth } from '../../../context/auth';
+import useTripRealtime from '../../hooks/tripRealtime';
+import { TripCallback } from '../../interfaces/tripRealtime';
+import { ChatRealtime } from '../../services/realtime/ChatRealtime';
+import { TripProps } from '../../contexts/Trip/types';
 
 interface TripContentProps {
   setModalDriverData: (data: boolean) => void;
 }
 
-function TripContent({setModalDriverData}: TripContentProps) {
-  const tripRealtime = useMemo(() => new TripRealtime(), []);
-  const chatRealtime = useMemo(() => new ChatRealtime(), []);
-  const {handleTripStateChange, stateTripCustomer, dispatchTripCustomer} =
-    useTrip();
-  const {user} = useAuth();
+function TripContent({ setModalDriverData }: TripContentProps) {
+  const [newMessage, setNewMessage] = useState(false);
+  const [message, setMessage] = useState<MessageProps | null>(null);
+  const messageIdRef = useRef<string | null>(null);
 
-  const {trip, tripPartnerList, partnerTripsReference} = stateTripCustomer;
-  const [loading, setLoading] = useState(true);
-  const [statusType, setStatusType] = useState('');
-  const navigation = useNavigation();
-  const [tripReferenceCurrent, setTripReferenceCurrent] = useState(null);
+  const { tripRealtime } = useTripRealtime();
+  const chatRealtime = useMemo(() => new ChatRealtime(), []);
+
+  const { handleTripStateChange, stateTripCustomer, dispatchTripCustomer } = useTrip();
+  const { user } = useAuth();
+
+  const { trip, tripPartnerList, partnerTripsReference } = stateTripCustomer;
+  const navigation = useNavigation<any>();
   const tripPartnerListLocal = [...tripPartnerList];
 
   const tripReferenceConnected = useRef(partnerTripsReference);
 
+  const tripReference = useMemo(() => trip?.tripReference, [trip?.tripReference]);
+
   const lastTripPartner = tripPartnerList[tripPartnerList.length - 1];
+
+  let tripUpdateEvent: string | null = null;
+  let statusType: string | null = null;
 
   const conditionComponentTrip = [
     STATUS_SEARCHING,
     STATUS_SCHEDULED && trip?.driver === null,
     STATUS_SEARCHING_DRIVER_OFFER,
-    STATUS_SEARCHING_FAVORITE,
   ].includes(trip?.status || lastTripPartner?.status);
 
   const mountSong = async () => {
-    const {sound} = await Audio.Sound.createAsync(
+    const { sound } = await Audio.Sound.createAsync(
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       require('../../assets/songs/status-trip.mp3'),
     );
     return sound;
   };
 
-  const getTrip = async (tripReference: string) => {
-    try {
-      const {
-        data: {data},
-      } = await apiMain.post('trip/get', {stdObject: [{tripReference}]});
-      return data;
-    } catch (error) {
-      console.log('error', error);
+  const clearTripUpdateEvent = () => {
+    if (!!tripUpdateEvent) {
+      tripRealtime.unsubscribe(tripUpdateEvent);
+      tripUpdateEvent = null;
+    }
+    statusType = null;
+  };
 
-      return false;
+  const onTripUpdate: TripCallback = async ({ data, type }) => {
+    const statusTypes = ['accepted', 'boarding', 'in_progress', 'finished'];
+
+    if (statusTypes.includes(data.status)) {
+      if (statusType !== data.status) {
+        mountSong().then(async (soung) => {
+          Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+            staysActiveInBackground: true,
+            playsInSilentModeIOS: true,
+            shouldDuckAndroid: true,
+            playThroughEarpieceAndroid: false,
+          });
+          await soung?.playAsync().then(() => {});
+        });
+
+        statusType = data.status;
+      }
+    }
+
+    if (['added', 'modified'].includes(type)) {
+      dispatchTripCustomer({ type: 'update', field: 'trip', arg: data });
+      await AsyncStorage.setItem('trip', JSON.stringify(data));
+    }
+
+    if (type === 'removed') {
+      await handleTripStateChange(data.tripReference);
+      clearTripUpdateEvent();
     }
   };
 
   useEffect(() => {
-    if (Object.keys(trip).length === 0) {
-      setTripReferenceCurrent(null);
-      setLoading(false);
-      return;
+    if (!!tripReference && !tripUpdateEvent) {
+      tripUpdateEvent = tripRealtime.getTrip(tripReference, onTripUpdate);
     }
-    if (trip.tripReference !== tripReferenceCurrent) {
-      setTripReferenceCurrent(trip.tripReference);
-      if (trip.tripReference) {
-        tripRealtime.getTrip(trip.tripReference, (trip, type) => {
-          if (
-            ['accepted', 'boarding', 'in_progress', 'finished'].includes(
-              trip.status,
-            )
-          ) {
-            if (statusType !== trip.status) {
-              mountSong().then(async soung => {
-                Audio.setAudioModeAsync({
-                  allowsRecordingIOS: false,
-                  staysActiveInBackground: true,
-                  playsInSilentModeIOS: true,
-                  shouldDuckAndroid: true,
-                  playThroughEarpieceAndroid: false,
-                });
-                await soung?.playAsync().then(() => {});
-              });
-
-              setStatusType(trip.status);
-            }
-          }
-          if (['added', 'modified'].includes(type)) {
-            dispatchTripCustomer({type: 'update', field: 'trip', arg: trip});
-            AsyncStorage.setItem('trip', JSON.stringify(trip));
-          }
-
-          if (type === 'removed') {
-            handleTripStateChange();
-          }
-        });
-      }
-    }
-    setLoading(false);
-  }, [trip]);
+  }, [tripReference]);
 
   const updateTripPartnerList = (trips: TripProps[]) => {
     dispatchTripCustomer({
@@ -146,38 +134,37 @@ function TripContent({setModalDriverData}: TripContentProps) {
   };
 
   useEffect(() => {
-    tripPartnerListLocal?.map(trip => {
+    const unsubscribes = new Map();
+
+    tripPartnerListLocal?.map((trip) => {
       if (!tripReferenceConnected.current.includes(trip.tripReference)) {
-        tripRealtime.getTrip(trip.tripReference, (trip, type) => {
-          if (!tripReferenceConnected.current.includes(trip.tripReference)) {
+        const onTripUpdate: TripCallback = async ({ data, type }) => {
+          if (!tripReferenceConnected.current.includes(data.tripReference)) {
             tripReferenceConnected.current = [
               ...tripReferenceConnected.current,
               trip.tripReference,
             ];
-            updateTripsReference([
-              ...tripReferenceConnected.current,
-              trip.tripReference,
-            ]);
+            updateTripsReference([...tripReferenceConnected.current, trip.tripReference]);
           }
 
           if (['added', 'modified'].includes(type)) {
-            const trips = tripPartnerListLocal?.filter(tripPartner => {
+            const trips = tripPartnerListLocal?.filter((tripPartner) => {
               return tripPartner.tripReference !== trip.tripReference;
             });
 
-            updateTripPartnerList([...trips, trip]);
+            updateTripPartnerList([...trips, data]);
 
-            if ([STATUS_ACCEPTED].includes(trip?.status)) {
-              navigation.navigate('TripRoutes', {screen: 'Home'});
+            if ([STATUS_ACCEPTED].includes(data?.status)) {
+              navigation.navigate('TripRoutes', { screen: 'Home' });
             }
           }
 
           if (type === 'removed') {
             const tripReferences = tripReferenceConnected.current.filter(
-              tripReference => tripReference !== trip.tripReference,
+              (tripReference) => tripReference !== trip.tripReference,
             );
 
-            const trips = tripPartnerListLocal.filter(tripPartner => {
+            const trips = tripPartnerListLocal.filter((tripPartner) => {
               return tripPartner.tripReference !== trip.tripReference;
             });
 
@@ -186,92 +173,64 @@ function TripContent({setModalDriverData}: TripContentProps) {
             tripReferenceConnected.current = [...tripReferences];
             updateTripsReference(tripReferences);
 
-            handleTripStateChange(trip.tripReference);
+            await handleTripStateChange(trip.tripReference, () => {
+              const _unsubscribe = unsubscribes.get(trip.tripReference);
+
+              if (_unsubscribe) {
+                tripRealtime.unsubscribe(_unsubscribe);
+                unsubscribes.delete(trip.tripReference);
+              }
+            });
           }
-        });
+        };
+
+        const unsubscribe = tripRealtime.getTrip(trip.tripReference, onTripUpdate);
+        unsubscribes.set(trip.tripReference, unsubscribe);
       }
     });
+
+    return () => {
+      unsubscribes.forEach((unsubscribe) => {
+        tripRealtime.unsubscribe(unsubscribe);
+      });
+      unsubscribes.clear();
+    };
   }, []);
 
-  const [newMessage, setNewMessage] = useState(false);
-  const [message, setMessage] = useState<any>({});
-  const [newMessageNotification, setNewMessageNotification] = useState(false);
-  const animationMessage = useDynamicAnimation(() => {
-    return {
-      transform: [{translateY: 500}],
-    };
-  });
+  const handleMessageRead = () => {
+    if (messageIdRef.current) {
+      chatRealtime.setViewMessage(messageIdRef.current);
 
-  // [TODO]: Falta atualizacao de back para funcionar
-  // const sendNotification = async () => {
-  //   if (trip.status === STATUS_IN_PROGRESS) {
-  //     const response = await getTrip(trip.tripReference);
-  //     if (
-  //       response &&
-  //       String(response?.paymentFormTypeId) === String(MONEY_IN_LOCAL)
-  //     ) {
-  //       await pushNative({
-  //         title: `<b> ${translate(
-  //           'statusTrip.dont_forget_your_money',
-  //         )} 💡 </b>`,
-  //         body: `💰 ${translate(
-  //           'statusTrip.you_need_to_pay_the_full_amount_the_driver_at_end_of_the_trip',
-  //         )}`,
-  //       });
-  //     }
-  //   }
-  // };
-
-  useEffect(() => {
-    if (newMessage)
-      setTimeout(() => {
-        setNewMessage(false);
-
-        animationMessage.animateTo({
-          transform: [{translateY: 500}],
-          opacity: 0.7,
-        });
-      }, 5000);
-  }, [newMessage]);
-
-  useEffect(() => {
-    if (trip.tripReference) {
-      chatRealtime.getLastMessageUnread(trip.tripReference, ({item, id}) => {
-        if (item.message !== 'null') {
-          if (
-            // eslint-disable-next-line eqeqeq
-            item.userId != user?.idUser &&
-            !item.viewed &&
-            navigation.isFocused()
-          ) {
-            Push.sendSimple({
-              title: `${
-                (trip && trip?.driver?.nickname) ||
-                translate('trip.title_driver')
-              } ${translate('trip.body_notify')}`,
-              body: item.message,
-            });
-            setMessage(item);
-            setNewMessage(true);
-            setNewMessageNotification(true);
-          }
-        }
-      });
+      messageIdRef.current = null;
     }
-    setLoading(false);
-  }, [trip]);
+
+    setNewMessage(false);
+  };
+
+  useEffect(() => {
+    if (tripReference) {
+      const unsubscribe = chatRealtime.getLastMessageUnread(
+        tripReference,
+        ({ item, id }) => {
+          if (item.message !== 'null') {
+            if (item.userId != user?.idUser && !item.viewed && navigation.isFocused()) {
+              messageIdRef.current = id;
+              setMessage(item);
+              setNewMessage(true);
+            }
+          }
+        },
+      );
+
+      return () => {
+        unsubscribe();
+        messageIdRef.current = null;
+      };
+    }
+  }, [tripReference]);
 
   return (
     <>
-      <If condition={message?.message && newMessage}>
-        <NotificationModalMessage
-          animationMessage={animationMessage}
-          isAudio={message?.isAudio}
-          message={message}
-          setNewMessage={setNewMessage}
-          setNewMessageNotification={setNewMessageNotification}
-        />
-      </If>
       <Container
         style={{
           shadowColor: theme.colors.primary,
@@ -297,22 +256,32 @@ function TripContent({setModalDriverData}: TripContentProps) {
             )}
           </>
         ) : trip.driver ? (
-          <TripContentInProgress setModalDriverData={setModalDriverData} />
+          <TripContentInProgress
+            setModalDriverData={setModalDriverData}
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+          />
         ) : (
-          <View
-            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-          >
+          <LoadingContainer>
             <ActivityIndicator size="large" color={theme.colors.primary} />
-          </View>
-        )}
-        {loading && (
-          <View
-            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-          >
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-          </View>
+          </LoadingContainer>
         )}
       </Container>
+
+      <NotificationMessage
+        visible={!!message?.message}
+        message={message}
+        isAudio={message?.isAudio}
+        title={trip?.driver?.nickname}
+        pictureUri={
+          trip?.centralId === null
+            ? trip?.driver?.profilePicture
+            : `${buildApp().HOST_IMAGE_TRIP_TYPE}${trip?.fare?.picture}`
+        }
+        onPress={() => navigation.navigate('TripChat', { trip })}
+        onRead={handleMessageRead}
+        onDismiss={() => { setMessage(null); }}
+      />
     </>
   );
 }

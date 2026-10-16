@@ -16,6 +16,7 @@ import {useAuth} from '../../../../context/auth';
 import theme from '../../styles/theme';
 import {RFValue} from 'react-native-responsive-fontsize';
 import {useModals} from '../../../../context/Modals';
+import {useStoragePictures} from '../../hooks/useStoragePictures';
 interface Props {
   aminating?: any;
   styleRelative?: boolean;
@@ -28,6 +29,7 @@ export const HomeHeaderTop = ({aminating, children, styleRelative}: Props) => {
   const {cityConfig} = useAuth();
 
   const [viewValue, setViewValue] = useState(false);
+  const {getStoragePictureSpecific} = useStoragePictures();
 
   return (
     <Container
@@ -44,9 +46,10 @@ export const HomeHeaderTop = ({aminating, children, styleRelative}: Props) => {
         >
           <Avatar
             source={{
-              uri: `${buildApp().HOST_IMAGE_DRIVER}${
-                userDriverFind?.profileImage
-              }`,
+              uri: `${
+                getStoragePictureSpecific('driver') ||
+                buildApp().HOST_IMAGE_DRIVER
+              }${userDriverFind?.profileImage}`,
             }}
           />
         </ContentImage>

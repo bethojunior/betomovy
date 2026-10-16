@@ -1,3 +1,4 @@
+import { TextInputMask } from 'react-native-masked-text';
 import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 
@@ -17,6 +18,16 @@ export const Title = styled.Text<TitleProps>`
   font-size: 12px;
   color: ${({theme}) => theme.colors.secondary};
   margin-bottom: ${({modeEdit}) => (modeEdit ? 0 : '-10px')};
+`;
+
+export const Input = styled(TextInputMask)`
+  border-width: 1px;
+  border-color: ${({theme}) => theme.colors.secondary};
+  color: ${({theme}) => theme.colors.secondary};
+  border-radius: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding: 5px;
 `;
 
 export const Content = styled.View`

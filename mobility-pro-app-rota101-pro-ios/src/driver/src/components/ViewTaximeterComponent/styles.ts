@@ -1,5 +1,4 @@
-import {MotiView} from 'moti';
-import {shade} from 'polished';
+import {shade, tint, getLuminance} from 'polished';
 import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 
@@ -8,15 +7,15 @@ interface ButtonProps {
 }
 
 export const Container = styled.View`
-  height: auto;
+  flex: 1;
   padding-left: ${RFValue(20)}px;
-  padding-bottom: ${RFValue(25)}px;
+  padding-bottom: ${RFValue(20)}px;
   padding-right: ${RFValue(20)}px;
   z-index: 1;
   width: 100%;
   background-color: ${({theme}) => theme.colors.background_global};
-  border-top-left-radius: ${RFValue(25)}px;
-  border-top-right-radius: ${RFValue(25)}px;
+  border-top-left-radius: ${({theme}) => theme.spacing.large}px;
+  border-top-right-radius: ${({theme}) => theme.spacing.large}px;
   position: absolute;
   bottom: 0;
 
@@ -28,15 +27,12 @@ export const Container = styled.View`
 `;
 
 export const Header = styled.View`
-  padding-top: ${({theme}) => theme.spacing.large}px;
-  padding-bottom: ${({theme}) => theme.spacing.small}px;
   flex-direction: row;
   justify-content: flex-start;
   margin-left: -5px;
-  margin-bottom: ${({theme}) => theme.spacing.small}px;
+  margin-bottom: ${({theme}) => theme.spacing.large}px;
   align-items: center;
   position: relative;
-  min-height: ${() => RFValue(30)}px;
 `;
 
 export const TitleContainer = styled.View`
@@ -44,17 +40,12 @@ export const TitleContainer = styled.View`
   align-items: center;
 `;
 
-export const InfoButton = styled.Text`
-  position: absolute;
-  right: ${() => RFValue(10)}px;
-  top: 50%;
-`;
-
 export const BackPage = styled.TouchableOpacity`
   margin-right: ${RFValue(5)}px;
 `;
 
 export const ContentTaximeter = styled.View`
+  min-height: 46px;
   padding: ${({theme}) => theme.spacing.medium}px;
   margin-top: ${({theme}) => theme.spacing.small}px;
   background-color: ${({theme}) => theme.colors.primary};
@@ -101,11 +92,18 @@ export const ContainerButton = styled.View`
 `;
 
 export const Button = styled.TouchableOpacity<ButtonProps>`
-  background-color: ${({theme, disabled}) =>
-    disabled ? shade(0.4, theme.colors.primary) : theme.colors.primary};
+  background-color: ${({theme, disabled}) => {
+    const color = theme.colors.primary;
+
+    if (!disabled) return color;
+
+    const isDark = getLuminance(color) < 0.2;
+
+    return isDark ? tint(0.4, color) : shade(0.4, color);
+  }};
+
   border-radius: 5px;
   padding: ${({theme}) => theme.spacing.medium}px;
-
   align-items: center;
   justify-content: center;
   width: 30%;
@@ -117,28 +115,17 @@ export const ContentTime = styled.View`
 
 export const ContainerCenter = styled.View``;
 
-export const ContainerIcon = styled.TouchableOpacity`
-  position: absolute;
-  top: -${({theme}) => theme.spacing.xsslarge}px;
-  border-radius: 50px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  justify-content: center;
+export const ButtonIcon = styled.Pressable`
+  margin: 0 auto;
+  margin-top: -20px;
   align-items: center;
-
-  margin-bottom: 20px;
+  background-color: ${({theme}) => theme.colors.primary};
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
 
   shadow-color: ${({theme}) => theme.colors.black};
   shadow-opacity: 0.25;
-`;
-
-export const Icon = styled.View`
-  background-color: ${({theme}) => theme.colors.primary};
-  border-radius: 50px;
-  height: 40px;
-  width: 40px;
-
-  align-items: center;
-  justify-content: center;
 `;

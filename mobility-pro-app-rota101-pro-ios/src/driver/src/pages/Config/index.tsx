@@ -1,15 +1,10 @@
-import {ActivityIndicator, View, Linking, AppState} from 'react-native';
-import {Switch} from 'react-native-elements';
-import {ScrollView} from 'react-native-gesture-handler';
-import {Feather} from '@expo/vector-icons';
-import {useEffect, useState} from 'react';
+import { ActivityIndicator, View, Linking } from 'react-native';
+import { Switch } from 'react-native-elements';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Feather } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Camera} from 'expo-camera';
-import * as Location from 'expo-location';
-import {Audio} from 'expo-av';
-import {useTheme} from 'styled-components';
-import * as Notifications from 'expo-notifications';
-import * as MediaLibrary from 'expo-media-library';
+import { useTheme } from 'styled-components';
 import {
   Content,
   Header,
@@ -19,22 +14,16 @@ import {
   Button,
   ButtonText,
 } from './styles';
-import {useConfig} from '../../context/Config';
-import {customToast} from '../../../../utils/FlashMessage';
-import {translate} from '../../../../client/locales';
-import {ModalSwitch} from '../../components/ModalSwitch';
-import {If} from '../../components/If';
+import { useConfig } from '../../context/Config';
+import { customToast } from '../../../../utils/FlashMessage';
+import { translate } from '../../../../client/locales';
+import { ModalSwitch } from '../../components/ModalSwitch';
+import { If } from '../../components/If';
+import { useAuth } from '../../../../context/auth';
+import { useDriverAppReport } from '../../hooks/useDriverAppReport';
+import { useDevicePermissions } from '../../hooks/useDevicePermissions';
 
 let addNew = [];
-
-const statusPermission = {
-  foreground: 'false',
-  background: 'false',
-  media: 'false',
-  camera: 'false',
-  audio: 'false',
-  notifications: 'false',
-};
 
 export const Config = () => {
   const [appSettings, setAppSettings] = useState(null);
@@ -55,7 +44,10 @@ export const Config = () => {
     updateChooseDriver,
   } = useConfig();
 
-  const {colors} = useTheme();
+  const { colors } = useTheme();
+  const { userDriver } = useAuth();
+  const { sendReport: sendAppReport } = useDriverAppReport();
+  const { permissions } = useDevicePermissions();
 
   const getAppSettings = async () => {
     const settings = JSON.parse(await AsyncStorage.getItem('appSetting'));
@@ -65,24 +57,8 @@ export const Config = () => {
     setOptionFlashLight(settings.enableFlashLight);
   };
 
-  const getPermissionExpo = async () => {
-    statusPermission.foreground = (
-      await Location.getForegroundPermissionsAsync()
-    ).status;
-    statusPermission.background = (
-      await Location.getBackgroundPermissionsAsync()
-    ).status;
-    statusPermission.media = (await MediaLibrary.getPermissionsAsync()).status;
-    statusPermission.camera = (await Camera.getCameraPermissionsAsync()).status;
-    statusPermission.audio = (await Audio.getPermissionsAsync()).status;
-    statusPermission.notifications = (
-      await Notifications.getPermissionsAsync()
-    ).status;
-  };
-
   useEffect(() => {
     const getList = async () => {
-      await getPermissionExpo();
       await getPaymentForm();
       await getChooseDriverPaymentForm();
       await getImpositionPaymentForm();
@@ -106,12 +82,6 @@ export const Config = () => {
     if (appSettings === null) {
       getAppSettings();
     }
-
-    AppState.addEventListener('change', state => {
-      if (state === 'active') {
-        getPermissionExpo();
-      }
-    });
   }, [appSettings]);
 
   const changePaymentForm = async (state: boolean, id: number) => {
@@ -168,7 +138,7 @@ export const Config = () => {
     }
   };
 
-  const ButonPermission = ({status}) => (
+  const ButtonPermission = ({ status }: { status: boolean }) => (
     <Button disabled={status} onPress={() => Linking.openSettings()}>
       <ButtonText disabled={status}>
         {translate(`configPage.text_${status}`)}
@@ -176,9 +146,24 @@ export const Config = () => {
     </Button>
   );
 
+  const handleSendAppInfo = async () => {
+    setLoading(true);
+    const { success, message } = await sendAppReport({
+      driverId: Number(userDriver?.idDriver),
+      userId: Number(userDriver?.idUser),
+      nickname: userDriver?.nickname,
+    });
+    setLoading(false);
+
+    customToast(
+      message ?? (success ? 'Sucesso' : 'Ocorreu um erro ao enviar os dados.'),
+      success ? 'success' : 'error',
+    );
+  };
+
   return (
     <View
-      style={{padding: 10, backgroundColor: colors.background_global, flex: 1}}
+      style={{ padding: 10, backgroundColor: colors.background_global, flex: 1 }}
     >
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} />
@@ -273,39 +258,31 @@ export const Config = () => {
               <SubTitle>
                 {translate('configPage.text_acess_localization')}
               </SubTitle>
-              <ButonPermission
-                status={statusPermission?.foreground === 'granted'}
-              />
+              <ButtonPermission status={permissions.foreground} />
             </Section>
             <Section>
               <SubTitle>
                 {translate('configPage.text_acess_localization_background')}
               </SubTitle>
-              <ButonPermission
-                status={statusPermission?.background === 'granted'}
-              />
+              <ButtonPermission status={permissions.background} />
             </Section>
             <Section>
               <SubTitle>{translate('configPage.text_acess_galery')} (Xiaomi)</SubTitle>
-              <ButonPermission status={statusPermission?.media === 'granted'} />
+              <ButtonPermission status={permissions.media} />
             </Section>
             <Section>
               <SubTitle>{translate('configPage.text_acess_camera')}</SubTitle>
-              <ButonPermission
-                status={statusPermission?.camera === 'granted'}
-              />
+              <ButtonPermission status={permissions.camera} />
             </Section>
             <Section>
               <SubTitle>{translate('configPage.text_acess_audio')}</SubTitle>
-              <ButonPermission status={statusPermission?.audio === 'granted'} />
+              <ButtonPermission status={permissions.audio} />
             </Section>
             <Section removeBorder>
               <SubTitle>
                 {translate('configPage.text_acess_notification')}
               </SubTitle>
-              <ButonPermission
-                status={statusPermission?.notifications === 'granted'}
-              />
+              <ButtonPermission status={permissions.notifications} />
             </Section>
           </Content>
           <Content>
@@ -343,11 +320,11 @@ export const Config = () => {
                 );
               })}
               <Section
-              removeBorder
-              style={{
-                borderTopColor: colors.primary,
-                borderTopWidth: 1,
-              }}
+                removeBorder
+                style={{
+                  borderTopColor: colors.primary,
+                  borderTopWidth: 1,
+                }}
               >
                 <SubTitle>Todos</SubTitle>
                 <Switch
@@ -360,6 +337,14 @@ export const Config = () => {
                 />
               </Section>
             </View>
+          </Content>
+          <Content>
+            <Section removeBorder style={{ alignItems: 'center' }}>
+              <SubTitle>{translate('configPage.title_report_app_status')}</SubTitle>
+              <Button onPress={handleSendAppInfo} disabled={false} style={{ marginTop: 2 }}>
+                <ButtonText disabled={false}>Relatar</ButtonText>
+              </Button>
+            </Section>
           </Content>
         </ScrollView>
       )}

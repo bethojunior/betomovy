@@ -10,7 +10,9 @@ import {useModals} from '../../../../context/Modals';
 export const DoorHandleComponent = ({setVisibleQrCode, visibleQrCode}) => {
   const {userDriverFind} = useUserDriver();
   const {cityConfig} = useAuth();
-  const {tripAccepted} = useTripProvider().stateTrip;
+  const tripAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripAccepted,
+  );
   const {containerTaximeter} = useModals();
   const [modalManual, setModalManual] = useState(false);
 

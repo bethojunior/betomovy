@@ -6,121 +6,176 @@ export const Container = styled(Animated.View)`
   flex: 1;
   position: absolute;
   width: 100%;
-  background-color: ${({theme}) => theme.colors.background_global};
+  background-color: ${({theme}) => theme.colors.white};
   z-index: 2;
-  align-items: center;
-  justify-content: center;
+  gap: ${({theme}) => theme.spacing.large}px;
 
-  padding: 20px;
+  padding: ${({theme}) => theme.spacing.large}px;
 
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  border-top-left-radius: ${({theme}) => theme.borderRadius.xlarge}px;
+  border-top-right-radius: ${({theme}) => theme.borderRadius.xlarge}px;
 
   bottom: 0;
 `;
 
-export const ButtonImage = styled.TouchableOpacity`
-  width: 100%;
-  align-items: center;
-  justify-content: center;
+export const Handle = styled.View`
+  align-self: center;
+  width: ${RFValue(40)}px;
+  height: ${RFValue(4)}px;
+  border-radius: ${RFValue(2)}px;
+  background-color: ${({theme}) => theme.colors.border};
 `;
 
 export const ContainerClose = styled.View`
-  width: 100%;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  margin-bottom: ${({theme}) => theme.spacing.medium}px;
+  position: absolute;
+  top: ${({theme}) => theme.spacing.large}px;
+  right: ${({theme}) => theme.spacing.large}px;
+  z-index: 1;
 `;
 
+export const CloseButton = styled.TouchableOpacity`
+  width: ${RFValue(30)}px;
+  height: ${RFValue(30)}px;
+  border-radius: ${RFValue(15)}px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({theme}) => theme.colors.background_global};
+`;
+
+export const DriverRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${({theme}) => theme.spacing.medium}px;
+`;
+
+export const ButtonImage = styled.TouchableOpacity``;
+
 export const ImageClient = styled.Image`
-  width: ${RFValue(100)}px;
-  height: ${RFValue(100)}px;
-  border-radius: ${RFValue(100)}px;
-  margin-bottom: ${({theme}) => theme.spacing.medium}px;
+  width: ${RFValue(56)}px;
+  height: ${RFValue(56)}px;
+  border-radius: ${RFValue(28)}px;
+  background-color: ${({theme}) => theme.colors.background_global};
+`;
+
+export const DriverTextGroup = styled.View`
+  flex: 1;
+`;
+
+export const DriverCaption = styled.Text`
+  font-size: ${({theme}) => theme.fontSizes.small}px;
+  color: ${({theme}) => theme.colors.grayLight};
 `;
 
 export const TextClient = styled.Text`
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-  font-family: MavenPro_400Regular;
+  font-size: ${({theme}) => theme.fontSizes.large}px;
+  font-weight: 700;
+  color: ${({theme}) => theme.colors.secondary};
+`;
+
+export const PriceCard = styled.View`
+  align-items: center;
+  gap: ${RFValue(4)}px;
+  background-color: ${({theme}) => theme.colors.background_greenLight};
+  border-radius: ${({theme}) => theme.borderRadius.large}px;
+  padding: ${({theme}) => theme.spacing.large}px;
+`;
+
+export const PriceLabelRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${RFValue(6)}px;
+`;
+
+export const PriceLabel = styled.Text`
+  font-size: ${({theme}) => theme.fontSizes.smalls}px;
+  font-weight: 700;
+  color: ${({theme}) => theme.colors.border_green};
+`;
+
+export const Price = styled.Text`
+  font-size: ${({theme}) => theme.fontSizes.xslarge}px;
+  font-weight: 700;
+  color: ${({theme}) => theme.colors.border_green};
+`;
+
+export const AddressCard = styled.View`
+  background-color: ${({theme}) => theme.colors.white};
+  border-width: 1px;
+  border-color: ${({theme}) => theme.colors.border_white_light};
+  border-radius: ${({theme}) => theme.borderRadius.large}px;
+  padding: ${({theme}) => theme.spacing.large}px;
+`;
+
+export const AddressCardHeader = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${RFValue(6)}px;
+  margin-bottom: ${({theme}) => theme.spacing.medium}px;
+`;
+
+export const AddressCardHeaderText = styled.Text`
+  font-size: ${({theme}) => theme.fontSizes.smalls}px;
+  font-weight: 700;
   color: ${({theme}) => theme.colors.secondary};
 `;
 
 export const AddressContent = styled.View`
   flex-direction: row;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  padding: 0 10px;
 `;
 
-export const Ball = styled.View`
-  width: 13px;
-  height: 13px;
-  border-radius: 100px;
-  background-color: ${({theme}) => theme.colors.primary};
+export const AddressIconsColumn = styled.View`
+  width: ${RFValue(16)}px;
+  align-items: center;
+  padding-top: ${RFValue(2)}px;
+  margin-right: ${({theme}) => theme.spacing.medium}px;
+`;
+
+export const Ball = styled.View<{color?: string}>`
+  width: ${RFValue(10)}px;
+  height: ${RFValue(10)}px;
+  border-radius: ${RFValue(5)}px;
+  background-color: ${({color, theme}) => color || theme.colors.marker_origin};
 `;
 
 export const Line = styled.View`
-  height: auto;
-  border-left-width: 0.5px;
-  border-color: ${({theme}) => theme.colors.primary};
+  width: 1px;
   flex: 1;
+  min-height: ${RFValue(20)}px;
+  border-left-width: 1px;
+  border-color: ${({theme}) => theme.colors.border};
+  border-style: dashed;
+  margin: ${RFValue(4)}px 0;
 `;
 
 export const Square = styled.View`
-  width: 10px;
-  height: 10px;
-  background-color: ${({theme}) => theme.colors.primary};
-  margin-bottom: 5px;
+  width: ${RFValue(10)}px;
+  height: ${RFValue(10)}px;
+  background-color: ${({theme}) => theme.colors.marker_destination};
 `;
 
-export const Origin = styled.Text`
-  font-size: 17px;
-
-  margin-left: 10px;
-  font-family: MavenPro_500Medium;
+export const AddressBlocks = styled.View`
+  flex: 1;
+  gap: ${({theme}) => theme.spacing.large}px;
 `;
 
-export const Destination = styled.Text`
-  font-size: 15px;
-  margin-top: 10px;
-
-  margin-left: 10px;
-  font-family: MavenPro_400Regular;
-`;
-
-export const Address = styled.Text<any>`
-  font-family: ${({selected}) =>
-    selected ? 'MavenPro_500Medium' : 'MavenPro_400Regular'};
-  margin-left: 10px;
-  font-size: ${({selected}) => (selected ? '17px' : '15px')};
-  color: ${({theme}) => theme.colors.secondary};
+export const Address = styled.Text<{selected?: boolean}>`
+  font-size: ${({theme}) => theme.fontSizes.smalls}px;
+  font-weight: ${({selected}) => (selected ? '700' : '400')};
+  color: ${({theme}) => theme.colors.text_gray};
 `;
 
 export const ContainerPrice = styled.View`
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  gap: ${({theme}) => theme.spacing.small}px;
 `;
 
 export const ContainerRow = styled.View`
   flex-direction: row;
   align-items: center;
-`;
-
-export const Price = styled.Text`
-  font-size: ${({theme}) => theme.fontSizes.xslarge}px;
-  font-family: MavenPro_500Medium;
-  color: ${({theme}) => theme.colors.primary};
-`;
-
-export const SimpleTitle = styled.Text`
-  font-family: MavenPro_400Regular;
-  color: ${({theme}) => theme.colors.secondary};
+  gap: ${RFValue(4)}px;
 `;
 
 export const SimpleText = styled.Text`
-  font-family: MavenPro_500Medium;
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: 17px;
+  font-size: ${({theme}) => theme.fontSizes.small}px;
+  font-weight: 700;
+  color: ${({theme}) => theme.colors.border_green};
 `;

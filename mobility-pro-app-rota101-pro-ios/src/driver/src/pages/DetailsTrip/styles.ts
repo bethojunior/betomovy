@@ -1,219 +1,56 @@
 import styled from 'styled-components/native';
-import {Button} from 'react-native-paper';
+import { RFValue } from 'react-native-responsive-fontsize';
 
-interface ColorProps {
-  color?: string;
-}
-
-interface BallProps {
-  color?: string;
-}
-
-export const ButtonsHelp = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  flex-wrap: wrap;
-  align-self: center;
-  padding: 20px 0;
-`;
-
-export const ContainerAddress = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
-
-export const ContainerButton = styled.View`
-  margin-top: ${({theme}) => theme.spacing.xlarge}px;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-
-  margin-bottom: 10px;
-`;
-
-export const ContainerDialog = styled.View`
-  margin-top: ${({theme}) => theme.spacing.large}px;
-  padding: 10px 0;
-`;
-
-export const ContainerFooter = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: ${({theme}) => theme.spacing.medium}px;
-  padding-right: ${({theme}) => theme.spacing.xslarge}px;
-`;
-
-export const ContainerModal = styled.ScrollView`
-  background-color: ${({theme}) => theme.colors.background_global};
+export const Container = styled.View`
   flex: 1;
-  padding: 0 ${({theme}) => theme.spacing.medium}px;
+  background-color: ${({ theme }) => theme.colors.background_global};
 `;
 
-export const ContainerText = styled.View`
-  margin-top: 5px;
-  width: 60%;
-  margin: 0 5px;
+export const Content = styled.ScrollView.attrs(({ theme }) => ({
+  contentContainerStyle: {
+    padding: theme.spacing.large,
+    gap: theme.spacing.large,
+  },
+}))``;
+
+/** Alinha a largura do ReportProblemButton (solto no scroll) com a do ViewFullCalculationButton (dentro do card, com padding próprio). */
+export const ReportProblemButtonWrapper = styled.View`
+  margin: 0 ${({ theme }) => theme.spacing.large}px;
 `;
 
-export const Content = styled.View`
-  margin-top: ${({theme}) => theme.spacing.medium}px;
-  flex-direction: column;
-`;
-
-export const Text = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: ${({theme}) => theme.fontSizes.small}px;
-`;
-
-export const HeaderCardContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  border-bottom-width: 0.1px;
-  border-bottom-color: ${({theme}) => theme.colors.border};
-`;
-
-export const Subtitle = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-`;
-
-export const TextSmall = styled.Text<ColorProps>`
-  color: ${({color, theme}) => color || theme.colors.secondary};
-  font-size: 12px;
-  width: 70%;
-`;
-
-export const TextTitle = styled.Text`
-  color: ${({theme}) => theme.colors.black};
-  text-transform: uppercase;
-  font-size: ${({theme}) => theme.fontSizes.large}px;
-`;
-
-export const MapContent = styled.View`
-  border-radius: 10px;
-  border-width: 1px;
-  border-color: ${({theme}) => theme.colors.background_global};
-  height: 150px;
-  overflow: hidden;
+export const ErrorContainer = styled.View`
+  flex: 1;
   align-items: center;
   justify-content: center;
-  margin-top: 5px;
+  gap: ${({ theme }) => theme.spacing.medium}px;
+  padding: ${({ theme }) => theme.spacing.xlarge}px;
 `;
 
-export const DriverContent = styled.View`
-  flex-direction: row;
-  align-items: center;
-  padding: 10px 10px 0 10px;
-  width: 100%;
-`;
-
-export const ContentDriverInfo = styled.View`
-  width: 90%;
-  margin-left: 10px;
-`;
-
-export const DriverName = styled.Text`
-  font-size: 18px;
-  align-self: flex-start;
+export const ErrorTitle = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.large}px;
+  font-weight: 700;
   text-align: center;
-  color: ${({theme}) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.secondary};
 `;
 
-export const SectionDriver = styled.View`
-  flex-direction: row;
-  width: 90%;
-  justify-content: space-around;
-`;
-
-export const Column = styled.View`
-  align-items: center;
-  margin-top: 10px;
-`;
-
-export const AddressContent = styled.View`
-  flex-direction: row;
-  align-items: center;
-  padding: 20px 10px 20px 0;
-  margin-top: 10px;
-  border-bottom-width: 0.5px;
-  border-bottom-color: ${({theme}) => theme.colors.primary};
-  border-top-width: 0.5px;
-  border-top-color: ${({theme}) => theme.colors.primary};
-`;
-
-export const Ball = styled.View<BallProps>`
-  background-color: ${({theme, color}) =>
-    color === 'primary' ? theme.colors.primary : theme.colors.secondary};
-  border-radius: 100px;
-  width: 10px;
-  height: 10px;
-  align-self: center;
-`;
-
-export const Square = styled.View`
-  background-color: ${({theme}) => theme.colors.primary};
-  width: 10px;
-  height: 10px;
-  align-self: center;
-`;
-
-export const Line = styled.View`
-  border-width: 0.8px;
-  border-color: ${({theme}) => theme.colors.primary};
-  flex: 1;
-  width: 1px;
-  align-self: center;
-  border-style: dashed;
-  min-height: 20px;
-`;
-
-export const Address = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-  margin-bottom: 10px;
-`;
-
-export const Destiny = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-`;
-
-export const TitleCentralized = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
+export const ErrorSubtitle = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
   text-align: center;
-  margin-top: 10px;
-  width: 100%;
-  border-bottom-width: 0.5px;
-  border-bottom-color: ${({theme}) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.text_gray};
 `;
 
-export const Buton = styled(Button)`
-  background-color: ${({theme}) => theme.colors.primary};
-  border-radius: 5px;
-  width: 45%;
-`;
-
-export const ContainerHelp = styled.View`
-  margin-top: ${({theme}) => theme.spacing.large}px;
-`;
-
-export const ButtonLiberation = styled(Button)`
-  background-color: ${({theme}) => theme.colors.primary};
-  border-radius: 5px;
-  width: 100%;
-`;
-
-export const CancelationConteiner = styled.View`
-  padding: 5px;
-  flex-wrap: wrap;
+export const RetryButton = styled.TouchableOpacity`
   flex-direction: row;
+  align-items: center;
+  gap: ${RFValue(8)}px;
+  background-color: ${({ theme }) => theme.colors.primary};
+  border-radius: ${({ theme }) => theme.borderRadius.medium}px;
+  padding: ${({ theme }) => theme.spacing.medium}px ${({ theme }) => theme.spacing.large}px;
+  margin-top: ${({ theme }) => theme.spacing.medium}px;
 `;
 
-export const CancelationTaxe = styled.View`
-  width: 50%;
-  margin-top: 5px;
+export const RetryButtonText = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.white};
 `;

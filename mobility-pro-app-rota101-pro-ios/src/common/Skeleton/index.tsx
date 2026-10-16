@@ -9,6 +9,16 @@ import {
 } from 'react-native-reanimated';
 import {SkeletonComponent} from './styles';
 
+interface SkeletonProps {
+  width?: number | string;
+  height?: number | string;
+  mv?: number;
+  mh?: number;
+  circle?: number;
+  loading?: boolean;
+  children?: React.ReactNode;
+}
+
 const Skeleton = ({
   width = 0,
   height = 0,
@@ -17,7 +27,7 @@ const Skeleton = ({
   circle = 0,
   loading = false,
   children = null,
-}) => {
+}: SkeletonProps) => {
   const opacity = useSharedValue(1);
 
   useEffect(() => {

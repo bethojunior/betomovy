@@ -1,7 +1,7 @@
 import {createContext, useContext, useMemo, useState} from 'react';
 import {customToast} from '../../../../utils/FlashMessage';
 import {ConfigService} from './services';
-import { translate } from '../../../../client/locales';
+import {translate} from '../../../../client/locales';
 
 interface ConfigProps {
   getPaymentForm: () => void;
@@ -24,9 +24,81 @@ interface List {
   tripPaymentFormId: number;
 }
 
-const ConfigContext = createContext({} as ConfigProps);
+// const ConfigContext = createContext({} as ConfigProps);
 
-export const ConfigProvider = ({children}: any) => {
+// export const ConfigProvider = ({children}: any) => {
+//   const [listPaymentForm, setPaymentForm] = useState<List[]>();
+//   const [listChooseDriver, setListChooseDriver] = useState<List[]>();
+//   const [listImposition, setListImposition] = useState<List[]>();
+
+//   const service = ConfigService();
+
+//   const getPaymentForm = async () => {
+//     const response = await service.get();
+//     if (!response.status) {
+//       return customToast(response.message, 'danger');
+//     }
+//     return setPaymentForm(response.data);
+//   };
+
+//   const getChooseDriverPaymentForm = async () => {
+//     const response = await service.getChooseDriver();
+//     if (!response.status) {
+//       return customToast(response.message, 'danger');
+//     }
+//     return setListChooseDriver(response.data);
+//   };
+
+//   const getImpositionPaymentForm = async () => {
+//     const response = await service.getImposition();
+//     if (!response.status) {
+//       return customToast(response.message, 'danger');
+//     }
+//     return setListImposition(response.data);
+//   };
+
+//   const updateChooseDriver = async (id: number[]) => {
+//     const response = await service.chooseFormPayment(id);
+//     if (!response.status) {
+//       return customToast(response.message, 'danger');
+//     }
+//     return customToast(
+//       translate('configPage.title_payment_form_updated'),
+//       'success',
+//     );
+//   };
+
+//   const value = useMemo(() => {
+//     return {
+//       getPaymentForm,
+//       getChooseDriverPaymentForm,
+//       getImpositionPaymentForm,
+//       updateChooseDriver,
+//       listPaymentForm,
+//       listChooseDriver,
+//       listImposition,
+//       setListChooseDriver,
+//     };
+//   }, [
+//     getPaymentForm,
+//     getChooseDriverPaymentForm,
+//     getImpositionPaymentForm,
+//     updateChooseDriver,
+//     listPaymentForm,
+//     listChooseDriver,
+//     listImposition,
+//     setListChooseDriver,
+//   ]);
+//   return (
+//     <ConfigContext.Provider value={value}>{children}</ConfigContext.Provider>
+//   );
+// };
+// export const useConfig = () => {
+//   const context = useContext(ConfigContext);
+//   return context;
+// };
+
+export const useConfig = () => {
   const [listPaymentForm, setPaymentForm] = useState<List[]>();
   const [listChooseDriver, setListChooseDriver] = useState<List[]>();
   const [listImposition, setListImposition] = useState<List[]>();
@@ -62,21 +134,13 @@ export const ConfigProvider = ({children}: any) => {
     if (!response.status) {
       return customToast(response.message, 'danger');
     }
-    return customToast(translate('configPage.title_payment_form_updated'), 'success');
+    return customToast(
+      translate('configPage.title_payment_form_updated'),
+      'success',
+    );
   };
 
-  const value = useMemo(() => {
-    return {
-      getPaymentForm,
-      getChooseDriverPaymentForm,
-      getImpositionPaymentForm,
-      updateChooseDriver,
-      listPaymentForm,
-      listChooseDriver,
-      listImposition,
-      setListChooseDriver,
-    };
-  }, [
+  return {
     getPaymentForm,
     getChooseDriverPaymentForm,
     getImpositionPaymentForm,
@@ -85,12 +149,5 @@ export const ConfigProvider = ({children}: any) => {
     listChooseDriver,
     listImposition,
     setListChooseDriver,
-  ]);
-  return (
-    <ConfigContext.Provider value={value}>{children}</ConfigContext.Provider>
-  );
-};
-export const useConfig = () => {
-  const context = useContext(ConfigContext);
-  return context;
+  };
 };

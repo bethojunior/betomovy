@@ -29,11 +29,11 @@ export const ContentButton = styled.View`
   justify-content: space-between;
 `;
 
-export const Button = styled.TouchableOpacity<TextButtonProps>`
+export const Button = styled.TouchableOpacity`
   margin-top: 10px;
   padding-top: 10px;
   padding-bottom: 10px;
-  width: 40%;
+  flex: 1;
   align-items: center;
   justify-content: center;
   border-radius: 5px;

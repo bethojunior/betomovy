@@ -1,103 +1,106 @@
-import {Platform} from 'react-native';
-import {RFValue} from 'react-native-responsive-fontsize';
-import styled, {css} from 'styled-components/native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import styled from 'styled-components/native';
+import { cardShadow } from '../../../../common/theme/cardShadow';
 
 export const Container = styled.View`
   flex: 1;
-  width: 100%;
-  background: ${({theme}) => theme.colors.white};
-  padding-left: ${RFValue(24)}px;
-  padding-right: ${RFValue(24)}px;
+  background-color: ${({ theme }) => theme.colors.background_global};
 `;
 
-export const ArrowBackContainer = styled.View`
-  height: ${RFValue(40)}px;
-  justify-content: flex-end;
-  margin-left: -${RFValue(10)}px;
+export const TopBar = styled.View`
+  padding: ${({ theme }) => theme.spacing.medium}px;
 `;
 
-export const Header = styled.View`
+export const ScrollContent = styled.ScrollView.attrs(({ theme }) => ({
+  contentContainerStyle: {
+    paddingHorizontal: theme.spacing.large,
+    paddingBottom: theme.spacing.xxlarge,
+    gap: theme.spacing.large,
+  },
+}))``;
+
+export const AvatarSection = styled.View`
   align-items: center;
-  margin-top: 35px;
-  margin-bottom: ${RFValue(24)}px;
+  margin-bottom: ${({ theme }) => theme.spacing.small}px;
 `;
 
-export const Photo = styled.TouchableOpacity`
+export const AvatarWrapper = styled.View`
+  position: relative;
+  border-radius: ${RFValue(48)}px;
+  ${cardShadow}
+  shadow-opacity: 0.15;
+`;
+
+export const CameraBadge = styled.View`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: ${RFValue(28)}px;
+  height: ${RFValue(28)}px;
+  border-radius: ${RFValue(14)}px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.primary};
+  border-width: ${RFValue(2)}px;
+  border-color: ${({ theme }) => theme.colors.background_global};
+  ${cardShadow}
+`;
+
+export const Card = styled.View`
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: ${({ theme }) => theme.borderRadius.large}px;
+  padding: ${({ theme }) => theme.spacing.large}px;
+  ${cardShadow}
+`;
+
+export const SectionTitle = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.large}px;
+  font-family: ${({ theme }) => theme.fonts.bold};
+  color: ${({ theme }) => theme.colors.secondary};
+  margin-bottom: ${({ theme }) => theme.spacing.medium}px;
+`;
+
+export const DocumentsRow = styled.TouchableOpacity`
   flex-direction: row;
-  justify-content: flex-end;
-  align-items: flex-end;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.medium}px;
 `;
 
-export const ImageContent = styled.Image.attrs({
-  resizeMode: 'stretch',
-})`
-  width: ${RFValue(120)}px;
-  height: ${RFValue(120)}px;
-  border-radius: 100px;
+export const DocumentsTextGroup = styled.View`
+  flex: 1;
 `;
 
-interface StatusPhotoProps {
-  statusImage: string;
-}
-
-export const StatusPhoto = styled.Text<StatusPhotoProps>`
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-  color: ${({statusImage, theme}) =>
-    statusImage === '1' ? theme.colors.border_green : theme.colors.red};
-  font-family: ${({theme}) => theme.fonts.bold};
-  margin-top: ${RFValue(15)}px;
+export const DocumentsLabel = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.medium}px;
+  font-family: ${({ theme }) => theme.fonts.bold};
+  color: ${({ theme }) => theme.colors.secondary};
 `;
 
-export const ContentItem = styled.View`
-  border-bottom-width: ${({theme}) => theme.borderWidth.small}px;
-  border-bottom-color: ${({theme}) => theme.colors.primary};
-  margin-top: ${RFValue(5)}px;
+export const DocumentsPendingText = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  color: ${({ theme }) => theme.colors.red};
+  margin-top: ${({ theme }) => theme.spacing.small}px;
 `;
 
-export const ContentDoc = styled.View``;
-
-export const DocumentItem = styled.TouchableOpacity`
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
-  border-bottom-width: ${({theme}) => theme.borderWidth.small}px;
-  border-bottom-color: ${({theme}) => theme.colors.primary};
-  margin-top: ${RFValue(5)}px;
-`;
-
-export const ItemLabel = styled.Text`
-  font-size: ${({theme}) => theme.fontSizes.large}px;
-  font-family: ${({theme}) => theme.fonts.secondary_regular};
-  color: ${({theme}) => theme.colors.primary};
-  margin-top: 10px;
-
-  ${Platform.OS === 'ios' &&
-  css`
-    margin-bottom: 7px;
-  `}
-`;
-
-export const InfoItemText = styled.Text`
-  width: 100%;
-  font-size: ${RFValue(13)}px;
-  color: ${({theme}) => theme.colors.secondary};
-  margin-bottom: 8px;
-  margin-top: ${RFValue(7)}px;
-  font-family: ${({theme}) => theme.fonts.regular};
-  text-decoration: none;
-`;
-
-export const ItemAttention = styled.Text`
-  font-size: ${RFValue(13)}px;
-  color: ${({theme}) => theme.colors.red};
-  font-family: ${({theme}) => theme.fonts.secondary_bold};
-  text-decoration: none;
-  margin-top: ${RFValue(-7)}px;
-  margin-bottom: ${RFValue(7)}px;
-`;
-
-export const ViewDocument = styled.View`
+export const StatusRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+`;
+
+export const StatusLabel = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.medium}px;
+  font-family: ${({ theme }) => theme.fonts.bold};
+  color: ${({ theme }) => theme.colors.secondary};
+`;
+
+export const Divider = styled.View`
+  height: 1px;
+  background-color: ${({ theme }) => theme.colors.border};
+  margin-vertical: ${({ theme }) => theme.spacing.medium}px;
+`;
+
+export const Footer = styled.View`
+  padding: ${({ theme }) => theme.spacing.large}px;
+  background-color: ${({ theme }) => theme.colors.background_global};
 `;

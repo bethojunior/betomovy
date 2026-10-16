@@ -2,11 +2,11 @@
 /* eslint-disable consistent-return */
 /* eslint-disable radix */
 // @ts-nocheck
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {MaterialIcons} from '@expo/vector-icons';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
 
-import {Alert} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import {
   Container,
   Content,
@@ -19,25 +19,25 @@ import {
 } from './styles';
 import InputAddress from '../../../../components/InputAddress';
 import SearchAddressModal from '../../../../components/SearchAddressModal';
-import {useLocal} from '../../../../contexts/local';
-import {ContainerLogoCentral, Logo} from '../../pages/MapCall/styles';
-import {If} from '../If';
+import { useLocal } from '../../../../contexts/local';
+import { ContainerLogoCentral, Logo } from '../../pages/MapCall/styles';
+import { If } from '../If';
 import TravelOptionsGL from '../TravelOptionsGL';
-import {translate} from '../../../../locales';
+import { translate } from '../../../../locales';
 import logo from '../../../../../../assets/logo.png';
 import Preload from '../../../../components/Preload';
-import {useAuth} from '../../../../../context/auth';
-import {useTripGL} from '../../../../contexts/TripGL';
+import { useAuth } from '../../../../../context/auth';
+import { useTripGL } from '../../../../contexts/TripGL';
 import theme from '../../../../styles/theme';
-import {BackPage} from '../../../../components/BackPage';
-import {useModules} from '../../../../contexts/modules';
+import { BackPage } from '../../../../components/BackPage';
+import { useModules } from '../../../../contexts/modules';
 
 export default function LookUpAddressesModalGL({
   onComplete,
   visible,
   setLoader,
 }) {
-  const {placeUser, position} = useLocal();
+  const { placeUser, position } = useLocal();
   const {
     origin,
     destination,
@@ -49,8 +49,8 @@ export default function LookUpAddressesModalGL({
     setWaypointQuantities,
     showLoadingToGetPrices,
   } = useTripGL();
-  const {cityConfig, offerBiometry} = useAuth();
-  const {init} = useModules();
+  const { cityConfig, offerBiometry } = useAuth();
+  const { init } = useModules();
 
   const searchAddressModal = useRef(null);
 
@@ -58,7 +58,7 @@ export default function LookUpAddressesModalGL({
   const [showWaypointInputAddButton, setShowWaypointInputAddButton] =
     useState(true);
   const [latitudeSum, setLatitudeSum] = useState('');
-  const {navigate} = useNavigation();
+  const { navigate } = useNavigation();
 
   const handleConfirmAddress = useCallback(() => {
     setLoadingConfirm(true);
@@ -93,7 +93,9 @@ export default function LookUpAddressesModalGL({
         return [];
       });
 
-      if (waypointQuantities === parseInt(cityConfig.quantityTripWayPoints))
+      if (
+        waypointQuantities === parseInt(cityConfig?.quantityTripWayPoints || 3)
+      )
         setShowWaypointInputAddButton(true);
     },
     [waypointQuantities, waypoints],
@@ -125,7 +127,22 @@ export default function LookUpAddressesModalGL({
       const addressAlreadyAdded =
         handlesAlreadyAddedAddressValidation(addressResult);
 
-      if (addressAlreadyAdded) {
+      if (type.startsWith('waypoint')) {
+        if (waypoints.length > 0) {
+          const isSameAsOrigin =
+            origin.latitude === addressResult.latitude &&
+            origin.longitude === addressResult.longitude;
+
+          if (isSameAsOrigin) {
+            return Alert.alert(
+              'Atenção',
+              'Endereço do waypoint não pode ser igual ao da origem!',
+            );
+          }
+        }
+      }
+
+      if (waypoints.length <= 0 && addressAlreadyAdded) {
         return Alert.alert('Atenção', 'Endereço já adicionado!');
       }
 
@@ -157,7 +174,7 @@ export default function LookUpAddressesModalGL({
           ]),
       };
 
-      const attribute = type.split('-')[0];
+      const attribute = type?.split('-')[0];
 
       addressesTypes[attribute](addressResult, type);
     },
@@ -171,7 +188,7 @@ export default function LookUpAddressesModalGL({
       searchAddressModal.current.show();
       return;
     }
-    if (onComplete) onComplete({origin, destination, waypoints});
+    if (onComplete) onComplete({ origin, destination, waypoints });
   }, [origin, destination, waypoints, waypointQuantities]);
 
   useEffect(() => {
@@ -207,14 +224,13 @@ export default function LookUpAddressesModalGL({
             <If condition={init !== 'GetLight'}>
               <ContainerBackPage>
                 <BackPage
-                  onPress={() => navigate('TripRoutes', {screen: 'Home'})}
+                  onPress={() => navigate('TripRoutes', { screen: 'Home' })}
                 />
               </ContainerBackPage>
             </If>
             <Logo
-              source={theme.images.logo ? {uri: theme.images.logo} : logo}
+              source={theme.images.logo ? { uri: theme.images.logo } : logo}
             />
-            {/* <LogoPublicity /> */}
           </ContainerLogoCentral>
           <ContentInputIcon>
             <ContentInputs>

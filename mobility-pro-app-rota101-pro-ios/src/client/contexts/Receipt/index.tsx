@@ -15,11 +15,12 @@ interface Props {
   sendReceipt: (tripReference: string) => void;
   postContactUs: (message: string, idUser: string) => void;
   postExcludeAccount: (details: string, reason: string) => void;
+  reportTrip: (tripReference: string, tripReportTypeId: string, message?: string) => Promise<boolean>;
 }
 
 const ReceiptContext = createContext<Props>({} as Props);
 export const ReceiptProvider = ({children}: any) => {
-  const {signOut} = useAuth();
+  const {signOut, user} = useAuth();
 
   const sendReceipt = useCallback(async (tripReference: string) => {
     try {
@@ -61,7 +62,7 @@ export const ReceiptProvider = ({children}: any) => {
             'warning',
           );
         }
-        customToast('Sua solicitação de exclusão foi feita', 'success');
+        customToast(translate('contactUs.text_deletion_request_sent'), 'success');
         return signOut();
       } catch (error) {
         return console.log(error);
@@ -70,13 +71,37 @@ export const ReceiptProvider = ({children}: any) => {
     [signOut],
   );
 
+  const reportTrip = useCallback(
+    async (tripReference: string, tripReportTypeId: string, message = '') => {
+      try {
+        const response = await ReceiptService.insertByCustomer({
+          tripReference,
+          tripReportTypeId,
+          message,
+          userId: user.idCustomer,
+        });
+        if (!response?.status) {
+          customToast(translate('contactUs.alert_error'), 'warning');
+          return false;
+        }
+        customToast(translate('contactUs.alert_sucess'), 'success');
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    },
+    [user?.idCustomer],
+  );
+
   const value = useMemo(
     () => ({
       sendReceipt,
       postContactUs,
       postExcludeAccount,
+      reportTrip,
     }),
-    [sendReceipt, postContactUs, postExcludeAccount],
+    [sendReceipt, postContactUs, postExcludeAccount, reportTrip],
   );
   return (
     <ReceiptContext.Provider value={value}>{children}</ReceiptContext.Provider>

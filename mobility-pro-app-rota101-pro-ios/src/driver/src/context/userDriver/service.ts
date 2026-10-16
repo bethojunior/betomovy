@@ -1,18 +1,23 @@
 import {useCallback} from 'react';
 import {customToast} from '../../../../utils/FlashMessage';
 import apiMain from '../../api/apiMain';
-import {PdfProps} from './types';
+
+const TIMEOUT_SHORT = 10000;
 
 export const UserDriverService = () => {
   const getDriverFind = useCallback(
     async (driverId: string) => {
-      const {data} = await apiMain.post('Driver/Find', {
-        stdObject: [
-          {
-            driverId,
-          },
-        ],
-      });
+      const {data} = await apiMain.post(
+        'Driver/Find',
+        {
+          stdObject: [
+            {
+              driverId,
+            },
+          ],
+        },
+        { timeout: TIMEOUT_SHORT },
+      );
 
       if (!data.status) {
         return customToast(data.message, 'danger');
@@ -29,6 +34,7 @@ export const UserDriverService = () => {
       status: string,
       latitude: string,
       longitude: string,
+      cityId = null,
     ) => {
       const date = new Date();
       const {data} = await apiMain.post('Driver/ToggleStatus', {
@@ -41,11 +47,12 @@ export const UserDriverService = () => {
               longitude,
               date: date.toISOString(),
             },
+            cityId: cityId,
           },
         ],
       });
       if (!data.data) {
-        return false;
+        throw new Error(data.message || 'Não foi possível alterar seu status');
       }
       return data.data.status;
     },
@@ -73,7 +80,6 @@ export const UserDriverService = () => {
 
       formData.append('driverId', id);
       formData.append('photo', {
-        // @ts-ignore
         uri,
         type,
         name: filename,
@@ -90,64 +96,6 @@ export const UserDriverService = () => {
       }
 
       return data.message;
-    },
-    [apiMain],
-  );
-
-  const getDocumentsConfig = useCallback(async () => {
-    const {data} = await apiMain.get('Doc/FindAll');
-
-    if (!data.status) {
-      customToast(data.message, 'danger');
-
-      return false;
-    }
-
-    return data.data;
-  }, [apiMain]);
-
-  const sendDocument = useCallback(
-    async (
-      text: string | null,
-      image: any,
-      pdf: PdfProps | null,
-      docId: string,
-    ) => {
-      if (pdf !== null && Number(pdf.size) > 2000000) {
-        customToast(
-          'O tamanho do arquivo não pode ser maior que 2MB',
-          'danger',
-        );
-
-        return;
-      }
-
-      const formData = new FormData();
-
-      formData.append('docId', docId);
-      if (text !== null) formData.append('text', text);
-      if (pdf !== null)
-        formData.append(`PDF_${docId}`, {
-          // @ts-ignore
-          uri: pdf.uri,
-          type: pdf.mimeType,
-          name: pdf.name,
-        });
-      if (image !== null) formData.append(`DOC_${docId}`, image);
-
-      const response = await apiMain.post('DocUser/Send', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      if (!response.data.status) {
-        customToast(response.data.message, 'danger');
-
-        return;
-      }
-
-      customToast(response.data.message, 'success');
     },
     [apiMain],
   );
@@ -248,8 +196,6 @@ export const UserDriverService = () => {
     toogleDriverStatus,
     getWeeklyEarnings,
     EditProfileImage,
-    getDocumentsConfig,
-    sendDocument,
     findPendencies,
     listClientFavorites,
     getLinkMenu,

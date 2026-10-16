@@ -1,8 +1,8 @@
 // @ts-nocheck
 
-import {useNavigation} from '@react-navigation/native';
-import React, {useCallback, useRef, useState, useEffect} from 'react';
-import {Picker} from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
+import { Picker } from '@react-native-picker/picker';
 import {
   View,
   StyleSheet,
@@ -13,13 +13,13 @@ import {
   Alert,
 } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
-import {TextInputMask} from 'react-native-masked-text';
+import { TextInputMask } from 'react-native-masked-text';
 import apiMain from '../../api/apiMain';
 import Colors from '../../components/Colors';
 import apiDelivery from '../../api/apiDelivery';
 
-import {translate} from '../../locales';
-import {styles} from './styles';
+import { translate } from '../../locales';
+import { styles } from './styles';
 import theme from '../../styles/theme';
 import Helper from '../../utils/Helper';
 
@@ -41,7 +41,7 @@ export default function AddPlaymentForm() {
 
   useEffect(() => {
     setLoading(true);
-    apiDelivery('delivery/getCardFlags').then(({data}) => {
+    apiDelivery('delivery/getCardFlags').then(({ data }) => {
       setListCardFlag(data.response);
       setLoading(false);
     });
@@ -103,12 +103,12 @@ export default function AddPlaymentForm() {
     const data = {
       cardNumber,
       cvv: securityCode,
-      expirationMonth: expirationDate.split('/')[0],
-      expirationYear: year + expirationDate.split('/')[1],
+      expirationMonth: expirationDate?.split('/')[0],
+      expirationYear: year + expirationDate?.split('/')[1],
       cardholderName: name,
       docNumber: document,
       mpToken: new Date().getTime(),
-      firstSixDigits: cardNumber.split(' ').join('').substr(0, 6),
+      firstSixDigits: cardNumber?.split(' ').join('').substr(0, 6),
       paymentMethodName: Helper.detectCardType(cardNumber),
       securityCodeLength: securityCode.length,
       lastFourDigits: cardNumber.substr(-4),
@@ -148,7 +148,7 @@ export default function AddPlaymentForm() {
         />
       </View>
       <View style={styles.contentInpus}>
-        <View style={[styles.contentInput, {flex: 1}]}>
+        <View style={[styles.contentInput, { flex: 1 }]}>
           <Text style={styles.textInput}>
             {translate('addPlaymentForm.text_cpf')}
           </Text>
@@ -163,7 +163,7 @@ export default function AddPlaymentForm() {
             }}
           />
         </View>
-        <View style={[styles.contentInput, {flex: 1}]}>
+        <View style={[styles.contentInput, { flex: 1 }]}>
           <Picker
             selectedValue={selectedCardFlag}
             onValueChange={itemValue => setSelectedCardFlag(itemValue)}
@@ -194,7 +194,7 @@ export default function AddPlaymentForm() {
         />
       </View>
       <View style={styles.contentInpus}>
-        <View style={[styles.contentInput, {flex: 1}]}>
+        <View style={[styles.contentInput, { flex: 1 }]}>
           <Text style={styles.textInput}>
             {translate('addPlaymentForm.text_expiring_date')}
           </Text>
@@ -214,7 +214,7 @@ export default function AddPlaymentForm() {
             }}
           />
         </View>
-        <View style={[styles.contentInput, {flex: 1}]}>
+        <View style={[styles.contentInput, { flex: 1 }]}>
           <Text style={styles.textInput}>
             {translate('addPlaymentForm.text_cvv')}
           </Text>
@@ -234,7 +234,7 @@ export default function AddPlaymentForm() {
       </View>
       <TouchableOpacity onPress={handleAddCard} disabled={loading}>
         <View style={styles.btn}>
-          <Text style={{color: theme.colors.primaryText, fontWeight: 'bold', fontSize: 16}}>
+          <Text style={{ color: theme.colors.primaryText, fontWeight: 'bold', fontSize: 16 }}>
             {translate('addPlaymentForm.text_save')}
           </Text>
         </View>

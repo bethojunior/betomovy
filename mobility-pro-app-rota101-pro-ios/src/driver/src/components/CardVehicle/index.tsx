@@ -1,3 +1,4 @@
+import { JSX } from 'react';
 import {ContainerCard, Input, TextDescription, TextTitle} from './styles';
 
 interface Props {

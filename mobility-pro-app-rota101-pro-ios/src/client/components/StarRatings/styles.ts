@@ -1,9 +1,10 @@
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
-  justify-content: center;
+  align-self: flex-start;
   flex-direction: row;
-  margin-top: 8px;
+  gap: ${({theme}) => theme.spacing.small}px;
+  margin-top: ${({theme}) => theme.spacing.medium}px;
 `;
 
 export const StarImg = styled.Image`

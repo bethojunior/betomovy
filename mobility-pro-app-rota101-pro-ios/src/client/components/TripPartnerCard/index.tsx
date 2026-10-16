@@ -1,9 +1,9 @@
-import {Fragment, useEffect, useState} from 'react';
-import {Alert, Share, View} from 'react-native';
-import {TripProps} from '../../contexts/Trip/types';
-import {useTrip} from '../../contexts/Trip';
-import {useNavigation} from '@react-navigation/native';
-import {AntDesign, Feather, MaterialIcons, Ionicons} from '@expo/vector-icons';
+import { Fragment, useEffect, useState } from 'react';
+import { Alert, Share, View } from 'react-native';
+import { TripProps } from '../../contexts/Trip/types';
+import { useTrip } from '../../contexts/Trip';
+import { useNavigation } from '@react-navigation/native';
+import { AntDesign, Feather, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import {
   ButtonCancel,
   ButtonMessage,
@@ -19,33 +19,34 @@ import {
   ImageClient,
 } from './styles';
 import theme from '../../styles/theme';
-import {buildApp} from '../../../constantBuild/config';
-import {RenderSvgImage} from '../../../common/RenderSvgImage';
-import {translate} from '../../locales';
-import {useAuth} from '../../../context/auth';
-import {maskMoney} from '../../utils/money';
-import {TripPartnerCardProps} from './types';
+import { buildApp } from '../../../constantBuild/config';
+import { RenderSvgImage } from '../../../common/RenderSvgImage';
+import { translate } from '../../locales';
+import { useAuth } from '../../../context/auth';
+import { maskMoney } from '../../utils/money';
+import { TripPartnerCardProps } from './types';
 import Collapse from '../Collapse';
-import {If} from '../If';
-import {STATUS_IN_PROGRESS} from '../../constants/trip';
-import {customToast} from '../../../utils/FlashMessage';
+import { If } from '../If';
+import { STATUS_IN_PROGRESS } from '../../constants/trip';
+import { customToast } from '../../../utils/FlashMessage';
 import apiMain from '../../api/apiMain';
+import { useStoragePictures } from '../../../driver/src/hooks/useStoragePictures';
 
-const TripPartnerCard = ({trip, setVisible}: TripPartnerCardProps) => {
-  const {dispatchTripCustomer, cancelParterTripByCustomer} = useTrip();
-  const {cityConfig} = useAuth();
+const TripPartnerCard = ({ trip, setVisible }: TripPartnerCardProps) => {
+  const { cancelParterTripByCustomer } = useTrip();
+  const { cityConfig } = useAuth();
   const navigation = useNavigation();
   const [linkShare, setLinkShare] = useState<string>('');
 
   const [detailsVisibility, setDetailsVisibility] = useState(false);
+  const { getStoragePictureSpecific } = useStoragePictures();
 
   const whatchTrip = async (trip: TripProps) => {
-    await dispatchTripCustomer({type: 'newTripSuccess', arg: trip});
-
-    navigation.navigate('TripRoutes', {screen: 'Trip'});
+    setVisible(false);
+    navigation.navigate('TripRoutes', { screen: 'TripView', params: trip });
   };
   const shareTrip = async (tripReference: string) => {
-    const {data} = await apiMain.get(
+    const { data } = await apiMain.get(
       `Trip/GetShareLink?tripReference=${tripReference}`,
     );
 
@@ -63,7 +64,7 @@ const TripPartnerCard = ({trip, setVisible}: TripPartnerCardProps) => {
         message: `${message}`,
       });
     } catch (error) {
-      customToast('Erro ao Compartilhar', 'error');
+      customToast(translate('toast.text_share_error'), 'danger');
     }
   };
 
@@ -91,7 +92,7 @@ const TripPartnerCard = ({trip, setVisible}: TripPartnerCardProps) => {
           },
         },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   };
 
@@ -101,7 +102,9 @@ const TripPartnerCard = ({trip, setVisible}: TripPartnerCardProps) => {
         <RenderSvgImage
           width={70}
           heigth={70}
-          image={`${buildApp().HOST_IMAGE_TRIP_TYPE}${trip?.fare?.picture}`}
+          image={`${getStoragePictureSpecific('tripType') ||
+            buildApp().HOST_IMAGE_TRIP_TYPE
+            }${trip?.fare?.picture}`}
         />
         <ClientSection>
           <NameClient>{trip?.customer?.name}</NameClient>
@@ -159,7 +162,7 @@ const TripPartnerCard = ({trip, setVisible}: TripPartnerCardProps) => {
               <Info>{waypoint.address}</Info>
             </View>
           ))}
-        <View style={{marginBottom: 20}}>
+        <View style={{ marginBottom: 20 }}>
           <TitleInfo>{translate('tripPreAccepted.text_destination')}</TitleInfo>
           <Info>{trip?.destination?.name}</Info>
         </View>
@@ -174,12 +177,12 @@ const TripPartnerCard = ({trip, setVisible}: TripPartnerCardProps) => {
                 source={{
                   uri:
                     trip?.centralId === null
-                      ? `${buildApp().HOST_IMAGE_DRIVER}${
-                          trip?.driver?.profileImage
-                        }`
-                      : `${buildApp().HOST_IMAGE_TRIP_TYPE}${
-                          trip?.fare?.picture
-                        }`,
+                      ? `${getStoragePictureSpecific('driver') ||
+                      buildApp().HOST_IMAGE_DRIVER
+                      }${trip?.driver?.profileImage}`
+                      : `${getStoragePictureSpecific('tripType') ||
+                      buildApp().HOST_IMAGE_TRIP_TYPE
+                      }${trip?.fare?.picture}`,
                 }}
               />
               <Info
@@ -190,14 +193,14 @@ const TripPartnerCard = ({trip, setVisible}: TripPartnerCardProps) => {
                 {trip?.driver?.name?.split(' ')[0]}{' '}
                 {
                   trip?.driver?.name?.split(' ')[
-                    trip?.driver?.name?.split(' ').length - 1
+                  trip?.driver?.name?.split(' ').length - 1
                   ]
                 }
               </Info>
             </RowStyle>
 
             <Ionicons
-              style={{marginTop: 5}}
+              style={{ marginTop: 5 }}
               name="md-share-social-sharp"
               size={30}
               color={theme.colors.primary}
@@ -208,21 +211,19 @@ const TripPartnerCard = ({trip, setVisible}: TripPartnerCardProps) => {
           </RowStyle>
         </View>
         <ButtonSection>
-          <If condition={false}>
-            <ButtonMessage
-              onPress={() => {
-                whatchTrip(trip);
-              }}
-            >
-              <TextMessage>{'Visualizar'}</TextMessage>
-              <AntDesign
-                name="eye"
-                size={20}
-                color={theme.colors.secondary}
-                style={{marginLeft: 5}}
-              />
-            </ButtonMessage>
-          </If>
+          <ButtonMessage
+            onPress={() => {
+              whatchTrip(trip);
+            }}
+          >
+            <TextMessage>{'Visualizar'}</TextMessage>
+            <AntDesign
+              name="eye"
+              size={20}
+              color={theme.colors.secondary}
+              style={{ marginLeft: 5 }}
+            />
+          </ButtonMessage>
 
           <ButtonCancel
             onPress={() => cancelTrip()}
@@ -233,7 +234,7 @@ const TripPartnerCard = ({trip, setVisible}: TripPartnerCardProps) => {
               name="x"
               size={20}
               color={theme.colors.primaryText}
-              style={{marginLeft: 5}}
+              style={{ marginLeft: 5 }}
             />
           </ButtonCancel>
         </ButtonSection>

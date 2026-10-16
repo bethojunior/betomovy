@@ -1,29 +1,18 @@
-import React, {FC, useEffect, useState} from 'react';
+import {FC, useEffect} from 'react';
 import StarIcon from '@expo/vector-icons/EvilIcons';
-import {useLocal} from '../../contexts/local';
-import {
-  ContentPlaces,
-  CardPlace,
-  ContentTitle,
-  SubTitle,
-  Title,
-} from './styles';
+import {ContentPlaces, CardPlace, SubTitle} from './styles';
 import theme from '../../styles/theme';
 import {TextEdit} from '../TextEdit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Helper from '../../utils/Helper';
 import {translate} from '../../locales';
+import {useTrip} from '../../contexts/Trip';
+import { Place, usePlaces } from '../../hooks/place';
 
 interface Props {
-  handleAddressSelected: (item: PlacesItem, type: string) => void;
+  handleAddressSelected: (item: Place, type: string) => void;
   visible: boolean;
   setVisible: (status: boolean) => void;
   type: string;
-}
-
-interface PlacesItem {
-  referencePoint: string;
-  address: string;
 }
 
 export const SavedLocalPlaces: FC<Props> = ({
@@ -32,24 +21,12 @@ export const SavedLocalPlaces: FC<Props> = ({
   setVisible,
   type,
 }) => {
-  const [places, setPlaces] = useState([]);
+  const { places, requestAllPlaces } = usePlaces();
 
-  const lastPlaces = async () => {
-    const request = await AsyncStorage.getItem('lastPlaces');
-    if (request) {
-      // setPlaces(JSON.parse(lastPlaces).reverse());
-      const parse = await JSON.parse(request);
-      const response = await Helper.indicatorsWithFilterId(
-        parse.reverse(),
-        setPlaces,
-      );
-      setPlaces(response);
-      return response;
-    }
-    return [];
-  };
+  const {dispatchTripCustomer} = useTrip();
+
   useEffect(() => {
-    lastPlaces();
+    requestAllPlaces();
   }, []);
   return (
     <>
@@ -57,13 +34,30 @@ export const SavedLocalPlaces: FC<Props> = ({
         <TextEdit color={theme.colors.border_green}>
           {translate('trip.last_destinys')}
         </TextEdit>
-        {places.map((item: PlacesItem, index) => {
+        {places.map((item: Place, index) => {
           return (
             <CardPlace
               key={index}
-              onPress={() => {
+              onPress={async () => {
+                const isTripNoDestinationAnother = JSON.parse(
+                  await AsyncStorage.getItem('@app:tripNoDestinationAnother'),
+                );
                 handleAddressSelected(item, type);
                 setVisible(false);
+
+                if (isTripNoDestinationAnother) {
+                  dispatchTripCustomer({
+                    type: 'update',
+                    field: 'hideTravelOptions',
+                    arg: false,
+                  });
+
+                  dispatchTripCustomer({
+                    type: 'update',
+                    field: 'visibleLookUpAddressesModal',
+                    arg: false,
+                  });
+                }
               }}
             >
               <StarIcon

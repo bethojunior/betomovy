@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import {useEffect, useState} from 'react';
-import {Alert, Modal} from 'react-native';
+import {Alert, Modal, Linking} from 'react-native';
 import {useNavigation, RouteProp} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
@@ -38,6 +38,7 @@ import {If} from '../../components/If';
 import {InputPassword} from '../../components/InputPassword';
 import {customToast} from '../../../utils/FlashMessage';
 import theme from '../../styles/theme';
+import {useSupportNumber} from '../../../hooks/useSupportNumber';
 
 interface FormData extends TextInputMask {
   email: string;
@@ -60,6 +61,7 @@ export default function RecoveryPassword({route}: Props) {
   const [modalPassword, setModalPassword] = useState(false);
 
   const isDriver = route?.params?.isDriver;
+  const {getSupportNumberFormatted} = useSupportNumber();
 
   const {
     control,
@@ -100,8 +102,29 @@ export default function RecoveryPassword({route}: Props) {
         return Alert.alert(
           translate('recoveryPassword.title_error'),
           translate('recoveryPassword.message_error_send_code'),
+          [
+            {
+              text: 'OK',
+              style: 'default',
+            },
+            {
+              text: translate('recoveryPassword.contact_support'),
+              style: 'default',
+              onPress: () => {
+                const supportNumber = getSupportNumberFormatted();
+                if (supportNumber) {
+                  const whatsappUrl = `https://wa.me/${supportNumber}`;
+                  Linking.openURL(whatsappUrl).catch(() => {
+                    Alert.alert('Erro', 'Não foi possível abrir o WhatsApp');
+                  });
+                } else {
+                  Alert.alert('Erro', 'Número de suporte não configurado');
+                }
+              },
+            },
+          ],
         );
-      } 
+      }
 
       if(isDriver) {
         setCodeWasSend(responseObject?.data?.sms)
@@ -153,6 +176,27 @@ export default function RecoveryPassword({route}: Props) {
           return Alert.alert(
             translate('recoveryPassword.title_error'),
             translate('recoveryPassword.message_change_password_error'),
+            [
+              {
+                text: 'OK',
+                style: 'default',
+              },
+              {
+                text: translate('recoveryPassword.contact_support'),
+                style: 'default',
+                onPress: () => {
+                  const supportNumber = getSupportNumberFormatted();
+                  if (supportNumber) {
+                    const whatsappUrl = `https://wa.me/${supportNumber}`;
+                    Linking.openURL(whatsappUrl).catch(() => {
+                      Alert.alert('Erro', 'Não foi possível abrir o WhatsApp');
+                    });
+                  } else {
+                    Alert.alert('Erro', 'Número de suporte não configurado');
+                  }
+                },
+              },
+            ],
           );
         }
 
@@ -195,6 +239,9 @@ export default function RecoveryPassword({route}: Props) {
                 icon
               />
             </InputContainer>
+            <ModalText style={{marginBottom: 20, textAlign: 'center', fontSize: 14, color: theme.colors.primary}}>
+              {translate('recoveryPassword.message_verification_code_info')}
+            </ModalText>
             <Button
               title={translate('recoveryPassword.text_button_send')}
               onPress={handleSubmit(handleSendCodeVerification)}

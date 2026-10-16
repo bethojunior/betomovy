@@ -1,13 +1,9 @@
 import {MotiView} from 'moti';
 import {lighten} from 'polished';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { RFValue } from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 
-interface ContainerPanicProps {
-  hasPublicity: boolean;
-}
-
-export const ContainerPanic = styled.View<ContainerPanicProps>`
+export const ContainerPanic = styled.View`
   flex-direction: row-reverse;
   elevation: 5;
 
@@ -15,9 +11,9 @@ export const ContainerPanic = styled.View<ContainerPanicProps>`
   shadow-offset: 0px 0px;
   shadow-opacity: 0.2;
   shadow-radius: 6.27px;
-  position: absolute;
-  top: -100px;
-  right: 5px
+
+  margin-bottom: ${RFValue(10)}px;
+  margin-right: ${RFValue(10)}px;
 `;
 
 export const ButtonPanic = styled.TouchableOpacity`

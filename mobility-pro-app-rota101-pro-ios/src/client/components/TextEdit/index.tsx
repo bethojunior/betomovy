@@ -2,14 +2,16 @@ import {Text} from '../ModalTransference/styles';
 
 interface TextProps {
   color?: string;
-  size?: 'small' | 'smalls' | 'medium' | 'large';
+  size?: 'small' | 'smalls' | 'medium' | 'large' | 'xlarge';
   children: React.ReactNode;
-  transform?: 'uppercase' | 'lowercase' | 'capitalize' | string;
+  change?: 'uppercase' | 'lowercase' | 'capitalize' | string;
+  numberOfLines?: number;
+  fontWeight?: 'bold' | 'normal';
 }
 
-export const TextEdit = ({color, size, children, transform}: TextProps) => {
+export const TextEdit = ({ color, size, children, change, numberOfLines, fontWeight }: TextProps) => {
   return (
-    <Text color={color} transform={transform} size={size}>
+    <Text color={color} change={change} size={size} numberOfLines={numberOfLines} fontWeight={fontWeight}>
       {children}
     </Text>
   );

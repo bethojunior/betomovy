@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Pressable } from 'react-native';
+import { View, Pressable, Platform } from 'react-native';
 import { useTheme } from 'styled-components';
 import { Feather } from '@expo/vector-icons';
 import {
@@ -57,53 +57,73 @@ export default function EditProfileSpeedMob() {
     setUploadingPhoto(true);
 
     try {
-      const result = await resizeImage(uri, 200, 200);
-      await updatePhoto(result.uri);
-    } catch (error) {
-      customToast(translate('toast.text_photo_processing_error'), 'danger');
+      let imageToUpload = uri;
+      try {
+        const result = await resizeImage(uri, 400, 400);
+        if (result?.uri) {
+          imageToUpload = result.uri;
+        }
+      } catch (resizeErr) {
+        console.warn('Falha ao redimensionar foto, utilizando uri original:', resizeErr);
+      }
+
+      await updatePhoto(imageToUpload);
+    } catch (error: any) {
+      console.error('Erro ao atualizar foto:', error);
+      if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
+        customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
+      } else if (error?.response?.status === 413) {
+        customToast(translate('toast.text_image_too_large'), 'danger');
+      } else {
+        customToast(error?.response?.data?.message || error?.message || translate('toast.text_photo_update_error'), 'danger');
+      }
     } finally {
       setUploadingPhoto(false);
     }
   }
 
   async function updatePhoto(uri: string) {
-    try {
-      const locaUri = uri;
-      const filename = locaUri?.split('/').pop();
+    const filename = (uri?.split('/').pop() || 'photo.jpg').split('?')[0];
 
-      // Infer the type of the image
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : `image`;
+    const match = /\.(\w+)$/.exec(filename);
+    const ext = match ? match[1].toLowerCase() : 'jpg';
+    let type = 'image/jpeg';
+    if (ext === 'png') type = 'image/png';
+    else if (ext === 'webp') type = 'image/webp';
 
-      const formData = new FormData();
-      formData.append('driverId', userDriverFind.idDriver);
-      // @ts-ignore
-      formData.append('photo', {
-        uri: uri,
-        type,
-        name: filename,
-      });
+    const fileUri = Platform.OS === 'ios'
+      ? (uri.startsWith('file://') ? uri : `file://${uri}`)
+      : uri;
 
-      const response = await apiMainDriver.post(
-        'Driver/EditProfileImage',
-        formData,
-        { timeout: 120000 },
-      );
+    const formData = new FormData();
+    formData.append('driverId', userDriverFind.idDriver);
+    // @ts-ignore
+    formData.append('photo', {
+      uri: fileUri,
+      type,
+      name: filename,
+    });
 
-      const { data } = response;
-      const { status } = data;
+    const response = await apiMainDriver.post(
+      'Driver/EditProfileImage',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+        timeout: 120000,
+      },
+    );
 
-      if (status) {
-        setImageKey(Date.now());
+    const { data } = response;
+    const { status } = data;
 
-        customToast(translate('toast.text_photo_change_request_sent'), 'success');
-      } else {
-        throw new Error(data.message || 'Upload falhou');
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar foto:', error);
-      customToast(translate('toast.text_photo_update_error'), 'danger');
-      throw error;
+    if (status) {
+      setImageKey(Date.now());
+      customToast(translate('toast.text_photo_change_request_sent'), 'success');
+    } else {
+      throw new Error(data.message || 'Upload falhou');
     }
   }
 

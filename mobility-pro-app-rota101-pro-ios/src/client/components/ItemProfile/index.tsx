@@ -1,45 +1,56 @@
 import Feather from '@expo/vector-icons/Feather';
-import theme from '../../styles/theme';
-import {Button, Container, ContentText, Item, LabelValue} from './styles';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import {useTheme} from 'styled-components/native';
 import {RFValue} from 'react-native-responsive-fontsize';
-import { translate } from '../../locales';
-
-interface ItemProfileProps {
-  label: string;
-  onPress: () => void;
-  textValue: string;
-  nameIconFeather?: any;
-}
+import {translate} from '../../locales';
+import {ItemProfileProps} from './types';
+import {
+  Button,
+  Container,
+  ContentText,
+  Item,
+  LabelValue,
+  RequiredContainer,
+  RequiredLabel,
+  TextGroup,
+} from './styles';
 
 export function ItemProfile({
   label,
   onPress,
   textValue,
+  icon,
   nameIconFeather,
+  isLast,
 }: ItemProfileProps) {
+  const theme = useTheme();
+
   return (
-    <Container noText={!textValue}>
+    <Container isLast={isLast}>
       <ContentText>
-        <Item>{label}</Item>
-        <Button onPress={onPress}>
-          <LabelValue>{textValue}</LabelValue>
+        {icon && (
+          <Ionicons name={icon} size={RFValue(18)} color={theme.colors.icon_gray} />
+        )}
+
+        <TextGroup>
+          <Item>{label}</Item>
+          {!textValue && (
+            <RequiredContainer>
+              <Feather name="alert-circle" size={RFValue(11)} color={theme.colors.red} />
+              <RequiredLabel>{translate('paymentDriver.error_required')}</RequiredLabel>
+            </RequiredContainer>
+          )}
+        </TextGroup>
+
+        <Button onPress={onPress} activeOpacity={0.7}>
+          <LabelValue numberOfLines={1}>{textValue}</LabelValue>
           <Feather
-            color={theme.colors.secondary}
-            name={nameIconFeather || 'edit'}
+            color={theme.colors.grayLight}
+            size={RFValue(15)}
+            name={nameIconFeather || 'edit-2'}
           />
         </Button>
       </ContentText>
-      {!textValue && (
-        <Item
-          style={{
-            color: 'red',
-            fontSize: RFValue(10),
-          }}
-        >
-          {' '}
-          {translate('paymentDriver.error_required')}{' '}
-        </Item>
-      )}
     </Container>
   );
 }

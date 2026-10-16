@@ -1,22 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, Platform, Image } from 'react-native';
-import { AnimatedRegion, Marker, MarkerAnimated } from 'react-native-maps';
+import { Dimensions, Platform } from 'react-native';
+import { AnimatedRegion, Marker } from 'react-native-maps';
 import { useTrip } from '../../contexts/Trip';
-import iconDriver from '../../assets/images/car.png';
+import icCar from '~/assets/map-pins/car.png';
 import {
   calculateDistanceFromLatLonInMeters,
   calculateHeading,
 } from '../../utils/position';
 import { useTripGL } from '../../contexts/TripGL';
+import { CustomImage } from './styles';
 
 let lastPosition = null;
 
-interface Props {
-  isHome?: boolean;
-  driver?: any;
-}
+const DriverMarker = React.memo(() => {
+  const [tracksViewChanges, setTracksViewChanges] = React.useState(true);
 
-const DriverMarker = React.memo(({ isHome, driver }: Props) => {
   const { width, height } = Dimensions.get('window');
   const ASPECT_RATIO = width / height;
   const LATITUDE_DELTA = 0.003;
@@ -30,22 +28,12 @@ const DriverMarker = React.memo(({ isHome, driver }: Props) => {
   const { routeTripScheduled } = useTripGL();
 
   const { routeTrip, trip } = stateTripCustomer;
-  if (isHome) {
-    return (
-      <MarkerAnimated
-        ref={markerDriverRef}
-        coordinate={
-          new AnimatedRegion({
-            latitude: driver?.latitude || 0,
-            longitude: driver?.longitude || 0,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          })
-        }
-        image={driver?.iconMapDriver || iconDriver}
-      />
-    );
-  }
+
+  const stopTrackingViewChanges = () => {
+    setTracksViewChanges(false);
+  };
+
+  const uriMapDriver = trip?.driver?.iconMapDriver;
 
   useEffect(() => {
     if (routeTripScheduled) {
@@ -143,41 +131,25 @@ const DriverMarker = React.memo(({ isHome, driver }: Props) => {
     }
   }, [routeTrip]);
 
-  return (
-    <>
-      {
-        !coordinateDriver ? null :
-          <MarkerAnimated
-            ref={markerDriverRef}
-            coordinate={coordinateDriver}
-            style={{
-              transform: [{ rotate: `${rotation}deg` }],
-              width: 70,
-              height: 70,
-            }}
-            anchor={{ x: 0.5, y: 0.5 }}
-          >
-            <Marker
-              coordinate={undefined}
-            >
-              <Image
-                style={{
-                  width: 60,
-                  height: 60,
-                }}
-                source={
-                  trip?.driver?.iconMapDriver
-                    ? { uri: trip?.driver?.iconMapDriver }
-                    : iconDriver
-                }
-                resizeMode="contain"
-              />
-            </Marker>
-          </MarkerAnimated>
-      }
-    </>
+  if (!coordinateDriver) return null;
 
-  );
-})
+  return (
+    <Marker.Animated
+      ref={markerDriverRef}
+      coordinate={coordinateDriver}
+      anchor={{ x: 0.5, y: 0.5 }}
+      tracksViewChanges={tracksViewChanges}
+      style={{
+        transform: [{ rotate: `${rotation}deg` }],
+      }}
+    >
+      <CustomImage
+        source={uriMapDriver ? { uri: uriMapDriver } : icCar}
+        resizeMode="contain"
+        onLoad={stopTrackingViewChanges}
+      />
+    </Marker.Animated>
+  )
+});
 
 export default DriverMarker;

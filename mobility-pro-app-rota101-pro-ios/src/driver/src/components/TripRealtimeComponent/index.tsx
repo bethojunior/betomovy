@@ -1,64 +1,93 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
-import {useNetwork} from '../../../../context/ConfigGlobal';
-import {useTripProvider} from '../../context/Trip';
-import {useUserDriver} from '../../context/userDriver';
-import {Alert, AppState} from 'react-native';
-import {useLocal} from '../../hooks/location';
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useNetwork } from '../../../../context/ConfigGlobal';
+import { useTripProvider } from '../../context/Trip';
+import { useUserDriver } from '../../context/userDriver';
+import { Alert, AppState, Platform } from 'react-native';
+import { useLocal } from '../../hooks/location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useTripStatusProvider} from '../../context/TripStatus';
-import {translate} from '../../../../client/locales';
+import { useTripStatusProvider } from '../../context/TripStatus';
+import { translate } from '../../../../client/locales';
 import {
-  STATUS_ACCEPTED,
+  STATUS_BACK_OFF,
   STATUS_BOARDING,
-  STATUS_IN_PROGRESS,
+  STATUS_CANCELED,
+  STATUS_FINISHED,
   STATUS_PRE_ACCEPTED,
-  STATUS_SCHEDULED,
 } from '../../constants/trip';
-import {useTaximeter} from '../../context/Taximeter';
-import {TripRealtime} from '../../service/realtime/TripRealtime';
-import {mountSong} from '../../utils/mountSong';
-import {customToast} from '../../../../utils/FlashMessage';
-import {useBubbleButton} from '@704apps/react-native-bubble-button';
-// @ts-ignore
-import Torch from 'react-native-torch';
-import Helper from '../../utils/Helper';
-import {ProgressBarComponent} from '../../../../common/ProgressBarComponent';
-import {useModals} from '../../../../context/Modals';
+import { useTaximeter } from '../../context/Taximeter';
+import { customToast } from '../../../../utils/FlashMessage';
+import { useBubbleButton } from '@704apps/react-native-bubble-button';
+import { ProgressBarComponent } from '../../../../common/ProgressBarComponent';
+import { useFlashlight } from '~/hooks/useFlashlight';
+import { useModals } from '../../../../context/Modals';
+import useTripRealtime from '../../hooks/tripRealtime';
+import { TripCallback } from '../../interfaces/tripRealtime';
+import apiMain from '../../../../client/api/apiMain';
+import { useDriverStatus } from '../../hooks/useDriverStatus';
+import { Audio } from 'expo-av';
+import { useAuth } from '../../../../context/auth';
+import { emitTripStatusChange } from '../../utils/tripStatusChangeEmitter';
+import { emitDriverLocation } from '~/utils/driverLocationEmmit';
+import { FinishedTripStorage } from '~/utils/Storage/finishedTripStorage';
+import { normalizeTripLongDistance } from '../../utils/tripUtils';
+import { useActiveTrips } from '~/hooks/useActiveTrips';
+import { Trip } from '~/interfaces/trip';
+import { TripActive } from '~/interfaces/tripActive';
+import { isTaximeterTripInProgress } from '../../service/rules/trip/isTaximeterTripInProgress';
+import { useSong } from '../../hooks/song';
 
 let canModifyRoute = true;
-let hasRun = true;
 
-export const TripRealtimeComponent = ({
+export interface TripRealtimeProps {
+  setIniTripModal: (value: boolean) => void;
+  setSwalVisible: (value: boolean) => void;
+  setVisibleQrCode: (value: boolean) => void;
+  onDriverTripStart: () => void;
+  iniTripModal: boolean;
+  setPreloadVisible: (value: boolean) => void;
+}
+
+export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   setIniTripModal,
   setSwalVisible,
   setVisibleQrCode,
-  handleMyLocation,
-  iniTripModal,
+  onDriverTripStart,
+  setPreloadVisible,
 }) => {
-  const {setContainerTaximeter, containerTaximeter} = useModals();
-  const {itsNetwork} = useNetwork();
-  const tripRealtime = useMemo(() => new TripRealtime(), []);
+  const { tripRealtime } = useTripRealtime();
+  const { setContainerTaximeter, containerTaximeter } = useModals();
+  const { itsNetwork } = useNetwork();
+
   const {
     getDriverTrip,
     dispatchTrip,
-    sendAvaliations,
     verifyExistTrip,
-    initTripPreAccepted,
     clearDataTrip,
-    clearDataPreAcceptedTrip,
-  } = useTripProvider();
-  const {userDriverFind, toogleDriverStatus, getDriverFind} = useUserDriver();
-  const {location} = useLocal();
-  const {setStatusTrip, onlyFinishTripOffline, initTripsActive} =
-    useTripStatusProvider();
-  const {stateTrip} = useTripProvider();
-  const {trip, tripPreAccepted, tripAccepted, song, cancelTrip} = stateTrip;
-  const {setTripTaximeter, tripTaximeter} = useTaximeter();
-  const [tripReferenceCurrent, setTripReferenceCurrent] = useState(null);
-  const {openApp} = useBubbleButton();
+    stateTrip: { tripAccepted, tripPreAccepted, cancelTrip, notificationTripCallRequest },
+  } = useTripProvider((context) => context);
 
-  const touchCount = useRef(0);
-  const tripAcceptedRef = useRef<any>(null);
+  const { setStatusTrip, restoreRecalculation } = useTripStatusProvider(
+    (context) => context,
+  );
+
+  const { userDriverFind, getDriverFind, song } = useUserDriver();
+  const { isOffline, isInTrip } = useDriverStatus();
+  const { location } = useLocal();
+  const { playSong } = useSong();
+
+  const {
+    data: tripsActives,
+    offlineData: offlineTripActive,
+    loading: isLoadingActiveTrips,
+  } = useActiveTrips({ field: 'driver', id: userDriverFind?.idDriver });
+
+  const { restoreTrip: restoreTripTaximeter, clearTrip: clearTripTaximeter } =
+    useTaximeter();
+
+  const { openApp } = useBubbleButton();
+  const { cityConfig } = useAuth();
+  const { blink, stop } = useFlashlight();
+
   const locationRef = useRef<any>({
     coords: {
       latitude: location?.coords?.latitude || 0,
@@ -66,539 +95,530 @@ export const TripRealtimeComponent = ({
     },
   });
 
-  const unsubscribesRef = useRef({
-    search: null,
-  });
+  // Refs sincronizados via useLayoutEffect (ver abaixo) para evitar closure obsoleta
+  // nos callbacks do tripRealtime, que são registrados uma única vez e não são
+  // recriados quando tripAccepted/cancelTrip/tripPreAccepted mudam.
+  const tripAcceptedRef = useRef(tripAccepted);
+  const cancelTripRef = useRef(cancelTrip);
+  const tripPreAcceptedRef = useRef(tripPreAccepted);
 
-  const [blinkTimeout, setBlinkTimeout] = useState(null);
-
-  useEffect(() => {
-    locationRef.current = location;
-  }, [location]);
-
-  useEffect(() => {
+  // useLayoutEffect (não useEffect) para eliminar a janela entre commit e a
+  // sincronização do ref: os listeners realtime (socket/Firestore) rodam fora
+  // do ciclo do React e podem disparar exatamente nesse intervalo.
+  useLayoutEffect(() => {
     tripAcceptedRef.current = tripAccepted;
   }, [tripAccepted]);
 
-  const verify = async (tripReference: string, isPreAccepted = false) => {
+  useLayoutEffect(() => {
+    cancelTripRef.current = cancelTrip;
+  }, [cancelTrip]);
+
+  useLayoutEffect(() => {
+    tripPreAcceptedRef.current = tripPreAccepted;
+  }, [tripPreAccepted]);
+
+  let tripUpdateEvent: string | null = null;
+
+  const verify = async (tripReference: string) => {
     if (!itsNetwork) {
       return;
     }
+
     const response = await verifyExistTrip(tripReference);
 
-    if (response && response.status === 'canceled') {
-      await mountSong(
-        require('../../assets/songs/alertClientCancelTrip.mp3'),
-      ).then(async sound => {
-        await sound?.playAsync();
+    if (
+      response?.status === STATUS_CANCELED ||
+      response?.status === STATUS_BACK_OFF ||
+      response?.status === STATUS_FINISHED
+    ) {
+      if ((response?.status === STATUS_CANCELED || response?.status === STATUS_BACK_OFF) && tripReference) {
+        const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+        if (tripReference) {
+          emitTripStatusChange(tripReference, 'removed', configCityId);
+        }
+      }
 
-        await openApp();
-      });
+      const currentLocation = location?.coords
+        ? { latitude: location.coords.latitude, longitude: location.coords.longitude }
+        : userDriverFind.latitude && userDriverFind.longitude
+          ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+          : undefined;
+      emitDriverLocation(userDriverFind, currentLocation, cityConfig);
+
+      playSong('cancel');
 
       getDriverFind();
 
-      if (
-        isPreAccepted &&
-        tripPreAccepted.tripReference !== undefined &&
-        tripAccepted.tripReference !== tripPreAccepted.tripReference
-      ) {
-        customToast(
-          translate(
-            `finishTrip.text_trip_pre_accepted_cancelled_by_${
-              response.canceledBy === 'customer'
-            }`,
-          ),
-          'warning',
-        );
+      const actualTrip = { ...tripAcceptedRef.current, cancelledBy: 'customer' };
 
-        clearDataPreAcceptedTrip();
-        return;
+      dispatchTrip({ type: 'update', field: 'tripAccepted', arg: actualTrip });
+
+      const isTripFinished = response?.status === STATUS_FINISHED;
+      if (!isTripFinished) {
+        const actualTrip = { ...tripAcceptedRef.current, cancelledBy: 'customer' };
+        dispatchTrip({ type: 'update', field: 'tripAccepted', arg: actualTrip });
       }
-      const actualTrip = {
-        ...tripAccepted,
-        cancelledBy: 'customer',
-      };
 
-      dispatchTrip({
-        type: 'update',
-        field: 'tripAccepted',
-        arg: actualTrip,
-      });
+      const toastType = isTripFinished ? 'success' : 'warning';
 
-      customToast(
-        translate(
-          `finishTrip.text_trip_cancelled_by_${
-            response.canceledBy === 'customer'
-          }`,
-        ),
-        'warning',
-      );
+      const message = await (isTripFinished
+        ? translate('finishTrip.title_success_finish')
+        : response.canceledBy === 'customer'
+          ? getCancelMessage(response)
+          : translate(`finishTrip.text_trip_cancelled_by_false`));
+
+      customToast(message, toastType);
+
       setIniTripModal(false);
+      setSwalVisible(false);
 
-      clearDataTrip();
+      requestAnimationFrame(clearDataTrip);
     }
   };
 
-  const handleTrip = async (
-    userId: number,
-    callType?: string | number | null,
-  ) => {
+  const dispatchCallDriverModal = (show: boolean) => {
+    if (show && AppState.currentState !== 'active') {
+      return;
+    }
+    requestAnimationFrame(() => {
+      dispatchTrip({ type: 'update', field: 'callDriverModal', arg: show });
+    });
+  };
+
+  const getCancelMessage = async (response: any) => {
+    const defaultMessage = translate('finishTrip.text_trip_cancelled_by_true');
+    try {
+      const { data } = await apiMain.get(`UserType/GetMessageTripCanceled`, {
+        params: {
+          tripReference: response.tripReference,
+        },
+      });
+
+      return data?.cancellationText || defaultMessage;
+    } catch (error) {
+      console.error('Error ao buscar mensagem de cancelamento:', error);
+      return defaultMessage;
+    }
+  };
+
+  const playSongActive = async () => {
+    if (AppState.currentState !== 'active') return;
+
+    Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      staysActiveInBackground: true,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+      playThroughEarpieceAndroid: false,
+    });
+
+    await song?.setIsLoopingAsync(true);
+    await song?.playAsync();
+  };
+
+  const stopSongActive = async () => {
+    await song?.stopAsync();
+  };
+
+  const handleTrip = async (userId: number, callType?: string | number | null) => {
     if (!itsNetwork) {
       return;
     }
-    await getDriverTrip(
-      Number(userDriverFind.idDriver),
-      {
-        latitude: locationRef?.current?.coords?.latitude,
-        longitude: locationRef?.current?.coords?.longitude,
-      },
-      userId,
-      callType,
-    ).then(async response => {
-      if (response) {
-        dispatchTrip({
-          type: 'update',
-          field: 'callDriverModal',
-          arg: true,
-        });
-        if (AppState.currentState !== 'active') {
-          // await openApp();
-        }
-        try {
-          await song?.playAsync();
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    });
-  };
 
-  let isFlashlightOn = false;
-
-  const handleFlashlight = (duration: number, interval: number) => {
-    if (touchCount.current >= 30) {
-      clearTimeout(blinkTimeout);
-      Torch && Torch.switchState(false);
-      touchCount.current = 0;
+    if (Object.keys(tripAcceptedRef.current || {}).length > 0) {
       return;
     }
 
-    touchCount.current += 1;
-
-    if (isFlashlightOn) {
-      Torch && Torch.switchState(false);
-      isFlashlightOn = false;
-    } else {
-      Torch && Torch.switchState(true);
-      isFlashlightOn = true;
-    }
-
-    setBlinkTimeout(
-      setTimeout(
-        () => {
-          handleFlashlight(duration, interval);
-        },
-        isFlashlightOn ? duration : interval,
-      ),
-    );
-  };
-
-  const verifyStorageFlashlight = async () => {
-    return JSON.parse(await AsyncStorage.getItem('appSetting'))
-      ?.enableFlashLight;
-  };
-
-  const playFlashlight = async () => {
-    const flashLightConfig = await verifyStorageFlashlight();
-    if (
-      tripAccepted?.status === 'boarding' &&
-      flashLightConfig &&
-      tripAccepted?.tripCallType !== 'VIAGEM DE MAÇANETA'
-    ) {
-      handleFlashlight(500, 1000);
-    }
-    Torch && Torch.switchState(false);
-    clearTimeout(blinkTimeout);
-  };
-
-  const searchTripByStatus = () => {
     try {
-      tripRealtime.searchTripByStatusScheduled(
-        userDriverFind?.idDriver,
-        STATUS_ACCEPTED,
-        async (trip, type) => {
-          if (type === 'modified' || type === 'added') {
-            if (
-              trip?.status !== STATUS_SCHEDULED &&
-              !tripAcceptedRef?.current
-            ) {
-              dispatchTrip({
-                type: 'update',
-                field: 'tripAccepted',
-                arg: trip,
-              });
-              await AsyncStorage.setItem('tripDriver', JSON.stringify(trip));
-              setIniTripModal(true);
-            }
-          }
+      const response = await getDriverTrip(
+        Number(userDriverFind.idDriver),
+        {
+          latitude: locationRef?.current?.coords?.latitude,
+          longitude: locationRef?.current?.coords?.longitude,
         },
+        userId,
+        callType,
       );
+
+      if (response) {
+        dispatchCallDriverModal(true);
+        await playSongActive();
+      } else {
+        dispatchCallDriverModal(false);
+        await stopSongActive();
+      }
     } catch (error) {
       console.log(error);
+      await stopSongActive();
     }
-  };
-
-  const initTripCallTaximeter = async trip => {
-    trip.initTaximeter = true;
-    await dispatchTrip({
-      type: 'update',
-      field: 'tripAccepted',
-      arg: trip,
-    });
   };
 
   useEffect(() => {
-    playFlashlight();
-    if (tripAccepted?.status) {
-      if (
-        tripAccepted?.tripCallType === 'CHAMADA TAXÍMETRO' &&
-        tripAccepted?.status === STATUS_IN_PROGRESS &&
-        !containerTaximeter &&
-        tripAccepted?.initTaximeter
-      ) {
-        setContainerTaximeter(true);
-        handleCreateVariablesTripTaximeter(tripAccepted);
-      }
-      if (!iniTripModal) {
-        setIniTripModal(true);
-      }
-      handleMyLocation && handleMyLocation();
-      // calculateAndDisplayRoute(
-      //   tripAccepted?.origin,
-      //   tripAccepted?.destination,
-      //   {
-      //     lat: position?.latitude,
-      //     lng: position?.longitude,
-      //   },
-      //   true,
-      // );
-    }
-    if (tripReferenceCurrent !== tripAccepted?.tripReference) {
-      if (
-        (tripAccepted?.status === 'accepted' ||
-          tripAccepted?.status === 'boarding') &&
-        Object.keys(cancelTrip).length !== 0
-      ) {
-        tripRealtime.searchTripByStatus(
-          userDriverFind?.idDriver,
-          tripAccepted?.status,
-          async (tripWatched: any, type) => {
-            if (type === 'removed') {
-              verify(tripWatched.tripReference);
-            }
-          },
-        );
-      }
-    }
-    if (tripReferenceCurrent !== tripAccepted?.tripReference) {
-      setTripReferenceCurrent(tripAccepted?.tripReference);
-      if (tripAccepted && Object.keys(tripAccepted).length !== 0) {
-        tripRealtime.getTrip(
-          tripAccepted.tripReference,
-          // eslint-disable-next-line @typescript-eslint/no-shadow
-          async (tripFirebase, type: string) => {
-            if (
-              type === 'modified' &&
-              Number(tripAccepted.oldDestinationId) !==
-                Number(tripFirebase.oldDestinationId) &&
-              canModifyRoute
-            ) {
-              try {
-                if (AppState.currentState === 'active') {
-                  await song?.playAsync();
-                }
-              } catch (error) {
-                console.log('erro');
-              }
-              canModifyRoute = false;
-              await mountSong(
-                require('../../assets/songs/alertClientCancelTrip.mp3'),
-              ).then(async sound => {
-                await sound?.playAsync();
-              });
-              await Alert.alert(
-                translate('trip.title_change_route'),
-                translate('trip.text_change_route'),
-              );
-              await AsyncStorage.setItem(
-                'tripDriver',
-                JSON.stringify(tripFirebase),
-              );
-              if (
-                tripAccepted?.tripWayPoints?.length !==
-                  tripFirebase?.tripWayPoints?.length &&
-                tripFirebase.status === 'in_progress'
-              ) {
-                setStatusTrip(translate('statusTrip.waypoint'));
-              }
-              return dispatchTrip({
-                type: 'update',
-                field: 'tripAccepted',
-                arg: tripFirebase,
-              });
-            }
+    if (!notificationTripCallRequest) return;
 
-            if (type === 'removed' && Object.keys(cancelTrip).length === 0) {
-              if (!hasRun) {
-                await Helper.timeout(5000).then(() => {
-                  hasRun = true;
-                });
-                return;
-              }
-              hasRun = false;
-              verify(tripFirebase.tripReference);
-              canModifyRoute = true;
-            }
-            return '';
-          },
-        );
-      }
-    }
-  }, [tripAccepted]);
+    dispatchTrip({ type: 'update', field: 'notificationTripCallRequest', arg: null });
 
-  const handleTripFirebase = async (tripFirebase, type) => {
+    if (Platform.OS !== 'ios') return;
+
+    setPreloadVisible(true);
+    handleTrip(
+      notificationTripCallRequest.userId,
+      notificationTripCallRequest.callType,
+    ).finally(() => {
+      setPreloadVisible(false);
+    });
+  }, [notificationTripCallRequest]);
+
+  const onSearchTrip: TripCallback = async ({ data: trip, type }) => {
     if (type === 'added' || type === 'modified') {
-      await handleTrip(tripFirebase.userId, tripFirebase?.tripCallTypeId);
+      await handleTrip(parseInt(trip.userId), trip?.tripCallTypeId);
       return;
     }
 
     if (type === 'removed') {
       AsyncStorage.removeItem('trip');
       try {
-        await song?.stopAsync();
+        await stopSongActive();
       } catch (error) {
-        console.log('erro', error);
+        console.log('Erro ao buscar viagens disponiveis', error);
       }
-      dispatchTrip({type: 'update', field: 'trip', arg: {}});
+      dispatchTrip({ type: 'update', field: 'trip', arg: {} });
     }
   };
 
-  const verificationIfHaveTripOffline = async () => {
-    try {
-      const trip = await AsyncStorage.getItem('tripOff');
-      const recalculated = await AsyncStorage.getItem('recalculateOff');
-      const sendAvaliableOff = await AsyncStorage.getItem('sendAvaliableOff');
-      if (trip || recalculated || sendAvaliableOff) {
-        const tripParse = await JSON?.parse(trip);
-        if (!tripParse) {
-          return false;
-        }
-        await onlyFinishTripOffline(tripParse);
-        if (sendAvaliableOff) {
-          const {
-            selectedOrigin,
-            selectedDestination,
-            originName,
-            destinationName,
-          } = await JSON?.parse(sendAvaliableOff);
-          await sendAvaliations(
-            selectedOrigin,
-            originName,
-            selectedDestination,
-            destinationName,
-            tripParse,
-          );
-        }
-        await AsyncStorage.removeItem('tripOff');
-        await AsyncStorage.removeItem('recalculateOff');
-        await AsyncStorage.removeItem('sendAvaliableOff');
+  const isTripAlreadyPromoted = async (tripReference: string) => {
+    if (!tripReference) return false;
 
-        return true;
-      }
-    } catch (error) {
-      console.log('error', error);
+    try {
+      const raw = await AsyncStorage.getItem('tripDriver');
+      const localTrip = raw ? JSON.parse(raw) : null;
+      return localTrip?.tripReference === tripReference;
+    } catch {
       return false;
     }
   };
 
-  const clearStorageTripTaximeter = () => {
-    AsyncStorage.multiRemove([
-      'startTaximetro',
-      'currentTimeTaximeter',
-      'priceTaximeter',
-      'taximeterIsPause',
-      'fare',
-      'routeTraveledTaximeter',
-      'lastKmTaximeter',
-      'TX-timeBg',
-    ]);
+  const clearStalePreAcceptedTrip = async (tripReference: string) => {
+    if (!tripReference) return;
+
+    let cached = null;
+    try {
+      const raw = await AsyncStorage.getItem('preAvailableTrip');
+      cached = raw ? JSON.parse(raw) : null;
+    } catch {
+      cached = null;
+    }
+
+    const matchesCache = cached?.tripReference === tripReference;
+    const matchesState = tripPreAcceptedRef.current?.tripReference === tripReference;
+
+    if (matchesCache) {
+      await AsyncStorage.removeItem('preAvailableTrip');
+    }
+
+    if (matchesCache || matchesState) {
+      dispatchTrip({ type: 'update', field: 'tripPreAccepted', arg: {} });
+    }
   };
 
-  const handleCreateVariablesTripTaximeter = response => {
-    clearStorageTripTaximeter();
-    AsyncStorage.setItem('fare', JSON.stringify(response.fare));
-    AsyncStorage.setItem('priceTaximeter', JSON.stringify(response.price));
-    AsyncStorage.setItem('startTaximetro', JSON.stringify(new Date()));
-    AsyncStorage.setItem('currentTimeTaximeter', JSON.stringify(0));
-    setTripTaximeter(response);
-    initTripCallTaximeter(response);
-  };
+  const initializeDriverTrip = async (trip: Trip) => {
+    if (trip?.status === STATUS_FINISHED || trip?.status === STATUS_CANCELED) return;
+    if (FinishedTripStorage.exists(trip?.tripReference)) return;
 
-  async function checkIfDriverIsInTrip(
-    type: string | boolean = false,
-    stopOnTerminate = false,
-  ) {
-    const response = JSON.parse(await AsyncStorage.getItem('tripDriver'));
-    const result = await verificationIfHaveTripOffline();
-    if (result || stopOnTerminate) {
-      return;
-    }
-    if (!itsNetwork) {
-      return;
-    }
-    if (response !== null) {
-      const updatedData = await verifyExistTrip(response.tripReference);
-      const preAvailableTrip = JSON.parse(
-        await AsyncStorage.getItem('preAvailableTrip'),
-      );
+    await clearStalePreAcceptedTrip(trip?.tripReference);
 
-      if (
-        !updatedData ||
-        (preAvailableTrip !== null && updatedData.status === 'finished')
-      ) {
-        initTripPreAccepted();
-        setStatusTrip(translate('statusTrip.accepted'));
-        setIniTripModal(true);
-        return;
-      }
+    const normalizedTrip = normalizeTripLongDistance(trip);
+    await AsyncStorage.setItem('tripDriver', JSON.stringify(normalizedTrip));
 
-      if (updatedData?.status === STATUS_PRE_ACCEPTED) {
-      } else {
-        dispatchTrip({
-          type: 'update',
-          field: 'tripAccepted',
-          arg: updatedData || {},
-        });
-      }
+    dispatchTrip({ type: 'update', field: 'trip', arg: {} });
+    dispatchTrip({ type: 'update', field: 'tripAccepted', arg: normalizedTrip });
 
-      if (
-        response?.tripCallType === 'CHAMADA TAXÍMETRO' &&
-        type !== 'modified'
-      ) {
-        setTripTaximeter(response);
-        if (!response?.customer?.name) {
-          setContainerTaximeter(true);
-          return true;
-        }
-        handleCreateVariablesTripTaximeter(response);
-        return true;
-      }
+    if (!isTaximeterTripInProgress(trip)) {
       setIniTripModal(true);
-      return true;
+
+      if (isInTrip && onDriverTripStart) {
+        onDriverTripStart();
+      }
     }
+  };
 
-    return false;
-  }
-
-  useEffect(() => {
-    if (itsNetwork) {
-      checkIfDriverIsInTrip(false, true);
+  const initializeTaximeterTrip = (trip: Trip) => {
+    if (isTaximeterTripInProgress(trip) && !containerTaximeter) {
+      restoreTripTaximeter(trip);
+      setContainerTaximeter(true);
     }
-  }, [itsNetwork]);
+  };
 
-  useEffect(() => {
-    const handleTripByStatus = async (trip, type) => {
-      if (
-        (type !== 'removed' && trip?.tripCallType === 'VIAGEM DE MAÇANETA') ||
-        (type !== 'removed' && trip?.oldPrice) ||
-        (type !== 'removed' && !trip?.callingDriver)
-      ) {
-        const response = await checkIfDriverIsInTrip(type);
-        if (response) return;
-        if (trip?.tripCallType === 'VIAGEM DE MAÇANETA') {
-          setStatusTrip(translate('statusTrip.boarding'));
-        }
+  const onTripScheduledAcceptedReady: TripCallback = ({ data: trip, type }) => {
+    if (type === 'added') {
+      openApp();
 
+      setSwalVisible(true);
+      initializeDriverTrip(trip);
+    }
+  };
+
+  const onSearchTripInProgress: TripCallback = async ({ data: trip, type }) => {
+    const tripReference = trip?.tripReference;
+
+    if (['added', 'modified'].includes(type)) {
+      if (FinishedTripStorage.exists(tripReference)) return;
+
+      if (trip?.tripCallType === 'VIAGEM DE MAÇANETA') {
         setVisibleQrCode(false);
-        if (type === 'added' || type === 'modified') {
-          await AsyncStorage.setItem('tripDriver', JSON.stringify(trip));
-          dispatchTrip({
-            type: 'update',
-            field: 'tripAccepted',
-            arg: trip,
-          });
-
-          if (
-            trip.status === 'accepted' &&
-            trip.schedule &&
-            Object.keys(trip.schedule).length > 0
-          ) {
-            return setSwalVisible(true);
+        if (trip?.status === 'in_progress') {
+          handleStatusTripWithWaypoints(trip);
+          if (!trip?.tripWayPoints?.length) {
+            setStatusTrip(translate('statusTrip.in_progress'));
           }
-
-          setIniTripModal(true);
+        } else {
+          setStatusTrip(translate(`statusTrip.${trip?.status}`));
         }
       }
 
+      if (trip?.status === STATUS_PRE_ACCEPTED) {
+        if (await isTripAlreadyPromoted(tripReference)) return;
 
-      if (
-        (type === 'added' && trip?.status === 'pre_accepted') ||
-        (type === 'modified' && trip?.status === 'pre_accepted')
-      ) {
         dispatchTrip({
           type: 'update',
           field: 'tripPreAccepted',
-          arg: trip || {},
+          arg: normalizeTripLongDistance(trip || {}),
+        });
+
+        return;
+      }
+
+      initializeDriverTrip(trip);
+      return;
+    }
+
+    if (
+      type === 'removed' &&
+      Object.keys(cancelTripRef.current || {}).length === 0 &&
+      tripReference &&
+      tripReference === tripAcceptedRef.current?.tripReference
+    ) {
+      openApp();
+      verify(tripReference);
+    }
+  };
+
+  const onTripUpdate: TripCallback = async ({ data: trip, type }) => {
+    if (!trip) return;
+
+    const hasDestinationChanged =
+      Number(tripAcceptedRef.current?.oldDestinationId) !==
+      Number(trip?.oldDestinationId);
+
+    const isRouteChange = type === 'modified' && hasDestinationChanged && canModifyRoute;
+
+    if (isRouteChange) {
+      openApp();
+
+      if (AppState.currentState === 'active') {
+        await song?.playAsync().catch(() => {
+          console.log('erro');
         });
       }
 
-      if (
-        (type === 'added' && !tripAcceptedRef?.current?.status) ||
-        (type === 'modified' && !tripAcceptedRef?.current?.status)
-      ) {
-        await AsyncStorage.setItem('tripDriver', JSON.stringify(trip));
-        const response = await checkIfDriverIsInTrip(type);
-        if (response) setIniTripModal(true);
-      }
-    };
+      canModifyRoute = false;
 
-    if (
-      (Object.keys(trip).length === 0 &&
-        userDriverFind?.status === 'disponivel') ||
-      (Object.keys(trip).length === 0 &&
-        userDriverFind?.preAvailable === '1' &&
-        Object.keys(tripPreAccepted).length === 0)
-    ) {
+      playSong('cancel');
 
-      tripRealtime.searchTripByStatus(
-        userDriverFind?.idDriver,
-        STATUS_BOARDING,
-        handleTripByStatus,
+      Alert.alert(
+        translate('trip.title_change_route'),
+        translate('trip.text_change_route'),
       );
+
+      if (
+        tripAcceptedRef.current?.tripWayPoints?.length !== trip?.tripWayPoints?.length &&
+        trip?.status === 'in_progress'
+      ) {
+        setStatusTrip(translate('statusTrip.waypoint'));
+      }
+
+      initializeDriverTrip(trip);
     }
+
+    if (type === 'removed' && Object.keys(cancelTripRef.current || {}).length === 0) {
+      if (tripUpdateEvent) {
+        tripRealtime.unsubscribe(tripUpdateEvent);
+        tripUpdateEvent = null;
+      }
+
+      openApp();
+
+      if (trip?.tripReference) {
+        verify(trip.tripReference);
+      }
+
+      canModifyRoute = true;
+    }
+  };
+
+  const handleStatusTripWithWaypoints = (trip: Trip) => {
+    if (trip.status === 'in_progress' && trip?.tripWayPoints.length !== 0) {
+      const waypoints = trip.tripWayPoints.filter((waypoint) => {
+        return waypoint.confirmed === '0';
+      });
+
+      if (waypoints.length > 0) {
+        setStatusTrip(translate('statusTrip.waypoint'));
+      } else {
+        setStatusTrip(translate('statusTrip.in_progress'));
+      }
+    }
+  };
+
+  async function clearDriverTripState() {
+    const tripDriver = await AsyncStorage.getItem('tripDriver');
+    if (!tripDriver) return;
+
+    await clearDataTrip();
+    await getDriverFind();
+
+    clearTripTaximeter();
+
+    setIniTripModal(false);
+    setSwalVisible(false);
+  }
+
+  async function resolvePreAcceptedTrip(tripReference: string): Promise<Trip> {
+    try {
+      const raw = await AsyncStorage.getItem('preAvailableTrip');
+      if (raw) {
+        return JSON.parse(raw);
+      }
+    } catch {}
+
+    return await verifyExistTrip(tripReference);
+  }
+
+  async function initializeActiveDriverTrips(tripsActives: TripActive[]) {
+    if (tripsActives.length === 0) {
+      clearDriverTripState();
+      return;
+    }
+
+    const preAcceptedTrip = tripsActives.find(
+      (trip) =>
+        trip?.status === STATUS_PRE_ACCEPTED &&
+        !FinishedTripStorage.exists(trip?.tripReference),
+    );
+
+    const activeTrip = tripsActives?.find(
+      (trip) =>
+        trip?.status !== STATUS_PRE_ACCEPTED &&
+        !FinishedTripStorage.exists(trip?.tripReference),
+    );
+
     if (
-      userDriverFind?.status === 'disponivel' &&
-      Object.keys(trip).length !== 0
+      preAcceptedTrip?.tripReference &&
+      !(await isTripAlreadyPromoted(preAcceptedTrip.tripReference))
     ) {
-      dispatchTrip({type: 'update', field: 'callDriverModal', arg: true});
+      const preAccepted = await resolvePreAcceptedTrip(preAcceptedTrip.tripReference);
+      if (preAccepted?.tripReference) {
+        dispatchTrip({ type: 'update', field: 'tripPreAccepted', arg: preAccepted });
+      }
     }
-    if (userDriverFind?.status === 'corrida' || userDriverFind?.trip) {
-      checkIfDriverIsInTrip();
+
+    if (!activeTrip) return;
+
+    try {
+      setStatusTrip(translate(`statusTrip.${activeTrip?.status}`));
+      const data: Trip = await verifyExistTrip(activeTrip.tripReference);
+
+      const tripToRestore = data || offlineTripActive;
+      if (tripToRestore) {
+        await restoreActiveTrip(tripToRestore);
+      }
+    } catch (error) {
+      console.log('Erro ao verificar viagens ativas', error);
     }
-    initTripsActive();
-  }, [userDriverFind?.status, userDriverFind?.preAvailable]);
+  }
+
+  const restoreActiveTrip = async (trip: Trip): Promise<void> => {
+    handleStatusTripWithWaypoints(trip);
+    await initializeDriverTrip(trip);
+    initializeTaximeterTrip(trip);
+    restoreRecalculation();
+  };
+
+  const handleFlashlight = async () => {
+    const appSetting = await AsyncStorage.getItem('appSetting');
+    const flashEnabled = JSON.parse(appSetting)?.enableFlashLight;
+
+    if (
+      flashEnabled &&
+      tripAccepted?.status === STATUS_BOARDING &&
+      tripAccepted?.tripCallType !== 'VIAGEM DE MAÇANETA'
+    ) {
+      blink(500, 1000);
+    } else {
+      stop();
+    }
+  };
 
   useEffect(() => {
-    if (userDriverFind?.idDriver)
-      unsubscribesRef.current.search = tripRealtime.searchTrip(
-        userDriverFind?.idDriver,
-        handleTripFirebase,
-      );
-    searchTripByStatus();
-    return () => {
-      unsubscribesRef.current?.search && unsubscribesRef?.current?.search();
-    };
-  }, []);
+    locationRef.current = location;
+  }, [location]);
 
-  return tripAccepted && <ProgressBarComponent trip={tripAccepted} />;
+  useEffect(() => {
+    if (!!tripUpdateEvent) return;
+
+    if (tripAccepted?.tripReference) {
+      tripUpdateEvent = tripRealtime.getTrip(tripAccepted.tripReference, onTripUpdate);
+    }
+
+    return () => {
+      if (!!tripUpdateEvent) {
+        tripRealtime.unsubscribe(tripUpdateEvent);
+        tripUpdateEvent = null;
+      }
+    };
+  }, [tripAccepted.tripReference, userDriverFind.idDriver]);
+
+  useEffect(() => {
+    if (!isLoadingActiveTrips) {
+      handleFlashlight();
+    }
+  }, [tripAccepted?.status, tripAccepted?.tripCallType, isLoadingActiveTrips]);
+
+  useEffect(() => {
+    if (!isLoadingActiveTrips) {
+      initializeActiveDriverTrips(tripsActives);
+    }
+  }, [tripsActives, isLoadingActiveTrips]);
+
+  useEffect(() => {
+    if (!userDriverFind?.idDriver) return;
+
+    const driver = userDriverFind?.idDriver;
+    const unsubscribes = new Set<string>();
+
+    if (!isOffline) {
+      const unsubscribeSearchTrip = tripRealtime.searchTrip(driver, onSearchTrip);
+
+      const unsubscribeScheduledTrips = tripRealtime.getTripScheduledAcceptedReady(
+        driver,
+        onTripScheduledAcceptedReady,
+      );
+
+      const unsubscribeTripByStatus = tripRealtime.searchTripInProgress(
+        driver,
+        onSearchTripInProgress,
+      );
+
+      unsubscribes.add(unsubscribeSearchTrip);
+      unsubscribes.add(unsubscribeScheduledTrips);
+      unsubscribes.add(unsubscribeTripByStatus);
+    }
+
+    return () => {
+      unsubscribes.forEach((unsubscribe) => tripRealtime.unsubscribe(unsubscribe));
+      unsubscribes.clear();
+    };
+  }, [userDriverFind.idDriver, isOffline]);
+
+  return <>{tripAccepted && <ProgressBarComponent trip={tripAccepted} />}</>;
 };

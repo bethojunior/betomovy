@@ -2,13 +2,14 @@ import {MotiView} from 'moti';
 import {shade} from 'polished';
 import {Platform} from 'react-native';
 import {Button} from 'react-native-paper';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 interface BallProps {
   color?: string;
 }
 
-export const ContainerModal = styled.View`
+export const ContainerModal = styled(SafeAreaView)`
   flex: 1;
   width: 100%;
   position: relative;
@@ -22,10 +23,7 @@ export const ContentModal = styled.View`
   margin-top: ${Platform.OS === 'ios' ? '10%' : '0'};
 `;
 
-export const ContainerAddress = styled.View`
-  border-bottom-width: 0.5px;
-  border-bottom-color: ${({theme}) => theme.colors.primary};
-`;
+export const ContainerAddress = styled.View``;
 
 export const MapContent = styled.View`
   border-radius: 10px;
@@ -92,8 +90,8 @@ export const ButtonCancel = styled(Button)`
   background-color: ${({theme}) => theme.colors.primary};
 `;
 export const ContainerReceivedOffers = styled.ScrollView`
-  margin-top: 10px;
   flex: 1;
+  margin-top: 10px;
 `;
 export const TitleOffer = styled.View`
   width: 100%;

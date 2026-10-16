@@ -1,9 +1,9 @@
-import {useRef, useState} from 'react';
-import {Ionicons, AntDesign} from '@expo/vector-icons';
-import {useNavigation} from '@react-navigation/native';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {Circle, Marker} from 'react-native-maps';
-import {Map} from '../../../components/Map';
+import { useRef, useState } from 'react';
+import { Ionicons, AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { Circle, Marker } from 'react-native-maps';
+import { Map } from '../../../components/Map';
 import {
   ButtonCard,
   Container,
@@ -14,19 +14,19 @@ import {
   Header,
   TitleHeader,
 } from './styles';
-import {ButtonIcon} from '../../../components/ButtonIcon';
+import { ButtonIcon } from '../../../components/ButtonIcon';
 import theme from '../../../styles/theme';
-import {TextEdit} from '../../../components/TextEdit';
+import { TextEdit } from '../../../components/TextEdit';
 import ModalFrame from '../../../components/Modal/ModalFrame';
-import {useLocalProvider} from '../../../context/local';
+import { useLocalProvider } from '../../../context/local';
 import apiMainDriver from '../../../api/apiMain';
 import Preload from '../../../components/Preload';
-import {If} from '../../../components/If';
-import {translate} from '../../../../../client/locales';
-import {customToast} from '../../../../../utils/FlashMessage';
+import { If } from '../../../components/If';
+import { translate } from '../../../../../client/locales';
+import { customToast } from '../../../../../utils/FlashMessage';
 
 export default function ZoneDynamic() {
-  const {location} = useLocalProvider();
+  const { location } = useLocalProvider();
   const [loading, setLoading] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
   const [dataDynamic, setDataDynamic] = useState<any>([]);
@@ -62,7 +62,7 @@ export default function ZoneDynamic() {
   ];
 
   const getDataPerEndpoint = async (endpoint: string) => {
-    const {data} = await apiMainDriver.get(endpoint);
+    const { data } = await apiMainDriver.get(endpoint);
     if (!data.status) {
       return customToast(data.message, 'danger');
     }
@@ -127,9 +127,7 @@ export default function ZoneDynamic() {
         </TitleHeader>
       </Header>
       <Map
-        mapRef={(ref: any) => {
-          mapRef.current = ref;
-        }}
+        ref={mapRef}
         noDriver
         setCountVisible={setLoading}
       >
@@ -154,19 +152,18 @@ export default function ZoneDynamic() {
         {dataDynamicNoFilter.length > 0 &&
           dataDynamicNoFilter.map((item, index) => {
             return (
-              <Marker
-                key={index}
-                coordinate={{
-                  latitude: Number(item?.latitude),
-                  longitude: Number(item?.longitude),
-                }}
-              >
-                <Ionicons
-                  name="person-circle"
-                  size={RFValue(20)}
-                  color={theme.colors.secondary}
-                />
-              </Marker>
+              item?.latitude && (
+                <Marker
+                  key={index}
+                  tracksViewChanges={false}
+                  coordinate={{
+                    latitude: Number(item?.latitude),
+                    longitude: Number(item?.longitude),
+                  }}
+                >
+                  <MaterialIcons name="person-pin" size={32} color={theme.colors.secondary} />
+                </Marker>
+              )
             );
           })}
       </Map>
@@ -177,7 +174,7 @@ export default function ZoneDynamic() {
           icon={
             <>
               <Ionicons
-                name="ios-stats-chart-outline"
+                name="stats-chart-outline"
                 size={RFValue(20)}
                 color={theme.colors.background_global}
               />

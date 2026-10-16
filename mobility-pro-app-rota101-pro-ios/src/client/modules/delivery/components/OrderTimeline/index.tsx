@@ -1,7 +1,7 @@
 // @ts-nocheck
 
-import React, {useEffect, useState, useRef} from 'react';
-import {StyleSheet, View, Text, Animated} from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, View, Text, Animated } from 'react-native';
 import IconFontAwesome from '@expo/vector-icons/FontAwesome5';
 import IconIonicons from '@expo/vector-icons/Ionicons';
 import IconMaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -20,11 +20,11 @@ import {
   DELIVERY_TYPE,
   WITHDRAWAL_TYPE,
 } from '../../../../constants/orderDeliveryType';
-import {MessageStatus, styles} from './styles';
+import { MessageStatus, styles } from './styles';
 
 import theme from '../../../../styles/theme';
 
-export default function OrderTimeline({order}) {
+export default function OrderTimeline({ order }) {
   const [status, setStatus] = useState({
     orderConfirmed: false,
     inPreparation: false,
@@ -44,14 +44,14 @@ export default function OrderTimeline({order}) {
 
   useEffect(() => {
     function getStatusOrder() {
-      const newStatus = {...status};
-      const newAwaitStatus = {...awaitStatus};
+      const newStatus = { ...status };
+      const newAwaitStatus = { ...awaitStatus };
 
       newAwaitStatus.orderConfirmed = true;
 
       if (order_confirmed > order.delivery_order_status.id) {
-        setStatus({...newStatus});
-        setAwaitStatus({...newAwaitStatus});
+        setStatus({ ...newStatus });
+        setAwaitStatus({ ...newAwaitStatus });
         return;
       }
       newStatus.orderConfirmed = true;
@@ -59,23 +59,23 @@ export default function OrderTimeline({order}) {
       newAwaitStatus.searchingDeliveryMan = false;
 
       if (order_in_preparation > order.delivery_order_status.id) {
-        setStatus({...newStatus});
-        setAwaitStatus({...newAwaitStatus});
+        setStatus({ ...newStatus });
+        setAwaitStatus({ ...newAwaitStatus });
         return;
       }
 
       newStatus.inPreparation = true;
 
       if (order_searching_delivery_man > order.delivery_order_status.id) {
-        setStatus({...newStatus});
-        setAwaitStatus({...newAwaitStatus});
+        setStatus({ ...newStatus });
+        setAwaitStatus({ ...newAwaitStatus });
         return;
       }
       newAwaitStatus.searchingDeliveryMan = true;
 
       if (order_out_for_delivery > order.delivery_order_status.id) {
-        setStatus({...newStatus});
-        setAwaitStatus({...newAwaitStatus});
+        setStatus({ ...newStatus });
+        setAwaitStatus({ ...newAwaitStatus });
         return;
       }
 
@@ -83,8 +83,8 @@ export default function OrderTimeline({order}) {
       newAwaitStatus.outForDelivery = true;
 
       if (order_arrived > order.delivery_order_status.id) {
-        setStatus({...newStatus});
-        setAwaitStatus({...newAwaitStatus});
+        setStatus({ ...newStatus });
+        setAwaitStatus({ ...newAwaitStatus });
         return;
       }
       newStatus.outForDelivery = true;
@@ -94,20 +94,20 @@ export default function OrderTimeline({order}) {
       newAwaitStatus.withdrawInLocal = true;
 
       if (order_withdrawal_in_local === order.delivery_order_status.id) {
-        setStatus({...newStatus});
-        setAwaitStatus({...newAwaitStatus});
+        setStatus({ ...newStatus });
+        setAwaitStatus({ ...newAwaitStatus });
         return;
       }
 
       if (order_delivered > order.delivery_order_status.id) {
-        setStatus({...newStatus});
-        setAwaitStatus({...newAwaitStatus});
+        setStatus({ ...newStatus });
+        setAwaitStatus({ ...newAwaitStatus });
         return;
       }
 
       newStatus.delivered = true;
-      setAwaitStatus({...newAwaitStatus});
-      setStatus({...newStatus});
+      setAwaitStatus({ ...newAwaitStatus });
+      setStatus({ ...newStatus });
     }
 
     getStatusOrder();
@@ -126,7 +126,7 @@ export default function OrderTimeline({order}) {
   );
 }
 
-function CheckLayoutByStatus({order, status, awaitStatus}) {
+function CheckLayoutByStatus({ order, status, awaitStatus }) {
   let layout = null;
 
   switch (order.delivery_order_status.id) {
@@ -137,7 +137,7 @@ function CheckLayoutByStatus({order, status, awaitStatus}) {
           cancel
           active
           awaitStatus={false}
-          icon={<IconIonicons name="ios-close" size={30} color={theme.colors.white} />}
+          icon={<IconIonicons name="close" size={30} color={theme.colors.white} />}
         />
       );
       break;
@@ -162,7 +162,7 @@ function CheckLayoutByStatus({order, status, awaitStatus}) {
             awaitStatus={awaitStatus.inPreparation}
             icon={
               <IconIonicons
-                name="ios-timer"
+                name="timer"
                 size={20}
                 color={status.inPreparation ? theme.colors.white : theme.colors.black}
               />
@@ -218,7 +218,7 @@ function CheckLayoutByStatus({order, status, awaitStatus}) {
             awaitStatus={awaitStatus.delivered}
             icon={
               <IconIonicons
-                name="ios-checkmark-circle-outline"
+                name="checkmark-circle-outline"
                 size={20}
                 color={status.delivered ? theme.colors.white : theme.colors.black}
               />
@@ -232,7 +232,7 @@ function CheckLayoutByStatus({order, status, awaitStatus}) {
   return layout;
 }
 
-function ItemStatus({cancel, icon, active, awaitStatus}) {
+function ItemStatus({ cancel, icon, active, awaitStatus }) {
   const fadeAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -253,16 +253,16 @@ function ItemStatus({cancel, icon, active, awaitStatus}) {
       style={[
         styles.containerItem,
         active
-          ? {backgroundColor: cancel ? theme.colors.red : theme.colors.border_green, opacity: 1}
+          ? { backgroundColor: cancel ? theme.colors.red : theme.colors.border_green, opacity: 1 }
           : awaitStatus
-          ? {
+            ? {
               opacity: 1,
               backgroundColor: fadeAnimation.interpolate({
                 inputRange: [0, 0.5, 1],
                 outputRange: [theme.colors.background_white, theme.colors.background_greenLight, theme.colors.background_white],
               }),
             }
-          : {},
+            : {},
       ]}
     >
       {icon}

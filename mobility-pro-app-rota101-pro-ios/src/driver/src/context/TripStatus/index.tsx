@@ -1,65 +1,93 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   getCurrentPositionAsync,
   getLastKnownPositionAsync,
 } from 'expo-location';
-import {Alert, AppState, DeviceEventEmitter, Platform} from 'react-native';
+import { Alert, AppState, DeviceEventEmitter, Platform } from 'react-native';
 import _ from 'lodash';
-import {VolumeManager} from 'react-native-volume-manager';
+import { VolumeManager } from 'react-native-volume-manager';
 import {
   RecalculatedProps,
   TripStatusContextChildren,
   TripStatusContextType,
 } from './types';
-import {useUserDriver} from '../userDriver';
-import {calculateDistanceFromLatLonInMeters} from '../../../../client/utils/position';
-import {TripStatusService} from './service';
-import {translate} from '../../../../client/locales';
-import {useTripProvider} from '../Trip';
+import { useUserDriver } from '../userDriver';
+import { calculateDistanceFromLatLonInMeters } from '../../../../client/utils/position';
+import { TripStatusService } from './service';
+import { isRecalcAlreadyApplied } from '../../utils/tripUtils';
+import { translate } from '../../../../client/locales';
+import { useTripProvider } from '../Trip';
 import {
   TRIP_CALL_CORPORATE,
   TRIP_CALL_RIDE,
   STATUS_PRE_ACCEPTED,
+  STATUS_IN_PROGRESS,
 } from '../../constants/trip';
-import {useAuth} from '../../../../context/auth';
-import {TripInfo} from '../Trip/types';
-import {useNetwork} from '../../../../context/ConfigGlobal';
-import {useConfigLocal} from '../ConfigLocal';
+import { useAuth } from '../../../../context/auth';
+import { stateTripProps, TripInfo } from '../Trip/types';
+import { useNetwork } from '../../../../context/ConfigGlobal';
+import { useConfigLocal } from '../ConfigLocal';
 import MapService from '../../../../client/services/mapService';
-import {useStorage} from '../../../../utils/Storage';
-import {diferenceBetweenNumber} from '../../utils/money';
+import { useStorage } from '../../../../utils/Storage';
+import { diferenceBetweenNumber } from '../../utils/money';
+import { serviceTaximeter } from '../Taximeter/services';
+import { emitDriverStatusChange } from '../../utils/driverStatusChangeEmitter';
+import { emitTripStatusChange } from '../../utils/tripStatusChangeEmitter';
+import { FinishedTripStorage } from '~/utils/Storage/finishedTripStorage';
+import { emitDriverLocation } from '~/utils/driverLocationEmmit';
+import { DriverStatusType } from '../../../../interfaces/driver';
+import { storage } from '~/common/services/mmkv/storage';
+import {
+  useOfflineTripActions,
+  offlineTripQueue,
+  OFFLINE_TRIP_FINISHED_EVENT,
+  OFFLINE_TAXIMETER_FLAG_KEY,
+  OFFLINE_TAXIMETER_INFO_KEY,
+} from '~/hooks/useOfflineTripActions';
+import { sendCriticalRequest } from '~/utils/network';
+
+function queueOfflineFinish(trip: TripInfo): void {
+  if (trip.tripCallType !== 'CHAMADA TAXÍMETRO') {
+    offlineTripQueue.addFinishTrip(trip.tripReference);
+  }
+}
 
 const TripStatusContext = createContext<TripStatusContextType>(
   {} as TripStatusContextType,
 );
 
-export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
+export const TripStatusProvider = ({ children }: TripStatusContextChildren) => {
   const [statusTrip, setStatusTrip] = useState('');
   const [hasRecalculation, setHasRecalculation] = useState(false);
   const [recalculated, setRecalculated] = useState({} as RecalculatedProps);
+  const [isFinishingTrip, setIsFinishingTrip] = useState(false);
   const [countTakeVolume, setCountTakeVolume] = useState(0);
   const [buttonTargetVisibility, setButtonTargetVisibility] = useState(false);
   const [metersRound, setMetersRound] = useState(0);
   const [minutesTraveled, setMinutesTraveled] = useState(0);
-  const {userDriverFind, setUserDriverFind, getDriverFind} = useUserDriver();
-  const {dispatchTrip, stateTrip, verifyExistTrip} = useTripProvider();
+  const [shouldShowFinishModal, setShouldShowFinishModal] = useState(false);
+  const { userDriverFind, setUserDriverFind, getDriverFind } = useUserDriver();
 
-  const {tripAccepted, tripPreAccepted} = stateTrip;
-  const {cityConfig, generalSettings} = useAuth();
-  const {itsNetwork} = useNetwork();
-  const {states} = useConfigLocal();
-  const {payloadInScreen} = states;
+  const {
+    dispatchTrip,
+    stateTrip,
+    verifyExistTrip,
+    startMapSuggestionTimeout
+  } = useTripProvider((context) => context);
 
-  const {getItem} = useStorage();
+  const { tripAccepted, tripPreAccepted } = stateTrip;
+
+  const { cityConfig, generalSettings } = useAuth();
+  const { itsNetwork } = useNetwork();
+  const { states } = useConfigLocal();
+  const { payloadInScreen } = states;
+
+  const { getItem } = useStorage();
+
+  // Activa drenagem automática da fila offline ao reconectar
+  useOfflineTripActions();
 
   const service = TripStatusService();
 
@@ -74,7 +102,7 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
       return response;
     }
 
-    dispatchTrip({type: 'update', field: 'tripAccepted', arg: {}});
+    dispatchTrip({ type: 'update', field: 'tripAccepted', arg: {} });
     return null;
   };
   const volumeChangesAfterOneRef = useRef(0);
@@ -85,31 +113,6 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
     if (AppState.currentState === 'active') {
       setCountTakeVolume(prev => prev + 1);
     }
-  };
-
-  const clearStorageTaximeter = () => {
-    AsyncStorage.multiRemove([
-      'startTaximetro',
-      'currentTimeTaximeter',
-      'priceTaximeter',
-      'taximeterIsPause',
-      'fare',
-      'routeTraveledTaximeter',
-      'lastKmTaximeter',
-      'TX-timeBg',
-    ]);
-  };
-
-  const initTripCallTaximeter = async trip => {
-    const tripAtt = {
-      ...trip,
-      initTaximeter: true,
-    };
-    await dispatchTrip({
-      type: 'update',
-      field: 'tripAccepted',
-      arg: tripAtt,
-    });
   };
 
   useEffect(() => {
@@ -191,49 +194,6 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
   }, []);
 
   useEffect(() => {
-    const getTrip = async () => {
-      const trip = JSON.parse(await AsyncStorage.getItem('tripDriver'));
-      if (trip !== null) {
-        const response = await verifyTrip(trip.tripReference);
-        if (!response) {
-          return;
-        }
-        dispatchTrip({type: 'update', field: 'tripAccepted', arg: trip || {}});
-
-        if (trip.status === 'in_progress' && trip?.tripWayPoints.length !== 0) {
-          const waypoints = trip.tripWayPoints.filter(waypoint => {
-            return waypoint.confirmed === '0';
-          });
-
-          if (waypoints.length > 0) {
-            return setStatusTrip(translate('statusTrip.waypoint'));
-          }
-          return setStatusTrip(translate('statusTrip.in_progress'));
-        }
-
-        if (trip.status === 'pre_accepted') {
-          return '';
-        }
-
-        return setStatusTrip(translate(`statusTrip.${[trip.status]}`));
-      }
-      setStatusTrip(translate('statusTrip.accepted'));
-      return dispatchTrip({type: 'update', field: 'tripAccepted', arg: {}});
-    };
-
-    if (
-      tripAccepted === null ||
-      (tripAccepted && Object.keys(tripAccepted).length === 0)
-    ) {
-      getTrip();
-    }
-
-    if (statusTrip === '' || statusTrip === translate('statusTrip.undefined')) {
-      setStatusTrip(translate(`statusTrip.${tripAccepted.status}`));
-    }
-  }, []);
-
-  useEffect(() => {
     if (!statusTrip || statusTrip === translate('statusTrip.undefined')) {
       if (tripAccepted?.status)
         setStatusTrip(translate(`statusTrip.${tripAccepted?.status}`));
@@ -265,12 +225,27 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
     await AsyncStorage.removeItem('tripCallKnob');
     await AsyncStorage.removeItem('valueCancellationFeeByCustomer');
     await AsyncStorage.removeItem('tripDriver');
+    storage.removeItem('@App:recalculationData');
+    storage.removeItem('@App:recalcSelectedPrice');
     setStatusTrip(translate('statusTrip.accepted'));
+    await AsyncStorage.removeItem('tripOff');
 
-    // userDriverFind.status = 'disponivel';
-    // setUserDriverFind(userDriverFind);
-    await getDriverFind();
-    dispatchTrip({type: 'clearTripAccepted'});
+    if (Object.keys(tripPreAccepted || {}).length === 0) {
+      setUserDriverFind({ ...userDriverFind, status: 'disponivel' });
+    }
+
+    dispatchTrip({ type: 'clearTripAccepted' });
+
+    await new Promise(resolve => {
+      try {
+        const { InteractionManager } = require('react-native');
+        InteractionManager.runAfterInteractions(resolve);
+      } catch {
+        Promise.resolve().then(resolve);
+      }
+    });
+
+    setIsFinishingTrip(false);
   };
 
   const getDistanceLocation = async (location1, location2) => {
@@ -283,9 +258,9 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(deg2rad(location2.lat)) *
-        Math.cos(deg2rad(location2.lat)) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2);
+      Math.cos(deg2rad(location2.lat)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     // eslint-disable-next-line radix
     return parseInt((R * c * 1000).toFixed());
@@ -296,7 +271,7 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
       let lastPosition = await getLastKnownPositionAsync();
 
       if (lastPosition == null) {
-        lastPosition = await getCurrentPositionAsync({accuracy: 1});
+        lastPosition = await getCurrentPositionAsync({ accuracy: 1 });
       }
 
       const driverPosition = {
@@ -319,7 +294,7 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
             {
               text: translate('finishTrip.text_yes'),
               onPress: () => {
-                return showArrivalDriver();
+                return showArrivalDriver().catch(() => false);
               },
             },
             {
@@ -335,78 +310,64 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
         );
         return true;
       }
-      return showArrivalDriver();
-    } catch (error) {
-      console.log(error);
+      return await showArrivalDriver();
+    } catch {
+      return false;
     }
   };
 
   const showArrivalDriver = async () => {
-    const result = await service.arrival(tripAccepted.tripReference);
+    try {
+      const result = await service.arrival(tripAccepted.tripReference);
 
-    if (!result.data.status) {
+      if (!result.data.status) {
+        return false;
+      }
+
+      // VER SE ISSO AQUI É REALMENTE NECESSARIO
+      // responseStatusTrip(result);
+
+      if (result.data.paymentInfo !== undefined) {
+        await AsyncStorage.setItem(
+          'paymentInfo',
+          JSON.stringify(result.data.paymentInfo),
+        );
+        return '';
+      }
+
+      userDriverFind.preAvailable = '0';
+      const updatedDriver = { ...userDriverFind, status: 'corrida' as DriverStatusType };
+      setUserDriverFind(updatedDriver);
+      dispatchTrip({
+        type: 'update',
+        field: 'tripAccepted',
+        arg: result.data.data,
+      });
+      await AsyncStorage.setItem('tripDriver', JSON.stringify(result.data.data));
+      await AsyncStorage.removeItem('paymentInfo');
+      setStatusTrip(translate('statusTrip.boarding'));
+
+      const currentLocation = userDriverFind.latitude && userDriverFind.longitude
+        ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+        : undefined;
+      emitDriverStatusChange(updatedDriver, 'corrida', cityConfig, currentLocation);
+      emitDriverLocation(updatedDriver, currentLocation, cityConfig);
+
+      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      if (tripAccepted?.tripReference) {
+        emitTripStatusChange(tripAccepted.tripReference, 'boarding', configCityId);
+        emitDriverLocation(updatedDriver, currentLocation, cityConfig);
+      }
+
+      return true;
+    } catch {
       return false;
     }
-
-    // VER SE ISSO AQUI É REALMENTE NECESSARIO
-    // responseStatusTrip(result);
-
-    if (result.data.paymentInfo !== undefined) {
-      await AsyncStorage.setItem(
-        'paymentInfo',
-        JSON.stringify(result.data.paymentInfo),
-      );
-      return '';
-    }
-
-    userDriverFind.preAvailable = '0';
-    setUserDriverFind(userDriverFind);
-    dispatchTrip({
-      type: 'update',
-      field: 'tripAccepted',
-      arg: result.data.data,
-    });
-    await AsyncStorage.setItem('tripDriver', JSON.stringify(result.data.data));
-    await AsyncStorage.removeItem('paymentInfo');
-    setStatusTrip(translate('statusTrip.boarding'));
-    return true;
   };
 
-  const setTripNow = async (field: string, trip: TripInfo) => {
+  const setTripNow = async (field: keyof stateTripProps, trip: TripInfo) => {
     const tripNew = await verifyTrip(trip.tripReference);
-    await dispatchTrip({
-      type: 'update',
-      field: field,
-      arg: tripNew || {},
-    });
-  };
-
-  const initTripsActive = async () => {
-    const {data}: {data: {trips: TripInfo[]}} = await service.getTripsActives(
-      userDriverFind?.idDriver,
-    );
-
-    if (data?.trips) {
-      checkIfTripForDriver(data?.trips);
-    } else {
-      setTripNow('tripAccepted', {} as TripInfo);
-    }
-  };
-
-  const checkIfTripForDriver = (trips: TripInfo[]) => {
-    if (trips?.length > 0) {
-      trips?.map(async trip => {
-        if (trip?.status === STATUS_PRE_ACCEPTED) {
-          return setTripNow('tripPreAccepted', trip);
-        }
-        if (trip?.status !== STATUS_PRE_ACCEPTED) {
-          setStatusTrip(translate(`statusTrip.${trip?.status}`));
-          return setTripNow('tripAccepted', trip);
-        }
-      });
-    } else {
-      setTripNow('tripAccepted', {} as TripInfo);
-    }
+    dispatchTrip({ type: 'update', field: field, arg: tripNew || {} });
   };
 
   const mountTripPreAccepted = async (tripAccepted, tripOnly = {}) => {
@@ -448,15 +409,18 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
 
       const trip = data?.data;
 
-      if (trip?.data?.tripCallType === 'CHAMADA TAXÍMETRO') {
-        await initTripCallTaximeter(trip?.data);
-      }
-
       if (
         trip.tripCallTypeId === TRIP_CALL_CORPORATE ||
         trip.tripCallTypeId === TRIP_CALL_RIDE
       ) {
         return '';
+      }
+
+      if (
+        data?.data?.data?.status === STATUS_IN_PROGRESS &&
+        tripAccepted?.status === 'boarding'
+      ) {
+        startMapSuggestionTimeout();
       }
 
       // await AsyncStorage.setItem('lastPosition', JSON.stringify(position)); //complicado
@@ -476,6 +440,18 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
          elementProperty.addClass('.footer-race', 'minimize');
         return '';
       } * */
+
+      const updatedDriver = { ...userDriverFind, status: 'corrida' as any };
+      const currentLocation = userDriverFind.latitude && userDriverFind.longitude
+        ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+        : undefined;
+      emitDriverStatusChange(updatedDriver, 'corrida', cityConfig, currentLocation);
+      emitDriverLocation(updatedDriver, currentLocation, cityConfig);
+
+      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      if (tripAccepted?.tripReference) {
+        emitTripStatusChange(tripAccepted.tripReference, 'in_progress', configCityId);
+      }
 
       return true;
     } catch (error) {
@@ -633,9 +609,8 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
     return value * parseFloat(multiplierDynamic);
   };
 
-  const calculateNewPrice = async (km, minute, isTaximeter = false) => {
+  const calculateNewPrice = async (km, minute, waitingFees) => {
     if (
-      !isTaximeter &&
       km <= tripAccepted.distance &&
       generalSettings.find(
         item => item.key === 'enable_floating_price_recalculation',
@@ -652,6 +627,11 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
       tripAccepted.fare.type_additional_value_after_km,
     );
 
+    // Calcula o valor total dos pedágios
+    const tollsValue = tripAccepted.tolls && Array.isArray(tripAccepted.tolls)
+      ? tripAccepted.tolls.reduce((acc: number, toll: any) => acc + parseFloat(toll.value || 0), 0)
+      : 0;
+
     const value =
       parseFloat(tripAccepted.fare.km_price) * km +
       parseFloat(tripAccepted.fare.minute_price) * parseInt(minute) +
@@ -659,9 +639,10 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
       parseFloat(tripAccepted.fare.another_fee) +
       parseFloat(tripAccepted.fare.tax_price) +
       parseFloat(tripAccepted.fare.waypoint_price) *
-        tripAccepted.tripWayPoints.length +
+      tripAccepted.tripWayPoints.length +
       taxCancel +
-      additionalValue;
+      additionalValue +
+      tollsValue;
 
     const newPrice = checkTripDiscountCoupon(
       checkMultiplierDynamic(value, tripAccepted.multiplierDynamic),
@@ -679,28 +660,83 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
       Alert.alert(
         'Mostrando payload do resultado',
         `km da corrida: ${km}\n` +
-          `minutos da corrida: ${Number(minute)?.toFixed(2)}\n` +
-          `taxas da corrida, para o calculo - : ${JSON.stringify(
-            tripAccepted?.fare,
-          )}\n`,
+        `minutos da corrida: ${Number(minute)?.toFixed(2)}\n` +
+        `taxas da corrida, para o calculo - : ${JSON.stringify(
+          tripAccepted?.fare,
+        )}\n` +
+        `valor dos pedágios: ${tollsValue}\n` +
+        `pedágios: ${JSON.stringify(tripAccepted?.tolls)}\n`,
       );
     }
 
-    if (Number(newPrice) < Number(minPrice)) {
-      return minPrice;
+    const waiting = await AsyncStorage.getItem("waitingTimer");
+    const waitingParse = waiting?.length > 0 ? JSON.parse(waiting) : {};
+
+    const pausedInMinutes = waitingParse?.totalPaused
+      ? waitingParse.totalPaused
+      : 0;
+
+    const waitingPrice = waitingTimePrice(pausedInMinutes, Number(waitingFees.waiting_tolerance_seconds), Number(waitingFees.waiting_penalty_fee), Number(waitingFees.waiting_extra_fee_per_minute))
+
+    const newPriceWithTime = Number(newPrice) + waitingPrice
+
+    if (newPriceWithTime < Number(minPrice)) {
+      return Number(minPrice);
     }
 
-    return newPrice;
+    return newPriceWithTime;
   };
 
-  const verifyRecalculateFare = async (tripAccepted: TripInfo) => {
+  const waitingTimePrice = (
+    seconds: number,
+    toleranceInSeconds: number,
+    taxPrice: number,
+    taxByMinutesPrice: number
+  ) => {
+    let value = 0
+    const timeAfterTolerance = (seconds - toleranceInSeconds) / 60
+
+    value += seconds > toleranceInSeconds ? Number(taxPrice) : 0
+
+    value += timeAfterTolerance > 0 ? timeAfterTolerance * Number(taxByMinutesPrice) : 0
+
+    return Number(value.toFixed(2))
+  }
+
+  const recalculateWaitingTime = (waitingFees, km, resultTime, pausedInSeconds, price) => {
+    const waitingPrice = waitingTimePrice(pausedInSeconds, Number(waitingFees.waiting_tolerance_seconds), Number(waitingFees.waiting_penalty_fee), Number(waitingFees.waiting_extra_fee_per_minute))
+    return {
+      price: Number(price) + waitingPrice,
+      km,
+      minute: Number(Number(resultTime).toFixed(2)),
+    }
+  }
+
+  const verifyRecalculateFare = async (tripAccepted: TripInfo, waitingFees) => {
     try {
       const km = await getKmRouteTraveled();
       const minute = await getMinutesRouteTraveled();
+      // removendo o tempo de espera do calculo final da viagem, para não cobrar duas vezes.
+      const waiting = await AsyncStorage.getItem("waitingTimer");
+      const waitingParse = waiting?.length > 0 ? JSON.parse(waiting) : {};
+
+      const pausedInSeconds = waitingParse?.totalPaused
+        ? waitingParse.totalPaused
+        : 0;
+
+      const resultTime = minute - (pausedInSeconds / 60);
 
       const valueMarginForRecalculation = parseFloat(
         cityConfig.marginForRecalculation,
       );
+
+      if (pausedInSeconds > 0) {
+        saveWaitingTime(
+          Number(tripAccepted?.driver?.userId),
+          tripAccepted.tripReference,
+          pausedInSeconds
+        )
+      }
 
       const tripDistance = tripAccepted.distance;
 
@@ -712,21 +748,32 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
             km > parseFloat(cityConfig.recalculationFromKm) ||
             (tripDistance - valueMarginForRecalculation < km &&
               km < tripDistance + valueMarginForRecalculation) ||
-            Number(minute?.toFixed(2)) !== estimatedTime
+            Number(resultTime?.toFixed(2)) !== estimatedTime
           );
         }
         return false;
       };
 
       if (!willBeRecalculatedOrNot()) {
+        if (pausedInSeconds > 0) {
+          return recalculateWaitingTime(waitingFees, km, resultTime, pausedInSeconds, tripAccepted?.price)
+        }
         return null;
       }
 
-      const newPrice = await calculateNewPrice(km, Number(minute?.toFixed(2)));
+      const newPrice = await calculateNewPrice(km, Number(resultTime?.toFixed(2)), waitingFees);
+
+      if (newPrice == tripAccepted.price && pausedInSeconds > Number(waitingFees.waiting_tolerance_seconds)) {
+        return recalculateWaitingTime(waitingFees, km, resultTime, pausedInSeconds, tripAccepted?.price)
+      }
 
       const floatPrice = generalSettings.find(
         item => item.key === 'enable_floating_price_recalculation',
       ).value;
+
+      const tollsValue = tripAccepted.tolls && Array.isArray(tripAccepted.tolls)
+        ? tripAccepted.tolls.reduce((acc: number, toll: any) => acc + parseFloat(toll.value || 0), 0)
+        : 0;
 
       if (floatPrice !== null) {
         if (diferenceBetweenNumber(tripAccepted.price, newPrice) >= 1) {
@@ -735,13 +782,17 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
               return {
                 price: newPrice,
                 km,
-                minute: Number(Number(minute).toFixed(2)),
+                minute: Number(Number(resultTime).toFixed(2)),
+                tolls: tripAccepted.tolls || [],
+                tollsValue,
               };
           } else {
             return {
               price: newPrice,
               km,
-              minute: Number(Number(minute).toFixed(2)),
+              minute: Number(Number(resultTime).toFixed(2)),
+              tolls: tripAccepted.tolls || [],
+              tollsValue,
             };
           }
         }
@@ -752,23 +803,54 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
     }
   };
 
-  const onlyFinishTripOffline = async (trip: TripInfo) => {
-    const result = await service.finish(trip?.tripReference);
+  const clearDataCacheTaximeter = () => {
+    storage.removeGroup([
+      OFFLINE_TAXIMETER_FLAG_KEY,
+      OFFLINE_TAXIMETER_INFO_KEY,
+    ]);
   };
 
-  const finishTrip = async (trip: TripInfo = tripAccepted) => {
-    /** if (tripAccepted.deliveryInfo != null) {
-      if (!Array.isArray(tripAccepted.deliveryInfo)) {
-        // return showInfoDeliveryPlace(trip.deliveryInfo.obsDestination);
+  const saveWaitingTime = async (userId: number, tripReference: string, timeInSeconds: number) => {
+    try {
+      const payload = {
+        userId,
+        tripReference,
+        timeInSeconds
       }
-    } * */
+      await service.saveWaitingTime(payload);
+    } catch (error) { console.error(error) }
+  }
 
-    /** if(trip.centralId && trip.haveReturn == true &&
-     *    ConfigGeneral().get("end_trip_only_by_central") == true){
-      return customToast(translate("Viagem só pode ser finalizar pela central de origem"), 'warn');
-    } * */
+  const cleaningWaitingTime = async () => {
+    await AsyncStorage.removeItem("waitingTimer");
+  }
 
-    const recalculate = await verifyRecalculateFare(trip);
+  const getWaitingTimeFees = async (tripAccepted: TripInfo) => {
+    const { data } = await service.getWaitingTimeFees({ tripTypeId: tripAccepted.tripTypeId, cityId: tripAccepted.cityId })
+    if (!data.status) return;
+    return data?.data;
+  }
+
+  const previewFinishTrip = async (trip: TripInfo = tripAccepted) => {
+    setHasRecalculation(false);
+    setRecalculated({} as RecalculatedProps);
+
+    // Sem rede, pula chamada de API — waitingFees ficará null e cálculo usa zero
+    let waitingFees = {
+      waiting_tolerance_seconds: '0',
+      waiting_penalty_fee: '0',
+      waiting_extra_fee_per_minute: '0',
+    };
+
+    if (itsNetwork) {
+      try {
+        waitingFees = await getWaitingTimeFees(tripAccepted);
+      } catch {
+        waitingFees = null;
+      }
+    }
+
+    const recalculate: RecalculatedProps = await verifyRecalculateFare(trip, waitingFees);
 
     if (recalculate !== null && itsNetwork) {
       if (
@@ -778,96 +860,255 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
       ) {
         setRecalculated(recalculate);
         setHasRecalculation(true);
-        userDriverFind.preAvailable = '0';
-        setUserDriverFind(userDriverFind);
+        storage.setItem('@App:recalculationData', JSON.stringify(recalculate), 'string');
+        setShouldShowFinishModal(true);
+        setUserDriverFind({ ...userDriverFind, preAvailable: "0" });
         tripAccepted.status = 'finished';
         dispatchTrip({
           type: 'update',
           field: 'tripAccepted',
           arg: tripAccepted,
         });
-
+        cleaningWaitingTime()
         return true;
       }
       // return applyTravelCalculation(recalculate);
       setHasRecalculation(false);
+      storage.removeItem('@App:recalculationData');
     }
-    if (!itsNetwork) {
-      const trip = {
-        ...tripAccepted,
-        tripOff: tripAccepted,
-      };
 
-      userDriverFind.preAvailable = '0';
-      setUserDriverFind(userDriverFind);
+    if (!itsNetwork) {
+      const isTaximeterCall = tripAccepted.tripCallType === 'CHAMADA TAXÍMETRO';
+      const hasOfflineRecalc = recalculate !== null && !isTaximeterCall;
+
+      const baseTrip = hasOfflineRecalc
+        ? { ...tripAccepted, price: recalculate.price }
+        : tripAccepted;
+
+      const trip = { ...baseTrip, tripOff: tripAccepted };
+
+      setUserDriverFind({ ...userDriverFind, preAvailable: "0" });
       setStatusTrip(translate('statusTrip.accepted'));
 
-      await dispatchTrip({
-        type: 'update',
-        field: 'tripAccepted',
-        arg: trip,
-      });
+      dispatchTrip({ type: 'update', field: 'tripAccepted', arg: trip });
 
       await AsyncStorage.setItem('tripOff', JSON.stringify(tripAccepted));
+      cleaningWaitingTime();
+
+      if (hasOfflineRecalc) {
+        offlineTripQueue.addFinishTripWithRecalc({
+          tripReference: tripAccepted.tripReference,
+          oldPrice: Number(tripAccepted.price),
+          newPrice: recalculate.price,
+          newDistance: recalculate.km,
+          newTripTime: recalculate.minute,
+          tolls: recalculate?.tolls ?? [],
+        });
+      } else {
+        queueOfflineFinish(trip);
+      }
 
       return true;
     }
-    const result = await service.finish(tripAccepted.tripReference);
 
-    if (!result.status) {
-      // return finishTripOffline();
-      return false;
+    setShouldShowFinishModal(true);
+    return true;
+  };
+
+  const confirmFinishTrip = async (trip: TripInfo = tripAccepted) => {
+    if (isFinishingTrip) return;
+
+    setIsFinishingTrip(true);
+
+    // Rede caiu entre o modal abrir e o usuário confirmar
+    if (!itsNetwork) {
+      queueOfflineFinish(trip);
+      setShouldShowFinishModal(false);
+      setIsFinishingTrip(false);
+      await clearDataTrip();
+      return true;
     }
 
-    userDriverFind.preAvailable = '0';
-    setUserDriverFind(userDriverFind);
-    setStatusTrip(translate('statusTrip.accepted'));
-    // tripAccepted.status = 'finished';
+    try {
+      const sent = await sendCriticalRequest(() =>
+        service.finish(trip.tripReference),
+      );
 
-    dispatchTrip({
-      type: 'update',
-      field: 'tripAccepted',
-      arg: result.data.data,
-    });
+      // Sem resposta do servidor: a finalização pode ter sido processada —
+      // fica pendente de sincronização e o motorista segue usando o app
+      if (!sent.delivered) {
+        queueOfflineFinish(trip);
+        setShouldShowFinishModal(false);
+        await clearDataTrip();
+        return true;
+      }
 
-    await AsyncStorage.setItem('tripDriver', JSON.stringify(result.data.data));
+      const result = sent.response;
+      if (!result.status) {
+        return false;
+      }
 
+      userDriverFind.preAvailable = '0';
+      setUserDriverFind(userDriverFind);
+
+      await AsyncStorage.setItem('tripDriver', JSON.stringify(result.data.data));
+
+      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      if (tripAccepted?.tripReference) {
+        emitTripStatusChange(tripAccepted.tripReference, 'finished', configCityId);
+
+        const currentLocation = userDriverFind.latitude && userDriverFind.longitude
+          ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+          : undefined;
+        emitDriverLocation(userDriverFind, currentLocation, cityConfig);
+      }
+
+      cleaningWaitingTime();
+      setShouldShowFinishModal(false);
+      await clearDataTrip();
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setIsFinishingTrip(false);
+    }
+  };
+
+  const finishTrip = async (trip: TripInfo = tripAccepted): Promise<boolean> => {
+    const canFinish = await previewFinishTrip(trip);
+    if (!canFinish) return false;
+
+    return true;
+  };
+
+  // Enfileira a finalização (com ou sem recálculo) para o drain offline e
+  // libera o motorista — usado quando não há rede ou o servidor não responde
+  const queueRecalculatedFinishOffline = async (
+    chooseRecalc: boolean,
+    trip: TripInfo,
+  ) => {
+    if (chooseRecalc && recalculated?.price) {
+      offlineTripQueue.addFinishTripWithRecalc({
+        tripReference: trip.tripReference,
+        oldPrice: Number(trip.price),
+        newPrice: recalculated.price,
+        newDistance: recalculated.km,
+        newTripTime: recalculated.minute,
+        tolls: recalculated.tolls ?? [],
+      });
+    } else {
+      queueOfflineFinish(trip);
+    }
+
+    resetRecalculation();
+    setShouldShowFinishModal(false);
+    setIsFinishingTrip(false);
+    await clearDataTrip();
     return true;
   };
 
   const finishTripRecalculated = async (
     chooseRecalc: boolean,
     trip = tripAccepted,
+    completeTripAfterRecalc = false,
   ) => {
-    if (chooseRecalc) {
-      const result = await service.finishWithRecalc({
-        tripReference: trip.tripReference,
-        newPrice: recalculated.price,
-        oldPrice: trip.price,
-        newDistance: await getKmRouteTraveled(),
-        newTripTime: await getMinutesRouteTraveled(),
-      });
+    setIsFinishingTrip(true);
 
-      if (!result.data.status) {
-        // return finishTripOffline();
-        return false;
-      }
+    // Rede caiu enquanto o modal de recálculo estava aberto
+    if (!itsNetwork) {
+      return queueRecalculatedFinishOffline(chooseRecalc, trip);
     }
 
-    const finish = await service.finish(tripAccepted.tripReference);
+    let result;
 
-    if (!finish.status) {
-      // return finishTripOffline();
+    // Fora do try: awaits não-HTTP — erro de programação aqui não pode ser
+    // confundido com falha de rede pelo catch abaixo
+    const newDistance = chooseRecalc ? await getKmRouteTraveled() : 0;
+    const newTripTime = chooseRecalc ? await getMinutesRouteTraveled() : 0;
+
+    try {
+      const sent = await sendCriticalRequest(async () => {
+        if (chooseRecalc) {
+          const tollsInfo = trip.tolls && Array.isArray(trip.tolls)
+            ? {
+              tollsValue: trip.tolls.reduce((acc: number, toll: any) => acc + parseFloat(toll.value || 0), 0),
+              tollsIds: trip.tolls.map((toll: any) => toll.id || toll.tollId)
+            }
+            : { tollsValue: 0, tollsIds: [] };
+
+          // Passo 1: Recalcular preço
+          const recalcResult = await service.finishWithRecalc({
+            tripReference: trip.tripReference,
+            newPrice: recalculated.price,
+            oldPrice: trip.price,
+            newDistance,
+            newTripTime,
+            tolls: tollsInfo.tollsIds,
+            completeTripAfterRecalc: false,
+          });
+
+          const recalcAccepted =
+            recalcResult?.data?.status || isRecalcAlreadyApplied(recalcResult?.data);
+
+          if (!recalcAccepted) {
+            return recalcResult;
+          }
+
+          // Passo 2: Finalizar a viagem explicitamente — recálculo já aplicado
+          // numa tentativa anterior também segue para o finish
+          if (trip?.tripReference) {
+            FinishedTripStorage.add(trip.tripReference);
+          }
+
+          return service.finish(trip.tripReference);
+        }
+
+        if (completeTripAfterRecalc) {
+          return service.finish(trip.tripReference);
+        }
+
+        return undefined;
+      });
+
+      // Sem resposta do servidor: fica pendente de sincronização
+      if (!sent.delivered) {
+        return queueRecalculatedFinishOffline(chooseRecalc, trip);
+      }
+
+      result = sent.response;
+    } catch {
+      setIsFinishingTrip(false);
       return false;
     }
 
-    setStatusTrip(translate('statusTrip.accepted'));
-    setHasRecalculation(false);
+    if (!result || !result.data || !result.data.status) {
+      setIsFinishingTrip(false);
+      return false;
+    }
+
+    if (result.data && result.data.data) {
+      tripAccepted.status = 'finished';
+      await dispatchTrip({
+        type: 'update',
+        field: 'tripAccepted',
+        arg: result.data.data
+      });
+      await AsyncStorage.setItem('tripDriver', JSON.stringify(result.data.data));
+    }
+
+    setIsFinishingTrip(false);
+    const currentLocation = userDriverFind.latitude && userDriverFind.longitude
+      ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+      : undefined;
+    emitDriverLocation(userDriverFind, currentLocation, cityConfig);
+    resetRecalculation();
+    setShouldShowFinishModal(false);
+    await clearDataTrip();
     return true;
   };
 
   const checkStatusTrip = async () => {
-    switch (tripAccepted.status) {
+    switch (tripAccepted?.status) {
       case 'accepted': {
         return {
           callback: await informArrival(),
@@ -898,11 +1139,23 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
           status: translate('statusTrip.in_progress'),
         };
       }
+      case 'waiting': {
+        return {
+          callback: await finishWaitingTime(),
+          status: translate('statusTrip.in_progress'),
+        };
+      }
       case 'finished': {
-        dispatchTrip({type: 'update', field: 'tripAccepted', arg: {}});
+        dispatchTrip({ type: 'update', field: 'tripAccepted', arg: {} });
 
         // MOSTRAR UMA MENSAGEM E QUE A CORRIDA FINALIZOU OU O TRIP FINISH MODAL
-        return {callback: false, status: ''};
+        return { callback: false, status: '' };
+      }
+      case 'pre_accepted': {
+        return {
+          callback: await informArrival(),
+          status: translate('statusTrip.accepted'),
+        };
       }
       default: {
         return null;
@@ -910,32 +1163,111 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
     }
   };
 
-  const value = useMemo(() => {
-    return {
-      clearDataTrip,
-      getDistanceLocation,
-      informArrival,
-      showArrivalDriver,
-      initTrip,
-      confirmStop,
-      finishTrip,
-      checkStatusTrip,
-      statusTrip,
-      setStatusTrip,
-      hasRecalculation,
-      finishTripRecalculated,
-      recalculated,
-      onlyFinishTripOffline,
-      countTakeVolume,
-      setCountTakeVolume,
-      buttonTargetVisibility,
-      setButtonTargetVisibility,
-      metersRound,
-      minutesTraveled,
-      mountTripPreAccepted,
-      initTripsActive,
-    };
-  }, [
+  const finishWaitingTime = async () => {
+    const data = await service.finishWaiting(tripAccepted.tripReference);
+    if (!data.data.status) {
+      return false;
+    }
+
+    dispatchTrip({
+      type: 'update',
+      field: 'tripAccepted',
+      arg: data?.data?.data || {},
+    });
+
+    await AsyncStorage.setItem('tripDriver', JSON.stringify(data.data.data));
+    return true;
+  }
+
+  const waitingFees = async () => {
+    return await getWaitingTimeFees(tripAccepted)
+  }
+
+  const waitingTripStatus = async () => {
+    const data = await service.waiting(tripAccepted.tripReference);
+    if (!data.data.status) {
+      return false;
+    }
+
+    dispatchTrip({
+      type: 'update',
+      field: 'tripAccepted',
+      arg: data?.data?.data || {},
+    });
+
+    await AsyncStorage.setItem('tripDriver', JSON.stringify(data.data.data));
+
+    return data.data.data;
+  }
+
+  const restoreRecalculation = () => {
+    const saved = storage.getItem('@App:recalculationData', 'string');
+    if (saved) {
+      setRecalculated(JSON.parse(saved));
+      setHasRecalculation(true);
+    }
+  };
+
+  const confirmRecalcPrice = (priceValue: number, chooseRecalc: boolean) => {
+    storage.setItem('@App:recalcSelectedPrice', JSON.stringify({ priceValue, chooseRecalc }), 'string');
+  };
+
+  const resetRecalcPrice = () => {
+    storage.removeItem('@App:recalcSelectedPrice');
+  };
+
+  const resetRecalculation = () => {
+    setHasRecalculation(false);
+    setRecalculated({} as RecalculatedProps);
+    storage.removeItem('@App:recalculationData');
+    storage.removeItem('@App:recalcSelectedPrice');
+  };
+
+  const getSavedRecalcPrice = (): { priceValue: number; chooseRecalc: boolean } | null => {
+    const saved = storage.getItem('@App:recalcSelectedPrice', 'string');
+    return saved ? JSON.parse(saved) : null;
+  };
+
+  const cancelPreviewFinishTrip = () => {
+    if (tripAccepted?.tripReference) {
+      FinishedTripStorage.remove(tripAccepted.tripReference);
+    }
+
+    setShouldShowFinishModal(false);
+    resetRecalculation();
+
+    if (tripAccepted?.status === 'finished') {
+      dispatchTrip({
+        type: 'update',
+        field: 'tripAccepted',
+        arg: { ...tripAccepted, status: 'in_progress' },
+      });
+    }
+
+    const pendingWaypoints = (tripAccepted?.tripWayPoints || []).filter(
+      (waypoint: any) => waypoint?.confirmed === '0',
+    );
+    setStatusTrip(
+      pendingWaypoints.length > 0
+        ? translate('statusTrip.waypoint')
+        : translate('statusTrip.in_progress'),
+    );
+  };
+
+  // Limpa o estado local quando o drain da fila offline conclui com sucesso
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener(
+      OFFLINE_TRIP_FINISHED_EVENT,
+      ({ tripReference }: { tripReference: string }) => {
+        if (tripAccepted?.tripReference === tripReference) {
+          clearDataTrip();
+        }
+      },
+    );
+    return () => sub.remove();
+  }, [tripAccepted?.tripReference]);
+
+  const value = {
     clearDataTrip,
     getDistanceLocation,
     informArrival,
@@ -943,13 +1275,17 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
     initTrip,
     confirmStop,
     finishTrip,
+    previewFinishTrip,
+    confirmFinishTrip,
     checkStatusTrip,
     statusTrip,
     setStatusTrip,
     hasRecalculation,
     finishTripRecalculated,
     recalculated,
-    onlyFinishTripOffline,
+    confirmRecalcPrice,
+    resetRecalcPrice,
+    getSavedRecalcPrice,
     countTakeVolume,
     setCountTakeVolume,
     buttonTargetVisibility,
@@ -957,8 +1293,14 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
     metersRound,
     minutesTraveled,
     mountTripPreAccepted,
-    initTripsActive,
-  ]);
+    waitingTripStatus,
+    waitingFees,
+    shouldShowFinishModal,
+    setShouldShowFinishModal,
+    restoreRecalculation,
+    resetRecalculation,
+    cancelPreviewFinishTrip
+  };
 
   return (
     <TripStatusContext.Provider value={value}>
@@ -967,10 +1309,10 @@ export const TripStatusProvider = ({children}: TripStatusContextChildren) => {
   );
 };
 
-export const useTripStatusProvider = () => {
-  const context = useContext(TripStatusContext);
-
-  return context;
+export const useTripStatusProvider = <Selected,>(
+  selector: (ctx: TripStatusContextType) => Selected
+): Selected => {
+  return useContextSelector(TripStatusContext, selector);
 };
 
 export default TripStatusProvider;

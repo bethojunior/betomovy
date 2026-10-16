@@ -1,9 +1,9 @@
-import {Camera} from 'expo-camera';
-import {forwardRef, useImperativeHandle, useRef, useState} from 'react';
-import {useLocal} from '../../hooks/location';
-import {sendDocumentPhoto} from '../Modal/InTrip/services';
-import {useUserDriver} from '../../context/userDriver';
-import {useConfigLocal} from '../../context/ConfigLocal';
+import { Camera, CameraView } from 'expo-camera';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { useLocal } from '../../hooks/location';
+import { sendDocumentPhoto } from '../Modal/InTrip/services';
+import { useUserDriver } from '../../context/userDriver';
+import { useConfigLocal } from '../../context/ConfigLocal';
 
 interface Props {
   width?: string;
@@ -16,11 +16,11 @@ export type RefCamera = {
 };
 
 export const CameraComponent = forwardRef<RefCamera, Props>((props, ref) => {
-  const cameraRef = useRef(null);
+  const cameraRef = useRef<CameraView | null>(null);
   const [loading, setLoading] = useState(false);
-  const {userDriverFind} = useUserDriver();
-  const {durationCam} = useConfigLocal()?.states;
-  const {location} = useLocal(false);
+  const { userDriverFind } = useUserDriver();
+  const { durationCam } = useConfigLocal()?.states;
+  const { location } = useLocal(false);
 
   useImperativeHandle(ref, () => ({
     async sendVideoPanic() {
@@ -35,7 +35,6 @@ export const CameraComponent = forwardRef<RefCamera, Props>((props, ref) => {
     if (cameraRef) {
       const data = await cameraRef.current.recordAsync({
         maxDuration: durationCam,
-        quality: `480p`,
       });
       await takePictureAndSendApi(data.uri);
       return data.uri;
@@ -44,7 +43,7 @@ export const CameraComponent = forwardRef<RefCamera, Props>((props, ref) => {
   };
 
   const takePictureAndSendApi = async videoUri => {
-    const {status} = await Camera.requestCameraPermissionsAsync();
+    const { status } = await Camera.requestCameraPermissionsAsync();
     if (status !== 'granted') {
       Camera.requestCameraPermissionsAsync();
       return;
@@ -52,7 +51,7 @@ export const CameraComponent = forwardRef<RefCamera, Props>((props, ref) => {
     if (!videoUri) {
       return;
     }
-    const filename = videoUri.split('/').pop();
+    const filename = videoUri?.split('/').pop();
     const match = /\.(\w+)$/.exec(filename);
     const typeVideo = match ? `video/${match[1]}` : `video`;
 
@@ -72,12 +71,13 @@ export const CameraComponent = forwardRef<RefCamera, Props>((props, ref) => {
   };
 
   return (
-    <Camera
-      ref={ref => (cameraRef.current = ref)}
-      type={Camera.Constants.Type['front']}
+    <CameraView
+      ref={cameraRef}
+      facing={"front"}
+      videoQuality="480p"
       style={{
-        width: props?.width || '50%',
-        height: props?.height || '50%',
+        width: props?.width as any || '50%',
+        height: props?.height as any || '50%',
       }}
     />
   );

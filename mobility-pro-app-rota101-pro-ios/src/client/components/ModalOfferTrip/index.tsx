@@ -1,21 +1,21 @@
-import {useEffect, useRef, useState} from 'react';
-import {Alert, Modal, View} from 'react-native';
-import {useAuth} from '../../../context/auth';
-import {customToast} from '../../../utils/FlashMessage';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { Alert, Modal, View } from 'react-native';
+import { useAuth } from '../../../context/auth';
+import { customToast } from '../../../utils/FlashMessage';
 import {
   STATUS_BACK_OFF,
   STATUS_SEARCHING_DRIVER_OFFER,
 } from '../../constants/trip';
-import {useTrip} from '../../contexts/Trip';
-import {translate} from '../../locales';
+import { useTrip } from '../../contexts/Trip';
+import { translate } from '../../locales';
 import theme from '../../styles/theme';
 import Helper from '../../utils/Helper';
-import {coinTypePerApi} from '../../utils/money';
-import {CardInDriver} from '../CardInDriver';
-import {CardOffer} from '../CardOffer';
-import {IfLoaderInsideScreen} from '../IfLoaderInsideScreen';
-import {SwalAlert} from '../SwalAlert';
-import {TextEdit} from '../TextEdit';
+import { coinTypePerApi } from '../../utils/money';
+import { CardInDriver } from '../CardInDriver';
+import { CardOffer } from '../CardOffer';
+import { IfLoaderInsideScreen } from '../IfLoaderInsideScreen';
+import { SwalAlert } from '../SwalAlert';
+import { TextEdit } from '../TextEdit';
 import {
   ContainerModal,
   ContentModal,
@@ -33,19 +33,19 @@ import {
   ContainerDot,
   Dot,
 } from './styles';
-import {mountSong} from '../../../driver/src/utils/mountSong';
+import { mountSong } from '../../../driver/src/utils/mountSong';
 
 interface Props {
   visible?: boolean;
   trip?: any;
 }
 
-export const ModalOfferTrip = ({visible, trip}: Props) => {
-  const {cityConfig} = useAuth();
-  const {cancelTripByCustomer, stateTripCustomer, dispatchTripCustomer} =
+export const ModalOfferTrip = ({ visible, trip }: Props) => {
+  const { cityConfig } = useAuth();
+  const { cancelTripByCustomer, stateTripCustomer, dispatchTripCustomer } =
     useTrip();
 
-  const {origin, destination, isLoading} = stateTripCustomer;
+  const { origin, destination, isLoading } = stateTripCustomer;
   const [priceOffer, setOfferPrice] = useState(0);
   const [initialPriceOffer, setInitialPriceOffer] = useState(0);
   const [changeOffer, setChangeOffer] = useState(false);
@@ -85,42 +85,42 @@ export const ModalOfferTrip = ({visible, trip}: Props) => {
       <ContainerModal>
         <SwalAlert
           visible={visibleModalAlert}
-          description={`${translate('inDriver.the_driver')} ${
-            findDriverAccept?.driver?.name
-          } ${translate('inDriver.accepted_your_offer_in_the_amount_of')} ${
-            cityConfig?.typeMoney
-          } ${Helper.maskMoney(Number(findDriverAccept?.price))}${translate(
-            'inDriver.waiting_for_your_confirmation',
-          )}`}
+          description={`${translate('inDriver.the_driver')} ${findDriverAccept?.driver?.name
+            } ${translate('inDriver.accepted_your_offer_in_the_amount_of')} ${cityConfig?.typeMoney
+            } ${Helper.maskMoney(Number(findDriverAccept?.price))}${translate(
+              'inDriver.waiting_for_your_confirmation',
+            )}`}
           setVisible={setVisibleModalAlert}
         />
         <ContentModal>
           <ContainerAddress>
             <AddressContent>
-              <View style={{padding: 10}}>
+              <View style={{ padding: 10 }}>
                 <Ball color="primary" />
                 <Line />
                 {trip.tripWayPoints &&
                   trip.tripWayPoints.length > 0 &&
-                  trip.tripWayPoints.map(() => (
-                    <>
+                  trip.tripWayPoints.map((wayPoint, index) => (
+                    <Fragment key={wayPoint.id ?? index}>
                       <Ball color="secondary" />
                       <Line />
-                    </>
+                    </Fragment>
                   ))}
                 <Square />
               </View>
-              <View style={{paddingRight: 20}}>
+              <View style={{ paddingRight: 20 }}>
                 <Address>{trip?.origin?.address}</Address>
                 {trip.tripWayPoints &&
                   trip.tripWayPoints.length > 0 &&
-                  trip.tripWayPoints.map(wayPoint => (
-                    <Address>{wayPoint.address}</Address>
+                  trip.tripWayPoints.map((wayPoint, index) => (
+                    <Address key={wayPoint.id ?? index}>
+                      {wayPoint.address}
+                    </Address>
                   ))}
                 <Destiny>{trip?.destination?.name}</Destiny>
               </View>
             </AddressContent>
-            <View style={{padding: 10}}>
+            <View style={{ padding: 10, paddingBottom: 20 }}>
               <TextEdit size={'medium'}>
                 {translate('inDriver.value_offered')}{' '}
                 {coinTypePerApi(cityConfig?.typeMoney)}{' '}
@@ -247,7 +247,9 @@ export const ModalOfferTrip = ({visible, trip}: Props) => {
                     {
                       text: translate('cleanBagModal.text_confirmed'),
                       onPress: async () => {
-                        await cancelTripByCustomer(null, STATUS_BACK_OFF);
+                        const canceled = await cancelTripByCustomer(null, STATUS_BACK_OFF);
+                        if (!canceled) return;
+
                         customToast(
                           translate('trip.your_trip_has_been_canceled'),
                           'success',
@@ -267,10 +269,10 @@ export const ModalOfferTrip = ({visible, trip}: Props) => {
 
                     {
                       text: translate('cleanBagModal.text_denied'),
-                      onPress: () => {},
+                      onPress: () => { },
                     },
                   ],
-                  {cancelable: false},
+                  { cancelable: false },
                 );
               }}
             >

@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 // @ts-nocheck
 
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -13,16 +13,19 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import {FontAwesome} from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import Colors from '../../../../components/Colors';
 import apiDelivery from '../../../../api/apiDelivery';
 import InputIcon from '../../../../components/form/InputIcon';
 
-import {translate} from '../../../../locales';
-import CardPublicity from '../../../../components/CardPublicty';
-import {Container, ContainerItem, styles} from './styles';
+import { translate } from '../../../../locales';
+import ListPublicity from '~/components/ListPublicity';
+import { usePublicity } from '~/hooks/usePublicity';
+import { useAuth } from '~/context/auth';
+import { Container, ContainerItem, styles } from './styles';
 import theme from '../../../../styles/theme';
-import {AppTypeConst} from '../../../../constants/app';
+import { APP_TYPE } from '~/constants/app';
+import { ADVERTISING_APP_SITE_TYPE } from '~/constants/advertisingAppSite';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -55,7 +58,7 @@ export default function ListEstablishment(props) {
       setLoading(true);
       const {
         data: {
-          response: {status, data, last_page},
+          response: { status, data, last_page },
         },
       } = await apiDelivery.get(`delivery/company/random`);
       setList(data);
@@ -86,7 +89,7 @@ export default function ListEstablishment(props) {
   ) {
     if (!currentPosition) return;
     try {
-      const {latitude, longitude} = currentPosition;
+      const { latitude, longitude } = currentPosition;
       if (pageNumber > totalPage && !shouldRefresh) return;
       if (loading) return;
 
@@ -104,9 +107,9 @@ export default function ListEstablishment(props) {
 
       const {
         data: {
-          response: {status, data, last_page},
+          response: { status, data, last_page },
         },
-      } = await apiDelivery.get(`delivery/company/near`, {params});
+      } = await apiDelivery.get(`delivery/company/near`, { params });
       setLoading(false);
       setTotalPage(last_page);
       setPage(pageNumber + 1);
@@ -114,7 +117,7 @@ export default function ListEstablishment(props) {
       if (data.length > 0) {
         setList(
           shouldRefresh
-            ? [...createListComponent(navigation, setLoading), ...data]
+            ? [...createListComponent(navigation, currentPosition), ...data]
             : [...list, ...data],
         );
       } else {
@@ -178,8 +181,8 @@ export default function ListEstablishment(props) {
           />
         }
         data={list}
-        renderItem={({item}) => {
-          const {component} = item;
+        renderItem={({ item }) => {
+          const { component } = item;
           if (component) {
             return component;
           }
@@ -187,7 +190,7 @@ export default function ListEstablishment(props) {
             <TouchableOpacity
               key={item.id}
               onPress={() => {
-                navigation.navigate('Restaurant', {restaurant: item});
+                navigation.navigate('Restaurant', { restaurant: item });
               }}
             >
               <ContainerItem
@@ -195,8 +198,8 @@ export default function ListEstablishment(props) {
               >
                 <ImageBackground
                   style={styles.logoItem}
-                  imageStyle={{borderRadius: 10, resizeMode: 'cover'}}
-                  source={{uri: item.company_delivery_config.picture}}
+                  imageStyle={{ borderRadius: 10, resizeMode: 'cover' }}
+                  source={{ uri: item.company_delivery_config.picture }}
                 />
                 <View style={styles.contentItem}>
                   <Text style={styles.nameItem} numberOfLines={2}>
@@ -205,7 +208,7 @@ export default function ListEstablishment(props) {
                   {/* <Text style={styles.detailsItem}>5 - Fast Food</Text> */}
                   <View style={styles.textRating}>
                     <FontAwesome name="star" size={12} color={theme.colors.yellowStrong} />
-                    <Text style={{marginLeft: 5, color: theme.colors.yellowStrong}}>
+                    <Text style={{ marginLeft: 5, color: theme.colors.yellowStrong }}>
                       {item.company_delivery_config.deliveryRating.toFixed(2)}
                     </Text>
                   </View>
@@ -228,7 +231,19 @@ export default function ListEstablishment(props) {
   );
 }
 
-function createListComponent(navigation, setLoading) {
+function EstablishmentAds({ position }) {
+  const { user } = useAuth();
+  const { data } = usePublicity({
+    position,
+    typeConst: APP_TYPE.DELIVERY,
+    advertisingAppSiteId: ADVERTISING_APP_SITE_TYPE.ABERTURA,
+    genderId: user?.genderId
+  });
+
+  return <ListPublicity data={data} />;
+}
+
+function createListComponent(navigation, position) {
   return [
     {
       component: (
@@ -253,11 +268,8 @@ function createListComponent(navigation, setLoading) {
     },
     {
       component: (
-        <View style={{marginHorizontal: 20}}>
-          <CardPublicity
-            setLoading={setLoading}
-            appConstPublicity={AppTypeConst}
-          />
+        <View style={{ marginHorizontal: 20 }}>
+          <EstablishmentAds position={position} />
         </View>
       ),
     },

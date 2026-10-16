@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigation } from '@react-navigation/native';
-import * as WebBrowser from 'expo-web-browser';
+import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import { TextInputMask } from 'react-native-masked-text';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -40,7 +39,6 @@ import { InputContainer } from '../../../components/InputContainer';
 import { Accessory } from '../../../components/Accessory';
 import { customToast } from '../../../../utils/FlashMessage';
 import { If } from '../../../components/If';
-import TermsOfUseModal from '../../../components/TermsOfUseModal';
 import { useAuth } from '../../../../context/auth';
 import { useModules } from '../../../contexts/modules';
 import { BackPage } from '../../../components/BackPage';
@@ -58,9 +56,9 @@ import apiMainDriver from '../../../../driver/src/api/apiMain';
 import { useConfigAppContextSpeedmob } from '../../../../context/ConfigAppSpeedmob';
 
 import { getApiMain } from '../../../api/apiMain.js';
+import { SupportTextComponent } from '../../../../components/SupportText';
 
 import * as Location from 'expo-location';
-import * as MediaLibrary from 'expo-media-library';
 
 interface DatasAppProps {
   app_type_id: number;
@@ -97,7 +95,6 @@ export default function LoginSpeedmob() {
   const [enabled, setEnabled] = useState(false);
   const [switchEnabled, setSwitchEnabled] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [modalTerms, setModalTerms] = useState(false);
   const [dataNewLogin, setDataNewLogin] = useState({});
   const [idNewLogin, setIdNewLogin] = useState('');
   const [appType, setAppType] = useState<'driver' | 'client'>('client');
@@ -109,7 +106,7 @@ export default function LoginSpeedmob() {
     password: '',
   });
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const {
     control,
@@ -164,32 +161,33 @@ export default function LoginSpeedmob() {
   const handleAuth = useCallback(
     async (form: FormData) => {
       setLoading(true);
-      const { email, password } = form;
+      try {
+        const { email, password } = form;
 
-      if (appType === 'driver') {
-        updateColors = true;
-        await loginDriver(email, password);
+        if (appType === 'driver') {
+          updateColors = true;
+          await loginDriver(email, password);
+          return;
+        }
 
+        updateColors = false;
+        const data = await useLoginEndPoint(email, password);
+        if (!data.status) {
+          customToast(data.message, 'danger');
+        } else {
+          // @ts-ignore
+          signIn(data.data);
+          await AsyncStorage.setItem(
+            'lastLogin',
+            JSON.stringify({
+              email,
+              password,
+            }),
+          );
+          await AsyncStorage.setItem('account', JSON.stringify(data.data));
+        }
+      } finally {
         setLoading(false);
-        return;
-      }
-
-      updateColors = false;
-      const data = await useLoginEndPoint(email, password);
-      setLoading(false);
-      if (!data.status) {
-        customToast(data.message, 'danger');
-      } else {
-        // @ts-ignore
-        signIn(data.data);
-        await AsyncStorage.setItem(
-          'lastLogin',
-          JSON.stringify({
-            email,
-            password,
-          }),
-        );
-        await AsyncStorage.setItem('account', JSON.stringify(data.data));
       }
     },
     [signIn, loginDriver, deviceToken, driverSelected],
@@ -384,26 +382,6 @@ export default function LoginSpeedmob() {
     }
   }, [appType])
 
-  // useEffect(() => {
-  //   const checkTerms = async () => {
-  //     try{
-  //       const { granted: permissionLocation } = await Location.getForegroundPermissionsAsync();
-  //       const { granted: permissionsLibrary } = await MediaLibrary.getPermissionsAsync();
-
-  //       if(!permissionLocation || !permissionsLibrary){
-  //         navigation.navigate('TermsCheckSpeedMob');
-  //       }
-
-  //     }catch(error){
-  //         console.log(error)
-  //     }
-  //   }
-
-  //   if(init === 'Speedmob'){
-  //     checkTerms();
-  //   }
-  // }, [])
-
   return (
     <>
       <Modal visible={switchEnabled} transparent>
@@ -420,7 +398,7 @@ export default function LoginSpeedmob() {
             onPress={handleChangeApp}
           >
             {appType === 'client' ? translate('login.text_account_type_driver') : translate('login.text_account_type_passenger')}
-            <Ionicons name="ios-arrow-forward" size={18} weigth="bold" />
+            <Ionicons name="arrow-forward" size={18} weigth="bold" />
           </TextTypeApp>
           <ContentImage>
             <Logo source={{ uri: themeClient.images.logo }} />
@@ -498,10 +476,12 @@ export default function LoginSpeedmob() {
             />
           </ContentButton>
 
+          <SupportTextComponent />
+
           <ContentTermsOfUse>
             <TermsOfUseButton
               activeOpacity={0.7}
-              onPress={() => setModalTerms(true)}
+              onPress={() => navigation.navigate('TermsOfUse', { colorText: themeClient.colors.primary })}
             >
               <TermsOfUseText>
                 {translate('myProfile.text_terms_of_use')}
@@ -511,7 +491,6 @@ export default function LoginSpeedmob() {
         </Content>
         <Preload visible={loading} />
       </Container>
-      <TermsOfUseModal colorText={themeClient.colors.primary} visible={modalTerms} setVisible={setModalTerms} />
     </>
   );
 }

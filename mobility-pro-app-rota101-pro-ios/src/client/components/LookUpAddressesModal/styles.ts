@@ -1,29 +1,27 @@
-import { shade } from 'polished';
-import {Platform} from 'react-native';
+import {shade} from 'polished';
 import {RFValue} from 'react-native-responsive-fontsize';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
-export const Container = styled.SafeAreaView`
-  /* margin-top: ${Platform.OS === 'ios' ? '40' : '0'}px; */
-`;
+export const Container = styled(SafeAreaView)``;
 
 export const Content = styled.View`
   background-color: ${({theme}) => theme.colors.background_global};
 `;
 
-export const ButtonText = styled.TouchableOpacity`	
-  width: 100%;	
-  margin-left: ${RFValue(20)}px;	
-  flex-direction: row;	
-  align-items: center;	
-`;	
+export const ButtonText = styled.TouchableOpacity`
+  width: 100%;
+  margin-left: ${RFValue(20)}px;
+  flex-direction: row;
+  align-items: center;
+`;
 
-export const ContainerButtonsUse = styled.View`	
-  flex-direction: column;	
-  width: 100%;	
-  border-top-width: 0.4px;	
-  border-top-color: ${({theme}) => theme.colors.secondary};	
-  background-color: ${({theme}) => shade(0.05, theme.colors.background_global)};	
+export const ContainerButtonsUse = styled.View`
+  flex-direction: column;
+  width: 100%;
+  border-top-width: 0.4px;
+  border-top-color: ${({theme}) => theme.colors.secondary};
+  background-color: ${({theme}) => shade(0.05, theme.colors.background_global)};
 `;
 
 export const ContentInputIcon = styled.View`

@@ -2,10 +2,11 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 export async function resizeImage(uri: string, width: number, height: number) {
   try {
+    const format = SaveFormat?.JPEG ?? ('jpeg' as any);
     return await manipulateAsync(
       uri,
       [{ resize: { width, height } }],
-      { compress: 0.7, format: SaveFormat.JPEG }
+      { compress: 0.7, format }
     );
   } catch (error) {
     console.warn('resizeImage error, falling back to original uri:', error);

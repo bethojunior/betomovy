@@ -85,25 +85,26 @@ export default function MyProfile() {
 
   const IMAGE_RULES = {
     maxSizeBytes: 10 * 1024 * 1024,
-    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'],
-    minWidth: 100,
-    minHeight: 100,
-    maxWidth: 5000,
-    maxHeight: 5000
+    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/heic', 'image/heif'],
+    minWidth: 50,
+    minHeight: 50,
+    maxWidth: 8000,
+    maxHeight: 8000
   };
 
-  async function validateImage(asset) {
-    const errors = [];
+  async function validateImage(asset: any) {
+    const errors: string[] = [];
+    const size = asset?.fileSize || asset?.size;
 
-    if (asset.fileSize && asset.fileSize > IMAGE_RULES.maxSizeBytes) {
+    if (size && size > IMAGE_RULES.maxSizeBytes) {
       errors.push(`Imagem muito grande. Máximo: ${IMAGE_RULES.maxSizeBytes / (1024 * 1024)}MB`);
     }
 
-    if (asset.mimeType && !IMAGE_RULES.allowedTypes.includes(asset.mimeType)) {
+    if (asset?.mimeType && !IMAGE_RULES.allowedTypes.includes(asset.mimeType.toLowerCase())) {
       errors.push('Formato não suportado. Use: JPG, JPEG ou PNG');
     }
 
-    if (asset.width && asset.height) {
+    if (asset?.width && asset?.height) {
       if (asset.width < IMAGE_RULES.minWidth || asset.height < IMAGE_RULES.minHeight) {
         errors.push(`Imagem muito pequena. Mínimo: ${IMAGE_RULES.minWidth}x${IMAGE_RULES.minHeight}px`);
       }
@@ -139,31 +140,32 @@ export default function MyProfile() {
         }
       }
 
-      const result = await resizeImage(uri, 500, 500);
-      await updatePhoto(result?.uri || uri);
-    } catch (error: any) {
-      console.warn('sendPhotoRecognition error:', error);
-      customToast(error?.message || translate('toast.text_photo_processing_error'), 'danger');
-    } finally {
-      setUploadingPhoto(false);
-    }
-  }
+      let imageToUpload = uri;
+      try {
+        const result = await resizeImage(uri, 500, 500);
+        if (result?.uri) {
+          imageToUpload = result.uri;
+        }
+      } catch (resizeErr) {
+        console.warn('Falha ao redimensionar foto, utilizando uri original:', resizeErr);
+      }
 
-  async function updatePhoto(uri: string) {
-    try {
-      await uploadProfileImage(uri, {
+      await uploadProfileImage(imageToUpload, {
         onSuccess: () => {
           customToast(translate('toast.text_photo_updated_success'), 'success');
         },
       });
     } catch (error: any) {
+      console.warn('sendPhotoRecognition error:', error);
       if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
         customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
       } else if (error?.response?.status === 413) {
         customToast(translate('toast.text_image_too_large'), 'danger');
       } else {
-        customToast(error?.message || translate('toast.text_photo_update_error'), 'danger');
+        customToast(error?.response?.data?.message || error?.message || translate('toast.text_photo_update_error'), 'danger');
       }
+    } finally {
+      setUploadingPhoto(false);
     }
   }
 

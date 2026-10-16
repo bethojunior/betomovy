@@ -2,122 +2,161 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 
 export const Container = styled.View`
-  padding: 10px;
   flex: 1;
   background-color: ${({theme}) => theme.colors.background_global};
 `;
 
-export const InfoContent = styled.View`
-  width: 90%;
-  align-self: center;
+export const ScrollContent = styled.ScrollView.attrs<{keyboardHeight?: number}>(
+  ({theme, keyboardHeight = 0}) => ({
+    keyboardShouldPersistTaps: 'handled',
+    contentContainerStyle: {
+      padding: theme.spacing.large,
+      paddingBottom: theme.spacing.large + keyboardHeight,
+      gap: theme.spacing.large,
+    },
+  }),
+)``;
+
+export const Card = styled.View`
+  background-color: ${({theme}) => theme.colors.white};
+  border-radius: ${({theme}) => theme.borderRadius.large}px;
+  padding: ${({theme}) => theme.spacing.large}px;
+  border-width: 1px;
+  border-color: ${({theme}) => theme.colors.border_white_light};
 `;
 
-export const Header = styled.View`
+export const AvatarRow = styled.View`
   flex-direction: row;
-  margin-top: 35px;
+  align-items: center;
+`;
+
+export const AvatarWrapper = styled.View`
+  position: relative;
+`;
+
+export const CameraBadge = styled.View`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: ${RFValue(24)}px;
+  height: ${RFValue(24)}px;
+  border-radius: ${RFValue(12)}px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({theme}) => theme.colors.primary};
+  border-width: ${RFValue(1.5)}px;
+  border-color: ${({theme}) => theme.colors.white};
+`;
+
+export const UserInfo = styled.View`
+  flex: 1;
+  justify-content: center;
+  margin-left: ${({theme}) => theme.spacing.large}px;
+  gap: ${({theme}) => theme.spacing.small}px;
 `;
 
 export const DriverName = styled.Text`
-  font-size: 17px;
+  font-size: ${({theme}) => theme.fontSizes.xlarge}px;
+  font-family: MavenPro_700Bold;
   color: ${({theme}) => theme.colors.secondary};
-  font-family: MavenPro_500Medium;
 `;
 
 export const SimpleText = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
+  font-size: ${({theme}) => theme.fontSizes.medium}px;
+  color: ${({theme}) => theme.colors.text_gray};
   font-family: MavenPro_400Regular;
 `;
 
-export const Photo = styled.View`
+export const SectionTitleRow = styled.View`
   flex-direction: row;
-  justify-content: flex-end;
-  align-items: flex-end;
-`;
-
-export const ButtonEdit = styled.TouchableOpacity`
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 20px 0 10px 0;
-  border-bottom-color: ${({theme}) => theme.colors.secondary};
-  border-bottom-width: 0.4px;
-`;
-
-export const ImageContent = styled.Image`
-  width: 120px;
-  height: 120px;
-  border-radius: 100px;
-`;
-
-export const ContainerModal = styled.View`
-  flex: 1;
-  background: ${({theme}) => theme.colors.background_black_opacity};
-  justify-content: center;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: ${({theme}) => theme.spacing.medium}px;
 `;
 
-export const ContentOptions = styled.View`
-  width: ${RFValue(300)}px;
-  background: ${({theme}) => theme.colors.background_global};
-  border-radius: ${RFValue(10)}px;
-  margin-top: ${RFValue(10)}px;
-  justify-content: center;
-  padding-left: 10%;
-  padding-right: 10%;
-  padding-top: ${RFValue(20)}px;
-  padding-bottom: ${RFValue(35)}px;
+export const SectionTitle = styled.Text`
+  font-size: ${({theme}) => theme.fontSizes.large}px;
+  font-family: MavenPro_700Bold;
+  color: ${({theme}) => theme.colors.secondary};
 `;
 
-export const ContentOptionsText = styled.Text`
+export const CountBadgeText = styled.Text`
   font-size: ${({theme}) => theme.fontSizes.medium}px;
-  font-family: ${({theme}) => theme.fonts.medium};
-  color: ${({theme}) => theme.colors.secondary};
-  text-align: center;
-  margin-top: ${RFValue(20)}px;
+  font-family: MavenPro_400Regular;
+  color: ${({theme}) => theme.colors.grayLight};
 `;
 
-export const ContentOptionsButtons = styled.View`
+export const TripTypesList = styled.View`
+  background-color: ${({theme}) => theme.colors.background_global};
+  border-radius: ${({theme}) => theme.borderRadius.medium}px;
+  padding-horizontal: ${({theme}) => theme.spacing.large}px;
+`;
+
+export const ListTypeContent = styled.View<{isLast: boolean}>`
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  margin-top: ${RFValue(20)}px;
+  gap: ${({theme}) => theme.spacing.medium}px;
+  padding-vertical: ${({theme}) => theme.spacing.medium}px;
+  border-bottom-width: ${({isLast, theme}) => (isLast ? 0 : theme.borderWidth.small)}px;
+  border-bottom-color: ${({theme}) => theme.colors.border};
 `;
 
-export const Exit = styled.TouchableOpacity`
-  position: absolute;
-  top: ${RFValue(10)}px;
-  right: ${RFValue(10)}px;
-`;
-
-export const TripTypeContent = styled.View`
-  border-bottom-color: ${({theme}) => theme.colors.secondary};
-  border-bottom-width: 0.4px;
-  margin-top: 30px;
-  padding-bottom: 10px;
-`;
-
-export const TitleTripType = styled.Text`
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: ${({theme}) => theme.colors.secondary};
-  font-family: MavenPro_500Medium;
-`;
-
-export const ListTypeContent = styled.View`
-  flex-direction: row;
-  align-items: center;
+export const Ball = styled.View`
+  width: ${RFValue(7)}px;
+  height: ${RFValue(7)}px;
+  background-color: ${({theme}) => theme.colors.primary};
+  border-radius: ${RFValue(4)}px;
 `;
 
 export const ItemTripType = styled.Text`
   font-family: MavenPro_400Regular;
-  font-size: 15px;
-  margin-bottom: 5px;
+  font-size: ${({theme}) => theme.fontSizes.smalls}px;
   color: ${({theme}) => theme.colors.secondary};
+  text-transform: uppercase;
 `;
 
-export const Ball = styled.View`
-  width: 7px;
-  height: 7px;
-  background-color: ${({theme}) => theme.colors.primary};
-  border-radius: 50px;
-  margin-bottom: 5px;
+export const DangerRow = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  gap: ${({theme}) => theme.spacing.medium}px;
+`;
+
+export const DangerTextGroup = styled.View`
+  flex: 1;
+`;
+
+export const DangerTitle = styled.Text`
+  font-size: ${({theme}) => theme.fontSizes.medium}px;
+  font-family: MavenPro_700Bold;
+  color: ${({theme}) => theme.colors.red};
+`;
+
+export const DangerSubtitle = styled.Text`
+  font-size: ${({theme}) => theme.fontSizes.smalls}px;
+  font-family: MavenPro_400Regular;
+  color: ${({theme}) => theme.colors.text_gray};
+  margin-top: ${RFValue(2)}px;
+`;
+
+export const SupportRow = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  gap: ${({theme}) => theme.spacing.medium}px;
+`;
+
+export const SupportTextGroup = styled.View`
+  flex: 1;
+`;
+
+export const SupportText = styled.Text`
+  font-size: ${({theme}) => theme.fontSizes.smalls}px;
+  font-family: MavenPro_400Regular;
+  color: ${({theme}) => theme.colors.text_gray};
+  line-height: ${RFValue(18)}px;
+`;
+
+export const SupportLinkText = styled.Text`
+  font-size: ${({theme}) => theme.fontSizes.smalls}px;
+  font-family: MavenPro_700Bold;
+  color: ${({theme}) => theme.colors.blue};
 `;

@@ -33,6 +33,7 @@ interface Props {
   title?: string;
   componentButton?: any;
   isLoading?: boolean;
+  onDismiss?: () => void;
 }
 
 const ModalFrame: FC<Props> = ({
@@ -51,6 +52,7 @@ const ModalFrame: FC<Props> = ({
   closeIcon,
   componentButton,
   isLoading,
+  onDismiss,
 }) => {
   return (
     <>
@@ -61,6 +63,7 @@ const ModalFrame: FC<Props> = ({
         onRequestClose={() => {
           setVisible(false);
         }}
+        onDismiss={onDismiss}
       >
         <Content behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <ModalContent pointerEvents={isLoading ? 'none' : 'auto'}>
@@ -97,31 +100,33 @@ const ModalFrame: FC<Props> = ({
             {error === true && <ErrorText>{textError}</ErrorText>}
             {children}
             <ContentButton>
-              <Button
-                disabled={isLoading}
-                hide={hideCancel}
-                onPress={() => {
-                  onClose();
-                  setVisible(false);
-                }}
-              >
-                <TextButton hide={hideCancel}>
-                  {textCancel || translate('driver_buttonModal.cancel')}
-                </TextButton>
-              </Button>
-              <Button
-                disabled={isLoading}
-                hide={hideConfirm}
-                onPress={onPressConfirm}
-              >
-                <View>
-                  <IfLoaderInsideScreen loading={isLoading || null}>
-                    <TextButton hide={hideConfirm}>
-                      {textConfirm || translate('driver_buttonModal.confirm')}
-                    </TextButton>
-                  </IfLoaderInsideScreen>
-                </View>
-              </Button>
+              {!hideCancel && (
+                <Button
+                  disabled={isLoading}
+                  onPress={() => {
+                    onClose();
+                    setVisible(false);
+                  }}
+                >
+                  <TextButton>
+                    {textCancel || translate('driver_buttonModal.cancel')}
+                  </TextButton>
+                </Button>
+              )}
+              {!hideConfirm && (
+                <Button
+                  disabled={isLoading}
+                  onPress={onPressConfirm}
+                >
+                  <View>
+                    <IfLoaderInsideScreen loading={isLoading || null}>
+                      <TextButton>
+                        {textConfirm || translate('driver_buttonModal.confirm')}
+                      </TextButton>
+                    </IfLoaderInsideScreen>
+                  </View>
+                </Button>
+              )}
             </ContentButton>
           </ModalContent>
         </Content>

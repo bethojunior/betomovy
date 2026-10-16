@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {TextEdit} from '../TextEdit';
+import { useEffect, useState } from 'react';
+import { TextEdit } from '../TextEdit';
 import {
   ContainerColumn,
   ContainerContent,
@@ -9,14 +9,14 @@ import {
   InputMask,
 } from './styles';
 
-import {useAuth} from '../../../context/auth';
-import {useTrip} from '../../contexts/Trip';
+import { useAuth } from '../../../context/auth';
+import { useTrip } from '../../contexts/Trip';
 import ModalFrame from '../form/Modal';
-import {translate} from '../../locales';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {SvgUri} from 'react-native-svg';
+import { translate } from '../../locales';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { SvgUri } from 'react-native-svg';
 import theme from '../../styles/theme';
-import {customToast} from '../../../utils/FlashMessage';
+import { customToast } from '../../../utils/FlashMessage';
 
 interface Props {
   visible: boolean;
@@ -33,9 +33,9 @@ export const ModalOfferInPrice = ({
   setOfferPrice,
   setTripType,
 }: Props) => {
-  const {cityConfig} = useAuth();
-  const {stateTripCustomer} = useTrip();
-  const {selectedOptionTravel} = stateTripCustomer;
+  const { cityConfig } = useAuth();
+  const { stateTripCustomer } = useTrip();
+  const { selectedOptionTravel } = stateTripCustomer;
   const [price, setPrice] = useState<any>(priceOffer);
   const [priceInitial, setPriceInitial] = useState<any>(priceOffer);
   const [ultrapassedPrice, setUltrapassedPrice] = useState<any>(false);
@@ -48,7 +48,7 @@ export const ModalOfferInPrice = ({
     if (ultrapassedPrice) {
       return;
     }
-    setOfferPrice(value.split(`$`)[1].replace(',', '.'));
+    setOfferPrice(value?.split(`$`)[1].replace(',', '.'));
     setVisible(false);
   };
 
@@ -77,7 +77,7 @@ export const ModalOfferInPrice = ({
             uri={selectedOptionTravel?.picture}
           />
         ) : (
-          <Image source={{uri: selectedOptionTravel?.picture}} />
+          <Image source={{ uri: selectedOptionTravel?.picture }} />
         )}
         <ContainerInput>
           <TextEdit color={theme.colors.secondary}>
@@ -99,7 +99,7 @@ export const ModalOfferInPrice = ({
                 setPrice(e);
 
                 if (
-                  Number(e.split(`$`)[1].replace(',', '.')) <
+                  Number(e?.split(`$`)[1].replace(',', '.')) <
                   Number(selectedOptionTravel?.price)
                 ) {
                   setUltrapassedPrice(true);
@@ -112,8 +112,8 @@ export const ModalOfferInPrice = ({
               <TextEdit size={'small'} color={theme.colors.secondary}>
                 {ultrapassedPrice
                   ? translate(
-                      'tripAnother.amount_below_the_minimum_travel_price',
-                    )
+                    'tripAnother.amount_below_the_minimum_travel_price',
+                  )
                   : ''}
               </TextEdit>
             </ContainerTextColumn>

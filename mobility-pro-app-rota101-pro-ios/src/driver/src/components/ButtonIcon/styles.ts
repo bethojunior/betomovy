@@ -17,6 +17,5 @@ export const ButtonSend = styled.TouchableOpacity`
 export const ButtonSendStar = styled.TouchableOpacity`
   border-radius: 25px;
   align-items: center;
-  margin-bottom: 10px;
   justify-content: center;
 `;

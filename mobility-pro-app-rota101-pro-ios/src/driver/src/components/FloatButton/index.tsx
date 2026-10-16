@@ -1,3 +1,4 @@
+import { JSX } from 'react';
 import {ButtonFloatContainer} from './styles';
 interface Props {
   onPress?: () => void;

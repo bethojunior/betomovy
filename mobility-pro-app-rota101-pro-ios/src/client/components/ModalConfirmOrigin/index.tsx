@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useRef } from 'react';
+import { Alert } from 'react-native';
 import {
   Container,
   Body,
@@ -10,14 +12,12 @@ import {
   TextBtnFixAddress,
 } from './styles';
 
-import {useTrip} from '../../contexts/Trip';
+import { useTrip } from '../../contexts/Trip';
 
-import {translate} from '../../locales';
+import { translate } from '../../locales';
 import SearchAddressModal from '../SearchAddressModal';
 
-import {useCallback, useEffect, useRef} from 'react';
-import {Alert} from 'react-native';
-import {useAddressConfirmation} from '../../../driver/src/hooks/addressConfirmation';
+import { useAddressConfirmation } from '../../../driver/src/hooks/addressConfirmation';
 
 interface ModalConfirmOriginProps {
   visibleTravelOptions: boolean;
@@ -47,9 +47,9 @@ export const ModalConfirmOrigin = ({
     getTripPaymentMethods,
   } = useTrip();
 
-  const {confirmAddress} = useAddressConfirmation();
+  const { confirmAddress } = useAddressConfirmation();
 
-  const {origin, destination, waypoints} = stateTripCustomer;
+  const { origin, destination, waypoints } = stateTripCustomer;
 
   const onAddressConfirmed = () => {
     confirmAddress();
@@ -86,7 +86,22 @@ export const ModalConfirmOrigin = ({
       const addressAlreadyAdded =
         handlesAlreadyAddedAddressValidation(addressResult);
 
-      if (addressAlreadyAdded) {
+      if (type.startsWith('waypoint')) {
+        if (waypoints.length > 0) {
+          const isSameAsOrigin =
+            origin.latitude === addressResult.latitude &&
+            origin.longitude === addressResult.longitude;
+
+          if (isSameAsOrigin) {
+            return Alert.alert(
+              'Atenção',
+              'Endereço do waypoint não pode ser igual ao da origem!',
+            );
+          }
+        }
+      }
+
+      if (waypoints.length <= 0 && addressAlreadyAdded) {
         return Alert.alert('Atenção', 'Endereço já adicionado!');
       }
 
@@ -139,7 +154,7 @@ export const ModalConfirmOrigin = ({
           }),
       };
 
-      const attribute = type.split('-')[0];
+      const attribute = type?.split('-')[0];
       addressesTypes[attribute](addressResult, type);
     },
     [origin, destination, waypoints],

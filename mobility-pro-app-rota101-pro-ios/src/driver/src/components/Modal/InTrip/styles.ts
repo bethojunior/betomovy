@@ -20,7 +20,6 @@ export const Modal = styled(MotiView)`
   width: 95%;
   padding: 5px;
   align-self: center;
-  min-height: 30%;
   position: absolute;
   bottom: 20px;
   border-radius: 8px;
@@ -142,7 +141,7 @@ export const Address = styled.Text<AddressProps>`
   margin-top: 10px;
 `;
 
-export const ButtonMinizeModal = styled.TouchableOpacity`
+export const ButtonMinimizeModal = styled.Pressable`
   align-self: center;
   background-color: ${({theme}) => theme.colors.primary};
   border-radius: 50px;
@@ -261,4 +260,25 @@ export const Time = styled.Text`
 export const CotentTime = styled.View`
   flex-direction: row;
   align-items: center;
+`;
+
+export const SwalButtonContainers = styled.View`
+  flex-direction: row;
+  justify-content: space-around;
+`;
+
+interface SwalButtonProps {
+  backgroundColor: string;
+}
+
+export const SwalButton = styled.TouchableOpacity<SwalButtonProps>`
+  padding: 8px;
+  background-color: ${({backgroundColor}) => backgroundColor};
+  border-radius: 5px;
+  margin-top: 10px;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 0.5px;
 `;

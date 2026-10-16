@@ -40,6 +40,7 @@ const GuestRoutes = () => (
         gestureEnabled: true,
         gestureDirection: 'horizontal',
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        headerBackTitleVisible: false,
       }}
     >
       <Screen

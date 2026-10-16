@@ -1,20 +1,28 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import themeCss from '../../styles/theme';
 
 export const Container = styled.View`
   flex: 1;
-  background-color: ${({theme}) => theme.colors.background_global};
+  background-color: ${({ theme }) => theme.colors.background_global};
 `;
 
 export const SimpleText = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
+  font-size: ${({ theme }) => theme.fontSizes.medium - 1}px;
+  color: ${({ theme }) => theme.colors.secondary};
+`;
+
+export const VersionContainer = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: ${({ theme }) => theme.spacing.medium}px;
 `;
 
 export const styles = StyleSheet.create({
   content: {
-    marginTop: 20,
-    flex: 1,
+    flexGrow: 1,
   },
   divider: {
     marginHorizontal: 5,
@@ -44,14 +52,6 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: themeCss.colors.text_gray,
     fontSize: 15,
-  },
-  versionNumber: {
-    color: themeCss.colors.secondary,
-    fontSize: 12,
-    alignSelf: 'center',
-    position: 'absolute',
-    paddingBottom: 5,
-    bottom: 0,
   },
   image: {
     width: 30,

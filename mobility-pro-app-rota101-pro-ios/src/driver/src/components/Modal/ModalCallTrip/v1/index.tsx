@@ -1,8 +1,8 @@
-import {AntDesign, Feather, MaterialCommunityIcons} from '@expo/vector-icons';
-import {useTheme} from 'styled-components';
-import {ActivityIndicator, NativeTouchEvent, View} from 'react-native';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {useEffect, useState} from 'react';
+import { AntDesign, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from 'styled-components';
+import { ActivityIndicator, NativeTouchEvent, View } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { Fragment, useEffect, useState } from 'react';
 import {
   Address,
   AddressContent,
@@ -19,7 +19,6 @@ import {
   Info,
   Label,
   Line,
-  Photo,
   PointsContent,
   Price,
   Section,
@@ -39,17 +38,18 @@ import {
   ContainerTurbine,
   GeneralContent,
 } from './styles';
-import {translate} from '../../../../../../client/locales';
-import {IsToShowField} from '../../../../utils/cityConfig';
-import {maskMoney} from '../../../../../../client/utils/money';
-import {buildApp} from '../../../../../../constantBuild/config';
-import {useTripProvider} from '../../../../context/Trip';
-import {useAuth} from '../../../../../../context/auth';
+import { translate } from '../../../../../../client/locales';
+import { IsToShowField } from '../../../../utils/cityConfig';
+import { getTripPaymentFormDisplay } from '../../../../utils/tripUtils';
+import { maskMoney } from '../../../../../../client/utils/money';
+import { useTripProvider } from '../../../../context/Trip';
+import { useAuth } from '../../../../../../context/auth';
 import Helper from '../../../../utils/Helper';
-import {useUserDriver} from '../../../../context/userDriver';
-import {AlertRecording} from '../../../../../../common/AlertRecording';
-import {If} from '../../../If';
-import {AnimationIconFly} from '../../../../../../client/components/AnimationIconFly';
+import { useUserDriver } from '../../../../context/userDriver';
+import { AlertRecording } from '../../../../../../common/AlertRecording';
+import { CallTripAvatar } from '../../../CallTripAvatar';
+import { If } from '../../../If';
+import { AnimationIconFly } from '../../../../../../client/components/AnimationIconFly';
 import theme from '../../../../styles/theme';
 import AnimationOnPulseBgWhiteOnCentralized from '../../../AnimationPulse';
 
@@ -70,6 +70,7 @@ interface Props {
 }
 
 let timesShowAlertRecording = 3;
+const MIN_DISTANCE = 100;
 
 export const V1ModalCallTrip = ({
   confirm,
@@ -83,20 +84,27 @@ export const V1ModalCallTrip = ({
   isMoved,
   layout,
 }: Props) => {
-  const {refuseTrip, dispatchTrip, stateTrip} = useTripProvider();
-  const {trip} = stateTrip;
-  const {colors} = useTheme();
-  const {cityConfig, generalSettings} = useAuth();
+  const refuseTrip: any = useTripProvider((context: any) => context.refuseTrip);
+  const dispatchTrip: any = useTripProvider(
+    (context: any) => context.dispatchTrip,
+  );
+  const trip: any = useTripProvider((context: any) => context.stateTrip.trip);
+  const { colors } = useTheme();
+  const { cityConfig, generalSettings } = useAuth();
   const [startDistance, setStartDistance] = useState<NativeTouchEvent>();
-  const {getDriverFind} = useUserDriver();
+  const { getDriverFind } = useUserDriver();
 
-  const verifyDistance = (endDistance: NativeTouchEvent) => {
-    const distanceX = (endDistance.locationX - startDistance.locationX) * -1;
-    const distanceY = (endDistance.locationY - startDistance.locationY) * -1;
-    if (distanceX > 100 || distanceY > 100) {
+  const verifyDistance = (endDistance?: NativeTouchEvent) => {
+    if (!startDistance || !endDistance) return;
+
+    const distanceX = (endDistance?.locationX - startDistance?.locationX) * -1;
+    const distanceY = (endDistance?.locationY - startDistance?.locationY) * -1;
+
+    if (distanceX >= MIN_DISTANCE || distanceY >= MIN_DISTANCE) {
       verifyToucheIsEnabled();
     }
   };
+
   useEffect(() => {
     generalSettings?.find(el => {
       if (
@@ -109,10 +117,16 @@ export const V1ModalCallTrip = ({
   }, []);
 
   const witchPrice = () => {
+    let basePrice = 0;
     if (String(cityConfig?.showNetValueForDriverOnCall) === '1') {
-      return trip?.driverValue + (trip?.rewardTrip?.value || 0);
+      basePrice = parseFloat(trip?.driverValue || 0);
+    } else {
+      basePrice = parseFloat(trip?.price || 0);
     }
-    return trip?.price + (trip?.rewardTrip?.value || 0);
+    const rewardValue = parseFloat(trip?.rewardTrip?.value || 0);
+    const finalPrice = basePrice + rewardValue;
+
+    return finalPrice;
   };
 
   const chooseLayout = (config: any) => {
@@ -125,7 +139,12 @@ export const V1ModalCallTrip = ({
                 {translate('trip.km_rs')}
                 {(
                   witchPrice() /
-                  (Number(trip?.estimative?.distance.text.replace('km', '')) +
+                  (Number(
+                    trip?.estimative?.distance?.text?.replaceAll(
+                      /[^0-9.]/g,
+                      '',
+                    ),
+                  ) +
                     Number(trip?.distance))
                 ).toFixed(2)}
               </TextCalc>
@@ -133,7 +152,7 @@ export const V1ModalCallTrip = ({
 
             <If
               condition={Boolean(
-                trip?.estimative?.duration.text && trip?.estimatedTripTime,
+                trip?.estimative?.duration?.text && trip?.estimatedTripTime,
               )}
             >
               <TextCalc>
@@ -141,7 +160,10 @@ export const V1ModalCallTrip = ({
                 {(
                   (witchPrice() /
                     (Number(
-                      trip.estimative?.duration.text.replace('mins', ''),
+                      trip?.estimative?.duration?.text?.replaceAll(
+                        /[^0-9.]/g,
+                        '',
+                      ),
                     ) +
                       Number(trip?.estimatedTripTime))) *
                   60
@@ -149,16 +171,16 @@ export const V1ModalCallTrip = ({
               </TextCalc>
             </If>
 
-            <If condition={IsToShowField('price') && cityConfig !== null}>
+            <If condition={IsToShowField('price', cityConfig) && cityConfig !== null}>
               <Price>
-                {cityConfig?.typeMoney} {maskMoney(Number(witchPrice()))}
+                {cityConfig?.typeMoney} {maskMoney(witchPrice())}
               </Price>
             </If>
           </>
         );
       default:
         return (
-          <If condition={IsToShowField('price') && cityConfig !== null}>
+          <If condition={IsToShowField('price', cityConfig) && cityConfig !== null}>
             <Price>
               {cityConfig?.typeMoney} {maskMoney(witchPrice())}
             </Price>
@@ -167,15 +189,21 @@ export const V1ModalCallTrip = ({
     }
   };
 
+  const handleRefuse = () => {
+    setLoading(false);
+    dispatchTrip({ type: 'update', field: 'callDriverModal', arg: false });
+    refuseTrip(Number(driverId), trip?.tripReference).then(() => getDriverFind());
+  };
+
+  const hasRiskArea = Boolean(trip?.riskArea?.destination || trip?.riskArea?.origin);
+
   return (
-    <View style={{position: 'relative', flex: 1}}>
+    <View style={{ position: 'relative', flex: 1 }}>
       {timesShowAlertRecording >= trip?.quantityTripsCustomer && (
         <AlertRecording />
       )}
       <GeneralContent>
-        <RiskAreaContent
-          visible={trip?.riskArea?.destination || trip?.riskArea?.origin}
-        >
+        <RiskAreaContent visible={hasRiskArea}>
           <TextRisk>{translate('trip.risk_area')}</TextRisk>
         </RiskAreaContent>
         <If condition={trip?.turbochargedPrice}>
@@ -185,20 +213,20 @@ export const V1ModalCallTrip = ({
           <If
             condition={!trip?.turbochargedPrice && trip?.callType !== 'partner'}
           >
-            <FavoriteText display={trip.status === 'searching_favorite'}>
+            <FavoriteText show={Boolean(Number(trip?.isFavoriteDriver))}>
               {translate('list_client.title_favorite')}
             </FavoriteText>
           </If>
 
           <If condition={trip?.callType === 'partner'}>
-            <FavoriteText display>
+            <FavoriteText show>
               {translate('callTrip.title_third')}
             </FavoriteText>
           </If>
 
           <If condition={trip?.turbochargedPrice}>
             <ContainerTurbine>
-              <FavoriteText display>
+              <FavoriteText show>
                 {translate('callTrip.title_turbocharged')}
               </FavoriteText>
               <AnimationIconFly>
@@ -214,19 +242,8 @@ export const V1ModalCallTrip = ({
             </ContainerTurbine>
           </If>
 
-          <ButtonRefuse
-            onPress={async () => {
-              setLoading(false);
-              await refuseTrip(Number(driverId), trip?.tripReference);
-              dispatchTrip({
-                type: 'update',
-                field: 'callDriverModal',
-                arg: false,
-              });
-              getDriverFind();
-            }}
-          >
-            <AntDesign name="close" size={RFValue(30)} color="red" />
+          <ButtonRefuse onPress={handleRefuse}>
+            <AntDesign name="close" size={RFValue(20)} color="red" />
           </ButtonRefuse>
         </Header>
         <View
@@ -234,35 +251,14 @@ export const V1ModalCallTrip = ({
           onTouchEnd={e => verifyDistance(e.nativeEvent)}
         >
           <ClientInfoContent>
-            <Photo
-              source={{
-                uri: trip?.customerImage
-                  ? `${buildApp().HOST_IMAGE_CUSTOMER}${trip?.customerImage}`
-                  : trip?.tripTypePicture,
-              }}
-            />
+            <CallTripAvatar trip={trip} style={{ marginRight: 10 }} />
             <ClientInfo>
-              <View style={{width: '60%'}}>
+              <View style={{ width: '60%' }}>
                 <SimpleText>{trip?.nameCustomer}</SimpleText>
                 <ClienSection>
-                  <AntDesign
-                    style={{marginRight: 5}}
-                    name="enviromento"
-                    size={12}
-                    color={colors.primary}
-                  />
-                  <SimpleText>
-                    {IsToShowField('quantityTripsCustomer')
-                      ? `${trip?.quantityTripsCustomer} ${translate(
-                          'callTrip.text_trip',
-                        )}`
-                      : ''}
-                  </SimpleText>
-                </ClienSection>
-                <ClienSection>
-                  <If condition={IsToShowField('ratingCustomer')}>
+                  <If condition={IsToShowField('ratingCustomer', cityConfig)}>
                     <AntDesign
-                      style={{marginRight: 5}}
+                      style={{ marginRight: 5 }}
                       name="star"
                       size={12}
                       color={colors.primary}
@@ -270,15 +266,18 @@ export const V1ModalCallTrip = ({
                     <ClientRating>
                       {/* @ts-ignore */}
                       {parseFloat(trip?.ratingCustomer).toPrecision(2)} -{' '}
-                      {trip?.quantityTripsCustomer}{' '}
-                      {translate('callTrip.text_trip')}
+                      {IsToShowField('quantityTripsCustomer', cityConfig)
+                        ? `${trip?.quantityTripsCustomer} ${translate(
+                          'callTrip.text_trip',
+                        )}`
+                        : ''}
                     </ClientRating>
                   </If>
                 </ClienSection>
               </View>
-              <If condition={totalBonus !== 0 && IsToShowField('reward')}>
-                <View style={{width: '45%'}}>
-                  <Label>{translate('callTrip.text_bonus')}</Label>
+              <If condition={totalBonus !== 0 && IsToShowField('reward', cityConfig)}>
+                <View style={{ width: '45%' }}>
+                  <Label>{translate('callTrip.text_bonus').toUpperCase()}</Label>
                   <Bonus>
                     + {cityConfig?.typeMoney} {maskMoney(totalBonus || 0)}
                   </Bonus>
@@ -286,27 +285,28 @@ export const V1ModalCallTrip = ({
               </If>
             </ClientInfo>
           </ClientInfoContent>
+
           <SectionInfo>
             <Section isFirst>
-              <View style={{marginBottom: 25}}>
+              <View style={{ marginBottom: 25 }}>
                 <Label>{translate('callTrip.text_type_trip')}</Label>
                 <Info>{trip?.type}</Info>
               </View>
               <View>
-                <If condition={IsToShowField('paymentForm')}>
+                <If condition={IsToShowField('paymentForm', cityConfig)}>
                   <Label>{translate('callTrip.text_type_payment')}</Label>
-                  <Info>{trip?.tripPaymentForm}</Info>
+                  <Info>{getTripPaymentFormDisplay(trip?.tripPaymentForm)}</Info>
                 </If>
               </View>
             </Section>
             <Section>
               <CalcContent>
                 <If condition={trip?.multiplierDynamic > 0}>
-                  <View style={{flexDirection: 'row'}}>
+                  <View style={{ flexDirection: 'row' }}>
                     <ClienSection>
                       <TextCalc>{trip?.multiplierDynamic}x</TextCalc>
                       <Feather
-                        style={{marginLeft: 5, marginRight: 5}}
+                        style={{ marginLeft: 5, marginRight: 5 }}
                         name="trending-up"
                         size={9}
                         color={colors.primaryText}
@@ -334,21 +334,21 @@ export const V1ModalCallTrip = ({
               <If
                 condition={
                   trip?.tripWayPoints?.length !== 0 &&
-                  IsToShowField('quantityWaypoints')
+                  IsToShowField('quantityWaypoints', cityConfig)
                 }
               >
-                {trip?.tripWayPoints?.map(() => (
-                  <>
+                {trip?.tripWayPoints?.map((_, index) => (
+                  <Fragment key={index}>
                     <Ball />
                     <Line />
-                  </>
+                  </Fragment>
                 ))}
               </If>
               <Square />
             </PointsContent>
-            <View style={{marginLeft: 5}}>
-              <View style={{paddingBottom: 10}}>
-                <If condition={IsToShowField('origin')}>
+            <View style={{ marginLeft: 5 }}>
+              <View style={{ paddingBottom: 10 }}>
+                <If condition={IsToShowField('origin', cityConfig)}>
                   <Address
                     riskArea={trip?.riskArea ? trip?.riskArea?.origin : false}
                   >
@@ -356,20 +356,12 @@ export const V1ModalCallTrip = ({
                   </Address>
                   <If condition={trip?.estimative}>
                     <Distance>
-                      {IsToShowField('estimatedDistance') &&
-                        trip?.estimative?.distance.text &&
-                        Helper.kmToMiles(
-                          Number(
-                            (trip?.estimative?.distance.text).replace('km', ''),
-                          ),
-                          Helper.generalSettingsActive(
-                            generalSettings,
-                            'enable_transform_km_for_mi',
-                          ),
-                        )}{' '}
-                      {IsToShowField('estimatedDistance') &&
-                        trip.estimative?.duration.text &&
-                        `, ${(trip.estimative?.duration.text).replace(
+                      {IsToShowField('estimatedDistance', cityConfig) &&
+                        trip?.estimative?.distance?.text &&
+                        trip?.estimative?.distance?.text}{' '}
+                      {IsToShowField('estimatedDistance', cityConfig) &&
+                        trip.estimative?.duration?.text &&
+                        `, ${trip.estimative?.duration?.text?.replace(
                           'mins',
                           'min',
                         )}`}
@@ -380,7 +372,7 @@ export const V1ModalCallTrip = ({
               <If
                 condition={
                   trip?.tripWayPoints?.length !== 0 &&
-                  IsToShowField('quantityWaypoints')
+                  IsToShowField('quantityWaypoints', cityConfig)
                 }
               >
                 {trip?.tripWayPoints?.map(waypoint => (
@@ -390,7 +382,7 @@ export const V1ModalCallTrip = ({
                 ))}
               </If>
               <View>
-                {IsToShowField('destination') && (
+                {IsToShowField('destination', cityConfig) && (
                   <>
                     <Address riskArea={trip.riskArea?.destination || false}>
                       {trip?.endAddress}
@@ -428,7 +420,7 @@ export const V1ModalCallTrip = ({
               ) : (
                 <>
                   <ProgressBarrer width={timeToAccept} />
-                  <TextButton style={{color: colors.primaryText}}>
+                  <TextButton style={{ color: colors.primaryText }}>
                     {translate('callTrip.text_accept')}
                   </TextButton>
                 </>

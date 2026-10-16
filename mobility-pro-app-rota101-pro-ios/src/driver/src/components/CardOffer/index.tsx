@@ -1,10 +1,11 @@
-import {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 
-import {useAuth} from '../../../../context/auth';
-import {searchNative} from '../../context/Trip/directionRoute';
-import {maskMoney} from '../../utils/money';
-import {ContainerRow} from '../ContainerRow';
+import { useAuth } from '../../../../context/auth';
+import { searchNative } from '../../context/Trip/directionRoute';
+import { maskMoney } from '../../utils/money';
+import { getTripPaymentFormDisplay } from '../../utils/tripUtils';
+import { ContainerRow } from '../ContainerRow';
 import {
   Address,
   AddressContent,
@@ -19,36 +20,42 @@ import {
   Square,
   TextDescription,
 } from './styles';
-import {translate} from '../../../../client/locales';
-import {useLocalProvider} from '../../context/local';
-import {If} from '../If';
-import {position} from 'polished';
+import { translate } from '../../../../client/locales';
+import { useLocalProvider } from '../../context/local';
+import { If } from '../If';
+import { position } from 'polished';
 import theme from '../../styles/theme';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {ModalInDriverOnDriver} from '../../../../client/components/ModalInDriverOnDriver';
-import {useTripProvider} from '../../context/Trip';
-import {useUserDriver} from '../../context/userDriver';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { ModalInDriverOnDriver } from '../../../../client/components/ModalInDriverOnDriver';
+import { useTripProvider } from '../../context/Trip';
+import { useUserDriver } from '../../context/userDriver';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ActivityIndicator } from 'react-native-paper';
+import { Trip } from '../../../../interfaces/trip';
+
+type TripOffer = Trip & { tripEstimative?: string };
 
 interface Props {
-  trip: any;
+  trip: TripOffer;
   onPress?: string;
-  onPressAccept?: (tripReference: string) => void;
-  checkIfIsRemoved?: () => void;
+  onPressAccept?: (tripReference: string) => Promise<void>;
+  onPressRefuse?: (idTrip: string) => Promise<void>;
 }
-export const CardOffer = ({trip, onPressAccept, checkIfIsRemoved}: Props) => {
-  const {cityConfig} = useAuth();
-  const {userDriverFind} = useUserDriver();
-  const {location} = useLocalProvider();
-  const {createTripOffer} = useTripProvider();
+export const CardOffer = ({ trip, onPressAccept, onPressRefuse }: Props) => {
+  const { cityConfig } = useAuth();
+  const { userDriverFind } = useUserDriver();
+  const { location } = useLocalProvider();
+  const createTripOffer: any = useTripProvider(
+    (context: any) => context.createTripOffer,
+  );
   const [loading, setLoading] = useState(false);
   const [modalInDriver, setModalInDriver] = useState(false);
   const [offerInDriver, setOfferInDriver] = useState(0);
   const [estimative, setEstimative] = useState('');
   const hasTripBid = trip?.tripBids
     ? trip?.tripBids.some(item => {
-        return item.driverId == userDriverFind?.idDriver;
-      })
+      return item.driverId == userDriverFind?.idDriver;
+    })
     : false;
   const getAttribuitionEstimative = async () => {
     const result = await searchNative(
@@ -76,14 +83,20 @@ export const CardOffer = ({trip, onPressAccept, checkIfIsRemoved}: Props) => {
     setOfferInDriver(parseFloat(trip.price));
   };
 
-  const refuseOffer = async (tripReference: string) => {
-    let tripsOffer =
-      JSON.parse(await AsyncStorage.getItem('refusedOffer')) || [];
+  // const refuseOffer = async (tripReference: string) => {
+  //   let tripsOffer =
+  //     JSON.parse(await AsyncStorage.getItem('refusedOffer')) || [];
 
-    tripsOffer.push(tripReference);
-    await AsyncStorage.setItem('refusedOffer', JSON.stringify(tripsOffer));
-    await checkIfIsRemoved();
-  };
+  //   const tripRefused = {
+  //     tripReference,
+  //     price: trip?.price,
+  //   };
+
+  //   const newList = [tripRefused, ...tripsOffer];
+
+  //   await AsyncStorage.setItem('refusedOffer', JSON.stringify(newList));
+  //   await checkIfIsRemoved();
+  // };
 
   return (
     <>
@@ -93,7 +106,7 @@ export const CardOffer = ({trip, onPressAccept, checkIfIsRemoved}: Props) => {
           setOfferPrice={setOfferInDriver}
           visible={modalInDriver}
           setVisible={setModalInDriver}
-          initialPriceOffer={trip?.price}
+          initialPriceOffer={parseInt(trip?.price)}
           onPress={createTripOffer}
           trip={trip}
         />
@@ -102,7 +115,7 @@ export const CardOffer = ({trip, onPressAccept, checkIfIsRemoved}: Props) => {
       <Container>
         <ContainerHeader>
           <AddressContent>
-            <View style={{paddingRight: 10}}>
+            <View style={{ paddingRight: 10 }}>
               <Ball color="primary" />
               <Line />
               {trip?.tripWayPoints &&
@@ -115,7 +128,7 @@ export const CardOffer = ({trip, onPressAccept, checkIfIsRemoved}: Props) => {
                 ))}
               <Square />
             </View>
-            <View style={{paddingRight: 20}}>
+            <View style={{ paddingRight: 20 }}>
               <Address>{trip?.origin?.address}</Address>
               {trip?.tripWayPoints &&
                 trip?.tripWayPoints.length > 0 &&
@@ -158,7 +171,9 @@ export const CardOffer = ({trip, onPressAccept, checkIfIsRemoved}: Props) => {
           <ContainerRow
             title={<TextDescription>Nome: </TextDescription>}
             description={
-              <TextDescription>{trip?.customer?.nickname}</TextDescription>
+              <TextDescription>
+                {trip?.customer?.nickname || trip?.customer?.name}
+              </TextDescription>
             }
           />
           <ContainerRow
@@ -182,7 +197,7 @@ export const CardOffer = ({trip, onPressAccept, checkIfIsRemoved}: Props) => {
           <ContainerRow
             title={<TextDescription>Pagamento: </TextDescription>}
             description={
-              <TextDescription>{trip?.tripPaymentForm}</TextDescription>
+              <TextDescription>{getTripPaymentFormDisplay(trip?.tripPaymentForm)}</TextDescription>
             }
           />
         </ContainerHeader>
@@ -193,7 +208,7 @@ export const CardOffer = ({trip, onPressAccept, checkIfIsRemoved}: Props) => {
                 bg={theme.colors.red}
                 isDisable={userDriverFind.status === 'desligado'}
                 disabled={userDriverFind.status === 'desligado'}
-                onPress={() => refuseOffer(trip.tripReference)}
+                onPress={() => onPressRefuse(trip.idTrip)}
               >
                 <TextDescription color={theme.colors.primaryText}>
                   {translate('trip.recuse')}
@@ -227,12 +242,17 @@ export const CardOffer = ({trip, onPressAccept, checkIfIsRemoved}: Props) => {
               onPress={async () => {
                 setLoading(true);
                 await onPressAccept(trip?.tripReference);
+                setModalInDriver(false);
                 setLoading(false);
               }}
             >
-              <TextDescription color={theme.colors.secondary}>
-                {translate('trip.acccept')}
-              </TextDescription>
+              {loading ? (
+                <ActivityIndicator size="small" color={theme.colors.secondary} />
+              ) : (
+                <TextDescription color={theme.colors.secondary}>
+                  {translate('trip.acccept')}
+                </TextDescription>
+              )}
             </ButtonAction>
           </View>
         </Footer>

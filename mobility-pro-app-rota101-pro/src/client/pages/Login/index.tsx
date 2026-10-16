@@ -88,6 +88,7 @@ export default function Login() {
     generalSettings,
     authenticateLogin,
     loading,
+    setLoading,
   } = useAuth();
 
 
@@ -148,8 +149,12 @@ export default function Login() {
           password,
           keyAppPartner: appPartnerSelected?.key ?? undefined,
         });
-      } catch (error) {
-        console.error(error);
+      } catch (error: any) {
+        console.error('Erro ao realizar login:', error);
+        customToast(
+          error?.response?.data?.message || error?.message || 'Erro ao realizar login.',
+          'danger',
+        );
       }
     },
     [betaEnd, isBeta, authenticateLogin, appPartnerSelected],

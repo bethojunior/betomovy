@@ -9,6 +9,15 @@ export default class Helper {
     return regex.test(email);
   }
 
+  static getTollIds(tolls) {
+    if (!tolls || !Array.isArray(tolls)) {
+      return [];
+    }
+    return tolls.map(toll =>
+      typeof toll === 'object' && toll.id ? toll.id : toll,
+    );
+  }
+
   static maskMoney(value) {
     if (!value || value == 0 || value === undefined || value === Infinity) {
       return '0,00';
@@ -21,12 +30,12 @@ export default class Helper {
     }
     if (value === 0) return '0,00';
 
-    let number = value.toFixed(4).split('.');
+    let number = value.toFixed(4)?.split('.');
 
     number = parseFloat(`${number[0]}.${number[1].slice(0, 2)}`);
 
-    number = number.toFixed(2).split('.');
-    number[0] = number[0].split(/(?=(?:...)*$)/).join('.');
+    number = number.toFixed(2)?.split('.');
+    number[0] = number[0]?.split(/(?=(?:...)*$)/).join('.');
 
     if (isNegative) return `-${number.join(',')}`;
 
@@ -99,7 +108,7 @@ export default class Helper {
       }
     }
 
-    return "Desconhecida";
+    return 'Desconhecida';
   }
 
   static coinMoney = coin => {
@@ -120,7 +129,7 @@ export default class Helper {
     return `****${numberReplace}`;
   }
   static formatDateAndHour(date) {
-    const dateSplit = date.split(' ');
+    const dateSplit = date?.split(' ');
     return `${convertDate(dateSplit[0])} ${maskHour(dateSplit[1])}`;
   }
 
@@ -138,8 +147,7 @@ export default class Helper {
       discount = coupon.value;
     }
 
-    if (discount >= parseFloat(coupon.limitedTo))
-      discount = parseFloat(coupon.limitedTo);
+    if (discount >= parseFloat(coupon.limitedTo)) discount = parseFloat(coupon.limitedTo);
 
     let newValue = price - discount;
 
@@ -193,6 +201,7 @@ export default class Helper {
   }
 
   static maskNames(name) {
+    if (!name) return name;
     let value = name.split(' ');
     let lastIndex = value.length - 1;
     if (value.length > 2) {
@@ -207,22 +216,21 @@ export default class Helper {
   // Condicional para verificar se existe a chave enviada, e generalSettings.
 
   static generalSettingsActive = (generalSettings, key) => {
-    return (generalSettings?.find(
-      item => item?.key === key,
-    )?.value === '1' ? true : false)
-  }
+    const config =  generalSettings?.find(item => item?.key === key);
+    return Boolean(Number(config?.value || 0));
+  };
 
   static formatDateBr = date => {
     if (!date) {
       return '';
     }
     if (date.includes('/')) {
-      const [day, month, year] = date.split('/');
+      const [day, month, year] = date?.split('/');
       return `${day}/${month}/${year}`;
     } else if (date.length <= 0) {
       return '';
     } else {
-      const [day, month, year] = date.split('-');
+      const [day, month, year] = date?.split('-');
       return `${year}/${month}/${day}`;
     }
   };
@@ -242,41 +250,73 @@ export default class Helper {
       return '';
     }
     if (date.includes('/')) {
-      const [day, month, year] = date.split('/');
+      const [day, month, year] = date?.split('/');
       return `${year}/${month}/${day}`;
     } else if (date.length <= 0) {
       return '';
     } else {
-      const [day, month, year] = date.split('-');
+      const [day, month, year] = date?.split('-');
       return `${year}/${month}/${day}`;
     }
   };
 
   static formatDateApiDefault = date => {
     if (date.includes('/')) {
-      const [day, month, year] = date.split('/');
+      const [day, month, year] = date?.split('/');
       return `${year}-${month}-${day}`;
     } else if (date.length <= 0) {
       return '';
     } else {
-      const [day, month, year] = date.split('-');
+      const [day, month, year] = date?.split('-');
       return `${year}-${month}-${day}`;
     }
   };
 
   static generalSettingsValue = (generalSettings, key) => {
-    return (generalSettings?.find(
-      item => item?.key === key
-    )?.value)
-  }
-  
+    return generalSettings?.find(item => item?.key === key)?.value;
+  };
+
   static formatSecondsToDate(seconds) {
     const date = new Date(seconds * 1000);
 
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    const secondsFormatted = String(date.getSeconds()).padStart(2, '0');
 
-    return `${hours}:${minutes}:${secondsFormatted}`;
+    return `${hours}:${minutes}`;
+  }
+
+  static formatDateInput(inputValue) {
+    let cleanInput = inputValue.replace(/\D+/g, '');
+
+    let day = cleanInput.slice(0, 2);
+    let month = cleanInput.slice(2, 4);
+    let year = cleanInput.slice(4, 8);
+
+    if (cleanInput.length > 4) {
+      return `${day}/${month}/${year}`;
+    } else if (cleanInput.length > 2) {
+      return `${day}/${month}`;
+    } else {
+      return day;
+    }
+  }
+
+  static validateUrl(value) {
+    if (!value) return false;
+    return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(
+      value,
+    );
+  }
+
+  static normalizeSocketUrl(url) {
+    if (url.endsWith('/')) url = url.slice(0, -1);
+
+    const match = url.match(/^(https?:\/\/[^\/:]+)(:\d+)?/);
+    if (!match) return url;
+
+    const host = match[1];
+    const port = match[2] || '';
+
+    return host + port;
   }
 }

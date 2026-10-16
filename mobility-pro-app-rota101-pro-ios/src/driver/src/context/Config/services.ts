@@ -1,4 +1,5 @@
 import {customToast} from '../../../../utils/FlashMessage';
+import {translate} from '../../../../client/locales';
 import apiMainDriver from '../../api/apiMain';
 
 export const ConfigService = () => {
@@ -7,7 +8,7 @@ export const ConfigService = () => {
       const result = await apiMainDriver('TripPaymentForm/GetAll');
       return result.data;
     } catch (error) {
-      return customToast('erro ao carregar as formas de pagamento', 'danger');
+      return customToast(translate('configPage.text_payment_forms_load_error'), 'danger');
     }
   };
 

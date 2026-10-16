@@ -1,6 +1,6 @@
 import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
-import {Camera} from 'expo-camera';
+import {CameraView} from 'expo-camera';
 
 export const Container = styled.View`
   flex: 1;
@@ -41,7 +41,7 @@ export const CloseButton = styled.TouchableOpacity`
   justify-content: center;
 `;
 
-export const Cam = styled(Camera)`
+export const Cam = styled(CameraView)`
   flex: 1;
   align-items: center;
   justify-content: center;

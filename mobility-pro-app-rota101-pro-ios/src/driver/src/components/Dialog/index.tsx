@@ -1,8 +1,6 @@
 import {Dialog as DialoContent, Paragraph, Portal} from 'react-native-paper';
 import {translate} from '../../../../client/locales';
 import {styleDialog, ButtonDialog, TextButtonDialog} from './styles';
-import theme from '../../styles/theme';
-import { color } from 'react-native-reanimated';
 import { useTheme } from 'styled-components';
 
 interface DialogProps {

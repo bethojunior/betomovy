@@ -1,4 +1,3 @@
-import {shade} from 'polished';
 import styled from 'styled-components/native';
 
 interface PropsCard {
@@ -7,9 +6,13 @@ interface PropsCard {
 
 export const CardContent = styled.TouchableOpacity<PropsCard>`
   flex-direction: row;
+  align-items: center;
   border-radius: 10px;
-  background-color: ${({selected, theme}) =>
-    selected ? shade(0.05, theme.colors.primary) : theme.colors.primary};
+  background-color: ${({ selected, theme }) =>
+    selected ? theme.colors.primary : theme.colors.background_white};
+  border-width: 1.5px;
+  border-color: ${({ selected, theme }) =>
+    selected ? theme.colors.primary : theme.colors.grayBright};
   margin-bottom: 10px;
 `;
 
@@ -17,12 +20,12 @@ export const CardPaymentForm = styled.View`
   flex-direction: row;
   align-items: center;
   padding: 7px;
-  align-items: center;
 `;
 
-export const TextPaymentType = styled.Text`
+export const TextPaymentType = styled.Text<PropsCard>`
   margin-left: 10px;
-  color: ${({theme}) => theme.colors.primaryText};
+  color: ${({ selected, theme }) =>
+    selected ? theme.colors.primaryText : theme.colors.secondary};
 `;
 
 export const Icon = styled.Image`

@@ -3,4 +3,5 @@ export interface AppUpdateModalProps {
   title: string;
   description: string;
   onPressUpdate: () => void;
+  onClose?: () => void;
 }

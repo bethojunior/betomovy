@@ -144,7 +144,7 @@ function OptionQuantity(props) {
           }}
         >
           <Icon
-            name="ios-remove"
+            name="remove"
             color={Colors.PRIMARY}
             size={30}
             style={{padding: 5}}
@@ -168,7 +168,7 @@ function OptionQuantity(props) {
         }}
       >
         <Icon
-          name="ios-add"
+          name="add"
           color={isLimit ? theme.colors.white_light : Colors.PRIMARY}
           size={30}
           style={{padding: 5}}

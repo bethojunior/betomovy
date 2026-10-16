@@ -17,6 +17,14 @@ export const PaymentFormService = {
     return apiMain.post('VoucherPurchase/CustomerInsert', data);
   },
 
+  addVoucherByPix: (data: any) => {
+    return apiMain.post('VoucherPurchase/PurchaseByPix', data);
+  },
+
+  verifyPaymentByPix: (data: any) => {
+    return apiMain.post('VoucherPurchase/Show', data);
+  },
+
   listCoupom: () => {
     return apiMain('DiscountCoupon/FindActivated');
   },

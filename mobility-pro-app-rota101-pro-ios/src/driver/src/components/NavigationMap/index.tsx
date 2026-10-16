@@ -1,193 +1,88 @@
 import {
   forwardRef,
   memo,
+  useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import {Map} from '../Map';
-import MapView, {
-  Marker,
-  MarkerAnimated,
-  Polygon,
-  Polyline,
-} from 'react-native-maps';
-import {If} from '../If';
-import Helper from '../../utils/Helper';
-import {useTripProvider} from '../../context/Trip';
-import {useAuth} from '../../../../context/auth';
-import {useLocalProvider} from '../../context/local';
-import {Platform, View, Image} from 'react-native';
-import {useZoneDynamic} from '../../context/ZoneDynamic';
-import {useConfigLocal} from '../../context/ConfigLocal';
-import {ContainerMultiplier} from '../../pages/Home/styles';
-import {TextEdit} from '../TextEdit';
-import theme from '../../styles/theme';
+import { Map } from '../Map';
+import MapView, { AnimatedRegion, MapMarker, Marker } from 'react-native-maps';
+import { View } from 'react-native';
+import { If } from '../If';
+import { useTripProvider } from '../../context/Trip';
+import { useAuth } from '../../../../context/auth';
+import { useLocalProvider } from '../../context/local';
+import { useZoneDynamic } from '../../context/ZoneDynamic';
 import {
   calculateDistanceFromLatLonInMeters,
-  calculateHeading,
+  calculateBearing,
 } from '../../../../client/utils/position';
-import {NavigationMapConfig} from '../../../constants/map';
-import {MapService} from '../Map/services';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useLocal} from '../../hooks/location';
-import DriverMarker from '../DriverMarker';
-import {MapSettingComponent, useMapSettings} from '../MapSettings';
-import {useNetwork} from '../../../../context/ConfigGlobal';
-import {useDriversNears} from '../../../../context/driversNears';
-import {PolylineChildren} from '../PolylineChildren';
-import FastImage from 'react-native-fast-image';
+import { NavigationMapConfig } from '../../../constants/map';
+import { MapSettingComponent, useMapSettings } from '../MapSettings';
+import { DriverPositionMarker } from './DriverPositionMarker';
+import { ZonesDynamicMarkers } from './ZonesDynamicMarkers';
+import { LocationObject } from 'expo-location';
+import { ILocation } from '~/interfaces/location';
+import { PolylineComponent } from '../PolylineComponent';
+import { useDevTools, SIMULATION_ROUTE } from '../../context/DevTools';
+import { NavigationPolyline } from '../../../../client/components/NavigationPolyline';
 
-enum MapType {
-  standard = 'standard',
-  satellite = 'satellite',
-  hybrid = 'hybrid',
-  terrain = 'terrain',
-  none = 'none',
-  mutedStandard = 'mutedStandard',
-}
+const MAX_POINTS = 10;
+
+const zoomToAltitude = (zoom: number) => Math.max(400, 35200000 / Math.pow(2, zoom));
 
 type NavigationMapProps = {
   onPress?: () => void;
-  mapType: MapType;
-  setMapType: (map: any) => void;
 };
+
 export type NavigationMapRef = {
   map: MapView;
   handleMyLocation: (isInTrip: boolean) => void;
-  toggleMapType: (mapNow: string) => void;
   visibleConfigMap: () => void;
-};
-type AnimationStateRef = {
-  current: boolean;
-  timeoutId?: NodeJS.Timeout;
-};
-const MapAnimation = ({
-  onUpdateLocation,
-  onMarkerRef,
-  markerRotate,
-  markerSize,
-}) => {
-  const {location} = useLocal();
-  const {location: cacheLocal} = useLocalProvider();
-
-  const {
-    stateTrip,
-    calculateAndDisplayRoute,
-    // sendPosition,
-  } = useTripProvider();
-  const {tripAccepted} = stateTrip;
-
-  const {itsNetwork} = useNetwork();
-  //@TODO - REMOVER
-  const calculateRoute = (condition = false) => {
-    if (
-      tripAccepted &&
-      Object.keys(tripAccepted).length !== 0 &&
-      itsNetwork &&
-      location?.coords?.latitude &&
-      tripAccepted?.tripCallType &&
-      tripAccepted?.tripCallType !== 'CHAMADA TAXÍMETRO'
-    ) {
-      calculateAndDisplayRoute(
-        tripAccepted?.origin,
-        tripAccepted?.destination,
-        {
-          lat: location?.coords?.latitude,
-          lng: location?.coords?.longitude,
-        },
-        condition,
-      );
-    }
-  };
-
-  useEffect(() => {
-    if (!location?.coords?.latitude) {
-    } else {
-      if (onUpdateLocation) onUpdateLocation(location);
-      //@TODO - REMOVER
-
-      // calculateRoute();
-      // if (location?.coords) sendPosition(location.coords);
-    }
-  }, [location]);
-
-  return (
-    <If condition={location?.coords?.latitude || cacheLocal?.coords?.latitude}>
-      <DriverMarker
-        latitude={
-          Platform.OS === 'ios'
-            ? location?.coords?.latitude
-            : cacheLocal?.coords?.latitude
-        }
-        longitude={
-          Platform.OS === 'ios'
-            ? location?.coords?.longitude
-            : cacheLocal?.coords?.longitude
-        }
-        onMarkerRef={onMarkerRef}
-        markerSize={markerSize}
-        markerRotate={markerRotate}
-      />
-    </If>
-  );
+  zoomToMapMarker: (zoom?: number) => void;
 };
 
-const NavigationMapComponent = forwardRef<NavigationMapRef, NavigationMapProps>(
+type AnimationStateRef =
+  | { active: true; timeoutId: NodeJS.Timeout }
+  | { active: false; timeoutId: null };
+
+const NavigationMap = forwardRef<NavigationMapRef, NavigationMapProps>(
   (props, ref) => {
-    const {onPress, mapType, setMapType} = props;
-    const [itsDay, setItsDay] = useState(false);
-    const timeoutRef = useRef<any>(null);
+    const { onPress } = props;
+
     const mapRef = useRef<MapView>(null);
-    const isTouchMapRef = useRef<boolean>(false);
-    const isAnimationMap = useRef<AnimationStateRef>({current: false});
-    const markerRef = useRef<MarkerAnimated>(null);
-    const [markerRotate, setMarkerRotate] = useState<number>(0);
-    const [configMap, setConfigMap] = useState<boolean>(false);
+    const markerRef = useRef<MapMarker>(null);
+    const isTouchMapRef = useRef(false);
+    const isAnimationMap = useRef<AnimationStateRef>({ active: false, timeoutId: null });
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const lastLocation = useRef<LocationObject | null>(null);
+    const lastPosition = useRef({ latitude: 0, longitude: 0 });
+    const lastRotation = useRef(0);
+    const isMountedRef = useRef(true);
 
-    const {generalSettings, cityConfig} = useAuth();
-    const {location} = useLocalProvider();
-    if (!location?.coords?.latitude) return null;
-    const lastLocation = useRef({});
+    const animatedLocations = useRef<ILocation[]>([]);
 
-    const {zonesDynamic} = useZoneDynamic();
+    const [configMap, setConfigMap] = useState(false);
 
-    const lastPosition = useRef({
-      latitude: 0,
-      longitude: 0,
-    });
+    const { location } = useLocalProvider();
+    const { zonesDynamic } = useZoneDynamic();
+    const { cityConfig } = useAuth();
+    const { stateTrip: { tripAccepted } } = useTripProvider((context) => context);
+    const { simulation } = useDevTools();
+    const isSimulatingRef = useRef(false);
+    isSimulatingRef.current = simulation.active;
 
-    const lastRotation = useRef<number>(0);
-
-    const {getDriversOnline, driversNears} = useDriversNears();
-
-    useEffect(() => {
-      if (location?.coords?.latitude) {
-        getDriversOnline(
-          Number(location?.coords?.latitude),
-          Number(location?.coords?.longitude),
-        );
-      }
-    }, []);
-
-    useImperativeHandle(
-      ref,
-      () => ({
-        map: mapRef.current,
-        handleMyLocation: () => {
-          isTouchMapRef.current = false;
-          handleMyLocation(lastLocation.current, true);
-        },
-        toggleMapType,
-        visibleConfigMap,
-      }),
-      [],
+    const animatedCoordinate: any = useRef(
+      new AnimatedRegion({
+        latitude: location?.coords?.latitude ?? 0,
+        longitude: location?.coords?.longitude ?? 0,
+        latitudeDelta: 0,
+        longitudeDelta: 0,
+      })
     );
-
-    const {
-      states: {secondsToRedirect, showConfigMap},
-    } = useConfigLocal();
 
     const {
       speedToMoveCamera,
@@ -203,152 +98,197 @@ const NavigationMapComponent = forwardRef<NavigationMapRef, NavigationMapProps>(
       distanceMap,
     } = useMapSettings();
 
-    const {
-      stateTrip: {tripAccepted},
-    } = useTripProvider();
+    const inTrip = useMemo(() => Object.keys(tripAccepted || {}).length > 0, [tripAccepted]);
 
-    const inTrip = Object.keys(tripAccepted).length > 0;
-
-    const getHourToDayOrNight = () => {
-      const date = new Date();
-      const hour = date.getHours();
-      const hourNow = hour > 6 && hour < 18 ? true : false;
-      const conditionalSettings =
-        generalSettings?.find(item => item?.key === 'enable_map_dark_driver')
-          ?.value === '1'
-          ? hourNow
-          : true;
-      return conditionalSettings;
-    };
-
-    const handleMyLocation = (
-      location,
-      init: boolean = false,
-      animationCamera: boolean = true,
-    ) => {
-      if (isAnimationMap.current?.current) return;
-      if (!mapRef?.current?.animateCamera) return;
-      if (!location?.coords?.latitude) return;
-
-      const meters = calculateDistanceFromLatLonInMeters(
-        lastPosition.current,
-        location.coords,
-      );
-
-      if (!init && meters < metersToMoveCamera) return;
-
-      if (
-        location?.coords?.speed >= speedToMoveCamera &&
-        meters >= metersToMoveCamera
-      ) {
-        const nextEx =
-          360 - calculateHeading(lastPosition.current, location?.coords);
-        const next = location?.coords?.heading
-          ? location?.coords?.heading
-          : nextEx;
-        if (!animationCamera) {
-          mapRef.current.getCamera().then(({heading}) => {
-            setMarkerRotate(!animationCamera ? next - heading : 0);
-          });
-        } else {
-          setMarkerRotate(0);
-        }
-
-        lastRotation.current = next;
-      }
-
-      if (animationCamera) {
-        mapRef?.current?.animateCamera(
-          {
-            zoom: (inTrip ? zoomInTrip : zoomOutTrip) || 12,
-            center: {
-              latitude: location?.coords?.latitude,
-              longitude: location?.coords.longitude,
-            },
-            // pitch: (inTrip ? pitch : outPitch) || 60,
-            pitch: 0,
-            heading: lastRotation.current,
-          },
-          {duration: NavigationMapConfig.duration},
-        );
-      }
-
-      // animateMarkerToCoordinate, so funciona no Android
-      if (
-        markerRef?.current &&
-        Platform?.OS !== 'ios' &&
-        location?.coords?.latitude
-      ) {
-        if (isAnimationMap.current.timeoutId) {
-          clearTimeout(isAnimationMap.current.timeoutId);
-        }
-
-        markerRef?.current?.animateMarkerToCoordinate(
-          {
-            latitude: location?.coords?.latitude,
-            longitude: location?.coords.longitude,
-          },
-          NavigationMapConfig.duration,
-        );
-
-        isAnimationMap.current.current = true;
-
-        isAnimationMap.current.timeoutId = setTimeout(() => {
-          isAnimationMap.current.current = false;
-        }, NavigationMapConfig.duration);
-      }
-
-      lastPosition.current = location?.coords;
-    };
-
-    const toggleMapType = async (mapNow: string) => {
-      const type = MapService.switchMapType(mapNow as MapType);
-      setMapType(type);
-      await AsyncStorage.setItem('mapType', type);
-    };
-
-    const visibleConfigMap = () => {
-      setConfigMap(!configMap);
-    };
-
-    useEffect(() => {
-      setItsDay(getHourToDayOrNight());
+    const moveMarker = useCallback((lat: number, lng: number) => {
+      animatedCoordinate.current.timing({
+        latitude: lat,
+        longitude: lng,
+        duration: NavigationMapConfig.duration,
+        useNativeDriver: false,
+      }).start();
     }, []);
+
+    const handleMyLocation = useCallback(
+      (location: LocationObject | null, init = false, animationCamera = true) => {
+        if (!isMountedRef.current || !location || !location?.coords || !mapRef.current) {
+          return;
+        }
+
+        const meters = calculateDistanceFromLatLonInMeters(
+          lastPosition.current,
+          location.coords
+        );
+
+        if (!init && meters < metersToMoveCamera) return;
+
+        // iOS: CLLocation returns speed=-1 and heading=-1 when values are unavailable
+        const speed = location.coords.speed < 0 ? speedToMoveCamera : location.coords.speed;
+        if (speed >= speedToMoveCamera && meters >= metersToMoveCamera) {
+          const nextEx = calculateBearing(lastPosition.current, location.coords);
+          const rawHeading = location.coords.heading;
+          const next = rawHeading != null && rawHeading >= 0 ? rawHeading : nextEx;
+          lastRotation.current = next;
+        }
+
+        if (animationCamera && mapRef.current) {
+          try {
+            const zoom = (inTrip || isSimulatingRef.current) ? zoomInTrip : zoomOutTrip || 12;
+
+            mapRef.current.animateCamera(
+              {
+                zoom,
+                altitude: zoomToAltitude(zoom),
+                center: {
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude,
+                },
+                pitch: 0,
+                heading: lastRotation.current,
+              },
+              { duration: NavigationMapConfig.duration }
+            );
+          } catch (error) {
+            // Ignore errors if map is being destroyed
+            console.log('Map animation error:', error);
+          }
+        }
+
+        const canAnimate = animatedLocations.current.length >= 2;
+
+        if (canAnimate) {
+          if (isAnimationMap.current.timeoutId) {
+            clearTimeout(isAnimationMap.current.timeoutId);
+          }
+
+          moveMarker(location.coords.latitude, location.coords.longitude);
+
+          isAnimationMap.current = {
+            active: true,
+            timeoutId: setTimeout(() => {
+              isAnimationMap.current = { active: false, timeoutId: null };
+            }, NavigationMapConfig.duration),
+          };
+        } else {
+          animatedCoordinate.current.setValue({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0,
+            longitudeDelta: 0,
+          } as any);
+        }
+
+        lastPosition.current = location.coords;
+      },
+      [speedToMoveCamera, zoomInTrip, metersToMoveCamera, zoomOutTrip, inTrip]
+    );
+
+
+    const visibleConfigMap = useCallback(() => setConfigMap(prev => !prev), []);
+    const visibleDynamicMap = useMemo(() => cityConfig?.showDynamicAreaInMap === '1', [cityConfig]);
+
+    const handleAnimatedLocations = (coords: ILocation) => {
+      if (!coords?.latitude || !coords?.longitude) return;
+
+      const list = animatedLocations.current;
+
+      list.push(coords);
+
+      if (list.length > MAX_POINTS) {
+        list.splice(0, list.length - MAX_POINTS);
+      }
+    };
+
+    const zoomToMapMarker = (zoom?: number) => {
+      if (!lastLocation.current?.coords || !mapRef.current) return;
+
+      const zoomLevel = zoom ?? (zoomInTrip || 13);
+      mapRef.current.animateCamera(
+        {
+          zoom: zoomLevel,
+          altitude: zoomToAltitude(zoomLevel),
+          center: lastLocation.current.coords,
+          pitch: 0,
+          heading: lastRotation.current,
+        },
+        { duration: NavigationMapConfig.duration }
+      );
+    };
+
+    const onMapReady = () => {
+      handleMyLocation(lastLocation.current, true, true);
+    }
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        map: mapRef.current,
+        handleMyLocation: () => {
+          if (isMountedRef.current) {
+            isTouchMapRef.current = false;
+            handleMyLocation(lastLocation.current, true);
+          }
+        },
+        visibleConfigMap,
+        zoomToMapMarker,
+      }),
+      [visibleConfigMap, handleMyLocation],
+    );
 
     useEffect(() => {
       handleMyLocation(lastLocation.current, true, true);
-    }, [
-      speedToMoveCamera,
-      zoomInTrip,
-      pitch,
-      metersToMoveCamera,
-      saveSettingMap,
-      outPitch,
-      zoomOutTrip,
-      markerSize,
-      markerSizeOut,
-      polylineWidth,
-      distanceMap,
-    ]);
+    }, [handleMyLocation]);
 
-    const redirectToPoint = () => {
-      if (!timeoutRef.current) {
-        return (timeoutRef.current = setTimeout(() => {
+    const redirectToPoint = useCallback(() => {
+      if (!isMountedRef.current || (timeoutRef.current && isAnimationMap.current.active)) return;
+
+      timeoutRef.current = setTimeout(() => {
+        if (isMountedRef.current) {
           isTouchMapRef.current = false;
-          handleMyLocation(lastLocation.current, true);
-        }, 1000 * secondsToRedirect));
-      }
-    };
-    const clearMapTimeout = () => {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    };
+          handleMyLocation(lastLocation.current, true, true);
+        }
+        timeoutRef.current = null;
+      }, 3000);
+    }, [handleMyLocation]);
 
-    if (!location && !Object.keys(location).length) return <></>;
+    const clearMapTimeout = useCallback(() => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    }, []);
+
+    // Cleanup all timeouts and animations when component unmounts
+    useEffect(() => {
+      isMountedRef.current = true;
+
+      return () => {
+        isMountedRef.current = false;
+
+        // Clear all timeouts
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+
+        if (isAnimationMap.current.timeoutId) {
+          clearTimeout(isAnimationMap.current.timeoutId);
+          isAnimationMap.current = { active: false, timeoutId: null };
+        }
+
+        // Clear map ref to prevent operations on destroyed map
+        mapRef.current = null;
+      };
+    }, []);
+
+    const onDriverLocationUpdate = useCallback((location: LocationObject) => {
+      lastLocation.current = location;
+      handleAnimatedLocations(location.coords);
+      handleMyLocation(location, true, !isTouchMapRef.current);
+    }, [handleMyLocation]);
 
     return (
       <If condition={location?.coords?.latitude}>
-        {/* <If condition={showConfigMap}> */}
         <MapSettingComponent
           metersToMoveCamera={metersToMoveCamera}
           pitch={pitch}
@@ -364,129 +304,38 @@ const NavigationMapComponent = forwardRef<NavigationMapRef, NavigationMapProps>(
           visible={configMap}
           setVisible={setConfigMap}
         />
-        {/* </If> */}
+
         <Map
+          ref={mapRef}
           setCenterInBottom={inTrip}
           distanceMapBottom={distanceMap}
-          latitude={location?.coords?.latitude}
-          longitude={location?.coords?.longitude}
           onTouchMove={() => {
             isTouchMapRef.current = true;
             clearMapTimeout();
           }}
           onTouchEnd={redirectToPoint}
-          mapRef={ref => {
-            mapRef.current = ref;
-          }}
-          onMapLoaded={() => handleMyLocation(lastLocation.current, true)}
-          mapType={
-            mapType === 'terrain' && Platform?.OS === 'ios'
-              ? 'standard'
-              : mapType
-          }
+          onMapReady={onMapReady}
           setCountVisible={onPress}
         >
-          {driversNears &&
-            Object.keys(tripAccepted).length <= 0 &&
-            driversNears.length > 0 &&
-            driversNears.map((value, index) => {
-              return (
-                <Marker
-                  key={index}
-                  coordinate={{
-                    latitude: Number(value?.latitude),
-                    longitude: Number(value?.longitude),
-                  }}
-                >
-                  <FastImage
-                    style={{
-                      width: 30,
-                      height: 30,
-                    }}
-                    source={
-                      value.iconMapDriver === null
-                        ? require('../../../../client/assets/images/car.png')
-                        : {
-                            uri: value?.iconMapDriver,
-                          }
-                    }
-                    resizeMode={FastImage.resizeMode.contain}
-                  />
-                </Marker>
-              );
-            })}
-          <MapAnimation
-            onUpdateLocation={location => {
-              lastLocation.current = location;
-              handleMyLocation(location, true, !isTouchMapRef.current);
-            }}
-            onMarkerRef={ref => {
-              markerRef.current = ref;
-            }}
-            markerRotate={markerRotate}
-            markerSize={inTrip ? markerSize : markerSizeOut}
+          <DriverPositionMarker
+            ref={markerRef}
+            coordinate={animatedCoordinate.current}
+            onUpdateLocation={onDriverLocationUpdate}
           />
-          <PolylineChildren />
-          <If condition={cityConfig?.showDynamicAreaInMap === '1'}>
-            {zonesDynamic.length > 0 &&
-              zonesDynamic
-                .filter((item: any) => item.active === '1')
-                .map((item: any, index: number) => {
-                  return (
-                    <View key={item.id}>
-                      <Marker
-                        style={{
-                          zIndex: 1,
-                        }}
-                        coordinate={Helper.getLatLonCenterFromGeom(item.area)}
-                        onPress={() => {
-                          mapRef.current?.animateToRegion({
-                            latitude: Helper.getLatLonCenterFromGeom(item.area)
-                              .latitude,
-                            longitude: Helper.getLatLonCenterFromGeom(item.area)
-                              .longitude,
-                            latitudeDelta: 0.005,
-                            longitudeDelta: 0.005,
-                          });
-                        }}
-                      >
-                        <ContainerMultiplier>
-                          <TextEdit
-                            size="medium"
-                            color={theme.colors.background_global}
-                          >
-                            x{item?.multiplierValue}
-                          </TextEdit>
-                        </ContainerMultiplier>
-                      </Marker>
-                      <Polygon
-                        coordinates={item.area.map((item: any) => {
-                          return {
-                            latitude: item.lat,
-                            longitude: item.lng,
-                          };
-                        })}
-                        strokeWidth={1}
-                        fillColor={Helper.getFillColor(
-                          parseFloat(item?.multiplierValue),
-                        )}
-                        strokeColor={Helper.getFillColor(
-                          parseFloat(item?.multiplierValue),
-                        )}
-                      />
-                    </View>
-                  );
-                })}
-          </If>
+          <PolylineComponent />
+          {simulation.active && (
+            <>
+              <NavigationPolyline coordinates={SIMULATION_ROUTE.slice(simulation.index)} />
+              <Marker coordinate={SIMULATION_ROUTE[SIMULATION_ROUTE.length - 1]} anchor={{ x: 0.5, y: 1 }} />
+            </>
+          )}
+          {visibleDynamicMap && (
+            <ZonesDynamicMarkers zones={zonesDynamic} mapRef={mapRef} />
+          )}
         </Map>
       </If>
     );
   },
-);
-
-const NavigationMap = memo(
-  NavigationMapComponent,
-  (prevProps, nextProps) => prevProps.mapType === nextProps.mapType,
 );
 
 export default NavigationMap;

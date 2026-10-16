@@ -1,7 +1,7 @@
 // @ts-nocheck
 
-import {Linking} from 'expo';
-import React, {useEffect, useState} from 'react';
+import { Linking } from 'expo';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Image,
@@ -17,24 +17,24 @@ import * as Application from 'expo-application';
 import * as IntentLauncher from 'expo-intent-launcher';
 import apiMain from '../../api/apiMain';
 import localization from '../../assets/images/localization.png';
-import {useLocal} from '../../contexts/local';
+import { useLocal } from '../../contexts/local';
 
-import {translate} from '../../locales';
-import {styles} from './styles';
-import {useAuth} from '../../../context/auth';
+import { translate } from '../../locales';
+import { styles } from './styles';
+import { useAuth } from '../../../context/auth';
 
 export default function PermissionLocal(props) {
   const [visibleModal, setVisibleModal] = useState(false);
-  const {getPermissionLocal} = useAuth();
-  const {placeSelected, loading} = useLocal();
-  const {visible, onWithoutLocal} = props;
+  const { getPermissionLocal } = useAuth();
+  const { placeSelected, loading } = useLocal();
+  const { visible, onWithoutLocal } = props;
   const [terms, setTerms] = useState('');
 
   useEffect(() => {
     if (loading) {
       if (!placeSelected) {
         apiMain
-          .get('termsUsePolicy/findByType?type=customer')
+          .get('termsUsePolicy/findByType?type=partner')
           .then(response => {
             setTerms(response.data.data.description);
             setVisibleModal(visible);

@@ -1,12 +1,11 @@
-import {Controller} from 'react-hook-form';
-import {KeyboardTypeOptions, ReturnKeyType} from 'react-native';
-import {Feather} from '@expo/vector-icons';
-import {If} from '../../modules/GetLight/components/If';
+import { Controller } from 'react-hook-form';
+import { InputAccessoryView, KeyboardTypeOptions, ReturnKeyType } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
-import {Container, Content, Error} from './styles';
+import { Container, Content, Error } from './styles';
 import theme from '../../styles/theme';
 
-interface InputProps {
+interface InputProps extends React.ComponentProps<typeof Content> {
   placeholder: string;
   icon?: boolean;
   secureTextEntry?: boolean;
@@ -40,27 +39,29 @@ export function Input({
     <Controller
       name={name}
       control={control}
-      render={({field: {onChange, value}}) => (
+      defaultValue={""}
+      render={({ field: { onChange, value, onBlur, name, ref } }) => (
         <>
           <Container color={color}>
-            <If condition={icon === true}>
-              <Feather
-                name="mail"
-                size={21}
-                color={color ? color : theme.colors.primary}
-              />
-            </If>
+            {icon && <Feather
+              name="mail"
+              size={21}
+              color={color ? color : theme.colors.primary}
+            />}
+
             <Content
+              ref={ref}
               icon={icon}
               placeholder={placeholder}
               autoComplete="off"
               color={color}
               onChangeText={onChange}
+              onBlur={onBlur}
               secureTextEntry={secureTextEntry}
               keyboardType={keyboardType}
               returnKeyType="done"
               autoCapitalize="none"
-              value={value}
+              value={value ?? ""}
               maxLength={maxLength}
               {...rest}
             />

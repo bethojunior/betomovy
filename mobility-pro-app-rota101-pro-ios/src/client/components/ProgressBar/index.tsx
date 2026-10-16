@@ -22,7 +22,7 @@ export const ProgressBar = ({visible}: Props) => {
 
   let dateStart = new Date();
 
-  const difTime = cityConfig?.waitingTimeCustomerCancellationFee;
+  const difTime = cityConfig?.waitingTimeCustomerCancellationFee || '10';
 
   const calculatePercentTime = async () => {
     const max = (dateFinal.getTime() - dateStart.getTime()) / 1000;

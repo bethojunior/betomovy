@@ -19,8 +19,7 @@ export const MenuService = () => {
 
   const getLinkMenu = async () => {
     const {data} = await apiMain.get('menuApp/findByType?type=2');
-
-    if (!data.status || data?.data?.length === 0) {
+    if (!data.status) {
       return {};
     }
 
@@ -29,6 +28,6 @@ export const MenuService = () => {
 
   return {
     getMenuOptions,
-    getLinkMenu
+    getLinkMenu,
   };
 };

@@ -1,8 +1,8 @@
 // @ts-nocheck
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
-import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import {
   View,
   TouchableNativeFeedback,
@@ -12,17 +12,42 @@ import {
 import Icon from '@expo/vector-icons/FontAwesome5';
 import Colors from '../../components/Colors';
 import styleMap from '../../assets/styles/map.json';
-import {useLocal} from '../../contexts/local';
+import { useLocal } from '../../contexts/local';
 
-import {translate} from '../../locales';
-import {styles} from './styles';
-import {useAuth} from '../../../context/auth';
+import { translate } from '../../locales';
+import { styles } from './styles';
+import { useAuth } from '../../../context/auth';
 
-export default function LocalMap({route, navigation}) {
-  const {isGuest} = useAuth();
-  const {places, addPlaceSelected, updateListPlaces} = useLocal();
-  const {place} = route.params;
+export default function LocalMap({ route, navigation }) {
+  const { isGuest } = useAuth();
+  const { places, addPlaceSelected, updateListPlaces } = useLocal();
+  const { place } = route.params;
   const [position, setPosition] = useState(null);
+
+  const getValidLatitude = () => {
+    if (position?.latitude) return position.latitude;
+    const lat = parseFloat(place?.latitude);
+    return isNaN(lat) ? -14.235 : lat;
+  };
+
+  const getValidLongitude = () => {
+    if (position?.longitude) return position.longitude;
+    const lng = parseFloat(place?.longitude);
+    return isNaN(lng) ? -51.9253 : lng;
+  };
+
+  const latitude = getValidLatitude();
+  const longitude = getValidLongitude();
+
+  if (isNaN(latitude) || isNaN(longitude)) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ padding: 20, textAlign: 'center' }}>
+          {translate('localMap.error_invalid_coordinates') || 'Coordenadas inválidas'}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -31,16 +56,15 @@ export default function LocalMap({route, navigation}) {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         region={{
-          latitude: position ? position.latitude : parseFloat(place.latitude),
-          longitude: position
-            ? position.longitude
-            : parseFloat(place.longitude),
-          latitudeDelta: position ? position.latitudeDelta : 0.0025,
-          longitudeDelta: position ? position.longitudeDelta : 0.0025,
+          latitude,
+          longitude,
+          latitudeDelta: position?.latitudeDelta || 0.0025,
+          longitudeDelta: position?.longitudeDelta || 0.0025,
         }}
         onRegionChangeComplete={result => {
           setPosition(result);
         }}
+        userInterfaceStyle="light"
       />
 
       <Icon
@@ -62,11 +86,11 @@ export default function LocalMap({route, navigation}) {
             navigation.goBack();
           }}
         >
-          <View style={{padding: 15, paddingHorizontal: 20, left: 0}}>
+          <View style={{ padding: 15, paddingHorizontal: 20, left: 0 }}>
             <Icon name="angle-left" size={30} color={Colors.PRIMARY} />
           </View>
         </TouchableOpacity>
-        <View style={{marginRight: 25, paddingRight: 25}}>
+        <View style={{ marginRight: 25, paddingRight: 25 }}>
           <Text style={styles.simpleAddress}>{place.address}</Text>
           <Text style={styles.fullName}>{place.neighborhood || ''}</Text>
         </View>
@@ -75,8 +99,8 @@ export default function LocalMap({route, navigation}) {
         <TouchableNativeFeedback
           onPress={() => {
             const positionSelected = position || {
-              latitude: parseFloat(place.latitude),
-              longitude: parseFloat(place.longitude),
+              latitude: getValidLatitude(),
+              longitude: getValidLongitude(),
             };
 
             if (isGuest) {

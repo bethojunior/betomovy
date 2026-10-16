@@ -1,5 +1,5 @@
 import ModalFrame from '../Modal/ModalFrame';
-import {TextEdit} from '../TextEdit';
+import { TextEdit } from '../TextEdit';
 import SvgQRCode from 'react-native-qrcode-svg';
 import {
   Header,
@@ -10,14 +10,14 @@ import {
   TitleHeader,
 } from './styles';
 import theme from '../../../../client/styles/theme';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {useEffect, useState} from 'react';
-import {useAuth} from '../../../../context/auth';
-import {useUserDriver} from '../../context/userDriver';
-import {View} from 'react-native';
-import {translate} from '../../../../client/locales';
-import {useTripProvider} from '../../context/Trip';
-import {useLocal} from '../../hooks/location';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../../../context/auth';
+import { useUserDriver } from '../../context/userDriver';
+import { View } from 'react-native';
+import { translate } from '../../../../client/locales';
+import { useTripProvider } from '../../context/Trip';
+import { useLocal } from '../../hooks/location';
 
 interface Props {
   setVisible?: (value: boolean) => void;
@@ -32,7 +32,9 @@ export const ModalDoorHandle = ({
 }: Props) => {
   const {generalSettings} = useAuth();
   const {userDriverFind} = useUserDriver();
-  const {postPerOrigin} = useTripProvider();
+  const postPerOrigin: any = useTripProvider(
+    (context: any) => context.postPerOrigin,
+  );
   const {location} = useLocal();
 
   const [link, setLink] = useState<string>('');
@@ -68,7 +70,7 @@ export const ModalDoorHandle = ({
         </Header>
         <ContainerQrCode>
           <SvgQRCode
-            logo={{uri: theme?.images?.logo}}
+            logo={{ uri: theme?.images?.logo }}
             value={link || 'https://teste.com'}
             size={RFValue(200)}
           />
@@ -81,7 +83,7 @@ export const ModalDoorHandle = ({
         <View>
           <TextEdit
             size="small"
-            transform="uppercase"
+            change="uppercase"
             color={theme.colors.primary}
           >
             {translate('doorHandle.or')}
@@ -95,7 +97,7 @@ export const ModalDoorHandle = ({
         >
           <TextEdit
             size="small"
-            transform="uppercase"
+            change="uppercase"
             color={theme.colors.primary}
           >
             {translate('doorHandle.open_manuel_trip')}

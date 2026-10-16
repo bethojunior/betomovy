@@ -1,47 +1,40 @@
-import {RFValue} from 'react-native-responsive-fontsize';
+import { RFValue } from 'react-native-responsive-fontsize';
 import {
-  SimpleLineIcons,
+  Feather,
   MaterialIcons,
   FontAwesome,
-  Foundation,
 } from '@expo/vector-icons';
-import {TextEdit} from '../TextEdit';
+import { TextEdit } from '../TextEdit';
 import {
   BackPage,
   Border,
   Container,
   ContainerButton,
-  ContainerIcon,
+  ButtonIcon,
   Content,
   ContentPrice,
   ContentTaximeter,
   ContentTime,
   Header,
-  Icon,
   TextPrice,
   TextTitle,
   Button,
-  InfoButton,
   TitleContainer,
 } from './styles';
 import theme from '../../../../client/styles/theme';
 import Helper from '../../utils/Helper';
-import {useAuth} from '../../../../context/auth';
-import {If} from '../If';
+import { useAuth } from '../../../../context/auth';
+import { If } from '../If';
 import Collapse from '../../../../client/components/Collapse';
 import Skeleton from '../../../../common/Skeleton';
-import {View, Text, Alert} from 'react-native';
-import {SwalAlert} from '../../../../client/components/SwalAlert';
-import {useState} from 'react';
-import {translate} from '../../../../client/locales';
+import { translate } from '../../../../client/locales';
 
 const ViewTaximeterComponent = ({
-  heightContainer,
+  expanded,
   priceTaximeter,
   handleOnLayout,
-  tripTaximeter,
   onClose,
-  kmRef,
+  km,
   countMinute,
   loading,
   isPause,
@@ -49,39 +42,23 @@ const ViewTaximeterComponent = ({
   handlePause,
   handleStop,
   dataPrices,
-  lastKm,
-  setVisible,
 }: any) => {
-  const {cityConfig} = useAuth();
+  const { cityConfig } = useAuth();
 
   return (
     <Container>
+      <ButtonIcon onPress={handleOnLayout}>
+        <Feather
+          name={expanded ? 'chevron-down' : 'chevron-up'}
+          size={RFValue(24)}
+          color={theme.colors.primaryText}
+        />
+      </ButtonIcon>
+
       <Header>
-        <ContainerIcon
-          style={{
-            marginBottom: priceTaximeter === 0 ? 20 : 0,
-          }}
-          onPress={() => handleOnLayout()}
-          activeOpacity={0.8}
-        >
-          <Icon>
-            <SimpleLineIcons
-              name={heightContainer ? 'arrow-down' : 'arrow-up'}
-              size={RFValue(15)}
-              color={theme.colors.primaryText}
-            />
-          </Icon>
-        </ContainerIcon>
         <If condition={priceTaximeter === 0}>
           <TitleContainer>
-            <BackPage
-              onPress={() => {
-                if (tripTaximeter && Object.keys(tripTaximeter).length > 0) {
-                  return;
-                }
-                onClose();
-              }}
-            >
+            <BackPage onPress={onClose}>
               <MaterialIcons
                 name="keyboard-arrow-left"
                 size={RFValue(30)}
@@ -91,9 +68,6 @@ const ViewTaximeterComponent = ({
             <TextEdit>{translate('taximeter.title')}</TextEdit>
           </TitleContainer>
         </If>
-        <InfoButton onPress={() => setVisible(true)}>
-          <Foundation name="info" size={RFValue(25)} color="black" />
-        </InfoButton>
       </Header>
       <ContentTaximeter>
         {priceTaximeter ? (
@@ -106,8 +80,8 @@ const ViewTaximeterComponent = ({
             </ContentPrice>
             <ContentTime>
               <TextEdit size="large" color={theme.colors.background_global}>
-                km: {(kmRef?.current + lastKm)?.toFixed(2)}km - tempo:{' '}
-                {countMinute.current}min
+                km: {Number(km)?.toFixed(2)}km - Tempo:{' '}
+                {countMinute}min
               </TextEdit>
             </ContentTime>
           </>
@@ -117,17 +91,17 @@ const ViewTaximeterComponent = ({
           </TextEdit>
         )}
       </ContentTaximeter>
-      <Collapse open={heightContainer}>
+      <Collapse open={expanded}>
         <Content>
           <Border>
             <TextTitle>Tarifas</TextTitle>
           </Border>
           <Skeleton
             loading={loading}
-            height={15}
-            mv={theme.spacing.small / 2}
-            width={100}
-            circle={5}
+            height={theme.fontSizes.small}
+            width={"100%"}
+            mv={theme.spacing.small}
+            circle={2}
           >
             <Content>
               <TextEdit size="small" color={theme.colors.secondary}>
@@ -155,7 +129,7 @@ const ViewTaximeterComponent = ({
 
             <Button
               onPress={handlePause}
-              disabled={isPause || priceTaximeter === 0}
+              disabled={loading || isPause || priceTaximeter === 0}
             >
               <FontAwesome
                 name="pause"

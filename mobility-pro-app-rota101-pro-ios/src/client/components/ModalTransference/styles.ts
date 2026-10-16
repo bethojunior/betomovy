@@ -7,8 +7,9 @@ import themeCss from '../../styles/theme';
 
 interface TextProps {
   color?: string;
-  size?: 'small' | 'smalls' | 'medium' | 'large';
-  transform?: string;
+  size?: 'small' | 'smalls' | 'medium' | 'large' | 'xlarge';
+  change?: string;
+  fontWeight?: 'bold' | 'normal';
 }
 
 export const ContainerModal = styled.KeyboardAvoidingView`
@@ -39,7 +40,8 @@ export const Content = styled.View`
 `;
 
 export const Text = styled.Text<TextProps>`
-  text-transform: ${props => props.transform || 'none'};
+  text-transform: ${props => props.change || 'none'};
+  font-weight: ${props => props.fontWeight || 'normal'};
   font-size: ${({size}) => {
     switch (size) {
       case 'small':
@@ -50,6 +52,8 @@ export const Text = styled.Text<TextProps>`
         return `${themeCss.fontSizes.medium}px`;
       case 'large':
         return `${themeCss.fontSizes.large}px`;
+      case 'xlarge':
+            return `${themeCss.fontSizes.xlarge}px`;
       default:
         return `${themeCss.fontSizes.medium}px`;
     }

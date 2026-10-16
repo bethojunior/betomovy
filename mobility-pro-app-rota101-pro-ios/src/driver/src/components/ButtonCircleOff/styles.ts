@@ -17,7 +17,7 @@ interface TextProps {
 
 export const Container = styled(TouchableOpacity)<ButtonProps>`
   background-color: ${({enabled, theme}) =>
-    enabled ? theme.colors.off : shade(0.6, theme.colors.primaryText)};
+    enabled ? theme.colors.off : '#000'};
   border-radius: ${RFValue(50)}px;
   margin-top: 10px;
   height: ${RFValue(90)}px;
@@ -43,9 +43,7 @@ export const Text = styled.Text<TextProps>`
     enabled ? theme.colors.white : theme.colors.button_text_disabled};
   font-family: ${({theme}) => theme.fonts.regular};
 `;
-export const Loading = styled.ActivityIndicator`
-  margin-left: ${RFValue(10)}px;
-`;
+export const Loading = styled.ActivityIndicator``;
 
 export const styles = StyleSheet.create({
   shadow: {

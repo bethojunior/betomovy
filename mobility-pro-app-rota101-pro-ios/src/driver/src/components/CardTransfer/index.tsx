@@ -1,5 +1,6 @@
-import {LastTransactionProps} from '../../context/bank/types';
-import {moneyMask} from '../../utils/money';
+import { translate } from '../../../../client/locales';
+import { LastTransactionProps } from '../../context/bank/types';
+import { moneyMask } from '../../utils/money';
 import {
   Ball,
   ContainerCard,
@@ -8,6 +9,7 @@ import {
   ContainerValue,
   P,
   TextAddress,
+  TextObservation,
 } from './styles';
 
 interface Props {
@@ -16,7 +18,7 @@ interface Props {
   background?: string;
 }
 
-export const CardTransfer = ({color, data, background}: Props) => {
+export const CardTransfer = ({ color, data, background }: Props) => {
   return (
     <ContainerCard background={background}>
       <ContainerCardLeft>
@@ -24,6 +26,15 @@ export const CardTransfer = ({color, data, background}: Props) => {
         <ContainerTypeAndDate>
           <P>{data?.date}</P>
           <TextAddress>{data?.summary}</TextAddress>
+          {!!data?.reason && (
+            <TextAddress>{data?.reason}</TextAddress>
+          )}
+          {!!data?.observation && (
+            <TextObservation>
+              {translate('driver_extract.detailing')}
+              {data?.observation}
+            </TextObservation>
+          )}
         </ContainerTypeAndDate>
       </ContainerCardLeft>
 

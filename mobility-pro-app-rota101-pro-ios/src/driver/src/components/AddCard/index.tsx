@@ -1,46 +1,95 @@
-import {FC, useCallback, useState} from 'react';
-import {yupResolver} from '@hookform/resolvers/yup';
-import {useForm} from 'react-hook-form';
-import {TextInputMask} from 'react-native-masked-text';
-import {Platform} from 'react-native';
-import {Group, SubGroup, Label} from './styles';
-import {schema} from './schema';
+import React, { FC, useState, useMemo, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { Platform, Text, View, Modal, TouchableOpacity } from 'react-native';
+import {
+  Group,
+  SubGroup,
+  Label,
+  CardMock,
+  CardIconWrapper,
+  CardIconTextWrapper,
+  CardInfoWrapper,
+} from './styles';
 import Input from '../form/InputForm';
+import { translate } from '../../../../client/locales';
 import InputMask from '../form/InputFormMask';
-import ModalFrame from '../form/ModalFrame';
 import Preload from '../Preload';
-import {usePaymentForm} from '../../context/paymentForms';
-import {translate} from '../../../../client/locales';
+import { usePaymentForm } from '../../context/paymentForms';
+import { styles } from './styles';
+
+import IconElo from '../../../../../assets/icon-elo.svg';
+import IconMaster from '../../../../../assets/icon-mastercard.svg';
+import IconVisa from '../../../../../assets/icon-visa.svg';
+import IconAmex from '../../../../../assets/icon-amex.svg';
+import IconDiners from '../../../../../assets/icon-diners.svg';
+import IconHipercard from '../../../../../assets/icon-hipercard.svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Feather from '@expo/vector-icons/Feather';
+
+const cardIcons = {
+  elo: <IconElo width={40} height={40} />,
+  mastercard: <IconMaster width={40} height={40} />,
+  visa: <IconVisa width={40} height={40} />,
+  amex: <IconAmex width={40} height={40} />,
+  diners: <IconDiners width={40} height={40} />,
+  hipercard: <IconHipercard width={40} height={40} />,
+};
 
 interface Props {
   visible: boolean;
-  setVisible(boolean: boolean): void;
+  setVisible(visible: boolean): void;
   listCard: any;
   updateList: () => void;
+  onDismiss?: () => void;
 }
 
-interface FormData extends TextInputMask {
+interface FormData {
   cardHolder: string;
   document: string;
   cardNumber: string;
   dueDate: string;
-  cvv: number;
+  cvv: string;
   birthday: string;
 }
 
-const AddCard: FC<Props> = ({visible, setVisible, listCard, updateList}) => {
+const getCardType = (number: string) => {
+  const re = {
+    elo: /^((((636368)|(438935)|(504175)|(451416)|(636297))\d{0,10})|((5067)|(4576)|(4011))\d{0,12})$/,
+    mastercard: /^5[1-5][0-9]{14}$/,
+    visa: /^4[0-9]{12}(?:[0-9]{3})?$/,
+    amex: /^3[47][0-9]{13}$/,
+    diners: /^3(0[0-5]|[68]\d)\d{11}$/,
+    hipercard: /^(606282\d{10}(\d{3})?)|(3841\d{15})$/,
+  };
+
+  for (const [key, regex] of Object.entries(re)) {
+    if (regex.test(number)) return key;
+  }
+
+  return 'default';
+};
+
+const AddCard: FC<Props> = ({ visible, setVisible, listCard, updateList, onDismiss }) => {
   const [loading, setLoading] = useState(false);
 
-  const {addCard} = usePaymentForm();
+  const { addCard } = usePaymentForm();
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: {errors},
-  } = useForm<FormData>({
-    resolver: yupResolver(schema),
-  });
+    formState: { errors },
+    watch,
+  } = useForm<FormData>();
+
+  const cardHolder = watch('cardHolder', '');
+  const cardNumber = watch('cardNumber', '');
+  const dueDate = watch('dueDate', '');
+  const cvv = watch('cvv', '');
+  const cardType = useMemo(
+    () => getCardType(cardNumber.replace(/\s+/g, '')),
+    [cardNumber],
+  );
 
   const insertCard = useCallback(
     async (form: FormData) => {
@@ -49,106 +98,206 @@ const AddCard: FC<Props> = ({visible, setVisible, listCard, updateList}) => {
       } else {
         setLoading(true);
       }
-      const {cardHolder, document, cardNumber, dueDate, cvv, birthday} = form;
+      const { cardHolder, document, cardNumber, cvv, birthday } = form;
+      let { dueDate } = form;
 
-      await addCard(
-        listCard,
-        cardHolder,
-        document,
-        cardNumber,
-        dueDate,
-        String(cvv),
-        birthday,
-      );
+      if (dueDate && dueDate.length === 5 && dueDate.indexOf('/') === 2) {
+        const [month, year] = dueDate?.split('/');
+        if (year.length === 2) {
+          dueDate = `${month}/20${year}`;
+        }
+      }
+
+      await addCard(listCard, cardHolder, document, cardNumber, dueDate, cvv, birthday);
       setLoading(false);
       setVisible(false);
       reset();
       return updateList();
     },
-    [addCard],
+    [addCard, listCard, setVisible, reset, updateList]
   );
+
+  const closeModal = useCallback(() => {
+    setVisible(false);
+    reset();
+  }, [setVisible, reset]);
 
   return (
     <>
       <Preload visible={loading} />
-      <ModalFrame
+      <Modal
         visible={visible}
-        setVisible={setVisible}
-        onPressConfirm={handleSubmit(insertCard)}
-        error={false}
-        textError=""
-        onClose={() => {
-          setVisible(false);
-          reset();
-        }}
+        animationType="slide"
+        transparent
+        onRequestClose={closeModal}
+        onDismiss={onDismiss}
       >
-        <Label>{translate('paymentPage.title_holder')}</Label>
-        <Input
-          name="cardHolder"
-          control={control}
-          error={errors.cardHolder && errors.cardHolder.message}
-          keyboardType="default"
-        />
-        <Label>{translate('paymentPage.title_number_of_card')}</Label>
-        <InputMask
-          type="credit-card"
-          name="cardNumber"
-          control={control}
-          error={errors.cardNumber && errors.cardNumber.message}
-          keyboardType="numeric"
-        />
-        <Group>
-          <SubGroup>
-            <Label>{translate('paymentPage.title_document')}</Label>
-            <InputMask
-              type="cpf"
-              name="document"
-              control={control}
-              error={errors.document && errors.document.message}
-              keyboardType="numeric"
-            />
-          </SubGroup>
-          <SubGroup>
-            <Label>{translate('paymentPage.title_birth_date')}</Label>
-            <InputMask
-              type="datetime"
-              options={{
-                format: 'DD/MM/YYYY',
-              }}
-              name="birthday"
-              control={control}
-              error={errors.birthday && errors.birthday.message}
-              keyboardType="numeric"
-            />
-          </SubGroup>
-        </Group>
+        <SafeAreaView style={{ flexGrow: 1 }}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <CardMock>
+                <CardIconWrapper>
+                  {cardType !== 'default' ? (
+                    cardIcons[cardType]
+                  ) : (
+                    <IconMaster
+                      width={40}
+                      height={40}
+                      style={styles.placeholder}
+                    />
+                  )}
+                </CardIconWrapper>
+                <CardInfoWrapper>
+                  <CardIconTextWrapper>
+                    <Text
+                      style={[
+                        styles.cardFlagText,
+                        cardType === 'default' && styles.placeholder,
+                      ]}
+                    >
+                      {cardType !== 'default'
+                        ? cardType.charAt(0).toUpperCase() + cardType.slice(1)
+                        : 'Mastercard'}
+                    </Text>
+                  </CardIconTextWrapper>
+                </CardInfoWrapper>
+                <Text
+                  style={[styles.cardNumber, !cardNumber && styles.placeholder]}
+                >
+                  {cardNumber
+                    ? cardNumber.replace(/(\d{4})(?=\d)/g, '$1 ')
+                    : '0000 0000 0000 0000'}
+                </Text>
+                <View style={styles.cardDetails}>
+                  <View style={styles.cardHolderCvvWrapper}>
+                    <Text
+                      style={[
+                        styles.cardHolder,
+                        !cardHolder && styles.placeholder,
+                      ]}
+                    >
+                      {cardHolder || 'John Doe'}
+                    </Text>
+                    <View style={styles.cardCvvContainer}>
+                      <Text
+                        style={[
+                          styles.cardCvvLabel,
+                          !cvv && styles.placeholder,
+                        ]}
+                      >
+                        {translate('paymentPage.title_cvv')}:
+                      </Text>
+                      <Text
+                        style={[styles.cardCvv, !cvv && styles.placeholder]}
+                      >
+                        {cvv || '000'}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.cardExpiry}>
+                    <Text
+                      style={[
+                        styles.cardDueDate,
+                        !dueDate && styles.placeholder,
+                      ]}
+                    >
+                      {dueDate || 'MM/YY'}
+                    </Text>
+                  </View>
+                </View>
+              </CardMock>
 
-        <Group>
-          <SubGroup>
-            <Label>{translate('paymentPage.title_due_date')}</Label>
-            <InputMask
-              type="datetime"
-              options={{
-                format: 'MM/YYYY',
-              }}
-              name="dueDate"
-              control={control}
-              error={errors.dueDate && errors.dueDate.message}
-              keyboardType="numeric"
-            />
-          </SubGroup>
-          <SubGroup>
-            <Label>{translate('paymentPage.title_cvv')}</Label>
-            <Input
-              maxLength={4}
-              name="cvv"
-              control={control}
-              error={errors.cvv && errors.cvv.message}
-              keyboardType="numeric"
-            />
-          </SubGroup>
-        </Group>
-      </ModalFrame>
+              <Label>{translate('paymentPage.title_holder')}</Label>
+              <Input
+                name="cardHolder"
+                control={control}
+                error={errors.cardHolder?.message}
+                keyboardType="default"
+                placeholder={translate('paymentPage.placeholder_holder')}
+              />
+              <Label>{translate('paymentPage.title_number_of_card')}</Label>
+              <InputMask
+                type="credit-card"
+                name="cardNumber"
+                control={control}
+                error={errors.cardNumber?.message}
+                keyboardType="numeric"
+                placeholder="0000 0000 0000 0000"
+              />
+              <Group style={{ alignItems: 'flex-end' }}>
+                <SubGroup>
+                  <Label>{translate('paymentPage.title_document')}</Label>
+                  <InputMask
+                    type="cpf"
+                    name="document"
+                    control={control}
+                    error={errors.document?.message}
+                    keyboardType="numeric"
+                    placeholder="000.000.000-00"
+                  />
+                </SubGroup>
+                <SubGroup>
+                  <Label>{translate('paymentPage.title_birth_date')}</Label>
+                  <InputMask
+                    type="datetime"
+                    options={{ format: 'DD/MM/YYYY' }}
+                    name="birthday"
+                    control={control}
+                    error={errors.birthday?.message}
+                    keyboardType="numeric"
+                    placeholder="DD/MM/YYYY"
+                  />
+                </SubGroup>
+              </Group>
+              <Group style={{ alignItems: 'flex-end' }}>
+                <SubGroup>
+                  <Label>{translate('paymentPage.title_due_date')}</Label>
+                  <InputMask
+                    type="datetime"
+                    options={{ format: 'MM/YY' }}
+                    name="dueDate"
+                    control={control}
+                    error={errors.dueDate?.message}
+                    keyboardType="numeric"
+                    placeholder="MM/YY"
+                  />
+                </SubGroup>
+                <SubGroup>
+                  <Label>{translate('paymentPage.title_cvv')}</Label>
+                  <Input
+                    maxLength={4}
+                    name="cvv"
+                    control={control}
+                    error={errors.cvv?.message}
+                    keyboardType="numeric"
+                    placeholder="CVV"
+                  />
+                </SubGroup>
+              </Group>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={[styles.button, styles.cancelButton]}
+                  onPress={closeModal}
+                  disabled={loading}
+                >
+                  <Text style={[styles.buttonText, styles.cancelButtonText]}>
+                    {translate('dialog.cancel')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.confirmButton]}
+                  onPress={handleSubmit(insertCard)}
+                  disabled={loading}
+                >
+                  <Text style={[styles.buttonText, styles.confirmButtonText]}>
+                    {translate('dialog.confirm')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </SafeAreaView>
+      </Modal>
     </>
   );
 };

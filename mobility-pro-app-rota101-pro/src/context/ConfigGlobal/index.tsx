@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 import { NetworkPropsContext } from './types';
-import { Linking, View } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 import { NetWorkAlert } from '../NetWorkAlert';
 import { TargetAlert } from '../TargetAlert';
 import { If } from '../../client/components/If';
@@ -14,6 +14,25 @@ import { AppsId } from './constants';
 import { buildApp } from '../../constantBuild/config';
 
 export const ConfigGlobalContext = createContext({} as NetworkPropsContext);
+
+function isVersionNewer(targetVersion?: string, currentVersion?: string): boolean {
+  if (!targetVersion || !currentVersion) return false;
+
+  const parse = (v: string) =>
+    v.split('.').map(n => parseInt(n.replace(/\D/g, ''), 10) || 0);
+
+  const targetParts = parse(targetVersion);
+  const currentParts = parse(currentVersion);
+
+  const maxLength = Math.max(targetParts.length, currentParts.length);
+  for (let i = 0; i < maxLength; i++) {
+    const t = targetParts[i] || 0;
+    const c = currentParts[i] || 0;
+    if (t > c) return true;
+    if (t < c) return false;
+  }
+  return false;
+}
 
 export const ConfigGlobalProvider = ({ children }) => {
   const [itsNetwork, setItsNetwork] = useState(true);
@@ -32,28 +51,45 @@ export const ConfigGlobalProvider = ({ children }) => {
   }, []);
 
   const checkVersionMobilityPro = async () => {
-    const data = await ConfigGlobalServices.checkVersion(AppsId['MOBILITY PRO']);
-    if (!data?.status) {
-      return;
-    }
-    const { update, version } = data?.data;
-    setVersionApp(version?.version);
-
-    if (update) {
-      const currentVersion = Constants.expoConfig?.version;
-      const targetVersion = version?.version;
-      if (currentVersion && targetVersion) {
-        const compare = currentVersion.localeCompare(targetVersion, undefined, { numeric: true, sensitivity: 'base' });
-        if (compare >= 0) {
-          setNeedUpdate(false);
-          return;
-        }
+    try {
+      const data = await ConfigGlobalServices.checkVersion(AppsId['MOBILITY PRO']);
+      if (!data?.status || !data?.data) {
+        setNeedUpdate(false);
+        return;
       }
-      setNeedUpdate(true);
-      setLinkUpdate(version?.link);
-      return;
+      const { update, version } = data.data;
+
+      // Se o backend não exigir update ou não fornecer objeto de versão válido, não bloqueia
+      if (!update || !version || !version?.version) {
+        setNeedUpdate(false);
+        return;
+      }
+
+      setVersionApp(version.version);
+
+      const currentVersion =
+        Constants.expoConfig?.version ||
+        Constants.nativeAppVersion ||
+        '8.1.2';
+      const targetVersion = version.version;
+
+      const isNewer = isVersionNewer(targetVersion, currentVersion);
+
+      if (isNewer) {
+        const defaultStoreLink = Platform.select({
+          android: 'https://play.google.com/store/apps/details?id=br.com.client.rota101',
+          ios: 'https://apps.apple.com/app/id6474148440',
+          default: '',
+        });
+        setLinkUpdate(version?.link || defaultStoreLink || '');
+        setNeedUpdate(true);
+      } else {
+        setNeedUpdate(false);
+      }
+    } catch (error) {
+      console.log('Erro ao checar versão do aplicativo:', error);
+      setNeedUpdate(false);
     }
-    setNeedUpdate(false);
   };
 
   useEffect(() => {
@@ -69,8 +105,13 @@ export const ConfigGlobalProvider = ({ children }) => {
         title={translate('configGlobal.needs_update')}
         description={translate(
           'configGlobal.A_new_version_of_name_is_available_Please_update_the_app',
-        ).replace('{name}', Constants?.expoConfig?.name)}
-        onPressUpdate={() => Linking.openURL(linkUpdate)}
+        ).replace('{name}', Constants?.expoConfig?.name || 'Movy')}
+        onPressUpdate={() => {
+          if (linkUpdate) {
+            Linking.openURL(linkUpdate).catch(() => {});
+          }
+        }}
+        onClose={() => setNeedUpdate(false)}
       />
       <View
         style={{

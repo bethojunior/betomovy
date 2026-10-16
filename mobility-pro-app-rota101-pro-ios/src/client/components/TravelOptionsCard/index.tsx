@@ -1,55 +1,77 @@
-import { View } from "react-native";
-import { If } from "../If";
-import { ContainerPrices, Image, OptionCoupon, OptionTravelItem, OptionTravelItemContent, RateImage, RateLabel, RateLabelContent, RatePriceLabel, RatePriceNoDiscount } from "../TravelOptions/styles";
-import AnimationIconRocket from "../AnimatedIconRocket";
-import { coinTypePerApi, formatPrice } from "../../utils/money";
-import Helper from "../../utils/Helper";
-import { TextEdit } from "../TextEdit";
-import { SvgUri } from "react-native-svg";
-import { RFValue } from "react-native-responsive-fontsize";
-import theme from "../../styles/theme";
-import { useTrip } from "../../contexts/Trip";
+import { View } from 'react-native';
+import {
+  ContainerPrices,
+  Image,
+  OptionCoupon,
+  OptionTravelItem,
+  OptionTravelItemContent,
+  RateImage,
+  RateLabel,
+  RateLabelContent,
+  RatePriceLabel,
+  RatePriceNoDiscount,
+} from '../TravelOptions/styles';
+import AnimationIconRocket from '../AnimatedIconRocket';
+import { coinTypePerApi, formatPrice } from '../../utils/money';
+import Helper from '../../utils/Helper';
+import { TextEdit } from '../TextEdit';
+import { SvgUri } from 'react-native-svg';
+import { RFValue } from 'react-native-responsive-fontsize';
+import theme from '../../styles/theme';
+import { useTrip } from '../../contexts/Trip';
 import coupom from '../../assets/images/coupon.png';
 import { Feather } from '@expo/vector-icons';
-import { useAuth } from "../../../context/auth";
-import { calculateDiscountByCoupon } from "../../utils/CalulateDiscountByCoupon";
-import { travelOptionsCardProps } from "./types";
-import { memo } from "react";
+import { useAuth } from '../../../context/auth';
+import { calculateDiscountByCoupon } from '../../utils/CalulateDiscountByCoupon';
+import { translate } from '../../locales';
+import { TravelOptionsCardProps } from './types';
+import styles from './styles';
+
+const isDynamicTag = (tag = ''): boolean => {
+  return tag.includes('div');
+};
 
 const TravelOptionsCard = ({
   selectedOptionTravel,
   item,
   setOfferInDriver,
+  onPressSelectedTripType,
   turbined,
   selectedCoupon,
   offerInDriver,
   verifyCardOnCoupon,
   coupons,
-  setModalCoupon
-}: travelOptionsCardProps) => {
+  setModalCoupon,
+}: TravelOptionsCardProps) => {
   const { dispatchTripCustomer } = useTrip();
   const { cityConfig } = useAuth();
+  const isSelected = selectedOptionTravel.tripTypeId === item?.tripTypeId;
 
-  const transformTag = (tag: string) => {
-    return tag.includes('div');
-  };
+  const handleSelectTripType = (): void => {
+    if (isSelected) {
+      onPressSelectedTripType(item);
+      return;
+    }
 
-  const selectTripType = () => {
     dispatchTripCustomer({
       type: 'update',
       field: 'selectedOptionTravel',
       arg: item,
     });
     setOfferInDriver(item.price);
-  }
+  };
+
+  const hasSelectedCoupon = Object.keys(selectedCoupon).length > 0;
+  const canApplyCoupon = hasSelectedCoupon && isSelected && verifyCardOnCoupon;
+  const isDynamicPrice = isDynamicTag(item?.tag);
 
   return (
     <OptionTravelItem
-      selected={selectedOptionTravel.tripTypeId === item?.tripTypeId}
-      onPress={selectTripType}
+      selected={isSelected}
+      onPress={handleSelectTripType}
     >
       <OptionTravelItemContent>
-        {item?.tripType?.picture.split('.').pop() === 'svg' ? (
+        {item?.tripType?.picture?.split('.').pop() === 'svg' ? (
           <SvgUri
             width={RFValue(60)}
             height={RFValue(60)}
@@ -63,32 +85,22 @@ const TravelOptionsCard = ({
           />
         )}
         <RateLabelContent>
-          <If condition={transformTag(item?.tag)}>
+          {isDynamicPrice && (
             <Feather
-              style={{ marginRight: 5 }}
+              style={styles.trendingIcon}
               name="trending-up"
               size={RFValue(12)}
               color={theme.colors.primary}
             />
-          </If>
+          )}
           <RateLabel turbined={turbined}>
-            {`${transformTag(item?.tag)
-              ? item?.multiplierPriceDynamic
-              : item?.tag
-              }`}
+            {`${isDynamicPrice ? item?.multiplierPriceDynamic : item?.tag}`}
           </RateLabel>
         </RateLabelContent>
-        <If condition={Object.keys(selectedCoupon).length === 0}>
-          <View
-            style={{
-              flexDirection: 'row-reverse',
-              alignItems: 'center',
-            }}
-          >
+        {(!hasSelectedCoupon || turbined) && (
+          <View style={styles.priceContent}>
             <RatePriceLabel
-              style={{
-                marginLeft: 10,
-              }}
+              style={styles.priceLabel}
               turbined={turbined}
             >
               {formatPrice(
@@ -96,51 +108,36 @@ const TravelOptionsCard = ({
                 selectedOptionTravel,
                 item,
                 cityConfig,
-                turbined
+                turbined,
               )}
             </RatePriceLabel>
-            <If condition={turbined}>
-              <AnimationIconRocket size={RFValue(15)} />
-            </If>
+            {turbined && <AnimationIconRocket size={RFValue(15)} />}
           </View>
-        </If>
+        )}
 
-        <If condition={Object.keys(selectedCoupon).length > 0}>
+        {hasSelectedCoupon && !turbined && (
           <ContainerPrices>
             <RatePriceLabel>
               {coinTypePerApi(cityConfig?.typeMoney)}{' '}
-              {Object.keys(selectedCoupon).length > 0 &&
-                selectedOptionTravel.tripTypeId === item.tripTypeId &&
-                verifyCardOnCoupon
+              {canApplyCoupon
                 ? Helper.maskMoney(
                   calculateDiscountByCoupon(
-                    parseFloat(item.price),
+                    item.price,
                     selectedCoupon,
                   ),
                 )
-                : Helper.maskMoney(parseFloat(item.price))}
+                : Helper.maskMoney(item.price)}
             </RatePriceLabel>
-            <If
-              condition={
-                Object.keys(selectedCoupon).length > 0 &&
-                selectedOptionTravel.tripTypeId === item.tripTypeId &&
-                verifyCardOnCoupon
-              }
-            >
+            {canApplyCoupon && (
               <RatePriceNoDiscount>
                 {coinTypePerApi(cityConfig?.typeMoney)}{' '}
-                {Helper.maskMoney(parseFloat(item.price))}
+                {Helper.maskMoney(item.price)}
               </RatePriceNoDiscount>
-            </If>
+            )}
           </ContainerPrices>
-        </If>
+        )}
       </OptionTravelItemContent>
-      <If
-        condition={
-          coupons.length > 0 &&
-          selectedOptionTravel.tripTypeId === item.tripTypeId
-        }
-      >
+      {coupons.length > 0 && isSelected && !turbined && (
         <OptionCoupon
           onPress={() => {
             setModalCoupon(true);
@@ -148,12 +145,12 @@ const TravelOptionsCard = ({
         >
           <Image source={coupom} />
           <TextEdit size={'small'} color={theme.colors.secondary}>
-            Veja Cupom
+            {translate('coupon.see_coupon')}
           </TextEdit>
         </OptionCoupon>
-      </If>
+      )}
     </OptionTravelItem>
-  )
-}
+  );
+};
 
 export default TravelOptionsCard;

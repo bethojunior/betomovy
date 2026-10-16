@@ -1,18 +1,23 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useAuth} from '../../../../context/auth';
-import {useTripProvider} from '../../context/Trip';
-import {useUserDriver} from '../../context/userDriver';
+import { useAuth } from '../../../../context/auth';
+import { useTripProvider } from '../../context/Trip';
+import { useUserDriver } from '../../context/userDriver';
 import Helper from '../../utils/Helper';
-import {ButtonTaximeter} from '../ButtonTaximeter';
-import {If} from '../If';
+import { ButtonTaximeter } from '../ButtonTaximeter';
+import { If } from '../If';
+import { useTaximeter } from '../../context/Taximeter';
 
 export const ButtonTaximeterComponent = ({
   setModalTaximeter,
   selectedTripType,
+  onPress,
 }) => {
-  const {userDriverFind} = useUserDriver();
-  const {generalSettings, isNegativate, setVisibleNegativateModal} = useAuth();
-  const {tripAccepted} = useTripProvider().stateTrip;
+  const { userDriverFind } = useUserDriver();
+  const { generalSettings, isNegativate, setVisibleNegativateModal } = useAuth();
+  const tripAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripAccepted,
+  );
+
+  const { clearStorage } = useTaximeter();
 
   const condition =
     userDriverFind?.status === 'disponivel' &&
@@ -20,25 +25,13 @@ export const ButtonTaximeterComponent = ({
     tripAccepted &&
     Object.keys(tripAccepted).length === 0;
 
-  const clearStorage = () => {
-    AsyncStorage.multiRemove([
-      'startTaximetro',
-      'currentTimeTaximeter',
-      'priceTaximeter',
-      'taximeterIsPause',
-      'fare',
-      'routeTraveledTaximeter',
-      'lastKmTaximeter',
-      'TX-timeBg',
-    ]);
-  };
-
   const openTaximeter = () => {
     if (isNegativate) {
       return setVisibleNegativateModal(true);
     }
     clearStorage();
-    return setModalTaximeter(true);
+    setModalTaximeter(true);
+    onPress?.();
   };
 
   return (

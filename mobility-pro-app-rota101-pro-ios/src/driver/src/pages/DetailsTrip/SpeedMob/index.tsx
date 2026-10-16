@@ -1,6 +1,6 @@
-import {Image, View, Text} from 'react-native';
-import {useEffect, useRef, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import { Image, View, Text } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
   Address,
   AddressContent,
@@ -26,7 +26,7 @@ import {
   TitleHeader,
 } from './styles';
 
-import {If} from '../../../components/If';
+import { If } from '../../../components/If';
 import apiMain from '../../../api/apiMain';
 import theme from '../../../styles/theme';
 import {
@@ -35,26 +35,28 @@ import {
   STATUS_SITUATION_BLOCKED,
   STATUS_SITUATION_RELEASED,
 } from '../../../constants/trip';
-import {convertDate, maskHour} from '../../../utils/FormatDate';
-import {translate} from '../../../../../client/locales';
+import { convertDate, maskHour } from '../../../utils/FormatDate';
+import { translate } from '../../../../../client/locales';
 import Preload from '../../../components/Preload';
 import Helper from '../../../utils/Helper';
-import {useAuth} from '../../../../../context/auth';
+import { useAuth } from '../../../../../context/auth';
 import HelpMethodModal from '../../../components/HelpMethodModal';
-import {buildApp} from '../../../../../constantBuild/config';
+import { buildApp } from '../../../../../constantBuild/config';
 
-import {Ionicons} from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { useStoragePictures } from '../../../hooks/useStoragePictures';
 
 interface LocationProps {
   latitude: string;
   longitude: string;
 }
 
-export const DetailsTripSpeedMob = ({route}: any) => {
+export const DetailsTripSpeedMob = ({ route }: any) => {
   const [detailsTrip, setDetailsTrip] = useState<any>({});
-  const {cityConfig, generalSettings} = useAuth();
+  const { cityConfig, generalSettings } = useAuth();
   const [loading, setLoading] = useState(true);
   const [modalMessage, setModalMessage] = useState(false);
+  const { getStoragePictureSpecific } = useStoragePictures();
 
   const navigation = useNavigation();
 
@@ -80,7 +82,7 @@ export const DetailsTripSpeedMob = ({route}: any) => {
   };
 
   const formatDateAndHour = (date: string) => {
-    const dateSplit = date.split(' ');
+    const dateSplit = date?.split(' ');
     return `${convertDate(dateSplit[0])} ${maskHour(dateSplit[1])}`;
   };
   const switchStatus = (status: string) => {
@@ -101,27 +103,27 @@ export const DetailsTripSpeedMob = ({route}: any) => {
         return '';
     }
   };
-  const {tripReference} = route.params;
-  const {trip} = route.params;
+  const { tripReference } = route.params;
+  const { trip } = route.params;
 
   const polilyneCoords = () => {
     return detailsTrip?.location?.length > 0
       ? detailsTrip?.location?.map((res: LocationProps) => {
-          return {
-            latitude: res.latitude,
-            longitude: res.longitude,
-          };
-        })
+        return {
+          latitude: res.latitude,
+          longitude: res.longitude,
+        };
+      })
       : [
-          {
-            latitude: parseFloat(detailsTrip?.origin.latitude),
-            longitude: parseFloat(detailsTrip?.origin.longitude),
-          },
-          {
-            latitude: parseFloat(detailsTrip?.destination.latitude),
-            longitude: parseFloat(detailsTrip?.destination.longitude),
-          },
-        ];
+        {
+          latitude: parseFloat(detailsTrip?.origin.latitude),
+          longitude: parseFloat(detailsTrip?.origin.longitude),
+        },
+        {
+          latitude: parseFloat(detailsTrip?.destination.latitude),
+          longitude: parseFloat(detailsTrip?.destination.longitude),
+        },
+      ];
   };
 
   useEffect(() => {
@@ -155,7 +157,12 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                     detailsTrip.driver !== undefined && (
                       <DriverContent>
                         <Image
-                          source={{ uri: buildApp().HOST_IMAGE_CUSTOMER + detailsTrip?.customer?.profileImage }}
+                          source={{
+                            uri:
+                              (getStoragePictureSpecific('customer') ||
+                                buildApp().HOST_IMAGE_CUSTOMER) +
+                              detailsTrip?.customer?.profileImage,
+                          }}
                           style={{
                             width: 70,
                             height: 70,
@@ -174,7 +181,7 @@ export const DetailsTripSpeedMob = ({route}: any) => {
               </ContainerDialog>
             )}
             <AddressContent>
-              <View style={{padding: 10}}>
+              <View style={{ padding: 10 }}>
                 <Ball color="primary" />
                 <Line />
                 {detailsTrip.tripWayPoints &&
@@ -187,7 +194,7 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                   ))}
                 <Square />
               </View>
-              <View style={{paddingRight: 20}}>
+              <View style={{ paddingRight: 20 }}>
                 <Address>{trip?.originAddress}</Address>
                 {detailsTrip?.tripWayPoints &&
                   detailsTrip?.tripWayPoints.length > 0 &&
@@ -208,7 +215,7 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                     {translate('detailsTrip.text_type_payment')}
                   </TextSmall>
                   <Text>{trip.paymentForm}</Text>
-                  <Content style={{marginTop: 20}}>
+                  <Content style={{ marginTop: 20 }}>
                     <TextSmall>{translate('detailsTrip.text_total')}</TextSmall>
                     <Text>
                       {cityConfig?.typeMoney}
@@ -220,7 +227,7 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                 <ContainerText>
                   <TextSmall>{translate('detailsTrip.text_status')}</TextSmall>
                   <Text>{switchStatus(trip.status.toUpperCase())}</Text>
-                  <Content style={{marginTop: 20}}>
+                  <Content style={{ marginTop: 20 }}>
                     <TextSmall>{translate('detailsTrip.text_date')}</TextSmall>
                     <Text>
                       {trip.schedule
@@ -270,7 +277,7 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                   </TitleCentralized>
                   <ContainerFooter>
                     <ContainerText>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <TextSmall>
                           ({translate('myTravels.dynamics_flags_triggers')})
                         </TextSmall>
@@ -280,23 +287,23 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                             : '0'}
                         </Text>
                       </Content>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <TextSmall>
                           {translate('myTravels.value_min')}
                         </TextSmall>
                         <Text>
                           {detailsTrip?.fare
                             ? cityConfig?.typeMoney +
-                              Helper.maskMoney(
-                                Number(
-                                  Number(detailsTrip?.fare?.min_price) *
-                                    Number(detailsTrip?.multiplierDynamic || 1),
-                                ),
-                              )
+                            Helper.maskMoney(
+                              Number(
+                                Number(detailsTrip?.fare?.min_price) *
+                                Number(detailsTrip?.multiplierDynamic || 1),
+                              ),
+                            )
                             : ''}
                         </Text>
                       </Content>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <TextSmall>
                           {translate('myTravels.waypoints')}
                         </TextSmall>
@@ -304,11 +311,11 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                           {cityConfig?.typeMoney}
                           {Helper.maskMoney(
                             parseFloat(detailsTrip?.fare?.waypoint_price) *
-                              parseFloat(detailsTrip?.tripWayPoints?.length),
+                            parseFloat(detailsTrip?.tripWayPoints?.length),
                           )}
                         </Text>
                       </Content>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <TextSmall>
                           {detailsTrip?.fare?.tax_price_description || ''}
                         </TextSmall>
@@ -319,7 +326,7 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                           )}
                         </Text>
                       </Content>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <View
                           style={{
                             width: '80%',
@@ -341,7 +348,7 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                           )}
                         </Text>
                       </Content>
-                      <Content style={{marginTop: 20, marginBottom: 20}}>
+                      <Content style={{ marginTop: 20, marginBottom: 20 }}>
                         <TextSmall>
                           {translate('myTravels.value_estimated')}
                         </TextSmall>
@@ -364,13 +371,13 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                       <Text>
                         {detailsTrip?.fare
                           ? ' + ' +
-                            cityConfig?.typeMoney +
-                            Helper.maskMoney(
-                              parseFloat(detailsTrip?.fare?.base_price),
-                            )
+                          cityConfig?.typeMoney +
+                          Helper.maskMoney(
+                            parseFloat(detailsTrip?.fare?.base_price),
+                          )
                           : ''}
                       </Text>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <TextSmall>
                           {generalSettings?.find(
                             item => item?.key === 'enable_transform_km_for_mi',
@@ -380,12 +387,12 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                           (
                           {detailsTrip?.fare
                             ? Helper.maskMoney(
-                                parseFloat(detailsTrip?.fare?.km_price),
-                              ) +
-                              'x ' +
-                              Helper.maskMoney(
-                                parseFloat(detailsTrip?.distance),
-                              )
+                              parseFloat(detailsTrip?.fare?.km_price),
+                            ) +
+                            'x ' +
+                            Helper.maskMoney(
+                              parseFloat(detailsTrip?.distance),
+                            )
                             : ''}
                           )
                         </TextSmall>
@@ -393,35 +400,35 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                           {cityConfig?.typeMoney}
                           {Helper.maskMoney(
                             parseFloat(detailsTrip?.fare?.km_price) *
-                              parseFloat(detailsTrip?.distance),
+                            parseFloat(detailsTrip?.distance),
                           )}
                         </Text>
                       </Content>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <TextSmall>
                           {translate('myTravels.minute_price')} (
                           {detailsTrip?.fare
                             ? Helper.maskMoney(
-                                parseFloat(detailsTrip?.fare?.minute_price),
-                              ) +
-                              'x ' +
-                              Helper.maskMoney(
-                                parseFloat(detailsTrip?.estimatedTripTime),
-                              )
+                              parseFloat(detailsTrip?.fare?.minute_price),
+                            ) +
+                            'x ' +
+                            Helper.maskMoney(
+                              parseFloat(detailsTrip?.estimatedTripTime),
+                            )
                             : ''}
                           ){' '}
                         </TextSmall>
                         <Text>
                           {detailsTrip?.fare
                             ? cityConfig?.typeMoney +
-                              Helper.maskMoney(
-                                parseFloat(detailsTrip?.fare?.minute_price) *
-                                  parseFloat(detailsTrip?.estimatedTripTime),
-                              )
+                            Helper.maskMoney(
+                              parseFloat(detailsTrip?.fare?.minute_price) *
+                              parseFloat(detailsTrip?.estimatedTripTime),
+                            )
                             : ''}
                         </Text>
                       </Content>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <TextSmall>
                           {detailsTrip?.fare?.another_fee_description}
                         </TextSmall>
@@ -432,7 +439,7 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                           )}
                         </Text>
                       </Content>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <TextSmall>
                           {translate('myTravels.long_distance_price')}
                         </TextSmall>
@@ -442,16 +449,16 @@ export const DetailsTripSpeedMob = ({route}: any) => {
                             parseFloat(
                               detailsTrip?.tripLongDistanceValue
                                 ? Helper.maskMoney(
-                                    parseFloat(
-                                      detailsTrip?.tripLongDistanceValue.value,
-                                    ),
-                                  )
+                                  parseFloat(
+                                    detailsTrip?.tripLongDistanceValue.value,
+                                  ),
+                                )
                                 : '0,00',
                             ),
                           )}
                         </Text>
                       </Content>
-                      <Content style={{marginTop: 20}}>
+                      <Content style={{ marginTop: 20 }}>
                         <TextSmall>
                           {translate('myTravels.additional_value')}
                         </TextSmall>

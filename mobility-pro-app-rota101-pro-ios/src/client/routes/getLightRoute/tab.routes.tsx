@@ -15,15 +15,14 @@ const {Navigator, Screen} = createBottomTabNavigator();
 export const TabBarRoutesGetLight = () => {
   return (
     <Navigator
-      tabBarOptions={{
-        activeTintColor: theme.colors.primary,
-        inactiveTintColor: '#999',
-        inactiveBackgroundColor: theme.colors.background_global,
-        activeBackgroundColor: theme.colors.background_global,
-      }}
       screenOptions={{
         headerShown: false,
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: '#999',
+        tabBarStyle: {
+          backgroundColor: theme.colors.background_global,
+        },
       }}
     >
       <Screen
@@ -95,16 +94,15 @@ export const TabBarRoutesGetLight = () => {
 export const InitialTabBarRoutesGetLight = () => {
   return (
     <Navigator
-      tabBarOptions={{
-        activeTintColor: theme.colors.primary,
-        inactiveTintColor: '#999',
-        inactiveBackgroundColor: theme.colors.background_global,
-        activeBackgroundColor: theme.colors.background_global,
-      }}
       initialRouteName={translate('tab.services')}
       screenOptions={{
         headerShown: false,
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: '#999',
+        tabBarStyle: {
+          backgroundColor: theme.colors.background_global,
+        },
       }}
     >
       <Screen

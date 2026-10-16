@@ -1,42 +1,43 @@
-/* eslint-disable consistent-return */
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable radix */
-// @ts-nocheck
-
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {AntDesign, MaterialIcons} from '@expo/vector-icons';
-import {Alert, Modal, View} from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { RFValue } from 'react-native-responsive-fontsize';
 import InputAddress from '../InputAddress';
 import SearchAddressModal from '../SearchAddressModal';
+import { BottomSheetModal } from '../BottomSheetModal';
 import {
-  ButtonBack,
+  AddressInputWrapper,
+  AddressRow,
+  BackButton,
   ButtonConfirm,
-  Container,
-  ContainerNewValue,
   Content,
   ContentChangePrice,
-  ContentIcons,
-  ContentInputIcon,
-  ContentInputs,
   ContentText,
-  DeleteWaypointButton,
-  DeleteWaypointButtonContainer,
-  DestinationAddressContainer,
-  DestinationIcon,
-  OriginIcon,
-  SeparateIcon,
-  StopIcon,
-  WaypointContainer,
+  DestinationSquare,
+  Footer,
+  HeaderRow,
+  HeaderSubtitle,
+  HeaderTextGroup,
+  HeaderTitle,
+  InputsColumn,
+  MarkerColumn,
+  MarkerLine,
+  OriginBall,
+  OriginHelpCard,
+  OriginHelpText,
+  RoundIconButton,
+  RouteCard,
+  TimelineRow,
+  Wrapper,
+  WaypointBall,
 } from './styles';
-import {useLocal} from '../../contexts/local';
-import {useTrip} from '../../contexts/Trip';
-import {useAuth} from '../../../context/auth';
-import {If} from '../If';
-import {TextEdit} from '../TextEdit';
+import { useLocal } from '../../contexts/local';
+import { useTrip } from '../../contexts/Trip';
+import { useAuth } from '../../../context/auth';
+import { TextEdit } from '../TextEdit';
 import theme from '../../styles/theme';
-import {IfLoaderInsideScreen} from '../IfLoaderInsideScreen';
 import Helper from '../../utils/Helper';
-import {translate} from '../../locales';
+import { translate } from '../../locales';
 
 export default function LookUpAddressesModalInTrip({
   onBack,
@@ -46,8 +47,10 @@ export default function LookUpAddressesModalInTrip({
   voice,
   setVisible,
 }) {
-  const {placeUser, lastPlaceSelected} = useLocal();
-  const {changeRoute, stateTripCustomer, dispatchTripCustomer} = useTrip();
+  const [isSubmittingChangeRoute, setIsSubmittingChangeRoute] = useState<boolean>();
+
+  const { placeUser, lastPlaceSelected } = useLocal();
+  const { changeRoute, stateTripCustomer, dispatchTripCustomer } = useTrip();
 
   const {
     origin,
@@ -58,10 +61,9 @@ export default function LookUpAddressesModalInTrip({
     changeRoutePreview,
   } = stateTripCustomer;
 
-  const {cityConfig} = useAuth();
+  const { cityConfig } = useAuth();
   const searchAddressModal = useRef(null);
-  const [showWaypointInputAddButton, setShowWaypointInputAddButton] =
-    useState(true);
+  const [showWaypointInputAddButton, setShowWaypointInputAddButton] = useState(true);
 
   useEffect(() => {
     if (lastPlaceSelected && Object.keys(lastPlaceSelected).length > 0) {
@@ -73,8 +75,16 @@ export default function LookUpAddressesModalInTrip({
     }
   }, []);
 
+  const resetChangeRoutePreview = useCallback(() => {
+    if (Object.keys(changeRoutePreview).length > 0) {
+      dispatchTripCustomer({ type: 'update', field: 'changeRoutePreview', arg: {} });
+    }
+  }, [changeRoutePreview, dispatchTripCustomer]);
+
   const handleRemoveInputWaypoint = useCallback(
-    id => {
+    (id) => {
+      resetChangeRoutePreview();
+
       dispatchTripCustomer({
         type: 'update',
         field: 'waypointQuantities',
@@ -87,15 +97,15 @@ export default function LookUpAddressesModalInTrip({
           field: 'waypoints',
           arg:
             waypoints.length > 1
-              ? [...waypoints.filter(waypoint => waypoint.id !== id)]
+              ? [...waypoints.filter((waypoint) => waypoint.id !== id)]
               : [],
         });
       }
 
-      if (waypointQuantities === parseInt(cityConfig.quantityTripWayPoints))
+      if (waypointQuantities === (parseInt(cityConfig?.quantityTripWayPoints) || 3))
         setShowWaypointInputAddButton(true);
     },
-    [waypointQuantities, waypoints],
+    [waypointQuantities, waypoints, resetChangeRoutePreview],
   );
 
   const handleAddInputWaypoint = useCallback(() => {
@@ -117,42 +127,54 @@ export default function LookUpAddressesModalInTrip({
       ],
     });
 
-    if (waypointQuantities + 1 === parseInt(cityConfig.quantityTripWayPoints))
+    if (waypointQuantities + 1 === (parseInt(cityConfig?.quantityTripWayPoints) || 3))
       setShowWaypointInputAddButton(false);
   }, [waypointQuantities, waypoints]);
 
   const handlesAlreadyAddedAddressValidation = useCallback(
-    address => {
+    (address) => {
       const waypointAlreadyExists = waypoints.some(
-        waypoint =>
-          waypoint.latitude === address.latitude &&
-          waypoint.longitude === address.longitude,
+        (waypoint) =>
+          waypoint.latitude === address.latitude && waypoint.longitude === address.longitude,
       );
       const originAlreadyExists =
-        origin.latitude === address.latitude &&
-        origin.longitude === address.longitude;
+        origin.latitude === address.latitude && origin.longitude === address.longitude;
       const destinationAlreadyExists =
         destination.latitude === address.latitude &&
         destination.longitude === address.longitude;
 
-      return (
-        waypointAlreadyExists || originAlreadyExists || destinationAlreadyExists
-      );
+      return waypointAlreadyExists || originAlreadyExists || destinationAlreadyExists;
     },
     [origin, destination, waypoints],
   );
 
   const handleAddressSelected = useCallback(
     (addressResult, type) => {
-      const addressAlreadyAdded =
-        handlesAlreadyAddedAddressValidation(addressResult);
+      resetChangeRoutePreview();
 
-      if (addressAlreadyAdded) {
+      const addressAlreadyAdded = handlesAlreadyAddedAddressValidation(addressResult);
+
+      if (type.startsWith('waypoint')) {
+        if (waypoints.length > 0) {
+          const isSameAsOrigin =
+            origin.latitude === addressResult.latitude &&
+            origin.longitude === addressResult.longitude;
+
+          if (isSameAsOrigin) {
+            return Alert.alert(
+              'Atenção',
+              'Endereço do waypoint não pode ser igual ao da origem!',
+            );
+          }
+        }
+      }
+
+      if (waypoints.length <= 0 && addressAlreadyAdded) {
         return Alert.alert('Atenção', 'Endereço já adicionado!');
       }
 
       const addressesTypes = {
-        origin: addressResult =>
+        origin: (addressResult) =>
           dispatchTripCustomer({
             type: 'update',
             field: 'origin',
@@ -164,7 +186,7 @@ export default function LookUpAddressesModalInTrip({
               type: 'origin',
             },
           }),
-        destination: addressResult =>
+        destination: (addressResult) =>
           dispatchTripCustomer({
             type: 'update',
             field: 'destination',
@@ -181,7 +203,7 @@ export default function LookUpAddressesModalInTrip({
             type: 'update',
             field: 'waypoints',
             arg: [
-              ...waypoints.map(waypoint => {
+              ...waypoints.map((waypoint) => {
                 if (waypoint.id === id)
                   return {
                     ...waypoint,
@@ -197,11 +219,11 @@ export default function LookUpAddressesModalInTrip({
             ],
           }),
       };
-      const attribute = type.split('-')[0];
+      const attribute = type?.split('-')[0];
 
       addressesTypes[attribute](addressResult, type);
     },
-    [origin, destination, waypoints],
+    [origin, destination, waypoints, resetChangeRoutePreview],
   );
 
   const handleAddressValidation = useCallback(() => {
@@ -220,7 +242,7 @@ export default function LookUpAddressesModalInTrip({
           street: waypoints[0].street || null,
           type: 'destination',
         };
-        if (onComplete) onComplete({origin, destination, waypoints: []});
+        if (onComplete) onComplete({ origin, destination, waypoints: [] });
         dispatchTripCustomer({
           type: 'update',
           field: 'waypoints',
@@ -235,8 +257,23 @@ export default function LookUpAddressesModalInTrip({
       return;
     }
 
-    if (onComplete) onComplete({origin, destination, waypoints});
+    if (onComplete) onComplete({ origin, destination, waypoints });
   }, [origin, destination, waypoints, waypointQuantities]);
+
+  const handleBack = () => {
+    if (Object.keys(changeRoutePreview).length > 0) {
+      dispatchTripCustomer({ type: 'update', field: 'changeRoutePreview', arg: {} });
+    }
+
+    if (onBack) onBack();
+  };
+
+  const handleChangeRoute = async () => {
+    setIsSubmittingChangeRoute(true);
+    await changeRoute();
+    setIsSubmittingChangeRoute(false);
+    setVisible(false);
+  };
 
   useEffect(() => {
     if (placeUser && !origin.address)
@@ -253,14 +290,6 @@ export default function LookUpAddressesModalInTrip({
       });
   }, [visible]);
 
-  // useEffect(() => {
-  //   if (
-  //     (destination?.address && searchAddressModal?.current?.setTypeOfAddress) ||
-  //     (destination?.name && searchAddressModal?.current?.setTypeOfAddress)
-  //   )
-  //     handleAddressValidation();
-  // }, [destination, origin, waypoints]);
-
   useEffect(() => {
     if (visible && voice) {
       setTimeout(() => {
@@ -270,147 +299,213 @@ export default function LookUpAddressesModalInTrip({
   }, [voice]);
 
   return (
-    <If condition={visible}>
-      <Modal visible={visible}>
-        <View
-          style={{
-            flex: 1,
-          }}
-        >
-          <SearchAddressModal
-            handleAddressSelected={(addressResult, type) => {
-              handleAddressSelected(addressResult, type);
-            }}
-            ref={searchAddressModal}
-          />
-          <Container>
-            <Content>
-              <ButtonBack onPress={onBack}>
-                <AntDesign name="arrowleft" size={30} color={theme.colors.secondary} />
-              </ButtonBack>
-              <ContentInputIcon>
-                <ContentIcons>
-                  <OriginIcon />
-                  <SeparateIcon />
-                  {Boolean(waypoints.length) &&
-                    waypoints.map((waypoint, index) => (
-                      <React.Fragment key={`${waypoint.id}-${index}`}>
-                        <StopIcon />
-                        <SeparateIcon />
-                      </React.Fragment>
-                    ))}
-                  <DestinationIcon />
-                </ContentIcons>
-                <ContentInputs>
+    <BottomSheetModal visible={visible} onRequestClose={handleBack}>
+      <SearchAddressModal
+        ref={searchAddressModal}
+        handleAddressSelected={(addressResult, type) => {
+          handleAddressSelected(addressResult, type);
+        }}
+      />
+
+      <LookUpAddressesContent
+        origin={origin}
+        destination={destination}
+        waypoints={waypoints}
+        changeRoutePreview={changeRoutePreview}
+        isLoading={isLoading}
+        isSubmittingChangeRoute={isSubmittingChangeRoute}
+        showWaypointInputAddButton={showWaypointInputAddButton}
+        cityConfig={cityConfig}
+        onBack={handleBack}
+        onPressOrigin={() => {
+          searchAddressModal.current.setTypeOfAddress('origin');
+          searchAddressModal.current.show();
+        }}
+        onPressWaypoint={(id) => {
+          searchAddressModal.current.setTypeOfAddress(id);
+          searchAddressModal.current.show();
+        }}
+        onPressDestination={() => {
+          searchAddressModal.current.setTypeOfAddress('destination');
+          searchAddressModal.current.show();
+        }}
+        onRemoveWaypoint={handleRemoveInputWaypoint}
+        onAddWaypoint={handleAddInputWaypoint}
+        onConfirm={handleAddressValidation}
+        onChangeRoute={handleChangeRoute}
+      />
+    </BottomSheetModal>
+  );
+}
+
+interface LookUpAddressesContentProps {
+  origin: any;
+  destination: any;
+  waypoints: any[];
+  changeRoutePreview: any;
+  isLoading: boolean;
+  isSubmittingChangeRoute: boolean;
+  showWaypointInputAddButton: boolean;
+  cityConfig: any;
+  onBack: () => void;
+  onPressOrigin: () => void;
+  onPressWaypoint: (id: string) => void;
+  onPressDestination: () => void;
+  onRemoveWaypoint: (id: string) => void;
+  onAddWaypoint: () => void;
+  onConfirm: () => void;
+  onChangeRoute: () => void;
+}
+
+const LookUpAddressesContent = ({
+  origin,
+  destination,
+  waypoints,
+  changeRoutePreview,
+  isLoading,
+  isSubmittingChangeRoute,
+  showWaypointInputAddButton,
+  cityConfig,
+  onBack,
+  onPressOrigin,
+  onPressWaypoint,
+  onPressDestination,
+  onRemoveWaypoint,
+  onAddWaypoint,
+  onConfirm,
+  onChangeRoute,
+}: LookUpAddressesContentProps) => {
+  const [showOriginHelp, setShowOriginHelp] = useState(false);
+  const hasChangeRoutePreview = Object.keys(changeRoutePreview).length > 0;
+
+  return (
+    <Wrapper>
+      <HeaderRow>
+        <BackButton activeOpacity={0.7} onPress={onBack}>
+          <Ionicons name="chevron-back" size={RFValue(18)} color={theme.colors.secondary} />
+        </BackButton>
+
+        <HeaderTextGroup>
+          <HeaderTitle>{translate('trip.edit_route_title')}</HeaderTitle>
+          <HeaderSubtitle>{translate('trip.edit_route_subtitle')}</HeaderSubtitle>
+        </HeaderTextGroup>
+      </HeaderRow>
+
+      <Content>
+        <RouteCard>
+          <InputsColumn>
+            <TimelineRow>
+              <MarkerColumn>
+                <OriginBall />
+                <MarkerLine />
+              </MarkerColumn>
+
+              <AddressRow>
+                <AddressInputWrapper>
                   <InputAddress
                     value={origin.address}
                     disabled
-                    onPress={() => {
-                      searchAddressModal.current.setTypeOfAddress('origin');
-                      searchAddressModal.current.show();
-                    }}
+                    onPress={onPressOrigin}
                     placeholder="Insira o local de partida"
                   />
-                  {Boolean(waypoints.length) &&
-                    waypoints.map((waypoint, index) => (
-                      <WaypointContainer key={`${index}-${waypoint.id}`}>
-                        <InputAddress
-                          value={waypoint.address}
-                          onPress={() => {
-                            searchAddressModal.current.setTypeOfAddress(
-                              waypoint.id,
-                            );
-                            searchAddressModal.current.show();
-                          }}
-                        />
-                        <DeleteWaypointButtonContainer>
-                          <DeleteWaypointButton
-                            onPress={() =>
-                              handleRemoveInputWaypoint(waypoint.id)
-                            }
-                          >
-                            <MaterialIcons
-                              name="close"
-                              size={18}
-                              color={theme.colors.secondary}
-                            />
-                          </DeleteWaypointButton>
-                        </DeleteWaypointButtonContainer>
-                      </WaypointContainer>
-                    ))}
-                  {/* <If condition={!destinationPerson}> */}
-                  <DestinationAddressContainer>
+                </AddressInputWrapper>
+                <RoundIconButton
+                  variant="help"
+                  onPress={() => setShowOriginHelp(current => !current)}
+                >
+                  <Ionicons
+                    name="help-circle-outline"
+                    size={RFValue(18)}
+                    color={theme.colors.text_gray}
+                  />
+                </RoundIconButton>
+              </AddressRow>
+            </TimelineRow>
+
+            {showOriginHelp && (
+              <OriginHelpCard>
+                <Ionicons
+                  name="information-circle"
+                  size={RFValue(16)}
+                  color={theme.colors.primary}
+                />
+                <OriginHelpText>{translate('trip.origin_address_cannot_change')}</OriginHelpText>
+              </OriginHelpCard>
+            )}
+
+            {waypoints.map((waypoint, index) => (
+              <TimelineRow key={`${index}-${waypoint.id}`}>
+                <MarkerColumn>
+                  <WaypointBall />
+                  <MarkerLine />
+                </MarkerColumn>
+
+                <AddressRow>
+                  <AddressInputWrapper>
                     <InputAddress
-                      value={destination?.address || destination?.name}
-                      onPress={() => {
-                        searchAddressModal.current.setTypeOfAddress(
-                          'destination',
-                        );
-                        searchAddressModal.current.show();
-                      }}
-                      placeholder="Para onde?"
+                      value={waypoint.address}
+                      onPress={() => onPressWaypoint(waypoint.id)}
                     />
-                    {showWaypointInputAddButton && (
-                      <DeleteWaypointButtonContainer>
-                        <DeleteWaypointButton onPress={handleAddInputWaypoint}>
-                          <MaterialIcons name="add" size={18} color={theme.colors.secondary} />
-                        </DeleteWaypointButton>
-                      </DeleteWaypointButtonContainer>
-                    )}
-                  </DestinationAddressContainer>
-                  {/* </If> */}
-                </ContentInputs>
-              </ContentInputIcon>
-            </Content>
-          </Container>
-          <IfLoaderInsideScreen loading={isLoading}>
-            <If condition={Object.keys(changeRoutePreview).length === 0}>
-              <ButtonConfirm onPress={handleAddressValidation}>
-                <TextEdit color={theme.colors.primaryText} size="large">
-                  {translate('tripDriver.text_ok')}
-                </TextEdit>
-              </ButtonConfirm>
-            </If>
-            <If condition={Object.keys(changeRoutePreview).length > 0}>
-              <ContainerNewValue>
-                <ContentChangePrice>
-                  <ButtonBack
-                    onPress={() =>
-                      dispatchTripCustomer({
-                        type: 'update',
-                        field: 'changeRoutePreview',
-                        arg: {},
-                      })
-                    }
+                  </AddressInputWrapper>
+                  <RoundIconButton
+                    variant="remove"
+                    onPress={() => onRemoveWaypoint(waypoint.id)}
                   >
-                    <AntDesign name="arrowleft" size={30} color="black" />
-                  </ButtonBack>
-                  <ContentText>
-                    <TextEdit size="large" color={theme.colors.secondary}>
-                      {translate('tripDriver.text_new_value_recalculated')}
-                    </TextEdit>
-                    <TextEdit size="large" color={theme.colors.secondary}>
-                      {`${cityConfig.typeMoney} ${Helper.maskMoney(
-                        Number(changeRoutePreview?.price),
-                      )}`}
-                    </TextEdit>
-                  </ContentText>
-                  <ButtonConfirm
-                    onPress={async () => {
-                      changeRoute();
-                      setVisible(false);
-                    }}
-                  >
-                    <TextEdit color={theme.colors.primaryText} size="large">
-                      {translate('tripDriver.text_confirm')}
-                    </TextEdit>
-                  </ButtonConfirm>
-                </ContentChangePrice>
-              </ContainerNewValue>
-            </If>
-          </IfLoaderInsideScreen>
-        </View>
-      </Modal>
-    </If>
+                    <Ionicons name="close" size={RFValue(14)} color={theme.colors.text_gray} />
+                  </RoundIconButton>
+                </AddressRow>
+              </TimelineRow>
+            ))}
+
+            <TimelineRow>
+              <MarkerColumn>
+                <DestinationSquare />
+              </MarkerColumn>
+
+              <AddressRow>
+                <AddressInputWrapper>
+                  <InputAddress
+                    value={destination?.address || destination?.name}
+                    onPress={onPressDestination}
+                    placeholder="Para onde?"
+                  />
+                </AddressInputWrapper>
+                {showWaypointInputAddButton && (
+                  <RoundIconButton variant="add" onPress={onAddWaypoint}>
+                    <Ionicons name="add" size={RFValue(16)} color={theme.colors.secondary} />
+                  </RoundIconButton>
+                )}
+              </AddressRow>
+            </TimelineRow>
+          </InputsColumn>
+        </RouteCard>
+      </Content>
+
+      <Footer>
+        {!hasChangeRoutePreview ? (
+          <ButtonConfirm
+            onPress={onConfirm}
+            title={translate('tripDriver.text_ok')}
+            loading={isLoading}
+          />
+        ) : (
+          <ContentChangePrice>
+            <ContentText>
+              <TextEdit size="large" color={theme.colors.secondary}>
+                {translate('tripDriver.text_new_value_recalculated')}
+              </TextEdit>
+              <TextEdit size="xlarge" color={theme.colors.secondary} fontWeight="bold">
+                {`${cityConfig?.typeMoney} ${Helper.maskMoney(Number(changeRoutePreview?.price))}`}
+              </TextEdit>
+            </ContentText>
+            <ButtonConfirm
+              title={translate('tripDriver.text_confirm')}
+              onPress={onChangeRoute}
+              loading={isSubmittingChangeRoute}
+            />
+          </ContentChangePrice>
+        )}
+      </Footer>
+    </Wrapper>
   );
-}
+};

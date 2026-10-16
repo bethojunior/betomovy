@@ -1,7 +1,8 @@
 import {useCallback} from 'react';
+import {translate} from '../../../../client/locales';
 import {customToast} from '../../../../utils/FlashMessage';
 import apiMain from '../../api/apiMain';
-import {PaymentPrepaidProps} from './types';
+import {PaymentPrepaidByPixProps, PaymentPrepaidProps, VerifyPaymentByPixProps} from './types';
 
 export const PrepaidService = () => {
   const getListPrepaid = useCallback(async (cityId) => {
@@ -28,7 +29,40 @@ export const PrepaidService = () => {
         return;
       }
 
-      customToast(data.message, 'success');
+      customToast(translate("prepaidRequest.text_request_success"), 'success');
+    },
+    [apiMain],
+  );
+
+
+  const paymentPrepaidByPix = useCallback(
+    async (payment: PaymentPrepaidByPixProps) => {
+      const {data} = await apiMain.post('/CreditPrepaid/Purchase', payment);
+
+      if (!data.status) {
+        customToast(data.message, 'danger');
+
+        return;
+      }
+
+      const paymentDataCode = String(data.data.payment_data.code);
+      const prepaidId = String(data.data.id);
+
+      return { paymentDataCode, prepaidId };
+    },
+    [apiMain],
+  );
+
+  const verifyPaymentByPix = useCallback(
+    async (payment: VerifyPaymentByPixProps) => {
+      const {data} = await apiMain.post('/CreditPrepaid/Show', payment);
+
+      if (!data.status) {
+        customToast(data.message, 'danger');
+
+        return;
+      }
+      return data;
     },
     [apiMain],
   );
@@ -36,5 +70,7 @@ export const PrepaidService = () => {
   return {
     getListPrepaid,
     paymentPrepaid,
+    paymentPrepaidByPix,
+    verifyPaymentByPix,
   };
 };

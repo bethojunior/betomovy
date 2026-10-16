@@ -1,18 +1,17 @@
-import {createContext, useContext, useMemo} from 'react';
 import {customToast} from '../../../../utils/FlashMessage';
-import {ChildrenType} from '../../../@types';
 import {PrepaidService} from './service';
-import {IPrepaidContext, PaymentPrepaidProps} from './types';
-import {useAuth} from '../../../../context/auth';
+import {PaymentPrepaidByPixProps, PaymentPrepaidProps, VerifyPaymentByPixProps} from './types';
+import { loadCache } from '../../../../hooks/useCityConfig';
 
-const PrepaidContext = createContext({} as IPrepaidContext);
-
-export const PrepaidProvider = ({children}: ChildrenType) => {
+export const usePrepaid = () => {
   const service = PrepaidService();
-  const {cityConfig} = useAuth();
 
   const getListPrepaid = async () => {
     try {
+      const cityConfig = loadCache();
+      if (!cityConfig) {
+        return;
+      }
       const response = await service.getListPrepaid(cityConfig?.cityId);
 
       if (typeof response === 'string') {
@@ -35,19 +34,28 @@ export const PrepaidProvider = ({children}: ChildrenType) => {
     }
   };
 
-  const value = useMemo(() => {
-    return {
-      getListPrepaid,
-      paymentPrepaid,
-    };
-  }, [getListPrepaid, paymentPrepaid]);
+  const paymentPrepaidByPix = async (payment: PaymentPrepaidByPixProps) => {
+    try {
+      const result = await service.paymentPrepaidByPix(payment);
+      return result
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-  return (
-    <PrepaidContext.Provider value={value}>{children}</PrepaidContext.Provider>
-  );
-};
+  const verifyPaymentByPix = async (payment: VerifyPaymentByPixProps) => {
+    try {
+      const result = await service.verifyPaymentByPix(payment);
+      return result
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-export const usePrepaid = () => {
-  const context = useContext(PrepaidContext);
-  return context;
+  return {
+    getListPrepaid,
+    paymentPrepaid,
+    paymentPrepaidByPix,
+    verifyPaymentByPix
+  };
 };

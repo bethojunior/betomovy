@@ -1,20 +1,20 @@
-import {TouchableOpacity} from 'react-native';
-import {useState} from 'react';
-import {AntDesign} from '@expo/vector-icons';
-import {useTheme} from 'styled-components';
-import {Container} from './styles';
-import {useTrip} from '../../contexts/Trip';
+import { TouchableOpacity } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { useTheme } from 'styled-components';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { Container } from './styles';
+import { useTrip } from '../../contexts/Trip';
 
 export default function StarRatings() {
-  const {colors} = useTheme();
-  const {stateTripCustomer, dispatchTripCustomer} = useTrip();
+  const { colors } = useTheme();
+  const { stateTripCustomer, dispatchTripCustomer } = useTrip();
 
-  const {defaultRating} = stateTripCustomer;
-  const [maxRating, setMaxRating] = useState([1, 2, 3, 4, 5]);
+  const { defaultRating } = stateTripCustomer;
+  const maxRating = [1, 2, 3, 4, 5];
 
   return (
     <Container>
-      {maxRating.map((item, key) => {
+      {maxRating.map((item) => {
         return (
           <TouchableOpacity
             activeOpacity={0.7}
@@ -28,9 +28,9 @@ export default function StarRatings() {
             }
           >
             <AntDesign
-              size={31}
-              name={item <= defaultRating ? 'star' : 'staro'}
-              color={colors.primary}
+              size={RFValue(31)}
+              name={'star'}
+              color={item <= defaultRating ? colors.primary : colors.grayLight}
             />
           </TouchableOpacity>
         );

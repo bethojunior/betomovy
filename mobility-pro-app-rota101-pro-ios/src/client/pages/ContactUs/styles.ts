@@ -19,7 +19,11 @@ export const Content = styled.ScrollView`
   padding: 0 20px;
 `;
 
-export const TextArea = styled.TextInput`
+export const TextArea = styled.TextInput.attrs({
+  multiline: true,
+  textAlignVertical: 'top',
+})`
+  height: 300px;
   background-color: ${({theme}) => theme.colors.border_white_light};
   border-radius: 10px;
   text-align: justify;
@@ -47,13 +51,4 @@ export const ViewButton = styled.View`
   width: 100%;
   height: 50px;
   margin-top: ${({theme}) => theme.spacing.xxlarge}px;
-`;
-
-export const Input = styled.TextInput`
-  background-color: ${({theme}) => theme.colors.background_global};
-  border: 0.5px solid ${({theme}) => theme.colors.primary};
-  border-radius: 10px;
-  text-align: justify;
-  padding: 12px;
-  margin-top: 20px;
 `;

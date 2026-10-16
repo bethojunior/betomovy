@@ -1,7 +1,7 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable array-callback-return */
 // @ts-nocheck
-import {useEffect, useMemo, useRef, useState} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import RenderHtml from 'react-native-render-html';
 import {
   Alert,
@@ -15,14 +15,14 @@ import {
   View,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import {StorageAccessFramework} from 'expo-file-system';
+import { StorageAccessFramework } from 'expo-file-system';
 import Iconicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Audio} from 'expo-av';
+import { Audio } from 'expo-av';
 import base64 from 'react-native-base64';
 import WebView from 'react-native-webview';
 import * as Speech from 'expo-speech';
-import {useTrip} from '../../../../contexts/Trip';
+import { useTrip } from '../../../../contexts/Trip';
 import {
   BackButton,
   ButtonMic,
@@ -42,8 +42,7 @@ import {
   TextHeader,
   TypeMessage,
 } from './styles';
-import {ButtonIcon} from '../ButtonIcon';
-import AppSocket from '../../../../services/socket';
+import { ButtonIcon } from '../ButtonIcon';
 import apiMain from '../../../../api/apiMain';
 import {
   RecordingButton,
@@ -51,17 +50,17 @@ import {
   TrashIconContainer,
 } from '../../../../pages/TripChat/styles';
 import theme from '../../../../styles/theme';
-import {If} from '../If';
+import { If } from '../If';
 import TripMessage from '../../../../components/TripMessage';
-import {ShippingDateText} from '../../../../components/TripMessage/styles';
-import {customToast} from '../../../../../utils/FlashMessage';
-import {convertBase64ToBlob} from '../../../../utils/dicument';
-import {translate} from '../../../../locales';
-import {Switch} from '../../../../components/Switch';
-import {useAuth} from '../../../../../context/auth';
-import {useTripGL} from '../../../../contexts/TripGL';
-import {MessageAudio} from '../MessageAudio';
-import {ChatRealtime} from '../../../../services/realtime/ChatRealtime';
+import { ShippingDateText } from '../../../../components/TripMessage/styles';
+import { customToast } from '../../../../../utils/FlashMessage';
+import { convertBase64ToBlob } from '../../../../utils/dicument';
+import { translate } from '../../../../locales';
+import { Switch } from '../../../../components/Switch';
+import { useAuth } from '../../../../../context/auth';
+import { useTripGL } from '../../../../contexts/TripGL';
+import { MessageAudio } from '../MessageAudio';
+import { ChatRealtime } from '../../../../services/realtime/ChatRealtime';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
 interface Props {
@@ -69,11 +68,10 @@ interface Props {
   visible: boolean;
 }
 
-export const ModalChat = ({setVisible, visible}: Props) => {
-  const socket = useRef<any>(null);
+export const ModalChat = ({ setVisible, visible }: Props) => {
   const scroll = useRef<any>(null);
-  const {user} = useAuth();
-  const {tripSchedule} = useTripGL();
+  const { user, generalSettings } = useAuth();
+  const { tripSchedule } = useTripGL();
   const [color, setColor] = useState(theme.colors.white);
 
   const [text, setText] = useState('');
@@ -97,17 +95,9 @@ export const ModalChat = ({setVisible, visible}: Props) => {
       }
       if (data.userId == user.idUser) {
         return (data.voiceRead = true);
-        Speech.speak(
-          `${user?.nickname} ${translate('trip.said')} ${data.message}`,
-          {
-            language: 'pt-BR',
-            // rate: rate,
-          },
-        );
       }
       Speech.speak(
-        `${tripSchedule?.driver?.name} ${translate('trip.said')} ${
-          data.message
+        `${tripSchedule?.driver?.name} ${translate('trip.said')} ${data.message
         }`,
         {
           language: 'pt-BR',
@@ -135,7 +125,7 @@ export const ModalChat = ({setVisible, visible}: Props) => {
               },
             },
           ],
-          {cancelable: false},
+          { cancelable: false },
         );
       }
     });
@@ -158,8 +148,7 @@ export const ModalChat = ({setVisible, visible}: Props) => {
     }
     if (received) {
       Speech.speak(
-        `${tripSchedule?.driver?.name} ${translate('trip.said')} ${
-          object.message
+        `${tripSchedule?.driver?.name} ${translate('trip.said')} ${object.message
         }`,
         {
           language: 'pt-BR',
@@ -222,16 +211,16 @@ export const ModalChat = ({setVisible, visible}: Props) => {
   }, [tripSchedule]);
 
   const scrollToEndWhenOpeningKeyboard = () => {
-    scroll.current.scrollToEnd({animated: true});
+    scroll.current.scrollToEnd({ animated: true });
   };
   async function handleMessage(idUser: string, tripReference: string) {
     if (text !== '') {
       apiMain.post('ChatTrip/SendMessage', {
-        stdObject: [{tripReference, message: text, userId: idUser}],
+        stdObject: [{ tripReference, message: text, userId: idUser }],
       });
       setText('');
     } else {
-      customToast('error', 'Digite uma mensagem');
+      customToast(translate('toast.text_empty_message'), 'warning');
     }
   }
   // gravaction
@@ -241,8 +230,8 @@ export const ModalChat = ({setVisible, visible}: Props) => {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      const {ios, android} = Audio.RecordingOptionsPresets.HIGH_QUALITY;
-      const {recording} = await Audio.Recording.createAsync({
+      const { ios, android } = Audio.RecordingOptionsPresets.HIGH_QUALITY;
+      const { recording } = await Audio.Recording.createAsync({
         android,
         ios,
         web: {},
@@ -255,7 +244,7 @@ export const ModalChat = ({setVisible, visible}: Props) => {
   async function stopRecording() {
     setRecording(undefined);
     await recording.stopAndUnloadAsync();
-    const {sound, status} = await recording.createNewLoadedSoundAsync();
+    const { sound, status } = await recording.createNewLoadedSoundAsync();
     setExecSound({
       duration: getDurationFormatted(10),
       sound,
@@ -296,7 +285,7 @@ export const ModalChat = ({setVisible, visible}: Props) => {
       const uri = await recording.getURI();
       const platform = Platform.OS;
       const extensionFile = recording._options[platform].extension;
-      const fileName = uri.split('/').pop().split(extensionFile)[0];
+      const fileName = uri?.split('/').pop()?.split(extensionFile)[0];
       const formData = new FormData();
       formData.append(
         'chatTrip',
@@ -382,8 +371,8 @@ export const ModalChat = ({setVisible, visible}: Props) => {
             />
           </BackButton>
           <ContainerDetails>
-            <Image source={{uri: tripSchedule?.driver.profilePicture}} />
-            <TextHeader>{tripSchedule?.driver.name.split(' ')[0]}</TextHeader>
+            <Image source={{ uri: tripSchedule?.driver.profilePicture }} />
+            <TextHeader>{tripSchedule?.driver.name?.split(' ')[0]}</TextHeader>
           </ContainerDetails>
           <ButtonIcon
             onPress={() => Linking.openURL(`tel:${tripSchedule?.driver.phone}`)}
@@ -398,7 +387,7 @@ export const ModalChat = ({setVisible, visible}: Props) => {
           <ContentChat
             ref={scroll}
             onContentSizeChange={() =>
-              scroll.current.scrollToEnd({animated: true})
+              scroll.current.scrollToEnd({ animated: true })
             }
           >
             {messages.length > 0 &&
@@ -446,7 +435,9 @@ export const ModalChat = ({setVisible, visible}: Props) => {
                   <TypeMessage>
                     {data.messageData.userId == user.idUser
                       ? translate('schedule.chat_you')
-                      : translate('schedule.chat_job')}
+                      : generalSettings.find(
+                        item => item?.key === 'text_name_driver_custom',
+                      )?.value || translate('register.partner')}
                   </TypeMessage>
                   {data.messageData.isAudio ? (
                     <>
@@ -465,7 +456,7 @@ export const ModalChat = ({setVisible, visible}: Props) => {
                   )}
                   <If condition={data.messageData.message?.voiceRead}>
                     <Iconicons
-                      style={{marginLeft: 'auto'}}
+                      style={{ marginLeft: 'auto' }}
                       name="volume-high"
                       size={15}
                       color={theme.colors.primary}
@@ -505,7 +496,7 @@ export const ModalChat = ({setVisible, visible}: Props) => {
 
               <ButtonMic
                 onPress={async () => {
-                  const {granted} = await Audio.getPermissionsAsync();
+                  const { granted } = await Audio.getPermissionsAsync();
                   if (!granted) {
                     Audio.requestPermissionsAsync();
                   }
@@ -527,7 +518,7 @@ export const ModalChat = ({setVisible, visible}: Props) => {
                 recording={Boolean(recording)}
               >
                 <Iconicons
-                  name="md-mic"
+                  name="mic"
                   size={24}
                   color={
                     recording
@@ -544,7 +535,7 @@ export const ModalChat = ({setVisible, visible}: Props) => {
   );
 };
 
-function ShippingDate({timeSendInSeconds, messageReceived}) {
+function ShippingDate({ timeSendInSeconds, messageReceived }) {
   const shippingDate = new Date();
 
   shippingDate.setTime(timeSendInSeconds * 1000);

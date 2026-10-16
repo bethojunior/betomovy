@@ -1,5 +1,6 @@
 import { ViewProps } from 'react-native';
 import {Container, Content} from './styles';
+import { JSX } from 'react';
 
 interface Props {
   title: JSX.Element;

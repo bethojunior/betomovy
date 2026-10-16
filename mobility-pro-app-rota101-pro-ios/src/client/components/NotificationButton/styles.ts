@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import {lighten} from 'polished';
-import {transparent} from 'react-native-paper/lib/typescript/styles/colors';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 interface ViewedProps {
   viewed: string;
@@ -142,8 +142,10 @@ export const Alert = styled.View<AlertProps>`
   border-radius: 100px;
   width: 8px;
   height: 8px;
-  align-self: flex-end;
-  margin-bottom: -5px;
+  position: absolute;
+  top: 0;
+  right: ${RFValue(2)}px;
+  z-index: 2;
 `;
 
 export const IconNotify = styled.Image`

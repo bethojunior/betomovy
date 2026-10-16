@@ -11,6 +11,7 @@ import {ContentModal, TextTitle} from '../CardService/styles';
 import ModalFrame from '../../../../components/form/Modal';
 import {translate} from '../../../../locales';
 import {buildApp} from '../../../../../constantBuild/config';
+import {useStoragePictures} from '../../../../../driver/src/hooks/useStoragePictures';
 
 interface Props {
   item: any;
@@ -20,6 +21,7 @@ interface Props {
 export function CardFavorite({item, setLoader}: Props) {
   const [dialogRemove, setDialogRemove] = useState(false);
   const {removeFavorites} = useFavorite();
+  const {getStoragePictureSpecific} = useStoragePictures();
 
   const handleRemoveFavorite = useCallback(async () => {
     if (Platform.OS !== 'ios') setLoader(true);
@@ -32,7 +34,11 @@ export function CardFavorite({item, setLoader}: Props) {
     <>
       <Container>
         <Avatar
-          source={{uri: buildApp().HOST_IMAGE_DRIVER + item.driverImage}}
+          source={{
+            uri:
+              (getStoragePictureSpecific('driver') ||
+                buildApp().HOST_IMAGE_DRIVER) + item.driverImage,
+          }}
         />
         <Badge
           size={15}

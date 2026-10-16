@@ -1,17 +1,17 @@
-import {TouchableOpacity} from 'react-native';
-import {AntDesign} from '@expo/vector-icons';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { TouchableOpacity } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { RFValue } from 'react-native-responsive-fontsize';
 import theme from '../../styles/theme';
-import {DeliveryOrderService} from '../../../../context/DeliveryOrder/services';
-import {useState} from 'react';
-import {IfLoaderInsideScreen} from '../IfLoaderInsideScreen';
+import { DeliveryOrderService } from '../../../../context/DeliveryOrder/services';
+import { useState } from 'react';
+import { IfLoaderInsideScreen } from '../IfLoaderInsideScreen';
 
 interface Props {
   callback?: () => void;
   orderId?: number;
 }
 
-export const ContainerButtonsAcceptDelivery = ({callback, orderId}: Props) => {
+export const ContainerButtonsAcceptDelivery = ({ callback, orderId }: Props) => {
   const [loading, setLoading] = useState({
     accept: false,
     refused: false,
@@ -57,7 +57,7 @@ export const ContainerButtonsAcceptDelivery = ({callback, orderId}: Props) => {
         >
           <AntDesign
             size={RFValue(40)}
-            name="closecircleo"
+            name="close-circle"
             color={theme.colors.red}
           />
         </TouchableOpacity>
@@ -69,7 +69,7 @@ export const ContainerButtonsAcceptDelivery = ({callback, orderId}: Props) => {
         >
           <AntDesign
             size={RFValue(40)}
-            name="checkcircleo"
+            name="check-circle"
             color={theme.colors.primary}
           />
         </TouchableOpacity>

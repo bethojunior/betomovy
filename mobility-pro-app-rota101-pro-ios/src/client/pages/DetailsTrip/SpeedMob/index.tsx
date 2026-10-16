@@ -1,23 +1,23 @@
-import {Ionicons} from '@expo/vector-icons';
-import {useNavigation} from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
-import {useState, useEffect, useCallback} from 'react';
-import {View, Alert, FlatList} from 'react-native';
-import {Avatar} from 'react-native-elements';
+import { useState, useEffect, useCallback } from 'react';
+import { View, Alert, FlatList } from 'react-native';
+import { Avatar } from 'react-native-elements';
 
-import {translate} from '../../../locales';
+import { translate } from '../../../locales';
 
 import apiMain from '../../../api/apiMain';
-import {customToast} from '../../../../utils/FlashMessage';
+import { customToast } from '../../../../utils/FlashMessage';
 
 import Preload from '../../../components/Preload';
 
-import {useAuth} from '../../../../context/auth';
-import {useReceipt} from '../../../contexts/Receipt';
-import {useFavorite} from '../../../contexts/favorite';
+import { useAuth } from '../../../../context/auth';
+import { useReceipt } from '../../../contexts/Receipt';
+import { useFavorite } from '../../../contexts/favorite';
 
-import {convertDate, maskHour} from '../../../utils/FormatDate';
-import {maskMoneyIntl} from '../../../utils/money';
+import { convertDate, maskHour } from '../../../utils/FormatDate';
+import { maskMoneyIntl } from '../../../utils/money';
 
 import theme from '../../../styles/theme';
 
@@ -54,10 +54,10 @@ import {
   PaymentNameTypeHelp
 } from './styles';
 
-export default function DetailsTripSpeedMob({route}: any) {
-  const {user} = useAuth();
-  const {addFavorites, getFavorites, favorites} = useFavorite();
-  const {sendReceipt} = useReceipt();
+export default function DetailsTripSpeedMob({ route }: any) {
+  const { user } = useAuth();
+  const { addFavorites, getFavorites, favorites } = useFavorite();
+  const { sendReceipt } = useReceipt();
   const [detailsTrip, setDetailsTrip] = useState<any>({});
   const [driverBloqued, setDriverBlocked] = useState({});
   const [loading, setLoading] = useState(true);
@@ -71,7 +71,7 @@ export default function DetailsTripSpeedMob({route}: any) {
   const listMethodsHelp = async () => {
     setLoading(true);
     try {
-      const {data} = await apiMain.get('/TripReportType/GetAll');
+      const { data } = await apiMain.get('/TripReportType/GetAll');
       setHelpers(data.data);
     } catch {
       console.log('error');
@@ -93,7 +93,7 @@ export default function DetailsTripSpeedMob({route}: any) {
     });
   }
 
-  const PaymentMethod = ({item}: any) => (
+  const PaymentMethod = ({ item }: any) => (
     <ContentTypeHelp
       onPress={() => {
         navigateToHelp(item);
@@ -126,7 +126,7 @@ export default function DetailsTripSpeedMob({route}: any) {
   };
 
   const formatDateAndHour = (date: string) => {
-    const dateSplit = date.split(' ');
+    const dateSplit = date?.split(' ');
     return `${convertDate(dateSplit[0])} ${maskHour(dateSplit[1])}`;
   };
   const switchStatus = (status: string) => {
@@ -148,14 +148,14 @@ export default function DetailsTripSpeedMob({route}: any) {
     }
   };
 
-  const {tripReference} = route.params;
-  const {trip} = route.params;
+  const { tripReference } = route.params;
+  const { trip } = route.params;
 
   const checkDriverIsFavorited = () => {
     const isDriverExists = favorites.filter((data) => data.idDriver === detailsTrip?.driver?.idDriver);
-    if(isDriverExists.length > 0){
+    if (isDriverExists.length > 0) {
       setIsDriverFavorited(true);
-    }else{
+    } else {
       setIsDriverFavorited(false);
     }
   }
@@ -177,14 +177,14 @@ export default function DetailsTripSpeedMob({route}: any) {
           },
         },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   };
 
   const listBlockDriver = async (idDriver: string) => {
     setLoading(true);
     try {
-      const {data} = await apiMain.post(`/RefusedDriver/list`, {
+      const { data } = await apiMain.post(`/RefusedDriver/list`, {
         customerId: user.idCustomer,
       });
       const driverBlocked = data.data.find(
@@ -228,7 +228,7 @@ export default function DetailsTripSpeedMob({route}: any) {
             },
           },
         ],
-        {cancelable: false},
+        { cancelable: false },
       );
     }
     return Alert.alert(
@@ -257,7 +257,7 @@ export default function DetailsTripSpeedMob({route}: any) {
           },
         },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   };
 
@@ -269,7 +269,7 @@ export default function DetailsTripSpeedMob({route}: any) {
 
   useEffect(() => {
     getDetailsTrip(tripReference);
-    if(switchStatus(trip.status.toUpperCase()) === 'Finalizado'){
+    if (switchStatus(trip.status.toUpperCase()) === 'Finalizado') {
       listMethodsHelp();
     }
   }, [favorites]);
@@ -279,12 +279,12 @@ export default function DetailsTripSpeedMob({route}: any) {
   }, []);
 
   useEffect(() => {
-    if(favorites){
-      if(switchStatus(trip.status.toUpperCase()) === 'Finalizado' || switchStatus(trip.status.toUpperCase()) === 'Cancelado'){
+    if (favorites) {
+      if (switchStatus(trip.status.toUpperCase()) === 'Finalizado' || switchStatus(trip.status.toUpperCase()) === 'Cancelado') {
         checkDriverIsFavorited();
       }
     }
-  },[loading]);
+  }, [loading]);
 
   return (
     <Container>
@@ -383,7 +383,7 @@ export default function DetailsTripSpeedMob({route}: any) {
         {switchStatus(trip.status.toUpperCase()) === 'Finalizado' && (
           <ContentHelp>
             <ContentHeaderHelp>
-              <ButtonHeaderHelp style={{ borderColor: screenFavoriteAndReceived === 'help' ? theme.colors.secondary : '', borderBottomWidth: screenFavoriteAndReceived === 'help' ? 1 : 0 }} 
+              <ButtonHeaderHelp style={{ borderColor: screenFavoriteAndReceived === 'help' ? theme.colors.secondary : '', borderBottomWidth: screenFavoriteAndReceived === 'help' ? 1 : 0 }}
                 onPress={() => setScreenFavoriteAndReceived('help')}
               >
                 <ButtonTextsHeaderHelp>
@@ -401,7 +401,7 @@ export default function DetailsTripSpeedMob({route}: any) {
             {screenFavoriteAndReceived === 'help' && (
               <ContentItemsList>
                 <FlatList
-                  style={{paddingBottom: 10}}
+                  style={{ paddingBottom: 10 }}
                   data={helpers}
                   renderItem={PaymentMethod}
                   keyExtractor={(item: any) => item.idTripReportType}

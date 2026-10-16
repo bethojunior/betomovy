@@ -9,13 +9,13 @@ export const setAsyncStorageByTime = async (key: string, value: any) => {
   return await AsyncStorage.setItem(key, JSON.stringify(data));
 };
 
-export const useAsyncStorageByTime = async (key: string, hour: number) => {
+export const getAsyncStorageByTime = async (key: string, hour: number) => {
   const data = await AsyncStorage.getItem(key);
   if (data) {
     const parsedData = JSON.parse(data);
     const now = new Date();
-    if (parsedData.time > now.getTime() - hour * 60 * 60 * 1000) {
-      return parsedData.value;
+    if (parsedData?.time > now.getTime() - hour * 60 * 60 * 1000) {
+      return parsedData?.value;
     } else {
       await AsyncStorage.removeItem(key);
       return null;

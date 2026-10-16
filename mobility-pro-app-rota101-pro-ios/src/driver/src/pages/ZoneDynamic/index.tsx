@@ -1,7 +1,6 @@
-import {useEffect, useRef, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import {Map} from '../../components/Map';
-import {Ionicons, AntDesign} from '@expo/vector-icons';
+import { useRef, useState } from 'react';
+import { Map } from '../../components/Map';
+import { Ionicons, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import {
   ButtonCard,
   Container,
@@ -9,21 +8,21 @@ import {
   ContainerIcon,
   ContainerIconCentralize,
 } from './styles';
-import {ButtonIcon} from '../../components/ButtonIcon';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { ButtonIcon } from '../../components/ButtonIcon';
+import { RFValue } from 'react-native-responsive-fontsize';
 import theme from '../../styles/theme';
-import {TextEdit} from '../../components/TextEdit';
+import { TextEdit } from '../../components/TextEdit';
 import ModalFrame from '../../components/Modal/ModalFrame';
-import {useLocalProvider} from '../../context/local';
+import { useLocalProvider } from '../../context/local';
 import apiMainDriver from '../../api/apiMain';
 import Preload from '../../components/Preload';
-import {Circle, Marker} from 'react-native-maps';
-import {If} from '../../components/If';
-import {translate} from '../../../../client/locales';
-import {customToast} from '../../../../utils/FlashMessage';
+import { Circle, Marker } from 'react-native-maps';
+import { If } from '../../components/If';
+import { translate } from '../../../../client/locales';
+import { customToast } from '../../../../utils/FlashMessage';
 
 export default function ZoneDynamic() {
-  const {location} = useLocalProvider();
+  const { location } = useLocalProvider();
   const [loading, setLoading] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
   const [dataDynamic, setDataDynamic] = useState<any>([]);
@@ -58,7 +57,7 @@ export default function ZoneDynamic() {
 
   const getDataPerEndpoint = async (endpoint: string) => {
     try {
-      const {data} = await apiMainDriver.get(endpoint);
+      const { data } = await apiMainDriver.get(endpoint);
       if (!data.status) {
         return customToast(data.message, 'danger');
       }
@@ -116,12 +115,8 @@ export default function ZoneDynamic() {
   return (
     <Container>
       <Map
-        mapRef={(ref: any) => {
-          mapRef.current = ref;
-        }}
+        ref={mapRef}
         noDriver
-        latitude={location?.coords?.latitude}
-        longitude={location?.coords?.longitude}
         setCountVisible={setLoading}
       >
         {dataDynamic &&
@@ -146,19 +141,18 @@ export default function ZoneDynamic() {
         {dataDynamicNoFilter.length > 0 &&
           dataDynamicNoFilter.map((item, index) => {
             return (
-              <Marker
-                key={index}
-                coordinate={{
-                  latitude: Number(item?.latitude),
-                  longitude: Number(item?.longitude),
-                }}
-              >
-                <Ionicons
-                  name="person-circle"
-                  size={RFValue(20)}
-                  color={theme.colors.secondary}
-                />
-              </Marker>
+              item?.latitude && (
+                <Marker
+                  key={index}
+                  tracksViewChanges={false}
+                  coordinate={{
+                    latitude: Number(item?.latitude),
+                    longitude: Number(item?.longitude),
+                  }}
+                >
+                  <MaterialIcons name="person-pin" size={32} color={theme.colors.secondary} />
+                </Marker>
+              )
             );
           })}
       </Map>
@@ -169,7 +163,7 @@ export default function ZoneDynamic() {
           icon={
             <>
               <Ionicons
-                name="ios-stats-chart-outline"
+                name="stats-chart-outline"
                 size={RFValue(20)}
                 color={theme.colors.background_global}
               />
@@ -199,28 +193,6 @@ export default function ZoneDynamic() {
               nextHandleDinamic(itemInitial);
             }}
           />
-          {/* <View
-            style={{
-              marginLeft: RFValue(15),
-            }}
-          >
-            <ButtonIcon
-              w={RFValue(50)}
-              h={RFValue(50)}
-              icon={
-                <>
-                  <MaterialIcons
-                    name="keyboard-arrow-right"
-                    size={RFValue(20)}
-                    color={theme.colors.secondary}
-                  />
-                </>
-              }
-              onPress={() => {
-                nextHandleDinamic(itemInitial);
-              }}
-            />
-          </View> */}
         </ContainerIconCentralize>
       </If>
 

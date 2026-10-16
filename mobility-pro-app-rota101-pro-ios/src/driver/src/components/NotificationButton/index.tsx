@@ -1,7 +1,7 @@
-import {Linking, Text, TouchableOpacity, View} from 'react-native';
-import {Ionicons, Feather} from '@expo/vector-icons';
-import {useEffect, useState} from 'react';
-import {ScrollView} from 'react-native-gesture-handler';
+import { Linking, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons, Feather } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import { ScrollView } from 'react-native-gesture-handler';
 import * as Notifications from 'expo-notifications';
 
 import {
@@ -26,14 +26,15 @@ import {
 import apiMain from '../../api/apiMain';
 import Logo from '../../../../client/assets/images/perfil-de-usuario.png';
 import Preload from '../Preload';
-import {If} from '../If';
-import {useAuth} from '../../../../context/auth';
-import {customToast} from '../../../../utils/FlashMessage';
-import {translate} from '../../../../client/locales';
-import {buildApp} from '../../../../constantBuild/config';
+import { If } from '../If';
+import { useAuth } from '../../../../context/auth';
+import { customToast } from '../../../../utils/FlashMessage';
+import { translate } from '../../../../client/locales';
+import { buildApp } from '../../../../constantBuild/config';
 import theme from '../../styles/theme';
 import ModalFrame from '../Modal/ModalFrame';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useStoragePictures } from '../../hooks/useStoragePictures';
 
 interface NotificationItem {
   viewed: string;
@@ -58,7 +59,8 @@ export default function NotificationButton({
   const [filter, setFilter] = useState(true);
   const [hasNotify, setHasNotify] = useState(true);
 
-  const {notification, getNotification, user, userDriver} = useAuth();
+  const { notification, getNotification, user, userDriver } = useAuth();
+  const { getStoragePictureSpecific } = useStoragePictures();
 
   useEffect(() => {
     if (notification === null) {
@@ -102,7 +104,7 @@ export default function NotificationButton({
           Object.keys(userDriver).length > 0 ? userDriver?.idUser : user.idUser,
         notifications: [id],
       })
-      .then(({data}) => {
+      .then(({ data }) => {
         setLoading(false);
 
         if (!data.status) {
@@ -117,23 +119,25 @@ export default function NotificationButton({
   };
 
   const transformPath = () => {
-    const arrayString = buildApp().HOST_IMAGE_DRIVER.split('/');
+    const arrayString =
+      getStoragePictureSpecific('driver')?.split('/') ||
+      buildApp().HOST_IMAGE_DRIVER?.split('/');
     arrayString.splice(-4);
     return `${arrayString.join('/')}/`;
   };
 
   const Card = (data: any) => {
-    const {item} = data;
+    const { item } = data;
     return (
       <Content viewed={item.viewed} key={item.idNotification}>
-        <View style={{display: 'flex', flexDirection: 'row'}}>
+        <View style={{ display: 'flex', flexDirection: 'row' }}>
           <IconNotify
             source={
               item.image === null
                 ? Logo
                 : {
-                    uri: `${transformPath()}${item.image}`,
-                  }
+                  uri: `${transformPath()}${item.image}`,
+                }
             }
           />
           <ContentInfo>
@@ -144,7 +148,7 @@ export default function NotificationButton({
                 show={item.link}
                 onPress={() => Linking.openURL(item.link)}
               >
-                <Text style={{color: theme.colors.primaryText, fontSize: 12}}>
+                <Text style={{ color: theme.colors.primaryText, fontSize: 12 }}>
                   {translate('notification.text_see_more')}
                 </Text>
               </LinkButton>
@@ -154,7 +158,7 @@ export default function NotificationButton({
                   readNotification(item.idNotification);
                 }}
               >
-                <Text style={{color: theme.colors.primaryText, fontSize: 12}}>
+                <Text style={{ color: theme.colors.primaryText, fontSize: 12 }}>
                   {translate('notification.text_mark_viewed')}
                 </Text>
               </ReadButton>
@@ -234,7 +238,7 @@ export default function NotificationButton({
                   return filter ? data.viewed === '0' : data;
                 })
                 .map((item: any, index: number) => {
-                  return Card({item, index});
+                  return Card({ item, index });
                 })
             ) : (
               <TextNoNotify>

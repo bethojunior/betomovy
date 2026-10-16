@@ -50,22 +50,76 @@ export const NameContainer = styled.View`
 
 export const CarDetails = styled.View`
   margin-top: ${RFValue(10)}px;
-  background-color: ${({theme}) => theme.colors.background_global};
-  padding: 10px;
-  border-radius: 18px;
-`;
-
-export const DriverCodeContainer = styled.View`
-  flex-direction: row;
-  border-bottom-width: 0.5px;
-  border-bottom-color: #797979d6;
-  margin-bottom: 5px;
-  padding-bottom: 5px;
+  background-color: ${({theme}) => theme.colors.white};
+  padding: ${RFValue(4)}px ${RFValue(12)}px;
+  border-radius: ${RFValue(14)}px;
 `;
 
 export const TitleDetails = styled.Text`
   font-weight: bold;
   color: ${({theme}) => theme.colors.secondary};
+`;
+
+export const DriverCodeContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${RFValue(4)}px;
+  padding: ${RFValue(7)}px 0;
+`;
+
+export const InfoGrid = styled.View`
+  flex-direction: row;
+  padding: ${RFValue(7)}px 0;
+`;
+
+export const InfoCell = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: ${RFValue(4)}px;
+`;
+
+export const InfoCellLabel = styled.Text`
+  font-size: ${RFValue(11)}px;
+  font-weight: 600;
+  color: ${({theme}) => theme.colors.secondary};
+  opacity: 0.6;
+`;
+
+export const InfoCellValue = styled.Text`
+  font-size: ${RFValue(11)}px;
+  font-weight: bold;
+  color: ${({theme}) => theme.colors.secondary};
+`;
+
+export const VehicleInfoCell = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: ${RFValue(4)}px;
+  overflow: hidden;
+`;
+
+export const VehicleInfoTextWrapper = styled.View`
+  flex: 1;
+  flex-shrink: 1;
+  overflow: hidden;
+`;
+
+export const VehicleInfoLine = styled.Text`
+  flex-shrink: 1;
+`;
+
+export const VehicleInfoValue = styled.Text`
+  font-size: ${RFValue(11)}px;
+  font-weight: bold;
+  color: ${({theme}) => theme.colors.secondary};
+`;
+
+export const RatingValueRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${RFValue(3)}px;
 `;
 
 export const TextData = styled.Text`
@@ -140,7 +194,15 @@ export const HeaderContent = styled.View`
   align-items: center;
 `;
 
-export const TitleAcordion = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
+export const TitleAcordion = styled.View`
   margin-left: 60px;
+`;
+
+export const ButtonSend = styled.TouchableOpacity`
+  width: 100%;
+  border-radius: 20px;
+  margin-top: 10px;
+  align-items: center;
+  padding: 15px;
+  background-color: ${({theme}) => theme.colors.primary};
 `;

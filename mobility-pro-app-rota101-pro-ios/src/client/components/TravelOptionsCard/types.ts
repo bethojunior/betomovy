@@ -1,15 +1,32 @@
-import { SelectedCouponProps, SelectedOptionTravelProps } from "../../contexts/Trip/types";
+import { SelectedCouponProps, SelectedOptionTravelProps } from '../../contexts/Trip/types';
 
-export interface travelOptionsCardProps {
-  selectedOptionTravel: SelectedOptionTravelProps; 
-  item: any;
-  setOfferInDriver: (val: number) => void;
+export interface TravelOptionsCardItem extends SelectedOptionTravelProps {
+  tag: string;
+  color?: string;
+  multiplierPriceDynamic?: number | string;
+  platformAmount?: number | null;
+  driverAmount?: number | null;
+  description?: string;
+  estimatedTripTime?: string | number;
+  tripType: SelectedOptionTravelProps['tripType'] & {
+    picture?: string;
+    name?: string;
+    estimatedTime?: string | number;
+    description?: string;
+  };
+}
+
+export interface TravelOptionsCardProps {
+  selectedOptionTravel: SelectedOptionTravelProps;
+  item: TravelOptionsCardItem;
+  setOfferInDriver: (value: number) => void;
+  onPressSelectedTripType: (value: TravelOptionsCardItem) => void;
   turbined: boolean;
   selectedCoupon: SelectedCouponProps;
   offerInDriver: number;
   verifyCardOnCoupon: boolean;
   coupons: CouponProps[];
-  setModalCoupon: (val: boolean) => void
+  setModalCoupon: (value: boolean) => void;
 }
 
 interface CouponProps {
@@ -32,5 +49,5 @@ interface CouponProps {
   used: string;
   userId: string;
   value: string;
-  valueType: symbol;
+  valueType: string;
 }

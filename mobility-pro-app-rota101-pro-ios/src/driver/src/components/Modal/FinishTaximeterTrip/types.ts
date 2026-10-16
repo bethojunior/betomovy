@@ -1,5 +1,7 @@
 export interface TaximeterDetails {
-  minutes: number,
-  km: number,
-  tripReference?: string
+  minutes: number;
+  km: number;
+  tripReference?: string;
+  tripTaximeter?: any;
+  price: any;
 }

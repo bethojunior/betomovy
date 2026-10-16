@@ -1,151 +1,243 @@
 import {
   collection,
-  limit,
-  onSnapshot,
-  orderBy,
   query,
-  QuerySnapshot,
   where,
+  orderBy,
+  limit,
 } from 'firebase/firestore';
-import db from '..';
+
 import {
   STATUS_ACCEPTED,
   STATUS_BOARDING,
   STATUS_GET_BID_BY_DRIVERS,
   STATUS_IN_PROGRESS,
+  STATUS_PRE_ACCEPTED,
   STATUS_SCHEDULED,
 } from '../../../constants/trip';
-import {CallbackFirebase} from '../types';
+
 import {TRIPS_PATH} from '../../../constants/firebase';
+import {ITripRealtime, TripCallback} from '../../../interfaces/tripRealtime';
+import IdGenerator from '../../../../../utils/IdGenerator';
+import {Trip} from '../../../../../interfaces/trip';
+import safeOnSnapshot from '~/utils/firestore/safeOnSnapshot';
+import { db } from '~/common/services/firebase/config';
 
-class TripCollection {
-  createQuery = constraints => {
-    return query(collection(db, TRIPS_PATH), ...constraints);
-  };
+class TripCollection implements ITripRealtime {
+  private unsubscribes: Map<string, () => void> = new Map();
 
-  getTripScheduledAccepted = (driverId: string, callback: CallbackFirebase) => {
-    const q = this.createQuery([
+  getTripScheduledAccepted(driverId: string, callback: TripCallback): string {
+    const id = IdGenerator.basic();
+
+    const mountedQuery = query(
+      collection(db, 'trips'),
       where('driverId', '==', driverId),
       where('status', '==', STATUS_SCHEDULED),
       orderBy('date', 'desc'),
-    ]);
+    );
 
-    return this.subscribeToQuery(q, callback);
-  };
+    let initialLoad = true;
 
-  getTripOffer = (cityId, tripTypeId, callback) => {
-    const q = this.createQuery([
+    const unsubscribe = safeOnSnapshot(mountedQuery, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (initialLoad && change.type === "added") {
+          return;
+        }
+        callback({data: change.doc.data() as Trip, type: change.type});
+      });
+
+      initialLoad = false;
+    });
+
+    this.unsubscribes.set(id, unsubscribe);
+    return id;
+  }
+
+  getTripOffer(
+    cityId: string,
+    tripTypeId: string,
+    callback: TripCallback,
+  ): string {
+    const id = IdGenerator.basic();
+
+    const mountedQuery = query(
+      collection(db, 'trips'),
       where('cityId', '==', cityId),
       where('driverId', '==', null),
       where('tripTypeId', '==', tripTypeId),
       where('status', '==', STATUS_GET_BID_BY_DRIVERS),
       orderBy('date', 'desc'),
-    ]);
+    );
 
-    this.subscribeToQuery(q, callback);
-  };
+    const unsubscribe = safeOnSnapshot(mountedQuery, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        callback({data: change.doc.data() as Trip, type: change.type});
+      });
+    });
 
-  getTripScheduled = (
+    this.unsubscribes.set(id, unsubscribe);
+    return id;
+  }
+
+  getTripScheduled(
     cityId: string,
     tripTypeId: string,
-    callback: CallbackFirebase,
-  ) => {
-    const q = this.createQuery([
+    callback: TripCallback,
+  ): string {
+    const id = IdGenerator.basic();
+
+    const mountedQuery = query(
+      collection(db, 'trips'),
       where('cityId', '==', cityId),
       where('driverId', '==', null),
       where('tripTypeId', '==', tripTypeId),
       where('status', '==', STATUS_SCHEDULED),
       orderBy('date', 'desc'),
-    ]);
+    );
 
-    this.subscribeToQuery(q, callback);
-  };
+    let initialLoad = true;
 
-  searchTripByStatus = (
-    driverId: string,
-    status = STATUS_ACCEPTED,
-    callback: CallbackFirebase,
-  ) => {
-    const q = this.createQuery([
-      where('driverId', '==', driverId),
-      where('status', 'in', [STATUS_ACCEPTED, status, STATUS_IN_PROGRESS]),
-      orderBy('date', 'desc'),
-    ]);
+    const unsubscribe = safeOnSnapshot(mountedQuery, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (initialLoad && change.type === "added") {
+          return;
+        }
+        callback({data: change.doc.data() as Trip, type: change.type});
+      });
 
-    return this.subscribeToQuery(q, callback);
-  };
+      initialLoad = false;
+    });
 
-  searchTripByStatusAll = (driverId: string, callback: CallbackFirebase) => {
-    const q = this.createQuery([
+    this.unsubscribes.set(id, unsubscribe);
+    return id;
+  }
+
+  searchTripInProgress(driverId: string, callback: TripCallback): string {
+    const id = IdGenerator.basic();
+
+    const mountedQuery = query(
+      collection(db, 'trips'),
       where('driverId', '==', driverId),
       where('status', 'in', [
-        STATUS_ACCEPTED,
         STATUS_BOARDING,
+        STATUS_ACCEPTED,
         STATUS_IN_PROGRESS,
+        STATUS_PRE_ACCEPTED,
       ]),
       orderBy('date', 'desc'),
-    ]);
+    );
 
-    return this.subscribeToQuery(q, callback);
-  };
+    let initialLoad = true;
 
-  searchTripByStatusScheduled = (
-    driverId: string,
-    status = STATUS_ACCEPTED,
-    callback: CallbackFirebase,
-  ) => {
-    const q = this.createQuery([
+    const unsubscribe = safeOnSnapshot(mountedQuery, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (initialLoad && change.type === "added") {
+          return;
+        }
+        callback({data: change.doc.data() as Trip, type: change.type});
+      });
+
+      initialLoad = false;
+    });
+
+    this.unsubscribes.set(id, unsubscribe);
+    return id;
+  }
+
+  getTripScheduledAcceptedReady(driverId: string, callback?: TripCallback): string {
+    const id = IdGenerator.basic();
+
+    const mountedQuery = query(
+      collection(db, 'trips'),
       where('driverId', '==', driverId),
-      where('status', 'in', [status, STATUS_SCHEDULED]),
-      orderBy('date', 'desc'),
-    ]);
+      where("status", "==", STATUS_ACCEPTED),
+      // where("schedule", "!=", null),
+      limit(1),
+    );
 
-    this.subscribeToQuery(q, callback);
-  };
+    const unsubscribe = safeOnSnapshot(mountedQuery, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        const data: Trip = change.doc.data();
 
-  searchTrip = (driverId: string, callback: CallbackFirebase) => {
-    const q = this.createQuery([
+        if (data?.schedule !== null) {
+          callback({data, type: change.type});
+        }
+      });
+    });
+
+    this.unsubscribes.set(id, unsubscribe);
+    return id;
+  }
+
+  searchTrip(driverId: string, callback: TripCallback): string {
+    const id = IdGenerator.basic();
+
+    const mountedQuery = query(
+      collection(db, 'trips'),
       where('callingDriver', 'array-contains', driverId),
       where('driver', '==', null),
       limit(1),
-    ]);
+    );
 
-    this.subscribeToQuery(q, callback);
-  };
+    const unsubscribe = safeOnSnapshot(mountedQuery, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        callback({data: change.doc.data() as Trip, type: change.type});
+      });
+    });
 
-  checkTripAccepted = (driverId, callback) => {
-    const q = this.createQuery([
+    this.unsubscribes.set(id, unsubscribe);
+    return id;
+  }
+
+  checkTripAccepted(driverId: string, callback: TripCallback): string {
+    const id = IdGenerator.basic();
+
+    const mountedQuery = query(
+      collection(db, 'trips'),
       where('driverId', '==', driverId),
       where('status', '==', STATUS_ACCEPTED),
       limit(1),
-    ]);
+    );
 
-    this.subscribeToQuery(q, callback);
-  };
+    const unsubscribe = safeOnSnapshot(mountedQuery, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        callback({data: change.doc.data() as Trip, type: change.type});
+      });
+    });
 
-  getTrip = (tripReference, callback) => {
-    const q = this.createQuery([
+    this.unsubscribes.set(id, unsubscribe);
+    return id;
+  }
+
+  getTrip(tripReference: string, callback: TripCallback): string {
+    const id = IdGenerator.basic();
+
+    const mountedQuery = query(
+      collection(db, TRIPS_PATH),
       where('tripReference', '==', tripReference),
       limit(1),
-    ]);
-
-    this.subscribeToQuery(q, callback);
-  };
-
-  subscribeToQuery = (query, callback) => {
-    return onSnapshot(
-      query,
-      (snapshot: QuerySnapshot) => {
-        snapshot?.docChanges()?.forEach(change => {
-          callback(change?.doc?.data(), change?.type);
-        });
-      },
-      error => {
-        console.error('Firestore subscription error:', error);
-        // Handle error appropriately
-      },
     );
-  };
+
+    const unsubscribe = safeOnSnapshot(mountedQuery, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        callback({data: change.doc.data() as Trip, type: change.type});
+      });
+    });
+
+    this.unsubscribes.set(id, unsubscribe);
+    return id;
+  }
+
+  unsubscribe(id: string): void {
+    if (this.unsubscribes.has(id)) {
+      this.unsubscribes.get(id)!();
+      this.unsubscribes.delete(id);
+    }
+  }
+
+  disconnect(): void {
+    this.unsubscribes.forEach(unsub => unsub());
+    this.unsubscribes.clear();
+  }
 }
 
 export default TripCollection;

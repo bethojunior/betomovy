@@ -38,13 +38,13 @@ export default function OrderDeliveryType() {
   const ShowOrderDeliveryTypeOption = useCallback(() => {
     switch (orderDeliveryType) {
       case DELIVERY_TYPE:
-        return <OrderLocal navigation={navigation} />;
+        return navigation ? <OrderLocal navigation={navigation} /> : null;
       case WITHDRAWAL_TYPE:
         return <WithdrawInLocal />;
       default:
         return null;
     }
-  }, [orderDeliveryType]);
+  }, [orderDeliveryType, navigation]);
 
   return (
     <>

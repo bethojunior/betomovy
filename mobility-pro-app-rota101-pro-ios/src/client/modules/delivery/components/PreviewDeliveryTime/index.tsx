@@ -1,26 +1,26 @@
 // @ts-nocheck
 
-import React, {useCallback} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {order_confirmed, order_delivered} from '../../../../constants';
-import {WITHDRAWAL_TYPE} from '../../../../constants/orderDeliveryType';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { order_confirmed, order_delivered } from '../../../../constants';
+import { WITHDRAWAL_TYPE } from '../../../../constants/orderDeliveryType';
 
-import {translate} from '../../../../locales';
-import {styles} from './styles';
+import { translate } from '../../../../locales';
+import { styles } from './styles';
 
-export default function PreviewDeliveryTime({order}) {
+export default function PreviewDeliveryTime({ order }) {
   const start = new Date(
     order.startDeliveryTime &&
-      `${order.startDeliveryTime.replace(' ', 'T')}.000+00:00`,
+    `${order.startDeliveryTime.replace(' ', 'T')}.000+00:00`,
   );
   const end = new Date(
     order.endDeliveryTime &&
-      `${order.endDeliveryTime.replace(' ', 'T')}.000+00:00`,
+    `${order.endDeliveryTime.replace(' ', 'T')}.000+00:00`,
   );
 
   const formatDate = useCallback(date => {
     const time = date.toLocaleTimeString();
-    const timeSplit = time.split(':');
+    const timeSplit = time?.split(':');
 
     return `${timeSplit[0]}:${timeSplit[1]}`;
   }, []);

@@ -5,20 +5,8 @@ interface ButtonProps {
   btnYes?: boolean;
 }
 
-export const Content = styled.View`
-  flex: 1;
-  background-color: ${({theme}) => theme.colors.background_black_light};
-  align-items: center;
-  justify-content: flex-end;
-`;
-
 export const ModalContent = styled.View`
-  background-color: ${({theme}) => theme.colors.background_global};
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
   width: 100%;
-  align-self: center;
   padding: 20px;
 `;
 

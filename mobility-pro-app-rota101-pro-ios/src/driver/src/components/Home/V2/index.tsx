@@ -1,18 +1,18 @@
-import {useBubbleButton} from '@704apps/react-native-bubble-button';
-import {SimpleLineIcons} from '@expo/vector-icons';
+import { useBubbleButton } from '@704apps/react-native-bubble-button';
+import { SimpleLineIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
-import {useState} from 'react';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {translate} from '../../../../../client/locales';
-import {useLocalProvider} from '../../../context/local';
-import {useTripProvider} from '../../../context/Trip';
-import {useUserDriver} from '../../../context/userDriver';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { translate } from '../../../../../client/locales';
+import { useLocalProvider } from '../../../context/local';
+import { useTripProvider } from '../../../context/Trip';
+import { useUserDriver } from '../../../context/userDriver';
 import theme from '../../../styles/theme';
-import {ButtonV2} from '../../ButtonOnAndOff';
-import {HomeHeaderTop} from '../../HomeHeaderTop';
-import {If} from '../../If';
-import {TextEdit} from '../../TextEdit';
+import { ButtonV2 } from '../../ButtonOnAndOff';
+import { HomeHeaderTop } from '../../HomeHeaderTop';
+import { If } from '../../If';
+import { TextEdit } from '../../TextEdit';
 import {
   ContainerBottom,
   ContainerHeader,
@@ -27,8 +27,9 @@ import {
   InfoTripTitle,
 } from './styles';
 
-import {UseContextBattery} from '../../../../../context/Battery';
-import {customToast} from '../../../../../utils/FlashMessage';
+import { useDriverHours } from '../../../hooks/useDriverHours';
+import { ModalHorasLimites } from '../../ModalHorasLimites';
+import { useDriverStatus } from '../../../hooks/useDriverStatus';
 
 interface Props {
   setOn: () => void;
@@ -46,22 +47,23 @@ export const V2 = ({
   aminating,
   publicity,
 }: Props) => {
-  const {navigate} = useNavigation();
-  const {hideBubble} = useBubbleButton();
-  const {userDriverFind, toogleDriverStatus} = useUserDriver();
-  const {location, setLocation} = useLocalProvider();
-  const {dispatchTrip, stateTrip} = useTripProvider();
-  const {tripsOffer} = stateTrip;
-  const {listSchedule, listScheduleAccepted} = stateTrip;
+  const { navigate } = useNavigation<NavigationProp<any>>();
+  const { hideBubble } = useBubbleButton();
+  const { toogleDriverStatus } = useUserDriver();
+  const { isOffline, isOnline } = useDriverStatus();
+  const { location, setLocation } = useLocalProvider();
+
+  const dispatchTrip = useTripProvider((context) => context.dispatchTrip);
+  const { tripSummary } = useTripProvider((context) => context.stateTrip);
 
   const [initLocationX, setInitLocationX] = useState(0);
 
-  const {levelBattery} = UseContextBattery();
+  const { checkHorasLimites, shouldShowModal, closeModal, getDriverHours } = useDriverHours();
 
   const conditionViewCard =
-    listSchedule.length == 0 &&
-    listScheduleAccepted.length == 0 &&
-    tripsOffer?.length == 0;
+    tripSummary.totalScheduledAvailable == 0 &&
+    tripSummary.totalScheduledAccepted == 0 &&
+    tripSummary.totalOfferTrips == 0;
 
   const setOff = async () => {
     const locationStorage = await AsyncStorage.getItem('lastPosition');
@@ -88,16 +90,8 @@ export const V2 = ({
     });
     await hideBubble();
 
-    dispatchTrip({type: 'update', field: 'trip', arg: {}});
+    dispatchTrip({ type: 'update', field: 'trip', arg: {} });
     setModalVisible(false);
-  };
-
-  const handleSetOn = () => {
-    if (levelBattery < 7) {
-      customToast(translate('home.message_low_battery'), 'warning');
-    } else {
-      setOn();
-    }
   };
 
   return (
@@ -105,9 +99,7 @@ export const V2 = ({
       <HomeHeaderTop
         aminating={aminating}
         children={
-          <If
-            condition={userDriverFind?.status === 'disponivel' && !iniTripModal}
-          >
+          <If condition={isOnline && !iniTripModal}>
             <ContainerTopTrip>
               {!conditionViewCard && (
                 <>
@@ -118,33 +110,21 @@ export const V2 = ({
                   </HeaderBottom>
                   <InfoTrip>
                     <InfoTripTitle
-                      onPress={() => {
-                        navigate('ScheduleAvailable', {
-                          listSchedule,
-                        });
-                      }}
+                      onPress={() => navigate('ScheduleAvailable')}
                     >
-                      {listSchedule.length || 0}{' '}
+                      {tripSummary.totalScheduledAvailable}{' '}
                       {translate('driverhome.info_disp')}
                     </InfoTripTitle>
                     <InfoTripTitle
-                      onPress={() =>
-                        navigate('ScheduleAccepted', {
-                          listScheduleAccepted,
-                        })
-                      }
+                      onPress={() => navigate('ScheduleAccepted')}
                     >
-                      {listScheduleAccepted.length || 0}{' '}
+                      {tripSummary.totalScheduledAccepted}{' '}
                       {translate('driverhome.info_schedule')}
                     </InfoTripTitle>
                     <InfoTripTitle
-                      onPress={() =>
-                        navigate('tripsOffer', {
-                          tripsOffer,
-                        })
-                      }
+                      onPress={() => navigate('tripsOffer')}
                     >
-                      {tripsOffer?.length || 0} Ofertas
+                      {tripSummary.totalOfferTrips} Ofertas
                     </InfoTripTitle>
                   </InfoTrip>
                 </>
@@ -172,7 +152,7 @@ export const V2 = ({
               </ContainerIcon>
               <ContainerText>
                 <TextEdit size="large" color={theme.colors.secondary}>
-                  {userDriverFind.status === 'desligado'
+                  {isOffline
                     ? translate('driverhome.info_off')
                     : translate('driverhome.info_on')}
                 </TextEdit>
@@ -187,6 +167,12 @@ export const V2 = ({
           </ContentButton>
         </ContainerBottom>
       </If>
+
+      {/* Modal de Horas Limites */}
+      <ModalHorasLimites
+        visible={shouldShowModal}
+        onClose={closeModal}
+      />
     </>
   );
 };

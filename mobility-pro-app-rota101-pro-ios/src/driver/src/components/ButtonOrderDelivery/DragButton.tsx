@@ -1,53 +1,41 @@
-import {Dimensions, View} from 'react-native';
+import { Dimensions, View } from 'react-native';
 import Animated, {
   runOnJS,
-  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { RFValue } from 'react-native-responsive-fontsize';
 import theme from '../../styles/theme';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {PanGestureHandler} from 'react-native-gesture-handler';
-import {ReanimatedComponentDelivery} from '.';
-import {translate} from '../../../../client/locales';
-import {SimpleTitle} from './styles';
+import { ReanimatedComponentDelivery } from '.';
+import { SimpleTitle } from './styles';
 
 const BUTTON_WIDTH = Dimensions.get('window').width * 0.8;
 const DRAG_THRESHOLD = BUTTON_WIDTH / 2;
 
-export const DragButtonDelivery = ({text, onPressButton, statusTrip}) => {
+export const DragButtonDelivery = ({ text, onPressButton, statusTrip }) => {
   const translateX = useSharedValue(0);
 
-  const gestureHandler = useAnimatedGestureHandler({
-    onStart: (_, ctx: any) => {
-      ctx.startX = translateX.value;
-    },
-    onActive: (event, ctx) => {
-      translateX.value = ctx.startX + event.translationX;
-    },
-    onEnd: () => {
+  const panGesture = Gesture.Pan()
+    .onStart(() => {
+    })
+    .onUpdate((event) => {
+      translateX.value = event.translationX;
+    })
+    .onEnd(() => {
       if (translateX.value >= DRAG_THRESHOLD) {
         runOnJS(onPressButton)();
-        translateX.value = withSpring(0);
-      } else {
-        translateX.value = withSpring(0);
       }
-    },
-  });
+      translateX.value = withSpring(0);
+    });
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{translateX: translateX.value}],
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
   return (
-    <View
-      style={{
-        width: '100%',
-      }}
-    >
+    <View style={{ width: '100%' }}>
       <View
         style={{
           backgroundColor: theme.colors.primary,
@@ -56,7 +44,7 @@ export const DragButtonDelivery = ({text, onPressButton, statusTrip}) => {
           alignItems: 'center',
         }}
       >
-        <PanGestureHandler onGestureEvent={gestureHandler}>
+        <GestureDetector gesture={panGesture}>
           <Animated.View
             style={[
               {
@@ -73,16 +61,12 @@ export const DragButtonDelivery = ({text, onPressButton, statusTrip}) => {
           >
             <ReanimatedComponentDelivery
               colors={theme.colors}
-              // translate={translate}
               statusTrip={statusTrip}
             />
           </Animated.View>
-        </PanGestureHandler>
-        <View
-          style={{
-            marginLeft: 15,
-          }}
-        >
+        </GestureDetector>
+
+        <View style={{ marginLeft: 15 }}>
           <SimpleTitle
             style={{
               fontFamily: 'MavenPro_600SemiBold',

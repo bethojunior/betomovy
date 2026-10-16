@@ -5,7 +5,9 @@ import {MaterialIcons} from '@expo/vector-icons';
 import {RFValue} from 'react-native-responsive-fontsize';
 
 export const FloatButtonHandleMyLocation = ({callback}) => {
-  const {tripAccepted} = useTripProvider().stateTrip;
+  const tripAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripAccepted,
+  );
   return (
     <FloatButton
       icon={
@@ -16,7 +18,7 @@ export const FloatButtonHandleMyLocation = ({callback}) => {
         />
       }
       onPress={() =>
-        callback(tripAccepted && Object.keys(tripAccepted).length > 0)
+        callback(tripAccepted && Object.keys(tripAccepted || {}).length > 0)
       }
     />
   );

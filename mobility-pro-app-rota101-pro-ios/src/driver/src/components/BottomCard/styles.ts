@@ -3,12 +3,7 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 import theme from '../../styles/theme';
 
-interface BottomProps {
-  visible?: boolean;
-}
-
-export const Bottom = styled.View<BottomProps>`
-  display: ${({visible}) => (visible ? 'flex' : 'none')};
+export const Bottom = styled.View`
   height: auto;
   padding-left: ${RFValue(20)}px;
   padding-right: ${RFValue(20)}px;

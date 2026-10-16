@@ -1,12 +1,16 @@
-import {BarCodeScanner} from 'expo-barcode-scanner';
-import {Platform} from 'react-native';
+// import {BarCodeScanner} from 'expo-barcode-scanner';
+import { CameraView } from 'expo-camera';
+import {Platform, StatusBar} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
-export const CameraBarCode = styled(BarCodeScanner)`
+const ANDROID_STATUS_BAR_HEIGHT = StatusBar.currentHeight ?? 24;
+
+export const CameraBarCode = styled(CameraView)`
   flex: 1;
 `;
 
-export const ContainerModal = styled.View`
+export const ContainerModal = styled(SafeAreaView)`
   position: relative;
   flex: 1;
   background-color: #000;
@@ -25,7 +29,7 @@ export const ContainerCentralize = styled.View`
 
 export const HeaderBack = styled.TouchableOpacity`
   position: absolute;
-  top: ${Platform.OS === 'ios' ? 5 : 0}%;
+  top: ${Platform.OS === 'ios' ? '5%' : `${ANDROID_STATUS_BAR_HEIGHT + 16}px`};
   left: 5%;
   z-index: 1;
 `;

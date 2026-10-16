@@ -3,28 +3,27 @@
 /* eslint-disable array-callback-return */
 // @ts-nocheck
 
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ScrollView,
   View,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Image,
   Alert,
 } from 'react-native';
-import {Text} from 'react-native-elements';
+import { Text } from 'react-native-elements';
 import Icon from '@expo/vector-icons/FontAwesome5';
 import Colors from '../../../../components/Colors';
 import apiDelivery from '../../../../api/apiDelivery';
 import Helper from '../../../../utils/Helper';
 import LoadView from '../../../../components/LoadView';
-import {useTabbar} from '../../../../contexts/tabBar';
-import {getCoinType} from '../../../../utils/money';
+import { useTabbar } from '../../../../contexts/tabBar/index.js';
+import { getCoinType } from '../../../../utils/money';
 
-import {translate} from '../../../../locales';
-import {styles} from './styles';
-import {useAuth} from '../../../../../context/auth';
+import { translate } from '../../../../locales';
+import { styles } from './styles';
+import { useAuth } from '../../../../../context/auth';
 
 let scrollPage = null;
 let scrollTab = null;
@@ -33,20 +32,21 @@ let itemsTab = {};
 const timeoutScroll = null;
 
 import theme from '../../../../styles/theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function Restaurant({route, navigation}) {
+export default function Restaurant({ route, navigation }) {
   const activeAnimation = useRef(false);
-  const {singleDelivery} = useAuth();
-  const {setVisibleTabbar} = useTabbar();
+  const { singleDelivery } = useAuth();
+  const { setVisibleTabbar } = useTabbar();
   const [products, setProducts] = useState([]);
-  const {restaurant} = route.params;
+  const { restaurant } = route.params;
   const [active, setActive] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getProducts() {
       const {
-        data: {response},
+        data: { response },
       } = await apiDelivery.get(
         `delivery/company/${restaurant.company_delivery_config.companyId}/products`,
       );
@@ -104,7 +104,7 @@ export default function Restaurant({route, navigation}) {
           Object.keys(itemsPage).map((attribute, indexPosition) => {
             const value = itemsPage[attribute];
             if (component == null || position >= value - 200) {
-              component = {id: attribute, position: value};
+              component = { id: attribute, position: value };
               index = indexPosition;
             }
           });
@@ -148,7 +148,7 @@ export default function Restaurant({route, navigation}) {
             <View style={styles.containerMinPrice}>
               <Text style={styles.textMinPrice}>
                 {translate('restaurant.text_minimum_order')}:{' '}
-                <Text style={{fontWeight: 'bold'}}>
+                <Text style={{ fontWeight: 'bold' }}>
                   {getCoinType()}
                   {Helper.maskMoney(
                     restaurant.company_delivery_order_config.minimumOrderValue,
@@ -191,7 +191,7 @@ function WithoutMenu() {
 }
 
 function TabHeader(props) {
-  const {products, activeSelected, onChangeActive} = props;
+  const { products, activeSelected, onChangeActive } = props;
   const [active, setActive] = useState(null);
 
   useEffect(() => {
@@ -210,7 +210,7 @@ function TabHeader(props) {
         return (
           <TouchableOpacity
             onLayout={event => {
-              const {layout} = event.nativeEvent;
+              const { layout } = event.nativeEvent;
               itemsTab[item.id] = layout.x;
             }}
             onPress={() => {
@@ -233,7 +233,7 @@ function TabHeader(props) {
               style={[
                 styles.tabItem,
                 active === index
-                  ? {borderBottomColor: '#000', borderBottomWidth: 1}
+                  ? { borderBottomColor: '#000', borderBottomWidth: 1 }
                   : {},
               ]}
             >
@@ -253,14 +253,14 @@ function TabHeader(props) {
   );
 }
 
-function ListItem({products, navigation, restaurant}) {
-  return products.map(({id, data, title}, index) => {
+function ListItem({ products, navigation, restaurant }) {
+  return products.map(({ id, data, title }, index) => {
     return (
       <View
         style={styles.containeItem}
         key={index}
         onLayout={event => {
-          const {layout} = event.nativeEvent;
+          const { layout } = event.nativeEvent;
           itemsPage[id] = layout.y;
         }}
       >
@@ -273,7 +273,7 @@ function ListItem({products, navigation, restaurant}) {
               key={index}
               onPress={() => {
                 if (item.active == true) {
-                  navigation.navigate('ItemDetail', {item, restaurant});
+                  navigation.navigate('ItemDetail', { item, restaurant });
                 } else {
                   Alert.alert(
                     'Produto indisponível',
@@ -300,19 +300,19 @@ function ListItem({products, navigation, restaurant}) {
                     {item.isOpenValue == false
                       ? `${getCoinType()} ${Helper.maskMoney(item.price)}`
                       : `A partir de ${getCoinType()} ${Helper.maskMoney(
-                          item.price,
-                        )}`}
+                        item.price,
+                      )}`}
                   </Text>
                   {item.active == false && (
                     <View style={styles.contentOffline}>
-                      <Text style={{color: theme.colors.white}}>
+                      <Text style={{ color: theme.colors.white }}>
                         {translate('restaurant.text_offline')}
                       </Text>
                     </View>
                   )}
                 </View>
                 <Image
-                  source={{uri: item.picture}}
+                  source={{ uri: item.picture }}
                   style={styles.logoProduct}
                 />
               </View>
@@ -325,7 +325,7 @@ function ListItem({products, navigation, restaurant}) {
 }
 
 function NavBar(props) {
-  const {restaurant, navigation, singleDelivery} = props;
+  const { restaurant, navigation, singleDelivery } = props;
   return (
     <View
       style={{
@@ -361,7 +361,7 @@ function NavBar(props) {
 
 function checkOpenEstablishment(restaurant) {
   if (!restaurant.company_delivery_order_config.isOpen)
-    return {isClose: true, value: translate('restaurant.text_closed')};
+    return { isClose: true, value: translate('restaurant.text_closed') };
 
   return {
     isClose: false,
@@ -370,13 +370,13 @@ function checkOpenEstablishment(restaurant) {
 }
 
 function ButtonOptionRestaurant(props) {
-  const {title, color, onPress} = props;
+  const { title, color, onPress } = props;
   return (
     <View style={styles.contentOptionBtn}>
       <TouchableOpacity onPress={onPress}>
         <View style={styles.optionBtn}>
           <Text
-            style={{color: color || '#666', fontWeight: 'bold', fontSize: 12}}
+            style={{ color: color || '#666', fontWeight: 'bold', fontSize: 12 }}
           >
             {title}
           </Text>

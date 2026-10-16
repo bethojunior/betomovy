@@ -27,7 +27,7 @@ export const MesssageContent = styled.View`
   padding: 20px;
   margin: 0 10px;
   background-color: ${({messageReceived, theme}) =>
-    messageReceived ? theme.colors.background_global : theme.colors.black};
+    messageReceived ? theme.colors.background_global : theme.colors.primary};
   border-radius: 10px;
 `;
 

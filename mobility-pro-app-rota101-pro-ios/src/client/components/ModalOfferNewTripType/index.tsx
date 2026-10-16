@@ -1,27 +1,26 @@
-import {FC} from 'react';
-import {Modal} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { FC } from 'react';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Button,
-  Content,
   ContentButton,
   ModalContent,
   SubTitle,
   TextButton,
   Title,
 } from './styles';
-import {useTrip} from '../../contexts/Trip';
-import {translate} from '../../locales';
+import { useTrip } from '../../contexts/Trip';
+import { translate } from '../../locales';
+import { PIX_CACHE_KEY, TRIP_CACHE_KEY } from '../../constants/pixCache';
+import { BottomSheetModal } from '../BottomSheetModal';
 
 interface Props {
   setVisibleTravelOption: (data: boolean) => void;
 }
 
-export const ModalOfferNewTripType: FC<Props> = ({
-  setVisibleTravelOption,
-}: Props) => {
-  const {calculateAll, stateTripCustomer, dispatchTripCustomer} = useTrip();
-  const navigation = useNavigation();
+export const ModalOfferNewTripType: FC<Props> = ({ setVisibleTravelOption }: Props) => {
+  const { calculateAll, clearTrip, stateTripCustomer, dispatchTripCustomer } = useTrip();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const {
     origin,
@@ -33,59 +32,50 @@ export const ModalOfferNewTripType: FC<Props> = ({
   const calcAndShowTravelOptions = async () => {
     calculateAll(origin, destiny, waypoints);
 
-    dispatchTripCustomer({
-      type: 'update',
-      field: 'offerOtherTypeTrip',
-      arg: false,
-    });
+    dispatchTripCustomer({ type: 'update', field: 'offerOtherTypeTrip', arg: false });
+    dispatchTripCustomer({ type: 'update', field: 'hideTravelOptions', arg: false });
+
     setVisibleTravelOption(true);
-    dispatchTripCustomer({
-      type: 'update',
-      field: 'hideTravelOptions',
-      arg: false,
-    });
   };
 
-  const cancel = () => {
-    dispatchTripCustomer({
-      type: 'update',
-      field: 'offerOtherTypeTrip',
-      arg: false,
-    });
-    dispatchTripCustomer({
-      type: 'update',
-      field: 'hideTravelOptions',
-      arg: true,
-    });
-    setVisibleTravelOption(true);
+  const cancel = async () => {
+    const fieldsToReset = {
+      offerOtherTypeTrip: false,
+      hideTravelOptions: true,
+      origin: {},
+      destination: {},
+      selectedOptionTravel: {},
+      selectedPaymentMethod: {},
+      trip: {},
+      loadingTrip: false,
+    };
 
-    navigation.navigate('TripRoutes', {
-      screen: 'Home',
+    Object.entries(fieldsToReset).forEach(([field, arg]) => {
+      dispatchTripCustomer({ type: 'update', field, arg });
     });
+
+    await AsyncStorage.multiRemove([PIX_CACHE_KEY, TRIP_CACHE_KEY, 'trip']);
+
+    clearTrip();
+
+    setVisibleTravelOption(false);
+    navigation.navigate('TripRoutes', { screen: 'Home' });
   };
 
   return (
-    <Modal visible={offerOtherTypeTrip} animationType="slide" transparent>
-      <Content>
-        <ModalContent>
-          <Title>{translate('offerOtherTrip.title')}</Title>
-          <SubTitle>{translate('offerOtherTrip.subtitle')}</SubTitle>
-          <ContentButton>
-            <Button activeOpacity={0.8} onPress={cancel}>
-              <TextButton>{translate('offerOtherTrip.cancel')}</TextButton>
-            </Button>
-            <Button
-              activeOpacity={0.8}
-              onPress={calcAndShowTravelOptions}
-              btnYes
-            >
-              <TextButton btnYes>
-                {translate('offerOtherTrip.accept')}
-              </TextButton>
-            </Button>
-          </ContentButton>
-        </ModalContent>
-      </Content>
-    </Modal>
+    <BottomSheetModal visible={offerOtherTypeTrip} onRequestClose={cancel}>
+      <ModalContent>
+        <Title>{translate('offerOtherTrip.title')}</Title>
+        <SubTitle>{translate('offerOtherTrip.subtitle')}</SubTitle>
+        <ContentButton>
+          <Button activeOpacity={0.8} onPress={cancel}>
+            <TextButton>{translate('offerOtherTrip.cancel')}</TextButton>
+          </Button>
+          <Button activeOpacity={0.8} onPress={calcAndShowTravelOptions} btnYes>
+            <TextButton btnYes>{translate('offerOtherTrip.accept')}</TextButton>
+          </Button>
+        </ContentButton>
+      </ModalContent>
+    </BottomSheetModal>
   );
 };

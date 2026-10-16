@@ -1,7 +1,7 @@
-import {useState} from 'react';
-import {AntDesign, Feather} from '@expo/vector-icons';
-import {Alert, View} from 'react-native';
-import {useTheme} from 'styled-components';
+import { useState } from 'react';
+import { AntDesign, Feather } from '@expo/vector-icons';
+import { Alert, View } from 'react-native';
+import { useTheme } from 'styled-components';
 import {
   NavigationProp,
   ParamListBase,
@@ -21,31 +21,42 @@ import {
   TitleInfo,
 } from './styles';
 import ModalFrame from '../ModalFrame';
-import {maskMoney} from '../../../../../client/utils/money';
-import {IsToShowField} from '../../../utils/cityConfig';
-import {useAuth} from '../../../../../context/auth';
-import {useTripProvider} from '../../../context/Trip';
-import {ModalCancellationReasons} from '../CancellationReason';
-import {useUserDriver} from '../../../context/userDriver';
-import {translate} from '../../../../../client/locales';
-import {buildApp} from '../../../../../constantBuild/config';
-import {customToast} from '../../../../../utils/FlashMessage';
+import { maskMoney } from '../../../../../client/utils/money';
+import { IsToShowField } from '../../../utils/cityConfig';
+import { getTripPaymentFormDisplay } from '../../../utils/tripUtils';
+import { useAuth } from '../../../../../context/auth';
+import { useTripProvider } from '../../../context/Trip';
+import { ModalCancellationReasons } from '../CancellationReason';
+import { useUserDriver } from '../../../context/userDriver';
+import { translate } from '../../../../../client/locales';
+import { buildApp } from '../../../../../constantBuild/config';
+import { customToast } from '../../../../../utils/FlashMessage';
+import { useStoragePictures } from '../../../hooks/useStoragePictures';
 
 interface ModalProps {
   visible: boolean;
   setVisible: (visible: boolean) => void;
 }
 
-export const ModalTripPreAccepted = ({visible, setVisible}: ModalProps) => {
+export const ModalTripPreAccepted = ({ visible, setVisible }: ModalProps) => {
   const [cancellationReasonsModal, setCancellationReasonsModal] =
     useState(false);
 
-  const {cancel, stateTrip, dispatchTrip} = useTripProvider();
-  const {cancelTrip, tripPreAccepted} = stateTrip;
-  const {navigate}: NavigationProp<ParamListBase> = useNavigation();
-  const {cityConfig} = useAuth();
-  const {colors} = useTheme();
-  const {userDriverFind} = useUserDriver();
+  const dispatchTrip: any = useTripProvider(
+    (context: any) => context.dispatchTrip,
+  );
+  const cancel: any = useTripProvider((context: any) => context.cancel);
+  const tripPreAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripPreAccepted,
+  );
+  const cancelTrip: any = useTripProvider(
+    (context: any) => context.stateTrip.cancelTrip,
+  );
+  const { navigate }: NavigationProp<ParamListBase> = useNavigation();
+  const { cityConfig } = useAuth();
+  const { colors } = useTheme();
+  const { userDriverFind } = useUserDriver();
+  const { getStoragePictureSpecific } = useStoragePictures();
 
   const cancelTripPreAccepted = (cancellationReasonId: number) => {
     if (cancellationReasonId === null) {
@@ -58,7 +69,7 @@ export const ModalTripPreAccepted = ({visible, setVisible}: ModalProps) => {
     cancelTrip.tripReference = tripPreAccepted.tripReference;
     cancelTrip.generateCancellationFee = false;
     cancelTrip.driverId = Number(userDriverFind.idDriver);
-    dispatchTrip({type: 'update', field: 'cancelTrip', arg: cancelTrip});
+    dispatchTrip({ type: 'update', field: 'cancelTrip', arg: cancelTrip });
 
     return Alert.alert(
       translate('tripPreAccepted.title_attention'),
@@ -95,12 +106,12 @@ export const ModalTripPreAccepted = ({visible, setVisible}: ModalProps) => {
             source={{
               uri:
                 tripPreAccepted?.centralId === null
-                  ? `${buildApp().HOST_IMAGE_CUSTOMER}${
-                      tripPreAccepted?.customer?.profileImage
-                    }`
-                  : `${buildApp().HOST_IMAGE_TRIP_TYPE}${
-                      tripPreAccepted?.fare?.picture
-                    }`,
+                  ? `${getStoragePictureSpecific('customer') ||
+                  buildApp().HOST_IMAGE_CUSTOMER
+                  }${tripPreAccepted?.customer?.profileImage}`
+                  : `${getStoragePictureSpecific('tripType') ||
+                  buildApp().HOST_IMAGE_TRIP_TYPE
+                  }${tripPreAccepted?.fare?.picture}`,
             }}
           />
           <ClientSection>
@@ -109,17 +120,17 @@ export const ModalTripPreAccepted = ({visible, setVisible}: ModalProps) => {
               <ButtonMessage
                 onPress={() => {
                   setVisible(false);
-                  navigate('TripChatDriver', {trip: tripPreAccepted});
+                  navigate('TripChatDriver', { trip: tripPreAccepted });
                 }}
               >
                 <TextMessage>
                   {translate('tripPreAccepted.text_message')}
                 </TextMessage>
                 <AntDesign
-                  name="message1"
+                  name="message"
                   size={20}
                   color={colors.secondary}
-                  style={{marginLeft: 5}}
+                  style={{ marginLeft: 5 }}
                 />
               </ButtonMessage>
               <ButtonCancel
@@ -135,7 +146,7 @@ export const ModalTripPreAccepted = ({visible, setVisible}: ModalProps) => {
                   name="x"
                   size={20}
                   color={colors.primaryText}
-                  style={{marginLeft: 5}}
+                  style={{ marginLeft: 5 }}
                 />
               </ButtonCancel>
             </ButtonSection>
@@ -150,13 +161,13 @@ export const ModalTripPreAccepted = ({visible, setVisible}: ModalProps) => {
           }}
         >
           <View>
-            {IsToShowField('paymentForm') && (
+            {IsToShowField('paymentForm', cityConfig) && (
               <>
                 <TitleInfo>
                   {translate('tripPreAccepted.text_payment_form')}
                 </TitleInfo>
 
-                <Info>{tripPreAccepted?.tripPaymentForm}</Info>
+                <Info>{getTripPaymentFormDisplay(tripPreAccepted?.tripPaymentForm)}</Info>
               </>
             )}
           </View>
@@ -169,7 +180,7 @@ export const ModalTripPreAccepted = ({visible, setVisible}: ModalProps) => {
           </View>
         </View>
 
-        {IsToShowField('origin') && (
+        {IsToShowField('origin', cityConfig) && (
           <>
             <TitleInfo>{translate('tripPreAccepted.text_origin')}</TitleInfo>
             <Info>{tripPreAccepted?.origin?.address}</Info>
@@ -177,7 +188,7 @@ export const ModalTripPreAccepted = ({visible, setVisible}: ModalProps) => {
         )}
 
         {tripPreAccepted?.tripWayPoints?.length !== 0 &&
-          IsToShowField('quantityWaypoints') &&
+          IsToShowField('quantityWaypoints', cityConfig) &&
           tripPreAccepted?.tripWayPoints?.map(waypoint => (
             <View key={waypoint.id}>
               <TitleInfo>
@@ -187,8 +198,8 @@ export const ModalTripPreAccepted = ({visible, setVisible}: ModalProps) => {
             </View>
           ))}
 
-        {IsToShowField('destination') && (
-          <View style={{marginBottom: 20}}>
+        {IsToShowField('destination', cityConfig) && (
+          <View style={{ marginBottom: 20 }}>
             <TitleInfo>
               {translate('tripPreAccepted.text_destination')}
             </TitleInfo>

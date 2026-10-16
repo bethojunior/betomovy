@@ -5,10 +5,6 @@ export const schema = Yup.object().shape({
   name: Yup.string()
     .required(() => translate('dataUserSignUp.text_error_name'))
     .min(2, () => translate('dataUserSignUp.text_error_name')),
-  document: Yup.string(),
-  //   .required(
-  //   translate('dataUserSignUp.text_requerid_cpf'),
-  // )
   date: Yup.string(),
   // .required(
   //   translate('dataUserSignUp.text_required_date_birth'),

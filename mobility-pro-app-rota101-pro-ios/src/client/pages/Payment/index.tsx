@@ -1,12 +1,9 @@
-// @ts-nocheck
-import React, {useCallback, useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { View, ScrollView } from 'react-native';
 import DeleteIcon from '@expo/vector-icons/Feather';
-// eslint-disable-next-line import/extensions
 import Helper from '../../utils/Helper.js';
 import {
   Button,
-  TextButton,
   Title,
   CardPaymentForm,
   Icon,
@@ -20,22 +17,20 @@ import {
   TitleDeleteCard,
   ScrollContent,
   SimpleText,
+  VoucherSectionContainer,
 } from './styles';
-import {getCoinType} from '../../utils/money';
-import Money from '../../assets/images/money.png';
-import Coupom from '../../assets/images/coupom.png';
+import { getCoinType } from '../../utils/money';
 import Card1 from '../../assets/images/card.png';
 import Preload from '../../components/Preload';
 import AddCard from '../../components/Payment/AddCard';
-import AddCoupom from '../../components/Payment/AddCoupom';
-import {translate} from '../../locales';
+import { translate } from '../../locales';
 import ModalFrame from '../../components/form/Modal';
 import AddVoucher from '../../components/Payment/AddVoucher';
-import {PaymentFormService} from '../../contexts/paymentForms/services';
-import {usePaymentForm} from '../../contexts/paymentForms';
-import {useLocal} from '../../contexts/local';
+import { PaymentFormService } from '../../contexts/paymentForms/services';
+import { usePaymentForm } from '../../contexts/paymentForms';
+import { useLocal } from '../../contexts/local';
 import theme from '../../styles/theme';
-import {customToast} from '../../../utils/FlashMessage';
+import { customToast } from '../../../utils/FlashMessage';
 
 interface VoucherSelected {
   amount: string;
@@ -50,33 +45,21 @@ interface listCard {
   number: string;
 }
 
-interface listCoupon {
-  code: string;
-  value: string;
-  tripPaymentForm: string;
-  valueType: string;
-  dateEnd: string;
-  id: string;
-}
-
 const PaymentPage = () => {
   const [loading, setLoading] = useState(false);
   const [listCard, setListCard] = useState<any>([]);
   const [currentSald, setCurrentSald] = useState(0);
-  const [coupon, setCoupon] = useState([]);
   const [cardSelected, setCardSelected] = useState('');
   const [listVoucher, setListVoucher] = useState([]);
   const [voucherSelected, setVoucherSelected] = useState<VoucherSelected>();
 
-  const [showCouponModal, setShowCouponModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
   const [showVoucherModal, setShowVoucherModal] = useState(false);
   const [visibleDialog, setVisibleDialog] = useState(false);
-  const [textEmptyCoupon, setTextEmptyCoupon] = useState(false);
 
-  const {position} = useLocal();
+  const { position } = useLocal();
 
-  const {getCards, getCoupons, getCurrentBalanceVoucher, removeCard} =
+  const { getCards, getCurrentBalanceVoucher, removeCard } =
     usePaymentForm();
 
   useEffect(() => {
@@ -84,13 +67,12 @@ const PaymentPage = () => {
 
     Promise.all([
       PaymentFormService.listCard(),
-      PaymentFormService.listCoupom(),
-      PaymentFormService.listVoucher(position.latitude, position?.longitude),
+      PaymentFormService.listVoucher(position.latitude?.toString(), position?.longitude?.toString()),
       PaymentFormService.getCurrentSaldVoucher(),
     ]).then((values: any) => {
       setLoading(false);
 
-      const {response} = values[0].request;
+      const { response } = values[0].request;
       if (!JSON.parse(response).status || !values[0].data.status) {
         return customToast(
           translate('paymentPage.text_error_load_info'),
@@ -101,8 +83,7 @@ const PaymentPage = () => {
       if (
         !values[0].data.status ||
         !values[1].data.status ||
-        !values[2].data.status ||
-        !values[3].data.status
+        !values[2].data.status
       ) {
         return customToast(
           translate('paymentPage.text_error_load_info'),
@@ -110,16 +91,9 @@ const PaymentPage = () => {
         );
       }
 
-      if (values[1].data.data.length === 0) {
-        setTextEmptyCoupon(true);
-      } else {
-        setTextEmptyCoupon(false);
-        setCoupon(values[1].data.data);
-      }
-
       setListCard(values[0].data.data);
-      setListVoucher(values[2].data.data);
-      return setCurrentSald(values[3].data.data.tripBalance);
+      setListVoucher(values[1].data.data);
+      return setCurrentSald(values[2].data.data.tripBalance);
     });
   }, []);
 
@@ -130,20 +104,6 @@ const PaymentPage = () => {
       setLoading(false);
     });
   }, [getCards]);
-
-  const listCoupons = () => {
-    setLoading(true);
-    getCoupons().then((data: any) => {
-      setLoading(false);
-
-      if (data.length === 0) {
-        return setTextEmptyCoupon(true);
-      }
-
-      setTextEmptyCoupon(false);
-      return setCoupon(data);
-    });
-  };
 
   const getCurrentSaldVoucher = useCallback(async () => {
     setLoading(true);
@@ -180,7 +140,14 @@ const PaymentPage = () => {
             paddingBottom: 10,
           }}
         >
-          <Title>{translate('paymentPage.title_payment_form')}</Title>
+          <Title>{translate('paymentPage.title_card')}</Title>
+
+          {listCard.length === 0 && !loading && (
+            <SimpleText style={{ paddingVertical: 10 }}>
+              {translate('paymentPage.text_no_card')}
+            </SimpleText>
+          )}
+
           {listCard.map((card: listCard) => {
             return (
               <CardContent
@@ -200,87 +167,43 @@ const PaymentPage = () => {
                   name="x"
                   size={15}
                   color={theme.colors.secondary}
-                  style={{alignSelf: 'center', marginTop: 10}}
+                  style={{ alignSelf: 'center', marginTop: 10 }}
                 />
               </CardContent>
             );
           })}
-          <CardPaymentForm>
-            <Icon source={Money} />
-            <TextPaymentType>
-              {translate('paymentPage.text_money')}
-            </TextPaymentType>
-          </CardPaymentForm>
+
           <Button
+            title={translate('paymentPage.text_add_card')}
             onPress={() =>
               listCard.length > 4
                 ? customToast(
-                    translate('paymentPage.text_max_card_recorded'),
-                    'warning',
-                  )
+                  translate('paymentPage.text_max_card_recorded'),
+                  'warning',
+                )
                 : setShowCardModal(true)
             }
-          >
-            <TextButton>{translate('paymentPage.text_add')}</TextButton>
-          </Button>
-        </View>
-        <View
-          style={{
-            borderBottomColor: theme.colors.secondary,
-            borderBottomWidth: 0.5,
-            paddingBottom: 10,
-          }}
-        >
-          <Title>{translate('paymentPage.title_cuopon')}</Title>
-          {textEmptyCoupon && (
-            <SimpleText style={{padding: 10}}>
-              {translate('paymentPage.text_no_coupon')}
-            </SimpleText>
-          )}
-          {coupon.map((item: listCoupon) => {
-            return (
-              <CardPaymentForm key={item.id}>
-                <Icon source={Coupom} />
-                <TextPaymentType>
-                  {item.valueType === '%'
-                    ? `-${item.value}${item.valueType} `
-                    : `- ${item.valueType}${item.value} `}
-                </TextPaymentType>
-                <SimpleText
-                  style={{
-                    textTransform: 'lowercase',
-                  }}
-                >
-                  {item.tripPaymentForm !== null
-                    ? `${translate('paymentPage.text_coupon')} ${
-                        item.tripPaymentForm
-                      }`
-                    : translate('paymentPage.text_all_type_payment')}
-                </SimpleText>
-              </CardPaymentForm>
-            );
-          })}
-          <Button>
-            <TextButton onPress={() => setShowCouponModal(true)}>
-              {translate('paymentPage.text_add')}
-            </TextButton>
-          </Button>
+          />
         </View>
         <View>
-          <Title>{translate('paymentPage.title_voucher')}</Title>
-          <CardPaymentForm
-            style={{alignSelf: 'flex-end', flexDirection: 'column'}}
-          >
-            <SimpleText style={{fontSize: 12}}>
-              {translate('paymentPage.text_current_balance')}
-            </SimpleText>
-            <TextPaymentType>
-              {getCoinType()}{' '}
-              {currentSald !== 0
-                ? Helper.maskMoney(Number(currentSald))
-                : '0,00'}
-            </TextPaymentType>
-          </CardPaymentForm>
+          <VoucherSectionContainer>
+            <Title>{translate('paymentPage.title_voucher')}</Title>
+
+            <CardPaymentForm
+              style={{ alignSelf: 'flex-end', flexDirection: 'column' }}
+            >
+              <SimpleText style={{ fontSize: 12 }}>
+                {translate('paymentPage.text_current_balance')}
+              </SimpleText>
+              <TextPaymentType>
+                {getCoinType()}{' '}
+                {currentSald !== 0
+                  ? Helper.maskMoney(Number(currentSald))
+                  : '0,00'}
+              </TextPaymentType>
+            </CardPaymentForm>
+          </VoucherSectionContainer>
+
           {listVoucher.map((item: any) => {
             return (
               <CardVoucher
@@ -299,11 +222,11 @@ const PaymentPage = () => {
                       {getCoinType()}
                       {Helper.maskMoney(Number(item.amount))}
                     </SimpleText>
-                    <SimpleText style={{fontSize: 12}}>
+                    <SimpleText style={{ fontSize: 12 }}>
                       {translate('paymentPage.text_pay')} {getCoinType()}
                       {Helper.maskMoney(Number(item.value))}{' '}
                     </SimpleText>
-                    <SimpleText style={{fontSize: 12}}>
+                    <SimpleText style={{ fontSize: 12 }}>
                       {translate('paymentPage.text_gain')} {getCoinType()}
                       {Helper.maskMoney(Number(item.amount))}
                     </SimpleText>
@@ -316,11 +239,7 @@ const PaymentPage = () => {
             );
           })}
         </View>
-        <AddCoupom
-          visible={showCouponModal}
-          setVisible={setShowCouponModal}
-          updateList={listCoupons}
-        />
+
         <AddCard
           updateList={listCards}
           visible={showCardModal}

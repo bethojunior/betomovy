@@ -1,131 +1,128 @@
-import {useState} from 'react';
+import { useState } from 'react';
+
+import { BottomSheetModal } from '../../../../client/components/BottomSheetModal';
+import { SheetHeader } from '../../../../client/components/SheetHeader';
+import { useKeyboardHeight } from '../../../../common/hooks/useKeyboardHeight';
+import Preload from '../Preload';
+import { translate } from '../../../../client/locales';
+import { useBank } from '../../context/bank';
+import { customToast } from '../../../../utils/FlashMessage';
+import { IModalTransference } from './modalTransferenceTypes';
 import {
   Asterisk,
-  ContentTransferModal,
+  ConfirmButton,
+  ConfirmButtonText,
   ContentValue,
-  CurrentSald,
+  CurrentSaldLabel,
+  CurrentSaldValue,
   InputMoney,
   ObservationContent,
-  SimpleText,
+  SheetContent,
   TextObservation,
   TitleValueTransfer,
 } from './styles';
-import ModalFrame from '../form/ModalFrame';
-import Preload from '../Preload';
-import {maskMoney} from '../../utils/money';
-import {translate} from '../../../../client/locales';
-import {useBank} from '../../context/bank';
-import {If} from '../If';
-import {customToast} from '../../../../utils/FlashMessage';
-import {useAuth} from '../../../../context/auth';
-
-interface Props {
-  visible: boolean;
-  setVisible: (value: boolean) => void;
-  currentSald: any;
-  realodBalance: () => void;
-}
 
 export const ModalTransference = ({
   visible,
   setVisible,
   currentSald,
-  realodBalance
-}: Props) => {
-  const {requestWithdraw} = useBank();
+  realodBalance,
+}: IModalTransference) => {
+  const { requestWithdraw } = useBank();
+  const keyboardHeight = useKeyboardHeight();
   const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState('0,00');
+  const [value, setValue] = useState('');
 
-  const {cityConfig} = useAuth();
+  const closeModal = () => {
+    setVisible(false);
+    setValue('');
+  };
 
   const handleWithDraw = async (amount: string) => {
     const amountNumber = Number(amount.replace(/[^0-9]/g, '')) / 100;
 
-    if (amount === '' || amount === '0,00' || amount === '0') {
-      return customToast(
-        translate('account_driver_modal.empty_value'),
-        'warning',
-      );
+    if (!amount) {
+      customToast(translate('account_driver_modal.empty_value'), 'warning');
+      return;
     }
 
     if (amountNumber > currentSald) {
-      return customToast(
-        translate('account_driver_modal.insuficient_value'),
-        'warning',
-      );
+      customToast(translate('account_driver_modal.insuficient_value'), 'warning');
+      return;
     }
 
-    setLoading(true);
-    const response = await requestWithdraw(amountNumber);
-    if (!response) {
-      return setLoading(false);
+    try {
+      setLoading(true);
+      const result = await requestWithdraw(amountNumber);
+      setLoading(false);
+      if (!result) return;
+      setVisible(false);
+    } catch (error) {
+      setValue('');
+      setLoading(false);
+      setVisible(false);
     }
-    setValue('0,00');
-    setLoading(false);
-    setVisible(false);
-    return realodBalance();
+    realodBalance();
+  };
+
+  const handleTransferTextValue = (text: string) => {
+    const numericValue = text.replace(/[^0-9]/g, '');
+
+    const floatValue = parseFloat(numericValue) / 100;
+
+    const formattedValue = floatValue.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    });
+
+    setValue(formattedValue);
+
+    if (floatValue > currentSald) {
+      customToast(translate('account_driver_modal.alert_max_value'), 'warning');
+      setValue(
+        `R$ ${currentSald.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}`,
+      );
+    }
   };
 
   return (
     <>
       <Preload visible={loading} />
-      <ModalFrame
-        visible={visible}
-        setVisible={setVisible}
-        textConfirm={translate('account_driver_modal.button_confirm_text')}
-        onClose={() => {
-          setVisible(false);
-        }}
-        onPressConfirm={() => handleWithDraw(value)}
-      >
-        <ContentTransferModal>
+      <BottomSheetModal visible={visible} onRequestClose={closeModal}>
+        <SheetHeader title={translate('account_driver_modal.transfer')} onClose={closeModal} />
+
+        <SheetContent keyboardHeight={keyboardHeight}>
           <ContentValue>
-            <SimpleText>
-              {translate('account_driver_modal.current_sald')}
-            </SimpleText>
-            <CurrentSald
-              style={{
-                textAlignVertical: 'center',
-              }}
-            >
-              {cityConfig.typeMoney}{' '}
-              {maskMoney(
-                currentSald - Number(value.replace(/[^0-9]/g, '')) / 100 || 0,
-              )}
-            </CurrentSald>
+            <CurrentSaldLabel>{translate('account_driver_modal.current_sald')}</CurrentSaldLabel>
+            <CurrentSaldValue>
+              {new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }).format(currentSald)}
+            </CurrentSaldValue>
           </ContentValue>
+
           <ContentValue>
-            <TitleValueTransfer>
-              {translate('account_driver_modal.value_transfer')}
-            </TitleValueTransfer>
+            <TitleValueTransfer>{translate('account_driver_modal.value_transfer')}</TitleValueTransfer>
             <InputMoney
-              type={'money'}
-              options={{
-                precision: 2,
-                separator: ',',
-                delimiter: '.',
-                unit: 'R$',
-                suffixUnit: '',
-              }}
+              testID="input_money_test"
+              keyboardType="numeric"
               value={value}
-              onChangeText={text => {
-                setValue(text);
-              }}
-              returnKeyType="done"
+              placeholder="R$ 0,00"
+              onChangeText={handleTransferTextValue}
             />
           </ContentValue>
-        </ContentTransferModal>
-        <ObservationContent>
-          <Asterisk>* </Asterisk>
-          <TextObservation>
-            {translate('account_driver_modal.text_data_bank')}
-          </TextObservation>
-        </ObservationContent>
 
-        <If condition={loading === true}>
-          <Preload visible={loading} />
-        </If>
-      </ModalFrame>
+          <ObservationContent>
+            <Asterisk>* </Asterisk>
+            <TextObservation>{translate('account_driver_modal.text_data_bank')}</TextObservation>
+          </ObservationContent>
+
+          <ConfirmButton activeOpacity={0.7} onPress={() => handleWithDraw(value)}>
+            <ConfirmButtonText>{translate('account_driver_modal.button_confirm_text')}</ConfirmButtonText>
+          </ConfirmButton>
+        </SheetContent>
+      </BottomSheetModal>
     </>
   );
 };

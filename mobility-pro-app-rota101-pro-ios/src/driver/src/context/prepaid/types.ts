@@ -26,9 +26,18 @@ export interface PaymentProps {
   updated_at: string;
 }
 
+export interface PaymentPrepaidByPixProps {
+  paymentFormId: number;
+  creditPrepaidId: number;
+}
+
 export interface PaymentPrepaidProps {
   creditPrepaidId: string;
   paymentFormId: string;
   cardId: string;
   mpToken?: string;
+}
+
+export interface VerifyPaymentByPixProps {
+  creditPrepaidPurchaseId: string;
 }

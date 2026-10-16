@@ -1,14 +1,16 @@
 import {StyleSheet} from 'react-native';
 import theme from '../../styles/theme';
+import styled from 'styled-components/native';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: 'relative',
   },
   image: {
-    height: 115,
+    height: 220,
     margin: 10,
-    borderRadius: 2,
+    borderRadius: 10,
   },
   description: {
     margin: 10,
@@ -27,3 +29,8 @@ export const styles = StyleSheet.create({
     padding: 10,
   },
 });
+
+export const ContainerWebview = styled.View`
+  z-index: 1;
+  position: absolute;
+`;

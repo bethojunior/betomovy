@@ -1,0 +1,1 @@
+export {getAuthIdentity} from './authIdentity';

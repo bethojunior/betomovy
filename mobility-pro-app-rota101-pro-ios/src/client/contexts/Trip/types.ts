@@ -1,14 +1,26 @@
+import { RecalculatedTrip } from "~/interfaces/recalculatedTrip";
+
+export interface NewTripCacheData {
+  origin?: AddressProps;
+  destination?: DestinationProps;
+  selectedOptionTravel?: SelectedOptionTravelProps;
+  selectedPaymentMethod?: SelectedPaymentMethodProps;
+  waypoints?: AddressProps[];
+  tolls?: any;
+}
+
 export interface TripContextType {
   previewChangeRoutes: (
     destination: DestinationProps,
     waypoints: AddressProps[],
   ) => Promise<boolean> | Promise<any>;
-  handleTripStateChange: (tripReference?: string) => Promise<void>;
+  handleTripStateChange: (tripReference?: string, tripOff?: () => void) => Promise<void>;
   calculateAll: (
     origin: AddressProps,
     destiny: DestinationProps,
     waypoints: AddressProps[],
     polylineFill?: boolean,
+    argsTrip?: any,
   ) => Promise<void>;
   getTripPaymentMethods: () => any;
   handleSelectedPaymentMethod: (
@@ -18,12 +30,14 @@ export interface TripContextType {
     cardSelected: string,
     price: number | null,
     isTurbine: boolean | null,
+    idTransaction?: string,
+    cacheData?: NewTripCacheData | null,
   ) => Promise<void>;
   cancelTripByCustomer: (
     cancellationReasonsId: number,
     status?: string,
     tripReference?: string,
-  ) => void;
+  ) => Promise<boolean>;
   checkIfHaveCancellationFee: () => Promise<any>;
   handleAvaliationDriver: (comment: string) => Promise<string>;
   newTripSchedule: (
@@ -72,10 +86,19 @@ export interface TripContextType {
   stateTripCustomer: InitialStateProps;
   dispatchTripCustomer: any;
   cancelParterTripByCustomer: (tripReference: string) => void;
+  showModalNoCity: (show: boolean) => void;
+  getWaitingTimer: (cityId: string, tripTypeId: number) => Promise<void>;
 }
 
 export interface TripContextChildren {
   children: React.ReactNode;
+}
+
+export interface ScheduleTripProps {
+  driverId: string | number | null;
+  schedule: string;
+  scheduleUTC: string;
+  tripReference: string;
 }
 
 export interface TripProps {
@@ -139,7 +162,7 @@ export interface TripProps {
     tripBalance: number;
     userTypeId: number;
   };
-  customerCancellationFee: number | null;
+  customerCancellationFee: CustomerCancellationFeeProps | null;
   customerId: number | null;
   customerName: string;
   date: string;
@@ -273,11 +296,11 @@ export interface TripProps {
   priceId: number;
   priceRange: number | null;
   priceRangeId: number | null;
-  recalculatedPrice: number | null;
+  recalculatedPrice: RecalculatedTrip | null;
   rewardTrip: number | null;
   rewardTripId: number | null;
   ride: number | null;
-  schedule: number | null;
+  schedule: ScheduleTripProps | null;
   situation: string;
   stationId: number | null;
   status: string;
@@ -297,6 +320,7 @@ export interface TripProps {
   tripLongDistanceValue: number | null;
   tripPaymentForm: string;
   tripPaymentFormId: number;
+  tripPaymentFormTypeId: number;
   tripReference: string;
   tripReferenceCancellationFee_generated: string | null;
   tripReferenceCancellationFee_paid: string | null;
@@ -307,12 +331,32 @@ export interface TripProps {
   zoneId: number;
 }
 
+export interface CustomerCancellationFeeProps {
+  billing_status: string;
+  created_at: string;
+  description: string;
+  driverId: string;
+  feeValue: string;
+  id: string;
+  paid_tripReference: any;
+  scheduledPaymentDate: any;
+  statusId: string;
+  title: string;
+  transactionId: any;
+  tripCancellationFeeTypeId: string;
+  tripReference: string;
+  updated_at: string;
+  userId: string;
+}
+
 export interface SelectedOptionTravelProps {
   turbinedPrice?: number | string | null;
   typeTaxi: {
     tripTypeId: number;
   };
   price: number;
+  platformAmount?: number;
+  driverAmount?: number;
   tripTypeId: number;
   idPrice: number;
   priceDynamicValue: number;
@@ -326,10 +370,17 @@ export interface SelectedOptionTravelProps {
 }
 
 export interface DestinationProps {
+  name?: string;
   address?: string;
   id?: number;
   latitude?: number | string;
   longitude?: number | string;
+}
+
+export interface FeeTimeExceededProps {
+  title: string | null;
+  description: string | null;
+  show: boolean;
 }
 
 export interface SelectedCouponProps {
@@ -339,14 +390,12 @@ export interface SelectedCouponProps {
 }
 
 export interface SelectedPaymentMethodProps {
+  id: number;
   idTripPaymentForm: number;
   paymentFormTypeId: string;
   name: string;
-}
-
-export interface SelectedFavoriteProps {
-  idDriver: number;
-  idFavorite: number;
+  active: string;
+  statusId: string;
 }
 
 export interface ChangeRoutePreviewProps {
@@ -381,7 +430,7 @@ export interface InitialStateProps {
   waypoints: AddressProps[];
   waypointQuantities: number;
   prices: any;
-  polylineCoordinates: [{latitude: number; longitude: number}];
+  polylineCoordinates: {latitude: number; longitude: number}[] | null;
   lastPolylineCoordinates: any;
   tripPaymentMethods: SelectedPaymentMethodProps[];
   selectedPaymentMethod: SelectedPaymentMethodProps;
@@ -399,7 +448,7 @@ export interface InitialStateProps {
   trip: TripProps;
   tripSchedule: any;
   completedTripData: any;
-  selectedFavorite: SelectedFavoriteProps[];
+  selectedFavorite: Array<number | string>;
   itsForMe: boolean;
   tripWho: string;
   inputWho: {
@@ -419,4 +468,7 @@ export interface InitialStateProps {
   pixId: null | string;
   tripPartnerList: TripProps[];
   partnerTripsReference: string[];
+  timeExceededFee: FeeTimeExceededProps;
+  showModalNoCity: boolean;
+  showModalScheduled: boolean;
 }

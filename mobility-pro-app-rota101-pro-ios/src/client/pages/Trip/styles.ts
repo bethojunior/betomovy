@@ -3,13 +3,16 @@ import {lighten, shade} from 'polished';
 import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 import themeCss from '../../styles/theme';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-export const Container = styled.SafeAreaView`
+export const Container = styled(SafeAreaView)`
   flex: 1;
+  background-color: ${({theme}) => theme.colors.background_global};
   shadow-color: ${({theme}) => theme.colors.secondary};
   shadow-offset: 0px 0px;
   shadow-opacity: 0.1;
   shadow-radius: 2px;
+  position: relative;
 
   elevation: 5;
 `;
@@ -78,18 +81,6 @@ export const ContainerMinutes = styled.View`
   shadow-offset: 0px 0px;
   shadow-opacity: 0.2;
   shadow-radius: 2px;
-`;
-
-export const CardContainer = styled.View`
-  bottom: 10px;
-  align-self: center;
-  position: absolute;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  border-radius: 10px;
-  width: 80%;
-  background-color: ${({theme}) => theme.colors.primary};
 `;
 
 export const ContainerButton = styled.TouchableOpacity`

@@ -1,5 +1,6 @@
 declare type ApiResponse<T> = {
   status: boolean;
-  response: T;
   message: string;
+  data: T;
+  errors: any | null;
 };

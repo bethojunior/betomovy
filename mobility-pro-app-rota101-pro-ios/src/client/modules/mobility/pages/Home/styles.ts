@@ -5,6 +5,7 @@ import {RFValue} from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 import themeCss from '../../../../styles/theme';
 import theme from '../../../../styles/theme';
+import profileImageDefault from '../../../../assets/images/user.png';
 
 interface ContentAdressProps {
   hasPlaces?: boolean;
@@ -13,6 +14,10 @@ interface ContentAdressProps {
 interface CardProps {
   hasBorder?: boolean;
 }
+ 
+export const RootContainer = styled.View`
+  flex: 1;
+`;
 
 export const HeaderTitle = styled.Text`
   color: ${({theme}) => theme.colors.secondary};
@@ -24,27 +29,6 @@ export const HeaderTitle = styled.Text`
 export const HeaderDescription = styled.Text`
   color: ${({theme}) => theme.colors.secondary};
   font-size: 16px;
-`;
-
-export const MyLocationViewer = styled.TouchableOpacity<{
-  backgroundColor: string;
-}>`
-  background-color: ${props =>
-    props.backgroundColor
-      ? props.backgroundColor
-      : ({theme}) => theme.colors.primary};
-  z-index: 2;
-  width: 45px;
-  height: 45px;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  margin-top: -${() => RFValue(80)}px;
-
-  border-radius: 45px;
-  padding: ${({theme}) => theme.spacing.small}px;
-
-  margin-left: 20px;
 `;
 
 export const HeaderButton = styled.TouchableOpacity`
@@ -110,54 +94,6 @@ export const HeaderDetails = styled.View`
   margin-bottom: 15px;
 `;
 
-export const ModuleButtonLarge = styled.TouchableOpacity`
-  background-color: ${({theme}) => theme.colors.primary};
-  elevation: 3;
-  padding: 10px 5px 20px 20px;
-  height: 90%;
-  width: 48%;
-  border-radius: 10px;
-`;
-
-export const ImageLarge = styled.Image`
-  width: 90px;
-  height: 90px;
-  align-self: flex-end;
-`;
-
-export const TextLarge = styled.Text`
-  font-size: 15px;
-  font-family: MavenPro_500Medium;
-  color: ${({theme}) => theme.colors.primaryText};
-`;
-
-export const ContentModuleButton = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-export const ModuleButtonSmall = styled.TouchableOpacity`
-  background-color: ${({theme}) => theme.colors.primary};
-  elevation: 3;
-  padding: 10px 5px 20px 20px;
-  height: 85%;
-  width: 48%;
-  border-radius: 10px;
-`;
-
-export const TextSmall = styled.Text`
-  font-size: 13px;
-  align-self: flex-end;
-  font-family: MavenPro_500Medium;
-  color: ${({theme}) => theme.colors.primaryText};
-`;
-
-export const ImageSmall = styled.Image`
-  width: 60px;
-  height: 60px;
-  align-self: flex-start;
-`;
-
 export const Input = styled.TouchableOpacity`
   max-height: ${RFValue(45)}px;
   height: ${RFValue(45)}px;
@@ -176,13 +112,6 @@ export const Input = styled.TouchableOpacity`
   font-family: MavenPro_400Regular;
 `;
 
-export const ContentAddress = styled.View<ContentAdressProps>`
-  margin-top: 10px;
-  padding: 0;
-  margin-bottom: 30px;
-  border-radius: 5px;
-`;
-
 export const ContentInput = styled.View`
   flex-direction: row;
   align-items: center;
@@ -190,6 +119,7 @@ export const ContentInput = styled.View`
   background-color: ${({theme}) => theme.colors.background_global};
   width: 100%;
   position: relative;
+  z-index: 1;
 `;
 
 export const ContentLastPlace = styled.View<ContentAdressProps>`
@@ -199,11 +129,29 @@ export const ContentLastPlace = styled.View<ContentAdressProps>`
 
 export const CardLastPlace = styled.TouchableOpacity<CardProps>`
   flex-direction: row;
-  padding: 10px 30px 10px 15px;
+  border-bottom-width: ${({hasBorder}) => (hasBorder ? '1px' : 0)};
+  border-color: #d3d3d3;
+`;
+export const CardLastPlaceText = styled.View`
+  flex: 1;
+  margin: 10px;
+`;
+
+export const ContentPlaceIcon = styled.Pressable`
+  max-width: 20px;
+  flex: 1;
+  justify-content: center;
   align-items: center;
-  border-bottom-width: ${({hasBorder}) => (hasBorder ? '0.5px' : 0)};
-  border-color: ${({theme}) => theme.colors.primary};
-  margin: ${RFValue(5)}px 0;
+`;
+
+export const ContentPlaceRemove = styled.Pressable`
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  border-radius: 4px;
+  margin: 5px 2px;
+  align-items: center;
+  background-color: ${({theme}) => theme.colors.primary};
 `;
 
 export const Title = styled.Text`
@@ -227,31 +175,28 @@ export const RaceSubTitle = styled.Text`
   color: ${({theme}) => theme.colors.secondary};
 `;
 
-export const DetailsContent = styled.View`
-  width: 100%;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  position: absolute;
-  align-self: center;
-  bottom: 0;
-  padding: 20px 25px 0 25px;
-  background-color: ${({theme}) => theme.colors.background_global};
-  min-height: 100%;
-  // condition plaform ios and android
-
-  shadow-color: ${({theme}) => theme.colors.primary};
-  shadow-offset: 0 3px;
-  shadow-opacity: 0.27;
-  shadow-radius: 4.65px;
-  elevation: 8;
+export const MapCardWrapper = styled.View`
+  flex: 1;
+  position: relative;
+  background-color: ${({theme}) => theme.colors.white};
 `;
 
-export const ProfileImage = styled.Image`
-  width: ${RFValue(70)}px;
-  height: ${RFValue(70)}px;
-  border-radius: 100px;
-  border-color: ${({theme}) => theme.colors.primary};
-  border-width: 1px;
+export const MapCard = styled.View`
+  width: 100%;
+  flex: 1;
+  min-height: ${RFValue(120)}px;
+  border-bottom-left-radius: ${({theme}) => theme.borderRadius.xlarge}px;
+  border-bottom-right-radius: ${({theme}) => theme.borderRadius.xlarge}px;
+  overflow: hidden;
+  position: relative;
+`;
+
+export const DriverSearchOverlay = styled.View`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 `;
 
 export const SimpleText = styled.Text`
@@ -271,7 +216,7 @@ export const ButtonMic = styled.TouchableOpacity`
   position: absolute;
   align-items: center;
   justify-content: center;
-  right: 0;
+  right: -1px;
 `;
 
 export const AnimatingMic = styled(MotiView)`
@@ -285,6 +230,14 @@ export const ViewVoice = styled.View`
   justify-content: center;
 `;
 
+export const VoicePulse = styled(MotiView)`
+  width: ${RFValue(100)}px;
+  height: ${RFValue(100)}px;
+  border-radius: ${RFValue(100)}px;
+  background-color: ${({theme}) => shade(0.08, theme.colors.background_global)};
+  position: absolute;
+`;
+
 export const Header = styled.View`
   flex-direction: row;
   width: 100%;
@@ -292,11 +245,21 @@ export const Header = styled.View`
   justify-content: space-between;
   align-items: flex-start;
   border-radius: 5px;
-  padding: 30px 30px 0 30px;
+  padding: 16px 30px 0 30px;
   height: 300px;
 `;
 
 export const styles = StyleSheet.create({
+  mapFill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  micIconMargin: {
+    marginLeft: 5,
+  },
   circle: {
     borderRadius: 150,
     width: RFValue(50),

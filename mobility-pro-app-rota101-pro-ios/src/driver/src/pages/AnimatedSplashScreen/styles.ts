@@ -6,3 +6,14 @@ export const Container = styled.View`
   justify-content: center;
   align-items: center;
 `;
+
+export const VersionText = styled.Text`
+  color: black;
+  font-size: 12px;
+  font-weight: bold;
+  position: absolute;
+  bottom: 50px;
+  align-self: center;
+  padding: 10px;
+  z-index: 999;
+`;

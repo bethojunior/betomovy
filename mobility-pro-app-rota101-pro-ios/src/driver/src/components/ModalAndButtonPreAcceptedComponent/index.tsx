@@ -11,8 +11,9 @@ import {useTheme} from 'styled-components';
 import {translate} from '../../../../client/locales';
 import {MaterialIcons} from '@expo/vector-icons';
 export const ModalAndButtonPreAcceptedComponent = () => {
-  const {stateTrip} = useTripProvider();
-  const {tripPreAccepted} = stateTrip;
+  const tripPreAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripPreAccepted,
+  );
   const [tripPreAcceptedModal, setTripPreAcceptedModal] = useState(false);
   const {colors} = useTheme();
   return (

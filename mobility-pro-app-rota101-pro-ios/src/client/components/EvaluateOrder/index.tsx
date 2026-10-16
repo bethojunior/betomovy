@@ -2,6 +2,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import apiDelivery from '../../api/apiDelivery';
 import {order_finished} from '../../constants';
 import EvaluateField from '../EvaluateField';
@@ -74,7 +75,7 @@ export default function EvaluateOrder({order}) {
         onRequestClose={() => setVisible(false)}
       >
         <View style={styles.containerModal}>
-          <View style={styles.contentModal}>
+          <SafeAreaView edges={['bottom']} style={styles.contentModal}>
             <Text style={styles.title}>
               {translate('evaluateOrder.text_what_did_you_think_of_your_order')}
             </Text>
@@ -101,7 +102,7 @@ export default function EvaluateOrder({order}) {
                 {translate('evaluateOrder.text_send')}
               </Text>
             </TouchableOpacity>
-          </View>
+          </SafeAreaView>
         </View>
       </Modal>
     </>

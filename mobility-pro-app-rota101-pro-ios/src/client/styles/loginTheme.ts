@@ -39,7 +39,6 @@ export default {
     background_greenLight: '#D5E6C9',
     red: '#E83F5B',
     redLight: '#F8E3E1',
-    orange: '#eb4034',
     yellowStrong: '#f8a63d',
     yellowLight: '#f1d6a9',
     background_blue_light: '#367FAE',

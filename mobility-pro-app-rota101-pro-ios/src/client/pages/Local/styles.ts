@@ -68,4 +68,19 @@ export const styles = StyleSheet.create({
   iconOptionLocal: {
     padding: 10,
   },
+  removeLastDestinationsButton: {
+    marginTop: 20,
+  },
+  removeLastDestinationsContainer: {
+    margin: 15,
+    marginVertical: 5,
+    display: 'flex',
+    flexDirection: 'row',
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: themeCss.colors.white,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: themeCss.colors.border || '#E0E0E0',
+  },
 });

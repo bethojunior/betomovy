@@ -1,8 +1,11 @@
 import * as Location from 'expo-location';
 import {TripProps} from '../../../../client/contexts/Trip/types';
+import { DriverStatusType } from '../../../../interfaces/driver';
+import { Sound } from 'expo-av/build/Audio';
 
 export interface UserDriverContextType {
   getDriverFind: () => Promise<UserDriverFind>;
+  song: Sound | null;
   userDriverFind: UserDriverFind;
   setUserDriverFind: (userDriverFind: UserDriverFind) => void;
   toogleDriverStatus: (
@@ -17,14 +20,7 @@ export interface UserDriverContextType {
     type: string,
     filename: string,
   ) => Promise<boolean>;
-  getDocumentsConfig: () => Promise<DocumentConfig[]>;
   stationId: string | null;
-  sendDocument: (
-    text: string | null,
-    image: string | null,
-    pdf: PdfProps | null,
-    docId: string,
-  ) => Promise<void>;
   statusDriver: () => void;
   listClientFavorites: (page: number) => Promise<FavoritesClientProps>;
   getLinkMenu: () => Promise<AdsProps>;
@@ -73,7 +69,7 @@ export interface UserDriverFind {
   referralMonetization: ReferralMonetizationProps;
   stationId: any;
   statistics: StatisticsProps;
-  status: string;
+  status: DriverStatusType;
   total_finished_trip: string;
   tripTypes: TripTypesProps[];
   userId: string;
@@ -163,32 +159,31 @@ export interface EarningsProps {
   total_day: string;
 }
 
-export interface DocumentConfig {
-  created_at: string;
-  deleted_at: any;
-  description: any;
-  id: string;
-  image: string;
-  label: string;
-  link: any;
-  pdf: string;
-  statusId: string;
-  text: string;
-  updated_at: string;
-}
-
-export interface PdfProps {
-  mimeType?: string;
-  name?: string;
-  size?: string;
-  type?: string;
-  uri?: string;
-}
-
 export interface AdsProps {
-  id: string;
+  active: string;
+  buttonCta?: ButtonCta;
+  buttonsActions?: ButtonsActions;
+  created_at: string;
   description: string;
+  id: string;
   link: string;
+  linkImage?: string;
+  menuAppTypeAction?: string;
+  menuAppTypeId?: string;
+  phoneNotification?: string;
+  quantity: null;
+  textImage: string;
+}
+
+export interface ButtonCta {
+  checked: boolean;
+  link: string;
+  name: string;
+}
+
+export interface ButtonsActions {
+  like: boolean;
+  share: boolean;
 }
 
 export interface ListIndicatorProps {

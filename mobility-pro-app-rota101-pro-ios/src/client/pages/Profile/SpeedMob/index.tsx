@@ -1,5 +1,5 @@
 import {Share} from 'react-native';
-import {Ionicons, FontAwesome, Entypo} from '@expo/vector-icons';
+import {Ionicons, FontAwesome, Entypo, MaterialIcons} from '@expo/vector-icons';
 import {Avatar} from 'react-native-elements';
 import {useNavigation} from '@react-navigation/native';
 
@@ -50,7 +50,7 @@ export default function ProfileSpeedMob() {
         // dismissed
       }
     } catch (error) {
-      customToast('Erro ao Compartilhar', 'error');
+      customToast(translate('toast.text_share_error'), 'danger');
     }
   };
   return (
@@ -140,6 +140,14 @@ export default function ProfileSpeedMob() {
             navigation.navigate('ContactUsSpeedMob');
           }}
         />
+
+        {__DEV__ && (
+          <ItemsTripSpeedMob
+            icon={<MaterialIcons name="developer-mode" size={25} color={theme.colors.primary} />}
+            name="Desenvolvedor"
+            onPress={() => navigation.navigate('DevMenu')}
+          />
+        )}
 
         <ItemsTripSpeedMob
           icon={<Ionicons name="exit" size={25} color={theme.colors.primary} />}

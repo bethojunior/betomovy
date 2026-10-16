@@ -1,8 +1,8 @@
-import {Dimensions, Modal, Animated, PanResponder} from 'react-native';
-import {Ionicons, AntDesign, Feather, MaterialIcons} from '@expo/vector-icons';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {useEffect, useRef, useState} from 'react';
-import {shade} from 'polished';
+import { Dimensions, Modal, Animated, PanResponder } from 'react-native';
+import { Ionicons, AntDesign, Feather, MaterialIcons } from '@expo/vector-icons';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useEffect, useRef, useState } from 'react';
+import { shade } from 'polished';
 import {
   BackButton,
   Container,
@@ -23,10 +23,10 @@ import {
   NicknameContainer,
 } from './styles';
 import theme from '../../styles/theme';
-import {TextEdit} from '../TextEdit';
-import {useTrip} from '../../contexts/Trip';
-import {useFavorite} from '../../contexts/favorite';
-import {CardAvaliation} from '../CardContainerAvaliation';
+import { TextEdit } from '../TextEdit';
+import { useTrip } from '../../contexts/Trip';
+import { useFavorite } from '../../contexts/favorite';
+import { CardAvaliation } from '../CardContainerAvaliation';
 
 interface Props {
   visible: boolean;
@@ -40,11 +40,11 @@ const MIN_BOTTOM_SHEET_HEIGHT = 350;
 const MAX_Y = MIN_BOTTOM_SHEET_HEIGHT - MAX_BOTTOM_SHEET_HEIGHT;
 const MIN_Y = 0;
 
-export const ModalDataDriver = ({visible, setVisible}: Props) => {
-  const {stateTripCustomer} = useTrip();
+export const ModalDataDriver = ({ visible, setVisible }: Props) => {
+  const { stateTripCustomer } = useTrip();
 
-  const {trip} = stateTripCustomer;
-  const {findPerCodeDriver} = useFavorite();
+  const { trip } = stateTripCustomer;
+  const { findPerCodeDriver } = useFavorite();
 
   const [detailsDriver, setDetailsDriver] = useState({});
 
@@ -112,7 +112,7 @@ export const ModalDataDriver = ({visible, setVisible}: Props) => {
               <DriverInfoContainer>
                 <DriverProfilePicture
                   // @ts-ignore
-                  source={{uri: trip?.driver?.profilePicture}}
+                  source={{ uri: trip?.driver?.profilePicture }}
                 />
               </DriverInfoContainer>
 
@@ -162,7 +162,7 @@ export const ModalDataDriver = ({visible, setVisible}: Props) => {
                   <Content>
                     <TextEdit
                       size="small"
-                      transform="none"
+                      change="none"
                       color={theme.colors.secondary}
                     >
                       Experiência
@@ -178,7 +178,7 @@ export const ModalDataDriver = ({visible, setVisible}: Props) => {
                 <TextEdit
                   size="small"
                   color={shade(0.04, theme.colors.secondary)}
-                  transform="none"
+                  change="none"
                 >
                   Mais informações
                 </TextEdit>

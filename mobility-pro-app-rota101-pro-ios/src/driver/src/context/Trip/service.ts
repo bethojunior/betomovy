@@ -1,9 +1,14 @@
-import axios from 'axios';
+import Logger from '~/utils/Logger';
 import {translate} from '../../../../client/locales';
+import {ApiResponse, ApiResponsePaginated} from '../../../../interfaces/api';
+import {DriverTripSummary} from '../../../../interfaces/driverTripSummary';
+import {Trip} from '../../../../interfaces/trip';
 import {customToast} from '../../../../utils/FlashMessage';
 import apiMainDriver from '../../api/apiMain';
-import Helper from '../../utils/Helper';
-import {AppState} from 'react-native';
+
+const logger = new Logger('TripService');
+
+const RATE_TIMEOUT_MS = 15000;
 
 export const TripService = () => {
   const accept = async (
@@ -56,9 +61,6 @@ export const TripService = () => {
     location: {latitude: number; longitude: number},
     userId: number,
   ) => {
-    if (AppState.currentState !== 'active') {
-      return;
-    }
     const response = await apiMainDriver.post('Driver/searchTrip', {
       stdObject: [
         {
@@ -111,7 +113,7 @@ export const TripService = () => {
   };
 
   const cancell = async (cancelTrip: any) => {
-    const response = await apiMainDriver.post('driver/cancelTrip', {
+    const response = await apiMainDriver.post('Driver/CancelTrip', {
       stdObject: [cancelTrip],
     });
 
@@ -120,17 +122,16 @@ export const TripService = () => {
 
   const rate = async (rating: number, tripReference: string) => {
     try {
-      const response = await apiMainDriver.post('TripRating/Rate', {
-        rating,
-        tripReference,
-      });
+      const response = await apiMainDriver.post<ApiResponse<any>>(
+        'TripRating/Rate',
+        { rating, tripReference },
+        { timeout: RATE_TIMEOUT_MS },
+      );
 
-      return response;
+      return response.data;
     } catch (e) {
-      console.log(e.response.data);
-      return {
-        status: true,
-      };
+      logger.log("rate", (e as any)?.response?.data);
+      throw e;
     }
   };
 
@@ -149,22 +150,22 @@ export const TripService = () => {
 
       return response;
     } catch (e) {
-      console.log(e?.response?.data);
+      logger.log("addBlackList", e?.response?.data);
     }
   };
 
   const addRiskArea = async (address: {}) => {
     try {
-        apiMainDriver.post('riskArea/store', address);
+      await apiMainDriver.post('riskArea/store', address);
     } catch (e) {
-      console.log(e?.response?.data);
+      logger.log("addRiskArea", e?.response?.data);
     }
-  }
+  };
 
   const getPaymentInVehicle = async () => {
     try {
       const {data} = await apiMainDriver.post(
-        'TripPaymentForm/GetAll?paymentInVehicle=1',
+          'TripPaymentForm/GetAll?paymentInVehicle=1',
         {
           stdObject: [{}],
         },
@@ -172,7 +173,7 @@ export const TripService = () => {
 
       return data;
     } catch (error) {
-      console.log(error);
+      logger.log("getPaymentInVehicle", error);
     }
   };
 
@@ -184,7 +185,7 @@ export const TripService = () => {
 
       return data;
     } catch (error) {
-      console.log(error);
+      logger.log("getTripTypes", error);
     }
   };
 
@@ -201,7 +202,7 @@ export const TripService = () => {
       });
       return response.data;
     } catch (error) {
-      console.log(error);
+      logger.log("cancelTrip", error);
     }
   };
 
@@ -213,7 +214,7 @@ export const TripService = () => {
       });
       return response.data;
     } catch (error) {
-      console.log(error);
+      logger.log("acceptScheduledTrip", error);
     }
   };
 
@@ -226,7 +227,7 @@ export const TripService = () => {
 
       return response.data;
     } catch (error) {
-      console.log(error);
+      logger.log("acceptTripOffer", error);
     }
   };
 
@@ -240,38 +241,41 @@ export const TripService = () => {
 
       return response.data;
     } catch (error) {
-      console.log(error);
+      logger.log("createTripOffer", error);
     }
   };
 
-  const sendPosition = async data => {
-    const objectLocation = {
-      stdObject: [
-        {
-          latitude: data?.latitude,
-          longitude: data?.longitude,
-          deviceModel: 'fabrica-socket',
-          deviceId: '704',
-          created_at: Helper.getNow(),
-          driverId: parseInt(data?.idDriver),
-          tripReference: data?.tripReference || null,
-        },
-      ],
-    };
-
+  const getTripsAvailable = async (page: number, params?: {}) => {
     try {
-      const response = await apiMainDriver.post(
-        'Location/Insert',
-        objectLocation,
-      );
-
+      const response = await apiMainDriver.post<
+        ApiResponsePaginated<Trip, 'trips'>
+      >('Driver/TripsAvailable', {stdObject: [{...params, page}]});
       return response.data;
     } catch (error) {
-      if (error) {
-        console.log('Request canceled', error.message);
-      } else {
-        console.log(error);
-      }
+      logger.log("getTripsAvailable", error);
+    }
+  };
+
+  const getTripsAccepted = async (page: number, params?: {}) => {
+    try {
+      const response = await apiMainDriver.post<
+        ApiResponsePaginated<Trip, 'trips'>
+      >('Driver/TripsAccepted', {stdObject: [{...params, page}]});
+      return response.data;
+    } catch (error) {
+      logger.log("getTripsAccepted", error);
+    }
+  };
+
+  const getTripsSummary = async (params?: {}) => {
+    try {
+      const response = await apiMainDriver.post<ApiResponse<DriverTripSummary>>(
+        'Driver/TripsSummary',
+        {stdObject: [params]},
+      );
+      return response.data;
+    } catch (error) {
+      logger.log("getTripsSummary", error);
     }
   };
 
@@ -292,6 +296,8 @@ export const TripService = () => {
     acceptScheduledTrip,
     acceptTripOffer,
     createTripOffer,
-    sendPosition,
+    getTripsAvailable,
+    getTripsAccepted,
+    getTripsSummary,
   };
 };

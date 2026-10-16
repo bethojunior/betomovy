@@ -3,9 +3,9 @@ import styled from 'styled-components/native';
 
 export const ContainerCardOffer = styled.View`
   background-color: ${({theme}) => theme.colors.background_global};
-  border-radius: 10px;
   padding: ${({theme}) => theme.spacing.medium}px;
   margin-bottom: ${({theme}) => theme.spacing.medium}px;
+  border-style: solid;
   border-bottom-width: 1px;
   border-bottom-color: ${({theme}) => theme.colors.primary};
 `;
@@ -36,16 +36,20 @@ export const ContainerFooter = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-
   margin-top: 10px;
 `;
 
-export const ButtonRefused = styled(Button)`
+export const ButtonRefused = styled(Button).attrs((props) => ({
+  ...props,
+  textColor: props.theme.colors.red,
+}))`
   border: 1px solid ${({theme}) => theme.colors.red};
   border-radius: 50px;
   width: 48%;
 `;
-export const ButtonAccept = styled(Button)`
+export const ButtonAccept = styled(Button).attrs({
+  textColor: 'white',
+})`
   background: ${({theme}) => theme.colors.border_green};
   margin-left: 10px;
   width: 48%;

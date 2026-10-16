@@ -5,12 +5,17 @@ import styled from 'styled-components/native';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-interface ButtonLocalizationSpeedMobProps{
+interface ButtonLocalizationSpeedMobProps {
   refuse?: boolean;
 }
 
-export const Container = styled.View`
-  flex: 1;
+export const Container = styled.ScrollView.attrs({
+  contentContainerStyle: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingTop: 24,
+  },
+})`
   background-color: ${({theme}) => theme.colors.background_global};
 `;
 
@@ -118,9 +123,10 @@ export const ContentButtonsLocalizationSpeedMob = styled.View`
 
 export const ButtonLocalizationSpeedMob = styled.Text<ButtonLocalizationSpeedMobProps>`
   font-size: 22px;
-  color: ${({theme, refuse}) => refuse ? theme.colors.red : theme.colors.blue_terms_button_speedmob};
+  color: ${({theme, refuse}) =>
+    refuse ? theme.colors.red : theme.colors.blue_terms_button_speedmob};
   font-weight: bold;
-`
+`;
 
 export const TitlePermissionsConcluded = styled.Text`
   font-size: 35px;
@@ -134,7 +140,7 @@ export const TitlePermissionsConcluded = styled.Text`
 
 export const TextOkPermissionConcluded = styled.Text`
   font-size: 60px;
-  text-align: center; 
+  text-align: center;
   color: ${({theme}) => theme.colors.blue_water};
   font-weight: bold;
   position: relative;

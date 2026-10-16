@@ -31,11 +31,12 @@ export const TextTime = styled.Text`
   font-family: MavenPro_500Medium;
   color: ${({theme}) => theme.colors.background_global};
   align-self: center;
-  font-size: 15px;
+  font-size: ${RFValue(12)}px;
 `;
 
 export const CotentTime = styled.View`
   flex-direction: row;
+  padding: 0 10px;
   align-items: center;
 `;
 

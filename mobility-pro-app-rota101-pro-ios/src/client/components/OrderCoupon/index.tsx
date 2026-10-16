@@ -24,7 +24,7 @@ export default function OrderCoupon() {
       <View style={styles.container}>
         <View style={styles.content}>
           <IconFontisto
-            color={coupon === null ? theme.colors.icon_gray : theme.colors.orange}
+            color={coupon === null ? theme.colors.icon_gray : theme.colors.primary}
             name="ticket"
             size={20}
           />

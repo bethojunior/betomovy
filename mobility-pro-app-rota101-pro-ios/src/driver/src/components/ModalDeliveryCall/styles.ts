@@ -6,6 +6,8 @@ export const Header = styled.View`
   justify-content: center;
   height: 80px;
   border-bottom-width: 0.5px;
+  padding-top: ${RFValue(10)}px;
+  margin-top: ${RFValue(10)}px;
 `;
 
 export const HeaderTitle = styled.Text<{color?: string; size?: number}>`
@@ -43,10 +45,12 @@ export const Line = styled.View`
 
 export const Logo = styled.Image`
   position: absolute;
-  width: ${RFValue(80)}px;
-  height: ${RFValue(80)}px;
-  top: 0;
-  left: 0;
+  width: ${RFValue(50)}px;
+  height: ${RFValue(50)}px;
+  border-radius: ${RFValue(25)}px;
+  top: ${RFValue(40)}px;
+  left: ${RFValue(10)}px;
+  z-index: 10;
 `;
 
 export const ContainerAddress = styled.View`

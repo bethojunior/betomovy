@@ -1,26 +1,30 @@
 /* eslint-disable radix */
-import {useEffect, useState} from 'react';
-import {Dimensions, View} from 'react-native';
+import { useEffect, useState } from 'react';
+import { Dimensions, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   useNavigation,
   NavigationProp,
   ParamListBase,
 } from '@react-navigation/native';
-import {Modal} from './styles';
-import {useTripProvider} from '../../../context/Trip';
-import {useUserDriver} from '../../../context/userDriver';
-import {useTripStatusProvider} from '../../../context/TripStatus';
-import {customToast} from '../../../../../utils/FlashMessage';
-import {V1ModalCallTrip} from './v1';
-import {translate} from '../../../../../client/locales';
+import { Modal } from './styles';
+import { useTripProvider } from '../../../context/Trip';
+import { useUserDriver } from '../../../context/userDriver';
+import { useTripStatusProvider } from '../../../context/TripStatus';
+import { customToast } from '../../../../../utils/FlashMessage';
+import { V1ModalCallTrip } from './v1';
+import { translate } from '../../../../../client/locales';
 import theme from '../../../styles/theme';
 import {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import {STATUS_PRE_ACCEPTED} from '../../../constants/trip';
+import { emitDriverStatusChange } from '../../../utils/driverStatusChangeEmitter';
+import { emitTripStatusChange } from '../../../utils/tripStatusChangeEmitter';
+import { useAuth } from '../../../../../context/auth';
+import { emitDriverLocation } from '~/utils/driverLocationEmmit';
+import { DriverStatusType } from '../../../../../interfaces/driver';
 
 interface Props {
   visible: any;
@@ -46,13 +50,20 @@ export default function ModalCallTrip({
   const [parentWidth, setParentWidth] = useState(0);
   const [parentHeight, setParentHeight] = useState(0);
 
-  const {acceptTrip, stateTrip, dispatchTrip, sendMessage} = useTripProvider();
+  const dispatchTrip: any = useTripProvider(
+    (context: any) => context.dispatchTrip,
+  );
+  const acceptTrip = useTripProvider((context) => context.acceptTrip);
 
-  const {trip, tripAccepted, song} = stateTrip;
-  const {userDriverFind, setUserDriverFind} = useUserDriver();
-  const {setStatusTrip} = useTripStatusProvider();
+  const trip: any = useTripProvider((context: any) => context.stateTrip.trip);
 
-  const {navigate}: NavigationProp<ParamListBase> = useNavigation();
+  const { userDriverFind, setUserDriverFind, song } = useUserDriver();
+  const setStatusTrip: any = useTripStatusProvider(
+    (context: any) => context.setStatusTrip,
+  );
+
+  const { navigate }: NavigationProp<ParamListBase> = useNavigation();
+  const { cityConfig } = useAuth();
 
   const version = 1;
   const heigthWindowSize = Dimensions.get('window').height;
@@ -94,14 +105,14 @@ export default function ModalCallTrip({
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateY: translateY.value}],
+      transform: [{ translateY: translateY.value }],
       opacity: opacity.value,
     };
   });
 
   const defaultAnimationValue = () => {
-    translateY.value = withTiming(heigthWindowSize, {duration: 800});
-    opacity.value = withTiming(0.7, {duration: 800});
+    translateY.value = withTiming(heigthWindowSize, { duration: 800 });
+    opacity.value = withTiming(0.7, { duration: 800 });
   };
 
   const countTimeAccept = async (second: number, timeLimit: number) => {
@@ -114,7 +125,7 @@ export default function ModalCallTrip({
     setTimeToAccept(timeElapsed);
 
     if (timeElapsed > 100) {
-      dispatchTrip({type: 'update', field: 'callDriverModal', arg: false});
+      dispatchTrip({ type: 'update', field: 'callDriverModal', arg: false });
       setRewardTrip(true);
       setTotalBonus(0);
       receivedNotification = true;
@@ -124,7 +135,7 @@ export default function ModalCallTrip({
         console.log('erro', error);
       }
       await AsyncStorage.removeItem('trip');
-      return dispatchTrip({type: 'update', field: 'trip', arg: {}});
+      return dispatchTrip({ type: 'update', field: 'trip', arg: {} });
     }
 
     second += 1;
@@ -153,8 +164,8 @@ export default function ModalCallTrip({
 
   useEffect(() => {
     if (Object.keys(trip).length !== 0 && visible) {
-      translateY.value = withTiming(0, {duration: 800});
-      opacity.value = withTiming(1, {duration: 800});
+      translateY.value = withTiming(0, { duration: 800 });
+      opacity.value = withTiming(1, { duration: 800 });
 
       if (trip.tripLongDistance !== null) {
         setTotalBonus(trip?.tripLongDistance?.value);
@@ -175,12 +186,6 @@ export default function ModalCallTrip({
     }
   }, [trip]);
 
-  const sendMessageBot = async (tripA, chatBotTripTypeId) => {
-    setTimeout(() => {
-      sendMessage(tripA.driver.userId, tripA.tripReference, chatBotTripTypeId);
-    }, 6000);
-  };
-
   const closeCall = async () => {
     try {
       await song?.stopAsync();
@@ -194,33 +199,23 @@ export default function ModalCallTrip({
     await AsyncStorage.removeItem('tripError');
   };
 
-  const acceptPreAvailable = async tripP => {
-    try {
-      await song?.stopAsync();
-    } catch (error) {
-      console.log('erro', error);
+  const startActiveTrip = (acceptedTrip: any) => {
+    setStatusTrip(translate('statusTrip.accepted'));
+
+    const updatedDriver = { ...userDriverFind, status: 'corrida' as DriverStatusType };
+    setUserDriverFind(updatedDriver);
+    const currentLocation = userDriverFind.latitude && userDriverFind.longitude
+      ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+      : undefined;
+    emitDriverStatusChange(updatedDriver, 'corrida', cityConfig, currentLocation);
+    emitDriverLocation(updatedDriver, currentLocation, cityConfig);
+    const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+    if (acceptedTrip?.tripReference) {
+      emitTripStatusChange(acceptedTrip.tripReference, 'accepted', configCityId);
     }
-    await sendMessageBot(tripP, 2);
-    receivedNotification = true;
 
-    userDriverFind.preAvailableTrip = tripP;
-    setUserDriverFind(userDriverFind);
-    await AsyncStorage.setItem('preAvailableTrip', JSON.stringify(tripP));
-    await AsyncStorage.setItem(
-      'tripInWait',
-      JSON.stringify(trip.tripReference),
-    );
-    await AsyncStorage.setItem('user', JSON.stringify(userDriverFind));
-
-    dispatchTrip({type: 'update', field: 'tripPreAccepted', arg: tripP});
-
-    closeCall();
-    dispatchTrip({type: 'update', field: 'callDriverModal', arg: false});
-    setRewardTrip(true);
-    setTotalBonus(0);
-    setLoading(false);
-
-    // MOSTRAR BOTÃO PRO MOTORISTA OLHAR OS DADOS DA CORRIDA PRE ACEITA
+    AsyncStorage.setItem('tripDriver', JSON.stringify(acceptedTrip));
+    showInitModal(true);
   };
 
   const confirm = async () => {
@@ -243,41 +238,28 @@ export default function ModalCallTrip({
     )
       .then(result => {
         setPreloadVisible(false);
+
         if (!result.status) {
           AsyncStorage.setItem('tripError', 'indisponivel');
-          return customToast(
-            translate('driverTrip.text_error_accept_trip'),
-            'danger',
-          );
+          customToast(translate('driverTrip.text_error_accept_trip'), 'warning');
+          return;
         }
+
         setTotalBonus(0);
 
-        if (
-          (userDriverFind?.preAvailable === '1' &&
-            tripAccepted &&
-            Object.keys(tripAccepted).length !== 0) ||
-          result?.data?.status === STATUS_PRE_ACCEPTED
-        ) {
-          return acceptPreAvailable(result.data);
+        if (!result.isPreAcceptedTrip) {
+          startActiveTrip(result.data);
         }
 
-        dispatchTrip({type: 'acceptTrip', arg: result.data});
-
-        sendMessageBot(result.data, 1);
         closeCall();
-        setStatusTrip(translate('statusTrip.accepted'));
-        AsyncStorage.setItem('tripDriver', JSON.stringify(result.data));
-        showInitModal(true);
-        // FAZER FUNC DE CONFIRM NA HOME SO PRA PODER ABRIR O MODAL DE INIT
-        // setIniTripModal(true);
-        dispatchTrip({type: 'update', field: 'callDriverModal', arg: false});
         setRewardTrip(true);
         setLoading(false);
-        return navigate('Home');
+
+        return result.isPreAcceptedTrip ? undefined : navigate('Home');
       })
       .catch(() => {
-        translateY.value = withTiming(0, {duration: 800});
-        opacity.value = withTiming(1, {duration: 800});
+        translateY.value = withTiming(0, { duration: 800 });
+        opacity.value = withTiming(1, { duration: 800 });
         setPreloadVisible(false);
         song.pauseAsync();
         showInitModal(false);
@@ -295,7 +277,7 @@ export default function ModalCallTrip({
   };
 
   const onLayout = event => {
-    const {width, height} = event.nativeEvent.layout;
+    const { width, height } = event.nativeEvent.layout;
     setParentWidth(width);
     setParentHeight(height);
   };

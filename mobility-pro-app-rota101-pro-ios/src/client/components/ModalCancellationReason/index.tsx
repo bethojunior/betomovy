@@ -1,42 +1,42 @@
-import {useEffect, useState} from 'react';
-import {SimpleLineIcons, Ionicons} from '@expo/vector-icons';
-import {Alert, TouchableOpacity} from 'react-native';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {useTheme} from 'styled-components';
-import {translate} from '../../locales';
-import {useTrip} from '../../contexts/Trip';
+import { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { translate } from '../../locales';
+import { useTrip } from '../../contexts/Trip';
+import { BottomSheetModal } from '../BottomSheetModal';
 import {
-  ButtonConfirm,
-  ButtonContent,
-  ButtonReason,
-  ContainerAll,
-  ContainerButton,
+  CloseButton,
+  ConfirmButton,
+  ConfirmButtonText,
   Content,
-  ContentDescription,
-  Description,
-  Header,
+  HeaderRow,
+  HeaderTextGroup,
+  IconCircle,
+  ReasonCard,
+  ReasonList,
   ReasonName,
-  ViewRelative,
+  Subtitle,
+  Title,
 } from './styles';
-import {If} from '../If';
-import {TextEdit} from '../TextEdit';
 import theme from '../../styles/theme';
-import {customToast} from '../../../utils/FlashMessage';
-
-interface ModalProps {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-}
+import { customToast } from '../../../utils/FlashMessage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CancellationReason, ModalCancellationReasonsCustomerProps } from './types';
 
 export const ModalCancellationReasonsCustomer = ({
   visible,
   setVisible,
-}: ModalProps) => {
-  const [listReasons, setListReasons] = useState([]);
+}: ModalCancellationReasonsCustomerProps) => {
+  const [listReasons, setListReasons] = useState<CancellationReason[]>([]);
   const [idSelected, setIdSelected] = useState(0);
 
-  const {getCancellationReasons, cancelTripByCustomer} = useTrip();
-  const {colors} = useTheme();
+  const { getCancellationReasons, cancelTripByCustomer } = useTrip();
+
+  const handleClose = () => {
+    setVisible(false);
+    setIdSelected(0);
+  };
 
   const showAlert = async () => {
     setVisible(false);
@@ -47,23 +47,20 @@ export const ModalCancellationReasonsCustomer = ({
         {
           text: translate('cleanBagModal.text_confirmed'),
           onPress: async () => {
-            await cancelTripByCustomer(idSelected);
+            const canceled = await cancelTripByCustomer(idSelected);
             setIdSelected(0);
-            customToast(
-              translate('trip.your_trip_has_been_canceled'),
-              'success',
-            );
+            if (!canceled) return;
+
+            await AsyncStorage.removeItem('waitingTimer');
+            customToast(translate('trip.your_trip_has_been_canceled'), 'success');
           },
         },
-
         {
           text: translate('cleanBagModal.text_denied'),
-          onPress: () => {
-            setIdSelected(0);
-          },
+          onPress: () => setIdSelected(0),
         },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   };
 
@@ -76,96 +73,51 @@ export const ModalCancellationReasonsCustomer = ({
   }, []);
 
   return (
-    <If condition={visible}>
-      <ViewRelative
-        from={{
-          opacity: 0,
-          transform: [{translateY: 150}],
-        }}
-        animate={{
-          opacity: 1,
-          transform: [{translateY: 0}],
-        }}
-        exit={{
-          opacity: 0,
-          transform: [{translateY: 0}],
-        }}
-      >
-        <ContainerAll>
-          <Header>
-            <Ionicons
-              name="arrow-back"
-              size={RFValue(20)}
-              color={colors.secondary}
-              onPress={() => {
-                setVisible(false);
-                setIdSelected(0);
-              }}
-            />
-            <TextEdit color={colors.secondary}>
-              {translate('trip.cancel_trip')}?
-            </TextEdit>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => {
-                setVisible(false);
-                setIdSelected(0);
-              }}
-            >
-              <TextEdit color={colors.secondary}>
-                {translate('trip.ignore')}
-              </TextEdit>
-            </TouchableOpacity>
-          </Header>
-          <ContentDescription>
-            <Description>
-              {translate('trip.why_you_want_cancel_trip')}
-            </Description>
-          </ContentDescription>
-          <Content>
-            {listReasons?.map(item => {
-              return (
-                <ButtonReason
-                  activeOpacity={0.9}
-                  key={item.idCancellationReasons}
-                  onPress={() => {
-                    setIdSelected(item.idCancellationReasons);
-                  }}
-                  selected={item.idCancellationReasons === idSelected}
-                >
-                  <ButtonContent>
-                    <ReasonName
-                      selected={item.idCancellationReasons === idSelected}
-                    >
-                      {item.name}
-                    </ReasonName>
-                    <SimpleLineIcons
-                      name="arrow-right"
-                      size={13}
-                      color={
-                        item.idCancellationReasons === idSelected
-                          ? colors.primaryText
-                          : colors.secondary
-                      }
-                    />
-                  </ButtonContent>
-                </ButtonReason>
-              );
-            })}
-          </Content>
-          <ContainerButton>
-            <If condition={idSelected !== 0}>
-              <ButtonConfirm
-                onPress={() => {
-                  showAlert();
-                }}
+    <BottomSheetModal visible={visible} onRequestClose={handleClose}>
+      <Content>
+        <HeaderRow>
+          <IconCircle>
+            <Ionicons name="alert-circle" size={RFValue(22)} color={theme.colors.destructive} />
+          </IconCircle>
+
+          <HeaderTextGroup>
+            <Title>{translate('trip.cancel_trip')}?</Title>
+            <Subtitle>{translate('trip.why_you_want_cancel_trip')}</Subtitle>
+          </HeaderTextGroup>
+
+          <CloseButton activeOpacity={0.7} onPress={handleClose}>
+            <Ionicons name="close" size={RFValue(16)} color={theme.colors.text_gray} />
+          </CloseButton>
+        </HeaderRow>
+
+        <ReasonList>
+          {listReasons?.map(item => {
+            const selected = item.idCancellationReasons === idSelected;
+
+            return (
+              <ReasonCard
+                key={item.idCancellationReasons}
+                activeOpacity={0.8}
+                selected={selected}
+                onPress={() => setIdSelected(item.idCancellationReasons)}
               >
-                <TextEdit color={theme.colors.primaryText}>{translate('dialog.confirm')}</TextEdit>
-              </ButtonConfirm>
-            </If>
-          </ContainerButton>
-        </ContainerAll>
-      </ViewRelative>
-    </If>
+                <ReasonName selected={selected}>{item.name}</ReasonName>
+                <Ionicons
+                  name={selected ? 'checkmark-circle' : 'ellipse-outline'}
+                  size={RFValue(20)}
+                  color={selected ? theme.colors.primary : theme.colors.grayLight}
+                />
+              </ReasonCard>
+            );
+          })}
+        </ReasonList>
+
+        {idSelected !== 0 && (
+          <ConfirmButton activeOpacity={0.7} onPress={showAlert}>
+            <ConfirmButtonText>{translate('dialog.confirm')}</ConfirmButtonText>
+          </ConfirmButton>
+        )}
+      </Content>
+    </BottomSheetModal>
   );
 };

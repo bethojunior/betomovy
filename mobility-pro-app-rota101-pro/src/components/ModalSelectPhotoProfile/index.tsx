@@ -57,9 +57,9 @@ export const ModalSelectPhotoProfile = ({
   }, [visible]);
 
   const pickerOptions: ImagePicker.ImagePickerOptions = useMemo(() => ({
-    mediaTypes: 'images',
+    mediaTypes: ['images'],
     allowsEditing: true,
-    quality: 1,
+    quality: 0.8,
     aspect: [1, 1],
   }), []);
 
@@ -67,14 +67,14 @@ export const ModalSelectPhotoProfile = ({
     setPressedGallery(false);
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status === "denied") {
-        setPermissionTypeError("gallery");
+      if (status !== 'granted') {
+        setPermissionTypeError('gallery');
         return;
       }
 
       const result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
 
-      if (result.canceled) {
+      if (result.canceled || !result.assets?.length) {
         setVisible(false);
         return;
       }
@@ -92,14 +92,14 @@ export const ModalSelectPhotoProfile = ({
     setPressedCamera(false);
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status === "denied") {
-        setPermissionTypeError("camera");
+      if (status !== 'granted') {
+        setPermissionTypeError('camera');
         return;
       }
 
       const result = await ImagePicker.launchCameraAsync(pickerOptions);
 
-      if (result.canceled) {
+      if (result.canceled || !result.assets?.length) {
         setVisible(false);
         return;
       }
@@ -113,8 +113,8 @@ export const ModalSelectPhotoProfile = ({
     }
   }
 
-  const selectGallery = generalSettings.find(
-    data => data.key === configKey,
+  const selectGallery = generalSettings?.find?.(
+    data => data?.key === configKey,
   );
 
   const getPermissionMessage = () => {
@@ -162,7 +162,7 @@ export const ModalSelectPhotoProfile = ({
           <Feather name="chevron-right" size={RFValue(20)} color={theme.colors.secondary} />
         </OptionCard>
 
-        {selectGallery.value === '1' && (
+        {selectGallery?.value === '1' && (
           <OptionCard
             onPress={handleOpenGallery}
             onPressIn={() => setPressedGallery(true)}

@@ -30,6 +30,7 @@ export default function OrderServiceRoutes() {
         headerTintColor: theme.colors.secondary,
         headerTitleStyle: {fontSize: theme.fontSizes.large},
         headerTitleAlign: 'center',
+        headerBackTitleVisible: false,
         headerRight: () => {
           return <NotificationButton marginR={10} />;
         },

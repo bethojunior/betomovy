@@ -1,15 +1,18 @@
-import {TouchableOpacityProps} from 'react-native';
-import theme from '../../styles/theme';
-import {Container, Loading, Text} from './styles';
+import { ReactNode } from 'react';
+import { TouchableOpacityProps } from 'react-native';
+import { ButtonVariant, CustomButton, IconWrapper, Spinner, Title } from './styles';
 
 interface Props extends TouchableOpacityProps {
   title: string;
   loading?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
   enabled?: boolean;
   inverted?: boolean;
   colorText?: string;
   color?: string;
+  textSize?: number;
+  variant?: ButtonVariant;
+  icon?: ReactNode;
 }
 
 export function Button({
@@ -19,27 +22,31 @@ export function Button({
   loading = false,
   colorText,
   color,
+  textSize,
+  variant = 'solid',
+  icon,
   ...rest
 }: Props) {
   return (
-    <Container
+    <CustomButton
+      disabled={!enabled}
       enabled={enabled}
-      onPress={enabled ? onPress : () => {}}
+      onPress={onPress}
       activeOpacity={0.8}
       color={color}
+      variant={variant}
       {...rest}
     >
-      <Text
-        style={{
-          color: colorText ? colorText : theme.colors.primaryText,
-        }}
-        enabled={enabled}
-      >
-        {title}
-      </Text>
       {loading ? (
-        <Loading size={'small'} color={color ? color : theme.colors.primary} />
-      ) : null}
-    </Container>
+        <Spinner color={colorText} />
+      ) : (
+        <>
+          {icon ? <IconWrapper>{icon}</IconWrapper> : null}
+          <Title textSize={textSize} enabled={enabled} variant={variant} color={colorText}>
+            {title}
+          </Title>
+        </>
+      )}
+    </CustomButton>
   );
 }

@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useReducer,
@@ -10,11 +8,10 @@ import {
 } from 'react';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {decode} from '@googlemaps/polyline-codec';
-import {Audio} from 'expo-av';
-import {useBubbleButton} from '@704apps/react-native-bubble-button';
-import {debounce} from 'lodash';
-import {tripService} from './services';
+import { decode } from '@googlemaps/polyline-codec';
+import { useBubbleButton } from '@704apps/react-native-bubble-button';
+import { debounce } from 'lodash';
+import { tripService } from './services';
 import {
   TripContextChildren,
   TripContextType,
@@ -23,28 +20,43 @@ import {
   OriginProps,
   DestinationProps,
   stateTripProps,
+  ReducerType,
+  TripListField,
 } from './types';
-import {useUserDriver} from '../userDriver';
-import {TripService} from './service';
-import {useAuth} from '../../../../context/auth';
+import { useUserDriver } from '../userDriver';
+import { TripService } from './service';
+import { useAuth } from '../../../../context/auth';
 import {
   STATUS_ACCEPTED,
   STATUS_BOARDING,
   STATUS_IN_PROGRESS,
+  STATUS_PRE_ACCEPTED,
   TRIP_CALL_PARTNER,
 } from '../../constants/trip';
 import Helper from '../../../../client/utils/Helper';
-import {useLocalProvider} from '../local';
+import { useLocalProvider } from '../local';
 import apiMainDriver from '../../api/apiMain';
-import {removeAllMask} from '../../utils/format';
-import {TripStatusService} from '../TripStatus/service';
-import {customToast} from '../../../../utils/FlashMessage';
-import {translate} from '../../../../client/locales';
-import {mountSong} from '../../utils/mountSong';
-import {searchNative, updateRoute} from './directionRoute';
-import {calculateDistanceFromLatLonInMeters} from '../../../../client/utils/position';
-import {useStorage} from '../../../../utils/Storage';
+import { removeAllMask } from '../../utils/format';
+import { sortTripsBySchedule } from '../../utils/tripOrder';
+import { TripStatusService } from '../TripStatus/service';
+import { customToast } from '../../../../utils/FlashMessage';
+import { offlineTripQueue } from '~/hooks/useOfflineTripActions';
+import { emitDriverStatusChange } from '../../utils/driverStatusChangeEmitter';
+import { emitTripStatusChange } from '../../utils/tripStatusChangeEmitter';
+import { translate } from '../../../../client/locales';
+import { searchNative, updateRoute } from './directionRoute';
+import { calculateDistanceFromLatLonInMeters } from '../../../../client/utils/position';
+import { useStorage } from '../../../../utils/Storage';
 import MapService from '../../../../client/services/mapService';
+import { createContext, useContextSelector } from 'use-context-selector';
+import { Trip } from '../../../../interfaces/trip';
+import { DriverStatusType } from '../../../../interfaces/driver';
+import { AvaliationPayload } from '~/interfaces/avaliation';
+import { DriverTripSummary } from '../../../../interfaces/driverTripSummary';
+import { PaginationApi } from '../../../../interfaces/api';
+import { InteractionManager } from 'react-native';
+import { useSong } from '../../hooks/song';
+import { sendCriticalRequest } from '~/utils/network';
 
 const TripContext = createContext<TripContextType>({} as TripContextType);
 
@@ -56,50 +68,111 @@ const initialState: stateTripProps = {
   destination: {} as DestinationProps,
   dataCalculate: {},
   listSchedule: [],
+  listSchedulePaginate: {} as PaginationApi,
+  scheduleFilter: { dateStart: null, dateEnd: null },
   listScheduleAccepted: [],
+  listScheduleAcceptedPaginate: {} as PaginationApi,
+  scheduleAcceptedFilter: { dateStart: null, dateEnd: null },
   rating: 5,
   polyline: [],
-  song: () => {},
   flashlight: false,
   callDriverModal: false,
   countTrip: 0,
   hasRun: true,
+  isAcceptingTrip: false,
+  notificationTripCallRequest: null,
   cancelTrip: {} as CancelTripProps,
-  tripsOffer: [] as TripInfo[],
+  tripsOffer: [],
+  tripsOfferPaginate: {} as PaginationApi,
+  showMapSuggestion: false,
+  tripSummary: {
+    totalOfferTrips: 0,
+    totalScheduledAccepted: 0,
+    totalScheduledAvailable: 0,
+  }
 };
 
-const reducer = (state, action: {type: string; field?: string; arg?: any}) => {
+const reducer: ReducerType = (state, action) => {
   switch (action.type) {
     case 'update':
       return {
         ...state,
         [action.field]: action.arg,
       };
+
     case 'clearTripAccepted':
       return {
         ...state,
-        tripAccepted: {},
+        tripAccepted: {} as TripInfo,
         polyline: [],
+        trip: {} as TripInfo,
       };
+
     case 'initTripPreAccepted':
       return {
         ...state,
         tripAccepted: action.arg,
-        tripPreAccepted: {},
+        tripPreAccepted: {} as TripInfo,
       };
+
     case 'acceptTrip':
       return {
         ...state,
         tripAccepted: action.arg,
-        trip: {},
+        trip: {} as TripInfo,
       };
+
+    case 'addOrUpdateList': {
+      const list = state[action.arg.field];
+      const exists = list.some(item => item.tripReference === action.arg.value.tripReference);
+
+      let updatedList = exists
+        ? list.map(item =>
+          item.tripReference === action.arg.value.tripReference ? { ...item, ...action.arg.value } : item
+        )
+        : [...list, action.arg.value];
+
+      if (action.arg.field === 'listSchedule' || action.arg.field === 'listScheduleAccepted') {
+        updatedList = sortTripsBySchedule(updatedList);
+      }
+
+      return { ...state, [action.arg.field]: updatedList };
+    }
+
+    case 'removeFromList': {
+      const list = state[action.arg.field];
+      return {
+        ...state,
+        [action.arg.field]: list.filter(item => item.tripReference !== action.arg.value.tripReference),
+      };
+    }
+
+    case 'incrementTripSummaryItem':
+      return {
+        ...state,
+        tripSummary: {
+          ...state.tripSummary,
+          [action.arg.field]: state.tripSummary[action.arg.field] + (action.arg.value ?? 1),
+        },
+      };
+
+    case 'decrementTripSummaryItem':
+      return {
+        ...state,
+        tripSummary: {
+          ...state.tripSummary,
+          [action.arg.field]: Math.max(state.tripSummary[action.arg.field] - (action.arg.value ?? 1), 0),
+        },
+      };
+
     default:
-      return false;
+      return state;
   }
 };
 
-export const TripProvider = ({children}: TripContextChildren) => {
+export const TripProvider = ({ children }: TripContextChildren) => {
   const [stateTrip, dispatchTrip] = useReducer(reducer, initialState);
+
   const {
     trip,
     tripPreAccepted,
@@ -109,42 +182,77 @@ export const TripProvider = ({children}: TripContextChildren) => {
     dataCalculate,
     rating,
     polyline,
-    song,
     hasRun,
     cancelTrip,
+    callDriverModal,
+    isAcceptingTrip,
   } = stateTrip;
 
-  const {hideBubble} = useBubbleButton();
-  const {cityConfig, tokenDriver} = useAuth();
-  const {userDriverFind, setUserDriverFind, toogleDriverStatus, getDriverFind} =
-    useUserDriver();
+  const isAcceptingTripRef = useRef(false);
+
+  const { hideBubble } = useBubbleButton();
+  const { cityConfig, tokenDriver } = useAuth();
+  const {
+    userDriverFind,
+    setUserDriverFind,
+    toogleDriverStatus,
+    getDriverFind,
+    song,
+  } = useUserDriver();
   const locationNow = useMemo(async () => {
     return await Location.getCurrentPositionAsync({});
   }, []);
   const service = TripService();
   const serviceTripStatus = TripStatusService();
-  const {getLocal, location} = useLocalProvider();
+  const { getLocal, location } = useLocalProvider();
 
-  const {getItem} = useStorage();
+  const { getItem } = useStorage();
+  const { playSong } = useSong();
+
+  const mapSuggestionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const cityId = cityConfig?.cityId || userDriverFind?.cityId;
+
+  const tripTypes = useMemo(() => {
+    return userDriverFind?.tripTypes?.map((tt) => tt.tripTypeId) || [];
+  }, [userDriverFind?.tripTypes]);
+
+  const clearMapSuggestionTimeout = useCallback(() => {
+    if (mapSuggestionTimeoutRef.current) {
+      clearTimeout(mapSuggestionTimeoutRef.current);
+      mapSuggestionTimeoutRef.current = null;
+    }
+  }, []);
+
+  const startMapSuggestionTimeout = useCallback(() => {
+    clearMapSuggestionTimeout();
+
+    mapSuggestionTimeoutRef.current = setTimeout(() => {
+      dispatchTrip({ type: 'update', field: 'showMapSuggestion', arg: true });
+      mapSuggestionTimeoutRef.current = null;
+    }, 10000);
+  }, [clearMapSuggestionTimeout]);
 
   useEffect(() => {
-    const mountSong = async () => {
-      const {sound} = await Audio.Sound.createAsync(
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        require('../../assets/songs/assobio.mp3'),
-      );
-
-      dispatchTrip({type: 'update', field: 'song', arg: sound});
+    return () => {
+      clearMapSuggestionTimeout();
     };
-
-    mountSong();
-  }, []);
+  }, [clearMapSuggestionTimeout]);
 
   const postPerOrigin = async (local = null) => {
     const response = await getLocal(local?.latitude, local?.longitude);
     if (response?.data) {
-      dispatchTrip({type: 'update', field: 'origin', arg: response.data});
+      dispatchTrip({ type: 'update', field: 'origin', arg: response.data });
     }
+  };
+
+  const isTripPreAccepted = (acceptedTrip: TripInfo) => {
+    const isDriverAlreadyOnAnotherTrip =
+      userDriverFind?.preAvailable === '1' &&
+      tripAccepted &&
+      Object.keys(tripAccepted).length !== 0;
+
+    return isDriverAlreadyOnAnotherTrip || acceptedTrip?.status === STATUS_PRE_ACCEPTED;
   };
 
   const acceptTrip = async (
@@ -153,8 +261,11 @@ export const TripProvider = ({children}: TripContextChildren) => {
     estimatedTimeDriverArrival: number,
     distanceDriverArrival: number,
   ) => {
+    isAcceptingTripRef.current = true;
+    dispatchTrip({ type: 'update', field: 'isAcceptingTrip', arg: true });
+
     try {
-      await song.pauseAsync();
+      await song?.pauseAsync();
       const response = await service.accept(
         driverId,
         tripReference,
@@ -162,18 +273,40 @@ export const TripProvider = ({children}: TripContextChildren) => {
         distanceDriverArrival,
       );
 
-      dispatchTrip({type: 'update', field: 'countTrip', arg: response.data});
+
+      let isPreAcceptedTrip = false;
+
+      if (response && typeof response === 'object' && response.status) {
+        dispatchTrip({ type: 'update', field: 'countTrip', arg: response.data });
+        dispatchTrip({ type: 'update', field: 'callDriverModal', arg: false });
+
+        isPreAcceptedTrip = isTripPreAccepted(response.data);
+
+        if (isPreAcceptedTrip) {
+          await registerPreAcceptedTrip(response.data);
+        } else {
+          dispatchTrip({ type: 'acceptTrip', arg: response.data });
+        }
+
+        await AsyncStorage.removeItem('trip');
+        notifyTripAccepted(response.data, isPreAcceptedTrip ? 2 : 1);
+        startMapSuggestionTimeout();
+      }
+
       try {
         await song?.stopAsync();
       } catch (error) {
         console.log(error);
       }
-      return response;
+      return { ...response, isPreAcceptedTrip };
     } catch (error) {
       return customToast(
         translate('driverTrip.text_error_accept_trip'),
-        'danger',
+        'warning',
       );
+    } finally {
+      isAcceptingTripRef.current = false;
+      dispatchTrip({ type: 'update', field: 'isAcceptingTrip', arg: false });
     }
   };
 
@@ -197,6 +330,12 @@ export const TripProvider = ({children}: TripContextChildren) => {
     }
   };
 
+  const notifyTripAccepted = (acceptedTrip: TripInfo, chatBotTripTypeId: number) => {
+    setTimeout(() => {
+      sendMessage(Number(acceptedTrip.driver.userId), acceptedTrip.tripReference, chatBotTripTypeId);
+    }, 6000);
+  };
+
   const getCancellationReasons = async () => {
     try {
       const result = await service.getReasonsCancel();
@@ -210,118 +349,6 @@ export const TripProvider = ({children}: TripContextChildren) => {
       }
 
       return result.data.data;
-    } catch (error) {
-      return console.log(error);
-    }
-  };
-
-  const getDriverTrip = async (
-    driverId: number,
-    location: {latitude: number; longitude: number},
-    userId: number,
-    callType?: string | number | null,
-  ) => {
-    if (!hasRun) {
-      await Helper.timeout(5000).then(() => {
-        dispatchTrip({type: 'update', field: 'hasRun', arg: true});
-      });
-      return '';
-    }
-    if (hasRun) {
-      await dispatchTrip({type: 'update', field: 'hasRun', arg: false});
-      try {
-        const listTripsDenied = await getTripDenied();
-        const response = await service.search(
-          driverId,
-          listTripsDenied,
-          location,
-          userId,
-        );
-
-        if (response === null || response === undefined) {
-          dispatchTrip({type: 'update', field: 'trip', arg: {}});
-          return false;
-        }
-
-        if (callType && callType === TRIP_CALL_PARTNER) {
-          response.callType = 'partner';
-        }
-
-        await AsyncStorage.setItem('trip', JSON.stringify(response));
-        dispatchTrip({type: 'update', field: 'trip', arg: response});
-        Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          staysActiveInBackground: true,
-          playsInSilentModeIOS: true,
-          shouldDuckAndroid: true,
-          playThroughEarpieceAndroid: false,
-        });
-        try {
-          // resolve song loop. Nao esta identificando const {sound}
-          await song?.setIsLoopingAsync(true);
-        } catch {
-          return true;
-        }
-        return true;
-      } catch (error) {
-        return console.log(error);
-      }
-    }
-    return '';
-  };
-
-  useEffect(() => {
-    if (tripAccepted && Object.keys(tripAccepted).length > 0) {
-      try {
-        song && song?.stopAsync();
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }, [tripAccepted]);
-
-  const refuseTrip = async (driverId: number, tripReference: string) => {
-    try {
-      if (tripReference === undefined) {
-        tripReference = JSON.parse(
-          await AsyncStorage.getItem('trip'),
-        ).tripReference;
-      }
-      await song.pauseAsync();
-      const response = await service.refuse(driverId, tripReference);
-
-      if (response) {
-        AsyncStorage.removeItem('trip');
-
-        let tripsDeined = JSON.parse(
-          await AsyncStorage.getItem('tripsDeniedDriver'),
-        );
-
-        if (tripsDeined === null || tripsDeined.length === 0) {
-          tripsDeined = {
-            tripReference: trip.tripReference,
-            date: new Date(),
-          };
-        } else {
-          tripsDeined.push({
-            tripReference: trip.tripReference,
-            date: new Date(),
-          });
-        }
-
-        try {
-          await song?.stopAsync();
-        } catch (error) {
-          console.log('erro', error);
-        }
-        dispatchTrip({type: 'update', field: 'trip', arg: {}});
-
-        await AsyncStorage.setItem(
-          'tripsDeniedDriver',
-          JSON.stringify(tripsDeined),
-        );
-      }
-      return '';
     } catch (error) {
       return console.log(error);
     }
@@ -364,6 +391,129 @@ export const TripProvider = ({children}: TripContextChildren) => {
     });
   };
 
+  const getDriverTrip = useCallback(async (
+    driverId: number,
+    location: { latitude: number; longitude: number },
+    userId: number,
+    callType?: string | number | null,
+  ): Promise<boolean> => {
+    if (callDriverModal) return false;
+    if (isAcceptingTripRef.current) return false;
+    if (Object.keys(tripAccepted || {}).length > 0) return false;
+
+    if (!hasRun) {
+      await Helper.timeout(5000).then(() => {
+        dispatchTrip({ type: 'update', field: 'hasRun', arg: true });
+      });
+      return false;
+    }
+
+    if (hasRun) {
+      dispatchTrip({ type: 'update', field: 'hasRun', arg: false });
+
+      try {
+        const listTripsDenied = await getTripDenied();
+        const response = await service.search(
+          driverId,
+          listTripsDenied,
+          location,
+          userId,
+        );
+
+        if (response === null || response === undefined) {
+          dispatchTrip({ type: 'update', field: 'trip', arg: {} });
+          return false;
+        }
+
+        if (callType && callType === TRIP_CALL_PARTNER) {
+          response.callType = 'partner';
+        }
+
+        if (response.risk_area && !response.riskArea) {
+          response.riskArea = response.risk_area;
+          delete response.risk_area;
+        }
+
+        if (!response.riskArea) {
+          response.riskArea = { origin: false, destination: false };
+        }
+
+        await AsyncStorage.setItem('trip', JSON.stringify(response));
+        dispatchTrip({ type: 'update', field: 'trip', arg: response });
+
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      } finally {
+        InteractionManager.runAfterInteractions(() => {
+          dispatchTrip({ type: 'update', field: 'hasRun', arg: true });
+        });
+      }
+    }
+    return false;
+  }, [callDriverModal, hasRun, song, tripAccepted]);
+
+  useEffect(() => {
+    if (tripAccepted && Object.keys(tripAccepted).length > 0) {
+      try {
+        song && song?.stopAsync();
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, [tripAccepted]);
+
+  const refuseTrip = async (driverId: number, tripReference: string) => {
+    try {
+      if (tripReference === undefined) {
+        tripReference = JSON.parse(
+          await AsyncStorage.getItem('trip'),
+        ).tripReference;
+      }
+
+      try {
+        await song?.stopAsync();
+      } catch (error) {
+        console.log('erro', error);
+      }
+
+      const response = await service.refuse(driverId, tripReference);
+
+      if (response) {
+        AsyncStorage.removeItem('trip');
+
+        let tripsDeined = JSON.parse(
+          await AsyncStorage.getItem('tripsDeniedDriver'),
+        );
+
+        if (tripsDeined === null || tripsDeined.length === 0) {
+          tripsDeined = [
+            {
+              tripReference: trip.tripReference,
+              date: new Date(),
+            },
+          ];
+        } else {
+          tripsDeined.push({
+            tripReference: trip.tripReference,
+            date: new Date(),
+          });
+        }
+
+        dispatchTrip({ type: 'update', field: 'trip', arg: {} });
+
+        await AsyncStorage.setItem(
+          'tripsDeniedDriver',
+          JSON.stringify(tripsDeined),
+        );
+      }
+      return '';
+    } catch (error) {
+      return console.log(error);
+    }
+  };
+
   const cancelTripSchedule = async (cancelationID, driverID, tripReference) => {
     const response = await tripService.cancelTrip(
       cancelationID,
@@ -380,16 +530,43 @@ export const TripProvider = ({children}: TripContextChildren) => {
     return response;
   };
   const clearDataTrip = async () => {
-    song.pauseAsync();
-    await AsyncStorage.removeItem('routeTraveled');
-    await AsyncStorage.removeItem('tripCallKnob');
-    await AsyncStorage.removeItem('valueCancellationFeeByCustomer');
-    await AsyncStorage.removeItem('tripDriver');
+    try {
+      if (song && song.pauseAsync) {
+        await song.pauseAsync();
+      }
 
-    userDriverFind.status = 'disponivel';
+      await AsyncStorage.removeItem('tripDriver');
+      await AsyncStorage.removeItem('routeTraveled');
+      await AsyncStorage.removeItem('tripCallKnob');
+      await AsyncStorage.removeItem('valueCancellationFeeByCustomer');
+
+      const updatedDriver = { ...userDriverFind, status: 'disponivel' as any };
+      setUserDriverFind(updatedDriver);
+
+      if (updatedDriver.status === 'disponivel') {
+        const currentLocation = location?.coords
+          ? { latitude: location.coords.latitude, longitude: location.coords.longitude }
+          : { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude };
+        emitDriverStatusChange(updatedDriver, 'disponivel', cityConfig, currentLocation);
+      }
+
+      clearMapSuggestionTimeout();
+
+      dispatchTrip({ type: 'clearTripAccepted' });
+      dispatchTrip({ type: 'update', field: 'showMapSuggestion', arg: false });
+    } catch (error) {
+      console.error("Erro ao limpar dados da viagem:", error);
+    }
+  };
+
+  const registerPreAcceptedTrip = async (preAcceptedTrip: TripInfo) => {
+    userDriverFind.preAvailableTrip = preAcceptedTrip;
     setUserDriverFind(userDriverFind);
+    await AsyncStorage.setItem('preAvailableTrip', JSON.stringify(preAcceptedTrip));
+    await AsyncStorage.setItem('tripInWait', JSON.stringify(preAcceptedTrip.tripReference));
+    await AsyncStorage.setItem('user', JSON.stringify(userDriverFind));
 
-    dispatchTrip({type: 'clearTripAccepted'});
+    dispatchTrip({ type: 'update', field: 'tripPreAccepted', arg: preAcceptedTrip });
   };
 
   const clearDataPreAcceptedTrip = async () => {
@@ -399,14 +576,18 @@ export const TripProvider = ({children}: TripContextChildren) => {
     await serviceTripStatus.putPreAvailable();
     userDriverFind.preAvailable = '1';
     await AsyncStorage.setItem('user', JSON.stringify(userDriverFind));
-    song.pauseAsync();
+    song?.pauseAsync();
     setUserDriverFind(userDriverFind);
-    dispatchTrip({type: 'update', field: 'tripPreAccepted', arg: {}});
+
+    clearMapSuggestionTimeout();
+
+    dispatchTrip({ type: 'update', field: 'tripPreAccepted', arg: {} });
+    dispatchTrip({ type: 'update', field: 'showMapSuggestion', arg: false });
   };
 
   const cancel = async (preAccepted = false) => {
     try {
-      song.pauseAsync();
+      song?.pauseAsync();
       const status = await service.cancell(cancelTrip);
       getDriverFind();
 
@@ -417,11 +598,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
         );
       }
 
-      mountSong(require('../../assets/songs/alertClientCancelTrip.mp3')).then(
-        async sound => {
-          await sound.playAsync();
-        },
-      );
+      playSong('cancel');
 
       if (preAccepted) {
         clearDataPreAcceptedTrip();
@@ -431,21 +608,29 @@ export const TripProvider = ({children}: TripContextChildren) => {
         );
       }
 
-      dispatchTrip({type: 'update', field: 'cancelTrip', arg: {}});
+      dispatchTrip({ type: 'update', field: 'cancelTrip', arg: {} });
 
-      clearDataTrip();
+      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      if (cancelTrip?.tripReference) {
+        emitTripStatusChange(cancelTrip.tripReference, 'removed', configCityId);
+      }
+
       return customToast(
         translate('driverTrip.text_trip_cancelled'),
         'success',
       );
     } catch (error) {
       return console.log(error);
+    } finally {
+      if (!preAccepted) {
+        await clearDataTrip();
+      }
     }
   };
 
   const verifyExistTrip = async (tripReference: string) => {
     try {
-      return service.get(tripReference);
+      return await service.get(tripReference);
     } catch {
       return false;
     }
@@ -457,56 +642,39 @@ export const TripProvider = ({children}: TripContextChildren) => {
       latitude: location?.coords?.latitude,
       longitude: location?.coords?.longitude,
     });
-    dispatchTrip({type: 'update', field: 'trip', arg: {}});
+    dispatchTrip({ type: 'update', field: 'trip', arg: {} });
   };
 
-  const setOn = async () => {
-    const positionDriver = {
-      latitude: (await locationNow).coords.latitude,
-      longitude: (await locationNow).coords.longitude,
-    };
-    await toogleDriverStatus('disponivel', {
-      latitude: positionDriver.latitude,
-      longitude: positionDriver.longitude,
-    });
-  };
+  const sendAvaliations = async (payload: AvaliationPayload): Promise<boolean> => {
+    dispatchTrip({ type: 'update', field: 'rating', arg: 5 });
 
-  const sendAvaliations = async (
-    selectedOrigin: number,
-    origin: string,
-    selectedDestination: number,
-    destination: string,
-    trip: TripInfo = tripAccepted,
-    mountRiskAddress: {}[] = [],
-  ) => {
-    const result = await service.rate(rating, trip.tripReference);
+    try {
+      const sent = await sendCriticalRequest(() =>
+        service.rate(payload.rating, payload.tripReference),
+      );
 
-    if (!result.status) {
+      // Sem resposta do servidor: avaliação fica pendente de sincronização
+      if (!sent.delivered) {
+        offlineTripQueue.addSendAvaliation(payload);
+        return true;
+      }
+
+      if (!sent.response.status) {
+        customToast(translate('finishTrip.title_error_finish'), 'danger');
+        return false;
+      }
+
+      if (payload.blacklistAddresses.length > 0) {
+        service.addBlackList(payload.blacklistAddresses);
+      }
+
+      payload.riskAreas.forEach(area => service.addRiskArea(area));
+
+      return true;
+    } catch {
       customToast(translate('finishTrip.title_error_finish'), 'danger');
       return false;
     }
-
-    const addresses = [];
-
-    if (selectedOrigin === 2) {
-      addresses.push(JSON.stringify(origin));
-    }
-
-    if (selectedDestination === 2) {
-      addresses.push(JSON.stringify(destination));
-    }
-
-    if (addresses.length > 0) {
-      service.addBlackList(addresses);
-    }
-
-    mountRiskAddress.map(item => {
-      service.addRiskArea(item);
-    });
-
-    customToast(translate('finishTrip.title_success_finish'), 'success');
-    setOn();
-    return true;
   };
 
   // const socketOnTrip = async () => {
@@ -531,24 +699,25 @@ export const TripProvider = ({children}: TripContextChildren) => {
   // };
 
   const newTripDoorHandle = useCallback(
-    async (dataCustomer, priceNew = null) => {
+    async (dataCustomer, priceNew = null, waypoints = []) => {
+      const multiplierDynamic = dataCalculate?.data?.price?.multiplierPriceDynamic
       const newTrip = {
         destination: await prepareAddressResult(destination),
-        distance: dataCalculate?.data.distance,
-        driverId: userDriverFind.idDriver,
+        distance: dataCalculate?.data?.distance,
+        driverId: userDriverFind?.idDriver,
         estimatedTripTime: dataCalculate?.data?.duration,
         origin: await prepareAddressResult(origin),
         price: priceNew
-          ? priceNew.replace(cityConfig?.typeMoney, '').replace(',', '.')
+          ? String(priceNew).replace(cityConfig?.typeMoney, '').replace(',', '.')
           : dataCalculate?.data?.price?.price,
         priceId: dataCalculate?.data?.price?.idPrice,
         recalculatedTrip: priceNew
           ? {
-              oldPrice: dataCalculate?.data?.price?.price,
-              newPrice: priceNew
-                .replace(cityConfig?.typeMoney, '')
-                .replace(',', '.'),
-            }
+            oldPrice: dataCalculate?.data?.price?.price,
+            newPrice: String(priceNew)
+              .replace(cityConfig?.typeMoney, '')
+              .replace(',', '.'),
+          }
           : null,
         tripCustomer: {
           name: dataCustomer?.name,
@@ -559,15 +728,17 @@ export const TripProvider = ({children}: TripContextChildren) => {
         tripPaymentFormId: dataCustomer?.idTripPaymentForm,
         tripTypeId: dataCalculate?.data?.price?.tripType?.idTripType,
         userId: userDriverFind?.userId,
+        multiplierDynamic: multiplierDynamic ? parseFloat(multiplierDynamic) : null,
+        waypoints: waypoints.length > 0 ? waypoints : null,
       };
-      const {data} = await apiMainDriver.post('/KnobTrip/Init', newTrip);
+      const { data } = await apiMainDriver.post('/KnobTrip/Init', newTrip);
       if (!data.status) {
-        dispatchTrip({type: 'update', field: 'dataCalculate', arg: {}});
-        dispatchTrip({type: 'update', field: 'destination', arg: {}});
-        return customToast(data?.message, 'danger');
+        dispatchTrip({ type: 'update', field: 'dataCalculate', arg: {} });
+        dispatchTrip({ type: 'update', field: 'destination', arg: {} });
+        throw new Error(data?.message || 'Erro ao criar viagem');
       }
-      dispatchTrip({type: 'update', field: 'dataCalculate', arg: {}});
-      dispatchTrip({type: 'update', field: 'destination', arg: {}});
+      dispatchTrip({ type: 'update', field: 'dataCalculate', arg: {} });
+      dispatchTrip({ type: 'update', field: 'destination', arg: {} });
 
       // return postPerOrigin();
     },
@@ -590,19 +761,20 @@ export const TripProvider = ({children}: TripContextChildren) => {
   }, []);
 
   const calculateAllDoorHandle = useCallback(
-    async (origin, destination, tripTypeId) => {
+    async (origin, destination, tripTypeId, waypoints = []) => {
       const payload = {
         destiny: await prepareAddressResult(destination),
         origin: await prepareAddressResult(origin),
         tripTypeId,
+        waypoints: waypoints.length > 0 ? waypoints : null,
       };
 
-      const {data} = await apiMainDriver.post('Price/Calculate', payload);
+      const { data } = await apiMainDriver.post('Price/Calculate', payload);
 
       if (!data.status) {
         return customToast(data?.message, 'danger');
       }
-      return dispatchTrip({type: 'update', field: 'dataCalculate', arg: data});
+      return dispatchTrip({ type: 'update', field: 'dataCalculate', arg: data });
     },
     [],
   );
@@ -610,7 +782,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
   const prepareAddressResult = useCallback(async item => {
     if (item.latitude == null && item.longitude == null) {
       const {
-        data: {data},
+        data: { data },
       } = await apiMainDriver.get(`geocoding/search?address=${item.address}`);
       return data;
     }
@@ -628,11 +800,20 @@ export const TripProvider = ({children}: TripContextChildren) => {
 
   const initTripPreAccepted = async () => {
     if (Object.keys(tripPreAccepted).length !== 0) {
-      tripPreAccepted.status = 'accepted';
+      const acceptedTrip = { ...tripPreAccepted, status: 'accepted' };
 
-      await AsyncStorage.setItem('tripDriver', JSON.stringify(tripPreAccepted));
+      await AsyncStorage.setItem('tripDriver', JSON.stringify(acceptedTrip));
       await AsyncStorage.removeItem('preAvailableTrip');
-      dispatchTrip({type: 'initTripPreAccepted', arg: tripPreAccepted});
+      dispatchTrip({ type: 'initTripPreAccepted', arg: acceptedTrip });
+
+      const updatedDriver = { ...userDriverFind, status: 'corrida' as DriverStatusType };
+      setUserDriverFind(updatedDriver);
+
+      const currentLocation = location?.coords
+        ? { latitude: location.coords.latitude, longitude: location.coords.longitude }
+        : { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude };
+
+      emitDriverStatusChange(updatedDriver, 'corrida', cityConfig, currentLocation);
 
       return true;
     }
@@ -679,7 +860,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
     return (end - start) / 60 / 1000;
   }
 
-  const sendPolyline = async ({lat, lng}, data) => {
+  const sendPolyline = async ({ lat, lng }, data) => {
     const [kmProgressing, minuteProgressing] = await Promise.all([
       getKmRouteTraveled(),
       getMinutesRouteTraveled(),
@@ -690,7 +871,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
       polyline: data?.overview_polyline?.points,
       time: `${(data?.duration / 60).toFixed(0)} min`,
       idDriver: userDriverFind?.idDriver,
-      position: {lat, lng},
+      position: { lat, lng },
       kmProgressing: kmProgressing,
       minuteProgressing: minuteProgressing,
     };
@@ -707,7 +888,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
       // Você pode querer logar isso em um serviço de monitoramento de erros
     });
   };
-  const sendPolylinePreAccepted = async ({lat, lng}, data) => {
+  const sendPolylinePreAccepted = async ({ lat, lng }, data) => {
     const [kmProgressing, minuteProgressing] = await Promise.all([
       getKmRouteTraveled(),
       getMinutesRouteTraveled(),
@@ -718,11 +899,11 @@ export const TripProvider = ({children}: TripContextChildren) => {
         polyline: data?.overview_polyline?.points,
         time: `${Number(data?.duration / 60)?.toFixed(0)} min`,
         idDriver: userDriverFind?.idDriver,
-        position: {lat, lng},
+        position: { lat, lng },
         kmProgressing: kmProgressing,
         minuteProgressing: minuteProgressing,
       },
-      {token: tokenDriver, userid: userDriverFind?.userId},
+      { token: tokenDriver, userid: userDriverFind?.userId },
       cityConfig?.configDriverLocation?.port_url,
     ).catch(err => {
       console.error('Erro ao enviar polyline:', err);
@@ -740,9 +921,9 @@ export const TripProvider = ({children}: TripContextChildren) => {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(deg2rad(lat1)) *
-        Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const d = R * c; // Distance in meters
     return d;
@@ -774,7 +955,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
   const isLoadingRoute = useRef(false); // Variável para verificar se uma cham
 
   const calculateAndDisplayRoute = useCallback(
-    debounce(async (origin, destination, {lat, lng}, continueTrue = false) => {
+    debounce(async (origin, destination, { lat, lng }, continueTrue = false) => {
       if (isLoadingRoute.current && !continueTrue) {
         // Se uma requisição já está em progresso, não inicie uma nova
         return;
@@ -821,7 +1002,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
           'longitude',
         )}`,
       )
-        .then(({status, data}: any) => {
+        .then(({ status, data }: any) => {
           if (!status) {
             return;
           }
@@ -831,16 +1012,19 @@ export const TripProvider = ({children}: TripContextChildren) => {
             `${Number(data?.duration / 60)} min`,
           );
 
-          sendPolyline({lat, lng}, data); // ENVIO DE POLYLINE PARA O CLIENTE
+          sendPolyline({ lat, lng }, data); // ENVIO DE POLYLINE PARA O CLIENTE
           // await socketOnTrip(); // Colocar quando houver socket
 
           if (tripPreAccepted?.tripReference) {
-            sendPolylinePreAccepted({lat, lng}, data); // ENVIO DE POLYLINE PARA O CLIENTE PREACEITO
+            sendPolylinePreAccepted({ lat, lng }, data); // ENVIO DE POLYLINE PARA O CLIENTE PREACEITO
           }
 
-          const polilyne = decode(data.overview_polyline.points).map(item => {
-            return {latitude: item[0], longitude: item[1]};
-          });
+          const polilyne = data?.overview_polyline?.points
+            ? decode(data.overview_polyline.points).map(item => ({
+                latitude: item[0],
+                longitude: item[1],
+              }))
+            : [];
 
           // dispatchTrip({type: 'update', field: 'polyline', arg: polilyne});
         })
@@ -869,14 +1053,27 @@ export const TripProvider = ({children}: TripContextChildren) => {
 
         customToast(response?.message, 'success');
 
-        await dispatchTrip({type: 'acceptTrip', arg: response?.data});
-        userDriverFind.status = 'corrida';
+        dispatchTrip({ type: 'acceptTrip', arg: response?.data });
+        const updatedDriver = { ...userDriverFind, status: 'corrida' as DriverStatusType };
+        setUserDriverFind(updatedDriver);
+
+        const currentLocation = location?.coords
+          ? { latitude: location.coords.latitude, longitude: location.coords.longitude }
+          : { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude };
+        emitDriverStatusChange(updatedDriver, 'corrida', cityConfig, currentLocation);
+
+        const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+        if (tripReference) {
+          emitTripStatusChange(tripReference, 'accepted', configCityId);
+        }
+
+        startMapSuggestionTimeout();
 
         await AsyncStorage.setItem(
           'tripDriver',
           JSON.stringify(response?.data),
         );
-      } catch {}
+      } catch { }
     },
     [userDriverFind],
   );
@@ -895,24 +1092,16 @@ export const TripProvider = ({children}: TripContextChildren) => {
         }
 
         customToast(response?.message, 'success');
-      } catch {}
+      } catch { }
     },
     [userDriverFind],
   );
 
   let lastPositionInRealTime = null;
   const metersDiffSendPosition = 50;
-  let isLoading = false;
 
   const sendPosition = useCallback(
     debounce(async payload => {
-      const data = {
-        latitude: payload?.latitude,
-        longitude: payload?.longitude,
-        idDriver: userDriverFind?.idDriver,
-        tripReference: tripAccepted?.tripReference || null,
-      };
-
       if (lastPositionInRealTime) {
         const metersDiffPosition = getDistanceFromLatLonInMeters(
           lastPositionInRealTime?.latitude,
@@ -925,27 +1114,7 @@ export const TripProvider = ({children}: TripContextChildren) => {
           return;
         }
       }
-
-      if (isLoading) {
-        // If a request is already in progress, don't make a new request
-        return;
-      }
-
-      isLoading = true; // A request is about to start
-
-      lastPositionInRealTime = {
-        latitude: payload?.latitude,
-        longitude: payload?.longitude,
-      };
-
-      try {
-        await service.sendPosition(data);
-        isLoading = false; // Request finished
-      } catch (error) {
-        console.log(error);
-        isLoading = false; // Request finished
-      }
-    }, 1000), // Adjust this time based on your needs
+    }, 5000), // Adjust this time based on your needs
     [userDriverFind, tripAccepted],
   );
 
@@ -960,6 +1129,56 @@ export const TripProvider = ({children}: TripContextChildren) => {
     }
     return Number(tripAccepted?.price);
   };
+
+  const loadTripsSummary = useCallback(async () => {
+    if (!userDriverFind?.idDriver || userDriverFind?.status === 'desligado') {
+      return;
+    }
+
+    try {
+      const response = await service.getTripsSummary({
+        driverId: userDriverFind?.idDriver,
+        tripTypeIds: tripTypes,
+        cityId: cityId,
+        tripWithoutRefusal: true
+      });
+
+      if (!response?.status) return;
+
+      dispatchTrip({ type: 'update', field: 'tripSummary', arg: response.data });
+    } catch (error) {
+      console.log(error);
+    }
+  }, [userDriverFind?.idDriver, userDriverFind?.status, tripTypes, cityId]);
+
+  const debouncedFetch = useMemo(
+    () => debounce(loadTripsSummary, 2000),
+    [loadTripsSummary]
+  );
+
+  const addOrUpdateList = useCallback((field: TripListField, tripUpdate: Trip) => {
+    dispatchTrip({ type: 'addOrUpdateList', arg: { field, value: tripUpdate } });
+  }, []);
+
+  const removeFromList = useCallback((field: TripListField, tripUpdate: Trip) => {
+    dispatchTrip({ type: 'removeFromList', arg: { field, value: tripUpdate } });
+  }, []);
+
+  const incrementTripSummaryItem = useCallback((field: keyof DriverTripSummary, value: number) => {
+    dispatchTrip({ type: 'incrementTripSummaryItem', arg: { field, value } });
+    debouncedFetch();
+  }, [debouncedFetch]);
+
+  const decrementTripSummaryItem = useCallback((field: keyof DriverTripSummary, value: number) => {
+    dispatchTrip({ type: 'decrementTripSummaryItem', arg: { field, value } });
+    debouncedFetch();
+  }, [debouncedFetch]);
+
+  useEffect(() => {
+    debouncedFetch();
+
+    return () => debouncedFetch.cancel();
+  }, [debouncedFetch]);
 
   const value = useMemo(() => {
     return {
@@ -990,6 +1209,12 @@ export const TripProvider = ({children}: TripContextChildren) => {
       postPerOrigin,
       sendPosition,
       priceToShow,
+      startMapSuggestionTimeout,
+      clearMapSuggestionTimeout,
+      addOrUpdateList,
+      removeFromList,
+      incrementTripSummaryItem,
+      decrementTripSummaryItem
     };
   }, [
     acceptTrip,
@@ -1019,14 +1244,19 @@ export const TripProvider = ({children}: TripContextChildren) => {
     postPerOrigin,
     sendPosition,
     priceToShow,
+    addOrUpdateList,
+    removeFromList,
+    incrementTripSummaryItem,
+    decrementTripSummaryItem
   ]);
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;
 };
-export const useTripProvider = () => {
-  const context = useContext(TripContext);
 
-  return context;
+export const useTripProvider = <Selected,>(
+  selector: (ctx: TripContextType) => Selected,
+): Selected => {
+  return useContextSelector(TripContext, selector);
 };
 
 export default TripProvider;

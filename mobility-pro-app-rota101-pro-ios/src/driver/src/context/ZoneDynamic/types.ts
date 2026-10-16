@@ -7,6 +7,14 @@ export interface ZoneDynamicObject {
   id: string;
   name: string;
   area: AreaProps[];
+  multiplierValue: number;
+  cityId: number;
+  active: number;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  startTime: string;
+  endTime: string;
 }
 
 export interface AreaProps {

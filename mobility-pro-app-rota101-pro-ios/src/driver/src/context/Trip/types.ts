@@ -1,3 +1,16 @@
+import {PaginationApi} from '../../../../interfaces/api';
+import {DriverTripSummary} from '../../../../interfaces/driverTripSummary';
+import {Trip} from '../../../../interfaces/trip';
+import {ScheduleDateFilter} from '../../utils/scheduleFilter';
+import { AvaliationPayload } from '~/interfaces/avaliation';
+
+export type ReducerAction = {
+  type: string;
+  field?: keyof stateTripProps;
+  arg?: any;
+};
+export type ReducerType = React.Reducer<stateTripProps, ReducerAction>;
+
 export interface TripContextType {
   acceptTrip: (
     driverId: string,
@@ -10,7 +23,7 @@ export interface TripContextType {
     location: {latitude: number; longitude: number},
     userId: number,
     callType?: string | number | null,
-  ) => any;
+  ) => Promise<boolean>;
   refuseTrip: (driverId: number, tripReference: string) => Promise<void | ''>;
   getTripDenied: any;
   cancelTripSchedule: (
@@ -26,16 +39,9 @@ export interface TripContextType {
   ) => void;
   cancel: (preAccepted: boolean) => void;
   verifyExistTrip: (tripReference: string) => Promise<any>;
-  sendAvaliations: (
-    selectedOrigin: number,
-    origin: string,
-    selectedDestination: number,
-    destination: string,
-    trip?: TripInfo,
-    mountRiskAddress?: object[],
-  ) => Promise<boolean>;
+  sendAvaliations: (payload: AvaliationPayload) => Promise<boolean>;
   getCancellationReasons: () => any;
-  clearDataTrip: () => void;
+  clearDataTrip: () => Promise<void>;
   calculateAllDoorHandle: (
     origin: OriginProps,
     destination: DestinationProps,
@@ -55,7 +61,7 @@ export interface TripContextType {
   acceptTripOffer: (tripReference: string) => Promise<void>;
   createTripOffer: (tripId: string, value: number) => void;
   stateTrip: stateTripProps;
-  dispatchTrip: (action: {type: string; field?: string; arg?: any}) => any;
+  dispatchTrip: React.Dispatch<ReducerAction>;
   setOff: () => Promise<void>;
   postPerOrigin: (local?: {
     latitude: number;
@@ -63,6 +69,18 @@ export interface TripContextType {
   }) => Promise<void>;
   sendPosition: (payload: {latitude: number; longitude: number}) => void;
   priceToShow: () => string | number;
+  startMapSuggestionTimeout: () => void;
+  clearMapSuggestionTimeout: () => void;
+  addOrUpdateList: (field: TripListField, value: Trip) => void;
+  removeFromList: (field: TripListField, value: Trip) => void;
+  incrementTripSummaryItem: (
+    field: keyof DriverTripSummary,
+    value: number,
+  ) => void;
+  decrementTripSummaryItem: (
+    field: keyof DriverTripSummary,
+    value: number,
+  ) => void;
 }
 
 export interface stateTripProps {
@@ -72,18 +90,31 @@ export interface stateTripProps {
   origin: OriginProps;
   destination: DestinationProps;
   dataCalculate: any;
-  listSchedule: [];
-  listScheduleAccepted: [];
+  listSchedule: Trip[];
+  listSchedulePaginate: PaginationApi;
+  scheduleFilter: ScheduleDateFilter;
+  listScheduleAccepted: Trip[];
+  listScheduleAcceptedPaginate: PaginationApi;
+  scheduleAcceptedFilter: ScheduleDateFilter;
   rating: number;
   polyline: [];
-  song: any;
   flashlight: boolean;
   callDriverModal: boolean;
   countTrip: number;
   hasRun: boolean;
+  isAcceptingTrip: boolean;
+  notificationTripCallRequest: { userId: number; callType?: string | number | null } | null;
   cancelTrip: CancelTripProps;
-  tripsOffer: TripInfo[];
+  tripsOffer: Trip[];
+  tripsOfferPaginate: PaginationApi;
+  showMapSuggestion: boolean;
+  tripSummary: DriverTripSummary;
 }
+
+export type TripListField =
+  | 'listSchedule'
+  | 'listScheduleAccepted'
+  | 'tripsOffer';
 
 export interface TripContextChildren {
   children: React.ReactNode;
@@ -94,59 +125,6 @@ export interface CancelTripProps {
   tripReference: string;
   cancellationReasonsId: number;
   generateCancellationFee: boolean;
-}
-
-export interface TripScheduleProps {
-  accessibility: AccessibilityProps;
-  active: boolean;
-  callingDriver: any;
-  calling_at: any;
-  centralId: any;
-  centralNeighborhoodId: any;
-  cityId: string;
-  colorAudit: string;
-  customer: CostumerProps;
-  customerCancellationFee: any;
-  date: DateProps;
-  deliveryInfo: any;
-  destination: DestinationProps;
-  distance: string;
-  driver: DriverProps;
-  driverCommissionId: string;
-  driverId: string;
-  estimatedTimeDriverArrival: any;
-  estimatedTripTime: string;
-  fare: FareProps;
-  freightItems: any;
-  haveReturn: string;
-  idTrip: string;
-  isOffer: string;
-  multiplierDynamic: string;
-  oldDestinationId: any;
-  oldPrice: any;
-  origin: OriginProps;
-  price: string;
-  priceId: string;
-  priceRange: any;
-  recalculatedPrice: any;
-  rewardTrip: any;
-  ride: any;
-  schedule: ScheduleProps;
-  status: string;
-  timeToExpireTrip: any;
-  tripBids: any;
-  tripCallType: string;
-  tripCallTypeId: string;
-  tripDiscountCoupon: any;
-  tripItems: boolean;
-  tripLongDistanceValue: any;
-  tripPaymentForm: string;
-  tripPaymentFormId: string;
-  tripReference: string;
-  tripType: string;
-  tripTypeId: string;
-  tripWayPoints: any;
-  userId: string;
 }
 
 export interface AccessibilityProps {
@@ -184,7 +162,8 @@ export interface CostumerProps {
   partnerRegisterStatusId: string;
   phone: string;
   profileImage: string;
-  rating: string;
+  rating?: number | string | null;
+  quantityTrips?: number | null;
   rg: string;
   rgBackPicture: string;
   rgFrontPicture: string;
@@ -243,7 +222,6 @@ export interface DriverProps {
   profileImageTemp: any;
   profilePicture: string;
   quantityTrips: string;
-  å;
   rating: string;
   stationId: any;
   status: string;
@@ -317,10 +295,20 @@ export interface ScheduleProps {
   tripReference: string;
 }
 
+export interface TollProps {
+  id: string;
+  tripId?: string;
+  tollId: string;
+  name: string;
+  address?: string;
+  value: string;
+}
+
 export interface TripInfo {
-  initTaximeter: boolean;
+  driverNetValue: string | number;
   cancelledBy: string;
   callType?: string;
+  driver?: DriverProps;
   tripOff?: TripInfo;
   accessibility: AccessibilityProps;
   centralId: number | null;
@@ -380,7 +368,7 @@ export interface TripInfo {
   timeLimitToAccept: string;
   timeToExpireTrip: number;
   timeToIncrease: number;
-  tolls: [];
+  tolls: TollProps[];
   tripLongDistance: {
     value: number;
   };

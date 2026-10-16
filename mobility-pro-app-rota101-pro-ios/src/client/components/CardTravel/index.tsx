@@ -1,8 +1,8 @@
 // @ts-nocheck
-import React, {useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
-import {convertDate, maskHour} from '../../utils/FormatDate';
-import {maskMoneyIntl} from '../../utils/money';
+import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { convertDate, maskHour } from '../../utils/FormatDate';
+import { maskMoneyIntl } from '../../utils/money';
 
 import {
   ContainerCard,
@@ -13,15 +13,15 @@ import {
   TextTitle,
 } from './styles';
 
-import {translate} from '../../locales';
+import { translate } from '../../locales';
 import theme from '../../styles/theme';
-import {STATUS_SCHEDULED} from '../../constants/trip';
+import { STATUS_SCHEDULED } from '../../constants/trip';
 
-export function CardService({trip, getListTrips, setLoading, isSpeedMob}) {
+export function CardService({ trip, getListTrips, setLoading, isSpeedMob = undefined }) {
   const navigation = useNavigation();
 
   const formatDateAndHour = (date: string) => {
-    const dateSplit = date.split(' ');
+    const dateSplit = date?.split(' ');
     return `${convertDate(dateSplit[0])} ${maskHour(dateSplit[1])}`;
   };
 
@@ -80,7 +80,7 @@ export function CardService({trip, getListTrips, setLoading, isSpeedMob}) {
     <>
       <ContainerCard
         activeOpacity={0.8}
-        style={{backgroundColor: switchColor(trip.status.toUpperCase())}}
+        style={{ backgroundColor: switchColor(trip.status.toUpperCase()) }}
         onPress={() => {
           handleTripUnic(trip);
         }}

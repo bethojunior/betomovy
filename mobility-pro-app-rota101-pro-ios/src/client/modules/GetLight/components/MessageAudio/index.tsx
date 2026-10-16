@@ -16,6 +16,7 @@ import {
 import theme from '../../../../styles/theme';
 import {useTripGL} from '../../../../contexts/TripGL';
 import {buildApp} from '../../../../../constantBuild/config';
+import {useStoragePictures} from '../../../../../driver/src/hooks/useStoragePictures';
 
 export const MessageAudio = ({isAudio, message, messageData}: any) => {
   const [audioTime, setAudioTime] = useState([0]);
@@ -25,12 +26,14 @@ export const MessageAudio = ({isAudio, message, messageData}: any) => {
   const [paused, setPaused] = useState(false);
   const [intervalReference, setIntervalReference] = useState();
   const {tripSchedule} = useTripGL();
+  const {getStorage} = useStoragePictures();
 
   const handleLoadingSound = async () => {
+    const url = `${getStorage()}chat/trip/`;
     const source = {
-      uri: `${buildApp().HOST_AUDIO_MESSAGE + tripSchedule.tripReference}/${
-        message || ''
-      }`,
+      uri: `${
+        (url || buildApp().HOST_AUDIO_MESSAGE) + tripSchedule.tripReference
+      }/${message || ''}`,
     };
     if (Platform === 'ios') {
       await Audio.setAudioModeAsync({

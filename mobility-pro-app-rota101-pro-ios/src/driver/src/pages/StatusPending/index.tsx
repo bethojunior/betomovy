@@ -1,196 +1,231 @@
-import {useEffect, useState} from 'react';
+import { useState } from 'react';
+import { Pressable, RefreshControl } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Foundation from '@expo/vector-icons/Foundation';
-import {useTheme} from 'styled-components';
-import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
-import {useUserDriver} from '../../context/userDriver';
-import {
-  ArrowBackContainer,
-  Container,
-  ContentDoc,
-  ContentItem,
-  DocumentItem,
-  Header,
-  ImageContent,
-  InfoItemText,
-  ItemAttention,
-  ItemLabel,
-  Photo,
-  StatusPhoto,
-  ViewDocument,
-} from './styles';
-import {FaceDetectorScreen} from '../../../../client/components/FaceDetector';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useTheme } from 'styled-components/native';
 import Preload from '../../../../client/components/Preload';
-import {resizeImage} from '../../utils/image';
-import {useAuth} from '../../../../context/auth';
-import {If} from '../../components/If';
-import {translate} from '../../../../client/locales';
-import {buildApp} from '../../../../constantBuild/config';
-import {BackHandler} from 'react-native';
+import { FaceDetectorScreen } from '../../../../client/components/FaceDetector';
+import { translate } from '../../../../client/locales';
+import { resizeImage } from '../../../../utils/image';
+import { AvatarProfile } from '../../../../components/AvatarProfile';
+import { Button } from '../../components/Button';
+import { IconInfoRow } from '../../../../common/components/IconInfoRow';
+import { IconBadge } from '../../../../common/components/IconBadge';
+import { StatusBadge } from '../../../../common/components/TripDetail/StatusBadge';
+import { ConfirmSignOutModal } from '../../components/ConfirmSignOutModal';
+import { resolveDocStatusInfo } from '../../../../common/services/documents/docStatus';
+import { useStoragePictures } from '../../hooks/useStoragePictures';
+import { getProfileImageUrl } from '../../utils/imageUrl';
+import { buildApp } from '../../../../constantBuild/config';
+import { useUserDriver } from '../../context/userDriver';
+import { useStatusPendingData } from './useStatusPendingData';
+import {
+  Container,
+  TopBar,
+  ScrollContent,
+  AvatarSection,
+  AvatarWrapper,
+  CameraBadge,
+  Card,
+  SectionTitle,
+  DocumentsRow,
+  DocumentsTextGroup,
+  DocumentsLabel,
+  DocumentsPendingText,
+  StatusRow,
+  StatusLabel,
+  Divider,
+  Footer,
+} from './styles';
 
 export function StatusPending() {
-  const {navigate}: NavigationProp<ParamListBase> = useNavigation();
-  const {colors} = useTheme();
-  const {userDriverFind, EditProfileImage, getDriverFind} = useUserDriver();
-  const {userDriver, signOutDriver, newActionFb, setNewActionFb} = useAuth();
+  const theme = useTheme();
+  const { EditProfileImage } = useUserDriver();
+  const { getStoragePictureSpecific } = useStoragePictures();
   const [modalFaceDetector, setModalFaceDetector] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [capturedImage, setCapturedImage] = useState(null);
-  const [docs, setDocs] = useState([]);
+  const [capturedImage, setCapturedImage] = useState<{ uri: string } | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [imageKey, setImageKey] = useState(0);
 
-  async function sendPhotoRecognition(uri) {
-    setLoading(true);
+  const {
+    loading,
+    refreshing,
+    userDriverFind,
+    email,
+    statusInfo,
+    hasPendingDocuments,
+    onContactSupport,
+    onRefresh,
+    onTrackStatus,
+    showSignOutConfirm,
+    requestSignOut,
+    cancelSignOut,
+    confirmSignOut,
+  } = useStatusPendingData();
+
+  const photoStatusInfo = resolveDocStatusInfo(userDriverFind?.profileImageStatusId as any);
+
+  async function sendPhotoRecognition(uri: string) {
+    setModalFaceDetector(false);
+    setUploadingPhoto(true);
 
     const manipulatedImage = await resizeImage(uri, 512, 512);
-
-    const filename = manipulatedImage.uri.split('/').pop();
-
-    const match = /\.(\w+)$/.exec(filename);
-    const type = match ? `image/${match[1]}` : `image`;
+    const filename = manipulatedImage.uri?.split('/').pop();
+    const match = /\.(\w+)$/.exec(filename || '');
+    const type = match ? `image/${match[1]}` : 'image';
 
     await EditProfileImage(manipulatedImage.uri, type, filename);
-
-    setModalFaceDetector(false);
-    setLoading(false);
+    setImageKey(Date.now());
+    setUploadingPhoto(false);
   }
 
-  const checkDriverStatus = () => {
-    if (userDriverFind?.driverRegisterStatusId === '1') {
-      navigate('Home');
-    }
-    setNewActionFb('');
-  };
-
-  useEffect(() => {
-    if (newActionFb.length > 0) {
-      getDriverFind();
-    }
-  }, [newActionFb]);
-
-  useEffect(() => {
-    if (userDriverFind) {
-      const docsPen = userDriverFind?.docsUser?.filter(docsFilter => {
-        return docsFilter.docStatusId !== '1';
-      });
-
-      setDocs(docsPen);
-      checkDriverStatus();
-    }
-  }, [userDriverFind]);
-
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', () => {
-      signOutDriver();
-      return true;
-    });
-  }, []);
+  if (!userDriverFind) return null;
 
   return (
     <Container>
       <Preload visible={loading} />
-      <ArrowBackContainer>
-        <Ionicons
-          name="arrow-back"
-          size={30}
-          color={colors.secondary}
-          onPress={signOutDriver}
-        />
-      </ArrowBackContainer>
-      <Header>
-        <Photo onPress={() => setModalFaceDetector(true)} activeOpacity={0.8}>
-          <ImageContent
-            source={
-              userDriverFind != null && {
-                uri:
-                  userDriverFind?.profileImageTemp !== null
-                    ? `${buildApp().PATH_IMAGE_TEMP}${
-                        userDriverFind?.profileImageTemp
-                      }`
-                    : `${buildApp().HOST_IMAGE_DRIVER}${
-                        userDriverFind?.profileImage
-                      }`,
-              }
-            }
+
+      <TopBar>
+        <Ionicons name="arrow-back" size={RFValue(28)} color={theme.colors.primary} onPress={requestSignOut} />
+      </TopBar>
+
+      <ScrollContent
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />}
+      >
+        <AvatarSection>
+          <Pressable onPress={() => setModalFaceDetector(true)}>
+            <AvatarWrapper>
+              <AvatarProfile
+                key={`driver-photo-${imageKey}`}
+                uri={getProfileImageUrl(
+                  userDriverFind.profileImage,
+                  getStoragePictureSpecific('driver'),
+                  buildApp().HOST_IMAGE_DRIVER,
+                )}
+                loading={uploadingPhoto}
+                showPreloadOverlay
+                size={RFValue(96)}
+                borderColor={theme.colors.primary}
+                borderWidth={RFValue(1.5)}
+              />
+              {!uploadingPhoto && (
+                <CameraBadge>
+                  <Feather name="camera" size={RFValue(12)} color={theme.colors.primaryText} />
+                </CameraBadge>
+              )}
+            </AvatarWrapper>
+          </Pressable>
+        </AvatarSection>
+
+        <Card>
+          <SectionTitle>{translate('statusPending.personal_info_title')}</SectionTitle>
+          <IconInfoRow
+            icon={color => <MaterialCommunityIcons name={photoStatusInfo.icon as any} size={RFValue(18)} color={color} />}
+            label={translate('driverStatus.text_statu_image')}
+            value={userDriverFind.profileImageStatus}
+            color={theme.colors.primary}
+            valueVariant={photoStatusInfo.variant}
           />
-          <Feather name="edit" style={{position: 'absolute'}} />
-        </Photo>
+          <IconInfoRow
+            icon={color => <Feather name="user" size={RFValue(18)} color={color} />}
+            label={translate('driverStatus.label_name')}
+            value={userDriverFind.name}
+            color={theme.colors.primary}
+          />
+          <IconInfoRow
+            icon={color => <Feather name="credit-card" size={RFValue(18)} color={color} />}
+            label={translate('driverStatus.label_document')}
+            value={userDriverFind.document}
+            color={theme.colors.primary}
+          />
+          <IconInfoRow
+            icon={color => <Feather name="phone" size={RFValue(18)} color={color} />}
+            label={translate('driverStatus.label_phone')}
+            value={userDriverFind.phone}
+            color={theme.colors.primary}
+          />
+          <IconInfoRow
+            icon={color => <Feather name="mail" size={RFValue(18)} color={color} />}
+            label={translate('driverStatus.label_email')}
+            value={email || ''}
+            color={theme.colors.primary}
+            showDivider={false}
+          />
+        </Card>
 
-        <StatusPhoto statusImage={userDriverFind.profileImageStatusId}>
-          {translate('driverStatus.text_statu_image')}:{' '}
-          {userDriverFind?.profileImageStatus}
-        </StatusPhoto>
-      </Header>
-
-      <ContentItem>
-        <ItemLabel>{translate('driverStatus.label_name')}</ItemLabel>
-        <InfoItemText>{userDriverFind?.name}</InfoItemText>
-      </ContentItem>
-
-      <ContentItem>
-        <ItemLabel>{translate('driverStatus.label_document')}</ItemLabel>
-        <InfoItemText>{userDriverFind?.document}</InfoItemText>
-      </ContentItem>
-
-      <ContentItem>
-        <ItemLabel>{translate('driverStatus.label_phone')}</ItemLabel>
-        <InfoItemText>{userDriverFind?.phone}</InfoItemText>
-      </ContentItem>
-
-      <ContentItem>
-        <ItemLabel>{translate('driverStatus.label_email')}</ItemLabel>
-        <InfoItemText>{userDriver?.email}</InfoItemText>
-      </ContentItem>
-
-      <If condition={docs?.length > 0}>
-        <DocumentItem
-          activeOpacity={0.8}
-          onPress={() =>
-            navigate('DocumentPending', {
-              docs,
-            })
-          }
-        >
-          <ContentDoc>
-            <ItemLabel>{translate('driverStatus.label_documents')}</ItemLabel>
-            <InfoItemText>
-              {translate('driverStatus.label_images')}
-            </InfoItemText>
-            <ItemAttention>
-              {translate('driverStatus.label_documents_pending')}
-            </ItemAttention>
-          </ContentDoc>
-
-          <ViewDocument>
-            <Foundation
-              name="alert"
-              size={21}
-              color={colors.red}
-              style={{marginRight: 25}}
+        {!!userDriverFind.car?.model && (
+          <Card>
+            <SectionTitle>{translate('statusPending.vehicle_info_title')}</SectionTitle>
+            <IconInfoRow
+              icon={color => <Feather name="tag" size={RFValue(18)} color={color} />}
+              label={translate('statusPending.vehicle_brand')}
+              value={userDriverFind.car.brand}
+              color={theme.colors.primary}
             />
-            <Ionicons
-              name="ios-arrow-redo-sharp"
-              size={30}
-              color={colors.primary}
+            <IconInfoRow
+              icon={color => <Feather name="truck" size={RFValue(18)} color={color} />}
+              label={translate('statusPending.vehicle_model')}
+              value={userDriverFind.car.model}
+              color={theme.colors.primary}
             />
-          </ViewDocument>
-        </DocumentItem>
-      </If>
+            <IconInfoRow
+              icon={color => <MaterialCommunityIcons name="card-text-outline" size={RFValue(18)} color={color} />}
+              label={translate('statusPending.vehicle_plate')}
+              value={userDriverFind.car.plate}
+              color={theme.colors.primary}
+              showDivider={false}
+            />
+          </Card>
+        )}
 
-      <ContentItem>
-        <ItemLabel>{translate('driverStatus.label_status')}</ItemLabel>
-        <InfoItemText>{userDriverFind?.driverRegisterStatus}</InfoItemText>
-      </ContentItem>
+        <Card>
+          <StatusRow>
+            <StatusLabel>{translate('statusPending.status_section_title')}</StatusLabel>
+            <StatusBadge label={translate(statusInfo.titleKey)} variant={statusInfo.variant} />
+          </StatusRow>
+
+          <Divider />
+
+          <DocumentsRow activeOpacity={0.8} onPress={onTrackStatus}>
+            <IconBadge
+              color={theme.colors.primary}
+              icon={color => <Feather name="folder" size={RFValue(20)} color={color} />}
+            />
+            <DocumentsTextGroup>
+              <DocumentsLabel>{translate('statusPending.documents_card_title')}</DocumentsLabel>
+              {hasPendingDocuments && (
+                <DocumentsPendingText>{translate('driverStatus.label_documents_pending')}</DocumentsPendingText>
+              )}
+            </DocumentsTextGroup>
+            <Feather name="chevron-right" size={RFValue(22)} color={theme.colors.grayLight} />
+          </DocumentsRow>
+        </Card>
+      </ScrollContent>
+
+      {!!onContactSupport && (
+        <Footer>
+          <Button
+            title={translate('support.button_label')}
+            onPress={onContactSupport}
+            icon={<Ionicons name="logo-whatsapp" size={RFValue(20)} color={theme.colors.primaryText} />}
+          />
+        </Footer>
+      )}
 
       <FaceDetectorScreen
         visible={modalFaceDetector}
         onClose={() => setModalFaceDetector(false)}
-        sendPhoto={() => sendPhotoRecognition(capturedImage.uri)}
+        sendPhoto={() => sendPhotoRecognition(capturedImage!.uri)}
         setImage={setCapturedImage}
+      />
+
+      <ConfirmSignOutModal
+        visible={showSignOutConfirm}
+        onCancel={cancelSignOut}
+        onConfirm={confirmSignOut}
       />
     </Container>
   );

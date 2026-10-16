@@ -12,7 +12,6 @@ export const STATUS_BOARDING = 'boarding';
 export const STATUS_IN_PROGRESS = 'in_progress';
 export const STATUS_FINISHED = 'finished';
 export const STATUS_SEARCHING_DRIVER_OFFER = 'get_bid_by_drivers';
-export const STATUS_SEARCHING_FAVORITE = "searching_favorite"
 
 export let tripStatus = {};
   setTimeout(() => {

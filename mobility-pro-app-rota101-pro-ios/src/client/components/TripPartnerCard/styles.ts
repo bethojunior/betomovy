@@ -24,7 +24,7 @@ export const NameClient = styled.Text`
 `;
 
 export const ButtonSection = styled.View`
-  flex-direction: row;
+  flex-direction: column;
   border-bottom-width: 1px;
   border-bottom-color: #d8d8d8;
   padding-bottom: 10px;
@@ -34,7 +34,8 @@ export const ButtonSection = styled.View`
 export const ButtonMessage = styled.TouchableOpacity`
   border-width: 0.5px;
   border-color: ${({theme}) => theme.colors.secondary};
-  padding: 6px;
+  padding: 10px;
+  margin-bottom: 5px;
   border-radius: 5px;
   justify-content: center;
   flex-direction: row;
@@ -48,15 +49,15 @@ export const TextMessage = styled.Text`
 `;
 
 export const ButtonCancel = styled.TouchableOpacity`
-  padding: 10px;
-  border-radius: 5px;
+  border-width: 0.5px;
   background-color: ${({theme, disabled}) =>
     theme.colors.primary + (disabled ? '50' : '')};
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 5px;
   justify-content: center;
   flex-direction: row;
   align-items: center;
-  margin-left: 10px;
-  width: 100%;
 `;
 
 export const TextCancel = styled.Text`

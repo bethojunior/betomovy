@@ -27,12 +27,12 @@ export function moneyMask(value) {
   }
   if (value === 0) return '0,00';
 
-  let number = value.toFixed(4).split('.');
+  let number = value.toFixed(4)?.split('.');
 
   number = parseFloat(`${number[0]}.${number[1].slice(0, 2)}`);
 
-  number = number.toFixed(2).split('.');
-  number[0] = number[0].split(/(?=(?:...)*$)/).join('.');
+  number = number.toFixed(2)?.split('.');
+  number[0] = number[0]?.split(/(?=(?:...)*$)/).join('.');
 
   if (isNegative) return `-${number.join(',')}`;
 
@@ -48,8 +48,8 @@ export function maskMoneyIntl(value) {
 }
 export function maskMoney(value) {
   let number = value;
-  number = number.toFixed(2).split('.');
-  number[0] = number[0].split(/(?=(?:...)*$)/).join('.');
+  number = number.toFixed(2)?.split('.');
+  number[0] = number[0]?.split(/(?=(?:...)*$)/).join('.');
   return number.join(',');
 }
 

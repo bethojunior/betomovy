@@ -1,6 +1,5 @@
 import {Linking} from 'react-native';
 import {useTripProvider} from '../../context/Trip';
-import {useTripStatusProvider} from '../../context/TripStatus';
 import {CardButtonText} from '../CardButtonText';
 import ModalFrame from '../Modal/ModalFrame';
 import {
@@ -77,8 +76,9 @@ export const ModalNavigation = ({
       </ModalFrame>
     );
   }
-  const {stateTrip} = useTripProvider();
-  const {tripAccepted} = stateTrip;
+  const tripAccepted: any = useTripProvider(
+    (context: any) => context.stateTrip.tripAccepted,
+  );
   const [loading, setLoading] = useState(true);
 
   const waypoints = tripAccepted?.tripWayPoints?.filter(waypoint => {

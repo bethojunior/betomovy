@@ -1,181 +1,147 @@
-import {shade} from 'polished';
-import {StyleSheet} from 'react-native';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { RFValue } from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
-import themeCss from '../../styles/theme';
 
-interface ColorProps {
-  color?: string;
-}
-
-export const ContainerText = styled.View`
-  margin-top: 5px;
-`;
-
-export const Container = styled.ScrollView`
-  background-color: ${({theme}) => theme.colors.background_global};
-  flex: 1;
-  padding: ${({theme}) => theme.spacing.xlarge}px
-    ${({theme}) => theme.spacing.xlarge}px;
-`;
-
-export const HeaderCard = styled.View`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-export const TextTitle = styled.Text`
-  color: ${({theme}) => theme.colors.black};
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: ${({theme}) => theme.fontSizes.small}px;
-`;
-
-export const DateCard = styled.View`
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-`;
-export const Subtitle = styled.Text`
-  margin-top: ${({theme}) => theme.spacing.small}px;
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-`;
-export const TextSmall = styled.Text<ColorProps>`
-  color: ${({color, theme}) => color || theme.colors.secondary};
-  font-size: ${({theme}) => theme.fontSizes.small}px;
-`;
-
-export const Content = styled.View`
-  margin-top: ${({theme}) => theme.spacing.medium}px;
-  flex-direction: column;
-`;
-
-export const ContainerAddress = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
-
-export const ContainerFooter = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: ${({theme}) => theme.spacing.medium}px;
-`;
-
-export const TextBold = styled.Text`
-  font-weight: bold;
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-`;
-
-export const ContainerButton = styled.View`
-  margin-top: ${({theme}) => theme.spacing.xlarge}px;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-`;
-
-export const ButtonsHelp = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  margin-top: ${({theme}) => theme.spacing.medium}px;
-`;
-
-export const ContainerDialog = styled.View`
-  margin-top: ${({theme}) => theme.spacing.large}px;
-  padding: 10px 0;
-  border-bottom-width: 0.5px;
-  border-bottom-color: ${({theme}) => theme.colors.border};
-`;
-
-export const HeaderCardContainer = styled.View`
-  flex-direction: row;
-  padding: 10px 0;
-  align-items: center;
-  border-bottom-width: 0.1px;
-  border-bottom-color: ${({theme}) => theme.colors.border};
-`;
-
-export const ContainerMoviment = styled.View`
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-top: ${({theme}) => theme.spacing.medium}px;
-`;
-
-export const Text = styled.Text`
-  font-size: ${({theme}) => theme.fontSizes.medium}px;
-  color: ${({theme}) => theme.colors.secondary};
-`;
-
-export const ContainerGraphic = styled.View`
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
-  margin-bottom: ${({theme}) => theme.spacing.xslarge}px;
-`;
-
-export const Chart = styled.View`
-  width: ${RFValue(120)}px;
-  height: ${RFValue(120)}px;
-  justify-content: center;
-`;
-
-export const ContainerValue = styled.View`
-  margin-left: ${({theme}) => theme.spacing.medium}px;
-  flex-direction: column;
-  justify-content: center;
-  margin-top: ${({theme}) => theme.spacing.medium}px;
-`;
-export const Value = styled.Text`
-  font-size: ${({theme}) => theme.fontSizes.xlarge}px;
-  color: ${({theme}) => theme.colors.secondary};
-  font-weight: 600;
-`;
-
-export const ContainerCard = styled.View`
-  margin-top: ${({theme}) => theme.spacing.xlarge}px;
-  margin-bottom: 30px;
-`;
-
-export const TextSize = styled.Text`
-  font-size: ${({theme}) => theme.fontSizes.small}px;
-  color: ${({theme}) => shade(0.5, theme.colors.background_global)};
-`;
-
-export const ContainerInfo = styled.View`
-  flex-direction: column;
-  margin-bottom: ${({theme}) => theme.spacing.medium}px;
-  margin-top: ${({theme}) => theme.spacing.medium}px;
-`;
-
-export const ContainerRow = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: ${({theme}) => theme.spacing.medium}px;
-`;
-
-export const ContainerViewScroller = styled.KeyboardAvoidingView`
-  flex: 1;
-  background-color: ${({theme}) => theme.colors.background_global};
-`;
-
-export const ContainerPicker = styled.View``;
-
-export const styleSelect = StyleSheet.create({
-  inputIOS: {
-    fontSize: 13,
-    marginLeft: 10,
-    paddingBottom: 5,
-    color: themeCss.colors.secondary,
+export const Container = styled.ScrollView.attrs(({ theme }) => ({
+  contentContainerStyle: {
+    padding: theme.spacing.large,
+    gap: theme.spacing.large,
   },
-  inputAndroid: {
-    fontSize: 13,
-    marginLeft: 10,
-    color: themeCss.colors.secondary,
-    paddingBottom: 1,
-  },
-});
+}))`
+  background-color: ${({ theme }) => theme.colors.background_global};
+  flex: 1;
+`;
+
+export const AlertContent = styled.View`
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.medium}px;
+`;
+
+export const AlertIconWrapper = styled.View`
+  width: ${RFValue(64)}px;
+  height: ${RFValue(64)}px;
+  border-radius: ${RFValue(32)}px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.background_global};
+`;
+
+export const AlertBody = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.medium}px;
+  color: ${({ theme }) => theme.colors.text_gray};
+  text-align: center;
+  line-height: ${RFValue(20)}px;
+`;
+
+export const BalanceCard = styled.View`
+  position: relative;
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: ${({ theme }) => theme.borderRadius.large}px;
+  padding: ${({ theme }) => theme.spacing.large}px;
+  gap: ${({ theme }) => theme.spacing.large}px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.06;
+  shadow-radius: 6px;
+  elevation: 2;
+`;
+
+export const BalanceCardTop = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.medium}px;
+`;
+
+export const BalanceIconWrapper = styled.View`
+  width: ${RFValue(80)}px;
+  height: ${RFValue(80)}px;
+  border-radius: ${RFValue(40)}px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.background_global};
+`;
+
+export const BalanceTextGroup = styled.View`
+  flex: 1;
+  gap: ${({ theme }) => theme.spacing.small}px;
+`;
+
+export const BalanceLabel = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  color: ${({ theme }) => theme.colors.text_gray};
+`;
+
+export const BalanceValue = styled.Text<{ negative?: boolean }>`
+  font-size: ${({ theme }) => theme.fontSizes.xxlarge}px;
+  font-weight: 700;
+  color: ${({ theme, negative }) => (negative ? theme.colors.red : theme.colors.secondary)};
+`;
+
+export const HideBalanceButton = styled.TouchableOpacity`
+  position: absolute;
+  top: ${({ theme }) => theme.spacing.medium}px;
+  right: ${({ theme }) => theme.spacing.medium}px;
+  padding: ${RFValue(4)}px;
+  z-index: 1;
+`;
+
+export const NegativeBadge = styled.View`
+  align-self: flex-start;
+  background-color: ${({ theme }) => theme.colors.redLight};
+  border-radius: ${({ theme }) => theme.borderRadius.xxxlarge}px;
+  padding: ${RFValue(3)}px ${({ theme }) => theme.spacing.medium}px;
+`;
+
+export const NegativeBadgeText = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.small}px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.red};
+`;
+
+export const NegativeMessage = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.small}px;
+  color: ${({ theme }) => theme.colors.text_gray};
+  line-height: ${RFValue(14)}px;
+`;
+
+export const ActionButtonsRow = styled.View`
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacing.medium}px;
+`;
+
+export const ActionOutlineButton = styled.TouchableOpacity<{ filled?: boolean }>`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: ${({ theme }) => theme.spacing.small}px;
+  border-radius: ${({ theme }) => theme.borderRadius.medium}px;
+  border-width: ${({ theme }) => theme.borderWidth.small}px;
+  border-color: ${({ theme, filled }) => (filled ? theme.colors.primary : theme.colors.border)};
+  background-color: ${({ theme, filled }) => (filled ? theme.colors.primary : 'transparent')};
+  padding: ${({ theme }) => theme.spacing.medium}px;
+`;
+
+export const ActionOutlineButtonText = styled.Text<{ filled?: boolean }>`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  font-weight: 700;
+  color: ${({ theme, filled }) => (filled ? theme.colors.primaryText : theme.colors.secondary)};
+`;
+
+export const MovementsHeader = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+export const MovementsTitle = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.medium}px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.secondary};
+`;
+
+export const SeeAllLink = styled.TouchableOpacity``;
+
+export const SeeAllLinkText = styled.Text`
+  font-size: ${({ theme }) => theme.fontSizes.smalls}px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.black};
+`;

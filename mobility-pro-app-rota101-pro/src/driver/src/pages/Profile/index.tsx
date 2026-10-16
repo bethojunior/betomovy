@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Linking, Pressable } from 'react-native';
+import { Linking, Platform, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from 'styled-components/native';
 import { Feather } from '@expo/vector-icons';
@@ -69,26 +69,26 @@ export default function Profile() {
 
   const IMAGE_RULES = {
     maxSizeBytes: 10 * 1024 * 1024, // 10MB
-    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'],
-    minWidth: 100,
-    minHeight: 100,
-    maxWidth: 5000,
-    maxHeight: 5000
+    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/heic', 'image/heif'],
+    minWidth: 50,
+    minHeight: 50,
+    maxWidth: 8000,
+    maxHeight: 8000
   };
 
-  async function validateImage(asset) {
-    const errors = [];
+  async function validateImage(asset: any) {
+    const errors: string[] = [];
+    const size = asset?.fileSize || asset?.size;
 
-    if (asset.size > IMAGE_RULES.maxSizeBytes) {
-
+    if (size && size > IMAGE_RULES.maxSizeBytes) {
       errors.push(`Imagem muito grande. Máximo: ${IMAGE_RULES.maxSizeBytes / (1024 * 1024)}MB`);
     }
 
-    if (!IMAGE_RULES.allowedTypes.includes(asset.mimeType)) {
+    if (asset?.mimeType && !IMAGE_RULES.allowedTypes.includes(asset.mimeType.toLowerCase())) {
       errors.push('Formato não suportado. Use: JPG, JPEG ou PNG');
     }
 
-    if (asset.width && asset.height) {
+    if (asset?.width && asset?.height) {
       if (asset.width < IMAGE_RULES.minWidth || asset.height < IMAGE_RULES.minHeight) {
         errors.push(`Imagem muito pequena. Mínimo: ${IMAGE_RULES.minWidth}x${IMAGE_RULES.minHeight}px`);
       }
@@ -111,61 +111,73 @@ export default function Profile() {
         return;
       }
 
-      const result = await resizeImage(uri, 200, 200);
-      await updatePhoto(result);
-    } catch (error) {
-      customToast(translate('toast.text_photo_processing_error'), 'danger');
+      let imageToUpload = uri;
+      try {
+        const result = await resizeImage(uri, 400, 400);
+        if (result?.uri) {
+          imageToUpload = result.uri;
+        }
+      } catch (resizeErr) {
+        console.warn('Falha ao redimensionar foto, utilizando uri original:', resizeErr);
+      }
+
+      await updatePhoto(imageToUpload);
+    } catch (error: any) {
+      console.error('Erro ao atualizar foto:', error);
+      if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
+        customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
+      } else if (error?.response?.status === 413) {
+        customToast(translate('toast.text_image_too_large'), 'danger');
+      } else {
+        customToast(error?.response?.data?.message || error?.message || translate('toast.text_photo_update_error'), 'danger');
+      }
     } finally {
       setUploadingPhoto(false);
     }
   }
 
-  async function updatePhoto(result) {
-    try {
-      const locaUri = result.uri;
-      const filename = locaUri?.split('/').pop();
+  async function updatePhoto(imageUri: string) {
+    const filename = (imageUri?.split('/').pop() || 'photo.jpg').split('?')[0];
 
-      // Infer the type of the image
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : `image`;
+    const match = /\.(\w+)$/.exec(filename);
+    const ext = match ? match[1].toLowerCase() : 'jpg';
+    let type = 'image/jpeg';
+    if (ext === 'png') type = 'image/png';
+    else if (ext === 'webp') type = 'image/webp';
 
-      const formData = new FormData();
-      formData.append('driverId', userDriverFind.idDriver);
-      // @ts-ignore
-      formData.append('photo', {
-        uri: result.uri,
-        type,
-        name: filename,
-      });
+    const fileUri = Platform.OS === 'ios'
+      ? (imageUri.startsWith('file://') ? imageUri : `file://${imageUri}`)
+      : imageUri;
 
-      const response = await apiMainDriver.post(
-        'Driver/EditProfileImage',
-        formData,
-        { timeout: 120000 },
-      );
+    const formData = new FormData();
+    formData.append('driverId', userDriverFind.idDriver);
+    // @ts-ignore
+    formData.append('photo', {
+      uri: fileUri,
+      type,
+      name: filename,
+    });
 
-      const { data } = response;
-      const { status } = data;
+    const response = await apiMainDriver.post(
+      'Driver/EditProfileImage',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Accept: 'application/json',
+        },
+        timeout: 120000,
+      },
+    );
 
-      if (status) {
-        setImageKey(Date.now());
+    const { data } = response;
+    const { status } = data;
 
-        customToast(translate('toast.text_photo_change_request_sent'), 'success');
-      } else {
-        throw new Error(data.message || 'Upload falhou');
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar foto:', error);
-
-      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
-        customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
-      } else if (error.response?.status === 413) {
-        customToast(translate('toast.text_image_too_large'), 'danger');
-      } else {
-        customToast(translate('toast.text_photo_update_error'), 'danger');
-      }
-
-      throw error;
+    if (status) {
+      setImageKey(Date.now());
+      customToast(translate('toast.text_photo_change_request_sent'), 'success');
+    } else {
+      throw new Error(data.message || 'Upload falhou');
     }
   }
 

@@ -79,7 +79,7 @@ export default function PaymentForm() {
               <View>
                 <Text style={styles.titlePaymentForm}>{payment.name}</Text>
               </View>
-              <Icon name="ios-arrow-forward" size={30} color={Colors.PRIMARY} />
+              <Icon name="chevron-forward" size={30} color={Colors.PRIMARY} />
             </View>
           </TouchableOpacity>
         );

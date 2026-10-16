@@ -1,8 +1,8 @@
-import React, {FC} from 'react';
-import {Modal, Platform, TouchableOpacity, View} from 'react-native';
+import { FC } from 'react';
+import { Modal, Platform, TouchableOpacity, View } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import {translate} from '../../../locales';
-import {If} from '../../If';
+import { translate } from '../../../locales';
+import { If } from '../../If';
 
 import {
   Content,
@@ -12,9 +12,9 @@ import {
   ErrorText,
   TextButton,
 } from './styles';
-import {TextBold} from '../../CardTravel/styles';
+import { TextBold } from '../../CardTravel/styles';
 import theme from '../../../styles/theme';
-import {IfLoaderInsideScreen} from '../../IfLoaderInsideScreen';
+import { IfLoaderInsideScreen } from '../../IfLoaderInsideScreen';
 
 interface Props {
   visible: boolean;
@@ -97,32 +97,34 @@ const ModalFrame: FC<Props> = ({
 
             {error === true && <ErrorText>{textError}</ErrorText>}
             {children}
-            <ContentButton>
-              <Button
-                disabled={isLoading}
-                hide={hideCancel}
-                onPress={() => {
-                  onClose();
-                  setVisible(false);
-                }}
-              >
-                <TextButton cancel hide={hideCancel}>
-                  {textCancel || translate('buttonModal.cancel')}
-                </TextButton>
-              </Button>
-              <Button
-                disabled={isLoading}
-                hide={hideConfirm}
-                onPress={onPressConfirm}
-              >
-                <View>
-                  <IfLoaderInsideScreen loading={isLoading || null}>
-                    <TextButton hide={hideConfirm}>
-                      {textConfirm || translate('buttonModal.confirm')}
-                    </TextButton>
-                  </IfLoaderInsideScreen>
-                </View>
-              </Button>
+            <ContentButton hide={hideCancel && hideConfirm}>
+              {!hideCancel && (
+                <Button
+                  disabled={isLoading}
+                  onPress={() => {
+                    onClose();
+                    setVisible(false);
+                  }}
+                >
+                  <TextButton cancel>
+                    {textCancel || translate('buttonModal.cancel')}
+                  </TextButton>
+                </Button>
+              )}
+              {!hideConfirm && (
+                <Button
+                  disabled={isLoading}
+                  onPress={onPressConfirm}
+                >
+                  <View>
+                    <IfLoaderInsideScreen loading={isLoading || null}>
+                      <TextButton>
+                        {textConfirm || translate('buttonModal.confirm')}
+                      </TextButton>
+                    </IfLoaderInsideScreen>
+                  </View>
+                </Button>
+              )}
             </ContentButton>
           </ModalContent>
         </Content>

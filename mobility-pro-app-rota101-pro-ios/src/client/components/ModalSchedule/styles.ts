@@ -12,7 +12,7 @@ export const HeaderSchedule = styled.View`
 `;
 
 export const SchedulerContainer = styled.View`
- padding: 10px;
+  padding: 10px;
 `;
 
 export const DateContainer = styled.View`
@@ -21,7 +21,7 @@ export const DateContainer = styled.View`
   width: 100%;
   border: 1px solid ${({theme}) => theme.colors.primary};
   border-radius: 4px;
-`
+`;
 
 export const DateButton = styled.TouchableOpacity`
   flex-direction: row;
@@ -37,7 +37,7 @@ export const InputLabel = styled.Text`
   font-size: 15px;
   padding: 8px 4px;
   color: ${({theme}) => theme.colors.secondary};
-`
+`;
 
 export const TextValue = styled.Text`
   font-size: 13px;
@@ -52,7 +52,7 @@ export const HourContainer = styled.View`
   border: 1px solid ${({theme}) => theme.colors.primary};
   border-radius: 4px;
   margin-top: 10px;
-`
+`;
 
 export const HourButton = styled.TouchableOpacity`
   flex-direction: row;

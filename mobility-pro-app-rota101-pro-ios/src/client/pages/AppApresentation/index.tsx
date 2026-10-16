@@ -5,21 +5,20 @@ import {
   ContentDotsLoading,
 } from './styles';
 import LottieView from 'lottie-react-native';
-import {Modal} from 'react-native';
+import { Modal } from 'react-native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 
 import LoadingDots from '../../components/LoadingDots';
 
-import {translate} from '../../locales';
-import {useModules} from '../../contexts/modules';
-import {useAuth} from '../../../context/auth';
-import {AnimatedSource} from './constants';
-import {RFValue} from 'react-native-responsive-fontsize';
+import { translate } from '../../locales';
+import { useModules } from '../../contexts/modules';
+import { useAuth } from '../../../context/auth';
+import { AnimatedSource } from './constants';
+import { RFValue } from 'react-native-responsive-fontsize';
 import { useNetwork } from '../../../context/ConfigGlobal';
 import { If } from '../../components/If';
+import { useTerms } from '../../../context/terms';
 
 interface ApresentationAppProps {
   setVisible: (data: boolean) => void;
@@ -32,9 +31,10 @@ export const ApresentationApp = ({
   visible,
   setModalTerms,
 }: ApresentationAppProps) => {
-  const {init} = useModules();
-  const {itsNetwork} = useNetwork();
-  const {loading} = useAuth();
+  const { init } = useModules();
+  const { itsNetwork } = useNetwork();
+  const { loading } = useAuth();
+  const { termsAccepted } = useTerms();
 
   const [routesLoaded, setRoutesLoaded] = useState(false);
   const [chooseAnimated, setChooseAnimated] = useState(
@@ -42,17 +42,16 @@ export const ApresentationApp = ({
   );
 
   useEffect(() => {
-    if(!itsNetwork) {
+    if (!itsNetwork) {
       setChooseAnimated(AnimatedSource.NO_CONNECTION.uri)
     } else {
       setChooseAnimated(AnimatedSource.MOBILITY.uri)
     }
-  },[itsNetwork])
+  }, [itsNetwork])
 
 
   const verifyAccept = async () => {
-    const response = await AsyncStorage.getItem('@mobility:AcceptTerms');
-    if (!response) {
+    if (!termsAccepted) {
       setModalTerms(true);
       return;
     }
@@ -102,9 +101,9 @@ export const ApresentationApp = ({
     >
       <Container>
         <TitleApresentation
-        color={
-          !itsNetwork && 'red' 
-        }
+          color={
+            !itsNetwork && 'red'
+          }
         >
           {itsNetwork ? translate('apresentation_app.title_apresentation') : translate('commom.your_connection_is_unstable_check_your_internet_connection')}
         </TitleApresentation>
@@ -121,12 +120,12 @@ export const ApresentationApp = ({
         />
         <If condition={itsNetwork}>
 
-        <DescriptionApresentation>
-          {translate('apresentation_app.text_loading')}
-        </DescriptionApresentation>
-        <ContentDotsLoading>
-          <LoadingDots />
-        </ContentDotsLoading>
+          <DescriptionApresentation>
+            {translate('apresentation_app.text_loading')}
+          </DescriptionApresentation>
+          <ContentDotsLoading>
+            <LoadingDots />
+          </ContentDotsLoading>
         </If>
 
       </Container>

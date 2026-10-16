@@ -1,45 +1,143 @@
-// @ts-nocheck
-
-import React, {useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity, Alert} from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, TouchableOpacity, Alert, Modal, ActivityIndicator } from 'react-native';
 import Icon from '@expo/vector-icons/FontAwesome5';
 import IconMaterial from '@expo/vector-icons/MaterialCommunityIcons';
 import Colors from '../../components/Colors';
 import InputIcon from '../../components/form/InputIcon';
 import SearchLocalModal from '../SearchLocalModal';
 import DetailAddressModal from '../DetailAddressModal';
-import {useLocal} from '../../contexts/local';
+import { useLocal } from '../../contexts/local';
 import apiMain from '../../api/apiMain';
-import {translate} from '../../locales/index';
-import {useAuth} from '../../../context/auth';
-import {ContentLocals, styles} from './styles';
+import { translate } from '../../locales/index';
+import { useAuth } from '../../../context/auth';
+import { ContentLocals, styles } from './styles';
 import theme from '../../styles/theme';
+import * as Location from 'expo-location';
+import { usePlaces } from '../../hooks/place';
+import { SavedLocalPlaces } from '../../components/SavedLocalPlaces';
 
-export default function Local({navigation}) {
-  const {places, placeSelected, placeUser, updateListPlaces, addPlaceSelected} =
-    useLocal();
-  const {isGuest, permissionLocal} = useAuth();
+export default function Local({ navigation }) {
+  const {
+    places,
+    placeSelected,
+    placeUser,
+    updateListPlaces,
+    addPlaceSelected,
+    setPosition,
+  } = useLocal();
+  const { getPermissionLocal } = useAuth();
+  const { isGuest, permissionLocal } = useAuth();
   const [visible, setVisible] = useState(false);
   const [visibleModalLocal, setVisibleModalLocal] = useState(false);
+  const [visibleLastDestinations, setVisibleLastDestinations] = useState(false);
   const [place, setPlace] = useState(null);
+  const { removeAllPlaces, requestAllPlaces, places: lastPlaces } = usePlaces();
+
+  const getCustomerPlaces = useCallback(async () => {
+    if (isGuest) return;
+    try {
+      const {
+        data: { data },
+      } = await apiMain.get('CustomerPlace/getAll');
+
+      if (data && updateListPlaces) {
+        updateListPlaces(data);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar lugares do cliente:', error?.message || error);
+    }
+  }, [isGuest, updateListPlaces]);
 
   useEffect(() => {
-    getCustomerPlaces();
-    const unsubscribe = navigation.addListener('focus', () => {
+    if (requestAllPlaces) {
+      requestAllPlaces().catch(error => {
+        console.error('Erro ao buscar lugares salvos:', error?.message || error);
+      });
+    }
+    if (!isGuest) {
       getCustomerPlaces();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!navigation?.addListener) return;
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (!isGuest) {
+        getCustomerPlaces();
+      }
     });
-
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, getCustomerPlaces, isGuest]);
 
-  async function getCustomerPlaces() {
-    if (isGuest) return;
-    const {
-      data: {data},
-    } = await apiMain.get('CustomerPlace/getAll');
+  const getPostion = useCallback(() => {
+    if (!getPermissionLocal) return;
+    getPermissionLocal()
+      .then(() => {
+        Location.getLastKnownPositionAsync()
+          .then(location => {
+            if (location) {
+              setPosition({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              });
+            } else {
+              Location.getCurrentPositionAsync({ accuracy: 1 })
+                .then(({ coords }) => {
+                  setPosition({
+                    latitude: coords.latitude,
+                    longitude: coords.longitude,
+                  });
+                })
+                .catch(error => {
+                  console.error('Erro ao obter a localização atual:', error?.message || error);
+                });
+            }
+          })
+          .catch(error => {
+            console.error('Erro ao obter a última localização conhecida:', error?.message || error);
+          });
+      })
+      .catch(error => {
+        console.error('Erro ao obter permissão de localização:', error?.message || error);
+      });
+  }, [getPermissionLocal, setPosition]);
 
-    updateListPlaces(data);
-  }
+  useEffect(() => {
+    getPostion();
+  }, [getPostion]);
+
+  const handleShowLastDestinations = () => {
+    if (lastPlaces.length === 0) {
+      Alert.alert(translate("profile.alert_info_no_have_addresses_to_remove.text_title"), translate("profile.alert_info_no_have_addresses_to_remove.text_message"));
+      return;
+    }
+    setVisibleLastDestinations(true);
+  };
+
+  const handleRemoveAllDestinations = () => {
+    Alert.alert('', translate("profile.alert_sure_remove_last_destinations.text_message"), [
+      {
+        text: translate("profile.alert_sure_remove_last_destinations.text_button_cancel"),
+        style: 'cancel',
+      },
+      {
+        text: translate("profile.alert_sure_remove_last_destinations.text_button_confirm"),
+        onPress: () => {
+          if (removeAllPlaces) {
+            removeAllPlaces()
+              .then(() => {
+                setVisibleLastDestinations(false);
+                Alert.alert("", translate("profile.alert_addresses_removed_successfully.text_message"));
+              })
+              .catch(error => {
+                console.error('Erro ao remover todos os lugares:', error?.message || error);
+                Alert.alert("", translate("profile.alert_error_removing_addresses") || "Erro ao remover endereços");
+              });
+          }
+        }
+      },
+    ]);
+  };
 
   return (
     <View style={styles.container}>
@@ -48,10 +146,9 @@ export default function Local({navigation}) {
         onClose={() => {
           setVisible(false);
         }}
-        // eslint-disable-next-line @typescript-eslint/no-shadow
         onPlace={place => {
           setVisible(false);
-          navigation.navigate('LocalMap', {place});
+          navigation?.navigate('LocalMap', { place });
         }}
       />
       <DetailAddressModal
@@ -62,12 +159,44 @@ export default function Local({navigation}) {
         }}
         onConfirm={() => {
           setVisibleModalLocal(false);
-          navigation.navigate('LocalMap', {place});
+          if (navigation && navigation.navigate) {
+            navigation.navigate('LocalMap', { place });
+          }
         }}
       />
+      <Modal visible={visibleLastDestinations} animationType="slide">
+        <View style={{ flex: 1, backgroundColor: theme.colors.background_global }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: theme.colors.border_green }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: theme.colors.secondary }}>
+              {translate('trip.last_destinys')}
+            </Text>
+            <TouchableOpacity onPress={() => setVisibleLastDestinations(false)}>
+              <Icon name="times" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
+          <SavedLocalPlaces
+            visible={true}
+            setVisible={() => { }}
+            handleAddressSelected={() => { }}
+            type=""
+          />
+          <View style={{ padding: 20 }}>
+            <TouchableOpacity
+              style={{ backgroundColor: theme.colors.primary, padding: 15, borderRadius: 8, alignItems: 'center' }}
+              onPress={handleRemoveAllDestinations}
+            >
+              <Text style={{ color: theme.colors.primaryText, fontWeight: 'bold' }}>
+                {translate('profile.text_title_remove_last_destinations')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <TouchableOpacity
         onPress={() => {
-          setVisible(true);
+          if (navigation?.navigate) {
+            setVisible(true);
+          }
         }}
       >
         <View>
@@ -90,22 +219,32 @@ export default function Local({navigation}) {
             description={placeUser ? placeUser.address : ''}
             active={false}
             onPress={() => {
+              if (!navigation?.navigate) return;
               if (isGuest) {
-                addPlaceSelected(placeUser).then(() => {
-                  navigation.goBack();
-                });
-
+                if (addPlaceSelected && placeUser) {
+                  addPlaceSelected(placeUser)
+                    .then(() => {
+                      navigation.goBack?.();
+                    })
+                    .catch(error => {
+                      console.error('Erro ao adicionar lugar selecionado:', error?.message || error);
+                    });
+                }
+                return;
+              }
+              const lat = parseFloat(placeUser?.latitude || 0);
+              const lng = parseFloat(placeUser?.longitude || 0);
+              if (isNaN(lat) || isNaN(lng)) {
+                Alert.alert(translate('local.error_invalid_coordinates') || 'Coordenadas inválidas');
                 return;
               }
               navigation.navigate('AddAddressMap', {
                 place: placeUser,
                 position: {
-                  latitude: parseFloat(placeUser.latitude),
-                  longitude: parseFloat(placeUser.longitude),
+                  latitude: lat,
+                  longitude: lng,
                 },
               });
-              // addPlaceSelected(null);
-              // navigation.goBack();
             }}
             hideRemove
           />
@@ -122,28 +261,63 @@ export default function Local({navigation}) {
               id={item.idPlace}
               title={item.address}
               description={item.neighborhood || ''}
-              update={() => {
-                getCustomerPlaces();
+              update={async () => {
+                await getCustomerPlaces();
               }}
               active={active}
               onPress={() => {
-                addPlaceSelected(item);
-                navigation.goBack();
+                if (!navigation?.goBack || !addPlaceSelected) return;
+                addPlaceSelected(item)
+                  .then(() => {
+                    navigation.goBack();
+                  })
+                  .catch(error => {
+                    console.error('Erro ao adicionar lugar selecionado:', error);
+                  });
               }}
             />
           );
         })}
+
+        <TouchableOpacity
+          style={styles.removeLastDestinationsButton}
+          onPress={handleShowLastDestinations}
+        >
+          <View style={styles.removeLastDestinationsContainer}>
+            <Icon
+              name="trash"
+              size={20}
+              color={theme.colors.primaryText}
+              style={styles.iconLocal}
+            />
+            <View style={styles.contentDescriptionLocal}>
+              <Text style={styles.titleLocal}>
+                {translate('profile.text_title_remove_last_destinations')}
+              </Text>
+              <Text style={styles.descriptionLocal}>
+                {lastPlaces && lastPlaces.length > 0
+                  ? (lastPlaces.length === 1
+                    ? translate('profile.one_address_saved', { count: lastPlaces.length })
+                    : translate('profile.multiple_addresses_saved', { count: lastPlaces.length })
+                  )
+                  : translate('profile.no_addresses_saved')
+                }
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
       </ContentLocals>
     </View>
   );
 }
 
 function ItemLocal(props) {
-  const {id, active, iconName, title, description, update, hideRemove} = props;
+  const { id, active, iconName, title, description, update, hideRemove } = props;
 
-  const {isGuest} = useAuth();
+  const { isGuest } = useAuth();
 
-  const {places, updateListPlaces} = useLocal();
+  const { places, updateListPlaces } = useLocal();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   return (
     <TouchableOpacity {...props}>
@@ -173,23 +347,42 @@ function ItemLocal(props) {
                   {
                     text: translate('local.text_button_confirmed_alert'),
                     onPress: () => {
-                      // eslint-disable-next-line consistent-return
-                      async function deletePlace() {
-                        const {
-                          data: {status, message},
-                        } = await apiMain.post('CustomerPlace/delete', {
-                          placeId: id,
-                        });
+                      setIsDeleting(true);
+                      function deletePlace() {
+                        apiMain
+                          .post('CustomerPlace/delete', {
+                            placeId: id,
+                          })
+                          .then(async ({ data: { status, message } }) => {
+                            if (!status) {
+                              Alert.alert(message || translate('local.text_error_deleting') || 'Erro ao deletar endereço');
+                              return;
+                            }
 
-                        if (!status) return Alert.alert(message);
-
-                        if (update) update();
+                            if (update) {
+                              await update();
+                            }
+                          })
+                          .catch(error => {
+                            console.error('Erro ao deletar lugar:', error?.message || error);
+                            Alert.alert(translate('local.text_error_deleting') || 'Erro ao deletar endereço');
+                          })
+                          .finally(() => {
+                            setIsDeleting(false);
+                          });
                       }
 
                       if (isGuest) {
                         updateListPlaces(
                           places.filter(item => item.idPlace !== id),
-                        );
+                        )
+                          .then(() => {
+                            setIsDeleting(false);
+                          })
+                          .catch(error => {
+                            setIsDeleting(false);
+                            console.error('Erro ao atualizar lista de lugares:', error?.message || error);
+                          });
                       } else {
                         deletePlace();
                       }
@@ -197,13 +390,18 @@ function ItemLocal(props) {
                   },
                   {
                     text: translate('local.text_button_denied_alert'),
-                    onPress: () => {},
+                    onPress: () => { },
                   },
                 ],
               );
             }}
+            disabled={isDeleting}
           >
-            <IconMaterial name="delete" size={25} color={Colors.PRIMARY} />
+            {isDeleting ? (
+              <ActivityIndicator size="small" color={Colors.PRIMARY} />
+            ) : (
+              <IconMaterial name="delete" size={25} color={Colors.PRIMARY} />
+            )}
           </TouchableOpacity>
         ) : null}
       </View>

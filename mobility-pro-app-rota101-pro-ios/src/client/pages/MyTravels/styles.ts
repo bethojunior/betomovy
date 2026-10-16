@@ -4,7 +4,6 @@ export const Container = styled.View`
   background-color: ${({theme}) => theme.colors.background_global};
   width: 100%;
   height: 100%;
-  padding: 0 ${({theme}) => theme.spacing.large}px;
 `;
 
 export const Header = styled.View`
@@ -22,11 +21,13 @@ export const Title = styled.Text`
   font-weight: bold;
 `;
 
-export const ContainerContent = styled.ScrollView`
-  margin: ${({theme}) => theme.spacing.large}px auto;
+export const ContainerContent = styled.ScrollView.attrs(({theme}) => ({
+  contentContainerStyle: {
+    paddingVertical: theme.spacing.medium,
+  },
+}))`
   height: 100%;
   width: 100%;
-  padding: 0 ${({theme}) => theme.spacing.large}px;
 `;
 
 export const ContainerFooter = styled.View`
@@ -41,4 +42,6 @@ export const NotTravel = styled.Text`
   color: ${({theme}) => theme.colors.secondary};
   font-size: ${({theme}) => theme.fontSizes.large}px;
   text-align: center;
+  margin-top: ${({theme}) => theme.spacing.xxlarge}px;
+  padding: 0 ${({theme}) => theme.spacing.large}px;
 `;

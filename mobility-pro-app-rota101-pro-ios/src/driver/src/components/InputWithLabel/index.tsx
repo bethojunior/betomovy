@@ -1,12 +1,19 @@
 import theme from '../../styles/theme';
 import {TextEdit} from '../TextEdit';
 import {ContentInput, InputAddress} from './styles';
+import {
+  KeyboardTypeOptions,
+  ReturnKeyTypeOptions,
+} from 'react-native';
 
 interface Props {
   value: string;
   onChange: (text: string) => void;
   title: string;
   placeholder?: string;
+  keyboardType?: KeyboardTypeOptions;
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  returnKeyType?: ReturnKeyTypeOptions;
 }
 
 export const InputWithLabel = ({
@@ -14,6 +21,9 @@ export const InputWithLabel = ({
   onChange,
   title,
   placeholder,
+  keyboardType = 'default',
+  autoCapitalize = 'sentences',
+  returnKeyType = 'done',
 }: Props) => {
   return (
     <ContentInput>
@@ -24,6 +34,9 @@ export const InputWithLabel = ({
         value={value}
         onChangeText={onChange}
         placeholder={placeholder}
+        keyboardType={keyboardType}
+        autoCapitalize={autoCapitalize}
+        returnKeyType={returnKeyType}
       />
     </ContentInput>
   );
