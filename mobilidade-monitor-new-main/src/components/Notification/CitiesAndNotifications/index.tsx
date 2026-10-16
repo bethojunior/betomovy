@@ -190,13 +190,25 @@ const SelectAndButtonNotification: FC<SelectAndButtonNotificationProps> = ({
   const changeCity = (value: number) => {
     const cityActive = citiesActives?.find((el) => el.cityId === value);
     if (!cityActive) return;
-    Session.setLocal("citySelected", JSON.stringify(cityActive));
-    if (cityActive.polygon) {
-      Session.setLocal(
-        "pointsCity",
-        JSON.stringify(getPathByPolygon(cityActive.polygon))
-      );
+
+    let pointsCity: any[] = [];
+    if (cityActive.polygon && typeof cityActive.polygon === "string" && cityActive.polygon.trim().length > 10) {
+      try {
+        pointsCity = getPathByPolygon(cityActive.polygon);
+      } catch (e) {
+        console.warn("Erro ao processar polygon:", e);
+      }
     }
+
+    if (!pointsCity || pointsCity.length === 0) {
+      const coords = Utils.newGetCircleCoordinates([-38.5267, -3.7319], 12000, 64);
+      pointsCity = coords.map((c: [number, number]) => ({ lat: c[1], lng: c[0] }));
+      const pairs = coords.map((c: [number, number]) => `${c[1]} ${c[0]}`).join(", ");
+      cityActive.polygon = `POLYGON((${pairs}))`;
+    }
+
+    Session.setLocal("citySelected", JSON.stringify(cityActive));
+    Session.setLocal("pointsCity", JSON.stringify(pointsCity));
     setIsSearching(false);
     window.location.reload();
   };

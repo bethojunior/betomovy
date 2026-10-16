@@ -29,7 +29,15 @@ function getAddressCurrent(address) {
 }
 
 function getConfigCentral(central) {
-    ConfigRepository.getConfigByLocation(central.latitude, central.longitude)
+    if (!central) {
+        central = Session.get("centralSelected");
+    }
+    const lat = central ? parseFloat(central.latitude) : NaN;
+    const lng = central ? parseFloat(central.longitude) : NaN;
+    if (isNaN(lat) || isNaN(lng)) {
+        return;
+    }
+    ConfigRepository.getConfigByLocation(lat, lng)
         .then(({status, response}) => {
             if (!status || !response)
                 return;

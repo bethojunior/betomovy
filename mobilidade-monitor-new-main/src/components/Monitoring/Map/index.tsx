@@ -1307,13 +1307,22 @@ const MapMonitoring: any = (props: MonitoringMapProps) => {
 
   // Valores padrão para Fortaleza caso polygon não exista
   let cityCoordinatesLatitude = -3.7327;
-  let lcityCoordinatesLongitude = -38.5270;
+  let cityCoordinatesLongitude = -38.5270;
 
   if (polygon) {
     const points = parsePolygonString(polygon);
-    const centroid = calculateCentroid(points);
-    cityCoordinatesLatitude = centroid.y;
-    lcityCoordinatesLongitude = centroid.x;
+    if (points && points.length > 0) {
+      const centroid = calculateCentroid(points);
+      let cLat = centroid.x;
+      let cLng = centroid.y;
+      // In Americas / Brazil, longitude is between -180 and -30, latitude is between -35 and 15
+      if (Math.abs(centroid.x) > 90 || (centroid.x < -30 && centroid.y > -35 && centroid.y < 35)) {
+        cLng = centroid.x;
+        cLat = centroid.y;
+      }
+      cityCoordinatesLatitude = cLat;
+      cityCoordinatesLongitude = cLng;
+    }
   } else {
     console.warn('⚠️ Polygon não encontrado para a cidade selecionada, usando coordenadas padrão de Fortaleza');
   }
@@ -1589,8 +1598,8 @@ const MapMonitoring: any = (props: MonitoringMapProps) => {
         }}
         mapboxAccessToken="pk.eyJ1IjoidGVzdGViYXlhbm1lZCIsImEiOiJjazd1d2U4OTMxNW9hM2lvNGI3cGFyaGVnIn0.Q4bC04l_8IU6HqONKXbcDA"
         initialViewState={{
-          longitude: cityCoordinatesLatitude,
-          latitude: lcityCoordinatesLongitude,
+          longitude: cityCoordinatesLongitude,
+          latitude: cityCoordinatesLatitude,
           zoom: 12,
         }}
         mapStyle="mapbox://styles/mapbox/streets-v9"

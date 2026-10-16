@@ -1,5 +1,23 @@
 <?php
 $central = Session::get("centralSelected");
+$centrals_user = Session::get("centrals");
+
+if (!$central || (is_object($central) && empty($central->id)) || (is_array($central) && empty($central['id']))) {
+    if (is_array($centrals_user) && count($centrals_user) > 0) {
+        $firstItem = $centrals_user[0];
+        $c = null;
+        if (is_array($firstItem) && isset($firstItem['central'])) {
+            $c = $firstItem['central'];
+        } elseif (is_object($firstItem) && isset($firstItem->central)) {
+            $c = $firstItem->central;
+        } else {
+            $c = $firstItem;
+        }
+        $central = $c;
+        Session::set("centralSelected", $central);
+    }
+}
+
 if (is_array($central)) {
     $central = (object) $central;
 }

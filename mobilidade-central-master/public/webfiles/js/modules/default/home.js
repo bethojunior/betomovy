@@ -88,14 +88,36 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function initLoadMap() {
-    const centralSelected = Session.get('centralSelected')
+    let centralSelected = Session.get('centralSelected')
 
-    if (!centralSelected) return setTimeout(initLoadMap, 3000)
+    if (!centralSelected) {
+      const centrals = Session.get('centrals')
+      if (Array.isArray(centrals) && centrals.length > 0) {
+        centralSelected = centrals[0].central || centrals[0]
+        Session.set('centralSelected', centralSelected)
+      }
+    }
 
-    initMap({
-      lat: parseFloat(centralSelected.latitude),
-      lng: parseFloat(centralSelected.longitude),
-    })
+    if (!centralSelected) return setTimeout(initLoadMap, 1500)
+
+    let lat = parseFloat(centralSelected.latitude)
+    let lng = parseFloat(centralSelected.longitude)
+
+    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
+      const userLoc = Session.getLocal('location')
+      if (userLoc && !isNaN(parseFloat(userLoc.lat)) && !isNaN(parseFloat(userLoc.lng))) {
+        lat = parseFloat(userLoc.lat)
+        lng = parseFloat(userLoc.lng)
+      } else {
+        lat = -3.7319
+        lng = -38.5267
+      }
+      centralSelected.latitude = lat
+      centralSelected.longitude = lng
+      Session.set('centralSelected', centralSelected)
+    }
+
+    initMap({ lat, lng })
   }
 
   function initMap(position) {

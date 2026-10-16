@@ -11,7 +11,16 @@ export const CityDelimiter = ({ coordinates }: CityDelimiterProps) => {
 		geometry: {
 			type: "LineString",
 			coordinates: coordinates.map((coordinate) => {
-				return coordinate.reverse();
+				if (!Array.isArray(coordinate) || coordinate.length < 2) return [0, 0];
+				const a = coordinate[0];
+				const b = coordinate[1];
+				// GeoJSON expects [longitude, latitude]
+				if (a < -30 && b > -35 && b < 35) {
+					// a is longitude, b is latitude
+					return [a, b];
+				}
+				// Otherwise assume [latitude, longitude] and convert to [longitude, latitude]
+				return [b, a];
 			})
 		}
 	};

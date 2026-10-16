@@ -92,6 +92,12 @@ class MapService {
     // ─── Criação e inicialização do mapa ─────────────────────────────────────
 
     initMap(id, position, callback = undefined) {
+        if (!position || isNaN(parseFloat(position.lat)) || isNaN(parseFloat(position.lng))) {
+            position = { lat: -3.7319, lng: -38.5267 };
+        } else {
+            position = { lat: parseFloat(position.lat), lng: parseFloat(position.lng) };
+        }
+
         if (this.map !== null) {
             this.map.setCenter([position.lng, position.lat]);
             this.resizeMap();

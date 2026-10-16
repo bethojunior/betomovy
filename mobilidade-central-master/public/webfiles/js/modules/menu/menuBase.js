@@ -82,12 +82,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }, true);
 
     elementProperty.addEventInElement("#selectCentralChange", "onchange", function () {
-        const centralId = Session.get("centralSelected")?.id;
-        if (centralId) {
-            sessionStorage.removeItem(`${WHATSAPP_CONFIG_KEY}_${centralId}`);
+        try {
+            const centralId = Session.get("centralSelected")?.id;
+            if (centralId && typeof WHATSAPP_CONFIG_KEY !== "undefined") {
+                sessionStorage.removeItem(`${WHATSAPP_CONFIG_KEY}_${centralId}`);
+            }
+            const selected = JSON.parse(this.value);
+            Session.set("centralSelected", selected);
+            try {
+                localStorage.setItem("centralSelected", JSON.stringify(selected));
+            } catch (e) {}
+        } catch (err) {
+            console.error("Erro ao alterar central:", err);
         }
-        Session.set("centralSelected", (JSON.parse(this.value)));
-        location.reload()
+        location.reload();
     });
 
     window.updateDataUserMenu = function () {
