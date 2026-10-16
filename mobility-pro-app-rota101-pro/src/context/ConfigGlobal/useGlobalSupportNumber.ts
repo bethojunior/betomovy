@@ -13,12 +13,28 @@ const formatForWhatsapp = (rawNumber?: string | null) => {
     cleaned = cleaned.substring(1);
   }
 
-  // DDD + 8 dígitos (sem o 9 do celular), insere o 9
-  if (cleaned.length === 10) {
-    cleaned = `${cleaned.substring(0, 2)}9${cleaned.substring(2)}`;
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    return cleaned;
   }
 
-  // DDD + celular (11 dígitos), ainda sem código do país
+  if (cleaned.length === 10 && cleaned.startsWith('508')) {
+    return `1${cleaned}`;
+  }
+
+  if (cleaned.startsWith('55') && (cleaned.length === 12 || cleaned.length === 13)) {
+    return cleaned;
+  }
+
+  if (cleaned.length === 10) {
+    const ddd = parseInt(cleaned.substring(0, 2), 10);
+    if (ddd >= 11 && ddd <= 99 && ddd % 10 !== 0) {
+      cleaned = `${cleaned.substring(0, 2)}9${cleaned.substring(2)}`;
+      cleaned = `${COUNTRY_CODE}${cleaned}`;
+      return cleaned;
+    }
+    return `1${cleaned}`;
+  }
+
   if (cleaned.length === 11) {
     cleaned = `${COUNTRY_CODE}${cleaned}`;
   }

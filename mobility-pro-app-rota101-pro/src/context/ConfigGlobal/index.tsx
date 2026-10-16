@@ -40,6 +40,15 @@ export const ConfigGlobalProvider = ({ children }) => {
     setVersionApp(version?.version);
 
     if (update) {
+      const currentVersion = Constants.expoConfig?.version;
+      const targetVersion = version?.version;
+      if (currentVersion && targetVersion) {
+        const compare = currentVersion.localeCompare(targetVersion, undefined, { numeric: true, sensitivity: 'base' });
+        if (compare >= 0) {
+          setNeedUpdate(false);
+          return;
+        }
+      }
       setNeedUpdate(true);
       setLinkUpdate(version?.link);
       return;

@@ -25,16 +25,25 @@ class AppVersionService
     public function checkVersion($appId)
     {
         $platform = Headers::getPlatform();
+        $clientVersion = Headers::getAppVersion();
+        $actualVersion = $this->getActualVersion($appId, $platform);
+
+        if ($clientVersion && $actualVersion && version_compare($clientVersion, $actualVersion->version, '>=')) {
+            return [
+                'update' => false,
+                'version' => $actualVersion
+            ];
+        }
 
         $version = $this->dao
             ->findVersions(
-                Headers::getAppVersion(),
+                $clientVersion,
                 $appId,
                 $platform
             );
 
         $update = !$version ?: false;
-        $version = $version ? $version : $this->getActualVersion($appId, $platform);
+        $version = $version ? $version : $actualVersion;
 
         return compact('update', 'version');
     }
