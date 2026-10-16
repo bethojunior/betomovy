@@ -41,6 +41,41 @@ class AppVersionDao extends BaseDao
             ->get(false);
     }
 
+    public function cleanInvalidVersions($app, $platform = PlatformConst::ANDROID)
+    {
+        try {
+            // Deactivate any unreleased/future version like 8.3.1 that is not on Google Play Store
+            $sqlDeactivate = "UPDATE {$this->table} SET statusId = 0 WHERE appId = :appId AND version = '8.3.1'";
+            $this->sqlRawExecute($sqlDeactivate, [':appId' => $app]);
+
+            // Ensure 8.1.2 exists and is active (statusId = 1)
+            $sqlCheck = "SELECT id, statusId FROM {$this->table} WHERE appId = :appId AND platform = :platform AND version = '8.1.2' LIMIT 1";
+            $res = $this->sqlRawSelect($sqlCheck, [':appId' => $app, ':platform' => $platform]);
+            $existing = $res ? $res->first() : null;
+
+            if ($existing && isset($existing->id)) {
+                if ((int)$existing->statusId !== Status::ATIVO) {
+                    $this->sqlRawExecute("UPDATE {$this->table} SET statusId = :statusId WHERE id = :id", [
+                        ':statusId' => Status::ATIVO,
+                        ':id' => $existing->id
+                    ]);
+                }
+            } else {
+                $this->sqlRawExecute(
+                    "INSERT INTO {$this->table} (appId, version, statusId, platform, link, created_at, updated_at) 
+                     VALUES (:appId, '8.1.2', :statusId, :platform, 'https://play.google.com/store/apps/details?id=br.com.client.rota101', NOW(), NOW())",
+                    [
+                        ':appId' => $app,
+                        ':statusId' => Status::ATIVO,
+                        ':platform' => $platform
+                    ]
+                );
+            }
+        } catch (\Throwable $e) {
+            // Log or ignore failure
+        }
+    }
+
     public function findActual($app, $platform = PlatformConst::ANDROID)
     {
         $sql = "

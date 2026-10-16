@@ -8,6 +8,7 @@ import { If } from '../../client/components/If';
 import { isBeta } from '../../constantBuild/config';
 import { ConfigGlobalServices } from './services';
 import { AppUpdateModal } from '../../components/AppUpdateModal';
+import * as Application from 'expo-application';
 import Constants from 'expo-constants';
 import { translate } from '../../client/locales';
 import { AppsId } from './constants';
@@ -68,6 +69,7 @@ export const ConfigGlobalProvider = ({ children }) => {
       setVersionApp(version.version);
 
       const currentVersion =
+        Application.nativeApplicationVersion ||
         Constants.expoConfig?.version ||
         Constants.nativeAppVersion ||
         '8.1.2';
