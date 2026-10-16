@@ -1,25 +1,78 @@
 export const injectDynamic = (titleElement: string) => {
   return `
-  let first = true
-  let interval = setInterval(function() {
-    if(first) {
+  (function() {
+    try {
+      const styleEl = document.createElement('style');
+      styleEl.id = 'hide-app-elements-style';
+      styleEl.innerHTML = `
+        header,
+        .content-nav,
+        .content-logo,
+        .content-links,
+        .merchant-download,
+        .content-merchant-website,
+        footer,
+        ${titleElement} {
+          display: none !important;
+          visibility: hidden !important;
+          height: 0 !important;
+          overflow: hidden !important;
+        }
+      `;
+      (document.head || document.documentElement).appendChild(styleEl);
+    } catch(e) {}
+  })();
+
+  const cleanElements = function() {
+    try {
+      const header = document.querySelector('header');
+      if (header) {
+        header.style.display = 'none';
+        header.remove();
+      }
+      const nav = document.querySelector('.content-nav');
+      if (nav) {
+        nav.style.display = 'none';
+        nav.remove();
+      }
       const title = document.querySelector('${titleElement}');
-      const storeContainer = document.querySelector('.content-merchant-website') 
       if (title) {
-        title.style.display = "none";
+        title.style.display = 'none';
       }
+      const storeContainer = document.querySelector('.content-merchant-website');
       if (storeContainer) {
-        storeContainer.style.display = "none";
+        storeContainer.style.display = 'none';
+        storeContainer.remove();
       }
-      if(title && storeContainer) {
-        clearInterval(interval)
-        first = false
-      } else {
-        interval
+      const merchant = document.querySelector('.merchant-download');
+      if (merchant) {
+        merchant.style.display = 'none';
+        merchant.remove();
       }
-    }
-    }, 200);
-    interval
+      const footer = document.querySelector('footer');
+      if (footer) {
+        footer.style.display = 'none';
+        footer.remove();
+      }
+    } catch(e) {}
+  };
+
+  const updateBrandLogo = function() {
+    try {
+      const brandImgs = document.querySelectorAll('.brand-header-link img, .content-logo img');
+      brandImgs.forEach(function(img) {
+        if (!img.src.includes('default.jpg') && !img.dataset.pinkFixed) {
+          img.dataset.pinkFixed = 'true';
+          img.src = 'https://minio.704app.com.br/rota101fb704/default.jpg';
+        }
+      });
+    } catch(e) {}
+  };
+
+  setInterval(cleanElements, 100);
+  setInterval(updateBrandLogo, 200);
+  cleanElements();
+  updateBrandLogo();
 
   const removePassengerCpf = function() {
     const isPassenger = !window.location.href.includes("motorista") && !window.location.href.includes("driver");

@@ -1,73 +1,65 @@
-import {useCallback, useState} from 'react';
-import {ActivityIndicator, Platform} from 'react-native';
-import {FontAwesome} from '@expo/vector-icons';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, Alert, Platform } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 import WebView from 'react-native-webview';
-import {HeaderOptions} from '../../components/HeaderOptions';
-import {If} from '../../components/If';
-import {NavRegister} from '../../components/NavRegister';
+import { HeaderOptions } from '../../components/HeaderOptions';
+import { If } from '../../components/If';
+import { NavRegister } from '../../components/NavRegister';
 import theme from '../../styles/theme';
-import {Container} from './styles';
-import {translate} from '../../locales';
-import {buildApp} from '../../../constantBuild/config';
-import {useAuth} from '../../../context/auth';
+import { Container } from './styles';
+import { translate } from '../../locales';
+import { buildApp } from '../../../constantBuild/config';
+import { useAuth } from '../../../context/auth';
 import Preload from '../../components/Preload';
+import { injectDynamic } from './webViewInject';
+import { useNavigation } from '@react-navigation/native';
+import { useConfigAppPartner } from '../../../context/ConfigAppPartner/useConfigAppPartner';
 
-// Injetando no site do cliente, para remover preload e esconder botão de escolher app e adicionar evento de click no botão ok
-const injectJSClient = `
-  const idPreload = document.getElementById('preload-general');
-  idPreload.style.display = 'none';
+const injectJSClient = injectDynamic('.passenger-title');
 
-  const chooseApp = document.getElementById('chooseApp');
-  if (chooseApp) {
-    chooseApp.style.visibility = "hidden";
-  }
-  document.getElementById('email').addEventListener('change', function(event) {
-    window.ReactNativeWebView.postMessage(JSON.stringify({ field: 'email', value: event.target.value }));
-  });
-  document.getElementById('password').addEventListener('change', function(event) {
-    window.ReactNativeWebView.postMessage(JSON.stringify({ field: 'password', value: event.target.value }));
-  });
-
-  function addEventListenerToOkButton() {
-    const verifyIconSuccess = document.querySelector('.swal-icon--success');
-    const okButton = document.querySelector('.swal-button--confirm');
-    if (okButton && verifyIconSuccess) {
-      okButton.addEventListener('click', function(event) {
-        event.preventDefault();
-        window.ReactNativeWebView.postMessage('registrationCompletedGoToLogin');
-      });
-    } else {
-      setTimeout(addEventListenerToOkButton, 500);
-    }
-  }
-
-  addEventListenerToOkButton();
-`;
-
-// Injetando no site do motorista, para remover preload
-const injectJSDriver = `
-  const idPreload = document.querySelector('ul:before').css('display', 'none');
-`;
+const injectJSDriver = injectDynamic('.driver-title');
 
 export function Register() {
-  const {authenticateLogin, setDriverSelected, driverSelected} = useAuth();
+  const { authenticateLogin, setDriverSelected, driverSelected, generalSettings } = useAuth();
   const [loadWebView, setLoadWebView] = useState(false);
   const [userRegistered, setUserRegistered] = useState({
     email: null,
     password: null,
   });
+
   const [loading, setLoading] = useState(false);
+  const { appPartnerSelected } = useConfigAppPartner();
+
+  const navigation = useNavigation();
 
   const handleAuth = useCallback(async () => {
     try {
       setLoading(true);
-      await authenticateLogin(userRegistered);
+      await authenticateLogin({
+        email: userRegistered.email,
+        password: userRegistered.password,
+        setModal: () => { }
+      });
     } catch (error) {
-      console.error('Erro durante a autenticação:', error);
+
     } finally {
       setLoading(false);
     }
   }, [authenticateLogin, userRegistered]);
+
+  const urlToRegister = (isDriver: boolean) => {
+    let siteUrl = isDriver ? 'motorista' : 'passageiro';
+
+    if (appPartnerSelected) {
+      return `${buildApp().HOST_SITE}${siteUrl}?name_app=${appPartnerSelected.key}&app=1`;
+    }
+    return `${buildApp().HOST_SITE}${siteUrl}?app=1`;
+  };
+
+
+  const handleRedirectLogin = () => {
+    navigation.goBack();
+  }
 
   return (
     <Container>
@@ -75,24 +67,49 @@ export function Register() {
         onPress={() => setDriverSelected(!driverSelected)}
         active={driverSelected}
         optionOne={translate('register.client')}
-        optionTwo={translate('register.partner')}
+        optionTwo={generalSettings.find(
+          item => item?.key === 'text_name_driver_custom',
+        )?.value || translate('register.partner')}
       />
 
       <If condition={driverSelected === true}>
         <NavRegister />
         <WebView
           source={{
-            uri: `${buildApp().HOST_SITE}driver/signup`,
+            uri: urlToRegister(true),
           }}
           injectedJavaScript={injectJSDriver}
-          onLoadProgress={({nativeEvent}) => {
+          onLoadProgress={({ nativeEvent }) => {
             if (nativeEvent.progress !== 1 && loadWebView === false) {
               setLoadWebView(true);
             } else if (nativeEvent.progress === 1) {
               setLoadWebView(false);
             }
           }}
-          onMessage={async ({nativeEvent}) => {
+          onMessage={async ({ nativeEvent }) => {
+            try {
+              const parsedData = JSON.parse(nativeEvent.data);
+              if (parsedData.type === 'DEBUG_LOG') {
+                return;
+              }
+            } catch (e) {
+
+            }
+
+            if (JSON.parse(nativeEvent.data) === "redirect-login") {
+              handleRedirectLogin();
+              return;
+            }
+
+            if (JSON.parse(nativeEvent.data) === "redirect-login-new-site") {
+              Alert.alert(
+                translate('login.text_redirect_title'),
+                translate('login.text_redirect_description'),
+                [{ text: "Ok", onPress: handleRedirectLogin }]
+              );
+              return;
+            }
+
             if (nativeEvent.data === 'registrationCompletedGoToLogin') {
               await handleAuth();
             } else {
@@ -131,17 +148,40 @@ export function Register() {
         />
         <WebView
           source={{
-            uri: `${buildApp().HOST_SITE}cliente/preregister`,
+            uri: urlToRegister(false),
           }}
           injectedJavaScript={injectJSClient}
-          onLoadProgress={({nativeEvent}) => {
+          onLoadProgress={({ nativeEvent }) => {
             if (nativeEvent.progress !== 1 && loadWebView === false) {
               setLoadWebView(true);
             } else if (nativeEvent.progress === 1) {
               setLoadWebView(false);
             }
           }}
-          onMessage={async ({nativeEvent}) => {
+          onMessage={async ({ nativeEvent }) => {
+            try {
+              const parsedData = JSON.parse(nativeEvent.data);
+              if (parsedData.type === 'DEBUG_LOG') {
+                return;
+              }
+            } catch (e) {
+
+            }
+
+            if (JSON.parse(nativeEvent.data) === "redirect-login") {
+              handleRedirectLogin();
+              return;
+            }
+
+            if (JSON.parse(nativeEvent.data) === "redirect-login-new-site") {
+              Alert.alert(
+                translate('login.text_redirect_title'),
+                translate('login.text_redirect_description'),
+                [{ text: "Ok", onPress: handleRedirectLogin }]
+              );
+              return;
+            }
+
             if (nativeEvent.data === 'registrationCompletedGoToLogin') {
               await handleAuth();
             } else {
@@ -166,13 +206,7 @@ export function Register() {
           />
         )}
 
-        {/* <DataUserSignUp
-          route={{
-            params: {
-              numberPhone: '',
-            },
-          }}
-        /> */}
+
       </If>
       <Preload visible={loading} />
     </Container>

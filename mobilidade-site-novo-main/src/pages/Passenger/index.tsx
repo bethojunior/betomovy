@@ -147,6 +147,10 @@ const Passenger = () => {
 
   const nameAppPartner = urlParams.get("name_app");
   const userInfo = urlParams.get("user");
+  const isApp =
+    urlParams.get("app") === "1" ||
+    typeof (window as any).ReactNativeWebView !== "undefined" ||
+    window.location.search.includes("app=1");
 
   const handleRegisterPassenger = (data: FormDataProps) => {
     setLoading(true);
@@ -478,7 +482,7 @@ const Passenger = () => {
   if (isPreRegister) {
     return (
       <Container>
-        <Header />
+        {!isApp && <Header />}
         <LoadingBackdrop loading={loading} />
         <div
           className="content-passenger"
@@ -608,15 +612,15 @@ const Passenger = () => {
             )}
           </div>
         </div>
-        <MerchantDownload />
-        <Footer />
+        {!isApp && <MerchantDownload />}
+        {!isApp && <Footer />}
       </Container>
     );
   }
 
   return (
     <Container>
-      <Header />
+      {!isApp && <Header />}
       <LoadingBackdrop loading={loading} />
       <div
         className="content-passenger"
@@ -1026,8 +1030,8 @@ const Passenger = () => {
           </form>
         </div>
       </div>
-      <MerchantDownload />
-      <Footer />
+      {!isApp && <MerchantDownload />}
+      {!isApp && <Footer />}
     </Container>
   );
 };

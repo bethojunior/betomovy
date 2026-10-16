@@ -51,9 +51,9 @@ export function Register() {
     let siteUrl = isDriver ? 'motorista' : 'passageiro';
 
     if (appPartnerSelected) {
-      return `${buildApp().HOST_SITE}${siteUrl}?name_app=${appPartnerSelected.key}`
+      return `${buildApp().HOST_SITE}${siteUrl}?name_app=${appPartnerSelected.key}&app=1`;
     }
-    return `${buildApp().HOST_SITE}${siteUrl}`;
+    return `${buildApp().HOST_SITE}${siteUrl}?app=1`;
   };
 
 

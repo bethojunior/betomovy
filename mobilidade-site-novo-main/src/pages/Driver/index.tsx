@@ -326,10 +326,14 @@ const Driver = () => {
   const urlParams = new URLSearchParams(query);
 
   const nameAppPartner = urlParams.get("name_app");
+  const isApp =
+    urlParams.get("app") === "1" ||
+    typeof (window as any).ReactNativeWebView !== "undefined" ||
+    window.location.search.includes("app=1");
 
   return (
     <Container>
-      <Header />
+      {!isApp && <Header />}
       <div
         className="content-driver"
         style={{ backgroundImage: `url(${pathBackgroundImage})` }}
@@ -371,8 +375,8 @@ const Driver = () => {
           </div>
         </div>
       </div>
-      <MerchantDownload />
-      <Footer />
+      {!isApp && <MerchantDownload />}
+      {!isApp && <Footer />}
     </Container>
   );
 };
