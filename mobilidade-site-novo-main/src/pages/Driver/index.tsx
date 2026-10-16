@@ -329,7 +329,11 @@ const Driver = () => {
   const isApp =
     urlParams.get("app") === "1" ||
     typeof (window as any).ReactNativeWebView !== "undefined" ||
-    window.location.search.includes("app=1");
+    window.location.search.includes("app=1") ||
+    (typeof navigator !== "undefined" && (
+      navigator.userAgent.includes("wv") ||
+      navigator.userAgent.includes("ReactNativeWebView")
+    ));
 
   return (
     <Container>
@@ -341,7 +345,7 @@ const Driver = () => {
         <div className="column-1">
           <Link
             to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}
-            className="brand-header-link"
+            className={`brand-header-link ${isApp ? "is-app" : ""}`}
           >
             <img
               src={getPathImageDefault()}
@@ -350,7 +354,7 @@ const Driver = () => {
                 e.currentTarget.src = LogoMovyDefault;
               }}
             />
-            <span className="brand-name">{getNameApplication()}</span>
+            {!isApp && <span className="brand-name">{getNameApplication()}</span>}
           </Link>
           <h1 className="driver-title">{t("register-driver-text")}</h1>
           <span>{descriptionRegistration}</span>

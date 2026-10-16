@@ -78,6 +78,7 @@ export function Register() {
           source={{
             uri: urlToRegister(true),
           }}
+          injectedJavaScriptBeforeContentLoaded={injectJSDriver}
           injectedJavaScript={injectJSDriver}
           onLoadProgress={({ nativeEvent }) => {
             if (nativeEvent.progress !== 1 && loadWebView === false) {
@@ -150,6 +151,7 @@ export function Register() {
           source={{
             uri: urlToRegister(false),
           }}
+          injectedJavaScriptBeforeContentLoaded={injectJSClient}
           injectedJavaScript={injectJSClient}
           onLoadProgress={({ nativeEvent }) => {
             if (nativeEvent.progress !== 1 && loadWebView === false) {

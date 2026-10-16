@@ -150,7 +150,11 @@ const Passenger = () => {
   const isApp =
     urlParams.get("app") === "1" ||
     typeof (window as any).ReactNativeWebView !== "undefined" ||
-    window.location.search.includes("app=1");
+    window.location.search.includes("app=1") ||
+    (typeof navigator !== "undefined" && (
+      navigator.userAgent.includes("wv") ||
+      navigator.userAgent.includes("ReactNativeWebView")
+    ));
 
   const handleRegisterPassenger = (data: FormDataProps) => {
     setLoading(true);
@@ -491,7 +495,7 @@ const Passenger = () => {
           <div className="column-1">
             <Link
               to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}
-              className="brand-header-link"
+              className={`brand-header-link ${isApp ? "is-app" : ""}`}
             >
               <img
                 src={getPathImageDefault()}
@@ -500,7 +504,7 @@ const Passenger = () => {
                   e.currentTarget.src = LogoMovyDefault;
                 }}
               />
-              <span className="brand-name">{getNameApplication()}</span>
+              {!isApp && <span className="brand-name">{getNameApplication()}</span>}
             </Link>
             <h1 className="passenger-title">{t("register-passenger-text")}</h1>
             <span className="passenger-description">{t("register-passenger-description")}</span>
@@ -629,7 +633,7 @@ const Passenger = () => {
         <div className="column-1">
           <Link
             to={nameAppPartner ? `/?name_app=${nameAppPartner}` : "/"}
-            className="brand-header-link"
+            className={`brand-header-link ${isApp ? "is-app" : ""}`}
           >
             <img
               src={getPathImageDefault()}
@@ -638,7 +642,7 @@ const Passenger = () => {
                 e.currentTarget.src = LogoMovyDefault;
               }}
             />
-            <span className="brand-name">{getNameApplication()}</span>
+            {!isApp && <span className="brand-name">{getNameApplication()}</span>}
           </Link>
           <h1 className="passenger-title">{t("register-passenger-text")}</h1>
           <span className="passenger-description">{t("register-passenger-description")}</span>

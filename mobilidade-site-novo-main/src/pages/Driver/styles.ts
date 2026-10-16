@@ -75,6 +75,28 @@ export const Container = styled.div`
         letter-spacing: -0.3px;
         text-transform: capitalize;
       }
+
+      &.is-app {
+        background: transparent !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+        margin: 0 auto 1.5rem auto !important;
+
+        img {
+          width: 130px !important;
+          height: 130px !important;
+          border-radius: 16px !important;
+          object-fit: contain !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .brand-name {
+          display: none !important;
+        }
+      }
     }
 
     h1.driver-title {
