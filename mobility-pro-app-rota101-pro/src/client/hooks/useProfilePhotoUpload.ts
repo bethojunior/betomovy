@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import apiMain from '../api/apiMain';
@@ -20,27 +21,29 @@ export function useProfilePhotoUpload() {
 
   const uploadProfileImage = useCallback(
     async (uri: string, options?: UploadProfileImageOptions): Promise<UploadProfileImageResult> => {
-      if (!user?.idCustomer) {
+      const customerId = user?.idCustomer || (user as any)?.customerId || user?.idUser;
+      if (!customerId) {
         throw new Error('Usuário inválido. Faça login novamente.');
       }
 
-      const filename = uri.split('/').pop() || 'photo.jpg';
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : 'image/jpeg';
+      const rawFilename = uri.split('/').pop() || 'profile.jpg';
+      const cleanFilename = rawFilename.includes('.') ? rawFilename : `${rawFilename}.jpg`;
+      const match = /\.(\w+)$/.exec(cleanFilename);
+      const ext = match ? match[1].toLowerCase() : 'jpg';
+      const type = ext === 'png' ? 'image/png' : 'image/jpeg';
+
+      const fileUri = Platform.OS === 'android' ? uri : uri.replace('file://', '');
 
       const formData = new FormData();
-      formData.append('customerId', String(user.idCustomer));
+      formData.append('customerId', String(customerId));
       formData.append('photo', {
-        uri,
+        uri: fileUri,
         type,
-        name: filename,
+        name: cleanFilename,
       } as any);
 
       try {
         const response = await apiMain.post('Customer/UpdateProfileImage', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
           timeout: options?.timeout ?? 120000,
         });
 

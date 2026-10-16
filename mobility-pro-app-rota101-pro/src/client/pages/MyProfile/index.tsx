@@ -126,6 +126,7 @@ export default function MyProfile() {
   };
 
   async function sendPhotoRecognition(uri: string | null, asset: any = null) {
+    if (!uri) return;
     setUploadingPhoto(true);
 
     try {
@@ -138,10 +139,11 @@ export default function MyProfile() {
         }
       }
 
-      const result = await resizeImage(uri, 200, 200);
-      await updatePhoto(result.uri);
-    } catch (error) {
-      customToast(translate('toast.text_photo_processing_error'), 'danger');
+      const result = await resizeImage(uri, 500, 500);
+      await updatePhoto(result?.uri || uri);
+    } catch (error: any) {
+      console.warn('sendPhotoRecognition error:', error);
+      customToast(error?.message || translate('toast.text_photo_processing_error'), 'danger');
     } finally {
       setUploadingPhoto(false);
     }
@@ -154,16 +156,14 @@ export default function MyProfile() {
           customToast(translate('toast.text_photo_updated_success'), 'success');
         },
       });
-    } catch (error) {
-      if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
+    } catch (error: any) {
+      if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
         customToast(translate('toast.text_image_too_large_or_slow_connection'), 'danger');
-      } else if (error.response?.status === 413) {
+      } else if (error?.response?.status === 413) {
         customToast(translate('toast.text_image_too_large'), 'danger');
       } else {
-        customToast(error.message || translate('toast.text_photo_update_error'), 'danger');
+        customToast(error?.message || translate('toast.text_photo_update_error'), 'danger');
       }
-
-      throw error;
     }
   }
 
@@ -430,7 +430,11 @@ export default function MyProfile() {
                   };
                 }
               }}
-              onSaved={raw => setUserData({ ...userData, dateOfBirth: Helper.formatDateApiDefault(raw) })}
+              onSaved={raw => {
+                const formattedBirthDate = Helper.formatDateApiDefault(raw);
+                setUserData({ ...userData, dateOfBirth: formattedBirthDate });
+                setUser({ ...user, birthDate: formattedBirthDate });
+              }}
             />
 
             <EditableItemProfile
@@ -565,7 +569,7 @@ export default function MyProfile() {
       <ModalSelectPhotoProfile
         visible={showModalSelectPhoto}
         setVisible={setShowModalSelectPhoto}
-        sendPhoto={(asset) => sendPhotoRecognition(asset?.uri, null)}
+        sendPhoto={(asset) => sendPhotoRecognition(asset?.uri, asset)}
       />
     </>
   );

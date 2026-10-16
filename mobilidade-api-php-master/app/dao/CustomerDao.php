@@ -1599,19 +1599,34 @@ class CustomerDao extends BaseDao
     public function updateProfileImage($customerId, $photo)
     {
         if (!$photo)
-            throw new CustomerException(705, compact($photo));
+            throw new CustomerException(705, ['photo' => null]);
 
-        $customer = $this->find($customerId);
+        $customer = null;
+        if (!empty($customerId)) {
+            $customer = $this->find($customerId);
+            if (!$customer) {
+                // In case $customerId was an idUser
+                $customer = $this->findByUser($customerId);
+            }
+        }
+
+        if (!$customer) {
+            $userId = Headers::getUserId();
+            if ($userId) {
+                $customer = $this->findByUser($userId);
+            }
+        }
 
         if (!$customer)
             throw new CustomerException(701, ['customerId' => $customerId]);
 
+        $resolvedCustomerId = $customer->idCustomer;
         $photoName = $this->service->updateProfileImage($customer->profileImage, $photo);
 
         $this->sqlUpdate(
             ['profileImage' => ':profileImage'],
             [['idCustomer', '=', ':idCustomer']],
-            [':profileImage' => $photoName, ':idCustomer' => $customerId]
+            [':profileImage' => $photoName, ':idCustomer' => $resolvedCustomerId]
         );
 
         $customer->profileImage = $photoName;

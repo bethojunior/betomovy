@@ -339,7 +339,7 @@ class CustomerController extends ApiController
     public function actionUpdateProfileImage()
     {
         try {
-            $customerId = $_POST['customerId'];
+            $customerId = $_POST['customerId'] ?? null;
             $photo = $_FILES['photo'] ?? null;
 
             echo $this->returnSuccess("Foto de perfil atualizada",
