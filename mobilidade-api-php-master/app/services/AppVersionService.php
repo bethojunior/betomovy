@@ -52,8 +52,8 @@ class AppVersionService
             ];
         }
 
-        // 8.1.2 is the official current production release - never force update on 8.1.2+
-        if (version_compare($cleanClient, '8.1.2', '>=')) {
+        // 8.1 is the official current production release (8.1, 8.1.0, 8.1.2) - never force update on 8.1+
+        if (version_compare($cleanClient, '8.1', '>=') || strpos($cleanClient, '8.1') === 0) {
             return [
                 'update' => false,
                 'version' => $actualVersion
@@ -75,8 +75,8 @@ class AppVersionService
             ];
         }
 
-        // Only require update if actual is strictly newer and client is not active
-        $update = version_compare($cleanActual, $cleanClient, '>');
+        // Only require update if actual is strictly newer and client is older than 8.1
+        $update = version_compare($cleanActual, $cleanClient, '>') && version_compare($cleanClient, '8.1', '<');
         $version = $actualVersion;
 
         return compact('update', 'version');
@@ -89,13 +89,26 @@ class AppVersionService
         if (!$newVersion)
             return null;
 
+        // Force correct store link per platform: iOS App Store vs Android Google Play
+        if ($platform === PlatformConst::IOS) {
+            if (empty($newVersion->link) || strpos($newVersion->link, 'play.google.com') !== false) {
+                $newVersion->link = 'https://apps.apple.com/app/id1549594459';
+            }
+        } else {
+            if (empty($newVersion->link) || strpos($newVersion->link, 'apple.com') !== false) {
+                $newVersion->link = 'https://play.google.com/store/apps/details?id=br.com.client.rota101';
+            }
+        }
+
         $data = [
             'action' => AppConst::ACTION_AUTO_LOGIN,
             'userId' => Headers::getUserId(),
         ];
 
-        if ($newVersion->link)
-            $newVersion->link .= "?referrer=" . base64_encode(json_encode($data));
+        // Only append referrer for Android Google Play (Apple App Store links do not accept ?referrer=)
+        if ($platform !== PlatformConst::IOS && $newVersion->link) {
+            $newVersion->link .= (strpos($newVersion->link, '?') !== false ? '&' : '?') . "referrer=" . base64_encode(json_encode($data));
+        }
 
         return $newVersion;
     }

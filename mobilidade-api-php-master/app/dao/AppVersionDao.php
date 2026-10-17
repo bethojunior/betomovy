@@ -44,30 +44,45 @@ class AppVersionDao extends BaseDao
     public function cleanInvalidVersions($app, $platform = PlatformConst::ANDROID)
     {
         try {
-            // Deactivate any unreleased/future version like 8.3.1 that is not on Google Play Store
+            // 1. Deactivate any unreleased/future version like 8.3.1 that is not on stores
             $sqlDeactivate = "UPDATE {$this->table} SET statusId = 0 WHERE appId = :appId AND version = '8.3.1'";
             $this->sqlRawExecute($sqlDeactivate, [':appId' => $app]);
 
-            // Ensure 8.1.2 exists and is active (statusId = 1)
-            $sqlCheck = "SELECT id, statusId FROM {$this->table} WHERE appId = :appId AND platform = :platform AND version = '8.1.2' LIMIT 1";
+            // 2. Fix store links per platform: iOS MUST point to Apple App Store, Android to Google Play
+            $appStoreLink = 'https://apps.apple.com/app/id1549594459';
+            $playStoreLink = 'https://play.google.com/store/apps/details?id=br.com.client.rota101';
+
+            $this->sqlRawExecute(
+                "UPDATE {$this->table} SET link = :link WHERE appId = :appId AND platform = 'ios'",
+                [':link' => $appStoreLink, ':appId' => $app]
+            );
+
+            $this->sqlRawExecute(
+                "UPDATE {$this->table} SET link = :link WHERE appId = :appId AND platform = 'android'",
+                [':link' => $playStoreLink, ':appId' => $app]
+            );
+
+            // 3. Ensure version 8.1 exists and is active for the requested platform
+            $targetLink = ($platform === PlatformConst::IOS) ? $appStoreLink : $playStoreLink;
+            $sqlCheck = "SELECT id, statusId, version FROM {$this->table} WHERE appId = :appId AND platform = :platform AND version IN ('8.1', '8.1.0', '8.1.2') ORDER BY id DESC LIMIT 1";
             $res = $this->sqlRawSelect($sqlCheck, [':appId' => $app, ':platform' => $platform]);
             $existing = $res ? $res->first() : null;
 
             if ($existing && isset($existing->id)) {
-                if ((int)$existing->statusId !== Status::ATIVO) {
-                    $this->sqlRawExecute("UPDATE {$this->table} SET statusId = :statusId WHERE id = :id", [
-                        ':statusId' => Status::ATIVO,
-                        ':id' => $existing->id
-                    ]);
-                }
+                $this->sqlRawExecute("UPDATE {$this->table} SET statusId = :statusId, link = :link, version = '8.1' WHERE id = :id", [
+                    ':statusId' => Status::ATIVO,
+                    ':link' => $targetLink,
+                    ':id' => $existing->id
+                ]);
             } else {
                 $this->sqlRawExecute(
                     "INSERT INTO {$this->table} (appId, version, statusId, platform, link, created_at, updated_at) 
-                     VALUES (:appId, '8.1.2', :statusId, :platform, 'https://play.google.com/store/apps/details?id=br.com.client.rota101', NOW(), NOW())",
+                     VALUES (:appId, '8.1', :statusId, :platform, :link, NOW(), NOW())",
                     [
                         ':appId' => $app,
                         ':statusId' => Status::ATIVO,
-                        ':platform' => $platform
+                        ':platform' => $platform,
+                        ':link' => $targetLink
                     ]
                 );
             }

@@ -25,6 +25,11 @@ function isVersionNewer(targetVersion?: string, currentVersion?: string): boolea
   const targetParts = parse(targetVersion);
   const currentParts = parse(currentVersion);
 
+  // If major and minor are identical (e.g. 8.1 vs 8.1.0 vs 8.1.2), they belong to the same 8.1 release
+  if (targetParts[0] === currentParts[0] && targetParts[1] === currentParts[1]) {
+    return false;
+  }
+
   const maxLength = Math.max(targetParts.length, currentParts.length);
   for (let i = 0; i < maxLength; i++) {
     const t = targetParts[i] || 0;
@@ -72,18 +77,24 @@ export const ConfigGlobalProvider = ({ children }) => {
         Application.nativeApplicationVersion ||
         Constants.expoConfig?.version ||
         Constants.nativeAppVersion ||
-        '8.1.2';
+        '8.1';
       const targetVersion = version.version;
 
       const isNewer = isVersionNewer(targetVersion, currentVersion);
 
       if (isNewer) {
-        const defaultStoreLink = Platform.select({
-          android: 'https://play.google.com/store/apps/details?id=br.com.client.rota101',
-          ios: 'https://apps.apple.com/app/id6474148440',
-          default: '',
-        });
-        setLinkUpdate(version?.link || defaultStoreLink || '');
+        let storeUrl = version?.link || '';
+        if (Platform.OS === 'ios') {
+          // Garantir link da Apple App Store oficial, NUNCA Google Play no iOS
+          if (!storeUrl || storeUrl.includes('play.google.com') || !storeUrl.includes('apple.com')) {
+            storeUrl = 'https://apps.apple.com/app/id1549594459';
+          }
+        } else {
+          if (!storeUrl || storeUrl.includes('apple.com')) {
+            storeUrl = 'https://play.google.com/store/apps/details?id=br.com.client.rota101';
+          }
+        }
+        setLinkUpdate(storeUrl);
         setNeedUpdate(true);
       } else {
         setNeedUpdate(false);
