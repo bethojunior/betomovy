@@ -41,7 +41,10 @@ apiMain.interceptors.request.use(async config => {
   const user = session.user ? JSON.parse(session.user) : null;
 
   config.headers.platform = Platform.OS === 'ios' ? 'ios' : 'android';
-  config.headers.version = Constants.expoConfig.version;
+  config.headers.version =
+    Constants?.expoConfig?.version ||
+    Constants?.nativeAppVersion ||
+    '8.1';
 
   if (session?.token && user?.idUser) {
     config.headers.token = session.token;

@@ -31,7 +31,10 @@ apiMainDriver.interceptors.request.use(async config => {
   }
 
   config.headers.platform = Platform.OS === 'ios' ? 'ios' : 'android';
-  config.headers.version = Constants.expoConfig?.version ?? '1.0.0';
+  config.headers.version =
+    Constants?.expoConfig?.version ||
+    Constants?.nativeAppVersion ||
+    '8.1';
 
   if (session?.token && user?.idUser) {
     config.headers.token = session.token;
