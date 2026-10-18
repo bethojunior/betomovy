@@ -300,25 +300,32 @@ const Driver = () => {
   }, []);
 
   useEffect(() => {
+    if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "PAGE_LOADED" }));
+    }
+  }, []);
+
+  useEffect(() => {
     const handleGetDocumentsCategories = async () => {
+      if (!idCategory) {
+        setStepDocuments([]);
+        return;
+      }
       setLoading(true);
       try {
         const response = await api.get(
           `DocUserType/FindByUserType?userTypeId=${idCategory}`
         );
-        setStepDocuments(response.data.data);
+        setStepDocuments(response.data.data || []);
       } catch (error) {
-        swal({
-          title: t("message-error-api-getDocumentsCategories") as string,
-          icon: "error",
-        });
-        console.log(error);
+        console.log("Erro ao buscar documentos da categoria:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     handleGetDocumentsCategories();
-  }, [idCategory, t]);
+  }, [idCategory]);
 
   document.title = `Cadastro Motorista | ${getNameApplication()}`;
 

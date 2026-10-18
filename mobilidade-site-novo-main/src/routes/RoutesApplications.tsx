@@ -41,6 +41,13 @@ const RoutesApplication = () => {
   );
 
   const getLocation = () => {
+    if (
+      window.location.pathname.includes("/passageiro") ||
+      window.location.pathname.includes("/motorista")
+    ) {
+      return;
+    }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -50,16 +57,9 @@ const RoutesApplication = () => {
           });
         },
         (error) => {
-          if (error.code === error.PERMISSION_DENIED) {
-            return swal({
-              title: "Permissão negada",
-              text: "Por favor, permita o acesso à localização nas configurações do seu navegador para um melhor funcionamento.",
-              icon: "warning",
-            });
-          } else {
-            console.log("Erro ao obter a localização: " + error.message);
-          }
-        }
+          console.log("Aviso ao obter a localização:", error.message);
+        },
+        { timeout: 5000, maximumAge: 60000, enableHighAccuracy: false }
       );
     } else {
       console.log("Geolocation is not supported by this browser.");

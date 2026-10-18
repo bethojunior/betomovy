@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, Platform } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Platform, View } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import WebView from 'react-native-webview';
 import { HeaderOptions } from '../../components/HeaderOptions';
@@ -32,6 +32,26 @@ export function Register() {
 
   const navigation = useNavigation();
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (loadWebView) {
+      timer = setTimeout(() => {
+        setLoadWebView(false);
+      }, 3500);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [loadWebView]);
+
+  useEffect(() => {
+    setLoadWebView(true);
+    const timer = setTimeout(() => {
+      setLoadWebView(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [driverSelected]);
+
   const handleAuth = useCallback(async () => {
     try {
       setLoading(true);
@@ -56,10 +76,9 @@ export function Register() {
     return `${buildApp().HOST_SITE}${siteUrl}?app=1`;
   };
 
-
   const handleRedirectLogin = () => {
     navigation.goBack();
-  }
+  };
 
   return (
     <Container>
@@ -78,62 +97,85 @@ export function Register() {
           source={{
             uri: urlToRegister(true),
           }}
+          domStorageEnabled={true}
+          javaScriptEnabled={true}
+          thirdPartyCookiesEnabled={true}
+          sharedCookiesEnabled={true}
+          scalesPageToFit={true}
+          startInLoadingState={false}
           injectedJavaScriptBeforeContentLoaded={injectJSDriver}
           injectedJavaScript={injectJSDriver}
+          onLoadStart={() => setLoadWebView(true)}
+          onLoadEnd={() => setLoadWebView(false)}
+          onLoad={() => setLoadWebView(false)}
+          onError={() => setLoadWebView(false)}
+          onHttpError={() => setLoadWebView(false)}
           onLoadProgress={({ nativeEvent }) => {
-            if (nativeEvent.progress !== 1 && loadWebView === false) {
-              setLoadWebView(true);
-            } else if (nativeEvent.progress === 1) {
+            if (nativeEvent.progress >= 0.85) {
               setLoadWebView(false);
             }
           }}
           onMessage={async ({ nativeEvent }) => {
             try {
               const parsedData = JSON.parse(nativeEvent.data);
-              if (parsedData.type === 'DEBUG_LOG') {
+              if (parsedData?.type === 'PAGE_LOADED' || parsedData?.type === 'LOADED') {
+                setLoadWebView(false);
                 return;
               }
-            } catch (e) {
-
-            }
-
-            if (JSON.parse(nativeEvent.data) === "redirect-login") {
-              handleRedirectLogin();
-              return;
-            }
-
-            if (JSON.parse(nativeEvent.data) === "redirect-login-new-site") {
-              Alert.alert(
-                translate('login.text_redirect_title'),
-                translate('login.text_redirect_description'),
-                [{ text: "Ok", onPress: handleRedirectLogin }]
-              );
-              return;
-            }
+              if (parsedData?.type === 'DEBUG_LOG') {
+                return;
+              }
+              if (parsedData === "redirect-login") {
+                handleRedirectLogin();
+                return;
+              }
+              if (parsedData === "redirect-login-new-site") {
+                Alert.alert(
+                  translate('login.text_redirect_title'),
+                  translate('login.text_redirect_description'),
+                  [{ text: "Ok", onPress: handleRedirectLogin }]
+                );
+                return;
+              }
+            } catch (e) {}
 
             if (nativeEvent.data === 'registrationCompletedGoToLogin') {
               await handleAuth();
             } else {
-              const data = JSON.parse(nativeEvent.data);
-              setUserRegistered(old => ({
-                ...old,
-                [data.field]: data.value,
-              }));
-              setDriverSelected(true);
+              try {
+                const data = JSON.parse(nativeEvent.data);
+                if (data?.field) {
+                  setUserRegistered(old => ({
+                    ...old,
+                    [data.field]: data.value,
+                  }));
+                  setDriverSelected(true);
+                }
+              } catch (e) {}
             }
           }}
         />
 
         {loadWebView && (
-          <ActivityIndicator
-            color={theme.colors.primary}
-            size="large"
+          <View
+            pointerEvents="none"
             style={{
               position: 'absolute',
-              left: Platform.OS === 'android' ? 160 : 190,
-              top: 400,
+              top: 50,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              zIndex: 99,
             }}
-          />
+          >
+            <ActivityIndicator
+              color={theme.colors.primary}
+              size="large"
+            />
+          </View>
         )}
       </If>
 
@@ -151,64 +193,85 @@ export function Register() {
           source={{
             uri: urlToRegister(false),
           }}
+          domStorageEnabled={true}
+          javaScriptEnabled={true}
+          thirdPartyCookiesEnabled={true}
+          sharedCookiesEnabled={true}
+          scalesPageToFit={true}
+          startInLoadingState={false}
           injectedJavaScriptBeforeContentLoaded={injectJSClient}
           injectedJavaScript={injectJSClient}
+          onLoadStart={() => setLoadWebView(true)}
+          onLoadEnd={() => setLoadWebView(false)}
+          onLoad={() => setLoadWebView(false)}
+          onError={() => setLoadWebView(false)}
+          onHttpError={() => setLoadWebView(false)}
           onLoadProgress={({ nativeEvent }) => {
-            if (nativeEvent.progress !== 1 && loadWebView === false) {
-              setLoadWebView(true);
-            } else if (nativeEvent.progress === 1) {
+            if (nativeEvent.progress >= 0.85) {
               setLoadWebView(false);
             }
           }}
           onMessage={async ({ nativeEvent }) => {
             try {
               const parsedData = JSON.parse(nativeEvent.data);
-              if (parsedData.type === 'DEBUG_LOG') {
+              if (parsedData?.type === 'PAGE_LOADED' || parsedData?.type === 'LOADED') {
+                setLoadWebView(false);
                 return;
               }
-            } catch (e) {
-
-            }
-
-            if (JSON.parse(nativeEvent.data) === "redirect-login") {
-              handleRedirectLogin();
-              return;
-            }
-
-            if (JSON.parse(nativeEvent.data) === "redirect-login-new-site") {
-              Alert.alert(
-                translate('login.text_redirect_title'),
-                translate('login.text_redirect_description'),
-                [{ text: "Ok", onPress: handleRedirectLogin }]
-              );
-              return;
-            }
+              if (parsedData?.type === 'DEBUG_LOG') {
+                return;
+              }
+              if (parsedData === "redirect-login") {
+                handleRedirectLogin();
+                return;
+              }
+              if (parsedData === "redirect-login-new-site") {
+                Alert.alert(
+                  translate('login.text_redirect_title'),
+                  translate('login.text_redirect_description'),
+                  [{ text: "Ok", onPress: handleRedirectLogin }]
+                );
+                return;
+              }
+            } catch (e) {}
 
             if (nativeEvent.data === 'registrationCompletedGoToLogin') {
               await handleAuth();
             } else {
-              const data = JSON.parse(nativeEvent.data);
-              setUserRegistered(old => ({
-                ...old,
-                [data.field]: data.value,
-              }));
+              try {
+                const data = JSON.parse(nativeEvent.data);
+                if (data?.field) {
+                  setUserRegistered(old => ({
+                    ...old,
+                    [data.field]: data.value,
+                  }));
+                }
+              } catch (e) {}
             }
           }}
         />
 
         {loadWebView && (
-          <ActivityIndicator
-            color={theme.colors.primary}
-            size="large"
+          <View
+            pointerEvents="none"
             style={{
               position: 'absolute',
-              left: Platform.OS === 'android' ? 160 : 190,
-              top: 400,
+              top: 50,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              zIndex: 99,
             }}
-          />
+          >
+            <ActivityIndicator
+              color={theme.colors.primary}
+              size="large"
+            />
+          </View>
         )}
-
-
       </If>
       <Preload visible={loading} />
     </Container>

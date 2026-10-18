@@ -82,14 +82,19 @@ export const injectDynamic = (titleElement: string) => {
       } catch(e) {}
     }
 
+    var notifyLoaded = function() {
+      try {
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'PAGE_LOADED' }));
+        }
+      } catch(e) {}
+    };
+
     var cleanElements = function() {
       try {
         var toRemove = document.querySelectorAll('header, nav.content-nav, .content-nav, .content-logo, .content-links, .merchant-download, .content-merchant-website, footer');
         for (var i = 0; i < toRemove.length; i++) {
           toRemove[i].style.setProperty('display', 'none', 'important');
-          if (toRemove[i].parentNode) {
-            toRemove[i].parentNode.removeChild(toRemove[i]);
-          }
         }
         var titles = document.querySelectorAll('${titleElement}');
         for (var j = 0; j < titles.length; j++) {
@@ -103,8 +108,9 @@ export const injectDynamic = (titleElement: string) => {
         var brandImgs = document.querySelectorAll('.brand-header-link img');
         for (var i = 0; i < brandImgs.length; i++) {
           var img = brandImgs[i];
-          if (img.src !== 'https://minio.704app.com.br/rota101fb704/default.jpg') {
+          if (img.getAttribute('data-logo-applied') !== 'true') {
             img.src = 'https://minio.704app.com.br/rota101fb704/default.jpg';
+            img.setAttribute('data-logo-applied', 'true');
           }
         }
         var brandNames = document.querySelectorAll('.brand-header-link .brand-name, .brand-header-link span');
@@ -117,14 +123,23 @@ export const injectDynamic = (titleElement: string) => {
     applyStyles();
     cleanElements();
     updateBrandLogo();
+    notifyLoaded();
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function() {
         applyStyles();
         cleanElements();
         updateBrandLogo();
+        notifyLoaded();
       });
     }
+
+    window.addEventListener('load', function() {
+      applyStyles();
+      cleanElements();
+      updateBrandLogo();
+      notifyLoaded();
+    });
 
     try {
       var observer = new MutationObserver(function() {
@@ -134,9 +149,6 @@ export const injectDynamic = (titleElement: string) => {
       });
       observer.observe(document.documentElement, { childList: true, subtree: true });
     } catch(e) {}
-
-    setInterval(cleanElements, 100);
-    setInterval(updateBrandLogo, 200);
 
     var removePassengerCpf = function() {
       var isPassenger = !window.location.href.includes("motorista") && !window.location.href.includes("driver");
@@ -166,17 +178,16 @@ export const injectDynamic = (titleElement: string) => {
             var dateInput = container.querySelector('input[name="dateOfBirth"]') || container.querySelector('input[placeholder*="nasc"]');
             if (!dateInput) {
               container.style.display = 'none';
-              if (container.parentNode) container.parentNode.removeChild(container);
               continue;
             }
           }
           el.style.display = 'none';
-          if (el.parentNode) el.parentNode.removeChild(el);
         }
       }
     };
 
-    setInterval(removePassengerCpf, 200);
+    setTimeout(removePassengerCpf, 300);
+    setTimeout(removePassengerCpf, 1000);
     removePassengerCpf();
 
     if(window.location.href.includes("motorista") || window.location.href.includes("driver")) {

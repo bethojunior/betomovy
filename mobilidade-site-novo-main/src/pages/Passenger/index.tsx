@@ -452,6 +452,12 @@ const Passenger = () => {
   }, [searchQuery, activeCities]);
 
   useEffect(() => {
+    if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "PAGE_LOADED" }));
+    }
+  }, []);
+
+  useEffect(() => {
     const handleGetActiveCities = async () => {
       setLoading(true);
       try {
@@ -469,17 +475,14 @@ const Passenger = () => {
         }
       } catch (error) {
         setActiveCities([]);
-        swal({
-          title: t("message-error-api-getCities") as string,
-          icon: "error",
-        });
-        console.log(error);
+        console.log("Erro ao buscar cidades ativas:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     handleGetActiveCities();
-  }, [t]);
+  }, []);
 
   document.title = isPreRegister ? `Cadastre-se | ${getNameApplication()}` : `Cadastro Passageiro | ${getNameApplication()}`;
 
