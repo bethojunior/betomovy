@@ -373,8 +373,12 @@ class PriceTrip {
         viewController.elementProperty.removeClass(".container-box-price", "update");
         document.querySelector("*[place='origin']").disabled = false;
         document.querySelector("*[place='destination']").disabled = false;
-        const msg = error?.errors?.message || error?.message || "Ocorreu um erro ao tentar calcular os preços da rota";
-        const title = error?.message && error?.errors?.message ? error.message : "";
+        let msg = error?.errors?.message || error?.message || "Ocorreu um erro ao tentar calcular os preços da rota";
+        let title = error?.message && error?.errors?.message ? error.message : "Atenção";
+        if (typeof msg === 'string' && (msg.includes("não estamos na sua cidade") || msg.includes("Infelizmente"))) {
+            title = "Área Fora de Cobertura";
+            msg = "O endereço selecionado está fora da área de atuação desta cidade ou ainda não há tarifas configuradas. Verifique se o endereço está dentro do polígono cadastrado no Monitor em Configurações > Áreas de Cidade.";
+        }
         SwalCustom.messageDialog(msg, title, () => {
             closeAddressTrip();
         });

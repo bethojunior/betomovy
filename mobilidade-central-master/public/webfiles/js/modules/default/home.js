@@ -87,6 +87,81 @@ document.addEventListener('DOMContentLoaded', function () {
       })
   }
 
+  function updateLocation() {
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          if (pos && pos.coords) {
+            const lat = pos.coords.latitude
+            const lng = pos.coords.longitude
+            Session.setLocal('location', { lat, lng })
+
+            let centralSelected = Session.get('centralSelected')
+            if (centralSelected) {
+              const cLat = parseFloat(centralSelected.latitude)
+              const cLng = parseFloat(centralSelected.longitude)
+              if (
+                isNaN(cLat) ||
+                isNaN(cLng) ||
+                (cLat === 0 && cLng === 0) ||
+                (cLat === -3.7319 && cLng === -38.5267)
+              ) {
+                centralSelected.latitude = lat
+                centralSelected.longitude = lng
+                Session.set('centralSelected', centralSelected)
+                if (window.mapService && window.mapService.map) {
+                  try {
+                    window.mapService.map.setCenter([lng, lat])
+                  } catch (e) {}
+                }
+              }
+            }
+          }
+        },
+        function (err) {
+          console.warn('Geolocation browser error or permission denied:', err)
+          if (typeof Position !== 'undefined' && Position.getPositionNetwork) {
+            Position.getPositionNetwork()
+              .then(function (res) {
+                if (res && res.loc) {
+                  const parts = res.loc.split(',')
+                  const lat = parseFloat(parts[0])
+                  const lng = parseFloat(parts[1])
+                  if (!isNaN(lat) && !isNaN(lng)) {
+                    Session.setLocal('location', { lat, lng })
+                    let centralSelected = Session.get('centralSelected')
+                    if (centralSelected) {
+                      const cLat = parseFloat(centralSelected.latitude)
+                      const cLng = parseFloat(centralSelected.longitude)
+                      if (
+                        isNaN(cLat) ||
+                        isNaN(cLng) ||
+                        (cLat === 0 && cLng === 0) ||
+                        (cLat === -3.7319 && cLng === -38.5267)
+                      ) {
+                        centralSelected.latitude = lat
+                        centralSelected.longitude = lng
+                        Session.set('centralSelected', centralSelected)
+                        if (window.mapService && window.mapService.map) {
+                          try {
+                            window.mapService.map.setCenter([lng, lat])
+                          } catch (e) {}
+                        }
+                      }
+                    }
+                  }
+                }
+              })
+              .catch(function (e) {
+                console.warn('IP location fallback failed:', e)
+              })
+          }
+        },
+        { maximumAge: 10000, timeout: 8000, enableHighAccuracy: true }
+      )
+    }
+  }
+
   function initLoadMap() {
     let centralSelected = Session.get('centralSelected')
 
@@ -103,15 +178,20 @@ document.addEventListener('DOMContentLoaded', function () {
     let lat = parseFloat(centralSelected.latitude)
     let lng = parseFloat(centralSelected.longitude)
 
-    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
-      const userLoc = Session.getLocal('location')
-      if (userLoc && !isNaN(parseFloat(userLoc.lat)) && !isNaN(parseFloat(userLoc.lng))) {
+    const userLoc = Session.getLocal('location')
+    if (userLoc && !isNaN(parseFloat(userLoc.lat)) && !isNaN(parseFloat(userLoc.lng))) {
+      if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0) || (lat === -3.7319 && lng === -38.5267)) {
         lat = parseFloat(userLoc.lat)
         lng = parseFloat(userLoc.lng)
-      } else {
-        lat = -3.7319
-        lng = -38.5267
+        centralSelected.latitude = lat
+        centralSelected.longitude = lng
+        Session.set('centralSelected', centralSelected)
       }
+    }
+
+    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
+      lat = -3.7319
+      lng = -38.5267
       centralSelected.latitude = lat
       centralSelected.longitude = lng
       Session.set('centralSelected', centralSelected)

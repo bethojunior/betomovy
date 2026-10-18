@@ -877,11 +877,44 @@ function localSelected(place, input) {
 }
 
 function localCurrent() {
-  trip.origin = Session.getLocal('location')
+  let userLoc = Session.getLocal('location')
+  if (!userLoc) {
+    const central = Session.get('centralSelected')
+    if (central && !isNaN(parseFloat(central.latitude)) && !isNaN(parseFloat(central.longitude))) {
+      userLoc = { lat: parseFloat(central.latitude), lng: parseFloat(central.longitude) }
+    }
+  }
 
-  mapService.addPointClient(trip.origin)
+  const applyLocation = (loc) => {
+    trip.origin = loc
+    mapService.addPointClient(trip.origin)
+    mapService.getAddressByLatLng(trip.origin).then(getAddressCurrent)
+  }
 
-  mapService.getAddressByLatLng(trip.origin).then(getAddressCurrent)
+  if (userLoc) {
+    applyLocation(userLoc)
+  } else if (typeof navigator !== 'undefined' && navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+        Session.setLocal('location', loc)
+        applyLocation(loc)
+      },
+      () => {
+        if (typeof Position !== 'undefined' && Position.getPositionNetwork) {
+          Position.getPositionNetwork().then((res) => {
+            if (res && res.loc) {
+              const parts = res.loc.split(',')
+              const loc = { lat: parseFloat(parts[0]), lng: parseFloat(parts[1]) }
+              Session.setLocal('location', loc)
+              applyLocation(loc)
+            }
+          })
+        }
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    )
+  }
 
   viewController.elementProperty.addEventInElement('#origin', 'onblur', function () {
     setTimeout(function () {

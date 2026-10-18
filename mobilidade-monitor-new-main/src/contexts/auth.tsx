@@ -234,25 +234,16 @@ export const AuthProvider = ({ children }: ChildrenTypeProps) => {
     };
 
     return new Promise<void>((resolve) => {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
+      getPosition().then(async (coords) => {
+        if (coords) {
           await performLogin(
-            `https://google.com/maps?q=${position?.coords?.latitude},${position?.coords?.longitude}`
+            `https://google.com/maps?q=${coords.latitude},${coords.longitude}`
           );
-          resolve();
-        },
-        async (error) => {
-          if (error.code === error.PERMISSION_DENIED) {
-            setLoading(false);
-            showLocationDeniedModal();
-            resolve();
-            return;
-          }
+        } else {
           await performLogin(null);
-          resolve();
-        },
-        GEOLOCATION_OPTIONS
-      );
+        }
+        resolve();
+      });
     });
   }
 
