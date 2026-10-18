@@ -216,4 +216,130 @@ export class MovyApiService {
 
     return await response.json();
   }
+
+  /**
+   * Cupons de Desconto
+   */
+  public static async applyCoupon(data: { code: string; fare_total: number; currency: 'USD' | 'BRL' }) {
+    const response = await fetch(`${API_BASE_URL}/coupons/apply`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+    return await response.json();
+  }
+
+  public static async listCoupons(currency: 'USD' | 'BRL') {
+    const response = await fetch(`${API_BASE_URL}/coupons/list?currency=${currency}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    return await response.json();
+  }
+
+  /**
+   * Botão de Pânico & SOS Emergencial
+   */
+  public static async triggerSos(data: {
+    trip_id: string;
+    user_id: number;
+    user_role: 'passenger' | 'driver';
+    latitude: number;
+    longitude: number;
+    country_code: 'US' | 'BR';
+    emergency_contacts?: string[];
+  }) {
+    const response = await fetch(`${API_BASE_URL}/safety/sos`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+    return await response.json();
+  }
+
+  /**
+   * Chat em Tempo Real
+   */
+  public static async sendChatMessage(data: {
+    trip_id: string;
+    sender_user_id: number;
+    sender_name: string;
+    sender_role: 'passenger' | 'driver';
+    message_type: 'text' | 'audio' | 'quick_reply';
+    message_text?: string;
+    audio_url?: string;
+    audio_duration_seconds?: number;
+  }) {
+    const response = await fetch(`${API_BASE_URL}/chat/send`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+    return await response.json();
+  }
+
+  public static async getChatHistory(tripId: string) {
+    const response = await fetch(`${API_BASE_URL}/chat/history/${tripId}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    return await response.json();
+  }
+
+  /**
+   * Corridas Agendadas
+   */
+  public static async createScheduledTrip(data: {
+    passenger_id: number;
+    scheduled_for: string;
+    origin_address: string;
+    origin_lat: number;
+    origin_lng: number;
+    destination_address: string;
+    destination_lat: number;
+    destination_lng: number;
+    category: 'eco' | 'comfort' | 'speed' | 'freight';
+    currency: 'USD' | 'BRL';
+  }) {
+    const response = await fetch(`${API_BASE_URL}/schedules/create`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+    return await response.json();
+  }
+
+  public static async getAvailableSchedules(currency: 'USD' | 'BRL') {
+    const response = await fetch(`${API_BASE_URL}/schedules/available?currency=${currency}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    return await response.json();
+  }
+
+  /**
+   * Documentos do Motorista
+   */
+  public static async submitDriverDocument(data: {
+    driver_id: number;
+    doc_type: string;
+    document_url: string;
+    country_code: 'US' | 'BR';
+  }) {
+    const response = await fetch(`${API_BASE_URL}/documents/upload`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+    return await response.json();
+  }
+
+  public static async getDriverDocuments(driverId: number) {
+    const response = await fetch(`${API_BASE_URL}/documents/driver/${driverId}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+    return await response.json();
+  }
 }
+

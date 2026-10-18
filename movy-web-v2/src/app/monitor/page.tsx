@@ -184,6 +184,89 @@ export default function MonitorPage() {
         </div>
       </div>
 
+      {/* FILA DE AUDITORIA & COMPLIANCE DE DOCUMENTOS DE MOTORISTAS */}
+      <div style={{ backgroundColor: '#0F1426', borderRadius: '14px', border: '1px solid #1E293B', padding: '24px', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#04F3FA', margin: 0 }}>
+              📄 AUDITORIA & APROVAÇÃO DE DOCUMENTOS (EUA 🇺🇸 & BRASIL 🇧🇷)
+            </h2>
+            <p style={{ color: '#94A3B8', fontSize: '13px', margin: '4px 0 0 0' }}>
+              Validação de Driver's License, Antecedentes Criminais, CNH e Documentos Veiculares
+            </p>
+          </div>
+          <span style={{ backgroundColor: '#B45309', color: '#FFF', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '800' }}>
+            2 PENDENTES DE REVISÃO
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#171D36', padding: '16px', borderRadius: '10px' }}>
+            <div>
+              <div style={{ fontWeight: '800', color: '#FFF' }}>Johnathan Taylor (Miami / FL) • Toyota RAV4</div>
+              <div style={{ color: '#94A3B8', fontSize: '12px', marginTop: '2px' }}>
+                Documento: <strong>Florida Driver's License (Front & Back)</strong> • Enviado há 2 horas
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => alert('Documento do motorista APROVADO!')}
+                style={{ backgroundColor: '#10B981', color: '#070A1A', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: '800', cursor: 'pointer' }}
+              >
+                ✓ Aprovar
+              </button>
+              <button
+                onClick={() => alert('Documento REPROVADO. Notificação enviada ao motorista.')}
+                style={{ backgroundColor: '#EF4444', color: '#FFF', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: '800', cursor: 'pointer' }}
+              >
+                ✕ Reprovar
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#171D36', padding: '16px', borderRadius: '10px' }}>
+            <div>
+              <div style={{ fontWeight: '800', color: '#FFF' }}>Ricardo Alves (São Paulo / SP) • Chevrolet Onix Plus</div>
+              <div style={{ color: '#94A3B8', fontSize: '12px', marginTop: '2px' }}>
+                Documento: <strong>CNH Definitiva com EAR & CRLV 2026</strong> • Enviado há 40 minutos
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => alert('Documento do motorista APROVADO!')}
+                style={{ backgroundColor: '#10B981', color: '#070A1A', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: '800', cursor: 'pointer' }}
+              >
+                ✓ Aprovar
+              </button>
+              <button
+                onClick={() => alert('Documento REPROVADO. Notificação enviada ao motorista.')}
+                style={{ backgroundColor: '#EF4444', color: '#FFF', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: '800', cursor: 'pointer' }}
+              >
+                ✕ Reprovar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MONITOR DE ALERTAS SOS DE EMERGÊNCIA */}
+      <div style={{ backgroundColor: '#1F1218', borderRadius: '14px', border: '1px solid #EF4444', padding: '24px', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+          <span style={{ fontSize: '24px' }}>🚨</span>
+          <div>
+            <h2 style={{ fontSize: '18px', fontWeight: '900', color: '#EF4444', margin: 0 }}>
+              CENTRAL DE MONITORAMENTO DE PÂNICO & SOS AO VIVO
+            </h2>
+            <p style={{ color: '#FCA5A5', fontSize: '13px', margin: '2px 0 0 0' }}>
+              Integração direta com chamadas policiais (911 EUA / 190 Brasil) e despacho de coordenadas
+            </p>
+          </div>
+        </div>
+        <div style={{ backgroundColor: '#070A1A', borderRadius: '10px', padding: '14px', color: '#94A3B8', fontSize: '13px' }}>
+          ✓ Nenhum alerta de pânico ativo no momento. Todos os passageiros e motoristas operando em segurança nos hubs dos EUA e Brasil.
+        </div>
+      </div>
+
       {/* Monitor Cartográfico Simulado ao Vivo */}
       <div style={{ backgroundColor: '#0F1426', borderRadius: '14px', border: '1px solid #1E293B', padding: '24px' }}>
         <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#FFF', margin: '0 0 16px 0' }}>
@@ -200,3 +283,4 @@ export default function MonitorPage() {
     </div>
   );
 }
+

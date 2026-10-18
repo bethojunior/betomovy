@@ -227,6 +227,10 @@ def create_audit_pdf(output_pdf_path):
         "• <b>Autenticação:</b> Login primário por E-mail e Senha; opção de telefone apenas se ativada no Monitor.<br/>"
         "• <b>Cadastro Bi-Nacional:</b> Nos EUA, cadastro rápido em 30 segundos (sem CPF); no Brasil, fluxo nacional com CPF.<br/>"
         "• <b>Mapa & Categorias:</b> MOVY Eco, Comfort, Speed/Moto, Fretes e <b>MOVY Negocia</b>, com preço em Dólar ($) ou Real (R$).<br/>"
+        "• <b>Cupons Promocionais:</b> Inserção de vouchers e aplicação dinâmica de descontos (ex: MOVYUSA, BEMVINDO).<br/>"
+        "• <b>Viagens Agendadas:</b> Reserva antecipada com data e horário para aeroportos e rotas habituais.<br/>"
+        "• <b>Chat em Tempo Real:</b> Comunicação direta motorista-passageiro com envio de mensagens de voz/áudio e respostas rápidas.<br/>"
+        "• <b>Botão de Pânico & SOS:</b> Chamada direta de emergência para 911 (EUA) ou 190 (Brasil) com compartilhamento de GPS ao vivo.<br/>"
         "• <b>Pagamentos Nativos:</b> Cartões salvos tokenizados, Apple Pay / Google Pay, Zelle e Pix.<br/>"
         "• <b>Segurança no Embarque:</b> PIN dinâmico de 4 dígitos obrigatório para o motorista iniciar a viagem.",
         body_style
@@ -238,6 +242,8 @@ def create_audit_pdf(output_pdf_path):
         "• <b>Cockpit Ergonômico:</b> Modo noturno antirreflexo, botões grandes e velocímetro integrado.<br/>"
         "• <b>Ofertas & MOVY Negocia:</b> Visualização do valor líquido e botões de contraproposta (+ $1, + $2, + $3, + $5).<br/>"
         "• <b>Ganhos & Saque Rápido:</b> Anel de meta diária animado e botão <b>Cash Out (Zelle)</b> nos EUA e <b>Pix</b> no Brasil.<br/>"
+        "• <b>Envio & Auditoria de Documentos:</b> Upload de Driver's License, Antecedentes e Seguro (EUA) ou CNH e CRLV (Brasil).<br/>"
+        "• <b>Corridas Agendadas:</b> Fila de corridas reservadas com aceitação prévia pelo motorista.<br/>"
         "• <b>Eliminação de Crashes no iPhone:</b> Remoção definitiva da injeção indevida do pacote Android BubbleButton no iOS.",
         body_style
     ))
@@ -247,7 +253,7 @@ def create_audit_pdf(output_pdf_path):
     story.append(Paragraph("4. CENTRAL DE DESPACHO, MONITOR DE FROTAS & BANCO DE DADOS", h1_style))
     story.append(Paragraph(
         "• <b>Central de Despacho (`movycentral.com` - Next.js 15):</b> Criação de corridas em menos de 8 segundos por telefone, integração com WhatsApp para envio de link com a rota do carro e suporte a pedidos em Dólar ou Real.<br/>"
-        "• <b>Monitor de Frotas (`movymonitor.com` - Next.js 15):</b> Gestão de motoristas, mapa ao vivo com visão de toda a frota e painel de interruptores (ligar/desligar login por SMS e QR Code de fiscalização).<br/>"
+        "• <b>Monitor de Frotas (`movymonitor.com` - Next.js 15):</b> Gestão de motoristas, fila de auditoria e aprovação de documentos em tempo real, gestão de cupons, monitor de emergências SOS e interruptores de Feature Flags.<br/>"
         "• <b>Banco de Dados Saneado:</b> As 403 tabelas desordenadas consolidadas com campos monetários em <code>DECIMAL(12,2)</code> (precisão de centavos), indexação espacial de GPS e padronização em <code>utf8mb4_unicode_ci</code>.<br/>"
         "• <b>Servidor de WebSockets:</b> Clusterizado com Redis no DigitalOcean, atingindo latência de GPS menor que 50ms.",
         body_style
