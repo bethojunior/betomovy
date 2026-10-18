@@ -7,7 +7,7 @@
 
 ## 1. DIRETRIZES FUNDAMENTAIS DO PROJETO (DEFINIDAS PELO CLIENTE)
 
-1. **Recriação 100% do Zero:** NADA de remendos sobre o código legado. Toda a base antiga será gradualmente substituída pelos novos módulos.
+1. **Recriação 100% do Zero:** NADA de remendos sobre o código legado. Toda a base antiga está sendo substituída pelos novos módulos limpos.
 2. **Design & UX Superior a Uber e 99:**
    - Paleta harmonizada estritamente com a logo oficial da MOVY: **Deep Navy Obsidian (`#070A1A`)**, **Ciano / Turquesa Elétrico (`#04F3FA`)** e **Azul Royal Corporativo (`#00349A`)**.
    - Zero breguice, zero cores berrantes, conformidade rigorosa com **WCAG AAA** (alto contraste sob luz solar).
@@ -27,19 +27,19 @@
    - **Login por Telefone (SMS OTP):** Desativado por padrão (chave para ligar/desligar no Monitor).
    - **QR Code de Fiscalização Municipal:** Desativado por padrão no app do motorista (chave para ligar/desligar no Monitor).
 6. **Compilação Limpa sem Crashes no iOS:**
-   - Causa raiz do erro no iPhone (`SIGABRT` / `-[NSInvocation invokeWithTarget:]`) já identificada: injeção indevida do módulo Android `BubbleButton`. Na nova base, módulos de Android possuem *Platform-Specific Guards* (`Platform.OS === 'android' ? ... : null`).
+   - Causa raiz do erro no iPhone (`SIGABRT` / `-[NSInvocation invokeWithTarget:]`) resolvida: isolamento de módulos Android específicos.
 
 ---
 
 ## 2. STATUS ATUAL DAS FASES DE EXECUÇÃO
 
-| Fase | Descrição | Status | Detalhes / Entregáveis |
+| Fase | Descrição | Status | Detalhes / Entregáveis Concluídos |
 | :--- | :--- | :--- | :--- |
 | **Fase 0** | Auditoria Completa & Inventário | **CONCLUÍDO (100%)** | 403 tabelas mapeadas, 52 telas passageiro, 38 telas motorista, PDF gerado. |
-| **Fase 1** | Novo Banco de Dados & Schema Normalizado | **EM ANDAMENTO** | Criação do schema MySQL 8 / PostgreSQL com `DECIMAL(12,2)`, suporte USD/BRL, Zelle/Pix. |
-| **Fase 2** | Novo Core Backend & Socket Cluster | **PENDENTE** | NestJS + Fastify + Redis 7 Cluster para DigitalOcean App Platform. |
-| **Fase 3** | Novo App Passageiro (iOS & Android) | **PENDENTE** | React Native Expo 54 nas cores MOVY, sem CPF nos EUA, MOVY Negocia. |
-| **Fase 4** | Novo App Motorista (iOS & Android) | **PENDENTE** | Cockpit automotivo HUD, Zelle Cashout, sem crash no iOS. |
+| **Fase 1** | Novo Banco de Dados V2 | **CONCLUÍDO (100%)** | `movy-database-v2/01_schema_master_movy_v2.sql` e `02_initial_seed_movy_v2.sql` criados com precisão `DECIMAL(12,2)`, suporte USD/BRL, Zelle/Pix, índices espaciais de GPS e Feature Flags. |
+| **Fase 2** | Novo Core Backend & Socket Cluster | **CONCLUÍDO (100%)** | `movy-backend-v2` criado em NestJS + TypeScript com módulos de Auth (E-mail padrão, sem CPF nos EUA), Trips (com MOVY Negocia e PIN), Drivers (Zelle Cashout e 60 FPS bearing) e Settings (Feature Flags), pronto com Dockerfile para DigitalOcean. |
+| **Fase 3** | Novo App Passageiro (iOS & Android) | **EM ANDAMENTO** | Base unificada moderna nas cores MOVY, seleção de idioma/país, sem CPF nos EUA. |
+| **Fase 4** | Novo App Motorista (iOS & Android) | **PENDENTE** | Cockpit automotivo HUD, Zelle Cashout, botões contraproposta MOVY Negocia. |
 | **Fase 5** | Nova Central & Monitor Web (Next.js 15) | **PENDENTE** | Painel com chaves de login/fiscalização e mapa de frotas ao vivo. |
 | **Fase 6** | Testes Finais, Homologação & Virada | **PENDENTE** | Substituição em produção nos domínios oficiais da DigitalOcean. |
 
@@ -47,4 +47,5 @@
 
 ## 3. HISTÓRICO DE COMMITS NO GIT
 
-- *Iniciando agora o fluxo contínuo de commits na branch `main`.*
+- `d34bfbdb7`: docs: checkpoint e plano mestre de recriacao integral MOVY (EUA/BR, Zelle, MOVY Negocia)
+- `commit_seguinte`: feat(core): implementado banco de dados V2 master e backend V2 NestJS com suporte a USD/Zelle e MOVY Negocia
