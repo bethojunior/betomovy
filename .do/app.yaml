@@ -1,4 +1,4 @@
-name: movy-platform
+name: movy-app
 region: nyc
 
 services:
@@ -6,6 +6,10 @@ services:
   - name: site-web
     source_dir: mobilidade-site-novo-main
     dockerfile_path: Dockerfile
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: developeragencia/movy
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xxs
@@ -25,6 +29,10 @@ services:
   - name: central-web
     source_dir: mobilidade-central-master
     dockerfile_path: Dockerfile
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: developeragencia/movy
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xs
@@ -48,6 +56,10 @@ services:
   - name: monitor-web
     source_dir: mobilidade-monitor-new-main
     dockerfile_path: Dockerfile
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: developeragencia/movy
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xxs
@@ -71,6 +83,10 @@ services:
   - name: api-php
     source_dir: mobilidade-api-php-master
     dockerfile_path: Dockerfile
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: developeragencia/movy
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xs
@@ -128,6 +144,10 @@ services:
   - name: api-node-ws
     source_dir: mobilidade-api-node-main
     dockerfile_path: Dockerfile
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: developeragencia/movy
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xs
