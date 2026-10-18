@@ -25,14 +25,72 @@ export default createGlobalStyle`
    }
 
    body {
-      background: #f3f3f3;
-      color: #000;
+      background: #F8FAFC;
+      color: #0F172A;
       -webkit-font-smoothing: antialiased;
-      font-family: sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
       .ant-menu.ant-menu-sub.ant-menu-vertical {
         display: none;
       }
+   }
+
+   /* ── Ant Design Menu Sidebar (Tema Corporativo MOVY) ── */
+   .ant-layout-sider {
+      background: #070A1A !important;
+   }
+
+   .ant-menu.ant-menu-dark,
+   .ant-menu-dark .ant-menu-sub,
+   .ant-menu.ant-menu-dark .ant-menu-sub {
+      background: #070A1A !important;
+      color: #94A3B8 !important;
+   }
+
+   .ant-menu-dark .ant-menu-item,
+   .ant-menu-dark .ant-menu-submenu-title {
+      color: #CBD5E1 !important;
+      border-radius: 8px !important;
+      margin: 3px 8px !important;
+      width: calc(100% - 16px) !important;
+      font-weight: 600 !important;
+      font-size: 13.5px !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+   }
+
+   /* REGRA ABSOLUTA: Hover em botões e itens de menu DEVE SER PRETO (#111111) com texto/ícone ciano (#04F3FA) */
+   .ant-menu-dark .ant-menu-item:hover,
+   .ant-menu-dark .ant-menu-submenu-title:hover {
+      background-color: #111111 !important;
+      color: #04F3FA !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+
+      a {
+        color: #04F3FA !important;
+      }
+
+      .ant-menu-item-icon, svg {
+        color: #04F3FA !important;
+      }
+   }
+
+   .ant-menu-dark .ant-menu-item-selected {
+      background-color: #00349A !important;
+      color: #FFFFFF !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 14px rgba(0, 52, 154, 0.4) !important;
+
+      a {
+        color: #FFFFFF !important;
+      }
+   }
+
+   /* ── Botões Globais: Hover PRETO (#111111) com acento Ciano ── */
+   .ant-btn-primary:not(:disabled):hover {
+      background-color: #111111 !important;
+      border-color: #04F3FA !important;
+      color: #04F3FA !important;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5) !important;
    }
 
     .button-notfication{

@@ -22,6 +22,7 @@ import api from "../../../services/api";
 import { openBillingPortal } from "../../../utils/billing";
 import { TbPigMoney } from "react-icons/tb";
 import Preload from "../../Utils/Preload";
+import pathLogoMovy from "../../../assets/logo-movy-transparent.png";
 import { AxiosError } from "axios";
 import swal from "sweetalert";
 import { CloseOutlined } from "@ant-design/icons";
@@ -252,22 +253,15 @@ const Menu = ({ children, titlePage }: MenuProps) => {
           collapsed={collapsed}
           menuMobile={isMobile}
         >
-          <Logo
-            className="profile-user"
-            style={{
-              backgroundImage: `url("${
-                import.meta.env.LOGO_APP
-              }?v=${new Date().getTime()}"), 
-               url("${
-                 import.meta.env.S3_LINK
-               }default.jpg?v=${new Date().getTime()}")`,
-            }}
-          />
-          <User className="user-data">
-            <div>{t("Usuário:")} {responseDataUser?.name}</div>
-            <div>{t("Perfil:")} {responseDataUser?.role?.name}</div>
-            <div>{new Date().toLocaleString()}</div>
-          </User>
+          <div className="brand-logo-wrap">
+            <img src={pathLogoMovy} alt="MOVY" className="movy-brand-logo" />
+          </div>
+          {!collapsed && (
+            <User className="user-data">
+              <div className="user-name">{responseDataUser?.name || "Administrador MOVY"}</div>
+              <div className="user-role">{responseDataUser?.role?.name || "Gestão Corporativa"}</div>
+            </User>
+          )}
           <PaymentButton
             onClick={openPaymentDebt}
             style={{
@@ -294,18 +288,16 @@ const Menu = ({ children, titlePage }: MenuProps) => {
             )}
             <TitleMenu level={4}>{t(titlePage)}</TitleMenu>
           </HeaderSection>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <div
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                backgroundColor: "#f5f5f5",
-                borderRadius: 20,
-                padding: "2px 4px",
-                border: "1px solid #d9d9d9",
+                backgroundColor: "rgba(255, 255, 255, 0.08)",
+                borderRadius: 24,
+                padding: "3px 4px",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
                 gap: 4,
-                fontSize: 12,
-                fontWeight: 600,
                 userSelect: "none",
               }}
             >
@@ -314,18 +306,19 @@ const Menu = ({ children, titlePage }: MenuProps) => {
                 onClick={() => setLanguage("pt")}
                 style={{
                   border: "none",
-                  background: language === "pt" ? "#1890ff" : "transparent",
-                  color: language === "pt" ? "#fff" : "#595959",
-                  borderRadius: 16,
-                  padding: "3px 8px",
+                  background: language === "pt" ? "#00349A" : "transparent",
+                  color: language === "pt" ? "#FFFFFF" : "#CBD5E1",
+                  borderRadius: 18,
+                  padding: "4px 10px",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: 4,
-                  fontWeight: 600,
+                  gap: 5,
+                  fontWeight: 700,
                   fontSize: 12,
-                  transition: "all 0.2s ease-in-out",
-                  boxShadow: language === "pt" ? "0 2px 4px rgba(24,144,255,0.3)" : "none",
+                  letterSpacing: "0.5px",
+                  transition: "all 0.2s ease",
+                  boxShadow: language === "pt" ? "0 2px 8px rgba(0, 52, 154, 0.6)" : "none",
                 }}
                 title="Português (Brasil)"
               >
@@ -337,18 +330,19 @@ const Menu = ({ children, titlePage }: MenuProps) => {
                 onClick={() => setLanguage("en")}
                 style={{
                   border: "none",
-                  background: language === "en" ? "#1890ff" : "transparent",
-                  color: language === "en" ? "#fff" : "#595959",
-                  borderRadius: 16,
-                  padding: "3px 8px",
+                  background: language === "en" ? "#00349A" : "transparent",
+                  color: language === "en" ? "#FFFFFF" : "#CBD5E1",
+                  borderRadius: 18,
+                  padding: "4px 10px",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: 4,
-                  fontWeight: 600,
+                  gap: 5,
+                  fontWeight: 700,
                   fontSize: 12,
-                  transition: "all 0.2s ease-in-out",
-                  boxShadow: language === "en" ? "0 2px 4px rgba(24,144,255,0.3)" : "none",
+                  letterSpacing: "0.5px",
+                  transition: "all 0.2s ease",
+                  boxShadow: language === "en" ? "0 2px 8px rgba(0, 52, 154, 0.6)" : "none",
                 }}
                 title="English (United States)"
               >

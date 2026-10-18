@@ -6,29 +6,65 @@ interface ButtonsFilteredProps {
 }
 
 export const DashBoardContainer = styled.div`
+  padding: 1.5rem;
+  background-color: #F8FAFC;
+  min-height: 100%;
+
   @media (max-width: 800px) {
-    padding: 10px;
+    padding: 12px;
   }
 `;
 
 export const GridButtonRefresh = styled.div`
   display: flex;
-  padding: 3px;
+  padding: 8px 0 16px 0;
   width: 100%;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #070A1A;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+
+  button.ant-btn {
+    height: 42px;
+    padding: 0 20px;
+    background-color: #00349A !important;
+    border: none !important;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13.5px;
+    letter-spacing: 0.5px;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(0, 52, 154, 0.25);
+    transition: all 0.22s ease;
+
+    &:hover {
+      background-color: #111111 !important;
+      color: #04F3FA !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+    }
+  }
 `;
 
 export const TypesOfDrivers = styled.div`
   display: flex;
-  padding: 15px;
+  padding: 10px 0;
   width: 100%;
   flex-direction: column;
 `;
 
 export const TitleNotTypesDrivers = styled.h1`
-  font-size: 2rem;
+  font-size: 1.5rem;
+  color: #64748B;
   text-align: center;
+  padding: 24px 0;
 `;
 
 export const TypeDriversCarousel = styled(Carousel)`
@@ -253,53 +289,59 @@ export const TypeDriversCard = styled(Card)`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  border-radius: 10px;
-  border: 1px solid #f0f2f5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  margin-right: 10px;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  margin: 8px;
   width: 100%;
-  height: auto;
-  transition: box-shadow 0.2s ease;
+  max-width: 280px;
+  background-color: #FFFFFF !important;
+  transition: all 0.25s ease;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    border-color: rgba(4, 243, 250, 0.4);
   }
 
   .ant-card-body {
-    padding-bottom: 14px;
-    padding-top: 14px;
-  }
-  @media (min-width: 800px) {
-    width: 20%;
+    padding: 20px 18px;
   }
 `;
 
 export const TypeDriverImageContainer = styled.div`
   display: flex;
   justify-content: center;
-  padding-bottom: 10px;
+  align-items: center;
+  padding-bottom: 12px;
 `;
 
 export const TypeDriverImage = styled(Image)`
-  min-height: 100px;
-  max-height: 100px;
+  min-height: 80px;
+  max-height: 90px;
+  object-fit: contain;
 `;
 
 export const TypeDriverContainer = styled.div`
-  margin-bottom: 10px;
-  color: #404040;
+  margin-bottom: 14px;
+  color: #070A1A;
+  font-weight: 800;
+  font-size: 16px;
   text-align: center;
+  letter-spacing: -0.2px;
 `;
 
 export const CustomersCardWrapper = styled(CardContainerMap)`
   flex-direction: column;
   align-items: center;
+  width: 100%;
 `;
 
 export const CustomersTypeTitle = styled(TypeDriverContainer)`
   margin-bottom: 16px;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 800;
+  color: #070A1A;
   width: 100%;
 `;
 
@@ -307,24 +349,30 @@ export const CustomersCardsRow = styled(LineConatiner)`
   flex-wrap: wrap;
   gap: 16px;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
+  width: 100%;
 `;
 
 export const CustomerMetricCard = styled(TypeDriversCard)`
-  min-width: 140px;
-  padding: 24px;
+  min-width: 160px;
+  flex: 1;
+  max-width: 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  border-radius: 8px;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
+  background-color: #FFFFFF !important;
 
   .ant-card-body {
-    padding: 24px;
+    padding: 20px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
+    width: 100%;
   }
 `;
 
@@ -332,18 +380,26 @@ export const CustomerMetricContent = styled(TypeDriverDataContainer)`
   flex-direction: column;
   align-items: center;
   text-align: center;
+  gap: 6px;
+  width: 100%;
 `;
 
 export const CustomerMetricLabel = styled(TypeDriverDataLabel)`
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 4px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: normal;
+  word-break: normal;
+  text-align: center;
 `;
 
 export const CustomerMetricValue = styled(TypeDriverDataItem)`
-  font-size: 18px;
-`;
-
+  font-size: 26px;
+  font-weight: 900;
+  color: #00349A;
+  margin-top: 4px;
 export const TripsAcceptedContainer = styled.div`
   display: flex;
   justify-content: space-between;

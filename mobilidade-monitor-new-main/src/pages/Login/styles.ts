@@ -36,112 +36,16 @@ export const Content = styled.div`
 
 export const ContentText = styled.div`
   flex: 1;
-  color: #FFFFFF;
-  padding: 44px 48px;
+  min-height: 520px;
   border-radius: 24px;
-  background: rgba(7, 10, 26, 0.45);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(4, 243, 250, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-
-  .text-wrapper {
-    max-width: 600px;
-  }
-
-  .badge-monitor {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 16px;
-    border-radius: 30px;
-    background: rgba(4, 243, 250, 0.12);
-    border: 1px solid rgba(4, 243, 250, 0.35);
-    color: #04F3FA;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    margin-bottom: 24px;
-  }
-
-  .dot-pulse {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #04F3FA;
-    box-shadow: 0 0 10px #04F3FA;
-    animation: pulse 1.8s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 10px #04F3FA; }
-    50% { opacity: 0.4; box-shadow: 0 0 4px #04F3FA; }
-  }
-
-  h1 {
-    font-size: 46px;
-    font-weight: 900;
-    line-height: 1.15;
-    letter-spacing: -0.5px;
-    margin-bottom: 20px;
-
-    .highlight {
-      color: #04F3FA;
-      text-shadow: 0 0 20px rgba(4, 243, 250, 0.3);
-    }
-  }
-
-  p {
-    font-size: 16px;
-    line-height: 1.7;
-    color: #CBD5E1;
-    margin-bottom: 32px;
-  }
-
-  .features-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .feature-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-
-    .check-icon {
-      color: #04F3FA;
-      font-weight: 900;
-      font-size: 16px;
-      margin-top: 2px;
-    }
-
-    strong {
-      display: block;
-      font-size: 14px;
-      color: #FFFFFF;
-    }
-
-    small {
-      display: block;
-      font-size: 12px;
-      color: #94A3B8;
-      margin-top: 2px;
-    }
-  }
+  background: rgba(7, 10, 26, 0.40);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(4, 243, 250, 0.18);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(4, 243, 250, 0.05);
 
   @media (max-width: 980px) {
-    text-align: center;
-    padding: 32px 24px;
-    .badge-monitor {
-      margin: 0 auto 20px;
-    }
-    h1 {
-      font-size: 32px;
-    }
-    .features-grid {
-      display: none;
-    }
+    display: none;
   }
 `;
 

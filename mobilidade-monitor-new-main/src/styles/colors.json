@@ -1,7 +1,8 @@
 {
-  "main_color": "#f7f7f7",
-  "second_color": "#1c4873",
-  "main_color_background": "#001529",
-  "color_antd": "#0899ff",
-  "black_color": "#000000"
+  "main_color": "#F8FAFC",
+  "second_color": "#00349A",
+  "main_color_background": "#070A1A",
+  "color_antd": "#00349A",
+  "black_color": "#111111",
+  "cyan_accent": "#04F3FA"
 }

@@ -2,47 +2,8 @@
 
     <div class="login-wrapper">
 
-        <!-- Lado Esquerdo: Banner Tecnológico MOVY com Glassmorphism e fundo de mobilidade -->
-        <section class="login-banner-glass">
-            <div class="text-wrapper">
-                <div class="badge-monitor">
-                    <span class="dot-pulse"></span>
-                    <span>CENTRAL OPERACIONAL &bull; GESTÃO GLOBAL</span>
-                </div>
-
-                <h1>
-                    Plataforma de Despacho & <span class="highlight">Gestão de Corridas</span>
-                </h1>
-
-                <p>
-                    Sistema de despacho corporativo de alta performance. Monitoramento via satélite em tempo real, gestão de frotas e motoristas, faturamento multimoeda (USD / BRL) e conformidade operacional integrada nos EUA e Brasil.
-                </p>
-
-                <div class="features-grid">
-                    <div class="feature-item">
-                        <span class="check-icon">✓</span>
-                        <div>
-                            <strong>Despacho Ultra-Rápido</strong>
-                            <small>Alocação inteligente com SLA &lt; 1s</small>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <span class="check-icon">✓</span>
-                        <div>
-                            <strong>Zelle & Pix Integrados</strong>
-                            <small>Faturamento e repasse automático multimoeda</small>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <span class="check-icon">✓</span>
-                        <div>
-                            <strong>MOVY Negocia & Leilão</strong>
-                            <small>Controle dinâmico de propostas e contrapropostas</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <!-- Lado Esquerdo: Efeito Vidro Translúcido com Fundo Azul Mobilidade -->
+        <section class="login-banner-glass"></section>
 
         <!-- Lado Direito: Formulário com FUNDO BRANCO PURO e Logo ampliada sem fundo rosa -->
         <aside class="login-card-container">

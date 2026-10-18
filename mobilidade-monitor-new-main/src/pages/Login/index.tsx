@@ -111,47 +111,8 @@ const Login: FC = () => {
       }}
     >
       <Content>
-        {/* Lado Esquerdo: Banner Tecnológico MOVY */}
-        <ContentText>
-          <div className="text-wrapper">
-            <div className="badge-monitor">
-              <span className="dot-pulse"></span>
-              <span>MONITOR PRO &bull; GESTÃO GLOBAL</span>
-            </div>
-
-            <h1>
-              Plataforma de Despacho & <span className="highlight">Telemetria de Frota</span>
-            </h1>
-
-            <p>
-              Sistema operacional completo para frotas de alta performance. Monitoramento via satélite em tempo real, despacho com SLA &lt; 1s, faturamento multimoeda (USD / BRL) e compliance fiscal nos EUA e Brasil.
-            </p>
-
-            <div className="features-grid">
-              <div className="feature-item">
-                <span className="check-icon">✓</span>
-                <div>
-                  <strong>Telemetria 60 FPS</strong>
-                  <small>Rastreamento contínuo em alta precisão</small>
-                </div>
-              </div>
-              <div className="feature-item">
-                <span className="check-icon">✓</span>
-                <div>
-                  <strong>Zelle & Pix Nativos</strong>
-                  <small>Saques automáticos em Dólar e Real</small>
-                </div>
-              </div>
-              <div className="feature-item">
-                <span className="check-icon">✓</span>
-                <div>
-                  <strong>MOVY Negocia</strong>
-                  <small>Contrapropostas dinâmicas de corrida</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ContentText>
+        {/* Lado Esquerdo: Efeito Vidro Translúcido com Fundo Azul Mobilidade */}
+        <ContentText />
 
         {/* Lado Direito: Formulário com FUNDO BRANCO PURO conforme exigido */}
         <LoginCardContainer>

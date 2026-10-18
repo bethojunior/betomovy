@@ -131,30 +131,49 @@ export const IconArrowLeft = styled(AiOutlineArrowLeft)`
 `;
 
 export const HeaderLayout = styled(Layout.Header)`
-  padding: 0 1rem !important;
+  padding: 0 1.5rem !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #070A1A !important;
+  border-bottom: 1px solid rgba(4, 243, 250, 0.12);
+  height: 64px;
 `;
 
 export const User = styled.div`
   display: block;
   text-align: center;
+  margin-top: 6px;
+
+  .user-name {
+    font-weight: 700;
+    color: #FFFFFF;
+    font-size: 13.5px;
+    letter-spacing: -0.2px;
+  }
+
+  .user-role {
+    font-size: 11.5px;
+    color: #04F3FA;
+    font-weight: 600;
+    margin-top: 2px;
+  }
 `;
 
 export const PaymentButton = styled(Button)`
-  width: 80%;
-  margin-top: 10px;
+  width: 85%;
+  margin-top: 12px;
   height: 36px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: bold;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
   color: #fff !important;
   border: none !important;
-  transition: opacity 0.2s;
+  transition: all 0.2s ease;
 
   &:hover {
-    opacity: 0.85;
+    background-color: #111111 !important;
+    color: #04F3FA !important;
   }
 
   span {
@@ -173,18 +192,25 @@ export const HeadSider = styled.div<HeadSideProps>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 14px 10px 10px 10px;
+  padding: ${(props) => (props.collapsed ? "16px 8px" : "20px 14px 16px")};
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #070A1A;
   flex-shrink: 0;
 
-  .profile-user {
-    width: ${(props) => (props.collapsed ? "42px" : "80px")};
-    height: ${(props) => (props.collapsed ? "42px" : "80px")};
-    border-radius: 50%;
-    margin: 6px 0 10px 0;
-    transition: 300ms;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  .brand-logo-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .movy-brand-logo {
+      height: ${(props) => (props.collapsed ? "28px" : "42px")};
+      width: auto;
+      max-width: ${(props) => (props.collapsed ? "38px" : "150px")};
+      object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+      transition: all 0.3s ease;
+    }
   }
 
   .user-data {
@@ -192,23 +218,9 @@ export const HeadSider = styled.div<HeadSideProps>`
     overflow: hidden;
     max-height: ${(props) => (props.collapsed ? "0px" : "200px")};
     transition: 300ms;
-    font-size: 13px;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.85);
-
-    > div:first-child {
-      font-weight: 600;
-      color: #ffffff;
-      font-size: 14px;
-    }
   }
 `;
 
 export const Logo = styled.div`
-  height: 15vh;
-  background-image: url("https://images-na.ssl-images-amazon.com/images/I/51Sa3eXCl9L.png");
-  background-size: 100%;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-radius: 50px;
+  display: none;
 `;

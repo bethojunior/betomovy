@@ -172,31 +172,29 @@ type AlertButtonProps = {
 };
 
 export const AlertButton = styled.div<AlertButtonProps>`
-  &:focus {
-    text-decoration: none;
-    color: #fff;
-    background-color: #929292;
-  }
-  &:hover {
-    text-decoration: none;
-    color: #fff;
-    background-color: #929292;
-  }
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 40px;
-  max-height: 40px;
-  min-width: 40px;
-  max-width: 40px;
-  border-radius: 100%;
-  background-color: #929292;
-  color: #fff;
-  border: none;
+  min-height: 38px;
+  max-height: 38px;
+  min-width: 38px;
+  max-width: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #CBD5E1;
   outline: none;
   z-index: 300;
-  margin: 0 10px;
+  margin: 0 4px;
   cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #111111 !important;
+    color: #04F3FA !important;
+    border-color: #04F3FA !important;
+    box-shadow: 0 0 12px rgba(4, 243, 250, 0.3);
+  }
 
   ${({ active }) =>
     active === true ? `animation: 1.5s notificationColor linear infinite` : ""}
