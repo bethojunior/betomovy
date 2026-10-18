@@ -181,7 +181,7 @@ const ConfigByCities: FC = () => {
       .get(`city/${targetCity}/config`)
       .then((res) => {
         const list = res.data?.response ?? res.data?.data ?? [];
-        if (Array.isArray(list) && list.length > 0) {
+        if (Array.isArray(list) && list.length > 0 && typeof list[0] === "object" && list[0] !== null && "attribute" in list[0]) {
           setConfigCitiesList(list);
           setShowData(false);
           setRenderKey((prev) => prev + 1);

@@ -586,13 +586,13 @@ class CityController extends ApiController
             }
 
             // Garante que exista registro na tabela cityConfig para esta cidade
-            $stmtCheck = $pdo->prepare("SELECT id FROM cityConfig WHERE cityId = :cityId LIMIT 1");
+            $stmtCheck = $pdo->prepare("SELECT 1 FROM cityConfig WHERE cityId = :cityId LIMIT 1");
             $stmtCheck->execute([':cityId' => $cityId]);
             if (!$stmtCheck->fetch()) {
-                $stmtTpl = $pdo->query("SELECT * FROM cityConfig ORDER BY id DESC LIMIT 1");
+                $stmtTpl = $pdo->query("SELECT * FROM cityConfig LIMIT 1");
                 $tpl = $stmtTpl ? $stmtTpl->fetch(\PDO::FETCH_ASSOC) : null;
                 if ($tpl) {
-                    unset($tpl['id']);
+                    unset($tpl['id'], $tpl['idCityConfig']);
                     $tpl['cityId'] = $cityId;
                     $cols = array_keys($tpl);
                     $colNames = implode('`, `', $cols);
@@ -665,13 +665,13 @@ class CityController extends ApiController
             $validCols = $stmtCols ? $stmtCols->fetchAll(\PDO::FETCH_COLUMN) : [];
 
             // Garante que cityConfig existe
-            $stmtCheck = $pdo->prepare("SELECT id FROM cityConfig WHERE cityId = :cityId LIMIT 1");
+            $stmtCheck = $pdo->prepare("SELECT 1 FROM cityConfig WHERE cityId = :cityId LIMIT 1");
             $stmtCheck->execute([':cityId' => $cityId]);
             if (!$stmtCheck->fetch()) {
-                $stmtTpl = $pdo->query("SELECT * FROM cityConfig ORDER BY id DESC LIMIT 1");
+                $stmtTpl = $pdo->query("SELECT * FROM cityConfig LIMIT 1");
                 $tpl = $stmtTpl ? $stmtTpl->fetch(\PDO::FETCH_ASSOC) : null;
                 if ($tpl) {
-                    unset($tpl['id']);
+                    unset($tpl['id'], $tpl['idCityConfig']);
                     $tpl['cityId'] = $cityId;
                     $cols = array_keys($tpl);
                     $colNames = implode('`, `', $cols);

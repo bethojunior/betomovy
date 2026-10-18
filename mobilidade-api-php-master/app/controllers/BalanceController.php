@@ -108,4 +108,150 @@ class BalanceController extends ApiController
             echo $this->returnError($e);
         }
     }
+
+    /**
+     * PUT /balance/{idCustomer}/flow
+     * Inserir ou retirar voucher de cliente
+     */
+    public function actionFlow()
+    {
+        try {
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            $rawInput = file_get_contents('php://input');
+            $payload = json_decode($rawInput, true);
+            if (!is_array($payload)) {
+                $payload = $_POST;
+            }
+
+            $idCustomer = (int)($_GET['id'] ?? ($payload['idCustomer'] ?? ($payload['id'] ?? 0)));
+            $action = strtolower(trim((string)($payload['action'] ?? 'insert')));
+            $amount = (float)str_replace(',', '.', (string)($payload['balance'] ?? ($payload['value'] ?? 0)));
+
+            if ($idCustomer <= 0) {
+                throw new Exception("Cliente não informado");
+            }
+            if ($amount <= 0) {
+                throw new Exception("O valor deve ser maior que zero");
+            }
+
+            // Busca o cliente primeiro por idCustomer
+            $stmtCust = $pdo->prepare("SELECT idCustomer, userId, balanceId FROM customer WHERE idCustomer = :id LIMIT 1");
+            $stmtCust->execute([':id' => $idCustomer]);
+            $customer = $stmtCust->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$customer) {
+                // Tenta buscar por userId caso idCustomer não seja encontrado
+                $stmtCust2 = $pdo->prepare("SELECT idCustomer, userId, balanceId FROM customer WHERE userId = :id LIMIT 1");
+                $stmtCust2->execute([':id' => $idCustomer]);
+                $customer = $stmtCust2->fetch(\PDO::FETCH_ASSOC);
+            }
+
+            if (!$customer) {
+                // Se não for cliente, verifica se foi passado ID de motorista
+                $stmtDrv = $pdo->prepare("SELECT idDriver, userId, balanceId FROM driver WHERE idDriver = :id OR userId = :id LIMIT 1");
+                $stmtDrv->execute([':id' => $idCustomer]);
+                $driver = $stmtDrv->fetch(\PDO::FETCH_ASSOC);
+                if ($driver) {
+                    $customer = [
+                        'idCustomer' => $driver['idDriver'],
+                        'userId' => $driver['userId'],
+                        'balanceId' => $driver['balanceId']
+                    ];
+                }
+            }
+
+            if (!$customer) {
+                throw new Exception("Cliente não encontrado");
+            }
+
+            $balanceId = !empty($customer['balanceId']) ? (int)$customer['balanceId'] : 0;
+
+            // Se ainda não tiver balanceId ou balance não existir, cria o registro de saldo
+            if ($balanceId <= 0) {
+                $stmtNewB = $pdo->prepare("
+                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance, created_at, updated_at)
+                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00, NOW(), NOW())
+                ");
+                $stmtNewB->execute();
+                $balanceId = (int)$pdo->lastInsertId();
+
+                $stmtUpCust = $pdo->prepare("UPDATE customer SET balanceId = :balanceId WHERE idCustomer = :idCustomer");
+                $stmtUpCust->execute([':balanceId' => $balanceId, ':idCustomer' => (int)$customer['idCustomer']]);
+            }
+
+            // Busca o registro na tabela balance
+            $stmtBal = $pdo->prepare("SELECT idBalance, tripBalance, balance FROM balance WHERE idBalance = :id LIMIT 1 FOR UPDATE");
+            $stmtBal->execute([':id' => $balanceId]);
+            $bal = $stmtBal->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$bal) {
+                $stmtNewB = $pdo->prepare("
+                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance, created_at, updated_at)
+                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00, NOW(), NOW())
+                ");
+                $stmtNewB->execute();
+                $balanceId = (int)$pdo->lastInsertId();
+
+                $stmtUpCust = $pdo->prepare("UPDATE customer SET balanceId = :balanceId WHERE idCustomer = :idCustomer");
+                $stmtUpCust->execute([':balanceId' => $balanceId, ':idCustomer' => (int)$customer['idCustomer']]);
+
+                $stmtBal = $pdo->prepare("SELECT idBalance, tripBalance, balance FROM balance WHERE idBalance = :id LIMIT 1 FOR UPDATE");
+                $stmtBal->execute([':id' => $balanceId]);
+                $bal = $stmtBal->fetch(\PDO::FETCH_ASSOC);
+            }
+
+            $currentTripBalance = (float)($bal['tripBalance'] ?? 0);
+
+            // Verifica tipo de ação: 'insert' (inserir) ou 'block'/'remove' (retirar)
+            $isInsert = in_array($action, ['insert', 'add', 'deposit'], true);
+            $isRemove = in_array($action, ['block', 'remove', 'withdraw', 'sub'], true);
+
+            if (!$isInsert && !$isRemove) {
+                throw new Exception("Ação inválida. Use 'insert' para inserir ou 'block'/'remove' para retirar.");
+            }
+
+            if ($isInsert) {
+                $newTripBalance = round($currentTripBalance + $amount, 2);
+                $flowType = \app\constant\CustomerBalanceConst::VOUCHER_BONUS;
+            } else {
+                $newTripBalance = round(max(0, $currentTripBalance - $amount), 2);
+                $flowType = \app\constant\CustomerBalanceConst::BALANCE_OUT;
+            }
+
+            // Atualiza balance
+            $stmtUpd = $pdo->prepare("UPDATE balance SET tripBalance = :tripBalance, updated_at = NOW() WHERE idBalance = :idBalance");
+            $stmtUpd->execute([
+                ':tripBalance' => $newTripBalance,
+                ':idBalance' => $balanceId
+            ]);
+
+            // Registra movimentação no balanceFlow
+            try {
+                $stmtCheckType = $pdo->prepare("SELECT idBalanceFlowType FROM balanceFlowType WHERE idBalanceFlowType = :type LIMIT 1");
+                $stmtCheckType->execute([':type' => $flowType]);
+                if (!$stmtCheckType->fetch()) {
+                    $stmtFirstType = $pdo->query("SELECT idBalanceFlowType FROM balanceFlowType ORDER BY idBalanceFlowType ASC LIMIT 1");
+                    $flowType = $stmtFirstType ? (int)$stmtFirstType->fetchColumn() : 1;
+                }
+
+                $stmtFlow = $pdo->prepare("
+                    INSERT INTO balanceFlow (`date`, `value`, `balanceFlowTypeId`, `balanceId`)
+                    VALUES (NOW(), :val, :type, :balanceId)
+                ");
+                $stmtFlow->execute([
+                    ':val' => $amount,
+                    ':type' => $flowType,
+                    ':balanceId' => $balanceId
+                ]);
+            } catch (\Throwable $tf) {
+                // Registro de fluxo opcional não interrompe o sucesso da atualização do saldo
+            }
+
+            $bal['tripBalance'] = $newTripBalance;
+            echo $this->returnSuccess("Voucher atualizado com sucesso", $bal);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, "Erro ao atualizar voucher");
+        }
+    }
 }

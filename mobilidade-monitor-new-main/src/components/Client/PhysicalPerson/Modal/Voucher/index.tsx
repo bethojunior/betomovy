@@ -40,34 +40,55 @@ const Voucher: FC<VoucherProps> = ({
 	const { Option } = Select;
 
 	const insertVoucher = (idCustomer: number) => {
+		const rawAmount = Mask.setMaskUSAFormatMoney(voucherValue);
+		const numAmount = parseFloat(rawAmount);
+		if (isNaN(numAmount) || numAmount <= 0) {
+			setMessageAlert('Informe um valor maior que zero.');
+			setShowAlert(true);
+			setTypeAlert('warning');
+			return;
+		}
+
 		setLoadingProps(true);
+		setVoucherModalProps(false);
 		api.put(`balance/${idCustomer}/flow`, {
 			action: statusVoucher,
-			balance: Mask.setMaskUSAFormatMoney(voucherValue),
+			balance: rawAmount,
 			idCustomer,
-		}).then((values) => {
-			setLoadingProps(false);
-			if (values.status) {
-				setMessageAlert('Ação efetuada com sucesso!');
-				setVoucherValue('0,00');
-				onSearchProps();
-				setShowAlert(true);
-				return setTypeAlert('success');
-			}
-			let errorMsg = 'Erro ao efetuar ação.';
-			try {
-				if (values?.data?.message) {
-					errorMsg = values.data.message;
-				} else if (values?.request?.response) {
-					const parsed = JSON.parse(values.request.response);
-					if (parsed?.response?.[0]) errorMsg = parsed.response[0];
+		})
+			.then((values) => {
+				setLoadingProps(false);
+				if (values?.data?.status || values?.status === 200) {
+					setMessageAlert('Voucher atualizado com sucesso!');
+					setVoucherValue('0,00');
+					onSearchProps();
+					setShowAlert(true);
+					return setTypeAlert('success');
 				}
-			} catch {}
-			setMessageAlert(errorMsg);
-			setShowAlert(true);
-			return setTypeAlert('error');
-		});
-		setVoucherModalProps(false);
+				let errorMsg = 'Erro ao efetuar ação.';
+				try {
+					if (values?.data?.response?.[0]) {
+						errorMsg = values.data.response[0];
+					} else if (values?.data?.message) {
+						errorMsg = values.data.message;
+					}
+				} catch {}
+				setMessageAlert(errorMsg);
+				setShowAlert(true);
+				return setTypeAlert('error');
+			})
+			.catch((err) => {
+				setLoadingProps(false);
+				let errorMsg = 'Erro ao efetuar ação.';
+				if (err?.response?.data?.response?.[0]) {
+					errorMsg = err.response.data.response[0];
+				} else if (err?.response?.data?.message) {
+					errorMsg = err.response.data.message;
+				}
+				setMessageAlert(errorMsg);
+				setShowAlert(true);
+				setTypeAlert('error');
+			});
 	};
 
 	return (
@@ -91,8 +112,16 @@ const Voucher: FC<VoucherProps> = ({
 						key="submit"
 						type="primary"
 						onClick={() => {
-							if (customerProps != null)
-								insertVoucher((customerProps as ListClient)?.idCustomer);
+							const id =
+								(customerProps as any)?.idCustomer ??
+								(customerProps as any)?.id;
+							if (id) {
+								insertVoucher(Number(id));
+							} else {
+								setMessageAlert('Cliente não identificado.');
+								setShowAlert(true);
+								setTypeAlert('error');
+							}
 						}}
 					>
 						Salvar
