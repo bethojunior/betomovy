@@ -1,0 +1,78 @@
+version: '3.8'
+
+# ==============================================================================
+# MOVY ECOSYSTEM V2 - DOCKER COMPOSE ORCHESTRATION
+# Executa localmente ou em VPS toda a infraestrutura recriada do zero:
+# - MySQL 8.0 com suporte a GIS (SRID 4326) e UTF-8 mb4
+# - Redis 7.0 para cluster de WebSockets a 60 FPS
+# - Core Backend NestJS V2 (HTTP REST + Socket.IO)
+# - Web Panels Next.js 15 (Monitor com Feature Flags + Central de Despacho)
+# ==============================================================================
+
+services:
+  movy-mysql:
+    image: mysql:8.0
+    container_name: movy-mysql-v2
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_movy_2026
+      MYSQL_DATABASE: defaultdb
+      MYSQL_USER: movy_admin
+      MYSQL_PASSWORD: movy_secure_password_2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./movy-database-v2/01_schema_master_movy_v2.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./movy-database-v2/02_initial_seed_movy_v2.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+
+  movy-redis:
+    image: redis:7.0-alpine
+    container_name: movy-redis-v2
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  movy-backend:
+    build:
+      context: ./movy-backend-v2
+      dockerfile: Dockerfile
+    container_name: movy-backend-v2
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      NODE_ENV: development
+      DEFAULT_COUNTRY: US
+      DEFAULT_CURRENCY: USD
+      MYSQL_HOST: movy-mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: movy_admin
+      MYSQL_PASS: movy_secure_password_2026
+      MYSQL_DATABASE: defaultdb
+      REDIS_HOST: movy-redis
+      REDIS_PORT: 6379
+      ENABLE_SOCKET_REDIS_ADAPTER: "true"
+    depends_on:
+      - movy-mysql
+      - movy-redis
+    restart: unless-stopped
+
+  movy-web:
+    build:
+      context: ./movy-web-v2
+      dockerfile: Dockerfile
+    container_name: movy-web-v2
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+      NEXT_PUBLIC_SOCKET_URL: http://localhost:8080
+    depends_on:
+      - movy-backend
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

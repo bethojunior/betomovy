@@ -1,0 +1,87 @@
+name: movy-app-v2
+region: nyc
+
+# ==============================================================================
+# MOVY V2 - ESPECIFICAÇÃO DE DEPLOY DIGITALOCEAN APP PLATFORM
+# Arquitetura moderna: Backend NestJS + Next.js 15 SSR/SPA unificado
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. CORE BACKEND & SOCKET CLUSTER (NestJS + Socket.IO + Redis Adapter)
+  # Unifica API REST e WebSockets em alta performance com suporte a USD e Zelle
+  # ----------------------------------------------------------------------------
+  - name: movy-backend-v2
+    source_dir: movy-backend-v2
+    dockerfile_path: Dockerfile
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: developeragencia/movy
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: basic-s
+    health_check:
+      http_path: /settings/public
+      initial_delay_seconds: 15
+      period_seconds: 10
+      timeout_seconds: 5
+      failure_threshold: 3
+    routes:
+      - path: /api
+      - path: /ws
+    envs:
+      - key: PORT
+        value: "8080"
+      - key: NODE_ENV
+        value: production
+      - key: DEFAULT_COUNTRY
+        value: US
+      - key: DEFAULT_CURRENCY
+        value: USD
+      - key: MYSQL_HOST
+        value: movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com
+      - key: MYSQL_PORT
+        value: "25060"
+      - key: MYSQL_USER
+        value: doadmin
+      - key: MYSQL_PASS
+        value: AVNS_ODYdiYw4rvg6gfvKYOO
+      - key: MYSQL_DATABASE
+        value: defaultdb
+      - key: MONGODB_URI
+        value: "mongodb+srv://doadmin:1dQ782TVG36Bc09A@movy-mongodb-79fd3aab.mongo.ondigitalocean.com/admin?tls=true&authSource=admin"
+      - key: ENABLE_SOCKET_REDIS_ADAPTER
+        value: "false"
+
+  # ----------------------------------------------------------------------------
+  # 2. PAINÉIS WEB V2 (Next.js 15: Monitor de Frotas & Central de Despacho)
+  # Painel de controle em tempo real para Chaves Globais e Despacho de Corridas
+  # ----------------------------------------------------------------------------
+  - name: movy-web-v2
+    source_dir: movy-web-v2
+    dockerfile_path: Dockerfile
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: developeragencia/movy
+    http_port: 3000
+    instance_count: 1
+    instance_size_slug: basic-s
+    health_check:
+      http_path: /monitor
+      initial_delay_seconds: 20
+      period_seconds: 10
+      timeout_seconds: 5
+      failure_threshold: 3
+    routes:
+      - path: /
+      - path: /monitor
+      - path: /central
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://api.movymob.com
+      - key: NEXT_PUBLIC_SOCKET_URL
+        value: https://socket.movymob.com

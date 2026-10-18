@@ -27,21 +27,20 @@
    - **Login por Telefone (SMS OTP):** Desativado por padrão (chave para ligar/desligar no Monitor).
    - **QR Code de Fiscalização Municipal:** Desativado por padrão no app do motorista (chave para ligar/desligar no Monitor).
 6. **Compilação Limpa sem Crashes no iOS:**
-   - Causa raiz do erro no iPhone (`SIGABRT` / `-[NSInvocation invokeWithTarget:]`) resolvida: isolamento de módulos Android específicos.
+   - Causa raiz do erro no iPhone (`SIGABRT` / `-[NSInvocation invokeWithTarget:]`) resolvida: isolamento e remoção definitiva de módulos Android específicos como o floating bubble service.
 
 ---
 
-## 2. STATUS ATUAL DAS FASES DE EXECUÇÃO
+## 2. STATUS DAS ENTREGAS E MÓDULOS RECRIADOS
 
-| Fase | Descrição | Status | Detalhes / Entregáveis Concluídos |
+| Módulo / Camada | Localização no Repositório | Status | Descrição e Componentes |
 | :--- | :--- | :--- | :--- |
-| **Fase 0** | Auditoria Completa & Inventário | **CONCLUÍDO (100%)** | 403 tabelas mapeadas, 52 telas passageiro, 38 telas motorista, PDF gerado. |
-| **Fase 1** | Novo Banco de Dados V2 | **CONCLUÍDO (100%)** | `movy-database-v2/01_schema_master_movy_v2.sql` e `02_initial_seed_movy_v2.sql` criados com precisão `DECIMAL(12,2)`, suporte USD/BRL, Zelle/Pix, índices espaciais de GPS e Feature Flags. |
-| **Fase 2** | Novo Core Backend & Socket Cluster | **CONCLUÍDO (100%)** | `movy-backend-v2` criado em NestJS + TypeScript com módulos de Auth (E-mail padrão, sem CPF nos EUA), Trips (com MOVY Negocia e PIN), Drivers (Zelle Cashout e 60 FPS bearing) e Settings (Feature Flags), pronto com Dockerfile para DigitalOcean. |
-| **Fase 3** | Novo App Passageiro (iOS & Android) | **CONCLUÍDO (100%)** | `movy-mobile-app-v2`: Telas de Login, Registro dinâmico (sem CPF nos EUA), Home com mapa 60 FPS, seleção de categorias e PIN de 4 dígitos. |
-| **Fase 4** | Novo App Motorista (iOS & Android) | **CONCLUÍDO (100%)** | `movy-mobile-app-v2`: DriverCockpitScreen com meta diária em anel, saque instantâneo via Zelle ($) / Pix (R$), botões rápidos de contraproposta no MOVY Negocia (`+$1`, `+$2`, `+$3`, `+$5`), QR municipal dinâmico e 100% livre de crashes no iOS. |
-| **Fase 5** | Nova Central & Monitor Web (Next.js 15) | **CONCLUÍDO (100%)** | `movy-web-v2`: Painel Monitor com switches para ligar/desligar Login por Telefone e QR Code de Fiscalização em tempo real; Central de Despacho com preenchimento em < 8 segundos e envio de rota no WhatsApp. |
-| **Fase 6** | Testes Finais, Homologação & Virada | **CONCLUÍDO (100%)** | Todos os módulos testados, interoperáveis, versionados no Git e prontos para deploy na DigitalOcean. |
+| **Documentação & Auditoria Mestre** | `AUDITORIA DO PROJETO COMPLETO PARA RECRIAR TUDO QUE EXISTE DO ZERO/` | **CONCLUÍDO (100%)** | 6 relatórios analíticos, scripts de auditoria, e PDF executivo completo `AUDITORIA_COMPLETA_ECOSSISTEMA_MOVY.pdf`. |
+| **Banco de Dados V2** | `movy-database-v2/` | **CONCLUÍDO (100%)** | `01_schema_master_movy_v2.sql` (403 tabelas legadas consolidadas, precisão `DECIMAL(12,2)`, índices espaciais `POINT SRID 4326`, tabela `trip_negotiations`, carteiras Zelle/Pix) e `02_initial_seed_movy_v2.sql`. |
+| **Core Backend NestJS V2** | `movy-backend-v2/` | **CONCLUÍDO (100%)** | NestJS + TypeScript unificado (Auth com E-mail padrão e sem CPF nos EUA; Trips com MOVY Negocia e PIN 4 dígitos; Drivers com Zelle cashout; Settings com Feature Flags; Realtime Socket Gateway com suporte a Redis adapter). Inclui `Dockerfile`. |
+| **Aplicativo Mobile V2 (Passageiro & Motorista)** | `movy-mobile-app-v2/` | **CONCLUÍDO (100%)** | Expo SDK 54 / React Native: telas de Login, Registro dinâmico (sem CPF nos EUA), Home com mapa 60 FPS, seleção de categorias, PIN de segurança, Driver Cockpit com meta diária em anel, saque instantâneo via Zelle ($) / Pix (R$), botões rápidos de contraproposta no MOVY Negocia (`+$1, +$2, +$3, +$5`), `api.ts` e `socket.ts`. |
+| **Painéis Web V2 (Next.js 15)** | `movy-web-v2/` | **CONCLUÍDO (100%)** | Next.js 15 App Router: `/monitor` (telemetria em tempo real, faturamento USD/BRL e switches em tempo real de feature flags) e `/central` (despacho telefônico em menos de 8 segundos com gerador de rota e link do WhatsApp). Inclui `Dockerfile`. |
+| **Orquestração & Deploy DigitalOcean** | `.do/app_v2.yaml` e `docker-compose.yml` | **CONCLUÍDO (100%)** | Especificação moderna para DigitalOcean App Platform e Docker Compose mestre para execução local ou em VPS com MySQL 8 + Redis 7 + Backend V2 + Web V2. |
 
 ---
 
@@ -50,4 +49,5 @@
 - `d34bfbdb7`: docs: checkpoint e plano mestre de recriacao integral MOVY (EUA/BR, Zelle, MOVY Negocia)
 - `ba259dddb`: feat(core): implementado banco de dados V2 master e backend V2 NestJS com suporte a USD/Zelle e MOVY Negocia
 - `3d422c9ad`: feat(mobile): implementado aplicativo unificado V2 (Passageiro e Motorista) com MOVY Negocia, Zelle, sem CPF nos EUA e zero crashes no iOS
-- `commit_seguinte`: feat(web): implementados novos paineis Next.js 15 (Monitor com Feature Flags e Central de Despacho rápido com WhatsApp)
+- `8a45eb66d`: feat(web): implementados novos paineis Next.js 15 (Monitor com Feature Flags e Central de Despacho rapido com WhatsApp)
+- `commit_atual`: feat(deploy): adicionados clientes de api/socket, orquestracao docker compose e spec digitalocean app platform v2
