@@ -103,3 +103,11 @@ desktop.ini
 *.swo
 *~
 vrificar se tem banco de dados/
+
+# 9. Binarios de release e bundletool
+*.apk
+*.aab
+*.jar
+aab_work/
+temp_bundle/
+base/
