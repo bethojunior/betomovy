@@ -3,7 +3,6 @@ import {
   Container,
   Content,
   ContentText,
-  ContentLogo,
   LoginCardContainer,
   HeaderCard,
   FormContainer,
@@ -20,7 +19,7 @@ import { useContextAuth } from "../../contexts/auth";
 import apiSpeedmob from "../../services/apiSpeedmob";
 
 import pathUrl from "../../assets/background-login.webp";
-import pathLogo from "../../assets/logo-movy.png";
+import pathLogo from "../../assets/logo-movy-transparent.png";
 
 const Login: FC = () => {
   const refInputPassword = useRef<HTMLInputElement | null>(null);
@@ -107,14 +106,10 @@ const Login: FC = () => {
   return (
     <Container
       style={{
-        backgroundImage: `linear-gradient(135deg, rgba(7, 10, 26, 0.94) 0%, rgba(0, 52, 154, 0.85) 100%), url(${pathUrl})`,
+        backgroundImage: `linear-gradient(135deg, rgba(7, 10, 26, 0.78) 0%, rgba(0, 52, 154, 0.65) 100%), url(${pathUrl})`,
         backgroundColor: '#070A1A',
       }}
     >
-      <ContentLogo>
-        <img src={pathLogo} alt="MOVY" />
-      </ContentLogo>
-
       <Content>
         {/* Lado Esquerdo: Banner Tecnológico MOVY */}
         <ContentText>

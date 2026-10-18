@@ -37,6 +37,13 @@ export const Content = styled.div`
 export const ContentText = styled.div`
   flex: 1;
   color: #FFFFFF;
+  padding: 44px 48px;
+  border-radius: 24px;
+  background: rgba(7, 10, 26, 0.45);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(4, 243, 250, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 
   .text-wrapper {
     max-width: 600px;
@@ -63,6 +70,12 @@ export const ContentText = styled.div`
     border-radius: 50%;
     background-color: #04F3FA;
     box-shadow: 0 0 10px #04F3FA;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 10px #04F3FA; }
+    50% { opacity: 0.4; box-shadow: 0 0 4px #04F3FA; }
   }
 
   h1 {
@@ -119,6 +132,7 @@ export const ContentText = styled.div`
 
   @media (max-width: 980px) {
     text-align: center;
+    padding: 32px 24px;
     .badge-monitor {
       margin: 0 auto 20px;
     }
@@ -131,24 +145,6 @@ export const ContentText = styled.div`
   }
 `;
 
-export const ContentLogo = styled.div`
-  position: absolute;
-  top: 28px;
-  left: 36px;
-
-  > img {
-    height: 40px;
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
-  }
-
-  @media (max-width: 980px) {
-    position: static;
-    margin-bottom: 1rem;
-    text-align: center;
-  }
-`;
 
 /* ── Container do Formulário com FUNDO BRANCO PURO conforme exigido ── */
 export const LoginCardContainer = styled.div`
@@ -171,14 +167,16 @@ export const HeaderCard = styled.div`
   margin-bottom: 28px;
 
   .card-logo-container {
-    margin-bottom: 14px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: center;
 
     img {
-      height: 42px;
+      height: 58px;
       width: auto;
+      max-width: 220px;
       object-fit: contain;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.1));
     }
   }
 
