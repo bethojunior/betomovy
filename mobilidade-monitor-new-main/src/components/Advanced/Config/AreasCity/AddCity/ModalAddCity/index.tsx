@@ -54,7 +54,7 @@ export const ModalAddCity = ({
         estado: String(idState),
         nome: nameCity.trim(),
         polygon: null,
-        statusId: 0,
+        statusId: 1,
       });
 
       if (responseAddCity.status) {

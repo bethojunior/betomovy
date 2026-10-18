@@ -192,9 +192,10 @@ export const TestServiceMaps = () => {
           cleanType = Array.isArray(parsed) ? parsed[0] : parsed;
         }
       } catch (e) {}
-      if (cleanType && typeof cleanType === "string") {
-        setValueSelect(cleanType);
-        handleTests(cleanType);
+      // If errorMapKey specifically relates to Google Maps, focus on google
+      if (cleanType === "google") {
+        setValueSelect("google");
+        handleTests("google");
       }
     }
   }, [errorMapKey]);

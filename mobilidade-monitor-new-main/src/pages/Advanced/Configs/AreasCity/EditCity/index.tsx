@@ -82,11 +82,10 @@ export const EditCity = () => {
       const responseCitiesFully = await api.get("city/actives/fully");
 
       if (responseCitiesFully.status) {
-        setCitiesFully(
-          Array.isArray(responseCitiesFully.data?.response) 
-            ? responseCitiesFully.data.response 
-            : []
-        );
+        const list = Array.isArray(responseCitiesFully.data?.response) 
+          ? responseCitiesFully.data.response 
+          : (Array.isArray(responseCitiesFully.data?.data) ? responseCitiesFully.data.data : []);
+        setCitiesFully(list);
       }
     } catch (error) {
       console.error(error);
@@ -396,18 +395,38 @@ export const EditCity = () => {
     return () => clearTimeout(timer);
   }, [isEditModalOpen, informationsCity, mapboxToken]);
 
+  const normalizeStr = (str?: string) =>
+    (str || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+
   // Filter cities for search
   const filteredCities = useMemo(() => {
     if (!searchTerm.trim()) {
       return citiesFully;
     }
-    const term = searchTerm.toLowerCase();
-    return citiesFully.filter(
-      (c) =>
-        c.nome?.toLowerCase().includes(term) ||
-        c.shortName?.toLowerCase().includes(term) ||
-        String(c.cityId).includes(term)
-    );
+    const term = normalizeStr(searchTerm);
+    return citiesFully.filter((c) => {
+      const nome = normalizeStr(c.nome);
+      const shortName = normalizeStr(c.shortName);
+      const idStr = String(c.cityId || c.id || "");
+
+      if (nome.includes(term) || shortName.includes(term) || idStr.includes(term)) {
+        return true;
+      }
+
+      // Typo-tolerant prefix match (e.g. "juaziro" matching "juazeiro")
+      if (term.length >= 4) {
+        const prefix = term.substring(0, 4);
+        if (nome.startsWith(prefix) || shortName.startsWith(prefix)) {
+          return true;
+        }
+      }
+
+      return false;
+    });
   }, [citiesFully, searchTerm]);
 
   // Statistics

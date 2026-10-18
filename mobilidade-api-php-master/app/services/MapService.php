@@ -189,41 +189,51 @@ class MapService
         }
 
         $logDao = new LogDao;
-        $place = true;
-        $direction = true;
-        $geocoding = true;
         $lastTestedService = is_array($mapsServices) ? ($mapsServices[0] ?? 'google') : $mapsServices;
+        $place = false;
+        $direction = false;
+        $geocoding = false;
 
         try {
             foreach ($mapsServices as $service) {
                 $lastTestedService = $service;
                 $result = $this->getServiceByType($service);
+                $svcPlace = false;
+                $svcDirection = false;
+                $svcGeocoding = false;
+
                 try {
                     $result->place->search("Centro", "-3.7263684626356084,-38.52706632770688");
-                    $place = true;
+                    $svcPlace = true;
                 } catch (Exception $exception) {
                     $logDao->logException($exception);
-                    $place = $exception->getMessage();
-                    return $this->returnServiceTest($service, $place, null, null);
+                    $svcPlace = $exception->getMessage();
                 }
 
                 try {
                     $result->direction->getDistanceWithFullAddress(-3.7330925949285385, -38.55555944450515, -3.722086684782012, -38.54062490485579);
-                    $direction = true;
+                    $svcDirection = true;
                 } catch (Exception $exception) {
                     $logDao->logException($exception);
-                    $direction = $exception->getMessage();
-                    return $this->returnServiceTest($service, null, $direction, null);
+                    $svcDirection = $exception->getMessage();
                 }
 
                 try {
                     $result->geocoding->search("-3.777033,-38.514835", true);
-                    $geocoding = true;
+                    $svcGeocoding = true;
                 } catch (Exception $exception) {
                     $logDao->logException($exception);
-                    $geocoding = $exception->getMessage();
-                    return $this->returnServiceTest($service, null, null, $geocoding);
+                    $svcGeocoding = $exception->getMessage();
                 }
+
+                // If this service passed all 3 tests, return it immediately as healthy
+                if ($svcPlace === true && $svcDirection === true && $svcGeocoding === true) {
+                    return $this->returnServiceTest($service, true, true, true);
+                }
+
+                $place = $svcPlace;
+                $direction = $svcDirection;
+                $geocoding = $svcGeocoding;
             }
         } catch (Exception $e) {
             $logDao->logException($e);

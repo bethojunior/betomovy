@@ -146,16 +146,40 @@ class CityController extends ApiController
     {
         try {
             $found = null;
-            $allActives = (new \app\services\CityService)->findActives();
-            $formatted = $this->formatCities($allActives, true);
-            foreach ($formatted as $fc) {
-                if ((int)$fc->id === (int)$id || (int)$fc->cityId === (int)$id) {
-                    $found = (array)$fc;
-                    break;
+            try {
+                $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        c.id, c.nome, c.shortName, c.estado, c.active, c.statusId,
+                        ST_AsText(ca.polygon) as polygon
+                    FROM city c
+                    LEFT JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
+                    WHERE c.id = :id
+                    ORDER BY ca.id DESC
+                    LIMIT 1
+                ");
+                $stmt->execute([':id' => $id]);
+                $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+                if ($row) {
+                    $found = $row;
+                }
+            } catch (\Throwable $e) {}
+
+            if (!$found) {
+                $allActives = (new \app\services\CityService)->findActives();
+                $formatted = $this->formatCities($allActives, true);
+                foreach ($formatted as $fc) {
+                    if ((int)$fc->id === (int)$id || (int)$fc->cityId === (int)$id) {
+                        $found = (array)$fc;
+                        break;
+                    }
                 }
             }
 
-            if (!$found) {
+            if ($found) {
+                $formatted = $this->formatCities([$found], true);
+                $found = (array)($formatted[0] ?? $found);
+            } else {
                 $found = [
                     'id' => (string)$id,
                     'cityId' => (int)$id,
@@ -213,8 +237,8 @@ class CityController extends ApiController
             if (is_array($polygonInput)) {
                 foreach ($polygonInput as $pt) {
                     if (is_array($pt)) {
-                        $lat = $pt['lat'] ?? $pt[0] ?? null;
-                        $lng = $pt['lng'] ?? $pt[1] ?? null;
+                        $lat = $pt['lat'] ?? (isset($pt[0]) && abs($pt[0]) <= 90 ? $pt[0] : ($pt[1] ?? null));
+                        $lng = $pt['lng'] ?? (isset($pt[1]) && abs($pt[1]) <= 180 ? $pt[1] : ($pt[0] ?? null));
                         if ($lat !== null && $lng !== null) {
                             $points[] = "{$lat} {$lng}";
                         }
@@ -241,10 +265,10 @@ class CityController extends ApiController
 
                 if ($row) {
                     $localCityId = (int)$row['id'];
-                    $stmtUp = $pdo->prepare("UPDATE city SET nome = :nome, shortName = :shortName, estado = :estado, active = 1 WHERE id = :id");
+                    $stmtUp = $pdo->prepare("UPDATE city SET nome = :nome, shortName = :shortName, estado = :estado, active = 1, statusId = 1 WHERE id = :id");
                     $stmtUp->execute([':nome' => $name, ':shortName' => $shortName, ':estado' => $estateId, ':id' => $localCityId]);
                 } else {
-                    $stmtIns = $pdo->prepare("INSERT INTO city (nome, shortName, estado, active) VALUES (:nome, :shortName, :estado, 1)");
+                    $stmtIns = $pdo->prepare("INSERT INTO city (nome, shortName, estado, active, statusId) VALUES (:nome, :shortName, :estado, 1, 1)");
                     $stmtIns->execute([':nome' => $name, ':shortName' => $shortName, ':estado' => $estateId]);
                     $localCityId = (int)$pdo->lastInsertId();
                 }
@@ -255,18 +279,12 @@ class CityController extends ApiController
                         $stmtDisable = $pdo->prepare("UPDATE cityArea SET statusId = 2 WHERE cityId = :cityId");
                         $stmtDisable->execute([':cityId' => $localCityId]);
 
-                        if ($polygonWkt) {
-                            try {
-                                $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, polygon, statusId) VALUES (:cityId, ST_GeomFromText(:wkt), 1)");
-                                $stmtArea->execute([':cityId' => $localCityId, ':wkt' => $polygonWkt]);
-                            } catch (\Throwable $polyEx) {
-                                $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, statusId) VALUES (:cityId, 1)");
-                                $stmtArea->execute([':cityId' => $localCityId]);
-                            }
-                        } else {
-                            $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, statusId) VALUES (:cityId, 1)");
-                            $stmtArea->execute([':cityId' => $localCityId]);
+                        if (!$polygonWkt) {
+                            $polygonWkt = "POLYGON((-15.8 -47.9, -15.8 -47.8, -15.7 -47.8, -15.7 -47.9, -15.8 -47.9))";
                         }
+
+                        $stmtArea = $pdo->prepare("INSERT INTO cityArea (cityId, polygon, statusId) VALUES (:cityId, ST_GeomFromText(:wkt), 1)");
+                        $stmtArea->execute([':cityId' => $localCityId, ':wkt' => $polygonWkt]);
                     } catch (\Throwable $caEx) {
                     }
                 }
@@ -358,10 +376,10 @@ class CityController extends ApiController
 
                 if ($existingId) {
                     $cityId = (int)$existingId;
-                    $stmtUp = $pdo->prepare("UPDATE city SET estado = :estado, active = 1 WHERE id = :id");
+                    $stmtUp = $pdo->prepare("UPDATE city SET estado = :estado, active = 1, statusId = 1 WHERE id = :id");
                     $stmtUp->execute([':estado' => $estado, ':id' => $cityId]);
                 } else {
-                    $stmtIns = $pdo->prepare("INSERT INTO city (nome, shortName, estado, active) VALUES (:nome, :shortName, :estado, 1)");
+                    $stmtIns = $pdo->prepare("INSERT INTO city (nome, shortName, estado, active, statusId) VALUES (:nome, :shortName, :estado, 1, 1)");
                     $stmtIns->execute([':nome' => $nome, ':shortName' => $nome, ':estado' => $estado]);
                     $cityId = (int)$pdo->lastInsertId();
                 }
@@ -867,11 +885,11 @@ class CityController extends ApiController
                 $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
                 $stmt = $pdo->query("
                     SELECT 
-                        c.id, c.nome, c.shortName, c.estado, c.active,
-                        ca.polygon
+                        c.id, c.nome, c.shortName, c.estado, c.active, c.statusId,
+                        ST_AsText(ca.polygon) as polygon
                     FROM city c
                     LEFT JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
-                    WHERE c.active = 1
+                    WHERE c.active = 1 OR c.statusId = 1
                     ORDER BY c.nome ASC
                 ");
                 $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -906,11 +924,11 @@ class CityController extends ApiController
                 $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
                 $stmt = $pdo->query("
                     SELECT 
-                        c.id, c.nome, c.shortName, c.estado, c.active,
-                        ca.polygon
+                        c.id, c.nome, c.shortName, c.estado, c.active, c.statusId,
+                        ST_AsText(ca.polygon) as polygon
                     FROM city c
                     LEFT JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
-                    WHERE c.active = 1
+                    WHERE c.active = 1 OR c.statusId = 1
                     ORDER BY c.nome ASC
                 ");
                 $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -970,11 +988,12 @@ class CityController extends ApiController
             $cityId = (int)$id;
 
             $def = $defaultCities[(string)$id] ?? null;
-            $isUS = in_array(strtolower($name), ['miami', 'orlando', 'new york', 'los angeles']) || ($cityId >= 100);
+            $estadoNum = (int)($c['estado'] ?? $c['estateId'] ?? ($def['estado'] ?? 1));
+            $isUS = ($estadoNum >= 100) || in_array(strtolower($name), ['miami', 'orlando', 'new york', 'los angeles', 'chicago', 'houston', 'phoenix']);
             $country = $c['country'] ?? ($def['country'] ?? ($isUS ? 'US' : 'BR'));
 
-            $lat = isset($c['latitude']) && is_numeric($c['latitude']) ? (float)$c['latitude'] : ($def['lat'] ?? ($isUS ? 25.7617 : -22.9068));
-            $lng = isset($c['longitude']) && is_numeric($c['longitude']) ? (float)$c['longitude'] : ($def['lng'] ?? ($isUS ? -80.1918 : -43.1729));
+            $lat = isset($c['latitude']) && is_numeric($c['latitude']) ? (float)$c['latitude'] : ($def['lat'] ?? ($isUS ? 25.7617 : -15.793889));
+            $lng = isset($c['longitude']) && is_numeric($c['longitude']) ? (float)$c['longitude'] : ($def['lng'] ?? ($isUS ? -80.1918 : -47.882778));
 
             $dLat = 0.12;
             $dLng = 0.12;
@@ -991,15 +1010,15 @@ class CityController extends ApiController
             $c['name'] = $name;
             $c['shortName'] = $name;
             $c['country'] = $country;
-            $c['estado'] = (string)($c['estado'] ?? $c['estateId'] ?? ($def['estado'] ?? '1'));
-            $c['estateId'] = $c['estado'];
+            $c['estado'] = (string)$estadoNum;
+            $c['estateId'] = (string)$estadoNum;
             $c['statusId'] = (string)($c['statusId'] ?? $c['active'] ?? '1');
             $c['active'] = $c['statusId'];
 
-            if ($withPolygon || !empty($c['polygon'])) {
-                if (empty($c['polygon']) || !is_string($c['polygon']) || strpos($c['polygon'], 'POLYGON((') === false) {
-                    $c['polygon'] = $defaultPolygon;
-                }
+            if (!empty($c['polygon']) && is_string($c['polygon']) && strpos($c['polygon'], 'POLYGON((') !== false) {
+                // Keep the real valid polygon from DB
+            } elseif ($withPolygon) {
+                $c['polygon'] = $defaultPolygon;
             }
 
             return (object)$c;
