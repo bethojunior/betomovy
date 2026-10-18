@@ -384,8 +384,10 @@ select.form-control {
 }
 
 .reg-btn:hover {
-    background: var(--reg-darker);
-    transform: translateY(-1px);
+    background: #111111 !important;
+    color: #04F3FA !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
 }
 
 .reg-btn:active {

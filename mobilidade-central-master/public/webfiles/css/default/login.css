@@ -1,19 +1,13 @@
 /* ─────────────────────────────────────────────────────────────
-   MOVY Central - Login Executivo V2 (Ultra Premium Dark UI)
-   Inspirado nos maiores padrões de mobilidade (Uber, DiDi, 99)
+   MOVY Central - Login Executivo V2 (Fundo Branco Puro no Formulário)
+   Design Corporativo de Alto Padrão (EUA & Brasil)
 ───────────────────────────────────────────────────────────── */
 :root {
     --movy-bg-dark: #070A1A;
     --movy-blue-primary: #00349A;
     --movy-cyan-accent: #04F3FA;
     --movy-hover-black: #111111;
-    --movy-card-bg: #0D1226;
-    --movy-card-border: rgba(4, 243, 250, 0.18);
-    --movy-input-bg: rgba(255, 255, 255, 0.05);
-    --movy-input-border: rgba(255, 255, 255, 0.12);
-    --movy-text-main: #FFFFFF;
-    --movy-text-muted: #94A3B8;
-    --movy-radius: 14px;
+    --movy-radius: 12px;
 }
 
 html, body {
@@ -21,7 +15,7 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: var(--movy-bg-dark);
+    background: #FFFFFF;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -32,8 +26,8 @@ html, body {
     right: 0;
     bottom: 0;
     display: grid;
-    grid-template-columns: 58% 42%;
-    background: radial-gradient(circle at 10% 20%, #001A4D 0%, #070A1A 85%);
+    grid-template-columns: 55% 45%;
+    background: #FFFFFF;
 }
 
 /* ── Banner Cinematográfico (Esquerda) ── */
@@ -50,7 +44,7 @@ html, body {
 .movy-login-v2 .login-banner__overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(7, 10, 26, 0.92) 0%, rgba(0, 52, 154, 0.78) 100%);
+    background: linear-gradient(135deg, rgba(7, 10, 26, 0.95) 0%, rgba(0, 52, 154, 0.85) 100%);
     backdrop-filter: blur(8px);
     display: flex;
     flex-direction: column;
@@ -76,11 +70,11 @@ html, body {
     gap: 8px;
     padding: 6px 14px;
     border-radius: 20px;
-    background: rgba(4, 243, 250, 0.1);
-    border: 1px solid rgba(4, 243, 250, 0.3);
+    background: rgba(4, 243, 250, 0.12);
+    border: 1px solid rgba(4, 243, 250, 0.35);
     color: var(--movy-cyan-accent);
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 1.2px;
     margin-bottom: 24px;
     width: fit-content;
@@ -92,13 +86,6 @@ html, body {
     border-radius: 50%;
     background: var(--movy-cyan-accent);
     box-shadow: 0 0 10px var(--movy-cyan-accent);
-    animation: pulseMovy 2s infinite;
-}
-
-@keyframes pulseMovy {
-    0% { transform: scale(0.9); opacity: 0.7; }
-    50% { transform: scale(1.3); opacity: 1; }
-    100% { transform: scale(0.9); opacity: 0.7; }
 }
 
 .movy-login-v2 .login-banner__headline {
@@ -139,16 +126,16 @@ html, body {
     font-size: 20px;
 }
 
-/* ── Painel do Formulário (Direita) ── */
+/* ── Painel do Formulário - FUNDO BRANCO PURO conforme exigido ── */
 .movy-login-v2 .login-panel {
     height: 100%;
-    background: #0B0F20;
+    background: #FFFFFF !important;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     padding: 60px 48px 30px;
-    box-shadow: -10px 0 50px rgba(0, 0, 0, 0.6);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.08);
     position: relative;
     z-index: 2;
     overflow-y: auto;
@@ -156,7 +143,7 @@ html, body {
 
 .movy-login-v2 .login-card {
     width: 100%;
-    max-width: 420px;
+    max-width: 400px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -164,40 +151,36 @@ html, body {
 }
 
 .login-logo-container {
-    padding: 14px 28px;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-    margin-bottom: 24px;
+    padding: 10px 24px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .movy-login-v2 .logo-company {
-    height: 48px;
+    height: 52px;
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
 }
 
 .movy-login-v2 .login-title {
-    font-size: 26px;
-    font-weight: 800;
-    color: #FFFFFF;
+    font-size: 28px;
+    font-weight: 900;
+    color: #070A1A;
     margin-bottom: 6px;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.5px;
+    text-align: center;
 }
 
 .movy-login-v2 .login-subtitle {
     font-size: 14px;
-    color: var(--movy-text-muted);
+    color: #64748B;
     margin-bottom: 32px;
     text-align: center;
 }
 
-/* ── Form & Inputs ── */
+/* ── Form & Inputs (Elegantes e Claros) ── */
 .movy-login-v2 .form-login {
     width: 100%;
     display: flex;
@@ -212,71 +195,71 @@ html, body {
 
 .movy-login-v2 .input-group > i.material-icons {
     position: absolute;
-    left: 18px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--movy-text-muted);
+    color: #94A3B8;
     font-size: 22px;
     transition: color 0.2s ease;
     pointer-events: none;
 }
 
 .movy-login-v2 .input-group:focus-within > i.material-icons {
-    color: var(--movy-cyan-accent);
+    color: #00349A;
 }
 
 .movy-login-v2 .input-group > input {
     width: 100%;
-    padding: 16px 18px 16px 52px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    height: 52px;
+    padding: 0 18px 0 52px;
+    background: #F8FAFC;
+    border: 1.5px solid #E2E8F0;
     border-radius: var(--movy-radius);
-    color: #FFFFFF;
+    color: #0F172A;
     font-size: 14px;
     font-weight: 500;
     outline: none;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     box-sizing: border-box;
 }
 
 .movy-login-v2 .input-group > input::placeholder {
-    color: #64748B;
+    color: #94A3B8;
 }
 
 .movy-login-v2 .input-group > input:focus {
-    border-color: var(--movy-cyan-accent);
-    background: rgba(4, 243, 250, 0.03);
-    box-shadow: 0 0 0 4px rgba(4, 243, 250, 0.12);
+    background: #FFFFFF;
+    border-color: #00349A;
+    box-shadow: 0 0 0 4px rgba(0, 52, 154, 0.12);
 }
 
 /* ── Botão Entrar - Estado Padrão Azul, Hover PRETO PROFUNDO ── */
 .movy-login-v2 .authenticate-user {
     width: 100%;
+    height: 52px;
     margin-top: 10px;
-    padding: 16px 24px;
-    background: var(--movy-blue-primary);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #00349A;
+    border: none;
     border-radius: var(--movy-radius);
     color: #FFFFFF;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 0.8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    box-shadow: 0 4px 20px rgba(0, 52, 154, 0.4);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(0, 52, 154, 0.35);
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* REGRA DE OURO: Hover DEVE SER PRETO conforme exigido pelo usuário */
 .movy-login-v2 .authenticate-user:hover {
-    background: var(--movy-hover-black) !important;
-    border-color: var(--movy-cyan-accent) !important;
-    color: #FFFFFF !important;
+    background: #111111 !important;
+    color: #04F3FA !important;
     transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8) !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6) !important;
 }
 
 .movy-login-v2 .authenticate-user:active {
@@ -290,33 +273,33 @@ html, body {
 
 .movy-login-v2 .authenticate-user:hover i {
     transform: translateX(4px);
-    color: var(--movy-cyan-accent);
+    color: #04F3FA;
 }
 
 /* ── Links & Rodapé ── */
 .movy-login-v2 .register-link {
     margin-top: 24px;
-    font-size: 13px;
-    color: var(--movy-text-muted);
+    font-size: 13.5px;
+    color: #64748B;
     text-decoration: none;
     text-align: center;
     transition: color 0.2s ease;
 }
 
 .movy-login-v2 .register-link strong {
-    color: var(--movy-cyan-accent);
-    font-weight: 600;
+    color: #00349A;
+    font-weight: 700;
     text-decoration: underline;
     text-underline-offset: 3px;
 }
 
-.movy-login-v2 .register-link:hover {
-    color: #FFFFFF;
+.movy-login-v2 .register-link:hover strong {
+    color: #111111;
 }
 
 .movy-login-v2 .login-panel__footer {
     font-size: 12px;
-    color: #64748B;
+    color: #94A3B8;
     text-align: center;
 }
 
