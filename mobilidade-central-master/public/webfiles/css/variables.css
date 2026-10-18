@@ -1,16 +1,17 @@
 :root {
-    /* ── Marca / ações ── */
-    --color-primary: #111111;
-    --color-primary-hover: #2A2A2A;
-    --color-primary-dark: #000000;
+    /* ── Marca MOVY / ações ── */
+    --color-primary: #00349A;
+    --color-primary-hover: #04F3FA;
+    --color-primary-dark: #070A1A;
+    --color-accent: #04F3FA;
 
     /* Aliases legados */
-    --color-dark: var(--color-primary);
-    --color-dark-hover: var(--color-primary-hover);
+    --color-dark: #070A1A;
+    --color-dark-hover: #00349A;
 
     /* Dark UI (footer, header, drawers) */
-    --color-header-gradient: linear-gradient(105deg, #111111 0%, #000000 100%);
-    --color-drawer-bg: #111111;
+    --color-header-gradient: linear-gradient(105deg, #070A1A 0%, #00349A 100%);
+    --color-drawer-bg: #070A1A;
 
     /* Links */
     --color-link: #2563eb;

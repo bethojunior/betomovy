@@ -50,10 +50,12 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
     </div>
 
     <a class="app-header__brand" href="<?php echo Host::getLocal(); ?>">
-        <img src="<?php echo Host::getCentral() . htmlspecialchars($central->logo ?? 'default.jpg', ENT_QUOTES, 'UTF-8'); ?>"
-             alt="Logo da central"
-             class="app-header__logo">
-        <span class="app-header__name"><?php echo htmlspecialchars($central->name, ENT_QUOTES, 'UTF-8'); ?></span>
+        <img src="/webfiles/img/logo/logo.png"
+             onerror="this.onerror=null; this.src='/webfiles/img/logo/logo.png';"
+             alt="MOVY Central"
+             class="app-header__logo"
+             style="max-height: 38px; object-fit: contain;">
+        <span class="app-header__name">MOVY</span>
     </a>
 
     <select class="app-header__select" id="selectCentralChange">

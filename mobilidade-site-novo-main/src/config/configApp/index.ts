@@ -1,6 +1,6 @@
 import { changeFavicon } from "../../utils/ChangeFavicon";
 import api from "../../api/apiAxios";
-import LogoMovyDefault from "../../assets/img/Logo_100x100.png";
+import LogoMovyDefault from "../../assets/img/logo-movy.png";
 
 //const HOME = "home";
 const NAME_APPLICATION = "Demo";
@@ -86,18 +86,6 @@ export const getPathImageDefault = () => {
     return (window as any).env.REACT_APP_LOGO_URL;
   }
 
-  const bucketUrl = window.env?.REACT_APP_BUCKET_URL?.trim();
-  if (
-    bucketUrl &&
-    bucketUrl !== "undefined" &&
-    !bucketUrl.endsWith("s3.amazonaws.com/") &&
-    bucketUrl !== "https://s3.amazonaws.com"
-  ) {
-    const logoDefault = `${bucketUrl}default.jpg`;
-    changeFavicon(logoDefault);
-    return logoDefault;
-  }
-
   changeFavicon(LogoMovyDefault);
   return LogoMovyDefault;
 };
@@ -150,7 +138,7 @@ export const getColorSecondaryApp = () => {
 
 export const getColorsDefaults = () => {
   return {
-    colorsPrimary: "#1f5579",
-    colorSecondary: "#367FAE",
+    colorsPrimary: "#00349A",
+    colorSecondary: "#04F3FA",
   };
 };

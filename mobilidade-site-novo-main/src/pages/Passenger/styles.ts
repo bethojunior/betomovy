@@ -172,7 +172,7 @@ export const Container = styled.div`
             &:focus {
                 border-color: var(--color-primary);
                 background-color: #ffffff;
-                box-shadow: 0 0 0 3px rgba(31, 85, 121, 0.15);
+                box-shadow: 0 0 0 3px rgba(0, 52, 154, 0.2);
             }
         }
 

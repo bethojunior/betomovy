@@ -16,21 +16,11 @@ class Host
 
     public static function getLogoCentral()
     {
-        $bucketName = getenv('BUCKET_NAME');
-        $storageHost = getenv('STORAGE_PRIMARY_HOST');
-        if ($storageHost && $bucketName) {
-            return rtrim($storageHost, '/') . '/' . trim($bucketName, '/') . '/';
-        }
         return '/webfiles/img/logo/';
     }
 
     public static function getCentral()
     {
-        $bucketName = getenv('BUCKET_NAME');
-        $storageHost = getenv('STORAGE_PRIMARY_HOST');
-        if ($storageHost && $bucketName) {
-            return rtrim($storageHost, '/') . '/' . trim($bucketName, '/') . '/';
-        }
         return '/webfiles/img/logo/';
     }
 

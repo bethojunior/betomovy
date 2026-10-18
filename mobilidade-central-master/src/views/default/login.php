@@ -6,10 +6,10 @@
         <div class="login-banner__overlay">
             <div class="login-banner__content">
                 <h1 class="login-banner__headline">
-                    Simplifique e gerencie o transporte urbano de seus clientes.
+                    MOVY Central de Despacho & Mobilidade Inteligente
                 </h1>
                 <p class="login-banner__desc">
-                    Controle total da sua central em um único painel.
+                    Plataforma internacional de despacho rápido e monitoramento de corridas.
                 </p>
             </div>
         </div>
@@ -20,13 +20,13 @@
 
         <div class="login-card">
 
-            <img src="<?php echo Host::getCentral(); ?>default.jpg"
-                 onerror="this.onerror=null; this.src='/webfiles/img/logo/logo.png';"
-                 alt="Logo da central"
-                 class="logo-company">
+            <img src="/webfiles/img/logo/logo.png"
+                 alt="MOVY"
+                 class="logo-company"
+                 style="max-height: 60px; object-fit: contain; margin-bottom: 16px;">
 
-            <h2 class="login-title">Bem-vindo de volta</h2>
-            <p class="login-subtitle">Acesse o painel de controle</p>
+            <h2 class="login-title">Central MOVY</h2>
+            <p class="login-subtitle">Acesse o painel de despacho</p>
 
             <form class="form-login" novalidate>
 

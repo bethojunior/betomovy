@@ -12,7 +12,7 @@
 
     <div class="container-menu-options">
         <div id="containerMenuOptions">
-            <img class="logo-white-return" src="<?php echo Host::getCentral(); ?>default.jpg">
+            <img class="logo-white-return" src="/webfiles/img/logo/logo.png" style="max-height: 48px; object-fit: contain;">
             <div class="row info-user">
                 <i class="material-icons hidden-menu">arrow_back</i>
                 <div id="imageUserMenu"></div>
