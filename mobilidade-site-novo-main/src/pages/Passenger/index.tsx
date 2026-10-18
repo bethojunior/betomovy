@@ -455,11 +455,14 @@ const Passenger = () => {
     if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
       window.ReactNativeWebView.postMessage(JSON.stringify({ type: "PAGE_LOADED" }));
     }
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+    }, 1200);
+    return () => clearTimeout(safetyTimer);
   }, []);
 
   useEffect(() => {
     const handleGetActiveCities = async () => {
-      setLoading(true);
       try {
         const responseActiveCities = await api.get("City/getActives");
         const rawCities = responseActiveCities?.data?.data ?? responseActiveCities?.data?.response;
@@ -476,8 +479,6 @@ const Passenger = () => {
       } catch (error) {
         setActiveCities([]);
         console.log("Erro ao buscar cidades ativas:", error);
-      } finally {
-        setLoading(false);
       }
     };
 

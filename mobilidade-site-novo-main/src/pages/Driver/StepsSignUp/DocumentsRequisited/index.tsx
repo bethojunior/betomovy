@@ -340,6 +340,14 @@ const DocumentsRequisited = ({
       if (response.data.status) {
         setIsRegistered(true);
         dispatch({ type: FormActions.setReset });
+        if (
+          (window as any).ReactNativeWebView &&
+          (window as any).ReactNativeWebView.postMessage
+        ) {
+          (window as any).ReactNativeWebView.postMessage(
+            JSON.stringify("redirect-login-new-site")
+          );
+        }
       } else {
         swal({
           title: t("message-error-api-register-driver") as string,

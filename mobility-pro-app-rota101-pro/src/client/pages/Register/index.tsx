@@ -37,7 +37,7 @@ export function Register() {
     if (loadWebView) {
       timer = setTimeout(() => {
         setLoadWebView(false);
-      }, 3500);
+      }, 1000);
     }
     return () => {
       if (timer) clearTimeout(timer);
@@ -48,7 +48,7 @@ export function Register() {
     setLoadWebView(true);
     const timer = setTimeout(() => {
       setLoadWebView(false);
-    }, 2500);
+    }, 800);
     return () => clearTimeout(timer);
   }, [driverSelected]);
 
@@ -97,13 +97,14 @@ export function Register() {
           source={{
             uri: urlToRegister(true),
           }}
+          style={{ flex: 1 }}
+          containerStyle={{ flex: 1 }}
           domStorageEnabled={true}
           javaScriptEnabled={true}
           thirdPartyCookiesEnabled={true}
           sharedCookiesEnabled={true}
           scalesPageToFit={true}
           startInLoadingState={false}
-          injectedJavaScriptBeforeContentLoaded={injectJSDriver}
           injectedJavaScript={injectJSDriver}
           onLoadStart={() => setLoadWebView(true)}
           onLoadEnd={() => setLoadWebView(false)}
@@ -111,7 +112,7 @@ export function Register() {
           onError={() => setLoadWebView(false)}
           onHttpError={() => setLoadWebView(false)}
           onLoadProgress={({ nativeEvent }) => {
-            if (nativeEvent.progress >= 0.85) {
+            if (nativeEvent.progress >= 0.3) {
               setLoadWebView(false);
             }
           }}
@@ -167,7 +168,7 @@ export function Register() {
               bottom: 0,
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              backgroundColor: 'rgba(255, 255, 255, 0.3)',
               zIndex: 99,
             }}
           >
@@ -193,13 +194,14 @@ export function Register() {
           source={{
             uri: urlToRegister(false),
           }}
+          style={{ flex: 1 }}
+          containerStyle={{ flex: 1 }}
           domStorageEnabled={true}
           javaScriptEnabled={true}
           thirdPartyCookiesEnabled={true}
           sharedCookiesEnabled={true}
           scalesPageToFit={true}
           startInLoadingState={false}
-          injectedJavaScriptBeforeContentLoaded={injectJSClient}
           injectedJavaScript={injectJSClient}
           onLoadStart={() => setLoadWebView(true)}
           onLoadEnd={() => setLoadWebView(false)}
@@ -207,7 +209,7 @@ export function Register() {
           onError={() => setLoadWebView(false)}
           onHttpError={() => setLoadWebView(false)}
           onLoadProgress={({ nativeEvent }) => {
-            if (nativeEvent.progress >= 0.85) {
+            if (nativeEvent.progress >= 0.3) {
               setLoadWebView(false);
             }
           }}
@@ -262,7 +264,7 @@ export function Register() {
               bottom: 0,
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              backgroundColor: 'rgba(255, 255, 255, 0.3)',
               zIndex: 99,
             }}
           >

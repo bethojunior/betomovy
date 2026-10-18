@@ -303,6 +303,10 @@ const Driver = () => {
     if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
       window.ReactNativeWebView.postMessage(JSON.stringify({ type: "PAGE_LOADED" }));
     }
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+    }, 1200);
+    return () => clearTimeout(safetyTimer);
   }, []);
 
   useEffect(() => {
@@ -438,23 +442,22 @@ const CategoriesDriver = ({
 
   const handleGetCategoryDriversPartners = async () => {
     try {
-      setLoading(true);
       const responseCategoriesDriverPartners = await api.get(
         `usertype/driversbyapppartners?app_partner=${appPartnerKey}`
       );
       const cats = responseCategoriesDriverPartners?.data?.data;
       if (Array.isArray(cats) && cats.length > 0) {
         setCategoryDriver(cats);
+      } else {
+        await handleGetCategoryDrivers();
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
+      await handleGetCategoryDrivers();
     }
   };
 
   const handleGetCategoryDrivers = async () => {
-    setLoading(true);
     try {
       const responseCategoriesDriver = await api.get("usertype/drivers");
       const cats = responseCategoriesDriver?.data?.data;
@@ -463,8 +466,6 @@ const CategoriesDriver = ({
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
 
