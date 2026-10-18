@@ -18,6 +18,7 @@ use app\services\DriverTripScheduled;
 use app\queue\Jobs\DriverRegisterJob;
 use app\queue\Queue;
 use app\services\RefusedDriverService;
+use PDO;
 
 /**
  * Created by PhpStorm.
