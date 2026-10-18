@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "MOVY",
+    "slug": "movy-app",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "splash": {
+      "backgroundColor": "#070A1A",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.movy.international",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "MOVY needs your location to display nearby drivers and optimize trip pickup.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "MOVY uses background location during active trips to provide safety and live route tracking."
+      }
+    },
+    "android": {
+      "package": "com.movy.international",
+      "versionCode": 20001,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "INTERNET",
+        "VIBRATE"
+      ]
+    }
+  }
+}

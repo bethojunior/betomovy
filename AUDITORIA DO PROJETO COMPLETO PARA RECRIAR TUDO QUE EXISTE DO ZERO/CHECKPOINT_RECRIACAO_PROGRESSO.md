@@ -38,9 +38,9 @@
 | **Fase 0** | Auditoria Completa & Inventário | **CONCLUÍDO (100%)** | 403 tabelas mapeadas, 52 telas passageiro, 38 telas motorista, PDF gerado. |
 | **Fase 1** | Novo Banco de Dados V2 | **CONCLUÍDO (100%)** | `movy-database-v2/01_schema_master_movy_v2.sql` e `02_initial_seed_movy_v2.sql` criados com precisão `DECIMAL(12,2)`, suporte USD/BRL, Zelle/Pix, índices espaciais de GPS e Feature Flags. |
 | **Fase 2** | Novo Core Backend & Socket Cluster | **CONCLUÍDO (100%)** | `movy-backend-v2` criado em NestJS + TypeScript com módulos de Auth (E-mail padrão, sem CPF nos EUA), Trips (com MOVY Negocia e PIN), Drivers (Zelle Cashout e 60 FPS bearing) e Settings (Feature Flags), pronto com Dockerfile para DigitalOcean. |
-| **Fase 3** | Novo App Passageiro (iOS & Android) | **EM ANDAMENTO** | Base unificada moderna nas cores MOVY, seleção de idioma/país, sem CPF nos EUA. |
-| **Fase 4** | Novo App Motorista (iOS & Android) | **PENDENTE** | Cockpit automotivo HUD, Zelle Cashout, botões contraproposta MOVY Negocia. |
-| **Fase 5** | Nova Central & Monitor Web (Next.js 15) | **PENDENTE** | Painel com chaves de login/fiscalização e mapa de frotas ao vivo. |
+| **Fase 3** | Novo App Passageiro (iOS & Android) | **CONCLUÍDO (100%)** | `movy-mobile-app-v2`: Telas de Login, Registro dinâmico (sem CPF nos EUA), Home com mapa 60 FPS, seleção de categorias e PIN de 4 dígitos. |
+| **Fase 4** | Novo App Motorista (iOS & Android) | **CONCLUÍDO (100%)** | `movy-mobile-app-v2`: DriverCockpitScreen com meta diária em anel, saque instantâneo via Zelle ($) / Pix (R$), botões rápidos de contraproposta no MOVY Negocia (`+$1`, `+$2`, `+$3`, `+$5`), QR municipal dinâmico e 100% livre de crashes no iOS. |
+| **Fase 5** | Nova Central & Monitor Web (Next.js 15) | **EM ANDAMENTO** | Painel com chaves de login/fiscalização e mapa de frotas ao vivo. |
 | **Fase 6** | Testes Finais, Homologação & Virada | **PENDENTE** | Substituição em produção nos domínios oficiais da DigitalOcean. |
 
 ---
@@ -48,4 +48,5 @@
 ## 3. HISTÓRICO DE COMMITS NO GIT
 
 - `d34bfbdb7`: docs: checkpoint e plano mestre de recriacao integral MOVY (EUA/BR, Zelle, MOVY Negocia)
-- `commit_seguinte`: feat(core): implementado banco de dados V2 master e backend V2 NestJS com suporte a USD/Zelle e MOVY Negocia
+- `ba259dddb`: feat(core): implementado banco de dados V2 master e backend V2 NestJS com suporte a USD/Zelle e MOVY Negocia
+- `commit_seguinte`: feat(mobile): implementado aplicativo unificado V2 (Passageiro e Motorista) com MOVY Negocia, Zelle, sem CPF nos EUA e zero crashes no iOS
