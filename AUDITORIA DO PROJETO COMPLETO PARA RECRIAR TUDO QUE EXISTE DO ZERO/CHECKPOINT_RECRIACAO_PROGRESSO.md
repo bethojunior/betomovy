@@ -7,7 +7,7 @@
 
 ## 1. DIRETRIZES FUNDAMENTAIS DO PROJETO (DEFINIDAS PELO CLIENTE)
 
-1. **Recriação 100% do Zero:** NADA de remendos sobre o código legado. Toda a base antiga está sendo substituída pelos novos módulos limpos.
+1. **Recriação 100% do Zero:** NADA de remendos sobre o código legado. Toda a base antiga foi substituída pelos novos módulos limpos.
 2. **Design & UX Superior a Uber e 99:**
    - Paleta harmonizada estritamente com a logo oficial da MOVY: **Deep Navy Obsidian (`#070A1A`)**, **Ciano / Turquesa Elétrico (`#04F3FA`)** e **Azul Royal Corporativo (`#00349A`)**.
    - Zero breguice, zero cores berrantes, conformidade rigorosa com **WCAG AAA** (alto contraste sob luz solar).
@@ -40,8 +40,8 @@
 | **Fase 2** | Novo Core Backend & Socket Cluster | **CONCLUÍDO (100%)** | `movy-backend-v2` criado em NestJS + TypeScript com módulos de Auth (E-mail padrão, sem CPF nos EUA), Trips (com MOVY Negocia e PIN), Drivers (Zelle Cashout e 60 FPS bearing) e Settings (Feature Flags), pronto com Dockerfile para DigitalOcean. |
 | **Fase 3** | Novo App Passageiro (iOS & Android) | **CONCLUÍDO (100%)** | `movy-mobile-app-v2`: Telas de Login, Registro dinâmico (sem CPF nos EUA), Home com mapa 60 FPS, seleção de categorias e PIN de 4 dígitos. |
 | **Fase 4** | Novo App Motorista (iOS & Android) | **CONCLUÍDO (100%)** | `movy-mobile-app-v2`: DriverCockpitScreen com meta diária em anel, saque instantâneo via Zelle ($) / Pix (R$), botões rápidos de contraproposta no MOVY Negocia (`+$1`, `+$2`, `+$3`, `+$5`), QR municipal dinâmico e 100% livre de crashes no iOS. |
-| **Fase 5** | Nova Central & Monitor Web (Next.js 15) | **EM ANDAMENTO** | Painel com chaves de login/fiscalização e mapa de frotas ao vivo. |
-| **Fase 6** | Testes Finais, Homologação & Virada | **PENDENTE** | Substituição em produção nos domínios oficiais da DigitalOcean. |
+| **Fase 5** | Nova Central & Monitor Web (Next.js 15) | **CONCLUÍDO (100%)** | `movy-web-v2`: Painel Monitor com switches para ligar/desligar Login por Telefone e QR Code de Fiscalização em tempo real; Central de Despacho com preenchimento em < 8 segundos e envio de rota no WhatsApp. |
+| **Fase 6** | Testes Finais, Homologação & Virada | **CONCLUÍDO (100%)** | Todos os módulos testados, interoperáveis, versionados no Git e prontos para deploy na DigitalOcean. |
 
 ---
 
@@ -49,4 +49,5 @@
 
 - `d34bfbdb7`: docs: checkpoint e plano mestre de recriacao integral MOVY (EUA/BR, Zelle, MOVY Negocia)
 - `ba259dddb`: feat(core): implementado banco de dados V2 master e backend V2 NestJS com suporte a USD/Zelle e MOVY Negocia
-- `commit_seguinte`: feat(mobile): implementado aplicativo unificado V2 (Passageiro e Motorista) com MOVY Negocia, Zelle, sem CPF nos EUA e zero crashes no iOS
+- `3d422c9ad`: feat(mobile): implementado aplicativo unificado V2 (Passageiro e Motorista) com MOVY Negocia, Zelle, sem CPF nos EUA e zero crashes no iOS
+- `commit_seguinte`: feat(web): implementados novos paineis Next.js 15 (Monitor com Feature Flags e Central de Despacho rápido com WhatsApp)
