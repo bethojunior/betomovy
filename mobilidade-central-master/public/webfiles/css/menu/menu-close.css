@@ -61,11 +61,11 @@
     display: grid;
     grid-template-columns: 52px 1fr auto;
     align-items: center;
-    padding-right: 16px;
+    padding-right: 18px;
     height: 64px;
-    background: var(--color-header-gradient, linear-gradient(105deg, var(--color-primary) 0%, var(--color-primary-hover) 100%));
-    border-bottom: 1px solid var(--color-surface);
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(105deg, #070A1A 0%, #001f5c 100%);
+    border-bottom: 1px solid rgba(4, 243, 250, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
     flex-shrink: 0;
 }
@@ -81,68 +81,72 @@
 .app-header__brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     min-width: 0;
     overflow: hidden;
-    padding: 5px 8px;
-    border-radius: 8px;
+    padding: 6px 12px;
+    border-radius: 12px;
     text-decoration: none;
-    transition: background 0.18s;
+    transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    width: fit-content;
 }
 
 .app-header__brand:hover {
-    background: var(--color-surface);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(4, 243, 250, 0.3);
 }
 
 .app-header__logo {
-    width: 30px;
-    height: 30px;
-    object-fit: cover;
-    border-radius: 7px;
-    flex-shrink: 0;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
 }
 
 .app-header__name {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--color-text-inverse);
-    letter-spacing: 0.5px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: 1px;
     text-transform: uppercase;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* ── Coluna 3: select branco (auto) ── */
+/* ── Coluna 3: select executivo (auto) ── */
 .app-header__select {
     appearance: none;
     -webkit-appearance: none;
-    background-color: var(--color-bg-surface);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23111111' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-color: #0D1226;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2304F3FA' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 10px center;
-    border: none;
-    border-radius: 8px;
-    color: var(--color-primary);
+    background-position: right 12px center;
+    border: 1px solid rgba(4, 243, 250, 0.3);
+    border-radius: 20px;
+    color: #FFFFFF;
     font-size: 12.5px;
     font-weight: 700;
-    padding: 8px 30px 8px 12px;
+    padding: 8px 32px 8px 16px;
     cursor: pointer;
-    min-width: 130px;
-    max-width: 200px;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
+    min-width: 140px;
+    max-width: 220px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
     outline: none;
-    letter-spacing: 0.2px;
-    transition: box-shadow 0.18s;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
 }
 
 .app-header__select:hover {
-    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.32);
+    background-color: #111111 !important;
+    border-color: #04F3FA !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6) !important;
 }
 
 .app-header__select:focus {
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 3px rgba(4, 243, 250, 0.25);
 }
 
 .app-header__select option {

@@ -87,12 +87,12 @@ body {
 }
 
 .map-zoom-btn {
-    width: 34px;
-    height: 34px;
-    background: var(--color-primary);
-    color: var(--color-text-inverse);
-    border: none;
-    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    background: #00349A;
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
     font-size: 20px;
     font-weight: 300;
     line-height: 1;
@@ -100,18 +100,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px var(--color-shadow-lg);
-    transition: background 0.15s, transform 0.1s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
     font-family: Arial, sans-serif;
     user-select: none;
 }
 
 .map-zoom-btn:hover {
-    background: var(--color-primary-hover);
+    background: #111111 !important;
+    border-color: #04F3FA !important;
+    color: #04F3FA !important;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6) !important;
 }
 
 .map-zoom-btn:active {
-    transform: scale(0.93);
+    transform: scale(0.95);
 }
 
 .map-zoom-btn:focus,
@@ -966,17 +970,26 @@ div.pac-container>.pac-item>span {
 
 #showMessageTripActive {
     flex: 0 0 auto;
-    border-radius: 8px;
-    font-size: 12.5px;
-    font-weight: 600;
-    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 20px;
     white-space: nowrap;
-    transition: background 0.15s, border-color 0.15s;
+    background: #00349A !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(0, 52, 154, 0.35);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Hover PRETO PROFUNDO com borda ciano */
 #showMessageTripActive:hover,
 #showMessageTripActive:focus {
-    box-shadow: none;
+    background: #111111 !important;
+    border-color: #04F3FA !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5) !important;
     outline: none;
 }
 
@@ -1457,36 +1470,43 @@ div.pac-container>.pac-item>span {
     }
 }
 
-/* ── Estilização refinada dos botões de ação ── */
+/* ── Estilização refinada dos botões de ação (MOVY V2) ── */
 .btn-call-trip > button {
     pointer-events: auto;
     cursor: pointer;
     flex: 0 1 auto;
-    min-width: 160px;
-    max-width: 240px;
-    height: 46px;
-    padding: 0 16px;
-    border-radius: 23px;
-    color: var(--color-text-inverse);
-    background-color: var(--color-primary);
-    border: none;
-    font-family: 'Open Sans', sans-serif;
+    min-width: 170px;
+    max-width: 250px;
+    height: 48px;
+    padding: 0 20px;
+    border-radius: 24px;
+    color: #FFFFFF !important;
+    background: #00349A;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
-    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 24px rgba(0, 52, 154, 0.35);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* REGRA: Quando passar o mouse em cima, a cor DEVE SER PRETA (#111111) */
 .btn-call-trip > button:hover {
-    background-color: var(--color-primary-hover);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+    background: #111111 !important;
+    color: #FFFFFF !important;
+    border-color: #04F3FA !important;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6) !important;
 }
 
 .btn-call-trip > button:active {
-    transform: scale(0.97);
+    transform: translateY(0);
 }
 
 /* Mobile: layout balanceado para 1, 2 ou 3 botões sem corte ou desalinhamento */

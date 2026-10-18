@@ -52,9 +52,8 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
     <a class="app-header__brand" href="<?php echo Host::getLocal(); ?>">
         <img src="/webfiles/img/logo/logo.png"
              onerror="this.onerror=null; this.src='/webfiles/img/logo/logo.png';"
-             alt="MOVY Central"
-             class="app-header__logo"
-             style="max-height: 38px; object-fit: contain;">
+             alt="MOVY"
+             class="app-header__logo">
         <span class="app-header__name">MOVY</span>
     </a>
 

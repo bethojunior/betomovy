@@ -39,8 +39,9 @@ body{
 }
 
 .btn-primary:hover {
-    background-color: var(--color-primary-hover) !important;
-    border-color: var(--color-primary-hover) !important;
+    background-color: #111111 !important;
+    border-color: #04F3FA !important;
+    color: #FFFFFF !important;
 }
 
 .btn-success {
