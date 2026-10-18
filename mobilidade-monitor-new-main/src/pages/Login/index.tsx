@@ -1,4 +1,4 @@
-import { FC, useState, useRef, useEffect, KeyboardEvent } from "react";
+import React, { FC, useState, useRef, useEffect } from "react";
 import {
   Container,
   Content,
@@ -22,11 +22,6 @@ import apiSpeedmob from "../../services/apiSpeedmob";
 import pathUrl from "../../assets/background-login.webp";
 import pathLogo from "../../assets/logo-movy.png";
 
-interface FranchiseProps {
-  id: string;
-  label: string;
-}
-
 const Login: FC = () => {
   const refInputPassword = useRef<HTMLInputElement | null>(null);
   const refInputCaptcha = useRef<HTMLInputElement | null>(null);
@@ -36,19 +31,19 @@ const Login: FC = () => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [openModalFranchises, setOpenModalFranchises] = useState(false);
 
-  const [geolocationsCoordinates, setGeolocationCoordinates] = useState<GeolocationCoordinates | null>(null);
+  const [geolocationsCoordinates, setGeolocationCoordinates] = useState<GeolocationCoordinatesProps | null>(null);
   const [firstNumberCheck, setFirstNumberCheck] = useState<number>(0);
   const [secondNumberCheck, setSecondNumberCheck] = useState<number>(0);
   const [showBtnLogin, setShowBtnLogin] = useState(false);
   const [captchaError, setCaptchaError] = useState(false);
 
   const { signIn, speedmobLogin, loading } = useContextAuth();
-  const [franchises, setFranchises] = useState<FranchiseProps[]>([]);
-  const [loginValues, setLoginValues] = useState<any>({});
+  const [franchises, setFranchises] = useState<any[]>([]);
+  const [loginValues, setLoginValues] = useState<{ email: string; password: string }>({ email: "", password: "" });
 
   useEffect(() => {
-    navigator.geolocation?.getCurrentPosition((position) => {
-      if (position) {
+    navigator.geolocation?.getCurrentPosition((position: any) => {
+      if (position && position.coords) {
         setGeolocationCoordinates(position.coords);
       }
     });
@@ -63,7 +58,7 @@ const Login: FC = () => {
     if (refInputCaptcha.current) refInputCaptcha.current.value = "";
   };
 
-  const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       checkCaptcha();
     }
@@ -92,7 +87,7 @@ const Login: FC = () => {
     if (import.meta.env.ISSPEEDMOB === "true") {
       const isSupport = await speedmobLogin(email, password);
       if (isSupport === "support") {
-        apiSpeedmob.get("franchise/getAll").then(({ data }) => {
+        apiSpeedmob.get("franchise/getAll").then(({ data }: any) => {
           setFranchises(
             data.response.map((item: any) => ({
               label: item.project_name,
@@ -134,7 +129,7 @@ const Login: FC = () => {
             </h1>
 
             <p>
-              Sistema operacional completo para frotas de alta performance. Monitoramento via satélite em tempo real, despacho com SLA < 1s, faturamento multimoeda (USD / BRL) e compliance fiscal nos EUA e Brasil.
+              Sistema operacional completo para frotas de alta performance. Monitoramento via satélite em tempo real, despacho com SLA &lt; 1s, faturamento multimoeda (USD / BRL) e compliance fiscal nos EUA e Brasil.
             </p>
 
             <div className="features-grid">
