@@ -193,11 +193,108 @@ export default createGlobalStyle`
       cursor: pointer;
    }
 
-   @media (max-width: 800px) {
-     .ant-picker-panel-container .ant-picker-panels {
-        display: flex !important;
-        flex-direction: column;
-     }
+   /* ── Tabelas Ant Design Corporativas (Todas as Listagens) ── */
+   .ant-table-wrapper {
+      background: #FFFFFF !important;
+      border-radius: 14px !important;
+      border: 1px solid #E2E8F0 !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+      overflow: hidden !important;
+   }
+
+   .ant-table-thead > tr > th {
+      background: #070A1A !important;
+      color: #FFFFFF !important;
+      font-weight: 700 !important;
+      font-size: 13px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      border-bottom: 1px solid rgba(4, 243, 250, 0.2) !important;
+      padding: 14px 16px !important;
+   }
+
+   .ant-table-tbody > tr > td {
+      font-size: 13.5px !important;
+      color: #1E293B !important;
+      padding: 12px 16px !important;
+      border-bottom: 1px solid #F1F5F9 !important;
+   }
+
+   .ant-table-tbody > tr:hover > td {
+      background: #F8FAFC !important;
+   }
+
+   /* ── Cards Ant Design Corporativos (Todas as Telas de Relatórios/Configs) ── */
+   .ant-card {
+      border-radius: 14px !important;
+      border: 1px solid #E2E8F0 !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+      background: #FFFFFF !important;
+   }
+
+   .ant-card-head {
+      border-bottom: 1px solid #F1F5F9 !important;
+      padding: 0 20px !important;
+   }
+
+   .ant-card-head-title {
+      font-weight: 800 !important;
+      color: #070A1A !important;
+      font-size: 16px !important;
+   }
+
+   /* ── Inputs e Formulários das Telas Internas ── */
+   .ant-input,
+   .ant-select-selector,
+   .ant-picker {
+      border-radius: 8px !important;
+      border-color: #CBD5E1 !important;
+      transition: all 0.2s ease !important;
+
+      &:focus, &:hover {
+        border-color: #00349A !important;
+        box-shadow: 0 0 0 3px rgba(0, 52, 154, 0.12) !important;
+      }
+   }
+
+   /* ── Modais Ant Design ── */
+   .ant-modal-content {
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+   }
+
+   .ant-modal-header {
+      background: #070A1A !important;
+      padding: 16px 24px !important;
+      border-bottom: 1px solid rgba(4, 243, 250, 0.15) !important;
+   }
+
+   .ant-modal-title {
+      color: #FFFFFF !important;
+      font-weight: 800 !important;
+      font-size: 16px !important;
+   }
+
+   .ant-modal-close-x {
+      color: #FFFFFF !important;
+   }
+
+   /* ── Paginação ── */
+   .ant-pagination-item-active {
+      border-color: #00349A !important;
+      background: #00349A !important;
+
+      a {
+        color: #FFFFFF !important;
+      }
+   }
+
+   .ant-pagination-item:hover {
+      border-color: #111111 !important;
+      a {
+        color: #111111 !important;
+      }
    }
 
    .swal-button--approve {
