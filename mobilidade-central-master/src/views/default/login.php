@@ -1,89 +1,107 @@
 <div class="container-login movy-login-v2">
 
-    <!-- Banner Cinematográfico com Glassmorphism e Grid Futurista -->
-    <aside class="login-banner">
-        <div class="login-banner__overlay">
-            <div class="login-banner__brand-glow"></div>
-            <div class="login-banner__content">
-                <div class="brand-pill">
-                    <span class="pulse-dot"></span>
-                    <span>SISTEMA DE DESPACHO GLOBAL</span>
+    <div class="login-wrapper">
+
+        <!-- Lado Esquerdo: Banner Tecnológico MOVY com Glassmorphism e fundo de mobilidade -->
+        <section class="login-banner-glass">
+            <div class="text-wrapper">
+                <div class="badge-monitor">
+                    <span class="dot-pulse"></span>
+                    <span>CENTRAL OPERACIONAL &bull; GESTÃO GLOBAL</span>
                 </div>
-                <h1 class="login-banner__headline">
-                    Mobilidade Urbana Inteligente de Próxima Geração
+
+                <h1>
+                    Plataforma de Despacho & <span class="highlight">Gestão de Corridas</span>
                 </h1>
-                <p class="login-banner__desc">
-                    Controle de frota em tempo real, monitoramento de viagens, leilão de corridas e despacho ultra-rápido para motoristas nos EUA e Brasil.
+
+                <p>
+                    Sistema de despacho corporativo de alta performance. Monitoramento via satélite em tempo real, gestão de frotas e motoristas, faturamento multimoeda (USD / BRL) e conformidade operacional integrada nos EUA e Brasil.
                 </p>
-                <div class="login-banner__features">
-                    <div class="feat-badge">
-                        <i class="material-icons">speed</i>
-                        <span>Despacho em < 1s</span>
+
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <span class="check-icon">✓</span>
+                        <div>
+                            <strong>Despacho Ultra-Rápido</strong>
+                            <small>Alocação inteligente com SLA &lt; 1s</small>
+                        </div>
                     </div>
-                    <div class="feat-badge">
-                        <i class="material-icons">public</i>
-                        <span>Operação Multimoeda (USD / BRL)</span>
+                    <div class="feature-item">
+                        <span class="check-icon">✓</span>
+                        <div>
+                            <strong>Zelle & Pix Integrados</strong>
+                            <small>Faturamento e repasse automático multimoeda</small>
+                        </div>
                     </div>
-                    <div class="feat-badge">
-                        <i class="material-icons">security</i>
-                        <span>Telemetria & Segurança SOS</span>
+                    <div class="feature-item">
+                        <span class="check-icon">✓</span>
+                        <div>
+                            <strong>MOVY Negocia & Leilão</strong>
+                            <small>Controle dinâmico de propostas e contrapropostas</small>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </aside>
+        </section>
 
-    <!-- Painel do formulário estilizado -->
-    <main class="login-panel">
-
-        <div class="login-card">
-
-            <div class="login-logo-container">
-                <img src="/webfiles/img/logo/logo.png"
-                     alt="MOVY"
-                     class="logo-company">
+        <!-- Lado Direito: Formulário com FUNDO BRANCO PURO e Logo ampliada sem fundo rosa -->
+        <aside class="login-card-container">
+            <div class="login-card-header">
+                <div class="card-logo-container">
+                    <img src="/webfiles/img/logo/logo-movy-transparent.png"
+                         alt="MOVY"
+                         class="logo-company">
+                </div>
+                <h2>Acesse sua central</h2>
+                <p>Insira suas credenciais de gestor corporativo</p>
             </div>
-
-            <h2 class="login-title">Central MOVY</h2>
-            <p class="login-subtitle">Acesse o painel de despacho executivo</p>
 
             <form class="form-login" novalidate>
-
                 <div class="input-group">
-                    <i class="material-icons" aria-hidden="true">mail_outline</i>
-                    <input type="email"
-                           id="email"
-                           placeholder="E-mail de acesso"
-                           autocomplete="email"
-                           required>
+                    <label for="email">E-mail de acesso</label>
+                    <div class="input-field-wrap">
+                        <i class="material-icons" aria-hidden="true">mail_outline</i>
+                        <input type="email"
+                               id="email"
+                               placeholder="nome@empresa.com"
+                               autocomplete="email"
+                               required>
+                    </div>
                 </div>
 
                 <div class="input-group">
-                    <i class="material-icons" aria-hidden="true">lock_outline</i>
-                    <input type="password"
-                           id="password"
-                           placeholder="Sua senha secreta"
-                           autocomplete="current-password"
-                           required>
+                    <label for="password">Senha</label>
+                    <div class="input-field-wrap">
+                        <i class="material-icons" aria-hidden="true">lock_outline</i>
+                        <input type="password"
+                               id="password"
+                               placeholder="••••••••"
+                               autocomplete="current-password"
+                               required>
+                    </div>
                 </div>
 
                 <button type="submit" class="authenticate-user">
-                    <span>ACESSAR PLATAFORMA</span>
+                    <span>ENTRAR NO PAINEL</span>
                     <i class="material-icons">arrow_forward</i>
                 </button>
-
             </form>
 
             <a href="/register" class="register-link">
                 Não possui conta empresarial? <strong>Cadastre sua central</strong>
             </a>
 
-        </div>
+            <div class="security-footer">
+                <div class="security-notice">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    <span>Conexão Segura &bull; Auditoria de Acesso e IP</span>
+                </div>
+                <small class="rights-text">&copy; <?php echo date('Y'); ?> MOVY Global Technologies &bull; Todos os direitos reservados</small>
+            </div>
+        </aside>
 
-        <p class="login-panel__footer">
-            &copy; <?php echo date('Y'); ?> MOVY Global Technologies &bull; Todos os direitos reservados
-        </p>
-
-    </main>
+    </div>
 
 </div>
