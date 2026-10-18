@@ -31,8 +31,15 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem('keyAppPartner', JSON.stringify(key_app_partner));
 
             if (Array.isArray(central_user) && central_user.length > 0) {
-                const firstCentral = central_user[0].central || central_user[0];
-                Session.set("centralSelected", firstCentral);
+                const activeCentralObj = central_user.find(c => {
+                    const item = c.central || c;
+                    return item && (item.status == 1 || item.status === true || item.status === "1");
+                });
+                const selectedCentral = activeCentralObj ? (activeCentralObj.central || activeCentralObj) : (central_user[0].central || central_user[0]);
+                Session.set("centralSelected", selectedCentral);
+                try {
+                    localStorage.setItem("centralSelected", JSON.stringify(selectedCentral));
+                } catch (e) {}
             }
 
             if(environment.appPartner === "false" && key_app_partner !== null) {

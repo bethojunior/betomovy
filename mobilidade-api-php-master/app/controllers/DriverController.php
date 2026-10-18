@@ -688,4 +688,333 @@ class DriverController extends ApiController
             echo $this->returnError($e);
         }
     }
+
+    /**
+     * GET /driver?page=1&...
+     * Called by Monitor web panel
+     */
+    public function actionIndex()
+    {
+        try {
+            $pdo = \app\utils\Connection::open();
+
+            // If a specific ID is requested in route (e.g. /driver/123)
+            $driverId = $_GET['id'] ?? null;
+            if ($driverId && is_numeric($driverId)) {
+                $driver = $this->findDriverDetail($pdo, (int)$driverId);
+                echo $this->returnSuccess('Motorista encontrado', $driver);
+                return;
+            }
+
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $limit = max(1, min(100, (int)($_GET['per_page'] ?? $_GET['limit'] ?? 10)));
+            $offset = ($page - 1) * $limit;
+
+            $headers = function_exists('getallheaders') ? getallheaders() : [];
+            $cityId = $headers['cityid'] ?? $headers['cityId'] ?? $_SERVER['HTTP_CITYID'] ?? $_GET['cityId'] ?? null;
+
+            $where = ["user.statusId = 1"];
+            $params = [];
+
+            if ($cityId) {
+                $where[] = "driver.cityId = :cityId";
+                $params[':cityId'] = (int)$cityId;
+            }
+
+            if (!empty($_GET['driverRegisterStatusId'])) {
+                $where[] = "driver.driverRegisterStatusId = :statusId";
+                $params[':statusId'] = (int)$_GET['driverRegisterStatusId'];
+            }
+
+            if (!empty($_GET['driverType'])) {
+                $where[] = "levelAccess.userTypeId = :driverType";
+                $params[':driverType'] = (int)$_GET['driverType'];
+            }
+
+            if (!empty($_GET['name'])) {
+                $where[] = "user.name LIKE :name";
+                $params[':name'] = '%' . trim($_GET['name']) . '%';
+            }
+
+            if (!empty($_GET['email'])) {
+                $where[] = "user.email LIKE :email";
+                $params[':email'] = '%' . trim($_GET['email']) . '%';
+            }
+
+            if (!empty($_GET['document'])) {
+                $digits = preg_replace('/\D/', '', $_GET['document']);
+                $where[] = "(user.document LIKE :doc OR user.document_digits LIKE :docDig)";
+                $params[':doc'] = '%' . trim($_GET['document']) . '%';
+                $params[':docDig'] = $digits . '%';
+            }
+
+            if (!empty($_GET['phone'])) {
+                $phoneDigits = preg_replace('/\D/', '', $_GET['phone']);
+                $where[] = "(user.phone LIKE :phone OR user.phone_digits LIKE :phoneDig)";
+                $params[':phone'] = '%' . trim($_GET['phone']) . '%';
+                $params[':phoneDig'] = $phoneDigits . '%';
+            }
+
+            if (!empty($_GET['carPlate'])) {
+                $cleanPlate = preg_replace('/[^A-Za-z0-9]/', '', $_GET['carPlate']);
+                $where[] = "car.plate LIKE :plate";
+                $params[':plate'] = '%' . $cleanPlate . '%';
+            }
+
+            $whereSql = implode(' AND ', $where);
+
+            // Count total
+            $countSql = "
+                SELECT count(DISTINCT driver.idDriver)
+                FROM driver
+                JOIN user ON driver.userId = user.idUser
+                LEFT JOIN levelAccess ON user.idUser = levelAccess.userId
+                LEFT JOIN car ON driver.idDriver = car.driverId AND car.deleted_at IS NULL
+                WHERE {$whereSql}
+            ";
+            $countStmt = $pdo->prepare($countSql);
+            $countStmt->execute($params);
+            $total = (int)$countStmt->fetchColumn();
+
+            // Query items
+            $sql = "
+                SELECT
+                    driver.idDriver,
+                    user.idUser,
+                    user.name,
+                    coalesce(user.nickname, '') as nickname,
+                    coalesce(user.document, '') as document,
+                    coalesce(user.phone, '') as phone,
+                    coalesce(user.email, '') as email,
+                    coalesce(user.rg, '') as rg,
+                    coalesce(user.gender, '') as gender,
+                    coalesce(user.created_at, driver.created_at, '') as created_at,
+                    coalesce(user.observation, '') as observation,
+                    user.platform,
+                    coalesce(user.zafiraValidated, 0) as zafiraValidated,
+                    coalesce(user.rating, 5) as rating,
+                    driver.driverRegisterStatusId,
+                    coalesce(drs.name, 'Pendente') as registerStatus,
+                    coalesce(driver.alvara, '') as alvara,
+                    driver.balanceId,
+                    coalesce(driver.prepaid, 0) as prepaid,
+                    coalesce(driver.profileImage, user.profilePhoto, '') as profileImage,
+                    driver.cityId,
+                    coalesce(city.nome, '') as city,
+                    coalesce(car.brand, '') as carBrand,
+                    coalesce(car.model, '') as carModel,
+                    coalesce(car.plate, '') as carPlate,
+                    coalesce(car.color, '') as carColor,
+                    coalesce(car.year, '') as carYear,
+                    coalesce(userType.name, 'Comum') as userType,
+                    coalesce(levelAccess.userTypeId, 0) as userTypeId,
+                    coalesce(balance.balance, 0) as balance,
+                    coalesce(balance.blockedBalance, 0) as blockedBalance,
+                    driver.last_lat,
+                    driver.last_lon,
+                    driver.appVersion,
+                    null as militaryForce,
+                    null as militaryPatent,
+                    null as militaryPatentPicture,
+                    null as militaryStatus,
+                    null as om,
+                    null as hours_worked,
+                    null as hours_open
+                FROM driver
+                JOIN user ON driver.userId = user.idUser
+                LEFT JOIN driverRegisterStatus drs ON driver.driverRegisterStatusId = drs.idDriverRegisterStatus
+                LEFT JOIN levelAccess ON user.idUser = levelAccess.userId
+                LEFT JOIN userType ON levelAccess.userTypeId = userType.idUserType
+                LEFT JOIN car ON driver.idDriver = car.driverId AND car.deleted_at IS NULL
+                LEFT JOIN city ON driver.cityId = city.id
+                LEFT JOIN balance ON driver.balanceId = balance.idBalance
+                WHERE {$whereSql}
+                GROUP BY driver.idDriver
+                ORDER BY driver.idDriver DESC
+                LIMIT {$limit} OFFSET {$offset}
+            ";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $drivers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Format monetary and numeric fields
+            $formatted = array_map(function ($d) {
+                $d['idDriver'] = (int)$d['idDriver'];
+                $d['idUser'] = (int)$d['idUser'];
+                $d['cityId'] = $d['cityId'] ? (int)$d['cityId'] : null;
+                $d['driverRegisterStatusId'] = (int)$d['driverRegisterStatusId'];
+                $d['userTypeId'] = (int)$d['userTypeId'];
+                $d['balance'] = (float)$d['balance'];
+                $d['blockedBalance'] = (float)$d['blockedBalance'];
+                $d['rating'] = (float)$d['rating'];
+                $d['prepaid'] = (int)$d['prepaid'];
+                $d['zafiraValidated'] = (int)$d['zafiraValidated'];
+                return $d;
+            }, $drivers);
+
+            $lastPage = $total > 0 ? (int)ceil($total / $limit) : 1;
+
+            $response = [
+                'current_page' => $page,
+                'data' => $formatted,
+                'first_page_url' => "/driver?page=1",
+                'from' => $offset + 1,
+                'last_page' => $lastPage,
+                'next_page_url' => $page < $lastPage ? "/driver?page=" . ($page + 1) : null,
+                'path' => "/driver",
+                'per_page' => $limit,
+                'prev_page_url' => $page > 1 ? "/driver?page=" . ($page - 1) : null,
+                'to' => min($offset + $limit, $total),
+                'total' => $total,
+            ];
+
+            echo $this->returnSuccess('Lista de motoristas', $response);
+        } catch (\Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    /**
+     * Helper to load full driver details
+     */
+    private function findDriverDetail(PDO $pdo, int $driverId): array
+    {
+        $sql = "
+            SELECT
+                driver.*,
+                user.name, user.nickname, user.document, user.phone, user.email,
+                user.dateOfBirth, user.gender, user.rg, user.created_at, user.observation,
+                user.zafiraValidated,
+                coalesce(car.idCar, 0) as idCar,
+                coalesce(car.brand, '') as brand,
+                coalesce(car.model, '') as model,
+                coalesce(car.plate, '') as plate,
+                coalesce(car.color, '') as color,
+                coalesce(car.year, '') as year,
+                coalesce(car.crlv, driver.crlv, '') as crlv,
+                coalesce(car.crlvPicture, driver.crlvPicture, '') as crlvPicture,
+                coalesce(balance.balance, 0) as balance,
+                coalesce(balance.blockedBalance, 0) as blockedBalance,
+                coalesce(city.nome, '') as city,
+                coalesce(drs.name, 'Pendente') as registerStatus
+            FROM driver
+            JOIN user ON driver.userId = user.idUser
+            LEFT JOIN car ON driver.idDriver = car.driverId AND car.deleted_at IS NULL
+            LEFT JOIN balance ON driver.balanceId = balance.idBalance
+            LEFT JOIN city ON driver.cityId = city.id
+            LEFT JOIN driverRegisterStatus drs ON driver.driverRegisterStatusId = drs.idDriverRegisterStatus
+            WHERE driver.idDriver = :id
+            LIMIT 1
+        ";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':id' => $driverId]);
+        $driver = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$driver) {
+            throw new \Exception("Motorista não encontrado");
+        }
+
+        return $driver;
+    }
+
+    /**
+     * GET /driver/positions
+     */
+    public function actionPositions()
+    {
+        try {
+            $pdo = \app\utils\Connection::open();
+            $headers = function_exists('getallheaders') ? getallheaders() : [];
+            $cityId = $headers['cityid'] ?? $headers['cityId'] ?? $_SERVER['HTTP_CITYID'] ?? $_GET['cityId'] ?? null;
+
+            $cityWhere = $cityId ? "AND driver.cityId = " . (int)$cityId : "";
+            $sql = "
+                SELECT driver.idDriver, driver.last_lat as latitude, driver.last_lon as longitude,
+                       user.name, user.phone, driver.status, car.plate
+                FROM driver
+                JOIN user ON driver.userId = user.idUser
+                LEFT JOIN car ON driver.idDriver = car.driverId AND car.deleted_at IS NULL
+                WHERE user.statusId = 1
+                  AND driver.last_lat IS NOT NULL
+                  AND driver.last_lon IS NOT NULL
+                  {$cityWhere}
+                LIMIT 100
+            ";
+            $stmt = $pdo->query($sql);
+            $positions = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+            echo $this->returnSuccess('Posições dos motoristas', $positions);
+        } catch (\Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    /**
+     * GET /driver/{id}/stations
+     */
+    public function actionStations()
+    {
+        try {
+            echo $this->returnSuccess('Estações do motorista', []);
+        } catch (\Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    /**
+     * GET /driver/{id}/driverAppInfo
+     */
+    public function actionDriverAppInfo()
+    {
+        try {
+            $id = $_GET['id'] ?? null;
+            $pdo = \app\utils\Connection::open();
+            $stmt = $pdo->prepare("SELECT appVersion, platform, last_lat, last_lon FROM driver JOIN user ON driver.userId = user.idUser WHERE driver.idDriver = :id");
+            $stmt->execute([':id' => $id]);
+            $info = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            echo $this->returnSuccess('App info do motorista', $info);
+        } catch (\Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    /**
+     * PUT/POST /driver/activateRegister or /driver/changeStatus/{id}
+     */
+    public function actionActivateRegister()
+    {
+        try {
+            $id = $_GET['id'] ?? null;
+            if (!$id) {
+                throw new \Exception("ID do motorista não informado");
+            }
+            $pdo = \app\utils\Connection::open();
+            $stmt = $pdo->prepare("UPDATE driver SET driverRegisterStatusId = 1 WHERE idDriver = :id");
+            $stmt->execute([':id' => $id]);
+
+            echo $this->returnSuccess('Cadastro ativado com sucesso');
+        } catch (\Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    public function actionChangeStatus()
+    {
+        try {
+            $id = $_GET['id'] ?? null;
+            $statusId = $_POST['statusId'] ?? $_GET['statusId'] ?? 1;
+            if (!$id) {
+                throw new \Exception("ID do motorista não informado");
+            }
+            $pdo = \app\utils\Connection::open();
+            $stmt = $pdo->prepare("UPDATE driver SET driverRegisterStatusId = :statusId WHERE idDriver = :id");
+            $stmt->execute([':statusId' => $statusId, ':id' => $id]);
+
+            echo $this->returnSuccess('Status alterado com sucesso');
+        } catch (\Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
 }
+

@@ -584,4 +584,233 @@ class CustomerController extends ApiController
             ]);
         }
     }
+
+    /**
+     * GET /customer?page=1&...
+     * Called by Monitor web panel (Physical client list)
+     */
+    public function actionIndex()
+    {
+        try {
+            $pdo = \app\utils\Connection::open();
+
+            // If a specific ID is requested in route (e.g. /customer/123)
+            $customerId = $_GET['id'] ?? null;
+            if ($customerId && is_numeric($customerId)) {
+                $customer = $this->findCustomerDetail($pdo, (int)$customerId);
+                echo $this->returnSuccess('Cliente encontrado', $customer);
+                return;
+            }
+
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $limit = max(1, min(100, (int)($_GET['per_page'] ?? $_GET['limit'] ?? 10)));
+            $offset = ($page - 1) * $limit;
+
+            $headers = function_exists('getallheaders') ? getallheaders() : [];
+            $cityId = $headers['cityid'] ?? $headers['cityId'] ?? $_SERVER['HTTP_CITYID'] ?? $_GET['cityId'] ?? null;
+
+            $where = ["user.statusId = 1"];
+            $params = [];
+
+            if ($cityId) {
+                $where[] = "user.cityId = :cityId";
+                $params[':cityId'] = (int)$cityId;
+            }
+
+            if (!empty($_GET['customerRegisterStatusId'])) {
+                $where[] = "customer.customerRegisterStatusId = :statusId";
+                $params[':statusId'] = (int)$_GET['customerRegisterStatusId'];
+            }
+
+            if (!empty($_GET['name'])) {
+                $where[] = "user.name LIKE :name";
+                $params[':name'] = '%' . trim($_GET['name']) . '%';
+            }
+
+            if (!empty($_GET['email'])) {
+                $where[] = "user.email LIKE :email";
+                $params[':email'] = '%' . trim($_GET['email']) . '%';
+            }
+
+            if (!empty($_GET['document'])) {
+                $digits = preg_replace('/\D/', '', $_GET['document']);
+                $where[] = "(user.document LIKE :doc OR user.document_digits LIKE :docDig)";
+                $params[':doc'] = '%' . trim($_GET['document']) . '%';
+                $params[':docDig'] = $digits . '%';
+            }
+
+            if (!empty($_GET['phone'])) {
+                $phoneDigits = preg_replace('/\D/', '', $_GET['phone']);
+                $where[] = "(user.phone LIKE :phone OR user.phone_digits LIKE :phoneDig)";
+                $params[':phone'] = '%' . trim($_GET['phone']) . '%';
+                $params[':phoneDig'] = $phoneDigits . '%';
+            }
+
+            $whereSql = implode(' AND ', $where);
+
+            // Count total
+            $countSql = "
+                SELECT count(DISTINCT customer.idCustomer)
+                FROM customer
+                JOIN user ON customer.userId = user.idUser
+                WHERE {$whereSql}
+            ";
+            $countStmt = $pdo->prepare($countSql);
+            $countStmt->execute($params);
+            $total = (int)$countStmt->fetchColumn();
+
+            // Query items
+            $sql = "
+                SELECT
+                    customer.idCustomer,
+                    user.idUser,
+                    user.name,
+                    coalesce(user.nickname, '') as nickname,
+                    coalesce(user.phone, '') as phone,
+                    coalesce(user.email, '') as email,
+                    coalesce(user.document, '') as document,
+                    coalesce(user.dateOfBirth, '') as dateOfBirth,
+                    coalesce(user.gender, '') as gender,
+                    coalesce(user.rg, '') as rg,
+                    user.rgFrontPicture,
+                    user.rgBackPicture,
+                    coalesce(crs.name, 'Aprovado') as status,
+                    customer.customerRegisterStatusId,
+                    user.cityId,
+                    coalesce(city.nome, '') as city,
+                    customer.balanceId,
+                    coalesce(balance.balance, 0) as comission,
+                    coalesce(balance.tripBalance, 0) as voucherBalance,
+                    coalesce(customer.profileImage, user.profilePhoto, '') as profileImage,
+                    customer.appVersion,
+                    user.platform,
+                    coalesce(user.quantityTrips, 0) as quantityTripsFinished,
+                    coalesce(user.created_at, '') as created_at,
+                    coalesce(user.observation, '') as observation,
+                    user.last_lat as latitude,
+                    user.last_lon as longitude,
+                    coalesce(user.zafiraValidated, 0) as zafiraValidated,
+                    null as om,
+                    null as militaryStatus,
+                    null as militaryForce,
+                    null as patent,
+                    null as patentPicture,
+                    null as docLabels,
+                    null as docTexts,
+                    null as docStatuses
+                FROM customer
+                JOIN user ON customer.userId = user.idUser
+                LEFT JOIN customerRegisterStatus crs ON customer.customerRegisterStatusId = crs.idCustomerRegisterStatus
+                LEFT JOIN city ON user.cityId = city.id
+                LEFT JOIN balance ON customer.balanceId = balance.idBalance
+                WHERE {$whereSql}
+                GROUP BY customer.idCustomer
+                ORDER BY customer.idCustomer DESC
+                LIMIT {$limit} OFFSET {$offset}
+            ";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $formatted = array_map(function ($c) {
+                $c['idCustomer'] = (int)$c['idCustomer'];
+                $c['idUser'] = (int)$c['idUser'];
+                $c['cityId'] = $c['cityId'] ? (int)$c['cityId'] : null;
+                $c['customerRegisterStatusId'] = (int)$c['customerRegisterStatusId'];
+                $c['comission'] = (float)$c['comission'];
+                $c['voucherBalance'] = (float)$c['voucherBalance'];
+                $c['quantityTripsFinished'] = (int)$c['quantityTripsFinished'];
+                $c['zafiraValidated'] = (int)$c['zafiraValidated'];
+                return $c;
+            }, $customers);
+
+            $lastPage = $total > 0 ? (int)ceil($total / $limit) : 1;
+
+            $response = [
+                'current_page' => $page,
+                'data' => $formatted,
+                'first_page_url' => "/customer?page=1",
+                'from' => $offset + 1,
+                'last_page' => $lastPage,
+                'next_page_url' => $page < $lastPage ? "/customer?page=" . ($page + 1) : null,
+                'path' => "/customer",
+                'per_page' => $limit,
+                'prev_page_url' => $page > 1 ? "/customer?page=" . ($page - 1) : null,
+                'to' => min($offset + $limit, $total),
+                'total' => $total,
+            ];
+
+            echo $this->returnSuccess('Lista de clientes', $response);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    /**
+     * Helper to load customer detail
+     */
+    private function findCustomerDetail(PDO $pdo, int $customerId): array
+    {
+        $sql = "
+            SELECT
+                customer.*,
+                user.name, user.nickname, user.document, user.phone, user.email,
+                user.dateOfBirth, user.gender, user.rg, user.created_at, user.observation,
+                user.zafiraValidated,
+                coalesce(balance.balance, 0) as balance,
+                coalesce(city.nome, '') as city,
+                coalesce(crs.name, 'Aprovado') as status
+            FROM customer
+            JOIN user ON customer.userId = user.idUser
+            LEFT JOIN balance ON customer.balanceId = balance.idBalance
+            LEFT JOIN city ON user.cityId = city.id
+            LEFT JOIN customerRegisterStatus crs ON customer.customerRegisterStatusId = crs.idCustomerRegisterStatus
+            WHERE customer.idCustomer = :id
+            LIMIT 1
+        ";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':id' => $customerId]);
+        $customer = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$customer) {
+            throw new Exception("Cliente não encontrado");
+        }
+
+        return $customer;
+    }
+
+    /**
+     * GET /customer/{id}/locations
+     */
+    public function actionLocations()
+    {
+        try {
+            echo $this->returnSuccess('Locais do cliente', []);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    /**
+     * PUT/POST /customer/{id}/changeStatus or /customer/changeStatus
+     */
+    public function actionChangeStatus()
+    {
+        try {
+            $id = $_GET['id'] ?? null;
+            $statusId = $_POST['statusId'] ?? $_GET['statusId'] ?? 1;
+            if (!$id) {
+                throw new Exception("ID do cliente não informado");
+            }
+            $pdo = \app\utils\Connection::open();
+            $stmt = $pdo->prepare("UPDATE customer SET customerRegisterStatusId = :statusId WHERE idCustomer = :id");
+            $stmt->execute([':statusId' => $statusId, ':id' => $id]);
+
+            echo $this->returnSuccess('Status do cliente alterado com sucesso');
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
 }
+
