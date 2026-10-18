@@ -788,7 +788,7 @@ class DriverController extends ApiController
                     coalesce(user.email, '') as email,
                     coalesce(user.rg, '') as rg,
                     coalesce(user.gender, '') as gender,
-                    coalesce(user.created_at, driver.created_at, '') as created_at,
+                    coalesce(user.created_at, '') as created_at,
                     coalesce(user.observation, '') as observation,
                     user.platform,
                     coalesce(user.zafiraValidated, 0) as zafiraValidated,
