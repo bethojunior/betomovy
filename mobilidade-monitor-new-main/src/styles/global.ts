@@ -29,10 +29,10 @@ export default createGlobalStyle`
       color: #0F172A;
       -webkit-font-smoothing: antialiased;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+   }
 
-      .ant-menu.ant-menu-sub.ant-menu-vertical {
-        display: none;
-      }
+   .ant-menu.ant-menu-sub.ant-menu-vertical {
+      display: none;
    }
 
    /* ── Ant Design Menu Sidebar (Tema Corporativo MOVY) ── */
@@ -64,14 +64,15 @@ export default createGlobalStyle`
       background-color: #111111 !important;
       color: #04F3FA !important;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+   }
 
-      a {
-        color: #04F3FA !important;
-      }
-
-      .ant-menu-item-icon, svg {
-        color: #04F3FA !important;
-      }
+   .ant-menu-dark .ant-menu-item:hover a,
+   .ant-menu-dark .ant-menu-submenu-title:hover a,
+   .ant-menu-dark .ant-menu-item:hover .ant-menu-item-icon,
+   .ant-menu-dark .ant-menu-item:hover svg,
+   .ant-menu-dark .ant-menu-submenu-title:hover .ant-menu-item-icon,
+   .ant-menu-dark .ant-menu-submenu-title:hover svg {
+      color: #04F3FA !important;
    }
 
    .ant-menu-dark .ant-menu-item-selected {
@@ -79,10 +80,10 @@ export default createGlobalStyle`
       color: #FFFFFF !important;
       font-weight: 700 !important;
       box-shadow: 0 4px 14px rgba(0, 52, 154, 0.4) !important;
+   }
 
-      a {
-        color: #FFFFFF !important;
-      }
+   .ant-menu-dark .ant-menu-item-selected a {
+      color: #FFFFFF !important;
    }
 
    /* ── Botões Globais: Hover PRETO (#111111) com acento Ciano ── */
@@ -250,11 +251,16 @@ export default createGlobalStyle`
       border-radius: 8px !important;
       border-color: #CBD5E1 !important;
       transition: all 0.2s ease !important;
+   }
 
-      &:focus, &:hover {
-        border-color: #00349A !important;
-        box-shadow: 0 0 0 3px rgba(0, 52, 154, 0.12) !important;
-      }
+   .ant-input:focus,
+   .ant-input:hover,
+   .ant-select-selector:focus,
+   .ant-select-selector:hover,
+   .ant-picker:focus,
+   .ant-picker:hover {
+      border-color: #00349A !important;
+      box-shadow: 0 0 0 3px rgba(0, 52, 154, 0.12) !important;
    }
 
    /* ── Modais Ant Design ── */
@@ -284,17 +290,18 @@ export default createGlobalStyle`
    .ant-pagination-item-active {
       border-color: #00349A !important;
       background: #00349A !important;
+   }
 
-      a {
-        color: #FFFFFF !important;
-      }
+   .ant-pagination-item-active a {
+      color: #FFFFFF !important;
    }
 
    .ant-pagination-item:hover {
       border-color: #111111 !important;
-      a {
-        color: #111111 !important;
-      }
+   }
+
+   .ant-pagination-item:hover a {
+      color: #111111 !important;
    }
 
    .swal-button--approve {
