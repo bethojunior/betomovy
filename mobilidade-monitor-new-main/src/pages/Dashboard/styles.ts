@@ -149,17 +149,19 @@ export const StatisticRealTime = styled.div`
 
 export const CardOfInformations = styled.div`
   width: 49%;
-  background-color: #fff;
-  border-radius: 10px;
-  border: 1px solid #f0f2f5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  background-color: #FFFFFF !important;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 
   &:hover {
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+    border-color: rgba(4, 243, 250, 0.3);
   }
 
   @media (max-width: 800px) {
@@ -198,19 +200,20 @@ export const ContentFilteredMonthAndDay = styled.div`
 `;
 
 export const ButtonsFiltered = styled.button<ButtonsFilteredProps>`
-  background-color: ${(props) => (props.selected ? "#1890ff" : "#fff")};
-  border: 1px solid ${(props) => (props.selected ? "#1890ff" : "#d9d9d9")};
-  padding: 3px 12px;
+  background-color: ${(props) => (props.selected ? "#00349A" : "#FFFFFF")};
+  border: 1px solid ${(props) => (props.selected ? "#00349A" : "#E2E8F0")};
+  padding: 5px 14px;
   font-size: 12px;
-  font-weight: 500;
-  color: ${(props) => (props.selected ? "#fff" : "#595959")};
-  border-radius: 6px;
+  font-weight: 700;
+  color: ${(props) => (props.selected ? "#FFFFFF" : "#64748B")};
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    color: ${(props) => (props.selected ? "#fff" : "#1890ff")};
-    border-color: #1890ff;
+    background-color: #111111 !important;
+    border-color: #04F3FA !important;
+    color: #04F3FA !important;
   }
 `;
 
@@ -219,6 +222,7 @@ export const TopDriversAndClients = styled.div`
   flex-direction: row;
   justify-content: space-between;
   padding-bottom: 70px;
+  gap: 16px;
 
   @media (max-width: 800px) {
     flex-direction: column;
@@ -230,37 +234,37 @@ export const TopDriversAndClients = styled.div`
 export const TripAndTicketOfToday = styled.div`
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  background-color: #fff;
-  margin-bottom: 6px;
-  border-radius: 10px;
-  border: 1px solid #f0f2f5;
+  padding: 16px 20px;
+  background-color: #FFFFFF;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
   height: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
   }
 `;
 
 export const ClientsAndDriversRealTime = styled.div`
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  background-color: #fff;
-  margin-top: 6px;
-  border-radius: 10px;
-  border: 1px solid #f0f2f5;
+  padding: 16px 20px;
+  background-color: #FFFFFF;
+  margin-top: 10px;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
   height: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
   }
-`;
-
 export const TripAndTicketContainer = styled.div`
   display: flex;
   flex-direction: column;

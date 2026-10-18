@@ -63,35 +63,42 @@ export const AreaChipDismissButton = styled(Button)<AreaChipDismissButtonProps>`
 `;
 
 export const SelectCities = styled(Select)`
-  min-width: 100px;
-  margin-top: 3px;
-  margin-right: 3px;
+  min-width: 150px;
+  margin-top: 0;
+  margin-right: 4px;
 
   .ant-select-selector {
-    height: 95% !important;
+    height: 38px !important;
     align-items: center;
-    font-size: 15px;
-  }
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 20px !important;
+    color: #FFFFFF !important;
+    padding: 0 14px !important;
+    transition: all 0.2s ease !important;
 
-  @media (max-width: 320px) {
-    width: 50px;
-    .ant-select-selector {
-      font-size: 14px;
+    &:hover {
+      border-color: #04F3FA !important;
+      background: rgba(255, 255, 255, 0.12) !important;
     }
   }
 
-  @media (min-width: 321px) and (max-width: 375px) {
-    width: 120px;
-    .ant-select-selector {
-      font-size: 14px;
-    }
+  .ant-select-selection-item {
+    color: #FFFFFF !important;
+    font-weight: 600;
   }
 
-  @media (min-width: 376px) and (max-width: 800px) {
-    min-width: 100px;
-    width: 150px;
+  .ant-select-arrow {
+    color: #CBD5E1 !important;
+  }
+
+  @media (max-width: 800px) {
+    min-width: 110px;
     .ant-select-selector {
-      font-size: 14px;
+      font-size: 13px !important;
+      height: 34px !important;
     }
   }
 `;

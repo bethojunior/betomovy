@@ -58,6 +58,8 @@ export const TitleMenu = styled(Title)`
 export const SiderMenu = styled(Sider)<SiderProps>`
   height: 100vh;
   position: relative;
+  background: linear-gradient(180deg, #070A1A 0%, #0A1128 100%) !important;
+  border-right: 1px solid rgba(4, 243, 250, 0.08);
 
   .ant-layout-sider-children {
     display: flex;
@@ -66,20 +68,20 @@ export const SiderMenu = styled(Sider)<SiderProps>`
     overflow-y: auto !important;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+    scrollbar-color: rgba(4, 243, 250, 0.2) transparent;
 
     &::-webkit-scrollbar {
-      width: 6px;
+      width: 4px;
     }
     &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.15);
+      background: transparent;
     }
     &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(4, 243, 250, 0.2);
       border-radius: 4px;
     }
     &::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.45);
+      background: rgba(4, 243, 250, 0.5);
     }
   }
 
