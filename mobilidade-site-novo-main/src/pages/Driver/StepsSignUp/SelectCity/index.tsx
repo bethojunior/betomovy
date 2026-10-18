@@ -120,11 +120,20 @@ const handleBackStep = () => {
     setStep(step - 1);
 }
 
-const handleGetActiveCities = async () => {
-    const responseActiveCities = await api.get('City/getActives')
-    setActiveCities(responseActiveCities.data.data);
-}
-
+  const handleGetActiveCities = async () => {
+    try {
+      const responseActiveCities = await api.get('City/getActives');
+      const rawCities = responseActiveCities?.data?.data ?? responseActiveCities?.data?.response;
+      if (Array.isArray(rawCities)) {
+        setActiveCities(rawCities);
+      } else {
+        setActiveCities([]);
+      }
+    } catch (error) {
+      console.log('Erro ao buscar cidades ativas:', error);
+      setActiveCities([]);
+    }
+  };
 
   useEffect(() => {
     handleGetActiveCities();
@@ -143,22 +152,26 @@ const handleGetActiveCities = async () => {
         <Controller
           control={control}
           name="cities"
-          render={({ field: { onChange, value, name }, fieldState: { error } }) => (
-            <div>
-              <Select
-                options={activeCities.map((city) => ({
-                  label: formatCityName(city),
-                  value: city.id,
-                }))}
-                onChange={(selectedOption) => onChange((selectedOption as OptionType)?.value)}
-                value={activeCities.find(city => city.id === value) ? { label: formatCityName(activeCities.find(city => city.id === value)!), value } : null}
-                name={name}
-                styles={customStyles}
-                placeholder={t('register-driver-select-step-2-city-default')}
-              />
-              {error && <span className="errors-input">{TranslationErrors(error.message as string)}</span>}
-            </div>
-          )}
+          render={({ field: { onChange, value, name }, fieldState: { error } }) => {
+            const list = Array.isArray(activeCities) ? activeCities : [];
+            const selectedCity = list.find(city => String(city.id || (city as any).cityId) === String(value));
+            return (
+              <div>
+                <Select
+                  options={list.map((city) => ({
+                    label: formatCityName(city),
+                    value: String(city.id || (city as any).cityId),
+                  }))}
+                  onChange={(selectedOption) => onChange((selectedOption as OptionType)?.value)}
+                  value={selectedCity ? { label: formatCityName(selectedCity), value: String(value) } : null}
+                  name={name}
+                  styles={customStyles}
+                  placeholder={t('register-driver-select-step-2-city-default')}
+                />
+                {error && <span className="errors-input">{TranslationErrors(error.message as string)}</span>}
+              </div>
+            );
+          }}
         />
         
         <div className="content-button">

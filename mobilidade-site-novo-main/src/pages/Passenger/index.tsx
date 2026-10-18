@@ -594,7 +594,7 @@ const Passenger = () => {
                     className={preRegisterForm.cityId ? "select-value" : "select-placeholder"}
                   >
                     <option value="">{t("register-passenger-select-city-default")}</option>
-                    {activeCities.map((city) => (
+                    {(Array.isArray(activeCities) ? activeCities : []).map((city) => (
                       <option key={city.id} value={city.id}>
                         {formatCityName(city)}
                       </option>
@@ -921,7 +921,7 @@ const Passenger = () => {
                           <option value="" disabled>
                             {t("register-passenger-select-city-default")}
                           </option>
-                          {activeCities.map((city) => (
+                          {(Array.isArray(activeCities) ? activeCities : []).map((city) => (
                             <option key={city.id} value={city.id}>
                               {formatCityName(city)}
                             </option>

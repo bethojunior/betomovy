@@ -884,15 +884,25 @@ class CityController extends ApiController
             try {
                 $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
                 $stmt = $pdo->query("
-                    SELECT 
-                        c.id, c.nome, c.shortName, c.estado, c.active, c.statusId,
-                        ST_AsText(ca.polygon) as polygon
+                    SELECT DISTINCT
+                        c.id, c.nome, c.shortName, c.estado, c.active, c.statusId
                     FROM city c
-                    LEFT JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
-                    WHERE c.active = 1 OR c.statusId = 1
+                    INNER JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
+                    WHERE ca.polygon IS NOT NULL
                     ORDER BY c.nome ASC
                 ");
                 $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+                if (empty($cities)) {
+                    $stmt2 = $pdo->query("
+                        SELECT DISTINCT
+                            c.id, c.nome, c.shortName, c.estado, c.active, c.statusId
+                        FROM city c
+                        WHERE c.id IN (SELECT DISTINCT cityId FROM cityConfig WHERE cityId IS NOT NULL)
+                        ORDER BY c.nome ASC
+                    ");
+                    $cities = $stmt2->fetchAll(\PDO::FETCH_ASSOC);
+                }
             } catch (\Throwable $e) {
                 $cities = (new CityService)->findActives();
             }
@@ -927,8 +937,8 @@ class CityController extends ApiController
                         c.id, c.nome, c.shortName, c.estado, c.active, c.statusId,
                         ST_AsText(ca.polygon) as polygon
                     FROM city c
-                    LEFT JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
-                    WHERE c.active = 1 OR c.statusId = 1
+                    INNER JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
+                    WHERE ca.polygon IS NOT NULL
                     ORDER BY c.nome ASC
                 ");
                 $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
