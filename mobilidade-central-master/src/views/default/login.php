@@ -2,10 +2,7 @@
 
     <div class="login-wrapper">
 
-        <!-- Lado Esquerdo: Efeito Vidro Translúcido com Fundo Azul Mobilidade -->
-        <section class="login-banner-glass"></section>
-
-        <!-- Lado Direito: Formulário com FUNDO BRANCO PURO e Logo ampliada sem fundo rosa -->
+        <!-- Formulário com FUNDO BRANCO PURO centralizado com fundo escuro vidro de mobilidade -->
         <aside class="login-card-container">
             <div class="login-card-header">
                 <div class="card-logo-container">

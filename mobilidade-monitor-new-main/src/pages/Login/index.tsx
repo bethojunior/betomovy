@@ -106,15 +106,12 @@ const Login: FC = () => {
   return (
     <Container
       style={{
-        backgroundImage: `linear-gradient(135deg, rgba(7, 10, 26, 0.78) 0%, rgba(0, 52, 154, 0.65) 100%), url(${pathUrl})`,
+        backgroundImage: `linear-gradient(135deg, rgba(7, 10, 26, 0.75) 0%, rgba(0, 52, 154, 0.60) 100%), url(${pathUrl})`,
         backgroundColor: '#070A1A',
       }}
     >
       <Content>
-        {/* Lado Esquerdo: Efeito Vidro Translúcido com Fundo Azul Mobilidade */}
-        <ContentText />
-
-        {/* Lado Direito: Formulário com FUNDO BRANCO PURO conforme exigido */}
+        {/* Formulário com FUNDO BRANCO PURO centralizado sobre imagem de mobilidade com vidro escuro */}
         <LoginCardContainer>
           <HeaderCard>
             <div className="card-logo-container">

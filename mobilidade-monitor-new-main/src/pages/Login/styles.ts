@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Container = styled.div`
   width: 100vw;
   min-height: 100vh;
-  padding: 2.5rem;
+  padding: 2.5rem 1.5rem;
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -13,6 +13,21 @@ export const Container = styled.div`
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-y: auto;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(7, 10, 26, 0.40) 0%, rgba(7, 10, 26, 0.80) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    pointer-events: none;
+    z-index: 0;
+  }
 
   @media (max-width: 900px) {
     padding: 1.5rem 1rem;
@@ -20,33 +35,17 @@ export const Container = styled.div`
 `;
 
 export const Content = styled.div`
-  max-width: 1280px;
+  max-width: 440px;
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  gap: 4rem;
-
-  @media (max-width: 980px) {
-    flex-direction: column;
-    justify-content: center;
-    gap: 2.5rem;
-  }
+  position: relative;
+  z-index: 1;
 `;
 
 export const ContentText = styled.div`
-  flex: 1;
-  min-height: 520px;
-  border-radius: 24px;
-  background: rgba(7, 10, 26, 0.40);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(4, 243, 250, 0.18);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(4, 243, 250, 0.05);
-
-  @media (max-width: 980px) {
-    display: none;
-  }
+  display: none;
 `;
 
 
