@@ -101,22 +101,32 @@ export const ModalRegister: FC<Props> = ({
   useEffect(() => {
     if (Object.keys(data).length !== 0 && visible) {
       isEdit = true
-      setPlace(data.address)
+      setPlace(data.address || '')
       setSelectedFile(data.logo)
       form.setFieldsValue(data)
 
       form.setFieldsValue({
-        responsibleName: data.responsible.name,
-        phone: data.responsible.phone,
+        name: data.name,
+        responsibleName: data.responsible?.name || data.responsibleName || '',
+        phone: data.responsible?.phone || data.phone || '',
         image: data.logo,
-        latitude: data.address.latitude,
-        longitude: data.address.longitude,
-        enableCustomRadiusCentral: data.enableCustomRadiusCentral === 1,
+        address: {
+          address: data.address || '',
+          latitude: data.latitude,
+          longitude: data.longitude,
+        },
+        latitude: data.latitude,
+        longitude: data.longitude,
+        enableCustomRadiusCentral: data.enableCustomRadiusCentral === 1 || data.enableCustomRadiusCentral === true,
         placesSearchRadius: data.placesSearchRadius,
+        centralCallDriver: data.centralCallDriver,
+        syncCustomers: Boolean(data.syncCustomers),
+        showAllPrices: data.showAllPrices !== undefined ? Boolean(data.showAllPrices) : true,
+        discount_type: data.discount_type || '%',
+        discount_value: data.discount_value,
       })
 
-      setEnableCustomRadius(data.enableCustomRadiusCentral === 1)
-
+      setEnableCustomRadius(data.enableCustomRadiusCentral === 1 || data.enableCustomRadiusCentral === true)
       setRenderImage(false)
     } else if (visible) {
       isEdit = false
@@ -126,6 +136,9 @@ export const ModalRegister: FC<Props> = ({
       setEligibleSearch('')
       setEligibleHasMore(true)
       setResponsibleId('')
+      setPlace('')
+      setSelectedFile(null)
+      form.resetFields()
     }
   }, [visible, data])
 
@@ -223,9 +236,10 @@ export const ModalRegister: FC<Props> = ({
   const editCentral = async (values: any) => {
     setLoading(true)
 
-    if (typeof values.image !== 'string') {
+    if (selectedFile && typeof selectedFile !== 'string' && selectedFile[0]) {
       const formData = new FormData()
-      resizeFile(values.image.target.files[0], 250, 250).then((result) => {
+      try {
+        const result = await resizeFile(selectedFile[0], 250, 250)
         formData.append('logo', result as Blob)
 
         const config = {
@@ -235,28 +249,59 @@ export const ModalRegister: FC<Props> = ({
           },
         }
 
-        apiv1.post(`central/${data.id}/updateLogo`, formData, config)
-      })
+        await apiv1.post(`central/${data.id}/updateLogo`, formData, config)
+      } catch (err) {
+        console.error('Erro ao atualizar logo da central:', err)
+      }
+    }
+
+    let addressStr = ''
+    let lat = data.latitude
+    let lng = data.longitude
+
+    if (typeof values.address === 'object' && values.address !== null) {
+      addressStr = values.address.address || values.address.adress || place || data.address || ''
+      if (values.address.latitude !== undefined && values.address.latitude !== null && values.address.latitude !== '') {
+        lat = Number(values.address.latitude)
+      }
+      if (values.address.longitude !== undefined && values.address.longitude !== null && values.address.longitude !== '') {
+        lng = Number(values.address.longitude)
+      }
+    } else if (typeof values.address === 'string' && values.address) {
+      addressStr = values.address
+    } else {
+      addressStr = place || data.address || ''
+    }
+
+    if (place && !addressStr) {
+      addressStr = place
+    }
+
+    const payload: any = {
+      name: values.name,
+      address: addressStr,
+      centralCallDriver: values.centralCallDriver,
+      showAllPrices: Boolean(values.showAllPrices),
+      syncCustomers: Boolean(values.syncCustomers),
+      enableCustomRadiusCentral: values.enableCustomRadiusCentral ? 1 : 0,
+      placesSearchRadius: values.enableCustomRadiusCentral && values.placesSearchRadius ? Number(values.placesSearchRadius) : null,
+      discount_type: values.discount_type || null,
+      discount_value: values.discount_value ? Number(values.discount_value) : null,
+    }
+
+    if (lat !== undefined && lat !== null && lat !== '') {
+      payload.latitude = Number(lat)
+    }
+    if (lng !== undefined && lng !== null && lng !== '') {
+      payload.longitude = Number(lng)
     }
 
     api
-      .put(`central/${data.id}`, {
-        address: values.address.adress,
-        centralCallDriver: values.centralCallDriver,
-        latitude: values.address.latitude,
-        longitude: values.address.longitude,
-        name: values.name,
-        showAllPrices: values.showAllPrices,
-        syncCustomers: values.syncCustomers,
-        enableCustomRadiusCentral: values.enableCustomRadiusCentral ? 1 : 0,
-        placesSearchRadius: values.enableCustomRadiusCentral ? values.placesSearchRadius : null,
-        discount_type: values.discount_type,
-        discount_value: values.discount_value
-      })
-      .then(({ data }) => {
+      .put(`central/${data.id}`, payload)
+      .then(({ data: resData }) => {
         setLoading(false)
-        if (!data.status) {
-          setMessageAlert('Ocorreu um erro, tente novamente')
+        if (!resData.status) {
+          setMessageAlert(resData.message || 'Ocorreu um erro, tente novamente')
           setTypeAlert('error')
           setShowAlert(true)
           return
@@ -272,6 +317,12 @@ export const ModalRegister: FC<Props> = ({
         setPlace('')
         form.resetFields()
         getCentral()
+      })
+      .catch((error) => {
+        setLoading(false)
+        setMessageAlert(error.response?.data?.message || 'Erro ao atualizar central, tente novamente')
+        setTypeAlert('error')
+        setShowAlert(true)
       })
   }
 
@@ -346,7 +397,7 @@ export const ModalRegister: FC<Props> = ({
           valuePropName='file'
           rules={[
             {
-              required: true,
+              required: !isEdit && !selectedFile,
               message: 'Insira a imagem da central',
             },
           ]}
@@ -377,16 +428,25 @@ export const ModalRegister: FC<Props> = ({
         <Form.Item
           name='address'
           label='Endereço da central'
-          initialValue={{ address: '' }}
           rules={[
             {
-              required: true,
-              message: 'Insira o endereço da central',
+              validator: async () => {
+                const currentPlace = place || form.getFieldValue('address')
+                if (!currentPlace || (typeof currentPlace === 'object' && !currentPlace.address)) {
+                  throw new Error('Insira o endereço da central')
+                }
+              },
             },
           ]}
         >
           <div style={{ display: 'flex' }}>
-            <Input value={place} onChange={(e) => setPlace(e.target.value)} />
+            <Input
+              value={place}
+              onChange={(e) => {
+                setPlace(e.target.value)
+                form.setFieldValue('address', e.target.value)
+              }}
+            />
             <Button type='primary' onClick={getPlaces}>
               Pesquisar
             </Button>

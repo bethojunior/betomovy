@@ -462,6 +462,28 @@ export const TypesTravels = () => {
     const initializeData = async () => {
       setIsInitialLoading(true);
 
+      if (!cityId) {
+        try {
+          const res = await api.get("city");
+          const rawCities = res.data?.response?.data || res.data?.response || [];
+          if (Array.isArray(rawCities) && rawCities.length > 0) {
+            const firstCity = rawCities[0];
+            const cityObj = {
+              cityId: firstCity.id || firstCity.cityId,
+              nome: firstCity.nome || firstCity.name,
+              polygon: firstCity.polygon,
+            };
+            Session.setLocal("citySelected", JSON.stringify(cityObj));
+            window.location.reload();
+            return;
+          }
+        } catch (e) {
+          console.error("Erro ao verificar cidades ativas:", e);
+        }
+        setIsInitialLoading(false);
+        return;
+      }
+
       const isCustomOrderEnabled = await getCustomOrderConfig();
 
       await getTypesTravels();
@@ -486,6 +508,31 @@ export const TypesTravels = () => {
     );
   });
   if (isInitialLoading) return <Loader spinning />;
+
+  if (!cityId) {
+    return (
+      <Container>
+        <div
+          style={{
+            padding: "2.5rem",
+            textAlign: "center",
+            background: "rgba(255, 255, 255, 0.95)",
+            borderRadius: 16,
+            margin: "2rem auto",
+            maxWidth: 600,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
+          }}
+        >
+          <h2 style={{ color: "#070A1A", fontWeight: 700, marginBottom: 12 }}>
+            Nenhuma Cidade Selecionada
+          </h2>
+          <p style={{ color: "#64748B", fontSize: 15, lineHeight: 1.6 }}>
+            Selecione uma cidade no menu superior para carregar, configurar e gerenciar as tarifas e tipos de viagem correspondentes.
+          </p>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container>

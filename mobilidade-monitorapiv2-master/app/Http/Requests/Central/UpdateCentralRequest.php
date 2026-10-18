@@ -29,6 +29,9 @@ class UpdateCentralRequest extends FormRequest
      */
     public function rules()
     {
+        $central = $this->route('central');
+        $centralId = is_object($central) ? $central->id : $central;
+
         return [
             'name' => 'sometimes|string',
             'latitude' => 'sometimes|numeric',
@@ -36,8 +39,8 @@ class UpdateCentralRequest extends FormRequest
             'syncCustomers' => 'sometimes|boolean',
             'showAllPrices' => 'sometimes|boolean',
             'enableCustomRadiusCentral' => 'sometimes|boolean',
-            'discount_type' => 'sometimes',
-            'discount_value' => 'sometimes',
+            'discount_type' => 'sometimes|nullable',
+            'discount_value' => 'sometimes|nullable',
             'placesSearchRadius' => 'sometimes|nullable|numeric',
             'centralCallDriver' => [
                 'sometimes',
@@ -49,6 +52,7 @@ class UpdateCentralRequest extends FormRequest
                 'integer',
                 Rule::unique('central', 'responsibleId')
                     ->where('statusId', StatusConst::ACTIVE)
+                    ->ignore($centralId)
             ],
             'address' => 'sometimes|nullable|string',
             'logo' => 'sometimes|nullable|image',

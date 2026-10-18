@@ -347,14 +347,12 @@ export const ListCentral = () => {
   const editCentral = async (id: number, values: any) => {
     setLoading(true);
     api
-      .put(`central${id}`, {
-        values,
-      })
+      .put(`central/${id}`, values)
       .then(({ data }) => {
+        setLoading(false);
         if (!data.status) {
-          setLoading(false);
           setMessageAlert(
-            "Não foi possível salvar a comissão, tente novamente"
+            data?.message || "Não foi possível atualizar a central, tente novamente"
           );
           setTypeAlert("error");
           setShowAlert(true);
@@ -365,6 +363,14 @@ export const ListCentral = () => {
         setTypeAlert("success");
         setShowAlert(true);
         getCentral();
+      })
+      .catch((error) => {
+        setLoading(false);
+        setMessageAlert(
+          error.response?.data?.message || "Erro ao atualizar central, tente novamente"
+        );
+        setTypeAlert("error");
+        setShowAlert(true);
       });
   };
 
