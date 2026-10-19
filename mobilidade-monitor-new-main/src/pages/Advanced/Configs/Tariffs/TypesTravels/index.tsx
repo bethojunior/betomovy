@@ -442,18 +442,23 @@ export const TypesTravels = () => {
           });
 
           const currentSavedId = tripId;
-          const freshTypes = await getTypesTravels();
-          await getCommissionsDriver();
-          await getPrices();
+          try {
+            const freshTypes = await getTypesTravels();
+            await getCommissionsDriver();
+            await getPrices();
 
-          const updatedTripType = (freshTypes || []).find(
-            (t) => Number(t.idTripType) === currentSavedId
-          );
-          if (updatedTripType) {
-            setTravelSelected({ ...updatedTripType, ...travelSelected, idTripType: currentSavedId });
-          } else {
-            setTravelSelected({ ...travelSelected, idTripType: currentSavedId });
+            const updatedTripType = (freshTypes || []).find(
+              (t) => Number(t.idTripType) === currentSavedId
+            );
+            if (updatedTripType) {
+              setTravelSelected({ ...updatedTripType, ...travelSelected, idTripType: currentSavedId });
+            } else {
+              setTravelSelected({ ...travelSelected, idTripType: currentSavedId });
+            }
+          } catch (refetchErr) {
+            console.warn("Aviso ao atualizar lista após salvar:", refetchErr);
           }
+
           setIsSavedSuccess(true);
           setCurrentStep(5);
         } catch (error: any) {

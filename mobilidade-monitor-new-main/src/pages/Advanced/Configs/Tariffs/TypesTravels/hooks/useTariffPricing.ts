@@ -3,6 +3,7 @@ import swal from "sweetalert";
 
 import api from "../../../../../../services/api";
 import Mask from "../../../../../../services/Mask";
+import Session from "../../../../../../utils/Session";
 import { ListPricesProps, TypesTravelsProps } from "../types";
 
 // Política de preço/tarifa do tipo de viagem selecionado (preço base, km,
@@ -79,8 +80,24 @@ export const useTariffPricing = (
   const isNoTravelSelected = Object.keys(travelSelected).length === 0;
 
   const getPrices = async (useCustomOrderParam?: boolean): Promise<ListPricesProps[]> => {
-    const rawCity = Session.getLocal("citySelected");
-    const activeCityId = Number(cityId || rawCity?.cityId || rawCity?.id);
+    let rawCity = null;
+    try {
+      rawCity = Session.getLocal("citySelected");
+    } catch (e) {
+      console.warn("Erro ao ler Session:", e);
+    }
+    const parsedCity = (() => {
+      if (!rawCity) return null;
+      if (typeof rawCity === "string") {
+        try {
+          return JSON.parse(rawCity);
+        } catch {
+          return null;
+        }
+      }
+      return rawCity;
+    })();
+    const activeCityId = Number(cityId || parsedCity?.cityId || parsedCity?.id);
     if (!activeCityId || isNaN(activeCityId) || activeCityId <= 0) {
       console.warn("getPrices cancelado: cityId não configurado", cityId);
       return [];
