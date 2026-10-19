@@ -152,31 +152,32 @@ class DriverCommissionService
             $commission = $this->driverCommissionRepository->create([
                 'cityId'             => $cityId,
                 'tripTypeId'         => $request['tripTypeId'],
-                'valueType'          => $request['valueType'],
-                'value'              => $request['value'],
-                'disableOnPromotion' => $request['disableOnPromotion'],
+                'valueType'          => $request['valueType'] ?? '%',
+                'value'              => $request['value'] ?? 0,
+                'disableOnPromotion' => $request['disableOnPromotion'] ?? false,
+                'statusId'           => StatusConst::ACTIVE,
             ]);
 
             if (isset($request['commissionAnotherFee'])) {
                 $this->driverCommissionAnotherFeeRepository->create([
                     'driverCommissionId' => $commission->idDriverCommission,
-                    'valueType'          => $request['commissionAnotherFee']['valueType'],
-                    'taxValueType'       => $request['commissionAnotherFee']['taxValueType'] ?? null,
-                    'another_value'      => $request['commissionAnotherFee']['another_value'],
-                    'tax_value'          => $request['commissionAnotherFee']['tax_value'] ?? null,
+                    'valueType'          => $request['commissionAnotherFee']['valueType'] ?? '%',
+                    'taxValueType'       => $request['commissionAnotherFee']['taxValueType'] ?? '%',
+                    'another_value'      => $request['commissionAnotherFee']['another_value'] ?? 0,
+                    'tax_value'          => $request['commissionAnotherFee']['tax_value'] ?? 0,
                 ]);
             }
 
             if (isset($request['commissionsPaymentForm'])) {
                 foreach ($request['commissionsPaymentForm'] as $commissionPaymentForm) {
-                    if ($commissionPaymentForm['value'] <= 0) {
+                    if (empty($commissionPaymentForm['value']) || $commissionPaymentForm['value'] <= 0) {
                         continue;
                     }
 
                     $this->driverCommissionPaymentFormRepository->create([
                         'driverCommissionId' => $commission->idDriverCommission,
                         'tripPaymentFormId'  => $commissionPaymentForm['tripPaymentFormId'],
-                        'valueType'          => $commissionPaymentForm['valueType'],
+                        'valueType'          => $commissionPaymentForm['valueType'] ?? '%',
                         'value'              => $commissionPaymentForm['value'],
                     ]);
                 }

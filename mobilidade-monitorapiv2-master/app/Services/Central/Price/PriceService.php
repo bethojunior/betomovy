@@ -51,6 +51,7 @@ class PriceService
             if ($preservedOrder !== null && !isset($request['order'])) {
                 $request['order'] = $preservedOrder;
             }
+            $request['statusId'] = StatusConst::ACTIVE;
             $price = Price::create($request);
 
             DB::commit();

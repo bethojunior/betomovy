@@ -81,9 +81,15 @@ export const useTariffPricing = (
   const getPrices = async (useCustomOrderParam?: boolean) => {
     setLoading(true);
     try {
-      const responsePrices = await api.get(`price?cityId=${cityId}`);
-      const pricesTypes = responsePrices.data.response.filter(
-        (data: ListPricesProps) => data.trip_type.serviceOption === 0
+      const responsePrices = await api.get(`price?cityId=${cityId}`, {
+        headers: { cityid: cityId },
+      });
+      const rawPrices = responsePrices.data?.response || [];
+      const pricesTypes = (Array.isArray(rawPrices) ? rawPrices : []).filter(
+        (data: ListPricesProps) =>
+          data &&
+          data.trip_type &&
+          Number(data.trip_type.serviceOption ?? 0) === 0
       );
 
       const shouldApplyCustomOrder =
@@ -166,13 +172,15 @@ export const useTariffPricing = (
 
   useEffect(() => {
     if (!isNoTravelSelected) {
+      const selectedId = Number(travelSelected.idTripType);
       const listFiltered = listPrices.filter(
-        (data) => data.tripTypeId === travelSelected.idTripType
+        (data) =>
+          Number(data.tripTypeId ?? data.trip_type?.idTripType) === selectedId
       );
       setPricesSelected(listFiltered[0]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [travelSelected]);
+  }, [travelSelected, listPrices]);
 
   useEffect(() => {
     if (pricesSelected) {

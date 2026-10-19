@@ -40,11 +40,34 @@ export const ModalNewTariffs = ({
       icon: "info",
       buttons: ["Não", "Sim"],
     }).then((accepted) => {
-      if (accepted) {
         const objectSend = {
+          tripTypeId: datasTravel.idTripType,
           trip_type: datasTravel,
+          min_price: "0.00",
+          base_price: "0.00",
+          km_price: "0.00",
+          minute_price: "0.00",
+          tax_price: "0.00",
+          tax_price_type: "%",
+          another_fee: "0.00",
+          another_fee_type: "%",
+          waypoint_price: "0.00",
+          tag: "",
+          color: "#00349A",
+          idealListCommonPrice: 5,
         };
-        setListPrices([...listPrices, objectSend] as any);
+        const existingIndex = listPrices.findIndex(
+          (p) =>
+            Number(p.tripTypeId ?? p.trip_type?.idTripType) ===
+            Number(datasTravel.idTripType)
+        );
+        if (existingIndex >= 0) {
+          const updated = [...listPrices];
+          updated[existingIndex] = objectSend as any;
+          setListPrices(updated);
+        } else {
+          setListPrices([...listPrices, objectSend] as any);
+        }
         if (onSelect) {
           onSelect(datasTravel);
         }

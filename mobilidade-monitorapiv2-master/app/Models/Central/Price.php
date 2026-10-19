@@ -46,6 +46,7 @@ class Price extends Model
         'percentage_max_offer',
         'percentage_min_trip_partner',
         'percentage_max_trip_partner',
+        'statusId',
     ];
 
     public function central()

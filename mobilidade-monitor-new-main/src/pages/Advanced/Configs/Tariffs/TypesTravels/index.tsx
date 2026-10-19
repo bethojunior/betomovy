@@ -319,134 +319,123 @@ export const TypesTravels = () => {
       text: "Deseja modificar os valores do preço?",
       icon: "info",
       buttons: ["Não", "Sim"],
-    }).then((isAccepted) => {
+    }).then(async (isAccepted) => {
       if (isAccepted) {
         setLoading(true);
-        const currentTripOrder = priceOrderMap.get(travelSelected.idTripType as number) ?? null;
-        const objectSendPrice = {
-          additional_value_after_km: Utils.BrlToNumber(
-            additionalValueAfterKm,
-            "positive"
-          ),
-          another_fee: Utils.BrlToNumber(valueSurchase, "positive"),
-          another_fee_description: !descriptionSurchase
-            ? ""
-            : descriptionSurchase,
-          another_fee_type: typeValueSurchase,
-          base_price: Utils.BrlToNumber(basePrice, "positive"),
-          cityId: cityId,
-          color: colorTag,
-          disable_after_km:
-            Utils.BrlToNumber(disableAfterKm, "positive") === 0
-              ? null
-              : Utils.BrlToNumber(disableAfterKm, "positive"),
-          idealListCommonPrice: ideaListCommonPrice,
-          km_price: Utils.BrlToNumber(kmPrice, "positive"),
-          km_to_additional_value: Utils.BrlToNumber(
-            kmToAdditionalValue,
-            "positive"
-          ),
-          long_distance_per_km: Utils.BrlToNumber(longDistanceKm, "positive"),
-          long_distance_radius: longDistanceRadius,
-          long_distance_value_to_final_price: longDistanceValueToFinalPrice,
-          min_price: Utils.BrlToNumber(minPrice, "positive"),
-          minute_price: Utils.BrlToNumber(minutePrice, "positive"),
-          promotional_price_temp: Utils.BrlToNumber(
-            promotionalPriceTemp,
-            "positive"
-          ),
-          reward_driver_min_price: Utils.BrlToNumber(
-            rewardDriverMinPrice,
-            "positive"
-          ),
-          tag: tag,
-          tax_price: Utils.BrlToNumber(taxRate, "positive"),
-          tax_price_description: !descriptionTaxRate ? "" : descriptionTaxRate,
-          tax_price_type: typeTaxRate,
-          tripTypeId: travelSelected.idTripType,
-          order: currentTripOrder,
-          type_additional_value_after_km: typeAdditionalValueAfterKm,
-          waypoint_price: Utils.BrlToNumber(wayPointPrice, "positive"),
-          waiting_tolerance_seconds: Number(waitingToleranceSeconds),
-          waiting_penalty_fee: Utils.BrlToNumber(waitingPenaltyFee, "positive"),
-          waiting_extra_fee_per_minute: Utils.BrlToNumber(
-            waitingExtraFeePerMinute,
-            "positive"
-          ),
-          percentage_min_offer: Utils.BrlToNumber(floatingLimitsOfferMin, "positive"),
-          percentage_max_offer: Utils.BrlToNumber(floatingLimitsOfferMax, "positive"),
-          percentage_min_trip_partner: Utils.BrlToNumber(floatingLimitsThirdPartyMin, "positive"),
-          percentage_max_trip_partner: Utils.BrlToNumber(floatingLimitsThirdPartyMax, "positive"),
-        };
-        const newObjectCommission = commissionPaymentForms.map((response) => {
-          if (typeof response.value === "string") {
-            return {
-              ...response,
-              value: Utils.BrlToNumber(response.value as string, "positive"),
-            };
-          }
-          return response;
-        });
-
-        const objectSendCommission = {
-          commissionAnotherFee: {
-            another_value: Utils.BrlToNumber(valueSurchase, "positive"),
-            taxValueType: typeTaxRate,
-            tax_value: Utils.BrlToNumber(taxRate, "positive"),
-            valueType: typeValueSurchase,
-          },
-          commissionsPaymentForm: newObjectCommission,
-          value: Utils.BrlToNumber(valueCalcDriver, "positive"),
-          tripTypeId: travelSelected.idTripType,
-          valueType: valueTypeCalcDriver,
-          disableOnPromotion,
-        };
-
-        const responseDriverComission = api.post(
-          `driverCommission/${cityId}`,
-          objectSendCommission
-        );
-
-        const responseUpdatePrices = api.post("price", objectSendPrice);
-
-        Promise.all([responseDriverComission, responseUpdatePrices])
-          .then((response) => {
-            setLoading(false);
-            if (!response[1]?.data?.status && !response[1]?.status) {
-              let errorMsg = "Não foi possível atualizar o preço.";
-              try {
-                if (response[1]?.data?.message) {
-                  errorMsg = response[1].data.message;
-                } else if (response[1]?.request?.response) {
-                  const parsed = JSON.parse(response[1].request.response);
-                  if (parsed?.response) errorMsg = parsed.response;
-                }
-              } catch {}
-              swal({
-                title: errorMsg,
-                icon: "warning",
-              });
-              return;
+        try {
+          const currentTripOrder = priceOrderMap.get(travelSelected.idTripType as number) ?? null;
+          const objectSendPrice = {
+            additional_value_after_km: Utils.BrlToNumber(
+              additionalValueAfterKm,
+              "positive"
+            ) || 0,
+            another_fee: Utils.BrlToNumber(valueSurchase, "positive") || 0,
+            another_fee_description: !descriptionSurchase
+              ? ""
+              : descriptionSurchase,
+            another_fee_type: typeValueSurchase || "%",
+            base_price: Utils.BrlToNumber(basePrice, "positive"),
+            cityId: Number(cityId),
+            color: colorTag || "#000000",
+            disable_after_km:
+              Utils.BrlToNumber(disableAfterKm, "positive") === 0
+                ? null
+                : Utils.BrlToNumber(disableAfterKm, "positive"),
+            idealListCommonPrice: Number(ideaListCommonPrice) || 1,
+            km_price: Utils.BrlToNumber(kmPrice, "positive"),
+            km_to_additional_value: Utils.BrlToNumber(
+              kmToAdditionalValue,
+              "positive"
+            ) || 0,
+            long_distance_per_km: Utils.BrlToNumber(longDistanceKm, "positive") || 0,
+            long_distance_radius: Number(longDistanceRadius) || 0,
+            long_distance_value_to_final_price: !!longDistanceValueToFinalPrice,
+            min_price: Utils.BrlToNumber(minPrice, "positive"),
+            minute_price: Utils.BrlToNumber(minutePrice, "positive"),
+            promotional_price_temp: Utils.BrlToNumber(
+              promotionalPriceTemp,
+              "positive"
+            ) || 0,
+            reward_driver_min_price: Utils.BrlToNumber(
+              rewardDriverMinPrice,
+              "positive"
+            ) || 0,
+            tag: tag || "",
+            tax_price: Utils.BrlToNumber(taxRate, "positive") || 0,
+            tax_price_description: !descriptionTaxRate ? "" : descriptionTaxRate,
+            tax_price_type: typeTaxRate || "%",
+            tripTypeId: Number(travelSelected.idTripType),
+            order: currentTripOrder,
+            type_additional_value_after_km: typeAdditionalValueAfterKm || "$",
+            waypoint_price: Utils.BrlToNumber(wayPointPrice, "positive") || 0,
+            waiting_tolerance_seconds: Number(waitingToleranceSeconds) || 0,
+            waiting_penalty_fee: Utils.BrlToNumber(waitingPenaltyFee, "positive") || 0,
+            waiting_extra_fee_per_minute: Utils.BrlToNumber(
+              waitingExtraFeePerMinute,
+              "positive"
+            ) || 0,
+            percentage_min_offer: Utils.BrlToNumber(floatingLimitsOfferMin, "positive") || 0,
+            percentage_max_offer: Utils.BrlToNumber(floatingLimitsOfferMax, "positive") || 0,
+            percentage_min_trip_partner: Utils.BrlToNumber(floatingLimitsThirdPartyMin, "positive") || 0,
+            percentage_max_trip_partner: Utils.BrlToNumber(floatingLimitsThirdPartyMax, "positive") || 0,
+          };
+          const newObjectCommission = commissionPaymentForms.map((response) => {
+            if (typeof response.value === "string") {
+              return {
+                ...response,
+                value: Utils.BrlToNumber(response.value as string, "positive") || 0,
+              };
             }
-            swal({
-              title: "Preço atualizado com sucesso!",
-              icon: "success",
-            });
-            getTypesTravels();
-            getCommissionsDriver();
-            getPrices();
-            setTravelSelected({});
-          })
-          .catch((error) => {
-            console.error(error);
-            swal({
-              title: "Erro ao atualizar tarifas",
-              icon: "error",
-            });
-          })
-          .finally(() => {
-            setLoading(false);
+            return response;
           });
+
+          const objectSendCommission = {
+            commissionAnotherFee: {
+              another_value: Utils.BrlToNumber(valueSurchase, "positive") || 0,
+              taxValueType: typeTaxRate || "%",
+              tax_value: Utils.BrlToNumber(taxRate, "positive") || 0,
+              valueType: typeValueSurchase || "%",
+            },
+            commissionsPaymentForm: newObjectCommission,
+            value: Utils.BrlToNumber(valueCalcDriver, "positive") || 0,
+            tripTypeId: Number(travelSelected.idTripType),
+            valueType: valueTypeCalcDriver || "%",
+            disableOnPromotion: !!disableOnPromotion,
+          };
+
+          await api.post(`driverCommission/${cityId}`, objectSendCommission);
+          await api.post("price", objectSendPrice);
+
+          swal({
+            title: "Preço atualizado com sucesso!",
+            icon: "success",
+          });
+
+          await getTypesTravels();
+          await getCommissionsDriver();
+          await getPrices();
+
+          setTravelSelected(travelSelected);
+        } catch (error: any) {
+          console.error("Erro ao atualizar tarifas:", error);
+          let errorMsg = "Ocorreu um erro ao atualizar os preços e comissões.";
+          if (error.response?.data?.message) {
+            errorMsg = error.response.data.message;
+          } else if (error.response?.data?.response) {
+            errorMsg = typeof error.response.data.response === "string" 
+              ? error.response.data.response 
+              : JSON.stringify(error.response.data.response);
+          } else if (error.message) {
+            errorMsg = error.message;
+          }
+          swal({
+            title: "Erro ao atualizar tarifas",
+            text: errorMsg,
+            icon: "error",
+          });
+        } finally {
+          setLoading(false);
+        }
       }
     });
   };
@@ -595,20 +584,22 @@ export const TypesTravels = () => {
         </ButtonAddNewTariff>
         <ContentListTypesTravels>
           {listPrices.map((value) => {
+            const tripTypeObj = value.trip_type || {};
+            const tripId = tripTypeObj.idTripType ?? value.tripTypeId;
             return (
-              <Fragment key={value.trip_type.idTripType}>
+              <Fragment key={tripId}>
                 <CardTariff
                   selected={
-                    travelSelected.idTripType === value.trip_type.idTripType
+                    Number(travelSelected.idTripType) === Number(tripId)
                   }
-                  onClick={() => handleSelectTravel(value.trip_type)}
+                  onClick={() => handleSelectTravel(tripTypeObj)}
                 >
                   <ImageTariff
                     src={
-                      value.trip_type?.picture
-                        ? (value.trip_type.picture.startsWith("http")
-                            ? value.trip_type.picture
-                            : `https://minio.704app.com.br/rota101fb704/tripType/${value.trip_type.picture}`)
+                      tripTypeObj?.picture
+                        ? (tripTypeObj.picture.startsWith("http")
+                            ? tripTypeObj.picture
+                            : `https://minio.704app.com.br/rota101fb704/tripType/${tripTypeObj.picture}`)
                         : "/default-trip-icon.png"
                     }
                     onError={(e: any) => {
@@ -616,8 +607,8 @@ export const TypesTravels = () => {
                       e.target.src = "/default-trip-icon.png";
                     }}
                   />
-                  <TitleCardTariff>{value.trip_type?.type}</TitleCardTariff>
-                  <TextCardTariff>{`Id: ${value.trip_type?.idTripType}`}</TextCardTariff>
+                  <TitleCardTariff>{tripTypeObj?.type}</TitleCardTariff>
+                  <TextCardTariff>{`Id: ${tripId}`}</TextCardTariff>
                 </CardTariff>
               </Fragment>
             );
