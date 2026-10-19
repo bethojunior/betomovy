@@ -40,49 +40,45 @@ export const useDriverCommission = (
   );
 
   const getCommissionsDriver = async () => {
+    if (!cityId) return;
     setLoading(true);
     try {
       const responseCommissionDriver = await api.get(
         `driverCommission/${cityId}`
       );
 
-      if (responseCommissionDriver.status) {
-        setDriverCommissions(responseCommissionDriver.data.response);
+      if (responseCommissionDriver.data?.response) {
+        const rawCommissions = responseCommissionDriver.data.response;
+        setDriverCommissions(Array.isArray(rawCommissions) ? rawCommissions : []);
       }
     } catch (error) {
-      console.log(error);
-      swal({
-        title: "Erro ao capturar dados de comissão de motoristas",
-        icon: "error",
-      });
+      console.log("Aviso ao buscar comissões de motorista:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const getTripPayments = async () => {
     setLoading(true);
     try {
       const responseTripPayments = await api.get("tripPaymentForm");
-      setTripPaymentsForms(responseTripPayments.data.response);
+      const rawPayments = responseTripPayments.data?.response;
+      const paymentList = Array.isArray(rawPayments) ? rawPayments : [];
+      setTripPaymentsForms(paymentList);
 
-      const listCommission: CommissionPaymentFormProps[] = [];
-
-      responseTripPayments.data.response.map(
-        (value: TripPaymentsFormsProps) => {
-          const objectCommission = {
-            tripPaymentFormId: String(value.idTripPaymentForm),
-            value: "0,00",
-            valueType: "%",
-          };
-
-          listCommission.push(objectCommission);
-        }
+      const listCommission: CommissionPaymentFormProps[] = paymentList.map(
+        (value: TripPaymentsFormsProps) => ({
+          tripPaymentFormId: String(value.idTripPaymentForm),
+          value: "0,00",
+          valueType: "%",
+        })
       );
       setCommissionPaymentForms(listCommission);
     } catch (error) {
-      console.log(error);
+      console.log("Erro ao buscar formas de pagamento:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleChangePaymentsCommissions = (

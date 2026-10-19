@@ -115,7 +115,18 @@ export const TypesTravels = () => {
   const canManageFloatingLimits = hasPermission(TARIFAS, "limite_flutuante");
 
   const rawCitySelected = Session.getLocal("citySelected");
-  const cityId = rawCitySelected?.cityId ?? rawCitySelected?.id;
+  const parsedCity = (() => {
+    if (!rawCitySelected) return null;
+    if (typeof rawCitySelected === "string") {
+      try {
+        return JSON.parse(rawCitySelected);
+      } catch {
+        return null;
+      }
+    }
+    return rawCitySelected;
+  })();
+  const cityId = Number(parsedCity?.cityId ?? parsedCity?.id ?? 0);
 
   const { customOrderConfig, getCustomOrderConfig } = useCustomOrderConfig();
 
@@ -476,44 +487,56 @@ export const TypesTravels = () => {
   };
 
   useEffect(() => {
-    const initializeData = async () => {
-      setIsInitialLoading(true);
+    let isMounted = true;
 
-      if (!cityId) {
+    const initializeData = async () => {
+      let activeCityId = cityId;
+
+      if (!activeCityId || isNaN(activeCityId) || activeCityId <= 0) {
         try {
           const res = await api.get("city");
           const rawCities = res.data?.response?.data || res.data?.response || [];
           if (Array.isArray(rawCities) && rawCities.length > 0) {
             const firstCity = rawCities[0];
             const cityObj = {
-              cityId: firstCity.id || firstCity.cityId,
+              cityId: Number(firstCity.id || firstCity.cityId),
               nome: firstCity.nome || firstCity.name,
               polygon: firstCity.polygon,
             };
-            Session.setLocal("citySelected", JSON.stringify(cityObj));
-            window.location.reload();
-            return;
+            Session.setLocal("citySelected", cityObj);
+            activeCityId = cityObj.cityId;
           }
         } catch (e) {
           console.error("Erro ao verificar cidades ativas:", e);
         }
-        setIsInitialLoading(false);
-        return;
       }
 
-      const isCustomOrderEnabled = await getCustomOrderConfig();
+      try {
+        setLoading(true);
+        const isCustomOrderEnabled = await getCustomOrderConfig().catch(() => false);
 
-      await getTypesTravels();
-      await getTripPayments();
-      await getCommissionsDriver();
-      await getInDriverConfig();
-
-      await getPrices(isCustomOrderEnabled);
-
-      setIsInitialLoading(false);
+        await Promise.allSettled([
+          getTypesTravels(),
+          getTripPayments(),
+          getCommissionsDriver(),
+          getInDriverConfig(),
+          getPrices(isCustomOrderEnabled),
+        ]);
+      } catch (err) {
+        console.error("Erro ao carregar dados das tarifas:", err);
+      } finally {
+        if (isMounted) {
+          setIsInitialLoading(false);
+          setLoading(false);
+        }
+      }
     };
 
     initializeData();
+
+    return () => {
+      isMounted = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cityId]);
 
@@ -524,9 +547,8 @@ export const TypesTravels = () => {
       }).length === 0
     );
   });
-  if (isInitialLoading) return <Loader spinning />;
 
-  if (!cityId) {
+  if (!cityId && !isInitialLoading) {
     return (
       <Container>
         <div
@@ -553,7 +575,7 @@ export const TypesTravels = () => {
 
   return (
     <Container>
-      {loading && (<Loader spinning />)}
+      {(isInitialLoading || loading) && (<Loader spinning />)}
       {customOrderConfig && (
         <CustomOrderContainer>
           <CustomOrderSubmenu>

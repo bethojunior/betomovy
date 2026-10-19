@@ -534,7 +534,9 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
             </ContentInputs>
           </ContentPricePolicy>
           <ContentPricePolicy>
-            <h2>Bonus de longa distancia</h2>
+            <h2 style={{ textAlign: "center", marginBottom: "1.25rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "0.5rem" }}>
+              Bonus de longa distancia
+            </h2>
             <ContentInputs>
               <LabelText>PAGO PELO CLIENTE</LabelText>
               <Switch
@@ -565,6 +567,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
               />
             </ContentInputs>
           </ContentPricePolicy>
+
           <ContentPricePolicy>
             <ContentInputs>
               <LabelText>VALOR BONUS(PROMOCIONAL)</LabelText>
@@ -603,6 +606,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
               />
             </ContentInputs>
           </ContentPricePolicy>
+
           <ContentPricePolicy>
             <MoneyValueTypeInput
               label="TAXA DE IMPOSTO"
@@ -613,18 +617,21 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                 setTypeTaxRate(type as "%" | "$")
               }
             />
-            <LabelText>DESCRIÇÃO (TAXA DE IMPOSTO)</LabelText>
-            <TextArea
-              rows={5}
-              cols={33}
-              value={
-                descriptionTaxRate === null ? "" : descriptionTaxRate
-              }
-              onChange={(event) =>
-                setDescriptionTaxRate(event.target.value)
-              }
-            />
+            <div style={{ marginTop: "1rem" }}>
+              <LabelText style={{ marginBottom: "0.5rem" }}>DESCRIÇÃO (TAXA DE IMPOSTO)</LabelText>
+              <TextArea
+                rows={5}
+                cols={33}
+                value={
+                  descriptionTaxRate === null ? "" : descriptionTaxRate
+                }
+                onChange={(event) =>
+                  setDescriptionTaxRate(event.target.value)
+                }
+              />
+            </div>
           </ContentPricePolicy>
+
           <ContentPricePolicy>
             <MoneyValueTypeInput
               label="TAXA EXTRA"
@@ -635,17 +642,19 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                 setTypeValueSurchase(type as "%" | "$")
               }
             />
-            <LabelText>DESCRIÇÃO (TAXA EXTRA)</LabelText>
-            <TextArea
-              rows={5}
-              cols={33}
-              value={
-                descriptionSurchase === null ? "" : descriptionSurchase
-              }
-              onChange={(event) =>
-                setDescriptionSurchase(event.target.value)
-              }
-            />
+            <div style={{ marginTop: "1rem" }}>
+              <LabelText style={{ marginBottom: "0.5rem" }}>DESCRIÇÃO (TAXA EXTRA)</LabelText>
+              <TextArea
+                rows={5}
+                cols={33}
+                value={
+                  descriptionSurchase === null ? "" : descriptionSurchase
+                }
+                onChange={(event) =>
+                  setDescriptionSurchase(event.target.value)
+                }
+              />
+            </div>
           </ContentPricePolicy>
           <ContentPricePolicy>
             <ContentInputs>
