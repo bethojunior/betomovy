@@ -433,10 +433,16 @@ export const TypesTravels = () => {
 
           // Salvar price primeiro (crítico), depois comissão independentemente
           const priceResponse = await api.post("price", objectSendPrice);
+          if (priceResponse.data && priceResponse.data.status === false) {
+            throw new Error(priceResponse.data.message || "Erro retornado pelo servidor ao gravar tarifa.");
+          }
           const savedPriceRaw = priceResponse.data?.response ?? priceResponse.data?.data;
 
           try {
-            await api.post(`driverCommission/${parsedCityId}`, objectSendCommission);
+            const commRes = await api.post(`driverCommission/${parsedCityId}`, objectSendCommission);
+            if (commRes.data && commRes.data.status === false) {
+              console.warn("Aviso ao salvar comissão:", commRes.data.message);
+            }
           } catch (commissionError: any) {
             console.warn("Aviso: erro ao salvar comissão do motorista:", commissionError);
           }

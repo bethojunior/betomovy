@@ -37,8 +37,25 @@ api.interceptors.request.use((config) => {
       }
     }
     const citySelected = Session.getLocal("citySelected");
-    if (citySelected?.cityId && !config.headers["cityId"]) {
-      config.headers["cityId"] = citySelected.cityId;
+    const parsedCity = (() => {
+      if (!citySelected) return null;
+      if (typeof citySelected === "string") {
+        try {
+          return JSON.parse(citySelected);
+        } catch {
+          return null;
+        }
+      }
+      return citySelected;
+    })();
+    const resolvedCityId = Number(parsedCity?.cityId ?? parsedCity?.id ?? 0);
+    if (resolvedCityId > 0) {
+      if (!config.headers["cityId"]) {
+        config.headers["cityId"] = resolvedCityId;
+      }
+      if (!config.headers["cityid"]) {
+        config.headers["cityid"] = resolvedCityId;
+      }
     }
   } catch (err) {
     console.error("Erro no interceptor de autenticacao:", err);

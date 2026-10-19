@@ -21,8 +21,14 @@ class PriceController extends ApiController
             return;
         }
 
+        if ($method === 'DELETE') {
+            $this->actionDelete();
+            return;
+        }
+
         try {
-            $cityId = (int)($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
+            $rawCityId = $_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? ($_SERVER['HTTP_CITY_ID'] ?? 0));
+            $cityId = (int)$rawCityId;
             $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
 
             $stmt = $pdo->prepare("
@@ -35,24 +41,25 @@ class PriceController extends ApiController
                     tt.picture as tripTypePicture,
                     COALESCE(tt.serviceOption, 0) as serviceOption
                 FROM price p
-                INNER JOIN tripType tt ON p.tripTypeId = tt.idTripType
+                LEFT JOIN tripType tt ON p.tripTypeId = tt.idTripType
                 WHERE (p.cityId = :cityId OR :cityIdZero = 0)
                   AND p.statusId = 1
-                ORDER BY p.cityId ASC, p.`order` ASC, p.tripTypeId ASC
+                ORDER BY p.cityId ASC, (p.`order` IS NULL) ASC, p.`order` ASC, p.tripTypeId ASC
             ");
             $stmt->execute([':cityId' => $cityId, ':cityIdZero' => $cityId]);
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             $data = array_map(function ($row) {
                 $item = $row;
+                $tId = (int)($row['idTripType'] ?? $row['tripTypeId']);
                 $item['trip_type'] = [
-                    'idTripType' => (int)$row['idTripType'],
-                    'id' => (int)$row['idTripType'],
-                    'type' => $row['type'],
-                    'name' => $row['tripTypeName'],
-                    'description' => $row['tripTypeDescription'],
-                    'picture' => $row['tripTypePicture'],
-                    'serviceOption' => (int)$row['serviceOption']
+                    'idTripType' => $tId,
+                    'id' => $tId,
+                    'type' => $row['type'] ?? $row['tripTypeName'] ?? $row['tag'] ?? ('Tarifa ' . $tId),
+                    'name' => $row['tripTypeName'] ?? $row['type'] ?? $row['tag'] ?? ('Tarifa ' . $tId),
+                    'description' => $row['tripTypeDescription'] ?? '',
+                    'picture' => $row['tripTypePicture'] ?? '',
+                    'serviceOption' => (int)($row['serviceOption'] ?? 0)
                 ];
                 return $item;
             }, $rows);
@@ -82,49 +89,163 @@ class PriceController extends ApiController
         try {
             $raw = file_get_contents('php://input');
             $body = json_decode($raw, true) ?: $_POST;
-            $cityId = (int)($body['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? 0));
-            $tripTypeId = (int)($body['tripTypeId'] ?? 0);
+            $rawCityId = $body['cityId'] ?? ($_GET['cityId'] ?? ($_SERVER['HTTP_CITYID'] ?? ($_SERVER['HTTP_CITY_ID'] ?? 0)));
+            $cityId = (int)$rawCityId;
+            $tripTypeId = (int)($body['tripTypeId'] ?? ($_GET['tripTypeId'] ?? 0));
+
+            if ($cityId <= 0 || $tripTypeId <= 0) {
+                http_response_code(400);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'cityId e tripTypeId são obrigatórios para salvar preço.',
+                    'data' => null,
+                    'response' => null,
+                    'errors' => 'cityId and tripTypeId required'
+                ]);
+                return;
+            }
 
             $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
             // Inactivate existing price for same city and tripType
-            if ($cityId > 0 && $tripTypeId > 0) {
-                $upd = $pdo->prepare("UPDATE price SET statusId = 2 WHERE cityId = :cityId AND tripTypeId = :tripTypeId");
-                $upd->execute([':cityId' => $cityId, ':tripTypeId' => $tripTypeId]);
+            $upd = $pdo->prepare("UPDATE price SET statusId = 2, updated_at = NOW() WHERE cityId = :cityId AND tripTypeId = :tripTypeId");
+            $upd->execute([':cityId' => $cityId, ':tripTypeId' => $tripTypeId]);
+
+            $order = null;
+            if (isset($body['order']) && $body['order'] !== '' && $body['order'] !== null) {
+                $order = (int)$body['order'];
             }
 
             $fields = [
                 'cityId' => $cityId,
                 'tripTypeId' => $tripTypeId,
-                'minPrice' => (float)($body['minPrice'] ?? 0),
-                'basePrice' => (float)($body['basePrice'] ?? 0),
-                'kmPrice' => (float)($body['kmPrice'] ?? 0),
-                'minutePrice' => (float)($body['minutePrice'] ?? 0),
-                'tag' => $body['tag'] ?? null,
+                'min_price' => (float)($body['min_price'] ?? $body['minPrice'] ?? 0),
+                'base_price' => (float)($body['base_price'] ?? $body['basePrice'] ?? 0),
+                'km_price' => (float)($body['km_price'] ?? $body['kmPrice'] ?? 0),
+                'minute_price' => (float)($body['minute_price'] ?? $body['minutePrice'] ?? 0),
+                'tax_price' => (float)($body['tax_price'] ?? $body['taxPrice'] ?? 0),
+                'tax_price_type' => (string)($body['tax_price_type'] ?? $body['taxPriceType'] ?? '%'),
+                'tax_price_description' => !empty($body['tax_price_description']) ? (string)$body['tax_price_description'] : null,
+                'another_fee' => (float)($body['another_fee'] ?? $body['anotherFee'] ?? 0),
+                'another_fee_type' => (string)($body['another_fee_type'] ?? $body['anotherFeeType'] ?? '%'),
+                'another_fee_description' => !empty($body['another_fee_description']) ? (string)$body['another_fee_description'] : null,
+                'waypoint_price' => (float)($body['waypoint_price'] ?? $body['waypointPrice'] ?? 0),
+                'tag' => !empty($body['tag']) ? (string)$body['tag'] : null,
+                'color' => !empty($body['color']) ? (string)$body['color'] : '#000000',
+                'idealListCommonPrice' => (int)($body['idealListCommonPrice'] ?? 1),
+                'long_distance_per_km' => (float)($body['long_distance_per_km'] ?? $body['longDistanceKm'] ?? 0),
+                'long_distance_value_to_final_price' => !empty($body['long_distance_value_to_final_price']) ? 1 : 0,
+                'long_distance_radius' => (float)($body['long_distance_radius'] ?? 0),
+                'disable_after_km' => isset($body['disable_after_km']) && $body['disable_after_km'] !== '' && $body['disable_after_km'] !== null ? (float)$body['disable_after_km'] : null,
+                'promotional_price_temp' => (float)($body['promotional_price_temp'] ?? 0),
+                'reward_driver_min_price' => (float)($body['reward_driver_min_price'] ?? 0),
+                'type_additional_value_after_km' => (string)($body['type_additional_value_after_km'] ?? '$'),
+                'km_to_additional_value' => (float)($body['km_to_additional_value'] ?? 0),
+                'additional_value_after_km' => (float)($body['additional_value_after_km'] ?? 0),
+                'waiting_tolerance_seconds' => (int)($body['waiting_tolerance_seconds'] ?? 0),
+                'waiting_extra_fee_per_minute' => (float)($body['waiting_extra_fee_per_minute'] ?? 0),
+                'waiting_penalty_fee' => (float)($body['waiting_penalty_fee'] ?? 0),
+                'order' => $order,
+                'percentage_min_offer' => (float)($body['percentage_min_offer'] ?? 0),
+                'percentage_max_offer' => (float)($body['percentage_max_offer'] ?? 0),
+                'percentage_min_trip_partner' => (float)($body['percentage_min_trip_partner'] ?? 0),
+                'percentage_max_trip_partner' => (float)($body['percentage_max_trip_partner'] ?? 0),
                 'statusId' => 1
             ];
 
-            $cols = implode(', ', array_keys($fields));
-            $placeholders = ':' . implode(', :', array_keys($fields));
+            $cols = implode(', ', array_keys($fields)) . ', created_at, updated_at';
+            $placeholders = ':' . implode(', :', array_keys($fields)) . ', NOW(), NOW()';
             $ins = $pdo->prepare("INSERT INTO price ({$cols}) VALUES ({$placeholders})");
             $ins->execute($fields);
-            $id = $pdo->lastInsertId();
+            $id = (int)$pdo->lastInsertId();
+
+            $stmt = $pdo->prepare("
+                SELECT 
+                    p.*,
+                    tt.idTripType,
+                    tt.type,
+                    COALESCE(tt.name, tt.type) as tripTypeName,
+                    tt.description as tripTypeDescription,
+                    tt.picture as tripTypePicture,
+                    COALESCE(tt.serviceOption, 0) as serviceOption
+                FROM price p
+                LEFT JOIN tripType tt ON p.tripTypeId = tt.idTripType
+                WHERE p.id = :id
+                LIMIT 1
+            ");
+            $stmt->execute([':id' => $id]);
+            $savedRow = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if ($savedRow) {
+                $tId = (int)($savedRow['idTripType'] ?? $savedRow['tripTypeId']);
+                $savedRow['trip_type'] = [
+                    'idTripType' => $tId,
+                    'id' => $tId,
+                    'type' => $savedRow['type'] ?? $savedRow['tripTypeName'] ?? $savedRow['tag'] ?? ('Tarifa ' . $tId),
+                    'name' => $savedRow['tripTypeName'] ?? $savedRow['type'] ?? $savedRow['tag'] ?? ('Tarifa ' . $tId),
+                    'description' => $savedRow['tripTypeDescription'] ?? '',
+                    'picture' => $savedRow['tripTypePicture'] ?? '',
+                    'serviceOption' => (int)($savedRow['serviceOption'] ?? 0)
+                ];
+            } else {
+                $savedRow = array_merge(['id' => $id], $fields);
+            }
 
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Preço salvo com sucesso',
-                'data' => array_merge(['id' => $id], $fields),
-                'response' => array_merge(['id' => $id], $fields),
+                'data' => $savedRow,
+                'response' => $savedRow,
                 'errors' => null
             ]);
         } catch (\Throwable $e) {
+            http_response_code(400);
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => false,
                 'message' => 'Erro ao salvar preço: ' . $e->getMessage(),
                 'data' => null,
                 'response' => null,
+                'errors' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function actionDelete()
+    {
+        try {
+            $id = (int)($_GET['id'] ?? ($_GET['price_id'] ?? 0));
+            if ($id <= 0) {
+                $raw = file_get_contents('php://input');
+                $body = json_decode($raw, true) ?: [];
+                $id = (int)($body['id'] ?? ($body['price_id'] ?? 0));
+            }
+
+            if ($id > 0) {
+                $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+                $stmt = $pdo->prepare("UPDATE price SET statusId = 2, updated_at = NOW() WHERE id = :id");
+                $stmt->execute([':id' => $id]);
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Preço excluído com sucesso',
+                'data' => true,
+                'response' => true,
                 'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            http_response_code(400);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao excluir preço: ' . $e->getMessage(),
+                'data' => null,
+                'response' => null,
+                'errors' => $e->getMessage()
             ]);
         }
     }
