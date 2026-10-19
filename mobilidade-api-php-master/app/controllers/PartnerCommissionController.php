@@ -74,7 +74,7 @@ class PartnerCommissionController extends ApiController
                         c.nome AS cityName,
                         tt.type AS tripTypeName
                     FROM partnerCommission pc
-                    LEFT JOIN city c ON c.cityId = pc.cityId
+                    LEFT JOIN city c ON c.id = pc.cityId
                     LEFT JOIN tripType tt ON tt.idTripType = pc.tripTypeId
                     WHERE pc.id = :id
                     LIMIT 1
@@ -111,7 +111,7 @@ class PartnerCommissionController extends ApiController
                     c.nome AS cityName,
                     tt.type AS tripTypeName
                 FROM partnerCommission pc
-                LEFT JOIN city c ON c.cityId = pc.cityId
+                LEFT JOIN city c ON c.id = pc.cityId
                 LEFT JOIN tripType tt ON tt.idTripType = pc.tripTypeId
                 WHERE (pc.statusId = 1 OR pc.statusId IS NULL)
                 ORDER BY pc.id DESC
