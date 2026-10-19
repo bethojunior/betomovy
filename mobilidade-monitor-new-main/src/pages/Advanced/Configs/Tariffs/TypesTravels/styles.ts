@@ -11,6 +11,8 @@ interface ButtonProps {
 
 export const Container = styled.div`
   margin: 1rem;
+  padding-bottom: 5rem;
+  min-height: 100%;
 `;
 
 export const ContentTypesTravels = styled.div`
@@ -170,39 +172,26 @@ export const TextCardTariff = styled.span`
 
 export const ContentDetailsTariffs = styled.div`
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;
   justify-content: center;
   background-color: #ffffff;
   border: 1px solid #E2E8F0;
   border-radius: 14px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  margin: 1rem 0;
-  overflow: hidden;
+  margin: 1rem 0 3rem 0;
+  padding: 1.5rem;
+  gap: 2rem;
 
   @media (max-width: 920px) {
     flex-direction: column;
+    padding: 1rem;
+    gap: 1.5rem;
   }
 `;
 
 export const ConfigDetailsTariffs = styled.div`
-  flex: 1;
-  height: 600px;
-
-  /* ::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #888;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  } */
+  flex: 1.6;
+  width: 100%;
 
   @media (max-width: 920px) {
     width: 100%;
@@ -250,6 +239,13 @@ export const ContentLogoApp = styled.div`
   flex: 1;
   display: flex;
   justify-content: center;
+  position: sticky;
+  top: 1rem;
+  align-self: flex-start;
+
+  @media (max-width: 920px) {
+    position: static;
+  }
 `;
 
 export const ImageLogoApp = styled.img`

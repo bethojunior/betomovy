@@ -279,17 +279,9 @@ export const TypesTravels = () => {
       return;
     }
 
-    // if (Utils.BrlToNumber(promotionalPriceTemp, "positive") <= 0) {
-    //   swal({
-    //     title: "O CAMPO PREÇO PROMOCIONAL PRECISA SER PREENCHIDO",
-    //     icon: "warning",
-    //   });
-    //   return;
-    // }
-
-    if (Utils.BrlToNumber(basePrice, "positive") <= 0) {
+    if (basePrice === "" || Utils.BrlToNumber(basePrice, "positive") < 0) {
       swal({
-        title: "O CAMPO BASE PROMOCIONAL PRECISA SER PREENCHIDO",
+        title: "O CAMPO PREÇO BASE PRECISA SER PREENCHIDO",
         icon: "warning",
       });
       return;
@@ -303,22 +295,15 @@ export const TypesTravels = () => {
       return;
     }
 
-    if (ideaListCommonPrice <= 0) {
+    if (minutePrice === "" || Utils.BrlToNumber(minutePrice, "positive") < 0) {
       swal({
-        title:
-          "O CAMPO LISTA IDEAL DE MOTORISTAS PRÓXIMOS (DINÂMICA) PRECISA SER PREENCHIDO",
+        title: "O CAMPO PREÇO MINUTO PRECISA SER PREENCHIDO",
         icon: "warning",
       });
       return;
     }
 
-    if (Utils.BrlToNumber(minutePrice, "positive") <= 0) {
-      swal({
-        title: "O campo PREÇO MINUTO PRECISA SER PREENCHIDO",
-        icon: "warning",
-      });
-      return;
-    }
+    const effectiveIdeaListCommonPrice = ideaListCommonPrice > 0 ? ideaListCommonPrice : 5;
 
     swal({
       title: "Atenção",
@@ -347,7 +332,7 @@ export const TypesTravels = () => {
               Utils.BrlToNumber(disableAfterKm, "positive") === 0
                 ? null
                 : Utils.BrlToNumber(disableAfterKm, "positive"),
-            idealListCommonPrice: Number(ideaListCommonPrice) || 1,
+            idealListCommonPrice: Number(effectiveIdeaListCommonPrice),
             km_price: Utils.BrlToNumber(kmPrice, "positive"),
             km_to_additional_value: Utils.BrlToNumber(
               kmToAdditionalValue,
