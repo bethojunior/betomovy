@@ -78,28 +78,43 @@ export const useTariffPricing = (
 
   const isNoTravelSelected = Object.keys(travelSelected).length === 0;
 
-  const getPrices = async (useCustomOrderParam?: boolean) => {
+  const getPrices = async (useCustomOrderParam?: boolean): Promise<ListPricesProps[]> => {
     setLoading(true);
+    let sortedPrices: ListPricesProps[] = [];
     try {
       const responsePrices = await api.get(`price?cityId=${cityId}`, {
         headers: { cityid: cityId },
       });
       const rawPrices = responsePrices.data?.response || [];
-      const pricesTypes = (Array.isArray(rawPrices) ? rawPrices : []).filter(
-        (data: ListPricesProps) =>
-          data &&
-          data.trip_type &&
-          Number(data.trip_type.serviceOption ?? 0) === 0
-      );
+      const normalizedPrices: ListPricesProps[] = (Array.isArray(rawPrices) ? rawPrices : [])
+        .map((data: any) => {
+          if (!data) return null;
+          const tripObj = data.trip_type || data.tripType;
+          return {
+            ...data,
+            trip_type: tripObj,
+            tripTypeId: data.tripTypeId ?? tripObj?.idTripType,
+          };
+        })
+        .filter((data: any): data is ListPricesProps => {
+          if (!data) return false;
+          if (
+            data.trip_type &&
+            data.trip_type.serviceOption !== undefined &&
+            data.trip_type.serviceOption !== null
+          ) {
+            return Number(data.trip_type.serviceOption) === 0;
+          }
+          return true;
+        });
 
       const shouldApplyCustomOrder =
         useCustomOrderParam !== undefined
           ? useCustomOrderParam
           : customOrderConfig;
 
-      let sortedPrices;
       if (shouldApplyCustomOrder) {
-        sortedPrices = pricesTypes.sort(
+        sortedPrices = normalizedPrices.sort(
           (a: ListPricesProps, b: ListPricesProps) => {
             const orderA = a.order === null ? 999 : a.order;
             const orderB = b.order === null ? 999 : b.order;
@@ -107,7 +122,7 @@ export const useTariffPricing = (
           }
         );
       } else {
-        sortedPrices = pricesTypes;
+        sortedPrices = normalizedPrices;
       }
 
       setListPrices(sortedPrices);
@@ -116,6 +131,7 @@ export const useTariffPricing = (
     } finally {
       setLoading(false);
     }
+    return sortedPrices;
   };
 
   const handleDisabledCalls = (

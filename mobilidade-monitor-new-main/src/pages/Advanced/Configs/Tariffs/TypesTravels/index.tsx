@@ -271,6 +271,26 @@ export const TypesTravels = () => {
   };
 
   const handleUpdateTariffs = async () => {
+    const tripId = Number(travelSelected.idTripType ?? (travelSelected as any).id);
+    if (!tripId || isNaN(tripId) || tripId <= 0) {
+      swal({
+        title: "NENHUM TIPO DE VIAGEM SELECIONADO",
+        text: "Selecione um tipo de viagem antes de atualizar os valores.",
+        icon: "warning",
+      });
+      return;
+    }
+
+    const parsedCityId = Number(cityId);
+    if (!parsedCityId || isNaN(parsedCityId) || parsedCityId <= 0) {
+      swal({
+        title: "NENHUMA CIDADE SELECIONADA",
+        text: "Selecione uma cidade no menu superior antes de atualizar as tarifas.",
+        icon: "warning",
+      });
+      return;
+    }
+
     if (Utils.BrlToNumber(minPrice, "positive") <= 0) {
       swal({
         title: "O CAMPO PREÇO MÍNIMO PRECISA SER PREENCHIDO",
@@ -314,7 +334,7 @@ export const TypesTravels = () => {
       if (isAccepted) {
         setLoading(true);
         try {
-          const currentTripOrder = priceOrderMap.get(travelSelected.idTripType as number) ?? null;
+          const currentTripOrder = priceOrderMap.get(tripId) ?? null;
           const objectSendPrice = {
             additional_value_after_km: Utils.BrlToNumber(
               additionalValueAfterKm,
@@ -326,7 +346,7 @@ export const TypesTravels = () => {
               : descriptionSurchase,
             another_fee_type: typeValueSurchase || "%",
             base_price: Utils.BrlToNumber(basePrice, "positive"),
-            cityId: Number(cityId),
+            cityId: parsedCityId,
             color: colorTag || "#000000",
             disable_after_km:
               Utils.BrlToNumber(disableAfterKm, "positive") === 0
@@ -355,7 +375,7 @@ export const TypesTravels = () => {
             tax_price: Utils.BrlToNumber(taxRate, "positive") || 0,
             tax_price_description: !descriptionTaxRate ? "" : descriptionTaxRate,
             tax_price_type: typeTaxRate || "%",
-            tripTypeId: Number(travelSelected.idTripType),
+            tripTypeId: tripId,
             order: currentTripOrder,
             type_additional_value_after_km: typeAdditionalValueAfterKm || "$",
             waypoint_price: Utils.BrlToNumber(wayPointPrice, "positive") || 0,
@@ -389,7 +409,7 @@ export const TypesTravels = () => {
             },
             commissionsPaymentForm: newObjectCommission,
             value: Utils.BrlToNumber(valueCalcDriver, "positive") || 0,
-            tripTypeId: Number(travelSelected.idTripType),
+            tripTypeId: tripId,
             valueType: valueTypeCalcDriver || "%",
             disableOnPromotion: !!disableOnPromotion,
           };
@@ -398,7 +418,7 @@ export const TypesTravels = () => {
           await api.post("price", objectSendPrice);
 
           try {
-            await api.post(`driverCommission/${cityId}`, objectSendCommission);
+            await api.post(`driverCommission/${parsedCityId}`, objectSendCommission);
           } catch (commissionError: any) {
             console.warn("Aviso: erro ao salvar comissão do motorista:", commissionError);
           }
@@ -408,7 +428,7 @@ export const TypesTravels = () => {
             icon: "success",
           });
 
-          const currentSavedId = Number(travelSelected.idTripType);
+          const currentSavedId = tripId;
           const freshTypes = await getTypesTravels();
           await getCommissionsDriver();
           await getPrices();
