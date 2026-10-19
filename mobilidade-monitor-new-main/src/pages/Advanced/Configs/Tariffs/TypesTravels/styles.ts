@@ -16,98 +16,168 @@ export const Container = styled.div`
 export const ContentTypesTravels = styled.div`
   display: flex;
   width: 100%;
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 8px;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
 
   @media (max-width: 920px) {
     flex-direction: column;
-    align-items: center;
-    border: none;
-    gap: 1rem;
-    height: 400px;
-    margin-bottom: 0.8rem;
+    align-items: stretch;
+    height: auto;
   }
 `;
 
 export const ContentListTypesTravels = styled.div`
   display: flex;
-  flex: 2;
+  flex: 1;
+  gap: 12px;
+  align-items: stretch;
+  overflow-x: auto;
+  padding-bottom: 4px;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
 
   @media (max-width: 920px) {
     width: 100%;
     flex-direction: column;
-    overflow: auto;
   }
 `;
 
 export const ButtonAddNewTariff = styled.button`
-  width: 250px;
-  min-height: 125px;
-  background-color: #1e88e5;
+  min-width: 170px;
+  max-width: 190px;
+  min-height: 140px;
+  background: linear-gradient(135deg, #00349A 0%, #002166 100%);
   color: #ffffff;
-  border: none;
-  font-size: 18px;
-  @media (max-width: 920px) {
-    width: 100%;
-    padding: 2rem;
+  border: 1px solid rgba(4, 243, 250, 0.3);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 1rem;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 4px 14px rgba(0, 52, 154, 0.2);
+
+  &::before {
+    content: "+";
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
   }
 
-  @media (max-width: 425px) {
-    padding: 0.5rem;
+  &:hover {
+    background: #111111 !important;
+    color: #ffffff !important;
+    border-color: #04F3FA !important;
+    box-shadow: 0 0 16px rgba(4, 243, 250, 0.5) !important;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 920px) {
+    width: 100%;
+    max-width: 100%;
+    min-height: 52px;
+    flex-direction: row;
+    padding: 0.75rem;
   }
 `;
 
 export const CardTariff = styled.div<CardTariffProps>`
-  width: 100%;
-  max-width: 300px;
+  min-width: 160px;
+  max-width: 180px;
+  min-height: 140px;
   text-align: center;
-  border: 1px solid gray;
+  border-radius: 12px;
+  border: 1.5px solid ${(props) => (props.selected ? "#04F3FA" : "#E2E8F0")};
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${(props) => (props.selected ? "#d6edc4" : "#ffffff")};
-  opacity: ${(props) => (props.selected ? 1 : 0.5)};
+  padding: 0.85rem 0.5rem;
+  background-color: ${(props) => (props.selected ? "#F0FDFA" : "#FFFFFF")};
+  box-shadow: ${(props) =>
+    props.selected
+      ? "0 4px 16px rgba(4, 243, 250, 0.25)"
+      : "0 2px 8px rgba(0, 0, 0, 0.04)"};
+  transition: all 0.2s ease-in-out;
+  opacity: 1;
+
+  &:hover {
+    border-color: #04F3FA;
+    box-shadow: 0 4px 14px rgba(4, 243, 250, 0.2);
+    transform: translateY(-2px);
+  }
 
   @media (max-width: 920px) {
     max-width: 100%;
-    border-right: none;
-    border-bottom: 1px solid gray;
-  }
-
-  @media (max-width: 425px) {
-    padding: 1rem 0;
-    gap: 5px;
-    h3 {
-      margin: 0.5rem 0;
-    }
+    min-width: 100%;
+    min-height: 70px;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
   }
 `;
 
 export const ImageTariff = styled.img`
-  width: 40%;
-  max-width: 100px;
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-bottom: 6px;
 
-  @media (max-width: 425px) {
-    width: 60px;
+  @media (max-width: 920px) {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 0;
   }
 `;
 
 export const TitleCardTariff = styled.h3`
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  line-height: 1.2;
 `;
 
 export const TextCardTariff = styled.span`
-  font-size: 16px;
+  font-size: 12px;
+  color: #64748B;
+  margin-top: 3px;
 `;
 
 export const ContentDetailsTariffs = styled.div`
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-
   background-color: #ffffff;
-  border: 0.5px solid #d3d3d3;
-  margin: 0.2rem 0;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin: 1rem 0;
+  overflow: hidden;
 
   @media (max-width: 920px) {
     flex-direction: column;

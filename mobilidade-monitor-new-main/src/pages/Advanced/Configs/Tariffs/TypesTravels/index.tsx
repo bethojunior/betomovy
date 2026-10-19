@@ -239,19 +239,22 @@ export const TypesTravels = () => {
     handleUpdatedRates,
   } = useTripRates(cityId, travelSelected.idTripType, setLoading);
 
-  async function getTypesTravels() {
+  async function getTypesTravels(): Promise<TypesTravelsProps[]> {
     setLoading(true);
+    let filteredTypes: TypesTravelsProps[] = [];
     try {
       const responseTypesTravels = await api.get("tripType");
-      const typesTravels = responseTypesTravels.data.response.filter(
+      filteredTypes = (responseTypesTravels.data?.response || []).filter(
         (data: TypesTravelsProps) => Number(data.serviceOption) === 0
       );
 
-      setTypesTravels(typesTravels);
+      setTypesTravels(filteredTypes);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+    return filteredTypes;
   }
 
   const handleSelectTravel = (datasTravel: TypesTravelsProps) => {
@@ -420,14 +423,19 @@ export const TypesTravels = () => {
             icon: "success",
           });
 
-          await getTypesTravels();
+          const currentSavedId = Number(travelSelected.idTripType);
+          const freshTypes = await getTypesTravels();
           await getCommissionsDriver();
           await getPrices();
 
-          const updatedTripType = typesTravels.find(
-            (t) => Number(t.idTripType) === Number(travelSelected.idTripType)
+          const updatedTripType = (freshTypes || []).find(
+            (t) => Number(t.idTripType) === currentSavedId
           );
-          setTravelSelected(updatedTripType ? { ...updatedTripType, ...travelSelected } : { ...travelSelected });
+          if (updatedTripType) {
+            setTravelSelected({ ...updatedTripType, ...travelSelected, idTripType: currentSavedId });
+          } else {
+            setTravelSelected({ ...travelSelected, idTripType: currentSavedId });
+          }
         } catch (error: any) {
           console.error("Erro ao atualizar tarifas:", error);
           let errorMsg = "Ocorreu um erro ao atualizar os preços e comissões.";
