@@ -796,13 +796,11 @@ export const TypesTravels = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "2.5rem 1.5rem",
+                padding: "2rem 1.25rem",
                 background: "#F8FAFC",
-                borderRadius: "16px",
+                borderRadius: "14px",
                 border: "1px solid #E2E8F0",
-                margin: "1rem",
                 width: "100%",
-                maxWidth: "320px",
                 boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
               }}
             >

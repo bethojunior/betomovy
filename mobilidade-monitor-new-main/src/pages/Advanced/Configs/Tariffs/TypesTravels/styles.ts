@@ -236,70 +236,119 @@ export const ButtonActions = styled.button`
 `;
 
 export const ContentLogoApp = styled.div`
-  flex: 1;
+  flex: 0 0 280px;
+  max-width: 300px;
   display: flex;
   justify-content: center;
   position: sticky;
-  top: 1rem;
+  top: 1.5rem;
   align-self: flex-start;
 
-  @media (max-width: 920px) {
+  @media (max-width: 1024px) {
+    flex: 1;
+    max-width: 100%;
+    width: 100%;
     position: static;
+    margin-top: 1.5rem;
   }
 `;
 
 export const ImageLogoApp = styled.img`
-  width: 200px;
+  width: 140px;
+  max-width: 100%;
   mix-blend-mode: multiply;
 
   @media (max-width: 920px) {
-    width: 50%;
+    width: 120px;
   }
 `;
 
 export const ContentPricePolicy = styled.div`
-  border: 1px solid #ccc;
-  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
   > h2 {
-    text-align: center;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
   }
 
   @media (max-width: 920px) {
+    padding: 1rem;
     > h2 {
-      font-size: 16px;
+      font-size: 15px;
     }
   }
 `;
 
 export const TextArea = styled.textarea`
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #00349A;
+  }
 `;
 
-export const LabelText = styled.p`
+export const LabelText = styled.label`
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   margin: 0;
-  flex: 1;
-  @media (max-width: 450px) {
-    font-size: 12px;
+  flex: 0 0 240px;
+  max-width: 280px;
+
+  @media (max-width: 768px) {
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 `;
 
 export const InputText = styled.input`
-  width: 100%;
-  padding: 0.3rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 10px;
   flex: 1;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+  background-color: #ffffff;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+  &:focus {
+    border-color: #00349A;
+    box-shadow: 0 0 0 3px rgba(0, 52, 154, 0.12);
+  }
 
   &:disabled {
-    background-color: #f5f5f5;
-    color: #999;
+    background-color: #f8fafc;
+    color: #94a3b8;
     cursor: not-allowed;
+    border-color: #e2e8f0;
   }
 
   @media (max-width: 450px) {
-    width: 70px;
+    width: 100%;
   }
 `;
 
@@ -307,11 +356,18 @@ export const ContentInputs = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
-  margin: 2rem 0;
+  gap: 1.25rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f8fafc;
 
-  @media (max-width: 450px) {
-    gap: 0.5rem;
+  &:last-child {
+    border-bottom: none;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
   }
 `;
 
@@ -522,21 +578,27 @@ export const SwitchLabel = styled.p`
 export const WizardStepper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
+  justify-content: flex-start;
+  margin-bottom: 1.75rem;
   background: #f8fafc;
   padding: 0.6rem 0.8rem;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 
   &::-webkit-scrollbar {
-    height: 4px;
+    height: 5px;
   }
   &::-webkit-scrollbar-thumb {
     background: #cbd5e1;
     border-radius: 4px;
+  }
+
+  @media (max-width: 920px) {
+    gap: 6px;
+    padding: 0.5rem;
   }
 `;
 

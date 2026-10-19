@@ -360,11 +360,35 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
             </ContentInputs>
             <ContentInputs>
               <LabelText>COR DA ETIQUETA(10)</LabelText>
-              <input
-                type="color"
-                value={colorTag}
-                onChange={(event) => setColorTag(event.target.value)}
-              />
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
+                <input
+                  type="color"
+                  value={colorTag || "#00349A"}
+                  onChange={(event) => setColorTag(event.target.value)}
+                  style={{
+                    width: "48px",
+                    height: "38px",
+                    padding: "2px",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    backgroundColor: "#ffffff",
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontFamily: "monospace",
+                    background: "#f1f5f9",
+                    padding: "4px 8px",
+                    borderRadius: "6px",
+                  }}
+                >
+                  {colorTag || "#00349A"}
+                </span>
+              </div>
             </ContentInputs>
           </ContentPricePolicy>
           <ContentPricePolicy>
