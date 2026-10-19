@@ -154,9 +154,10 @@ class PriceController extends ApiController
                 'statusId' => 1
             ];
 
-            $cols = implode(', ', array_keys($fields)) . ', created_at, updated_at';
+            $escapedCols = array_map(function($c) { return "`{$c}`"; }, array_keys($fields));
+            $cols = implode(', ', $escapedCols) . ', `created_at`, `updated_at`';
             $placeholders = ':' . implode(', :', array_keys($fields)) . ', NOW(), NOW()';
-            $ins = $pdo->prepare("INSERT INTO price ({$cols}) VALUES ({$placeholders})");
+            $ins = $pdo->prepare("INSERT INTO `price` ({$cols}) VALUES ({$placeholders})");
             $ins->execute($fields);
             $id = (int)$pdo->lastInsertId();
 
