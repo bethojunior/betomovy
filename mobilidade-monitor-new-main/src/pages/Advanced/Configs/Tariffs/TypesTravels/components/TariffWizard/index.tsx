@@ -165,6 +165,7 @@ interface TariffWizardProps {
   handleUpdateTariffs: () => void;
   handleDisabledCalls: () => void;
   setVisibleModal: (val: boolean) => void;
+  onCloseModal?: () => void;
 }
 
 export const TariffWizard: React.FC<TariffWizardProps> = ({
@@ -174,6 +175,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
   setIsSavedSuccess,
   travelSelected,
   cityId,
+  onCloseModal,
   tag,
   setTag,
   colorTag,
@@ -1003,8 +1005,16 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                 >
                   <AiOutlineArrowLeft size={16} /> Editar Novamente
                 </WizardButtonPrev>
+                {onCloseModal && (
+                  <WizardButtonNext
+                    onClick={onCloseModal}
+                    style={{ background: "#10b981", borderColor: "#059669" }}
+                  >
+                    <AiOutlineCheckCircle size={16} /> Concluir e Fechar
+                  </WizardButtonNext>
+                )}
                 <WizardButtonNext onClick={() => setVisibleModal(true)}>
-                  <AiOutlineCheckCircle size={16} /> Adicionar Nova Tarifa
+                  <AiOutlinePlus size={16} /> Adicionar Nova Tarifa
                 </WizardButtonNext>
               </div>
             </SuccessScreenContainer>

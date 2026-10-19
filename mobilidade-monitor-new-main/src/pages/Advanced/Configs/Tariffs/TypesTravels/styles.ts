@@ -10,8 +10,11 @@ interface ButtonProps {
 }
 
 export const Container = styled.div`
-  margin: 1rem;
-  padding-bottom: 5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.5rem 0.5rem 4rem 0.5rem;
   min-height: 100%;
 `;
 

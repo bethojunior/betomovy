@@ -11,20 +11,25 @@ type SiderProps = {
 };
 
 export const Container = styled(Layout)`
-  width: 100%;
-  height: 100%;
-  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
   overflow: hidden;
+  display: flex !important;
+  flex-direction: row !important;
 
   > aside {
     overflow-y: auto;
+    flex-shrink: 0;
   }
 
   > section {
     height: 100vh;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-width: 0 !important;
   }
 
   .trigger {

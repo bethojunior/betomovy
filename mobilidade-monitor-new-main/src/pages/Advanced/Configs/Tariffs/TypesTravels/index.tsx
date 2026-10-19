@@ -65,7 +65,7 @@ import {
 } from "./styles";
 
 import Session from "../../../../../utils/Session";
-import { Collapse, Switch, Radio, Select as SelectAntd, Checkbox } from "antd";
+import { Collapse, Switch, Radio, Select as SelectAntd, Checkbox, Modal } from "antd";
 
 import {
   AiOutlineClose,
@@ -111,6 +111,7 @@ export const TypesTravels = () => {
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isSavedSuccess, setIsSavedSuccess] = useState<boolean>(false);
+  const [isWizardModalOpen, setIsWizardModalOpen] = useState<boolean>(false);
   const canManageFloatingLimits = hasPermission(TARIFAS, "limite_flutuante");
 
   const cityId = Session.getLocal("citySelected")?.cityId;
@@ -291,6 +292,7 @@ export const TypesTravels = () => {
     setTravelSelected(fullTripType ? { ...fullTripType, ...datasTravel } : datasTravel);
     setCurrentStep(1);
     setIsSavedSuccess(false);
+    setIsWizardModalOpen(true);
     setLoading(false);
   };
 
@@ -676,182 +678,327 @@ export const TypesTravels = () => {
       </ContentTypesTravels>
 
       {Object.keys(travelSelected).length > 0 ? (
-        <ContentDetailsTariffs>
-          <ConfigDetailsTariffs>
-            <TariffWizard
-              currentStep={currentStep}
-              setCurrentStep={setCurrentStep}
-              isSavedSuccess={isSavedSuccess}
-              setIsSavedSuccess={setIsSavedSuccess}
-              travelSelected={travelSelected}
-              cityId={cityId}
-              tag={tag}
-              setTag={setTag}
-              colorTag={colorTag}
-              setColorTag={setColorTag}
-              minPrice={minPrice}
-              setMinPrice={setMinPrice}
-              promotionalPriceTemp={promotionalPriceTemp}
-              setPromotionalPriceTem={setPromotionalPriceTem}
-              basePrice={basePrice}
-              setBasePrice={setBasePrice}
-              kmPrice={kmPrice}
-              setKmPrice={setKmPrice}
-              minutePrice={minutePrice}
-              setMinutePrice={setMinutePrice}
-              wayPointPrice={wayPointPrice}
-              setWayPointPrice={setWayPointPrice}
-              longDistanceValueToFinalPrice={longDistanceValueToFinalPrice}
-              onChangeSwitchLongDistanceValueToFinalPrice={onChangeSwitchLongDistanceValueToFinalPrice}
-              longDistanceRadius={longDistanceRadius}
-              setLongDistanceRadius={setLongDistanceRadius}
-              longDistanceKm={longDistanceKm}
-              setLongDistanceKm={setLongDistanceKm}
-              rewardDriverMinPrice={rewardDriverMinPrice}
-              setRewardDriverMinPrice={setRewardDriverMinPrice}
-              ideaListCommonPrice={ideaListCommonPrice}
-              setIdeaListCommonPrice={setIdeaListCommonPrice}
-              disableAfterKm={disableAfterKm}
-              setDisableAfterKm={setDisableAfterKm}
-              kmToAdditionalValue={kmToAdditionalValue}
-              setKmToAdditionalValue={setKmToAdditionalValue}
-              additionalValueAfterKm={additionalValueAfterKm}
-              setAdditionalValueAfterKm={setAdditionalValueAfterKm}
-              typeAdditionalValueAfterKm={typeAdditionalValueAfterKm}
-              setTypeAdditionalValueAfterKm={setTypeAdditionalValueAfterKm}
-              waitingToleranceSeconds={waitingToleranceSeconds}
-              setWaitingToleranceSeconds={setWaitingToleranceSeconds}
-              waitingPenaltyFee={waitingPenaltyFee}
-              setWaitingPenaltyFee={setWaitingPenaltyFee}
-              waitingExtraFeePerMinute={waitingExtraFeePerMinute}
-              setWaitingExtraFeePerMinute={setWaitingExtraFeePerMinute}
-              valueCalcDriver={valueCalcDriver}
-              setValueCalcDriver={setValueCalcDriver}
-              valueTypeCalcDriver={valueTypeCalcDriver}
-              setValueTypeCalcDriver={setValueTypeCalcDriver}
-              disableOnPromotion={disableOnPromotion}
-              setDisableOnPromotion={setDisableOnPromotion}
-              tripPaymentsForms={tripPaymentsForms}
-              commissionPaymentForms={commissionPaymentForms}
-              handleChangePaymentsCommissions={handleChangePaymentsCommissions}
-              valueCashback={valueCashback}
-              setValueCashback={setValueCashback}
-              valueTypeCashback={valueTypeCashback}
-              setValueTypeCashback={setValueTypeCashback}
-              onChangeSwitchFinalPrice={onChangeSwitchFinalPrice}
-              backToTripBalance={backToTripBalance}
-              setBackToTripBalance={setBackToTripBalance}
-              cashBacks={cashBacks}
-              handleDeleteCashback={handleDeleteCashback}
-              handleAddCashback={handleAddCashback}
-              descriptionPriceRange={descriptionPriceRange}
-              setDescritpionPriceRange={setDescritpionPriceRange}
-              minValue={minValue}
-              setMinValue={setMinValue}
-              maxValue={maxValue}
-              setMaxValue={setMaxValue}
-              newValue={newValue}
-              setNewValue={setNewValue}
-              handleAddRangePrice={handleAddRangePrice}
-              datasPriceRange={datasPriceRange}
-              handleDeletePriceRange={handleDeletePriceRange}
-              allRates={allRates}
-              handleUpdatedRates={handleUpdatedRates}
-              inputValues={inputValues}
-              handleInputChange={handleInputChange}
-              handeDeleteRates={handeDeleteRates}
-              isShowNewRates={isShowNewRates}
-              setIsShowNewRates={setIsShowNewRates}
-              nameRates={nameRates}
-              setNameRates={setNameRates}
-              valueRates={valueRates}
-              setValueRates={setValueRates}
-              setDescriptionRates={setDescriptionRates}
-              selectChargedRates={selectChargedRates}
-              typeChargeRates={typeChargeRates}
-              setTypeChargeRates={setTypeChargeRates}
-              setStatusActiveRates={setStatusActiveRates}
-              handleAddRates={handleAddRates}
-              isInDriverEnabled={isInDriverEnabled}
-              canManageFloatingLimits={canManageFloatingLimits}
-              floatingLimitsOfferMin={floatingLimitsOfferMin}
-              setFloatingLimitsOfferMin={setFloatingLimitsOfferMin}
-              floatingLimitsOfferMax={floatingLimitsOfferMax}
-              setFloatingLimitsOfferMax={setFloatingLimitsOfferMax}
-              floatingLimitsThirdPartyEnabled={floatingLimitsThirdPartyEnabled}
-              setFloatingLimitsThirdPartyEnabled={setFloatingLimitsThirdPartyEnabled}
-              floatingLimitsThirdPartyMin={floatingLimitsThirdPartyMin}
-              setFloatingLimitsThirdPartyMin={setFloatingLimitsThirdPartyMin}
-              floatingLimitsThirdPartyMax={floatingLimitsThirdPartyMax}
-              setFloatingLimitsThirdPartyMax={setFloatingLimitsThirdPartyMax}
-              handleUpdateTariffs={handleUpdateTariffs}
-              handleDisabledCalls={handleDisabledCalls}
-              setVisibleModal={setVisibleModal}
-            />
-          </ConfigDetailsTariffs>
-          <ContentLogoApp>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "2rem 1.25rem",
-                background: "#F8FAFC",
-                borderRadius: "14px",
-                border: "1px solid #E2E8F0",
-                width: "100%",
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
+        <ContentDetailsTariffs
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%)',
+            border: '1.5px solid #E2E8F0',
+            borderRadius: 16,
+            padding: '1.5rem 2rem',
+            marginTop: '1.5rem',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+            flexWrap: 'wrap',
+            gap: '1.5rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: '1 1 320px' }}>
+            <ImageTariff
+              src={
+                travelSelected?.picture
+                  ? (travelSelected.picture.startsWith('http')
+                      ? travelSelected.picture
+                      : 'https://minio.704app.com.br/rota101fb704/tripType/' + travelSelected.picture)
+                  : logoMovy
+              }
+              alt={travelSelected?.type || 'Tarifa Movy'}
+              onError={(e: any) => {
+                e.target.onerror = null;
+                e.target.src = logoMovy;
               }}
-            >
-              <ImageLogoApp
-                src={
-                  travelSelected?.picture
-                    ? (travelSelected.picture.startsWith("http")
-                        ? travelSelected.picture
-                        : `https://minio.704app.com.br/rota101fb704/tripType/${travelSelected.picture}`)
-                    : logoMovy
-                }
-                alt={travelSelected?.type || "Movy"}
-                onError={(e: any) => {
-                  e.target.onerror = null;
-                  e.target.src = logoMovy;
-                }}
-                style={{
-                  maxWidth: "180px",
-                  maxHeight: "130px",
-                  objectFit: "contain",
-                  marginBottom: "1.2rem",
-                  filter: "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08))",
-                }}
-              />
-              <h3
-                style={{
-                  margin: "0 0 6px 0",
-                  color: "#070A1A",
-                  fontWeight: 700,
-                  fontSize: "17px",
-                  textAlign: "center",
-                }}
-              >
-                {travelSelected?.type || "Tarifas Movy"}
+              style={{
+                width: '64px',
+                height: '64px',
+                objectFit: 'contain',
+                background: '#ffffff',
+                padding: '8px',
+                borderRadius: '12px',
+                border: '1px solid #E2E8F0',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+              }}
+            />
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#00349A',
+                    background: '#E0F2FE',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                  }}
+                >
+                  Id: {travelSelected?.idTripType ?? '—'}
+                </span>
+                {travelSelected?.gender?.name && (
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: '#475569',
+                      background: '#F1F5F9',
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                    }}
+                  >
+                    Gênero: {travelSelected.gender.name}
+                  </span>
+                )}
+              </div>
+              <h3 style={{ margin: 0, fontSize: '19px', fontWeight: 700, color: '#0F172A' }}>
+                {travelSelected?.type || 'Tarifa Selecionada'}
               </h3>
-              <p
-                style={{
-                  margin: 0,
-                  color: "#64748B",
-                  fontSize: "13px",
-                  textAlign: "center",
-                  lineHeight: 1.4,
-                }}
-              >
-                {travelSelected?.description ||
-                  "Ajuste os valores operacionais e regras nos painéis ao lado."}
+              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748B' }}>
+                {travelSelected?.description || 'Valores e regras operacionais ativos para esta modalidade.'}
               </p>
             </div>
-          </ContentLogoApp>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1.5rem',
+              background: '#FFFFFF',
+              padding: '0.85rem 1.25rem',
+              borderRadius: 12,
+              border: '1px solid #E2E8F0',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase' }}>
+                Preço Mínimo
+              </div>
+              <div style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A' }}>
+                R$ {minPrice || '0,00'}
+              </div>
+            </div>
+            <div style={{ width: 1, height: 32, background: '#E2E8F0' }} />
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase' }}>
+                Preço Base
+              </div>
+              <div style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A' }}>
+                R$ {basePrice || '0,00'}
+              </div>
+            </div>
+            <div style={{ width: 1, height: 32, background: '#E2E8F0' }} />
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase' }}>
+                Preço KM
+              </div>
+              <div style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A' }}>
+                R$ {kmPrice || '0,00'}
+              </div>
+            </div>
+            <div style={{ width: 1, height: 32, background: '#E2E8F0' }} />
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase' }}>
+                Comissão
+              </div>
+              <div style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A' }}>
+                {valueCalcDriver || '0,00'} {valueTypeCalcDriver}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <ButtonActions
+              onClick={() => {
+                setCurrentStep(1);
+                setIsSavedSuccess(false);
+                setIsWizardModalOpen(true);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '0.75rem 1.4rem',
+                fontSize: '14px',
+                fontWeight: 700,
+              }}
+            >
+              ⚙️ Abrir Assistente de Edição
+            </ButtonActions>
+            <button
+              onClick={handleDisabledCalls}
+              style={{
+                background: '#FEE2E2',
+                color: '#DC2626',
+                border: '1px solid #FECACA',
+                borderRadius: 8,
+                padding: '0.75rem 1.25rem',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#FCA5A5')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#FEE2E2')}
+            >
+              Desabilitar Tarifa
+            </button>
+          </div>
         </ContentDetailsTariffs>
       ) : null}
+
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <img
+              src={
+                travelSelected?.picture
+                  ? (travelSelected.picture.startsWith('http')
+                      ? travelSelected.picture
+                      : 'https://minio.704app.com.br/rota101fb704/tripType/' + travelSelected.picture)
+                  : logoMovy
+              }
+              alt={travelSelected?.type || 'Tarifa'}
+              style={{ width: 34, height: 34, objectFit: 'contain' }}
+              onError={(e: any) => {
+                e.target.onerror = null;
+                e.target.src = logoMovy;
+              }}
+            />
+            <div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: '#0F172A' }}>
+                {travelSelected?.type ? 'Configuração de Tarifa: ' + travelSelected.type : 'Assistente de Tarifa'}
+              </div>
+              <div style={{ fontSize: 12, color: '#64748B', fontWeight: 500 }}>
+                {travelSelected?.idTripType ? 'ID: ' + travelSelected.idTripType : ''} • Passo a Passo de Configuração
+              </div>
+            </div>
+          </div>
+        }
+        open={isWizardModalOpen}
+        onCancel={() => setIsWizardModalOpen(false)}
+        footer={null}
+        width={980}
+        centered
+        destroyOnClose={false}
+        zIndex={10000020}
+        bodyStyle={{
+          maxHeight: '82vh',
+          overflowY: 'auto',
+          padding: '1.5rem',
+        }}
+      >
+        <TariffWizard
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+          isSavedSuccess={isSavedSuccess}
+          setIsSavedSuccess={setIsSavedSuccess}
+          travelSelected={travelSelected}
+          cityId={cityId}
+          tag={tag}
+          setTag={setTag}
+          colorTag={colorTag}
+          setColorTag={setColorTag}
+          minPrice={minPrice}
+          setMinPrice={setMinPrice}
+          promotionalPriceTemp={promotionalPriceTemp}
+          setPromotionalPriceTem={setPromotionalPriceTem}
+          basePrice={basePrice}
+          setBasePrice={setBasePrice}
+          kmPrice={kmPrice}
+          setKmPrice={setKmPrice}
+          minutePrice={minutePrice}
+          setMinutePrice={setMinutePrice}
+          wayPointPrice={wayPointPrice}
+          setWayPointPrice={setWayPointPrice}
+          longDistanceValueToFinalPrice={longDistanceValueToFinalPrice}
+          onChangeSwitchLongDistanceValueToFinalPrice={onChangeSwitchLongDistanceValueToFinalPrice}
+          longDistanceRadius={longDistanceRadius}
+          setLongDistanceRadius={setLongDistanceRadius}
+          longDistanceKm={longDistanceKm}
+          setLongDistanceKm={setLongDistanceKm}
+          rewardDriverMinPrice={rewardDriverMinPrice}
+          setRewardDriverMinPrice={setRewardDriverMinPrice}
+          ideaListCommonPrice={ideaListCommonPrice}
+          setIdeaListCommonPrice={setIdeaListCommonPrice}
+          disableAfterKm={disableAfterKm}
+          setDisableAfterKm={setDisableAfterKm}
+          kmToAdditionalValue={kmToAdditionalValue}
+          setKmToAdditionalValue={setKmToAdditionalValue}
+          additionalValueAfterKm={additionalValueAfterKm}
+          setAdditionalValueAfterKm={setAdditionalValueAfterKm}
+          typeAdditionalValueAfterKm={typeAdditionalValueAfterKm}
+          setTypeAdditionalValueAfterKm={setTypeAdditionalValueAfterKm}
+          waitingToleranceSeconds={waitingToleranceSeconds}
+          setWaitingToleranceSeconds={setWaitingToleranceSeconds}
+          waitingPenaltyFee={waitingPenaltyFee}
+          setWaitingPenaltyFee={setWaitingPenaltyFee}
+          waitingExtraFeePerMinute={waitingExtraFeePerMinute}
+          setWaitingExtraFeePerMinute={setWaitingExtraFeePerMinute}
+          valueCalcDriver={valueCalcDriver}
+          setValueCalcDriver={setValueCalcDriver}
+          valueTypeCalcDriver={valueTypeCalcDriver}
+          setValueTypeCalcDriver={setValueTypeCalcDriver}
+          disableOnPromotion={disableOnPromotion}
+          setDisableOnPromotion={setDisableOnPromotion}
+          tripPaymentsForms={tripPaymentsForms}
+          commissionPaymentForms={commissionPaymentForms}
+          handleChangePaymentsCommissions={handleChangePaymentsCommissions}
+          valueCashback={valueCashback}
+          setValueCashback={setValueCashback}
+          valueTypeCashback={valueTypeCashback}
+          setValueTypeCashback={setValueTypeCashback}
+          onChangeSwitchFinalPrice={onChangeSwitchFinalPrice}
+          backToTripBalance={backToTripBalance}
+          setBackToTripBalance={setBackToTripBalance}
+          cashBacks={cashBacks}
+          handleDeleteCashback={handleDeleteCashback}
+          handleAddCashback={handleAddCashback}
+          descriptionPriceRange={descriptionPriceRange}
+          setDescritpionPriceRange={setDescritpionPriceRange}
+          minValue={minValue}
+          setMinValue={setMinValue}
+          maxValue={maxValue}
+          setMaxValue={setMaxValue}
+          newValue={newValue}
+          setNewValue={setNewValue}
+          handleAddRangePrice={handleAddRangePrice}
+          datasPriceRange={datasPriceRange}
+          handleDeletePriceRange={handleDeletePriceRange}
+          allRates={allRates}
+          handleUpdatedRates={handleUpdatedRates}
+          inputValues={inputValues}
+          handleInputChange={handleInputChange}
+          handeDeleteRates={handeDeleteRates}
+          isShowNewRates={isShowNewRates}
+          setIsShowNewRates={setIsShowNewRates}
+          nameRates={nameRates}
+          setNameRates={setNameRates}
+          valueRates={valueRates}
+          setValueRates={setValueRates}
+          setDescriptionRates={setDescriptionRates}
+          selectChargedRates={selectChargedRates}
+          typeChargeRates={typeChargeRates}
+          setTypeChargeRates={setTypeChargeRates}
+          setStatusActiveRates={setStatusActiveRates}
+          handleAddRates={handleAddRates}
+          isInDriverEnabled={isInDriverEnabled}
+          canManageFloatingLimits={canManageFloatingLimits}
+          floatingLimitsOfferMin={floatingLimitsOfferMin}
+          setFloatingLimitsOfferMin={setFloatingLimitsOfferMin}
+          floatingLimitsOfferMax={floatingLimitsOfferMax}
+          setFloatingLimitsOfferMax={setFloatingLimitsOfferMax}
+          floatingLimitsThirdPartyEnabled={floatingLimitsThirdPartyEnabled}
+          setFloatingLimitsThirdPartyEnabled={setFloatingLimitsThirdPartyEnabled}
+          floatingLimitsThirdPartyMin={floatingLimitsThirdPartyMin}
+          setFloatingLimitsThirdPartyMin={setFloatingLimitsThirdPartyMin}
+          floatingLimitsThirdPartyMax={floatingLimitsThirdPartyMax}
+          setFloatingLimitsThirdPartyMax={setFloatingLimitsThirdPartyMax}
+          handleUpdateTariffs={handleUpdateTariffs}
+          handleDisabledCalls={handleDisabledCalls}
+          setVisibleModal={setVisibleModal}
+          onCloseModal={() => setIsWizardModalOpen(false)}
+        />
+      </Modal>
 
       <ModalNewTariffs
         datasTariffs={listTravelsDisabled}

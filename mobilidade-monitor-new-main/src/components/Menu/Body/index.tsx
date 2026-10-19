@@ -230,7 +230,7 @@ const Menu = ({ children, titlePage }: MenuProps) => {
   }, []);
 
   return (
-    <Container>
+    <Container hasSider>
       <Preload visible={loading} />
       <SiderMenu
         menumobile={isMobile}
@@ -357,9 +357,11 @@ const Menu = ({ children, titlePage }: MenuProps) => {
           id="main-scroll-content"
           style={{
             height: "calc(100vh - 64px)",
-            padding: "1vw",
+            padding: "1.25rem",
             overflowY: "auto",
             overflowX: "hidden",
+            boxSizing: "border-box",
+            width: "100%",
           }}
         >
           {children}
