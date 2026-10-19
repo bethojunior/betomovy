@@ -48,6 +48,8 @@ return [
         '/price/range',
         '/price/dynamic',
         '/drivercommission',
+        '/partnercommission',
+        '/partnercommission/',
         '/trippaymentform',
         '/trippaymentform/index',
         '/trippaymentform/getall',

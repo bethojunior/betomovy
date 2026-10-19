@@ -15,12 +15,26 @@ class CentralController extends ApiController
 
     public function actionIndex()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->handleRegister();
-            return;
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if ($method === 'POST' && isset($_POST['_method'])) {
+            $method = strtoupper($_POST['_method']);
         }
 
-        $this->handleList();
+        switch ($method) {
+            case 'POST':
+                $this->handleRegister();
+                break;
+            case 'PUT':
+                $this->handleUpdate();
+                break;
+            case 'DELETE':
+                $this->handleDelete();
+                break;
+            case 'GET':
+            default:
+                $this->handleList();
+                break;
+        }
     }
 
     private function handleRegister()
@@ -34,6 +48,14 @@ class CentralController extends ApiController
             $latitude = $_POST['latitude'] ?? null;
             $longitude = $_POST['longitude'] ?? null;
             $appPartner = $_POST['app_partner'] ?? null;
+            $responsibleId = !empty($_POST['responsibleId']) ? (int)$_POST['responsibleId'] : null;
+            $centralCallDriver = $_POST['centralCallDriver'] ?? 'all';
+            $syncCustomers = isset($_POST['syncCustomers']) ? (int)$_POST['syncCustomers'] : 1;
+            $showAllPrices = isset($_POST['showAllPrices']) ? (int)$_POST['showAllPrices'] : 1;
+            $enableCustomRadiusCentral = isset($_POST['enableCustomRadiusCentral']) ? (int)$_POST['enableCustomRadiusCentral'] : 0;
+            $placesSearchRadius = !empty($_POST['placesSearchRadius']) ? (int)$_POST['placesSearchRadius'] : null;
+            $discount_type = $_POST['discount_type'] ?? null;
+            $discount_value = isset($_POST['discount_value']) && $_POST['discount_value'] !== '' ? (float)$_POST['discount_value'] : null;
 
             // User data may be nested user[name] or flat
             $userName = null;
@@ -54,7 +76,7 @@ class CentralController extends ApiController
             }
 
             // Fallback to JSON payload if $_POST was empty
-            if (empty($name) && empty($userName)) {
+            if (empty($name) && empty($userName) && empty($responsibleId)) {
                 $raw = file_get_contents('php://input');
                 $json = json_decode($raw, true);
                 if ($json) {
@@ -63,6 +85,15 @@ class CentralController extends ApiController
                     $latitude = $json['latitude'] ?? null;
                     $longitude = $json['longitude'] ?? null;
                     $appPartner = $json['app_partner'] ?? null;
+                    $responsibleId = !empty($json['responsibleId']) ? (int)$json['responsibleId'] : null;
+                    $centralCallDriver = $json['centralCallDriver'] ?? 'all';
+                    $syncCustomers = isset($json['syncCustomers']) ? (int)$json['syncCustomers'] : 1;
+                    $showAllPrices = isset($json['showAllPrices']) ? (int)$json['showAllPrices'] : 1;
+                    $enableCustomRadiusCentral = isset($json['enableCustomRadiusCentral']) ? (int)$json['enableCustomRadiusCentral'] : 0;
+                    $placesSearchRadius = !empty($json['placesSearchRadius']) ? (int)$json['placesSearchRadius'] : null;
+                    $discount_type = $json['discount_type'] ?? null;
+                    $discount_value = isset($json['discount_value']) ? (float)$json['discount_value'] : null;
+
                     if (isset($json['user']) && is_array($json['user'])) {
                         $userName = $json['user']['name'] ?? null;
                         $userEmail = $json['user']['email'] ?? null;
@@ -72,16 +103,81 @@ class CentralController extends ApiController
                 }
             }
 
-            if (empty($userName) || empty($userEmail) || empty($userPassword)) {
-                header('Content-Type: application/json; charset=utf-8');
-                echo json_encode([
-                    'status' => false,
-                    'message' => 'Campos obrigatórios: Nome, E-mail e Senha',
-                    'data' => null,
-                    'response' => null,
-                    'errors' => ['message' => 'Campos obrigatórios']
-                ]);
-                return;
+            $userId = null;
+
+            if ($responsibleId && $responsibleId > 0) {
+                // User already exists
+                $stmtCheckU = $pdo->prepare("SELECT idUser, name, email, phone FROM user WHERE idUser = :uid LIMIT 1");
+                $stmtCheckU->execute([':uid' => $responsibleId]);
+                $userRow = $stmtCheckU->fetch(PDO::FETCH_ASSOC);
+
+                if (!$userRow) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'status' => false,
+                        'message' => 'Usuário responsável não encontrado',
+                        'data' => null,
+                        'response' => null,
+                        'errors' => ['message' => 'Usuário responsável não encontrado']
+                    ]);
+                    return;
+                }
+
+                $userId = (int)$userRow['idUser'];
+                $userName = $userRow['name'];
+                $cleanEmail = $userRow['email'];
+                $cleanPhone = preg_replace('/\D/', '', (string)$userRow['phone']);
+            } else {
+                // New user validation
+                if (empty($userName) || empty($userEmail) || empty($userPassword)) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'status' => false,
+                        'message' => 'Campos obrigatórios: Nome, E-mail e Senha',
+                        'data' => null,
+                        'response' => null,
+                        'errors' => ['message' => 'Campos obrigatórios']
+                    ]);
+                    return;
+                }
+
+                $cleanPhone = preg_replace('/\D/', '', (string)$userPhone);
+                $cleanEmail = strtolower(trim($userEmail));
+                $encodedPass = base64_encode($userPassword);
+
+                // Check if user already exists
+                $stmtU = $pdo->prepare("SELECT idUser, password FROM user WHERE email = :email LIMIT 1");
+                $stmtU->execute([':email' => $cleanEmail]);
+                $existingUser = $stmtU->fetch(PDO::FETCH_ASSOC);
+
+                if ($existingUser) {
+                    $userId = (int)$existingUser['idUser'];
+                    $updU = $pdo->prepare("UPDATE user SET name = :name, phone = :phone, password = :pass, statusId = 1 WHERE idUser = :userId");
+                    $updU->execute([
+                        ':name' => $userName,
+                        ':phone' => $cleanPhone ?: $userPhone,
+                        ':pass' => $encodedPass,
+                        ':userId' => $userId
+                    ]);
+                } else {
+                    $parts = explode(' ', trim($userName));
+                    $nickname = $parts[0];
+                    $token = password_hash($cleanEmail . '_' . time(), PASSWORD_BCRYPT);
+
+                    $insU = $pdo->prepare("
+                        INSERT INTO user (name, nickname, email, phone, password, statusId, api_token, registered_in, created_at, updated_at) 
+                        VALUES (:name, :nickname, :email, :phone, :password, 1, :token, 'central', NOW(), NOW())
+                    ");
+                    $insU->execute([
+                        ':name' => $userName,
+                        ':nickname' => $nickname,
+                        ':email' => $cleanEmail,
+                        ':phone' => $cleanPhone ?: $userPhone,
+                        ':password' => $encodedPass,
+                        ':token' => $token
+                    ]);
+                    $userId = (int)$pdo->lastInsertId();
+                }
             }
 
             if (empty($name)) {
@@ -90,46 +186,6 @@ class CentralController extends ApiController
 
             if (empty($address)) {
                 $address = 'Endereço Principal';
-            }
-
-            $cleanPhone = preg_replace('/\D/', '', (string)$userPhone);
-            $cleanEmail = strtolower(trim($userEmail));
-
-            // Check if user already exists
-            $stmtU = $pdo->prepare("SELECT idUser, password FROM user WHERE email = :email LIMIT 1");
-            $stmtU->execute([':email' => $cleanEmail]);
-            $existingUser = $stmtU->fetch(PDO::FETCH_ASSOC);
-
-            $userId = null;
-            $encodedPass = base64_encode($userPassword);
-
-            if ($existingUser) {
-                $userId = (int)$existingUser['idUser'];
-                $updU = $pdo->prepare("UPDATE user SET name = :name, phone = :phone, password = :pass, statusId = 1 WHERE idUser = :userId");
-                $updU->execute([
-                    ':name' => $userName,
-                    ':phone' => $cleanPhone ?: $userPhone,
-                    ':pass' => $encodedPass,
-                    ':userId' => $userId
-                ]);
-            } else {
-                $parts = explode(' ', trim($userName));
-                $nickname = $parts[0];
-                $token = password_hash($cleanEmail . '_' . time(), PASSWORD_BCRYPT);
-
-                $insU = $pdo->prepare("
-                    INSERT INTO user (name, nickname, email, phone, password, statusId, api_token, registered_in, created_at, updated_at) 
-                    VALUES (:name, :nickname, :email, :phone, :password, 1, :token, 'central', NOW(), NOW())
-                ");
-                $insU->execute([
-                    ':name' => $userName,
-                    ':nickname' => $nickname,
-                    ':email' => $cleanEmail,
-                    ':phone' => $cleanPhone ?: $userPhone,
-                    ':password' => $encodedPass,
-                    ':token' => $token
-                ]);
-                $userId = (int)$pdo->lastInsertId();
             }
 
             // Create Balance for central/customer
@@ -152,7 +208,7 @@ class CentralController extends ApiController
                 ");
                 $insCust->execute([
                     ':name' => $userName,
-                    ':phone' => $cleanPhone ?: $userPhone,
+                    ':phone' => $cleanPhone ?: ($userPhone ?? ''),
                     ':userId' => $userId,
                     ':balanceId' => $balanceId
                 ]);
@@ -189,8 +245,19 @@ class CentralController extends ApiController
 
             // Insert Central
             $insC = $pdo->prepare("
-                INSERT INTO central (name, latitude, longitude, address, logo, responsibleId, balanceId, key_app_partner, statusId, created_at, updated_at)
-                VALUES (:name, :lat, :lng, :address, :logo, :responsibleId, :balanceId, :keyAppPartner, 1, NOW(), NOW())
+                INSERT INTO central (
+                    name, latitude, longitude, address, logo, 
+                    responsibleId, balanceId, key_app_partner, statusId, active,
+                    centralCallDriver, syncCustomers, showAllPrices,
+                    enableCustomRadiusCentral, placesSearchRadius, discount_type, discount_value,
+                    created_at, updated_at
+                ) VALUES (
+                    :name, :lat, :lng, :address, :logo, 
+                    :responsibleId, :balanceId, :keyAppPartner, 1, 1,
+                    :centralCallDriver, :syncCustomers, :showAllPrices,
+                    :enableCustomRadiusCentral, :placesSearchRadius, :discount_type, :discount_value,
+                    NOW(), NOW()
+                )
             ");
             $insC->execute([
                 ':name' => $name,
@@ -200,7 +267,14 @@ class CentralController extends ApiController
                 ':logo' => $logoFilename,
                 ':responsibleId' => $userId,
                 ':balanceId' => $balanceId,
-                ':keyAppPartner' => $appPartner ?: null
+                ':keyAppPartner' => $appPartner ?: null,
+                ':centralCallDriver' => $centralCallDriver,
+                ':syncCustomers' => $syncCustomers,
+                ':showAllPrices' => $showAllPrices,
+                ':enableCustomRadiusCentral' => $enableCustomRadiusCentral,
+                ':placesSearchRadius' => $placesSearchRadius,
+                ':discount_type' => $discount_type,
+                ':discount_value' => $discount_value
             ]);
             $centralId = (int)$pdo->lastInsertId();
 
@@ -224,7 +298,15 @@ class CentralController extends ApiController
                 'responsibleId' => $userId,
                 'balanceId' => $balanceId,
                 'key_app_partner' => $appPartner ?: null,
-                'statusId' => 1
+                'centralCallDriver' => $centralCallDriver,
+                'syncCustomers' => $syncCustomers,
+                'showAllPrices' => $showAllPrices,
+                'enableCustomRadiusCentral' => $enableCustomRadiusCentral,
+                'placesSearchRadius' => $placesSearchRadius,
+                'discount_type' => $discount_type,
+                'discount_value' => $discount_value,
+                'statusId' => 1,
+                'active' => 1
             ];
 
             header('Content-Type: application/json; charset=utf-8');
@@ -247,6 +329,122 @@ class CentralController extends ApiController
         }
     }
 
+    private function handleUpdate()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true) ?: $_POST;
+
+            if ($id <= 0 && !empty($data['id'])) {
+                $id = (int)$data['id'];
+            }
+
+            if ($id <= 0) {
+                throw new Exception("ID da central não informado");
+            }
+
+            // Extract fields to update
+            $name = $data['name'] ?? null;
+            $address = $data['address'] ?? null;
+            $latitude = isset($data['latitude']) && $data['latitude'] !== '' ? (float)$data['latitude'] : null;
+            $longitude = isset($data['longitude']) && $data['longitude'] !== '' ? (float)$data['longitude'] : null;
+            $centralCallDriver = $data['centralCallDriver'] ?? null;
+            $syncCustomers = isset($data['syncCustomers']) ? (int)$data['syncCustomers'] : null;
+            $showAllPrices = isset($data['showAllPrices']) ? (int)$data['showAllPrices'] : null;
+            $enableCustomRadiusCentral = isset($data['enableCustomRadiusCentral']) ? (int)$data['enableCustomRadiusCentral'] : null;
+            $placesSearchRadius = isset($data['placesSearchRadius']) ? ($data['placesSearchRadius'] !== '' ? (int)$data['placesSearchRadius'] : null) : null;
+            $discount_type = $data['discount_type'] ?? null;
+            $discount_value = isset($data['discount_value']) ? ($data['discount_value'] !== '' ? (float)$data['discount_value'] : null) : null;
+
+            $stmt = $pdo->prepare("
+                UPDATE central SET
+                    name = COALESCE(:name, name),
+                    address = COALESCE(:address, address),
+                    latitude = COALESCE(:latitude, latitude),
+                    longitude = COALESCE(:longitude, longitude),
+                    centralCallDriver = COALESCE(:centralCallDriver, centralCallDriver),
+                    syncCustomers = COALESCE(:syncCustomers, syncCustomers),
+                    showAllPrices = COALESCE(:showAllPrices, showAllPrices),
+                    enableCustomRadiusCentral = COALESCE(:enableCustomRadiusCentral, enableCustomRadiusCentral),
+                    placesSearchRadius = :placesSearchRadius,
+                    discount_type = :discount_type,
+                    discount_value = :discount_value,
+                    updated_at = NOW()
+                WHERE id = :id
+            ");
+
+            $stmt->execute([
+                ':name' => $name,
+                ':address' => $address,
+                ':latitude' => $latitude,
+                ':longitude' => $longitude,
+                ':centralCallDriver' => $centralCallDriver,
+                ':syncCustomers' => $syncCustomers,
+                ':showAllPrices' => $showAllPrices,
+                ':enableCustomRadiusCentral' => $enableCustomRadiusCentral,
+                ':placesSearchRadius' => $placesSearchRadius,
+                ':discount_type' => $discount_type,
+                ':discount_value' => $discount_value,
+                ':id' => $id
+            ]);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Central atualizada com sucesso',
+                'response' => true,
+                'data' => true
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao atualizar central: ' . $e->getMessage(),
+                'response' => false,
+                'data' => false
+            ]);
+        }
+    }
+
+    private function handleDelete()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+            if ($id <= 0) {
+                $raw = file_get_contents('php://input');
+                $data = json_decode($raw, true) ?: $_POST;
+                $id = (int)($data['id'] ?? 0);
+            }
+
+            if ($id <= 0) {
+                throw new Exception("ID da central não informado");
+            }
+
+            $stmt = $pdo->prepare("UPDATE central SET statusId = 2, active = 0, updated_at = NOW() WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Central removida com sucesso',
+                'response' => true,
+                'data' => true
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao remover central: ' . $e->getMessage(),
+                'response' => false,
+                'data' => false
+            ]);
+        }
+    }
+
     private function handleList()
     {
         try {
@@ -254,11 +452,32 @@ class CentralController extends ApiController
             $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
             if ($id > 0) {
-                $stmt = $pdo->prepare("SELECT * FROM central WHERE id = :id LIMIT 1");
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        c.*,
+                        COALESCE(b.tripBalance, b.balance, 0.00) AS tripBalance,
+                        COALESCE(b.balance, 0.00) AS balance,
+                        u.name AS responsibleName,
+                        u.email AS responsibleEmail,
+                        u.phone AS phone
+                    FROM central c
+                    LEFT JOIN balance b ON b.idBalance = c.balanceId
+                    LEFT JOIN user u ON u.idUser = c.responsibleId
+                    WHERE c.id = :id
+                    LIMIT 1
+                ");
                 $stmt->execute([':id' => $id]);
                 $central = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($central) {
+                    $central['active'] = (int)($central['active'] ?? 0);
+                    $central['responsible'] = [
+                        'id' => (int)($central['responsibleId'] ?? 0),
+                        'name' => $central['responsibleName'] ?? '',
+                        'email' => $central['responsibleEmail'] ?? '',
+                        'phone' => $central['phone'] ?? ''
+                    ];
+
                     header('Content-Type: application/json; charset=utf-8');
                     echo json_encode([
                         'status' => true,
@@ -271,15 +490,77 @@ class CentralController extends ApiController
                 }
             }
 
-            $stmt = $pdo->query("SELECT * FROM central WHERE statusId = 1 LIMIT 50");
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $limit = 50;
+            $offset = ($page - 1) * $limit;
+            $nameSearch = trim($_GET['name'] ?? '');
+
+            $where = "WHERE (c.statusId = 1 OR c.statusId IS NULL)";
+            $params = [];
+
+            if ($nameSearch !== '') {
+                $where .= " AND c.name LIKE :searchName";
+                $params[':searchName'] = "%{$nameSearch}%";
+            }
+
+            $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM central c {$where}");
+            $stmtCount->execute($params);
+            $total = (int)$stmtCount->fetchColumn();
+
+            $sql = "
+                SELECT 
+                    c.*,
+                    COALESCE(b.tripBalance, b.balance, 0.00) AS tripBalance,
+                    COALESCE(b.balance, 0.00) AS balance,
+                    u.name AS responsibleName,
+                    u.email AS responsibleEmail,
+                    u.phone AS phone
+                FROM central c
+                LEFT JOIN balance b ON b.idBalance = c.balanceId
+                LEFT JOIN user u ON u.idUser = c.responsibleId
+                {$where}
+                ORDER BY c.id DESC
+                LIMIT {$limit} OFFSET {$offset}
+            ";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
             $centrals = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($centrals as &$c) {
+                $c['active'] = (int)($c['active'] ?? 0);
+                $c['tripBalance'] = $c['tripBalance'] !== null ? (float)$c['tripBalance'] : null;
+                $c['responsible'] = [
+                    'id' => (int)($c['responsibleId'] ?? 0),
+                    'name' => $c['responsibleName'] ?? '',
+                    'email' => $c['responsibleEmail'] ?? '',
+                    'phone' => $c['phone'] ?? ''
+                ];
+            }
+            unset($c);
+
+            $lastPage = max(1, (int)ceil($total / $limit));
+            $hasMore = ($offset + count($centrals)) < $total;
+            $hasPrev = $page > 1;
+
+            $nextPageUrl = $hasMore ? "central?page=" . ($page + 1) . "&name=" . urlencode($nameSearch) : null;
+            $prevPageUrl = $hasPrev ? "central?page=" . ($page - 1) . "&name=" . urlencode($nameSearch) : null;
+
+            $paginated = [
+                'data' => $centrals,
+                'current_page' => $page,
+                'last_page' => $lastPage,
+                'total' => $total,
+                'next_page_url' => $nextPageUrl,
+                'prev_page_url' => $prevPageUrl
+            ];
 
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Sucesso',
-                'response' => $centrals,
-                'data' => $centrals,
+                'response' => $paginated,
+                'data' => $paginated,
                 'errors' => null
             ]);
         } catch (Exception $e) {
@@ -287,11 +568,361 @@ class CentralController extends ApiController
             echo json_encode([
                 'status' => false,
                 'message' => $e->getMessage(),
-                'data' => null,
-                'response' => null,
+                'data' => ['data' => []],
+                'response' => ['data' => []],
                 'errors' => ['message' => $e->getMessage()]
             ]);
         }
+    }
+
+    public function actionBlock()
+    {
+        try {
+            $id = (int)($_GET['id'] ?? 0);
+            if ($id <= 0) {
+                throw new Exception("ID da central inválido");
+            }
+
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $stmt = $pdo->prepare("UPDATE central SET active = 0, updated_at = NOW() WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Central bloqueada com sucesso',
+                'response' => true
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao bloquear central: ' . $e->getMessage(),
+                'response' => false
+            ]);
+        }
+    }
+
+    public function actionActivate()
+    {
+        try {
+            $id = (int)($_GET['id'] ?? 0);
+            if ($id <= 0) {
+                throw new Exception("ID da central inválido");
+            }
+
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $stmt = $pdo->prepare("UPDATE central SET active = 1, updated_at = NOW() WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Central ativada com sucesso',
+                'response' => true
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao ativar central: ' . $e->getMessage(),
+                'response' => false
+            ]);
+        }
+    }
+
+    public function actionUpdateLogo()
+    {
+        try {
+            $id = (int)($_GET['id'] ?? 0);
+            if ($id <= 0) {
+                throw new Exception("ID da central inválido");
+            }
+
+            $logoFilename = null;
+            if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+                $ext = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION) ?: 'png';
+                $logoFilename = 'central_' . $id . '_' . time() . '.' . $ext;
+                $uploadDir = __DIR__ . '/../../public/uploads/central/';
+                if (!is_dir($uploadDir)) {
+                    @mkdir($uploadDir, 0777, true);
+                }
+                @move_uploaded_file($_FILES['logo']['tmp_name'], $uploadDir . $logoFilename);
+
+                $pdo = Connection::open(Connection::DB_MYSQL);
+                $stmt = $pdo->prepare("UPDATE central SET logo = :logo, updated_at = NOW() WHERE id = :id");
+                $stmt->execute([':logo' => $logoFilename, ':id' => $id]);
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Logo atualizado com sucesso',
+                'response' => ['logo' => $logoFilename]
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao atualizar logo: ' . $e->getMessage(),
+                'response' => null
+            ]);
+        }
+    }
+
+    public function actionBalance()
+    {
+        try {
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true) ?: $_POST;
+
+            $centralId = (int)($data['centralId'] ?? 0);
+            $type = (string)($data['type'] ?? '1');
+            $value = (float)($data['value'] ?? 0);
+
+            if ($centralId <= 0 || $value <= 0) {
+                throw new Exception("Central e valor são obrigatórios e devem ser maiores que zero");
+            }
+
+            $pdo = Connection::open(Connection::DB_MYSQL);
+
+            // Find balanceId from central
+            $stmtC = $pdo->prepare("SELECT id, balanceId FROM central WHERE id = :id LIMIT 1");
+            $stmtC->execute([':id' => $centralId]);
+            $central = $stmtC->fetch(PDO::FETCH_ASSOC);
+
+            if (!$central) {
+                throw new Exception("Central não encontrada");
+            }
+
+            $balanceId = (int)($central['balanceId'] ?? 0);
+
+            if ($balanceId <= 0) {
+                $stmtInsB = $pdo->prepare("INSERT INTO balance (balance, tripBalance, created_at, updated_at) VALUES (0.00, 0.00, NOW(), NOW())");
+                $stmtInsB->execute();
+                $balanceId = (int)$pdo->lastInsertId();
+
+                $stmtUpdC = $pdo->prepare("UPDATE central SET balanceId = :bid WHERE id = :id");
+                $stmtUpdC->execute([':bid' => $balanceId, ':id' => $centralId]);
+            }
+
+            // type '1' or 'credit' = add; type '2' or 'debit' = subtract
+            $isAdd = ($type === '1' || strtolower($type) === 'credit' || strtolower($type) === 'adicionar');
+
+            if ($isAdd) {
+                $stmtB = $pdo->prepare("UPDATE balance SET balance = balance + :v, tripBalance = tripBalance + :v, updated_at = NOW() WHERE idBalance = :bid");
+            } else {
+                $stmtB = $pdo->prepare("UPDATE balance SET balance = balance - :v, tripBalance = tripBalance - :v, updated_at = NOW() WHERE idBalance = :bid");
+            }
+            $stmtB->execute([':v' => $value, ':bid' => $balanceId]);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Saldo atualizado com sucesso!',
+                'response' => true
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao atualizar saldo: ' . $e->getMessage(),
+                'response' => false
+            ]);
+        }
+    }
+
+    public function actionUser()
+    {
+        try {
+            $centralId = (int)($_GET['id'] ?? 0);
+            if ($centralId <= 0) {
+                throw new Exception("ID da central inválido");
+            }
+
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $stmt = $pdo->prepare("
+                SELECT 
+                    cu.id,
+                    cu.centralId,
+                    cu.userId,
+                    cu.isAdmin,
+                    u.idUser,
+                    u.name,
+                    u.email,
+                    u.phone
+                FROM centralUser cu
+                INNER JOIN user u ON u.idUser = cu.userId
+                WHERE cu.centralId = :cid AND cu.statusId = 1
+                ORDER BY u.name ASC
+            ");
+            $stmt->execute([':cid' => $centralId]);
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $formatted = [];
+            foreach ($users as $u) {
+                $formatted[] = [
+                    'id' => (int)$u['id'],
+                    'centralId' => (int)$u['centralId'],
+                    'userId' => (int)$u['userId'],
+                    'idUser' => (int)$u['idUser'],
+                    'isAdmin' => (bool)$u['isAdmin'],
+                    'name' => $u['name'],
+                    'email' => $u['email'],
+                    'phone' => $u['phone']
+                ];
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Usuários encontrados',
+                'response' => $formatted,
+                'data' => $formatted
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao buscar usuários: ' . $e->getMessage(),
+                'response' => [],
+                'data' => []
+            ]);
+        }
+    }
+
+    public function actionUserEligible()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $search = trim($_GET['search'] ?? '');
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $limit = 20;
+            $offset = ($page - 1) * $limit;
+
+            $params = [];
+            $where = "WHERE (u.statusId = 1 OR u.statusId IS NULL)";
+            if ($search !== '') {
+                $where .= " AND (u.name LIKE :s OR u.email LIKE :s OR u.phone LIKE :s)";
+                $params[':s'] = "%{$search}%";
+            }
+
+            $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM user u {$where}");
+            $stmtCount->execute($params);
+            $total = (int)$stmtCount->fetchColumn();
+
+            $sql = "SELECT u.idUser AS id, u.name AS text, u.email, u.phone 
+                    FROM user u 
+                    {$where} 
+                    ORDER BY u.name ASC 
+                    LIMIT {$limit} OFFSET {$offset}";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $hasMore = ($offset + count($users)) < $total;
+            $nextPageUrl = $hasMore ? "central/user/eligible?page=" . ($page + 1) . "&search=" . urlencode($search) : null;
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Usuários encontrados',
+                'response' => [
+                    'data' => $users,
+                    'current_page' => $page,
+                    'total' => $total,
+                    'next_page_url' => $nextPageUrl
+                ],
+                'data' => [
+                    'data' => $users,
+                    'current_page' => $page,
+                    'total' => $total,
+                    'next_page_url' => $nextPageUrl
+                ]
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao buscar usuários: ' . $e->getMessage(),
+                'response' => ['data' => [], 'next_page_url' => null],
+                'data' => ['data' => [], 'next_page_url' => null]
+            ]);
+        }
+    }
+
+    public function actionUserInsert()
+    {
+        try {
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true) ?: $_POST;
+
+            $centralId = (int)($data['centralId'] ?? 0);
+            $userId = (int)($data['userId'] ?? 0);
+            $isAdmin = !empty($data['isAdmin']) ? 1 : 0;
+
+            if ($centralId <= 0 || $userId <= 0) {
+                throw new Exception("Central e usuário são obrigatórios");
+            }
+
+            $pdo = Connection::open(Connection::DB_MYSQL);
+
+            // Check if user is already linked to this central
+            $stmtCheck = $pdo->prepare("SELECT id, statusId FROM centralUser WHERE centralId = :cid AND userId = :uid LIMIT 1");
+            $stmtCheck->execute([':cid' => $centralId, ':uid' => $userId]);
+            $existing = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+            if ($existing) {
+                if ((int)$existing['statusId'] === 1) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'status' => false,
+                        'message' => 'Este usuário já está cadastrado na central.',
+                        'response' => null
+                    ]);
+                    return;
+                } else {
+                    $stmtUpd = $pdo->prepare("UPDATE centralUser SET statusId = 1, isAdmin = :isAdmin, updated_at = NOW() WHERE id = :id");
+                    $stmtUpd->execute([':isAdmin' => $isAdmin, ':id' => $existing['id']]);
+                }
+            } else {
+                $stmtIns = $pdo->prepare("INSERT INTO centralUser (centralId, userId, isAdmin, statusId, created_at, updated_at) VALUES (:cid, :uid, :isAdmin, 1, NOW(), NOW())");
+                $stmtIns->execute([':cid' => $centralId, ':uid' => $userId, ':isAdmin' => $isAdmin]);
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Usuário adicionado com sucesso!',
+                'response' => true
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao adicionar usuário: ' . $e->getMessage(),
+                'response' => false
+            ]);
+        }
+    }
+
+    public function actionCentralCallDriver()
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'status' => true,
+            'message' => 'Sucesso',
+            'response' => [
+                'all' => 'Todos os motoristas',
+                'only_app' => 'Apenas motoristas do app',
+                'only_central_drivers' => 'Apenas motoristas da central'
+            ],
+            'data' => [
+                'all' => 'Todos os motoristas',
+                'only_app' => 'Apenas motoristas do app',
+                'only_central_drivers' => 'Apenas motoristas da central'
+            ]
+        ]);
     }
 
     public function actionDriver()
@@ -513,7 +1144,6 @@ class CentralController extends ApiController
     {
         try {
             $pdo = Connection::open(Connection::DB_MYSQL_RO);
-            // Busca tipos de chamada ativos do banco
             $stmt = $pdo->query("SELECT id, name, active FROM centralCallType WHERE active = 1");
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

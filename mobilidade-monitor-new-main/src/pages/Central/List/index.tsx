@@ -35,7 +35,7 @@ interface CentralType {
   address: string;
   created_at: string;
   responsibleEmail: string;
-  id: 8;
+  id: number;
   latitude: string;
   logo: string;
   longitude: string;
@@ -185,7 +185,7 @@ export const ListCentral = () => {
       width: 100,
       render: (item: any) => (
         <Switch
-          checked={item.active === 1}
+          checked={Number(item.active) === 1}
           onChange={(e) => changeStatusCentral(item.id, e)}
         />
       ),
@@ -299,24 +299,29 @@ export const ListCentral = () => {
         return;
       }
 
-      let citySelected;
-      try {
-        citySelected = Session.getLocal("citySelected");
-      } catch (error) {
-        console.error("Erro ao obter cidade selecionada:", error);
+      let citySelected = Session.getLocal("citySelected");
+      if (typeof citySelected === "string") {
+        try {
+          citySelected = JSON.parse(citySelected);
+        } catch (error) {
+          console.error("Erro ao fazer parse da cidade selecionada:", error);
+        }
       }
       
+      const selectedCityId = Number(citySelected?.cityId ?? citySelected?.id ?? 0);
+      const selectedCityName = String(citySelected?.nome ?? citySelected?.name ?? "").trim().toLowerCase();
+
       const rawData = data?.response?.data ?? data?.response;
       let filteredCentrals = Array.isArray(rawData) ? rawData : [];
       const isFilteringByCity = true;
 
-      if (isFilteringByCity && citySelected && citySelected.cityId) {
+      if (isFilteringByCity && (selectedCityId > 0 || selectedCityName !== "")) {
         const byCity = filteredCentrals.filter((central: any) => {
-          if (central.cityId !== undefined && central.cityId !== null) {
-            return Number(central.cityId) === Number(citySelected.cityId);
+          if (central.cityId !== undefined && central.cityId !== null && Number(central.cityId) > 0) {
+            return Number(central.cityId) === selectedCityId;
           }
-          if (central.address && citySelected.nome) {
-            return central.address.toLowerCase().includes(citySelected.nome.toLowerCase());
+          if (central.address && selectedCityName !== "") {
+            return central.address.toLowerCase().includes(selectedCityName);
           }
           return false;
         });
