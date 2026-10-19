@@ -34,13 +34,14 @@ class DeliveryRateController extends Controller
     public function getAll(Request $request)
     {
         try {
+            $cityId = $request->header('cityid') ?? $request->header('cityId') ?? $request->query('cityId') ?? $request->get('cityId');
             $results = $this->service
-                ->getAll($request->header('cityid'));
+                ->getAll($cityId);
         } catch (\Exception $e) {
             return ApiResponse::error($e, "Erro ao listar taxas");
         }
 
-        return ApiResponse::created($results);
+        return ApiResponse::success($results);
     }
 
     public function delete($id)

@@ -25,11 +25,13 @@ class DeliveryRateRepository extends AbstractRepository
             ->first();
     }
 
-    public function getAll($cityId)
+    public function getAll($cityId = null)
     {
         return $this->getModel()
             ::where("statusId", StatusConst::ACTIVE)
-            ->where("cityId", $cityId)
+            ->when($cityId, function ($query) use ($cityId) {
+                return $query->where("cityId", $cityId);
+            })
             ->get();
     }
 

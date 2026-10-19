@@ -23,14 +23,19 @@ export const DeliveryRates: React.FC = () => {
 
   useEffect(() => {
     loadRates();
-  }, []);
+  }, [cityId]);
 
   const loadRates = async () => {
     setLoading(true);
     try {
-      const response = await api.get('deliveryRate');
-      if (response?.data?.status) {
-        setRates(Array.isArray(response.data.response) ? response.data.response : []);
+      const currentCityId = cityId || Session.getLocal('citySelected')?.cityId;
+      const response = await api.get('deliveryRate', {
+        headers: currentCityId ? { cityid: String(currentCityId) } : undefined,
+        params: currentCityId ? { cityId: currentCityId } : undefined,
+      });
+      const data = response?.data;
+      if (data?.status || Array.isArray(data?.response)) {
+        setRates(Array.isArray(data.response) ? data.response : []);
       }
     } catch (error) {
       message.error('Erro ao carregar taxas');
@@ -50,23 +55,32 @@ export const DeliveryRates: React.FC = () => {
   };
 
   const handleSubmit = async (values: any) => {
+    const currentCityId = cityId || Session.getLocal('citySelected')?.cityId;
+    if (!currentCityId) {
+      message.error('Selecione uma cidade no menu superior antes de adicionar uma taxa');
+      return;
+    }
     try {
       const data = {
-        range: values.range,
+        range: Number(values.range),
         tax: parseFloat(String(values.tax ?? '0').replace(',', '.')),
-        time: values.time,
-        cityId,
+        time: Number(values.time),
+        cityId: Number(currentCityId),
         deliveryServiceFee: parseFloat(String(values.deliveryServiceFee ?? '0').replace(',', '.')),
-        deliveryServiceFeeType: values.deliveryServiceFeeType
+        deliveryServiceFeeType: values.deliveryServiceFeeType,
       };
 
-      await api.post('deliveryRate', data);
-      message.success('Taxa adicionada com sucesso');
-      setModalVisible(false);
-      form.resetFields();
-      loadRates();
-    } catch (error) {
-      message.error('Erro ao adicionar taxa');
+      const res = await api.post('deliveryRate', data);
+      if (res?.data?.status || res?.status === 200 || res?.status === 201) {
+        message.success('Taxa adicionada com sucesso');
+        setModalVisible(false);
+        form.resetFields();
+        loadRates();
+      } else {
+        message.error(res?.data?.message || 'Erro ao adicionar taxa');
+      }
+    } catch (error: any) {
+      message.error(error.response?.data?.message || 'Erro ao adicionar taxa');
     }
   };
 

@@ -92,8 +92,8 @@ android {
         applicationId 'br.com.client.rota101'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 80102
-        versionName "8.1"
+        versionCode 80103
+        versionName "8.1.3"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }

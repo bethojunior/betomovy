@@ -26,14 +26,27 @@ export const useTripRates = (
   const [inputValues, setInputValues] = useState<{ [key: string]: string }>({});
 
   const getRates = async () => {
+    if (!cityId || !tripTypeId) {
+      setAllRates([]);
+      return;
+    }
     setLoading(true);
     try {
       const responseRates = await api.get(
         `tax?cityId=${cityId}&tripTypeId=${tripTypeId}`
       );
-      setAllRates(responseRates.data.response);
+      if (responseRates.data && responseRates.data.response) {
+        setAllRates(
+          Array.isArray(responseRates.data.response)
+            ? responseRates.data.response
+            : []
+        );
+      } else {
+        setAllRates([]);
+      }
     } catch (error) {
       console.log(error);
+      setAllRates([]);
     }
     setLoading(false);
   };
@@ -51,25 +64,43 @@ export const useTripRates = (
   };
 
   const handleAddRates = async () => {
+    if (!cityId || !tripTypeId) {
+      swal({
+        title: "Selecione uma cidade e modalidade antes de adicionar uma taxa",
+        icon: "warning",
+      });
+      return;
+    }
+    if (!nameRates.trim()) {
+      swal({
+        title: "Informe o nome da taxa",
+        icon: "warning",
+      });
+      return;
+    }
     setLoading(true);
     try {
       const objectSend = {
-        active: statusActiveRates,
+        active: statusActiveRates ? 1 : 0,
         chargeBy: selectCharged,
-        cityId: cityId,
-        description: descriptionRates,
-        name: nameRates,
-        tripTypeId: tripTypeId,
+        cityId: Number(cityId),
+        description: descriptionRates || "",
+        name: nameRates.trim(),
+        tripTypeId: Number(tripTypeId),
         value: Utils.BrlToNumber(valueRates, "positive"),
         valueType: typeChargeRates,
       };
       const responseRates = await api.post("tax", objectSend);
-      if (responseRates.status) {
+      if (
+        responseRates.data?.status ||
+        responseRates.status === 200 ||
+        responseRates.status === 201
+      ) {
         swal({
           title: "Taxa adicionada com sucesso!",
           icon: "success",
         });
-        getRates();
+        await getRates();
         setIsShowNewRates(false);
         setNameRates("");
         setValueRates("0,00");
@@ -77,11 +108,16 @@ export const useTripRates = (
         setTypeChargeRates("%");
         setStatusActiveRates(false);
         setSelectCharged("driver");
+      } else {
+        swal({
+          title: responseRates.data?.message || "Erro ao criar taxas",
+          icon: "error",
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       swal({
-        title: "Erro ao criar taxas",
+        title: error.response?.data?.message || "Erro ao criar taxas",
         icon: "error",
       });
     }
@@ -147,12 +183,12 @@ export const useTripRates = (
           String(isActiveUpdated) === "on" ? true : false;
 
         const objectSend = {
-          active: isActivedFormated,
+          active: isActivedFormated ? 1 : 0,
           chargeBy: selectChargedRatesUpdated,
-          cityId: cityId,
-          description: descriptionRatesUpdated,
+          cityId: Number(cityId),
+          description: descriptionRatesUpdated || "",
           name: nameRatesUpdated,
-          tripTypeId: tripTypeId,
+          tripTypeId: Number(tripTypeId),
           value: Utils.BrlToNumber(value as string, "positive"),
           valueType: valueTypeUpdated,
         };
@@ -161,18 +197,23 @@ export const useTripRates = (
           .put(`tax/${idUpdated}`, objectSend)
           .then((response) => {
             setLoading(false);
-            if (response.status) {
+            if (response.data?.status || response.status === 200) {
               swal({
                 title: "Taxa atualizada com sucesso!",
                 icon: "success",
               });
               getRates();
+            } else {
+              swal({
+                title: response.data?.message || "Erro ao atualizar taxas",
+                icon: "error",
+              });
             }
           })
           .catch((error) => {
             console.log(error);
             swal({
-              title: "Erro ao atualizar taxas",
+              title: error.response?.data?.message || "Erro ao atualizar taxas",
               icon: "error",
             });
           })
@@ -186,7 +227,7 @@ export const useTripRates = (
   useEffect(() => {
     getRates();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tripTypeId]);
+  }, [cityId, tripTypeId]);
 
   useEffect(() => {
     if (allRates.length > 0) {
