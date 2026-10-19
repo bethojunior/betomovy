@@ -203,8 +203,8 @@ class CentralController extends ApiController
 
             if (!$existingCust) {
                 $insCust = $pdo->prepare("
-                    INSERT INTO customer (name, phone, customerRegisterStatusId, userId, balanceId, created_at, updated_at)
-                    VALUES (:name, :phone, 1, :userId, :balanceId, NOW(), NOW())
+                    INSERT INTO customer (name, phone, customerRegisterStatusId, userId, balanceId)
+                    VALUES (:name, :phone, 1, :userId, :balanceId)
                 ");
                 $insCust->execute([
                     ':name' => $userName,

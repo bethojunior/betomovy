@@ -167,14 +167,25 @@ export const ModalRegister: FC<Props> = ({
     }
 
     setLoading(true)
-    resizeFile(selectedFile[0], 250, 250).then((result) => {
+
+    const doSubmit = (logoBlob?: Blob | null) => {
       const formData = new FormData()
 
       formData.append('name', data.name)
-      formData.append('address', data.address.address)
-      formData.append('latitude', data.address.latitude)
-      formData.append('longitude', data.address.longitude)
-      formData.append('centralCallDriver', data.centralCallDriver)
+      const addr = typeof data.address === 'object' && data.address !== null
+        ? data.address.address || place || ''
+        : (data.address || place || '')
+      const lat = typeof data.address === 'object' && data.address !== null
+        ? (data.address.latitude || '')
+        : (data.latitude || '')
+      const lng = typeof data.address === 'object' && data.address !== null
+        ? (data.address.longitude || '')
+        : (data.longitude || '')
+
+      formData.append('address', addr)
+      formData.append('latitude', lat)
+      formData.append('longitude', lng)
+      formData.append('centralCallDriver', data.centralCallDriver || 'only_central_drivers')
       formData.append('syncCustomers', data.syncCustomers ? '1' : '0')
       formData.append('showAllPrices', data.showAllPrices ? '1' : '0')
       formData.append('enableCustomRadiusCentral', data.enableCustomRadiusCentral ? '1' : '0')
@@ -189,7 +200,9 @@ export const ModalRegister: FC<Props> = ({
         formData.append('user[phone]', data.phone)
         formData.append('user[password]', data.password)
       }
-      formData.append('logo', result as Blob)
+      if (logoBlob) {
+        formData.append('logo', logoBlob)
+      }
 
       const config = {
         headers: {
@@ -202,8 +215,9 @@ export const ModalRegister: FC<Props> = ({
         .post(`central`, formData, config)
         .then((value) => {
           setLoading(false)
-          if (!value.status) {
-            setMessageAlert('Ocorreu um erro, tente novamente')
+          const res = value.data
+          if (!res?.status && value.status !== 200) {
+            setMessageAlert(res?.message || 'Ocorreu um erro, tente novamente')
             setTypeAlert('error')
             return setShowAlert(true)
           }
@@ -222,7 +236,15 @@ export const ModalRegister: FC<Props> = ({
           setTypeAlert('error')
           setShowAlert(true)
         })
-    })
+    }
+
+    if (selectedFile && typeof selectedFile !== 'string' && selectedFile[0]) {
+      resizeFile(selectedFile[0], 250, 250)
+        .then((result) => doSubmit(result as Blob))
+        .catch(() => doSubmit(null))
+    } else {
+      doSubmit(null)
+    }
   }
 
   useEffect(() => {
