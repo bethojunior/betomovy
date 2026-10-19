@@ -93,6 +93,18 @@ interface TariffWizardProps {
   setAdditionalValueAfterKm: (val: string) => void;
   typeAdditionalValueAfterKm: string;
   setTypeAdditionalValueAfterKm: (val: string) => void;
+  taxRate: string;
+  setTaxRate: (val: string) => void;
+  typeTaxRate: "%" | "$";
+  setTypeTaxRate: (val: "%" | "$") => void;
+  descriptionTaxRate: string | null;
+  setDescriptionTaxRate: (val: string | null) => void;
+  valueSurchase: string;
+  setValueSurchase: (val: string) => void;
+  typeValueSurchase: "%" | "$";
+  setTypeValueSurchase: (val: "%" | "$") => void;
+  descriptionSurchase: string | null;
+  setDescriptionSurchase: (val: string | null) => void;
   // Step 2: Espera
   waitingToleranceSeconds: string;
   setWaitingToleranceSeconds: (val: string) => void;
@@ -252,6 +264,18 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
   setAdditionalValueAfterKm,
   typeAdditionalValueAfterKm,
   setTypeAdditionalValueAfterKm,
+  taxRate,
+  setTaxRate,
+  typeTaxRate,
+  setTypeTaxRate,
+  descriptionTaxRate,
+  setDescriptionTaxRate,
+  valueSurchase,
+  setValueSurchase,
+  typeValueSurchase,
+  setTypeValueSurchase,
+  descriptionSurchase,
+  setDescriptionSurchase,
   waitingToleranceSeconds,
   setWaitingToleranceSeconds,
   waitingPenaltyFee,
@@ -510,9 +534,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
             </ContentInputs>
           </ContentPricePolicy>
           <ContentPricePolicy>
-            <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#00349A", margin: "0 0 10px 0" }}>
-              Bônus de longa distância
-            </h3>
+            <h2>Bonus de longa distancia</h2>
             <ContentInputs>
               <LabelText>PAGO PELO CLIENTE</LabelText>
               <Switch
@@ -531,7 +553,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
               />
             </ContentInputs>
             <ContentInputs>
-              <LabelText>LONGA DISTANCIA KM</LabelText>
+              <LabelText>R$ DO BONUS</LabelText>
               <InputText
                 type="text"
                 value={longDistanceKm}
@@ -545,7 +567,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
           </ContentPricePolicy>
           <ContentPricePolicy>
             <ContentInputs>
-              <LabelText>RECOMPENSA AO MOTORISTA PREÇO MÍNIMO</LabelText>
+              <LabelText>VALOR BONUS(PROMOCIONAL)</LabelText>
               <InputText
                 type="text"
                 value={rewardDriverMinPrice}
@@ -569,7 +591,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
               />
             </ContentInputs>
             <ContentInputs>
-              <LabelText>DESABILITAR APÓS (KM)</LabelText>
+              <LabelText>MÁX KM PARA TARIFA</LabelText>
               <InputText
                 type="text"
                 value={disableAfterKm}
@@ -580,8 +602,56 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                 }
               />
             </ContentInputs>
+          </ContentPricePolicy>
+          <ContentPricePolicy>
+            <MoneyValueTypeInput
+              label="TAXA DE IMPOSTO"
+              value={taxRate}
+              onChangeValue={setTaxRate}
+              valueType={typeTaxRate}
+              onChangeType={(type) =>
+                setTypeTaxRate(type as "%" | "$")
+              }
+            />
+            <LabelText>DESCRIÇÃO (TAXA DE IMPOSTO)</LabelText>
+            <TextArea
+              rows={5}
+              cols={33}
+              value={
+                descriptionTaxRate === null ? "" : descriptionTaxRate
+              }
+              onChange={(event) =>
+                setDescriptionTaxRate(event.target.value)
+              }
+            />
+          </ContentPricePolicy>
+          <ContentPricePolicy>
+            <MoneyValueTypeInput
+              label="TAXA EXTRA"
+              value={valueSurchase}
+              onChangeValue={setValueSurchase}
+              valueType={typeValueSurchase}
+              onChangeType={(type) =>
+                setTypeValueSurchase(type as "%" | "$")
+              }
+            />
+            <LabelText>DESCRIÇÃO (TAXA EXTRA)</LabelText>
+            <TextArea
+              rows={5}
+              cols={33}
+              value={
+                descriptionSurchase === null ? "" : descriptionSurchase
+              }
+              onChange={(event) =>
+                setDescriptionSurchase(event.target.value)
+              }
+            />
+          </ContentPricePolicy>
+          <ContentPricePolicy>
             <ContentInputs>
-              <LabelText>VALOR ADICIONAL APÓS KM</LabelText>
+              <LabelText>
+                DISTANCIA PARA COBRAR VALOR ADICIONAL
+              </LabelText>
               <InputText
                 type="text"
                 value={kmToAdditionalValue}
@@ -593,7 +663,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
               />
             </ContentInputs>
             <ContentInputs>
-              <LabelText>DISTANCIA ADICIONAL</LabelText>
+              <LabelText>VALOR DA DISTANCIA ADICIONAL</LabelText>
               <InputText
                 type="text"
                 value={additionalValueAfterKm}
@@ -990,27 +1060,37 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
           {/* Taxas por tipo de viagem */}
           <ContentPricePolicy style={{ marginTop: "1rem" }}>
             <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#00349A", margin: "0 0 10px 0" }}>
-              Taxas Adicionais
+              Taxas
             </h3>
             {allRates.map((value, index) => (
               <Fragment key={value.id}>
                 <form
                   onSubmit={(event) =>
-                    handleUpdatedRates(event, inputValues[`valueRates-${index}`])
+                    handleUpdatedRates(
+                      event,
+                      inputValues[`valueRates-${index}`]
+                    )
                   }
-                  style={{ marginBottom: "1rem", borderBottom: "1px dashed #e2e8f0", paddingBottom: "1rem" }}
+                  style={{ marginBottom: "1.25rem", borderBottom: "1px dashed #cbd5e1", paddingBottom: "1rem" }}
                 >
                   <ContentInputs>
                     <ContentColumnInputs>
                       <input type="hidden" name="id" value={value.id} />
                       <LabelText>Nome da taxa</LabelText>
-                      <InputText type="text" defaultValue={value.name} name="nameRates" id="nameRates" />
-                    </ContentColumnInputs>
-                    <ContentColumnInputs>
-                      <LabelText>Valor</LabelText>
                       <InputText
                         type="text"
-                        defaultValue={Mask.setMaskMoneyAlternative(value.value)}
+                        defaultValue={value.name}
+                        name="nameRates"
+                        id="nameRates"
+                      />
+                    </ContentColumnInputs>
+                    <ContentColumnInputs>
+                      <LabelText>Valor a ser cobrado</LabelText>
+                      <InputText
+                        type="text"
+                        defaultValue={Mask.setMaskMoneyAlternative(
+                          value.value
+                        )}
                         value={inputValues[`valueRates-${index}`] || ""}
                         onChange={handleInputChange}
                         name={`valueRates-${index}`}
@@ -1018,9 +1098,70 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                       />
                     </ContentColumnInputs>
                   </ContentInputs>
-                  <ContentInputs style={{ justifyContent: "flex-end", gap: "8px" }}>
-                    <Button color="#0069d9" type="submit">Atualizar</Button>
-                    <Button color="#C82333" type="button" onClick={() => handeDeleteRates(value.id)}>Excluir</Button>
+                  <LabelText>Descrição</LabelText>
+                  <TextArea
+                    rows={5}
+                    cols={33}
+                    defaultValue={value.description}
+                    name="descriptionRates"
+                  />
+                  <ContentInputs>
+                    <ContentColumnInputs>
+                      <LabelText>Quem será cobrado</LabelText>
+                      <Select
+                        name="selectChargedRates"
+                        defaultValue={value.chargeBy}
+                      >
+                        <option value="driver">Motorista</option>
+                        <option value="customer">Cliente</option>
+                      </Select>
+                    </ContentColumnInputs>
+                    <ContentColumnInputs>
+                      <LabelText>Tipo de cobrança</LabelText>
+                      <ContentInputs>
+                        <Radio.Group
+                          defaultValue={value.valueType}
+                          name="valueType"
+                        >
+                          <Radio value="%">%</Radio>
+                          <Radio value="$">$</Radio>
+                        </Radio.Group>
+                      </ContentInputs>
+                    </ContentColumnInputs>
+                    <ContentColumnInputs>
+                      <LabelText>Status</LabelText>
+                      <ContentInputs
+                        style={{
+                          justifyContent: "center",
+                          gap: 2,
+                        }}
+                      >
+                        <Checkbox
+                          defaultChecked={
+                            value.active === 1 ? true : false
+                          }
+                          name="isActive"
+                        />
+                        <LabelText>Ativada</LabelText>
+                      </ContentInputs>
+                    </ContentColumnInputs>
+                  </ContentInputs>
+                  <ContentInputs
+                    style={{
+                      justifyContent: "flex-end",
+                      gap: "8px",
+                    }}
+                  >
+                    <Button color="#0069d9" type="submit">
+                      Atualizar
+                    </Button>
+                    <Button
+                      color="#C82333"
+                      type="button"
+                      onClick={() => handeDeleteRates(value.id)}
+                    >
+                      Excluir
+                    </Button>
                   </ContentInputs>
                 </form>
               </Fragment>
@@ -1030,36 +1171,187 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                 <ContentInputs>
                   <ContentColumnInputs>
                     <LabelText>Nome da taxa</LabelText>
-                    <InputText type="text" value={nameRates} onChange={(event) => setNameRates(event.target.value)} />
+                    <InputText
+                      type="text"
+                      value={nameRates}
+                      onChange={(event) =>
+                        setNameRates(event.target.value)
+                      }
+                    />
                   </ContentColumnInputs>
                   <ContentColumnInputs>
-                    <LabelText>Valor</LabelText>
-                    <InputText type="text" value={valueRates} onChange={(event) => setValueRates(Mask.setMaskMoney(event.target.value))} />
+                    <LabelText>Valor a ser cobrado</LabelText>
+                    <InputText
+                      type="text"
+                      value={valueRates}
+                      onChange={(event) =>
+                        setValueRates(
+                          Mask.setMaskMoney(event.target.value)
+                        )
+                      }
+                    />
                   </ContentColumnInputs>
                 </ContentInputs>
-                <ContentInputs style={{ justifyContent: "flex-end" }}>
-                  <Button color="#0069d9" onClick={handleAddRates}>Criar Taxa</Button>
+                <LabelText>Descrição</LabelText>
+                <TextArea
+                  rows={5}
+                  cols={33}
+                  onChange={(event) =>
+                    setDescriptionRates(event.target.value)
+                  }
+                />
+                <ContentInputs>
+                  <ContentColumnInputs>
+                    <LabelText>Quem será cobrado</LabelText>
+                    <SelectAntd
+                      onChange={selectChargedRates}
+                      defaultValue="driver"
+                    >
+                      <SelectAntd.Option value="driver">
+                        Motorista
+                      </SelectAntd.Option>
+                      <SelectAntd.Option value="customer">
+                        Cliente
+                      </SelectAntd.Option>
+                    </SelectAntd>
+                  </ContentColumnInputs>
+                  <ContentColumnInputs>
+                    <LabelText>Tipo de cobrança</LabelText>
+                    <ContentInputs>
+                      <Radio.Group
+                        onChange={(event) =>
+                          setTypeChargeRates(event.target.value)
+                        }
+                        value={typeChargeRates}
+                      >
+                        <Radio value="%">%</Radio>
+                        <Radio value="$">$</Radio>
+                      </Radio.Group>
+                    </ContentInputs>
+                  </ContentColumnInputs>
+                  <ContentColumnInputs>
+                    <LabelText>Status</LabelText>
+                    <ContentInputs
+                      style={{
+                        justifyContent: "center",
+                        gap: 2,
+                      }}
+                    >
+                      <Switch
+                        onChange={(checked) =>
+                          setStatusActiveRates(checked)
+                        }
+                      />
+                      <LabelText>Ativada</LabelText>
+                    </ContentInputs>
+                  </ContentColumnInputs>
+                </ContentInputs>
+                <ContentInputs
+                  style={{
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <Button color="#0069d9" onClick={handleAddRates}>
+                    Criar
+                  </Button>
                 </ContentInputs>
               </>
-            ) : (
-              <Button color="#0069d9" onClick={() => setIsShowNewRates(true)}>+ Nova Taxa</Button>
-            )}
+            ) : null}
+            {!isShowNewRates ? (
+              <ContentInputs
+                style={{
+                  justifyContent: "center",
+                }}
+              >
+                <Button
+                  color="#0069d9"
+                  onClick={() => setIsShowNewRates(true)}
+                >
+                  Nova Taxa
+                </Button>
+              </ContentInputs>
+            ) : null}
           </ContentPricePolicy>
 
           {/* InDriver Limites flutuantes */}
           {isInDriverEnabled && canManageFloatingLimits && (
             <ContentPricePolicy style={{ marginTop: "1rem" }}>
               <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#00349A", margin: "0 0 10px 0" }}>
-                Limites Flutuantes (InDriver)
+                Limite flutuantes
               </h3>
+              <LabelText>
+                Chamado por oferta (apenas para este tipo de chamado)
+              </LabelText>
               <ContentInputs>
                 <ContentColumnInputs>
                   <LabelText>Valor mínimo %</LabelText>
-                  <InputText type="text" value={floatingLimitsOfferMin} onChange={(event) => setFloatingLimitsOfferMin(Mask.setMaskMoney(event.target.value))} />
+                  <InputText
+                    type="text"
+                    value={floatingLimitsOfferMin}
+                    onChange={(event) =>
+                      setFloatingLimitsOfferMin(
+                        Mask.setMaskMoney(event.target.value)
+                      )
+                    }
+                    placeholder="Valor mínimo %"
+                  />
                 </ContentColumnInputs>
                 <ContentColumnInputs>
                   <LabelText>Valor máximo %</LabelText>
-                  <InputText type="text" value={floatingLimitsOfferMax} onChange={(event) => setFloatingLimitsOfferMax(Mask.setMaskMoney(event.target.value))} />
+                  <InputText
+                    type="text"
+                    value={floatingLimitsOfferMax}
+                    onChange={(event) =>
+                      setFloatingLimitsOfferMax(
+                        Mask.setMaskMoney(event.target.value)
+                      )
+                    }
+                    placeholder="Valor máximo %"
+                  />
+                </ContentColumnInputs>
+              </ContentInputs>
+
+              <LabelText>Chamado para terceiros</LabelText>
+
+              <SwitchContainer>
+                <Switch
+                  checked={floatingLimitsThirdPartyEnabled}
+                  onChange={(checked) => setFloatingLimitsThirdPartyEnabled(checked)}
+                  size="small"
+                />
+                <SwitchLabel>
+                  Permitir para terceiros
+                </SwitchLabel>
+              </SwitchContainer>
+
+              <ContentInputs>
+                <ContentColumnInputs>
+                  <LabelText>Valor mínimo %</LabelText>
+                  <InputText
+                    type="text"
+                    value={floatingLimitsThirdPartyMin}
+                    onChange={(event) =>
+                      setFloatingLimitsThirdPartyMin(
+                        Mask.setMaskMoney(event.target.value)
+                      )
+                    }
+                    disabled={!floatingLimitsThirdPartyEnabled}
+                    placeholder="Valor mínimo %"
+                  />
+                </ContentColumnInputs>
+                <ContentColumnInputs>
+                  <LabelText>Valor máximo %</LabelText>
+                  <InputText
+                    type="text"
+                    value={floatingLimitsThirdPartyMax}
+                    onChange={(event) =>
+                      setFloatingLimitsThirdPartyMax(
+                        Mask.setMaskMoney(event.target.value)
+                      )
+                    }
+                    disabled={!floatingLimitsThirdPartyEnabled}
+                    placeholder="Valor máximo %"
+                  />
                 </ContentColumnInputs>
               </ContentInputs>
             </ContentPricePolicy>

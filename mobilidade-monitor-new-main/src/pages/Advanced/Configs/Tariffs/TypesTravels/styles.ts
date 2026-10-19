@@ -419,6 +419,9 @@ export const ButtonDelete = styled.button`
 export const ContentColumnInputs = styled.div`
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 140px;
+  gap: 6px;
 
   div {
     margin: 0;
@@ -577,32 +580,24 @@ export const SwitchLabel = styled.p`
   margin: 0;
 `;
 
-// Stepper Navigation (Passo a Passo)
 export const WizardStepper = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
-  justify-content: flex-start;
   margin-bottom: 1.5rem;
   background: #ffffff;
-  padding: 0.6rem 0.8rem;
+  padding: 0.5rem;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  gap: 10px;
-  overflow-x: auto;
+  gap: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: -1.25rem;
   z-index: 20;
 
-  &::-webkit-scrollbar {
-    height: 5px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-  }
-
-  @media (max-width: 920px) {
+  @media (max-width: 900px) {
+    display: flex;
+    overflow-x: auto;
     gap: 6px;
     padding: 0.5rem;
   }
@@ -611,9 +606,10 @@ export const WizardStepper = styled.div`
 export const WizardStepItem = styled.div<{ active: boolean; completed: boolean }>`
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
   cursor: pointer;
-  padding: 8px 14px;
+  padding: 8px 6px;
   border-radius: 8px;
   background: ${(props) =>
     props.active ? "#00349A" : props.completed ? "#e0f2fe" : "transparent"};
@@ -627,6 +623,12 @@ export const WizardStepItem = styled.div<{ active: boolean; completed: boolean }
   &:hover {
     background: ${(props) =>
       props.active ? "#002166" : props.completed ? "#bae6fd" : "#f1f5f9"};
+  }
+
+  @media (max-width: 1100px) {
+    font-size: 12px;
+    padding: 7px 4px;
+    gap: 4px;
   }
 `;
 
