@@ -166,7 +166,48 @@ interface TariffWizardProps {
   handleDisabledCalls: () => void;
   setVisibleModal: (val: boolean) => void;
   onCloseModal?: () => void;
+  loading?: boolean;
 }
+
+interface StepInstructionBannerProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+const StepInstructionBanner: React.FC<StepInstructionBannerProps> = ({ title, children }) => (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: '12px',
+      background: '#FFF1F2',
+      border: '1.5px solid #F43F5E',
+      borderRadius: '10px',
+      padding: '0.85rem 1.15rem',
+      marginBottom: '1.25rem',
+      boxShadow: '0 2px 8px rgba(244, 63, 94, 0.08)',
+    }}
+  >
+    <span style={{ fontSize: '20px', lineHeight: 1 }}>⚠️</span>
+    <div style={{ flex: 1 }}>
+      <div
+        style={{
+          fontSize: '13px',
+          fontWeight: 800,
+          color: '#E11D48',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          marginBottom: '4px',
+        }}
+      >
+        {title}
+      </div>
+      <div style={{ fontSize: '13px', color: '#9F1239', lineHeight: 1.5 }}>
+        {children}
+      </div>
+    </div>
+  </div>
+);
 
 export const TariffWizard: React.FC<TariffWizardProps> = ({
   currentStep,
@@ -176,6 +217,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
   travelSelected,
   cityId,
   onCloseModal,
+  loading = false,
   tag,
   setTag,
   colorTag,
@@ -351,6 +393,14 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
       {currentStep === 1 && (
         <WizardStepContent>
           <WizardStepTitle>1. Política de Preço & Tarifas</WizardStepTitle>
+          <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Como Preencher as Tarifas:">
+            <div>• <strong>PREÇO MÍNIMO (Obrigatório)*:</strong> Digite o valor mínimo cobrado pela corrida (ex: 12,00). Deve ser maior que 0.</div>
+            <div>• <strong>PREÇO BASE*:</strong> Valor da bandeirada ao iniciar o chamado (ex: 0,00 ou 5,00).</div>
+            <div>• <strong>PREÇO KM*:</strong> Valor cobrado por cada quilômetro rodado (ex: 2,50). Se a modalidade tiver taxa fixa por entrega, digite 0,00.</div>
+            <div>• <strong>PREÇO MINUTO*:</strong> Valor cobrado por minuto de duração (ex: 0,30 ou 0,00 caso não tarifado por tempo).</div>
+            <div>• <strong>ETIQUETA E COR:</strong> Texto de destaque e cor da badge visível no aplicativo do passageiro.</div>
+            <div style={{ marginTop: 4, fontWeight: 700 }}>⚠️ Atenção: Utilize vírgula para centavos (ex: 12,00). Não deixe campos obrigatórios vazios!</div>
+          </StepInstructionBanner>
           <ContentPricePolicy>
             <ContentInputs>
               <LabelText>ETIQUETA(10)</LabelText>
@@ -577,6 +627,12 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
       {currentStep === 2 && (
         <WizardStepContent>
           <WizardStepTitle>2. Tempo em Espera & Tolerância</WizardStepTitle>
+          <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Tempo em Espera:">
+            <div>• <strong>TOLERÂNCIA DE ESPERA (segundos):</strong> Quantidade de segundos que o motorista aguarda gratuitamente no embarque (ex: 180s = 3 minutos, 300s = 5 minutos).</div>
+            <div>• <strong>MULTA DE ESPERA (R$):</strong> Cobrança fixa cobrada do cliente caso ultrapasse o tempo de tolerância gratuito (ex: 5,00).</div>
+            <div>• <strong>MINUTO EXCEDENTE (R$):</strong> Valor adicional cobrado a cada minuto que passar após a tolerância (ex: 0,50).</div>
+            <div style={{ marginTop: 4, fontWeight: 700 }}>⚠️ Se não desejar cobrar tempo de espera nesta modalidade, preencha 0 em todos os campos.</div>
+          </StepInstructionBanner>
           <ContentPricePolicy>
             <ContentInputs>
               <LabelText>TEMPO EM SEGUNDOS PARA TOLERÂNCIA*</LabelText>
@@ -628,6 +684,13 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
       {currentStep === 3 && (
         <WizardStepContent>
           <WizardStepTitle>3. Cálculos de Motoristas & Comissões</WizardStepTitle>
+          <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Comissão do Motorista:">
+            <div>• <strong>TAXA DE SERVIÇO GERAL:</strong> Porcentagem (%) ou valor fixo ($) que a central retém por viagem finalizada (ex: 15% ou R$ 2,00).</div>
+            <div>• <strong>TIPO DE CÁLCULO:</strong> Escolha "%" para reter percentual ou "$" para valor fixo por corrida.</div>
+            <div>• <strong>COMISSÕES POR FORMA DE PAGAMENTO:</strong> Configure taxas personalizadas para Dinheiro, PIX, Cartão ou Saldo do App.</div>
+            <div>• <strong>DESABILITAR EM PROMOÇÃO:</strong> Marque para isentar o motorista da comissão durante viagens promocionais.</div>
+            <div style={{ marginTop: 4, fontWeight: 700 }}>⚠️ Esta comissão é automaticamente debitada ou descontada do saldo do motorista ao concluir a corrida.</div>
+          </StepInstructionBanner>
           <ContentPricePolicy>
             <MoneyValueTypeInput
               label="TAXA DE SERVIÇO"
@@ -708,6 +771,12 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
       {currentStep === 4 && (
         <WizardStepContent>
           <WizardStepTitle>4. Cashback, Faixa de Preços & Taxas Extras</WizardStepTitle>
+          <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Taxas Extras e Cashback:">
+            <div>• <strong>TAXA ADICIONAL / SOBRETAXA:</strong> Taxa administrativa fixa ou percentual somada ao valor final da corrida (opcional).</div>
+            <div>• <strong>CASHBACK AO PASSAGEIRO:</strong> Ative se desejar creditar saldo promocional ao passageiro para usar em viagens futuras.</div>
+            <div>• <strong>FAIXA DE PREÇO (PRICE RANGE):</strong> Crie tabelas de preços com valores diferenciados por distância ou horário.</div>
+            <div style={{ marginTop: 4, fontWeight: 700 }}>⚠️ Caso esta modalidade não utilize taxas adicionais nem cashback, basta clicar em "Próximo Passo".</div>
+          </StepInstructionBanner>
           {/* Cashback */}
           <ContentPricePolicy>
             <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#00349A", margin: "0 0 10px 0" }}>
@@ -1021,6 +1090,12 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
           ) : (
             <>
               <WizardStepTitle>5. Resumo e Confirmação da Tarifa</WizardStepTitle>
+              <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Como Atualizar e Salvar:">
+                <div>• <strong>1. Revise com Atenção:</strong> Verifique os valores de Preço Mínimo, Base, KM e Comissões nos cartões abaixo.</div>
+                <div>• <strong>2. Gravar no Banco:</strong> Para salvar definitivamente no banco de dados e aplicar no app, clique no botão azul abaixo:</div>
+                <div style={{ margin: "4px 0", fontWeight: 800, fontSize: "14px" }}>👉 CLIQUE EM "ATUALIZAR E SALVAR TARIFA"</div>
+                <div>• <strong>3. Confirmação:</strong> A alteração será sincronizada instantaneamente com os servidores e você verá a tela de confirmação.</div>
+              </StepInstructionBanner>
               <p style={{ color: "#64748b", margin: "0 0 1.25rem 0", fontSize: "14px" }}>
                 Revise os parâmetros configurados abaixo antes de persistir no banco de dados.
               </p>
@@ -1065,8 +1140,8 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                   >
                     DESABILITAR CHAMADO
                   </ButtonActions>
-                  <ButtonActions onClick={handleUpdateTariffs} style={{ minWidth: "220px" }}>
-                    ATUALIZAR E SALVAR TARIFA
+                  <ButtonActions onClick={handleUpdateTariffs} disabled={loading} style={{ minWidth: "240px", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: loading ? 0.7 : 1, cursor: loading ? "not-allowed" : "pointer" }}>
+                    {loading ? "SALVANDO NO BANCO..." : "ATUALIZAR E SALVAR TARIFA"}
                   </ButtonActions>
                 </div>
               </WizardNavContainer>

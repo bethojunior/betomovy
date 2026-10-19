@@ -321,48 +321,19 @@ export const TypesTravels = () => {
       return;
     }
 
-    if (Utils.BrlToNumber(minPrice, "positive") <= 0) {
+    if (!minPrice || Utils.BrlToNumber(minPrice, "positive") <= 0) {
       swal({
-        title: "O CAMPO PREÇO MÍNIMO PRECISA SER PREENCHIDO",
+        title: "PREÇO MÍNIMO OBRIGATÓRIO",
+        text: "O Preço Mínimo é obrigatório e deve ser maior que zero (ex: 12,00).",
         icon: "warning",
       });
-      return;
-    }
-
-    if (basePrice === "" || Utils.BrlToNumber(basePrice, "positive") < 0) {
-      swal({
-        title: "O CAMPO PREÇO BASE PRECISA SER PREENCHIDO",
-        icon: "warning",
-      });
-      return;
-    }
-
-    if (Utils.BrlToNumber(kmPrice, "positive") <= 0) {
-      swal({
-        title: "O CAMPO PREÇO KM PRECISA SER PREENCHIDO",
-        icon: "warning",
-      });
-      return;
-    }
-
-    if (minutePrice === "" || Utils.BrlToNumber(minutePrice, "positive") < 0) {
-      swal({
-        title: "O CAMPO PREÇO MINUTO PRECISA SER PREENCHIDO",
-        icon: "warning",
-      });
+      setCurrentStep(1);
       return;
     }
 
     const effectiveIdeaListCommonPrice = ideaListCommonPrice > 0 ? ideaListCommonPrice : 5;
 
-    swal({
-      title: "Atenção",
-      text: "Deseja modificar os valores do preço?",
-      icon: "info",
-      buttons: ["Não", "Sim"],
-    }).then(async (isAccepted) => {
-      if (isAccepted) {
-        setLoading(true);
+    setLoading(true);
         try {
           const currentTripOrder = priceOrderMap.get(tripId) ?? null;
           const objectSendPrice = {
@@ -493,8 +464,6 @@ export const TypesTravels = () => {
         } finally {
           setLoading(false);
         }
-      }
-    });
   };
 
   const handleDisabledCalls = () => {
@@ -848,28 +817,42 @@ export const TypesTravels = () => {
 
       <Modal
         title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img
-              src={
-                travelSelected?.picture
-                  ? (travelSelected.picture.startsWith('http')
-                      ? travelSelected.picture
-                      : 'https://minio.704app.com.br/rota101fb704/tripType/' + travelSelected.picture)
-                  : logoMovy
-              }
-              alt={travelSelected?.type || 'Tarifa'}
-              style={{ width: 34, height: 34, objectFit: 'contain' }}
-              onError={(e: any) => {
-                e.target.onerror = null;
-                e.target.src = logoMovy;
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: "4px 0" }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 10,
+                background: "rgba(255, 255, 255, 0.12)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 4,
+                border: "1px solid rgba(4, 243, 250, 0.3)",
               }}
-            />
+            >
+              <img
+                src={
+                  travelSelected?.picture
+                    ? (travelSelected.picture.startsWith('http')
+                        ? travelSelected.picture
+                        : 'https://minio.704app.com.br/rota101fb704/tripType/' + travelSelected.picture)
+                    : logoMovy
+                }
+                alt={travelSelected?.type || 'Tarifa'}
+                style={{ width: "100%", height: "100%", objectFit: 'contain' }}
+                onError={(e: any) => {
+                  e.target.onerror = null;
+                  e.target.src = logoMovy;
+                }}
+              />
+            </div>
             <div>
-              <div style={{ fontSize: 17, fontWeight: 700, color: '#0F172A' }}>
-                {travelSelected?.type ? 'Configuração de Tarifa: ' + travelSelected.type : 'Assistente de Tarifa'}
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', letterSpacing: "0.3px" }}>
+                Configuração de Tarifa: {travelSelected?.type || "Modalidade"}
               </div>
-              <div style={{ fontSize: 12, color: '#64748B', fontWeight: 500 }}>
-                {travelSelected?.idTripType ? 'ID: ' + travelSelected.idTripType : ''} • Passo a Passo de Configuração
+              <div style={{ fontSize: 12, color: '#04F3FA', fontWeight: 600 }}>
+                ID: {travelSelected?.idTripType ?? "—"} • Assistente Passo a Passo
               </div>
             </div>
           </div>
@@ -884,7 +867,8 @@ export const TypesTravels = () => {
         bodyStyle={{
           maxHeight: '82vh',
           overflowY: 'auto',
-          padding: '1.5rem',
+          padding: '1.25rem 1.75rem',
+          backgroundColor: '#FFFFFF',
         }}
       >
         <TariffWizard
@@ -996,6 +980,7 @@ export const TypesTravels = () => {
           handleUpdateTariffs={handleUpdateTariffs}
           handleDisabledCalls={handleDisabledCalls}
           setVisibleModal={setVisibleModal}
+          loading={loading}
           onCloseModal={() => setIsWizardModalOpen(false)}
         />
       </Modal>

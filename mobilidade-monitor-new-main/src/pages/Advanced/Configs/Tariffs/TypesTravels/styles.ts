@@ -582,14 +582,17 @@ export const WizardStepper = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  margin-bottom: 1.75rem;
-  background: #f8fafc;
+  margin-bottom: 1.5rem;
+  background: #ffffff;
   padding: 0.6rem 0.8rem;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   gap: 10px;
   overflow-x: auto;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: -1.25rem;
+  z-index: 20;
 
   &::-webkit-scrollbar {
     height: 5px;
