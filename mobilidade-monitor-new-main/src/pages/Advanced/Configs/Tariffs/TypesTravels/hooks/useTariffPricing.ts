@@ -108,7 +108,10 @@ export const useTariffPricing = (
       const responsePrices = await api.get(`price?cityId=${activeCityId}`, {
         headers: { cityid: activeCityId },
       });
-      const rawPrices = responsePrices.data?.response || [];
+      const rawData = responsePrices.data;
+      const rawPrices = Array.isArray(rawData)
+        ? rawData
+        : (rawData?.response ?? rawData?.data ?? []);
       const normalizedPrices: ListPricesProps[] = (Array.isArray(rawPrices) ? rawPrices : [])
         .map((data: any) => {
           if (!data) return null;

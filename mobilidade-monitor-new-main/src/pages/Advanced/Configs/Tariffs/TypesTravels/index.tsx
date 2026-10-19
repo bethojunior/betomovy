@@ -431,7 +431,8 @@ export const TypesTravels = () => {
           };
 
           // Salvar price primeiro (crítico), depois comissão independentemente
-          await api.post("price", objectSendPrice);
+          const priceResponse = await api.post("price", objectSendPrice);
+          const savedPriceRaw = priceResponse.data?.response ?? priceResponse.data?.data;
 
           try {
             await api.post(`driverCommission/${parsedCityId}`, objectSendCommission);
@@ -439,12 +440,31 @@ export const TypesTravels = () => {
             console.warn("Aviso: erro ao salvar comissão do motorista:", commissionError);
           }
 
-          swal({
-            title: "Preço atualizado com sucesso!",
-            icon: "success",
-          });
-
           const currentSavedId = tripId;
+          const fullType = typesTravels.find((t) => Number(t.idTripType) === currentSavedId);
+
+          if (savedPriceRaw) {
+            const normalizedSaved: ListPricesProps = {
+              ...savedPriceRaw,
+              tripTypeId: currentSavedId,
+              trip_type: { ...(fullType || {}), ...(savedPriceRaw.trip_type || {}) },
+            };
+            setListPrices((prev) => {
+              const remaining = (prev || []).filter(
+                (p) => Number(p.trip_type?.idTripType ?? p.tripTypeId) !== currentSavedId
+              );
+              return [...remaining, normalizedSaved];
+            });
+            setTravelSelected({
+              ...(fullType || {}),
+              ...(savedPriceRaw.trip_type || {}),
+              ...travelSelected,
+              idTripType: currentSavedId,
+              type: fullType?.type || savedPriceRaw.trip_type?.type || travelSelected.type || `Tarifa ${currentSavedId}`,
+              picture: fullType?.picture || savedPriceRaw.trip_type?.picture || travelSelected.picture,
+            });
+          }
+
           try {
             const freshTypes = await getTypesTravels();
             await getCommissionsDriver();
@@ -454,13 +474,17 @@ export const TypesTravels = () => {
               (t) => Number(t.idTripType) === currentSavedId
             );
             if (updatedTripType) {
-              setTravelSelected({ ...updatedTripType, ...travelSelected, idTripType: currentSavedId });
-            } else {
-              setTravelSelected({ ...travelSelected, idTripType: currentSavedId });
+              setTravelSelected((prev) => ({ ...updatedTripType, ...prev, idTripType: currentSavedId }));
             }
           } catch (refetchErr) {
             console.warn("Aviso ao atualizar lista após salvar:", refetchErr);
           }
+
+          swal({
+            title: "Tarifa salva com sucesso!",
+            text: "Os valores foram sincronizados e gravados no banco de dados.",
+            icon: "success",
+          });
 
           setIsSavedSuccess(true);
           setCurrentStep(5);
@@ -557,6 +581,10 @@ export const TypesTravels = () => {
           (p) => Number(p.trip_type?.idTripType ?? p.tripTypeId) === currentSelectedId
         );
       }
+      // Se o modal do assistente estiver aberto e o usuário estiver adicionando uma nova modalidade, não sobrescrever
+      if (isWizardModalOpen && !targetPrice && currentSelectedId) {
+        return;
+      }
       if (!targetPrice) {
         targetPrice = listPrices[0];
       }
@@ -579,7 +607,7 @@ export const TypesTravels = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listPrices, typesTravels]);
+  }, [listPrices, typesTravels, isWizardModalOpen]);
 
   const listTravelsDisabled = typesTravels.filter((item) => {
     return (
@@ -877,7 +905,43 @@ export const TypesTravels = () => {
             </button>
           </div>
         </ContentDetailsTariffs>
-      ) : null}
+      ) : listPrices.length === 0 && !loading && (
+        <div
+          style={{
+            background: "linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%)",
+            border: "1.5px dashed #CBD5E1",
+            borderRadius: 16,
+            padding: "2.5rem 2rem",
+            marginTop: "1.5rem",
+            textAlign: "center",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.02)",
+          }}
+        >
+          <div style={{ fontSize: 36, marginBottom: 10 }}>🚗</div>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: "#1E293B", marginBottom: 8 }}>
+            Nenhuma tarifa cadastrada para esta cidade
+          </h3>
+          <p style={{ fontSize: 14, color: "#64748B", maxWidth: 520, margin: "0 auto 1.5rem auto", lineHeight: 1.6 }}>
+            Clique no botão azul <strong>"+ Adicionar novo"</strong> acima para configurar as modalidades de viagem, valores por KM, preço base e comissões para esta região.
+          </p>
+          <button
+            onClick={() => setVisibleModal(true)}
+            style={{
+              background: "linear-gradient(135deg, #00349A 0%, #002166 100%)",
+              color: "#FFFFFF",
+              border: "1px solid rgba(4, 243, 250, 0.4)",
+              borderRadius: 8,
+              padding: "0.75rem 1.75rem",
+              fontWeight: 700,
+              fontSize: 14,
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(0, 52, 154, 0.25)",
+            }}
+          >
+            + Adicionar Primeira Tarifa
+          </button>
+        </div>
+      )}
 
       <Modal
         title={
