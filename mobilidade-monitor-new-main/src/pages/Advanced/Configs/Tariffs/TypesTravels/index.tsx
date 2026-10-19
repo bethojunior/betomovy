@@ -403,8 +403,14 @@ export const TypesTravels = () => {
             disableOnPromotion: !!disableOnPromotion,
           };
 
-          await api.post(`driverCommission/${cityId}`, objectSendCommission);
+          // Salvar price primeiro (crítico), depois comissão independentemente
           await api.post("price", objectSendPrice);
+
+          try {
+            await api.post(`driverCommission/${cityId}`, objectSendCommission);
+          } catch (commissionError: any) {
+            console.warn("Aviso: erro ao salvar comissão do motorista:", commissionError);
+          }
 
           swal({
             title: "Preço atualizado com sucesso!",

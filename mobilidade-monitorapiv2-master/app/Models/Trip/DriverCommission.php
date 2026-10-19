@@ -19,6 +19,7 @@ class DriverCommission extends Model
         'cityId',
         'tripTypeId',
         'disableOnPromotion',
+        'statusId',
     ];
 
     public function tripType()

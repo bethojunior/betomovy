@@ -32,7 +32,7 @@ export const useTariffPricing = (
   const [longDistanceKm, setLongDistanceKm] = useState<string>("0,00");
   const [rewardDriverMinPrice, setRewardDriverMinPrice] =
     useState<string>("0,00");
-  const [ideaListCommonPrice, setIdeaListCommonPrice] = useState<number>(0);
+  const [ideaListCommonPrice, setIdeaListCommonPrice] = useState<number>(5);
   const [disableAfterKm, setDisableAfterKm] = useState<string>("0,00");
   const [additionalValueAfterKm, setAdditionalValueAfterKm] =
     useState<string>("0,00");
@@ -276,7 +276,7 @@ export const useTariffPricing = (
       setWayPointPrice("0,00");
       setLongDistanceKm("0,00");
       setRewardDriverMinPrice("0,00");
-      setIdeaListCommonPrice(0);
+      setIdeaListCommonPrice(5);
       setDisableAfterKm("0,00");
       setTypeAdditionalValueAfterKm("$");
       setKmToAdditionalValue("0,00");
