@@ -616,9 +616,26 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
           </ContentPricePolicy>
           <WizardNavContainer>
             <div />
-            <WizardButtonNext onClick={() => setCurrentStep(2)}>
-              Próximo: Tempo em Espera <AiOutlineArrowRight size={16} />
-            </WizardButtonNext>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+              <ButtonActions
+                onClick={handleUpdateTariffs}
+                disabled={loading}
+                style={{
+                  minWidth: "210px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+              >
+                {loading ? "SALVANDO NO BANCO..." : "ATUALIZAR E SALVAR TARIFA"}
+              </ButtonActions>
+              <WizardButtonNext onClick={() => setCurrentStep(2)}>
+                Próximo: Tempo em Espera <AiOutlineArrowRight size={16} />
+              </WizardButtonNext>
+            </div>
           </WizardNavContainer>
         </WizardStepContent>
       )}
@@ -673,9 +690,26 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
             <WizardButtonPrev onClick={() => setCurrentStep(1)}>
               <AiOutlineArrowLeft size={16} /> Voltar: Tarifas
             </WizardButtonPrev>
-            <WizardButtonNext onClick={() => setCurrentStep(3)}>
-              Próximo: Motorista & Comissões <AiOutlineArrowRight size={16} />
-            </WizardButtonNext>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+              <ButtonActions
+                onClick={handleUpdateTariffs}
+                disabled={loading}
+                style={{
+                  minWidth: "210px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+              >
+                {loading ? "SALVANDO NO BANCO..." : "ATUALIZAR E SALVAR TARIFA"}
+              </ButtonActions>
+              <WizardButtonNext onClick={() => setCurrentStep(3)}>
+                Próximo: Motorista & Comissões <AiOutlineArrowRight size={16} />
+              </WizardButtonNext>
+            </div>
           </WizardNavContainer>
         </WizardStepContent>
       )}
@@ -760,9 +794,26 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
             <WizardButtonPrev onClick={() => setCurrentStep(2)}>
               <AiOutlineArrowLeft size={16} /> Voltar: Tempo em Espera
             </WizardButtonPrev>
-            <WizardButtonNext onClick={() => setCurrentStep(4)}>
-              Próximo: Taxas & Cashback <AiOutlineArrowRight size={16} />
-            </WizardButtonNext>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+              <ButtonActions
+                onClick={handleUpdateTariffs}
+                disabled={loading}
+                style={{
+                  minWidth: "210px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+              >
+                {loading ? "SALVANDO NO BANCO..." : "ATUALIZAR E SALVAR TARIFA"}
+              </ButtonActions>
+              <WizardButtonNext onClick={() => setCurrentStep(4)}>
+                Próximo: Taxas & Cashback <AiOutlineArrowRight size={16} />
+              </WizardButtonNext>
+            </div>
           </WizardNavContainer>
         </WizardStepContent>
       )}
@@ -1018,9 +1069,26 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
             <WizardButtonPrev onClick={() => setCurrentStep(3)}>
               <AiOutlineArrowLeft size={16} /> Voltar: Comissões
             </WizardButtonPrev>
-            <WizardButtonNext onClick={() => setCurrentStep(5)}>
-              Revisar e Salvar <AiOutlineArrowRight size={16} />
-            </WizardButtonNext>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+              <ButtonActions
+                onClick={handleUpdateTariffs}
+                disabled={loading}
+                style={{
+                  minWidth: "210px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+              >
+                {loading ? "SALVANDO NO BANCO..." : "ATUALIZAR E SALVAR TARIFA"}
+              </ButtonActions>
+              <WizardButtonNext onClick={() => setCurrentStep(5)}>
+                Revisar e Salvar <AiOutlineArrowRight size={16} />
+              </WizardButtonNext>
+            </div>
           </WizardNavContainer>
         </WizardStepContent>
       )}

@@ -114,7 +114,8 @@ export const TypesTravels = () => {
   const [isWizardModalOpen, setIsWizardModalOpen] = useState<boolean>(false);
   const canManageFloatingLimits = hasPermission(TARIFAS, "limite_flutuante");
 
-  const cityId = Session.getLocal("citySelected")?.cityId;
+  const rawCitySelected = Session.getLocal("citySelected");
+  const cityId = rawCitySelected?.cityId ?? rawCitySelected?.id;
 
   const { customOrderConfig, getCustomOrderConfig } = useCustomOrderConfig();
 

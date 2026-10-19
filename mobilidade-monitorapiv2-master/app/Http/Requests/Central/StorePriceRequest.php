@@ -51,7 +51,7 @@ class StorePriceRequest extends FormRequest
             'disable_after_km' => 'sometimes|nullable|numeric',
             'promotional_price_temp' => 'sometimes|nullable|numeric',
             'reward_driver_min_price' => 'sometimes|nullable|numeric',
-            'type_additional_value_after_km' => 'sometimes|nullable|in:$,km',
+            'type_additional_value_after_km' => 'sometimes|nullable|in:$,km,%',
             'km_to_additional_value' => 'sometimes|nullable|numeric',
             'additional_value_after_km' => 'sometimes|nullable|numeric',
             'long_distance_delivery_price' => 'sometimes|nullable|numeric',

@@ -26,10 +26,17 @@ class PriceRepository extends AbstractRepository
 
     public function findAll(array $request = [], int $cityId = null): Collection
     {
-        return $this->getModel()::when(isset($request['cityId']) || !is_null($cityId), function (Builder $query) use ($request, $cityId) {
-            $query->where('price.cityId', $request['cityId'] ?? $cityId);
+        $targetCityId = null;
+        if (isset($request['cityId']) && is_numeric($request['cityId']) && (int)$request['cityId'] > 0) {
+            $targetCityId = (int)$request['cityId'];
+        } elseif (!is_null($cityId) && $cityId > 0) {
+            $targetCityId = $cityId;
+        }
+
+        return $this->getModel()::when(!is_null($targetCityId), function (Builder $query) use ($targetCityId) {
+            $query->where('price.cityId', $targetCityId);
         })
-            ->where('statusId', StatusConst::ACTIVE)
+            ->where('price.statusId', StatusConst::ACTIVE)
             ->with('tripType')
             ->orderBy('price.cityId')
             ->orderByRaw('price.`order` IS NULL, price.`order` ASC')

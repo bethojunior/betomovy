@@ -79,11 +79,17 @@ export const useTariffPricing = (
   const isNoTravelSelected = Object.keys(travelSelected).length === 0;
 
   const getPrices = async (useCustomOrderParam?: boolean): Promise<ListPricesProps[]> => {
+    const rawCity = Session.getLocal("citySelected");
+    const activeCityId = Number(cityId || rawCity?.cityId || rawCity?.id);
+    if (!activeCityId || isNaN(activeCityId) || activeCityId <= 0) {
+      console.warn("getPrices cancelado: cityId não configurado", cityId);
+      return [];
+    }
     setLoading(true);
     let sortedPrices: ListPricesProps[] = [];
     try {
-      const responsePrices = await api.get(`price?cityId=${cityId}`, {
-        headers: { cityid: cityId },
+      const responsePrices = await api.get(`price?cityId=${activeCityId}`, {
+        headers: { cityid: activeCityId },
       });
       const rawPrices = responsePrices.data?.response || [];
       const normalizedPrices: ListPricesProps[] = (Array.isArray(rawPrices) ? rawPrices : [])
@@ -93,11 +99,11 @@ export const useTariffPricing = (
           return {
             ...data,
             trip_type: tripObj,
-            tripTypeId: data.tripTypeId ?? tripObj?.idTripType,
+            tripTypeId: Number(data.tripTypeId ?? tripObj?.idTripType),
           };
         })
         .filter((data: any): data is ListPricesProps => {
-          if (!data) return false;
+          if (!data || !data.tripTypeId) return false;
           if (
             data.trip_type &&
             data.trip_type.serviceOption !== undefined &&

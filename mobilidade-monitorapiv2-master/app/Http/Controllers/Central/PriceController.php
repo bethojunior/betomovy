@@ -26,8 +26,19 @@ class PriceController extends Controller
     public function findAll(Request $request): JsonResponse
     {
         try {
-            $cityId = $request->header('cityid') ?? $request->header('cityId') ?? $request->query('cityId') ?? $request->get('cityId');
-            $data = $this->service->findAll($request->query->all(), $cityId ? (int)$cityId : null);
+            $rawCityId = $request->header('cityid') ?? $request->header('cityId') ?? $request->query('cityId') ?? $request->get('cityId');
+            $cityId = (is_numeric($rawCityId) && (int)$rawCityId > 0) ? (int)$rawCityId : null;
+            
+            $query = $request->query->all();
+            if (isset($query['cityId'])) {
+                if (is_numeric($query['cityId']) && (int)$query['cityId'] > 0) {
+                    $query['cityId'] = (int)$query['cityId'];
+                } else {
+                    unset($query['cityId']);
+                }
+            }
+
+            $data = $this->service->findAll($query, $cityId);
         } catch (\Exception $e) {
             return ApiResponse::error($e, "Erro ao buscar preços");
         }
