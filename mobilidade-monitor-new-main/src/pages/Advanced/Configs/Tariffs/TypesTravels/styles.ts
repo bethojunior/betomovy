@@ -517,3 +517,233 @@ export const SwitchContainer = styled.div`
 export const SwitchLabel = styled.p`
   margin: 0;
 `;
+
+// Stepper Navigation (Passo a Passo)
+export const WizardStepper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  background: #f8fafc;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  gap: 8px;
+  overflow-x: auto;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+`;
+
+export const WizardStepItem = styled.div<{ active: boolean; completed: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: ${(props) =>
+    props.active ? "#00349A" : props.completed ? "#e0f2fe" : "transparent"};
+  color: ${(props) =>
+    props.active ? "#ffffff" : props.completed ? "#00349A" : "#64748b"};
+  font-weight: ${(props) => (props.active ? "700" : "600")};
+  font-size: 13px;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+
+  &:hover {
+    background: ${(props) =>
+      props.active ? "#002166" : props.completed ? "#bae6fd" : "#f1f5f9"};
+  }
+`;
+
+export const WizardStepNumber = styled.span<{ active: boolean; completed: boolean }>`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  background: ${(props) =>
+    props.active ? "#04F3FA" : props.completed ? "#00349A" : "#cbd5e1"};
+  color: ${(props) =>
+    props.active ? "#002166" : props.completed ? "#ffffff" : "#ffffff"};
+  font-weight: 700;
+`;
+
+export const WizardStepContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-height: 380px;
+`;
+
+export const WizardStepTitle = styled.h3`
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const WizardNavContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  gap: 1rem;
+`;
+
+export const WizardButtonPrev = styled.button`
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+export const WizardButtonNext = styled.button`
+  background: #00349A;
+  color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.75rem 1.75rem;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 52, 154, 0.25);
+
+  &:hover {
+    background: #111111 !important;
+    color: #ffffff !important;
+    border-color: #04F3FA !important;
+    box-shadow: 0 0 16px rgba(4, 243, 250, 0.5) !important;
+    transform: translateY(-1px);
+  }
+`;
+
+// Tela de Sucesso
+export const SuccessScreenContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  animation: fadeInStep 0.4s ease-in-out;
+
+  @keyframes fadeInStep {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+export const SuccessIconBadge = styled.div`
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 40px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+`;
+
+export const SuccessTitle = styled.h2`
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+`;
+
+export const SuccessSubtitle = styled.p`
+  font-size: 15px;
+  color: #64748b;
+  max-width: 520px;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+`;
+
+export const SuccessSummaryGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 650px;
+  margin-bottom: 2.5rem;
+`;
+
+export const SuccessSummaryCard = styled.div`
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+export const SuccessSummaryLabel = styled.span`
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+export const SuccessSummaryValue = styled.span`
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+`;
+
+export const SummarySectionCard = styled.div`
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+`;
