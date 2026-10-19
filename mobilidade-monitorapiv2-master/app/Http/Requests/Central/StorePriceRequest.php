@@ -63,7 +63,7 @@ class StorePriceRequest extends FormRequest
             'percentage_max_offer' => 'sometimes|nullable|numeric|min:0|max:100',
             'percentage_min_trip_partner' => 'sometimes|nullable|numeric|min:0|max:100',
             'percentage_max_trip_partner' => 'sometimes|nullable|numeric|min:0|max:100',
-            'order' => 'sometimes|nullable|integer|min:1',
+            'order' => 'sometimes|nullable|integer|min:0',
         ];
     }
 }

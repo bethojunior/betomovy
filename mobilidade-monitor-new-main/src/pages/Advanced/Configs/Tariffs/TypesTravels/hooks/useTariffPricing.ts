@@ -120,15 +120,7 @@ export const useTariffPricing = (
           };
         })
         .filter((data: any): data is ListPricesProps => {
-          if (!data || !data.tripTypeId) return false;
-          if (
-            data.trip_type &&
-            data.trip_type.serviceOption !== undefined &&
-            data.trip_type.serviceOption !== null
-          ) {
-            return Number(data.trip_type.serviceOption) === 0;
-          }
-          return true;
+          return !!(data && (data.tripTypeId || data.trip_type?.idTripType));
         });
 
       const shouldApplyCustomOrder =

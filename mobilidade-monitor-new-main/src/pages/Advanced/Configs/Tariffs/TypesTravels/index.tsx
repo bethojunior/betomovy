@@ -283,9 +283,7 @@ export const TypesTravels = () => {
     let filteredTypes: TypesTravelsProps[] = [];
     try {
       const responseTypesTravels = await api.get("tripType");
-      filteredTypes = (responseTypesTravels.data?.response || []).filter(
-        (data: TypesTravelsProps) => Number(data.serviceOption) === 0
-      );
+      filteredTypes = responseTypesTravels.data?.response || [];
 
       setTypesTravels(filteredTypes);
     } catch (error) {
@@ -389,7 +387,12 @@ export const TypesTravels = () => {
             tax_price_description: !descriptionTaxRate ? "" : descriptionTaxRate,
             tax_price_type: typeTaxRate || "%",
             tripTypeId: tripId,
-            order: currentTripOrder,
+            order:
+              currentTripOrder !== undefined &&
+              currentTripOrder !== null &&
+              Number(currentTripOrder) >= 0
+                ? Number(currentTripOrder)
+                : null,
             type_additional_value_after_km: typeAdditionalValueAfterKm || "$",
             waypoint_price: Utils.BrlToNumber(wayPointPrice, "positive") || 0,
             waiting_tolerance_seconds: Number(waitingToleranceSeconds) || 0,
@@ -544,6 +547,39 @@ export const TypesTravels = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cityId]);
+
+  useEffect(() => {
+    if (listPrices && listPrices.length > 0) {
+      const currentSelectedId = Number(travelSelected?.idTripType ?? (travelSelected as any)?.id);
+      let targetPrice: ListPricesProps | undefined;
+      if (currentSelectedId && !isNaN(currentSelectedId) && currentSelectedId > 0) {
+        targetPrice = listPrices.find(
+          (p) => Number(p.trip_type?.idTripType ?? p.tripTypeId) === currentSelectedId
+        );
+      }
+      if (!targetPrice) {
+        targetPrice = listPrices[0];
+      }
+      const tripId = Number(targetPrice.trip_type?.idTripType ?? targetPrice.tripTypeId);
+      const fullType = typesTravels.find((t) => Number(t.idTripType) === tripId);
+      const tripTypeObj = { ...(fullType || {}), ...(targetPrice.trip_type || {}) };
+      const pic = tripTypeObj?.picture || fullType?.picture;
+      const displayTitle = tripTypeObj?.type || fullType?.type || `Tarifa ${tripId}`;
+      if (
+        !travelSelected?.idTripType ||
+        Number(travelSelected.idTripType) !== tripId ||
+        travelSelected.type !== displayTitle
+      ) {
+        setTravelSelected({
+          ...tripTypeObj,
+          idTripType: tripId,
+          type: displayTitle,
+          picture: pic,
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listPrices, typesTravels]);
 
   const listTravelsDisabled = typesTravels.filter((item) => {
     return (
