@@ -14,6 +14,18 @@ class StorePriceRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (!$this->has('cityId')) {
+            $cityId = $this->header('cityid') ?? $this->header('cityId') ?? $this->query('cityId');
+            if ($cityId) {
+                $this->merge([
+                    'cityId' => (int) $cityId,
+                ]);
+            }
+        }
+    }
+
     public function rules(): array
     {
         return [

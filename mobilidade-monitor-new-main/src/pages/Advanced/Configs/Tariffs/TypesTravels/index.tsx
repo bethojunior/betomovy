@@ -256,7 +256,10 @@ export const TypesTravels = () => {
 
   const handleSelectTravel = (datasTravel: TypesTravelsProps) => {
     setLoading(true);
-    setTravelSelected(datasTravel);
+    const fullTripType = typesTravels.find(
+      (t) => Number(t.idTripType) === Number(datasTravel.idTripType)
+    );
+    setTravelSelected(fullTripType ? { ...fullTripType, ...datasTravel } : datasTravel);
     setLoading(false);
   };
 
@@ -421,7 +424,10 @@ export const TypesTravels = () => {
           await getCommissionsDriver();
           await getPrices();
 
-          setTravelSelected(travelSelected);
+          const updatedTripType = typesTravels.find(
+            (t) => Number(t.idTripType) === Number(travelSelected.idTripType)
+          );
+          setTravelSelected(updatedTripType ? { ...updatedTripType, ...travelSelected } : { ...travelSelected });
         } catch (error: any) {
           console.error("Erro ao atualizar tarifas:", error);
           let errorMsg = "Ocorreu um erro ao atualizar os preços e comissões.";
@@ -590,22 +596,26 @@ export const TypesTravels = () => {
         </ButtonAddNewTariff>
         <ContentListTypesTravels>
           {listPrices.map((value) => {
-            const tripTypeObj = value.trip_type || {};
-            const tripId = tripTypeObj.idTripType ?? value.tripTypeId;
+            const tripId = value.trip_type?.idTripType ?? value.tripTypeId;
+            const fullType = typesTravels.find((t) => Number(t.idTripType) === Number(tripId));
+            const tripTypeObj = { ...(fullType || {}), ...(value.trip_type || {}) };
+            const pic = tripTypeObj?.picture || fullType?.picture;
+            const displayTitle = tripTypeObj?.type || fullType?.type || `Tarifa ${tripId}`;
+
             return (
               <Fragment key={tripId}>
                 <CardTariff
                   selected={
                     Number(travelSelected.idTripType) === Number(tripId)
                   }
-                  onClick={() => handleSelectTravel(tripTypeObj)}
+                  onClick={() => handleSelectTravel({ ...tripTypeObj, idTripType: tripId, type: displayTitle, picture: pic })}
                 >
                   <ImageTariff
                     src={
-                      tripTypeObj?.picture
-                        ? (tripTypeObj.picture.startsWith("http")
-                            ? tripTypeObj.picture
-                            : `https://minio.704app.com.br/rota101fb704/tripType/${tripTypeObj.picture}`)
+                      pic
+                        ? (pic.startsWith("http")
+                            ? pic
+                            : `https://minio.704app.com.br/rota101fb704/tripType/${pic}`)
                         : "/default-trip-icon.png"
                     }
                     onError={(e: any) => {
@@ -613,7 +623,7 @@ export const TypesTravels = () => {
                       e.target.src = "/default-trip-icon.png";
                     }}
                   />
-                  <TitleCardTariff>{tripTypeObj?.type}</TitleCardTariff>
+                  <TitleCardTariff>{displayTitle}</TitleCardTariff>
                   <TextCardTariff>{`Id: ${tripId}`}</TextCardTariff>
                 </CardTariff>
               </Fragment>

@@ -53,6 +53,7 @@ class PriceService
             }
             $request['statusId'] = StatusConst::ACTIVE;
             $price = Price::create($request);
+            $price->load('tripType');
 
             DB::commit();
             return $price;
