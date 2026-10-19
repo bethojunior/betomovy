@@ -40,6 +40,7 @@ export const ModalNewTariffs = ({
       icon: "info",
       buttons: ["Não", "Sim"],
     }).then((accepted) => {
+      if (accepted) {
         const objectSend = {
           tripTypeId: datasTravel.idTripType,
           trip_type: datasTravel,
