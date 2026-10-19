@@ -173,23 +173,45 @@ export const useTripRates = (
         const formData = new FormData(event.target as HTMLFormElement);
 
         const idUpdated = formData.get("id");
+        if (!idUpdated) {
+          swal({
+            title: "ID da taxa não localizado",
+            icon: "warning",
+          });
+          setLoading(false);
+          return;
+        }
+
         const nameRatesUpdated = formData.get("nameRates");
+        if (!nameRatesUpdated || !String(nameRatesUpdated).trim()) {
+          swal({
+            title: "O nome da taxa é obrigatório",
+            icon: "warning",
+          });
+          setLoading(false);
+          return;
+        }
+
         const descriptionRatesUpdated = formData.get("descriptionRates");
-        const selectChargedRatesUpdated = formData.get("selectChargedRates");
-        const valueTypeUpdated = formData.get("valueType");
+        const selectChargedRatesUpdated = formData.get("selectChargedRates") || "driver";
+        const valueTypeUpdated = formData.get("valueType") || "%";
         const isActiveUpdated = formData.get("isActive");
 
         const isActivedFormated =
-          String(isActiveUpdated) === "on" ? true : false;
+          String(isActiveUpdated) === "on" || isActiveUpdated === "true" || isActiveUpdated === true;
+
+        const effectiveValue = value !== undefined && value !== null && String(value).trim() !== ""
+          ? Utils.BrlToNumber(String(value), "positive")
+          : 0;
 
         const objectSend = {
           active: isActivedFormated ? 1 : 0,
           chargeBy: selectChargedRatesUpdated,
           cityId: Number(cityId),
           description: descriptionRatesUpdated || "",
-          name: nameRatesUpdated,
+          name: String(nameRatesUpdated).trim(),
           tripTypeId: Number(tripTypeId),
-          value: Utils.BrlToNumber(value as string, "positive"),
+          value: effectiveValue,
           valueType: valueTypeUpdated,
         };
 

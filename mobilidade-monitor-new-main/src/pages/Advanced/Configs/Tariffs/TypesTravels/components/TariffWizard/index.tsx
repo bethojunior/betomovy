@@ -155,6 +155,7 @@ interface TariffWizardProps {
   setNameRates: (val: string) => void;
   valueRates: string;
   setValueRates: (val: string) => void;
+  descriptionRates?: string;
   setDescriptionRates: (val: string) => void;
   selectChargedRates: (val: string) => void;
   typeChargeRates: string;
@@ -323,6 +324,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
   setNameRates,
   valueRates,
   setValueRates,
+  descriptionRates = "",
   setDescriptionRates,
   selectChargedRates,
   typeChargeRates,
@@ -1154,9 +1156,11 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                 <TextArea
                   rows={5}
                   cols={33}
+                  value={descriptionRates}
                   onChange={(event) =>
                     setDescriptionRates(event.target.value)
                   }
+                  placeholder="Descrição da taxa opcional"
                 />
                 <ContentInputs>
                   <ContentColumnInputs>
@@ -1207,10 +1211,14 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                 <ContentInputs
                   style={{
                     justifyContent: "flex-end",
+                    gap: "8px",
                   }}
                 >
+                  <Button color="#64748b" onClick={() => setIsShowNewRates(false)}>
+                    Cancelar
+                  </Button>
                   <Button color="#0069d9" onClick={handleAddRates}>
-                    Criar
+                    Criar Taxa
                   </Button>
                 </ContentInputs>
               </>

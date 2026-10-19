@@ -194,11 +194,6 @@ class DriverCommissionService
 
     private function removeIfExistsOnInsert(int $cityId, int $tripTypeId): void
     {
-        $commission = $this->driverCommissionRepository->findByCityAndTripType($cityId, $tripTypeId);
-
-        if ($commission) {
-            $commission->statusId = StatusConst::REMOVED;
-            $commission->save();
-        }
+        $this->driverCommissionRepository->removeInCityByTripType($cityId, $tripTypeId);
     }
 }

@@ -266,6 +266,7 @@ export const TypesTravels = () => {
     setNameRates,
     valueRates,
     setValueRates,
+    descriptionRates,
     setDescriptionRates,
     typeChargeRates,
     setTypeChargeRates,
@@ -1099,6 +1100,7 @@ export const TypesTravels = () => {
           setNameRates={setNameRates}
           valueRates={valueRates}
           setValueRates={setValueRates}
+          descriptionRates={descriptionRates}
           setDescriptionRates={setDescriptionRates}
           selectChargedRates={selectChargedRates}
           typeChargeRates={typeChargeRates}

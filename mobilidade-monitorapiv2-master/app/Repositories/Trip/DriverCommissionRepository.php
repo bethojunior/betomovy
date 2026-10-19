@@ -41,8 +41,18 @@ class DriverCommissionRepository extends AbstractRepository
                 'value',
                 'valueType',
                 'cityId',
-                'tripTypeId'
+                'tripTypeId',
+                'statusId'
             ]);
+    }
+
+    public function removeInCityByTripType(int $cityId, int $tripTypeId): bool
+    {
+        return (bool) $this->getModel()
+            ::where('cityId', $cityId)
+            ->where('tripTypeId', $tripTypeId)
+            ->where('statusId', StatusConst::ACTIVE)
+            ->update(['statusId' => StatusConst::REMOVED]);
     }
 
     public function findByCity($cityId): Collection
