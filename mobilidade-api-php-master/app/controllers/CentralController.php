@@ -190,8 +190,8 @@ class CentralController extends ApiController
 
             // Create Balance for central/customer
             $insB = $pdo->prepare("
-                INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance, created_at, updated_at)
-                VALUES (0.00, 0.00, 0.00, 0.00, 0.00, NOW(), NOW())
+                INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance)
+                VALUES (0.00, 0.00, 0.00, 0.00, 0.00)
             ");
             $insB->execute();
             $balanceId = (int)$pdo->lastInsertId();
@@ -698,7 +698,7 @@ class CentralController extends ApiController
             $balanceId = (int)($central['balanceId'] ?? 0);
 
             if ($balanceId <= 0) {
-                $stmtInsB = $pdo->prepare("INSERT INTO balance (balance, tripBalance, created_at, updated_at) VALUES (0.00, 0.00, NOW(), NOW())");
+                $stmtInsB = $pdo->prepare("INSERT INTO balance (balance, tripBalance, blockedBalance, withheldBalance, blockedBalanceToPay) VALUES (0.00, 0.00, 0.00, 0.00, 0.00)");
                 $stmtInsB->execute();
                 $balanceId = (int)$pdo->lastInsertId();
 
@@ -710,9 +710,9 @@ class CentralController extends ApiController
             $isAdd = ($type === '1' || strtolower($type) === 'credit' || strtolower($type) === 'adicionar');
 
             if ($isAdd) {
-                $stmtB = $pdo->prepare("UPDATE balance SET balance = balance + :v, tripBalance = tripBalance + :v, updated_at = NOW() WHERE idBalance = :bid");
+                $stmtB = $pdo->prepare("UPDATE balance SET balance = balance + :v, tripBalance = tripBalance + :v WHERE idBalance = :bid");
             } else {
-                $stmtB = $pdo->prepare("UPDATE balance SET balance = balance - :v, tripBalance = tripBalance - :v, updated_at = NOW() WHERE idBalance = :bid");
+                $stmtB = $pdo->prepare("UPDATE balance SET balance = balance - :v, tripBalance = tripBalance - :v WHERE idBalance = :bid");
             }
             $stmtB->execute([':v' => $value, ':bid' => $balanceId]);
 
