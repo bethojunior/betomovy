@@ -6,6 +6,7 @@ import { useContextAuth } from "../../../../../../../contexts/auth";
 import apiSpeedmob from "../../../../../../../services/apiSpeedmob";
 
 import { FranchiseProps, LoginValues } from "./types";
+import logoMovy from "../../../../../../../assets/logo-movy-transparent.png";
 
 import {
   Container,
@@ -189,7 +190,14 @@ export const LoginScreenSimulator = () => {
       />
 
       <ContentLogo>
-        <ImgLogo src={import.meta.env.LOGO_APP} alt="" />
+        <ImgLogo
+          src={logoMovy}
+          alt="logo movy"
+          onError={(e: any) => {
+            e.target.onerror = null;
+            e.target.src = logoMovy;
+          }}
+        />
       </ContentLogo>
 
       <FooterLogin>

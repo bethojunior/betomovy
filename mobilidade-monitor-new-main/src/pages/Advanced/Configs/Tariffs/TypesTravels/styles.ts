@@ -151,14 +151,28 @@ export const ContentButtons = styled.div`
 `;
 
 export const ButtonActions = styled.button`
-  background-color: #4ba066;
+  background-color: #00349A;
   color: #ffffff;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
-  padding: 1rem 2rem;
+  padding: 0.9rem 2.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 4px 14px rgba(0, 52, 154, 0.25);
+
+  &:hover {
+    background-color: #111111 !important;
+    color: #ffffff !important;
+    border-color: #04F3FA !important;
+    box-shadow: 0 0 16px rgba(4, 243, 250, 0.45) !important;
+    transform: translateY(-1px);
+  }
 
   @media (max-width: 920px) {
     font-size: 14px;
+    padding: 0.75rem 1.25rem;
   }
 `;
 

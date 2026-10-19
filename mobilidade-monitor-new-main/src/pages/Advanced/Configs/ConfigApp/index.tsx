@@ -21,6 +21,7 @@ import { resizeLogo } from "../../../../hooks/resizeLogo";
 
 import api from "../../../../services/api";
 import { AiFillDelete, AiFillEye } from "react-icons/ai";
+import logoMovy from "../../../../assets/logo-movy.png";
 
 const locale = {
   emptyText: "Sem dados",
@@ -263,9 +264,10 @@ export const ConfigApp = () => {
             <label
               htmlFor="input-logo-global"
               style={{
-                backgroundImage: `url('${
-                  import.meta.env.LOGO_APP
-                }?v=${new Date().getTime()}')`,
+                backgroundImage: `url('${logoMovy}')`,
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
               }}
             ></label>
             <p

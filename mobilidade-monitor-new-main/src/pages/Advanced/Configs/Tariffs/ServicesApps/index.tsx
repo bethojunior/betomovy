@@ -53,6 +53,7 @@ import api from "../../../../../services/api";
 
 import Preload from "../../../../../components/Utils/Preload";
 import { ModalNewServices } from "../../../../../components/Advanced/Tariffs/ModalNewServices";
+import logoMovy from "../../../../../assets/logo-movy-transparent.png";
 
 import {
   CommissionDriverProps,
@@ -1706,7 +1707,67 @@ export const ServicesApps = () => {
             </ContentButtons>
           </ConfigDetailsTariffs>
           <ContentLogoApp>
-            <ImageLogoApp src={import.meta.env.LOGO_APP} />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "2.5rem 1.5rem",
+                background: "#F8FAFC",
+                borderRadius: "16px",
+                border: "1px solid #E2E8F0",
+                margin: "1rem",
+                width: "100%",
+                maxWidth: "320px",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
+              }}
+            >
+              <ImageLogoApp
+                src={
+                  travelSelected?.picture
+                    ? (travelSelected.picture.startsWith("http")
+                        ? travelSelected.picture
+                        : `https://minio.704app.com.br/rota101fb704/tripType/${travelSelected.picture}`)
+                    : logoMovy
+                }
+                alt={travelSelected?.type || "Movy"}
+                onError={(e: any) => {
+                  e.target.onerror = null;
+                  e.target.src = logoMovy;
+                }}
+                style={{
+                  maxWidth: "180px",
+                  maxHeight: "130px",
+                  objectFit: "contain",
+                  marginBottom: "1.2rem",
+                  filter: "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08))",
+                }}
+              />
+              <h3
+                style={{
+                  margin: "0 0 6px 0",
+                  color: "#070A1A",
+                  fontWeight: 700,
+                  fontSize: "17px",
+                  textAlign: "center",
+                }}
+              >
+                {travelSelected?.type || "Serviço Movy"}
+              </h3>
+              <p
+                style={{
+                  margin: 0,
+                  color: "#64748B",
+                  fontSize: "13px",
+                  textAlign: "center",
+                  lineHeight: 1.4,
+                }}
+              >
+                {travelSelected?.description ||
+                  "Ajuste os valores operacionais e regras nos painéis ao lado."}
+              </p>
+            </div>
           </ContentLogoApp>
         </ContentDetailsTariffs>
       ) : null}

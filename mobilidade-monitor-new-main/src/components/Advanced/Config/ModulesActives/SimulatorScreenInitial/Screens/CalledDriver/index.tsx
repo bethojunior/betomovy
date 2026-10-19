@@ -34,6 +34,7 @@ import {
 import { constants } from "../../../../../../../pages/Advanced/Configs/ModulesActives/constants";
 
 import pathIconClient from "../../../../../../../assets/avatar2.png";
+import logoMovy from "../../../../../../../assets/logo-movy-transparent.png";
 
 import { useColorInverse } from "../../../../../../../utils/Hook/useColorInverse";
 
@@ -61,7 +62,14 @@ export const CalledDriver = ({
         </NameUser>
 
         <ContentImgUser>
-          <ImgUser src={import.meta.env.LOGO_APP} alt="logo aplicação" />
+          <ImgUser
+            src={logoMovy}
+            alt="logo movy"
+            onError={(e: any) => {
+              e.target.onerror = null;
+              e.target.src = logoMovy;
+            }}
+          />
         </ContentImgUser>
       </Header>
 
