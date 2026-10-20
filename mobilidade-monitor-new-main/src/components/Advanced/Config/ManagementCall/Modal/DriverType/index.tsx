@@ -512,7 +512,11 @@ const DriverTypeModal: FC<ModalProps> = ({
               <img
                 src={
                   typeModal === "edit" && !renderImage
-                    ? (selectedFile as string)
+                    ? typeof selectedFile === "string"
+                      ? selectedFile.startsWith("http") || selectedFile.startsWith("data:") || selectedFile.startsWith("blob:")
+                        ? selectedFile
+                        : `https://api.movymob.com/${selectedFile.replace(/^\/+/, "")}`
+                      : whatRender || Blank
                     : whatRender || Blank
                 }
                 style={{

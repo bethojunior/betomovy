@@ -500,9 +500,17 @@ const EditTripTypeModal = ({
               <TripTypeIconPreview
                 src={
                   typeModal === "edit" && !renderImage
-                    ? (selectedFile as string)
-                    : whatRender
+                    ? typeof selectedFile === "string"
+                      ? selectedFile.startsWith("http") || selectedFile.startsWith("data:") || selectedFile.startsWith("blob:")
+                        ? selectedFile
+                        : `https://api.movymob.com/${selectedFile.replace(/^\/+/, "")}`
+                      : whatRender || Blank
+                    : whatRender || Blank
                 }
+                onError={(e: any) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = Blank;
+                }}
                 alt="Ícone do chamado"
               />
             )}

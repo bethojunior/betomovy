@@ -404,13 +404,31 @@ export const ModalRegister: FC<Props> = ({
       >
         {selectedFile && (
           <img
-            src={isEdit && !renderImage ? (selectedFile as string) : whatRender}
+            src={
+              isEdit && !renderImage
+                ? typeof selectedFile === 'string'
+                  ? selectedFile.startsWith('http') || selectedFile.startsWith('data:') || selectedFile.startsWith('blob:')
+                    ? selectedFile
+                    : selectedFile === 'default.jpg' || selectedFile === 'default.png'
+                    ? Blank
+                    : `https://movycentral.com/${selectedFile.replace(/^\/+/, '')}`
+                  : whatRender || Blank
+                : whatRender || Blank
+            }
+            onError={(e) => {
+              e.currentTarget.onerror = null
+              e.currentTarget.src = Blank
+            }}
             style={{
               width: '80%',
-              height: 150,
+              maxHeight: 150,
+              objectFit: 'contain',
               borderRadius: 5,
+              marginBottom: 10,
+              backgroundColor: '#f5f5f5',
+              padding: 4,
             }}
-            alt='Ícone do chamado'
+            alt='Imagem da central'
           />
         )}
         <Form.Item
