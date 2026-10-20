@@ -12,6 +12,26 @@ use Exception;
  */
 class AppController extends ApiController
 {
+    public function actionIndex()
+    {
+        try {
+            $dao = new \app\utils\BaseDao();
+            $rows = $dao->sqlRawSelect("SELECT idApp, name, version, isCritical, link_store, statusId FROM app WHERE statusId = 1 ORDER BY idApp ASC")->get();
+            $result = [];
+            if (is_array($rows)) {
+                foreach ($rows as $r) {
+                    $r['id'] = (int)$r['idApp'];
+                    $r['idApp'] = (int)$r['idApp'];
+                    $r['statusId'] = (int)$r['statusId'];
+                    $result[] = $r;
+                }
+            }
+            echo $this->returnSuccess("Aplicativos", $result);
+        } catch (\Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
     public function actionCheckVersion()
     {
         $service = new AppVersionService;

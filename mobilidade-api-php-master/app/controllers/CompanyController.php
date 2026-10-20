@@ -13,6 +13,41 @@ use Exception;
  */
 class CompanyController extends ApiController
 {
+    public function actionIndex()
+    {
+        try {
+            $dao = new \app\utils\BaseDao();
+            $cityId = isset($_GET['cityId']) && !empty($_GET['cityId']) ? (int)$_GET['cityId'] : null;
+
+            $where = ["c.statusId = 1"];
+            $params = [];
+
+            if ($cityId) {
+                $where[] = "(c.cityId = :cityId OR c.cityId IS NULL)";
+                $params[':cityId'] = $cityId;
+            }
+
+            $whereStr = implode(" AND ", $where);
+            $sql = "SELECT c.idCompany AS id, c.idCompany, c.name, c.fantasyName, c.cnpj, c.phone, c.statusId, c.cityId 
+                    FROM company c 
+                    WHERE {$whereStr} 
+                    ORDER BY c.idCompany DESC 
+                    LIMIT 200";
+
+            $rows = $dao->sqlRawSelect($sql, $params)->get();
+            $result = is_array($rows) ? $rows : [];
+
+            foreach ($result as &$r) {
+                $r['id'] = (int)$r['id'];
+                $r['idCompany'] = (int)$r['idCompany'];
+            }
+
+            echo $this->returnSuccess("Empresas", $result);
+        } catch (\Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
     public function actionRegister()
     {
         try {

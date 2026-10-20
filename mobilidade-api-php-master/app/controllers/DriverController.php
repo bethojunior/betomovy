@@ -1017,5 +1017,72 @@ class DriverController extends ApiController
             echo $this->returnError($e);
         }
     }
+
+    public function actionBalance()
+    {
+        try {
+            $data = $this->request(false);
+            $balanceFlowTypeId = isset($data->balanceFlowTypeId) ? (int)$data->balanceFlowTypeId : null;
+            $userTypeId = !empty($data->userTypeDriverSelected) ? (int)$data->userTypeDriverSelected : null;
+            $billingDay = isset($data->billingDay) && $data->billingDay !== '' ? (int)$data->billingDay : null;
+            
+            $rawVal = $data->value ?? '0';
+            $cleanVal = (float)str_replace(['R$', ' ', '.'], ['', '', ''], str_replace(',', '.', $rawVal));
+
+            if (!$balanceFlowTypeId) {
+                throw new \Exception("Tipo de movimentação é obrigatório.");
+            }
+
+            $dao = new \app\utils\BaseDao();
+
+            // Se for lançamento com dia de faturamento, grava em balancePosting
+            if ($billingDay !== null) {
+                $dao->sqlRawSelect("INSERT INTO balancePosting (userTypeId, balanceFlowTypeId, value, billingDay, active, created_at, updated_at) 
+                                    VALUES (:userTypeId, :balanceFlowTypeId, :value, :billingDay, 1, NOW(), NOW())", [
+                    ':userTypeId' => $userTypeId,
+                    ':balanceFlowTypeId' => $balanceFlowTypeId,
+                    ':value' => $cleanVal,
+                    ':billingDay' => $billingDay
+                ]);
+            } else {
+                // Lançamento avulso: buscar flow (entrada/saida)
+                $flowType = $dao->sqlRawSelect("SELECT * FROM balanceFlowType WHERE idBalanceFlowType = :id", [':id' => $balanceFlowTypeId])->first();
+                $isCredit = $flowType && strtolower($flowType['flow']) === 'entrada';
+
+                $where = ["d.driverRegisterStatusId = 1"];
+                $params = [];
+                if ($userTypeId) {
+                    $where[] = "d.userTypeId = :userTypeId";
+                    $params[':userTypeId'] = $userTypeId;
+                }
+
+                $drivers = $dao->sqlRawSelect("SELECT d.idDriver, d.userId FROM driver d WHERE " . implode(" AND ", $where), $params)->get();
+                if (is_array($drivers)) {
+                    foreach ($drivers as $dr) {
+                        $balRow = $dao->sqlRawSelect("SELECT idBalance, value FROM balance WHERE userId = :userId", [':userId' => $dr['userId']])->first();
+                        if ($balRow) {
+                            $newVal = $isCredit ? ((float)$balRow['value'] + $cleanVal) : ((float)$balRow['value'] - $cleanVal);
+                            $dao->sqlRawSelect("UPDATE balance SET value = :val, updated_at = NOW() WHERE idBalance = :id", [
+                                ':val' => $newVal,
+                                ':id' => $balRow['idBalance']
+                            ]);
+
+                            $dao->sqlRawSelect("INSERT INTO balanceFlow (balanceId, balanceFlowTypeId, value, created_at) 
+                                                VALUES (:balanceId, :typeId, :value, NOW())", [
+                                ':balanceId' => $balRow['idBalance'],
+                                ':typeId' => $balanceFlowTypeId,
+                                ':value' => $cleanVal
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            echo $this->returnSuccess('Lançamento efetuado com sucesso');
+        } catch (\Exception $e) {
+            echo $this->returnError($e, "Erro ao alterar saldo de motoristas");
+        }
+    }
 }
+
 

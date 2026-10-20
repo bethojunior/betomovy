@@ -1,18 +1,53 @@
 <?php
 
 namespace app\controllers;
-use app\services\AdvertisingService;
 
+use app\services\AdvertisingService;
+use app\utils\BaseDao;
 use Exception;
 
-/**
- * Created by PhpStorm.
- * User: Eduardo Roseo
- * Date: 31/10/2019
- * Time: 10:20
- */
 class AdvertisingController extends ApiController
 {
+    public function actionIndex()
+    {
+        try {
+            $dao = new BaseDao();
+            $cityId = isset($_GET['cityId']) && !empty($_GET['cityId']) ? (int)$_GET['cityId'] : null;
+
+            $where = ["a.statusId = 1"];
+            $params = [];
+
+            if ($cityId) {
+                $where[] = "(a.cityId = :cityId OR a.cityId IS NULL)";
+                $params[':cityId'] = $cityId;
+            }
+
+            $whereStr = implode(" AND ", $where);
+            $sql = "SELECT a.*, 
+                           c.name AS companyName,
+                           c.fantasyName AS companyFantasyName,
+                           ci.name AS cityName
+                    FROM advertising a
+                    LEFT JOIN company c ON c.idCompany = a.companyId
+                    LEFT JOIN city ci ON ci.idCity = a.cityId
+                    WHERE {$whereStr}
+                    ORDER BY a.id DESC";
+
+            $rows = $dao->sqlRawSelect($sql, $params)->get();
+            $result = is_array($rows) ? $rows : [];
+
+            foreach ($result as &$r) {
+                $r['id'] = (int)$r['id'];
+                $r['companyId'] = (int)$r['companyId'];
+                $r['statusId'] = (int)$r['statusId'];
+            }
+
+            echo $this->returnSuccess("Publicidades", $result);
+        } catch (Exception $e) {
+            echo $this->returnError($e, "Erro ao listar publicidades");
+        }
+    }
+
     public function actionGet()
     {
         try {
