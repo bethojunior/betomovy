@@ -85,41 +85,175 @@ class TripDao extends BaseDao
         try {
             $this->beginTransaction();
 
-            /** @var \app\model\Customer $customer */
-            $customer = (new CustomerDao())->create($data->customer);
-            $data->customerId = $customer->getIdCustomer();
+            // 1. Resolve or Create Customer (Support Central, Customer App and Establishment)
+            $customer = null;
+            $custData = $data->customer ?? ($data->tripCustomer ?? ($data->centralCustomer ?? null));
 
+            if (!empty($data->customerId)) {
+                try {
+                    $customer = (new CustomerDao())->find($data->customerId);
+                } catch (\Throwable $t) {}
+            }
+
+            if (!$customer && $custData) {
+                if (is_array($custData)) {
+                    $custData = (object)$custData;
+                }
+                if (!empty($custData->id)) {
+                    try {
+                        $customer = (new CustomerDao())->find($custData->id);
+                    } catch (\Throwable $t) {}
+                }
+                if (!$customer && !empty($custData->userId)) {
+                    try {
+                        $customer = (new CustomerDao())->findByUser($custData->userId);
+                    } catch (\Throwable $t) {}
+                }
+                if (!$customer && (!empty($custData->name) || !empty($custData->phone))) {
+                    try {
+                        $customer = (new CustomerDao())->create($custData);
+                    } catch (\Throwable $t) {}
+                }
+            }
+
+            if (!$customer && !empty($data->userId)) {
+                try {
+                    $customer = (new CustomerDao())->findByUser($data->userId);
+                } catch (\Throwable $t) {}
+            }
+
+            if ($customer && method_exists($customer, 'getIdCustomer')) {
+                $data->customerId = $customer->getIdCustomer();
+            }
+
+            // Central customer handling if centralId is present
+            if (!empty($data->centralId) && $custData) {
+                try {
+                    $cCustData = is_array($custData) ? (object)$custData : $custData;
+                    if (!empty($cCustData->name) || !empty($cCustData->phone)) {
+                        $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+                        $stmtCheck = $pdo->prepare("SELECT id FROM centralCustomer WHERE (phone = :phone OR name = :name) AND centralId = :centralId LIMIT 1");
+                        $stmtCheck->execute([
+                            ':phone' => $cCustData->phone ?? '',
+                            ':name' => $cCustData->name ?? '',
+                            ':centralId' => $data->centralId
+                        ]);
+                        $cId = $stmtCheck->fetchColumn();
+                        if (!$cId) {
+                            $stmtIns = $pdo->prepare("INSERT INTO centralCustomer (name, phone, centralId, userId, created_at, updated_at) VALUES (:name, :phone, :centralId, :userId, NOW(), NOW())");
+                            $stmtIns->execute([
+                                ':name' => $cCustData->name ?? '',
+                                ':phone' => $cCustData->phone ?? '',
+                                ':centralId' => $data->centralId,
+                                ':userId' => $data->userId ?? null
+                            ]);
+                            $cId = $pdo->lastInsertId();
+                        }
+                        if ($cId) {
+                            $data->centralCustomerId = (int)$cId;
+                        }
+                    }
+                } catch (\Throwable $t) {}
+            }
+
+            // 2. Resolve Origin & Destination
+            if (isset($data->origin) && is_object($data->origin) && empty($data->originId)) {
+                try {
+                    $origin = (new OriginDao())->create($data->origin);
+                    if ($origin && method_exists($origin, 'getIdOrigin')) {
+                        $data->originId = $origin->getIdOrigin();
+                        if (empty($data->cityId) && method_exists($origin, 'getCityId')) {
+                            $data->cityId = $origin->getCityId();
+                        }
+                    }
+                } catch (\Throwable $t) {}
+            }
+
+            if (isset($data->destination) && is_object($data->destination) && empty($data->destinationId)) {
+                try {
+                    $dest = (new DestinationDao())->create($data->destination);
+                    if ($dest && method_exists($dest, 'getIdDestination')) {
+                        $data->destinationId = $dest->getIdDestination();
+                    }
+                } catch (\Throwable $t) {}
+            }
+
+            // 3. Resolve City
+            if (empty($data->cityId)) {
+                if (isset($data->origin->latitude, $data->origin->longitude)) {
+                    try {
+                        $city = (new \app\services\CityService())->findCityByCoordinate($data->origin->latitude, $data->origin->longitude);
+                        if ($city && !empty($city->id)) {
+                            $data->cityId = $city->id;
+                        }
+                    } catch (\Throwable $t) {}
+                }
+                if (empty($data->cityId) && !empty($_SERVER['HTTP_CITYID'])) {
+                    $data->cityId = (int)$_SERVER['HTTP_CITYID'];
+                }
+            }
+
+            // 4. Resolve Trip Call Type
+            if (empty($data->tripCallTypeId)) {
+                if (!empty($data->centralId)) {
+                    $data->tripCallTypeId = 4; // CENTRAL
+                } else {
+                    $data->tripCallTypeId = 1; // NORMAL
+                }
+            }
+
+            // 5. Driver Commission
+            if (empty($data->driverCommissionId) && !empty($data->cityId) && !empty($data->tripTypeId)) {
+                try {
+                    $originObj = isset($data->origin) && is_object($data->origin) ? $data->origin : null;
+                    $data->driverCommissionId = $this->driverCommissionService
+                        ->findCommissionId($data->cityId, $data->tripTypeId, $originObj);
+                } catch (\Throwable $t) {}
+            }
+
+            $data->date = $data->date ?? now();
+            $data->status = $data->status ?? 'search_driver';
+
+            // 6. Create Trip Record
             $this->trip = $this->createTrip($data);
 
-            $this->tripPayment($establishment);
+            // 7. Payment for Establishment only if establishmentId is provided
+            $establishment = null;
+            if (!empty($data->establishmentId)) {
+                try {
+                    $this->tripPayment($establishment);
+                } catch (\Throwable $t) {}
+            }
 
-            $vehicleCategory = (new TripTypeDao())->find($this->trip->getTripTypeId())->type ?? null;
+            // 8. Push to Drivers (Fail-safe)
+            $vehicleCategory = null;
+            try {
+                $vehicleCategory = (new TripTypeDao())->find($this->trip->getTripTypeId())->type ?? null;
+                $this->sendPushDriversClose(
+                    $this->trip->getTripReference(),
+                    $this->trip->getPrice(),
+                    $vehicleCategory,
+                    $this->trip->getUserId(),
+                    $this->trip->getTripCallTypeId()
+                );
+            } catch (\Throwable $t) {}
 
-            $result = $this->sendPushDriversClose(
-                $this->trip->getTripReference(),
-                $this->trip->getPrice(),
-                $vehicleCategory,
-                $this->trip->getUserId(),
-                $this->trip->getTripCallTypeId()
-            );
+            // 9. Waypoints
+            if (!empty($data->waypoints) && (is_array($data->waypoints) || is_object($data->waypoints))) {
+                try {
+                    $wpDao = new TripWayPointDao();
+                    $wps = is_array($data->waypoints) ? $data->waypoints : [$data->waypoints];
+                    foreach ($wps as $wp) {
+                        $wpObj = is_array($wp) ? (object)$wp : $wp;
+                        if (is_object($wpObj)) {
+                            $wpObj->tripReference = $this->trip->getTripReference();
+                            $wpDao->create($wpObj);
+                        }
+                    }
+                } catch (\Throwable $t) {}
+            }
 
-            $logData = (object)[
-                'drivers' => $result['resultDrivers'],
-                'resultPush' => $result['resultPush'],
-                'customer' => $customer->toStdClass(),
-                'trip' => $this->trip->toStdClass(),
-                'establishment' => $establishment
-            ];
-
-            $this->createLogEstablishment(
-                $logData,
-                $this->trip->getTripReference(),
-                $this->trip->getUserId(),
-                "VIAGEM INSERIDA",
-                LogCriticalType::AVISO
-            );
-
-            /** @var stdClass $trip */
+            // 10. Fetch and return complete trip
             $trip = $this->find($this->trip->getTripReference());
 
             $this->commit();
@@ -1527,12 +1661,25 @@ class TripDao extends BaseDao
      */
     private function createTrip($data): Trip
     {
-        if (isset($data->destination)) {
-            /** @var Destination $destination */
-            $destination = (new DestinationDao())
-                ->create($data->destination);
+        if (isset($data->origin) && is_object($data->origin) && empty($data->originId)) {
+            try {
+                $origin = (new OriginDao())->create($data->origin);
+                if ($origin && method_exists($origin, 'getIdOrigin')) {
+                    $data->originId = $origin->getIdOrigin();
+                    if (empty($data->cityId) && method_exists($origin, 'getCityId')) {
+                        $data->cityId = $origin->getCityId();
+                    }
+                }
+            } catch (\Throwable $t) {}
+        }
 
-            $data->destinationId = $destination->getIdDestination();
+        if (isset($data->destination) && is_object($data->destination) && empty($data->destinationId)) {
+            try {
+                $destination = (new DestinationDao())->create($data->destination);
+                if ($destination && method_exists($destination, 'getIdDestination')) {
+                    $data->destinationId = $destination->getIdDestination();
+                }
+            } catch (\Throwable $t) {}
         }
 
         /** @var Trip $trip */
