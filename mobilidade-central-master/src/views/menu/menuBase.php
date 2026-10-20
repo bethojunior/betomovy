@@ -202,6 +202,9 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
                     <li>
                         <a href="<?php echo Host::getLocal() ?>whatsapp/management">Configurações</a>
                     </li>
+                    <li>
+                        <a href="<?php echo Host::getLocal() ?>whatsapp/groups">Grupos</a>
+                    </li>
                 </ul>
             </li>
 

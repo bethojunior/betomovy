@@ -35,6 +35,34 @@ class WhatsAppController extends View
         $this->actionManagement();
     }
 
+    public function actionGroups(){
+        if (!$this->isWhatsappEnabled()) {
+            $this->redirectController('');
+            return;
+        }
+
+        $this->setTemplate(Template::defaultView());
+
+        $this->layoutBuilder(
+            [
+                'whatsapp/groups'
+            ],
+            [
+                'repositories/TripRepository',
+                'repositories/TripPaymentFormRepository',
+                'repositories/KeyRepository',
+                'utils/whatsappSession',
+                'repositories/whatsappRepository',
+                'repositories/ConfigRepository',
+                'modules/whatsapp/group'
+            ],
+            [
+                'whatsapp/groups',
+                'whatsapp/management'
+            ]
+        );
+    }
+
     public function actionManagement(){
         if (!$this->isWhatsappEnabled()) {
             $this->redirectController('');

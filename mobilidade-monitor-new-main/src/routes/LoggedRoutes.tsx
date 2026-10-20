@@ -872,7 +872,7 @@ const LoggedRoutes: FC = () => {
                 <ListPhonesGeneral />
               </Menu>
             </Route>
-            <Route path="/config/firebaseVerification">
+            <Route path={["/config/firebaseVerification", "/config/FirebaseVerification"]}>
               <Menu titlePage="Verificação Firebase">
                 <FirebaseVerification />
               </Menu>
