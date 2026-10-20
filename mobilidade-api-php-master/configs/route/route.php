@@ -187,6 +187,8 @@ return [
         '/car/acceptcar',
         '/car/rejectcar',
         '/user/removeaccountsrequest',
+        '/user/removeaccountuser',
+        '/user/cancelremoveaccountuser',
         '/acquirer',
         '/role',
         '/role/permissions',

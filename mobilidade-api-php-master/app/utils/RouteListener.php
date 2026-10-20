@@ -137,6 +137,17 @@ class RouteListener extends ApiController
                     return $subAction;
                 }
             }
+
+            // Suporte para identificador de string/UUID no path[2] (ex: /dashboard/activeTrips/{uuid})
+            $subAction = "action" . ucfirst($path[1]);
+            if (method_exists($class, $subAction)) {
+                if (!isset($_GET['id'])) {
+                    $_GET['id'] = $path[2];
+                }
+                $_GET['reference'] = $path[2];
+                $_GET['tripReference'] = $path[2];
+                return $subAction;
+            }
         }
 
         if (isset($path[1])) {

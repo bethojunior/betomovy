@@ -407,7 +407,7 @@ const Monitoring: FC = () => {
       };
 
       const result = await TripService.getActiveAllTrip(requestFilters);
-      const tripActiveArray = Array.isArray(result?.data) ? result.data : [];
+      const tripActiveArray = Array.isArray(result?.data) ? result.data : (Array.isArray(result) ? (result as any) : []);
 
       setScheduledTotal(result?.scheduledTotal ?? 0);
       setHasMoreTrips(Boolean(result?.next_page_url));
@@ -447,7 +447,7 @@ const Monitoring: FC = () => {
             status: 'scheduled',
             perPage: 200,
           }).then((scheduledResult) => {
-            const scheduledTrips = Array.isArray(scheduledResult?.data) ? scheduledResult.data : [];
+            const scheduledTrips = Array.isArray(scheduledResult?.data) ? scheduledResult.data : (Array.isArray(scheduledResult) ? (scheduledResult as any) : []);
             scheduledCountedRef.current = new Set(scheduledTrips.map((trip) => trip.tripReference));
           }).catch(() => {});
         }

@@ -109,7 +109,12 @@ export const AccountDeletionRequests = ({ type }: AccountDeletionRequestsProps) 
       dataIndex: "created_at",
       key: "created_at",
       width: 140,
-      render: (createdAt: string) => new Date(createdAt).toLocaleString(),
+      render: (createdAt: string) => {
+        if (!createdAt) return '-';
+        const str = String(createdAt).replace(' ', 'T');
+        const d = new Date(str);
+        return isNaN(d.getTime()) ? String(createdAt) : d.toLocaleString('pt-BR');
+      },
     },
     {
       title: "Usuário",

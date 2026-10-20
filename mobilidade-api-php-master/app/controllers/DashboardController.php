@@ -157,29 +157,315 @@ class DashboardController extends ApiController
     public function actionActiveTrips()
     {
         try {
-            $cityId = $this->getCityId();
             $pdo = $this->getPdo();
-            $cityWhere = $cityId ? "AND t.cityId = {$cityId}" : "";
+            $cityId = $this->getCityId();
 
+            // Detect if a single tripReference was requested:
+            // e.g., /dashboard/activeTrips/{tripReference}
+            $targetRef = $_GET['tripReference'] ?? $_GET['reference'] ?? null;
+            if (!$targetRef && isset($_GET['id']) && !is_numeric($_GET['id']) && strlen($_GET['id']) > 10) {
+                $targetRef = $_GET['id'];
+            }
+            if (!$targetRef && isset($_SERVER['REQUEST_URI'])) {
+                if (preg_match('#/dashboard/activeTrips/([a-zA-Z0-9\-]+)#i', $_SERVER['REQUEST_URI'], $m)) {
+                    $targetRef = $m[1];
+                }
+            }
+
+            if (!empty($targetRef)) {
+                // Return single trip detail
+                $sqlSingle = "
+                    SELECT 
+                        t.idTrip,
+                        t.tripReference,
+                        t.status,
+                        t.price,
+                        DATE_FORMAT(t.date, '%Y-%m-%d %H:%i:%s') AS date,
+                        t.userId,
+                        COALESCE(u.name, '') AS customerName,
+                        COALESCE(u.phone, '') AS customerPhone,
+                        u.profilePhoto AS customerPhoto,
+                        t.driverId,
+                        d.userId AS driverUserId,
+                        COALESCE(du.name, '') AS driverName,
+                        COALESCE(du.phone, '') AS driverPhone,
+                        du.profilePhoto AS driverPhoto,
+                        c.plate AS carPlate,
+                        t.tripTypeId,
+                        tt.type AS tripType,
+                        t.tripPaymentFormId,
+                        tPF.name AS paymentForm,
+                        t.originId,
+                        o.address AS originAddress,
+                        o.latitude AS originLatitude,
+                        o.longitude AS originLongitude,
+                        t.destinationId,
+                        dest.address AS destinationAddress,
+                        dest.latitude AS destinationLatitude,
+                        dest.longitude AS destinationLongitude,
+                        ts.schedule,
+                        t.callingDriver
+                    FROM trip t
+                    LEFT JOIN user u ON t.userId = u.idUser
+                    LEFT JOIN driver d ON t.driverId = d.idDriver
+                    LEFT JOIN user du ON d.userId = du.idUser
+                    LEFT JOIN car c ON d.idDriver = c.driverId AND c.deleted_at IS NULL
+                    LEFT JOIN tripType tt ON t.tripTypeId = tt.idTripType
+                    LEFT JOIN tripPaymentForm tPF ON t.tripPaymentFormId = tPF.idTripPaymentForm
+                    LEFT JOIN origin o ON t.originId = o.idOrigin
+                    LEFT JOIN destination dest ON t.destinationId = dest.idDestination
+                    LEFT JOIN tripScheduled ts ON t.tripReference = ts.tripReference
+                    WHERE t.tripReference = :ref
+                    LIMIT 1
+                ";
+                $stmt = $pdo->prepare($sqlSingle);
+                $stmt->execute([':ref' => $targetRef]);
+                $r = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$r) {
+                    http_response_code(404);
+                    echo json_encode(['status' => false, 'message' => 'Viagem não encontrada', 'response' => null]);
+                    return;
+                }
+
+                $detail = [
+                    'idTrip' => (int)$r['idTrip'],
+                    'tripReference' => $r['tripReference'],
+                    'status' => $r['status'],
+                    'price' => $r['price'] !== null ? (float)$r['price'] : null,
+                    'date' => $r['date'],
+                    'userId' => (int)$r['userId'],
+                    'customerName' => $r['customerName'],
+                    'customerPhone' => $r['customerPhone'],
+                    'customerPhoto' => $r['customerPhoto'],
+                    'driverId' => $r['driverId'] ? (int)$r['driverId'] : null,
+                    'driverUserId' => $r['driverUserId'] ? (int)$r['driverUserId'] : null,
+                    'driverName' => $r['driverName'],
+                    'driverPhone' => $r['driverPhone'],
+                    'driverPhoto' => $r['driverPhoto'],
+                    'carPlate' => $r['carPlate'],
+                    'tripTypeId' => $r['tripTypeId'] ? (int)$r['tripTypeId'] : null,
+                    'tripType' => $r['tripType'],
+                    'paymentForm' => $r['paymentForm'],
+                    'originAddress' => $r['originAddress'],
+                    'originLatitude' => $r['originLatitude'],
+                    'originLongitude' => $r['originLongitude'],
+                    'destinationAddress' => $r['destinationAddress'],
+                    'destinationLatitude' => $r['destinationLatitude'],
+                    'destinationLongitude' => $r['destinationLongitude'],
+                    'origin' => [
+                        'address' => $r['originAddress'],
+                        'latitude' => $r['originLatitude'],
+                        'longitude' => $r['originLongitude'],
+                    ],
+                    'destination' => [
+                        'name' => $r['destinationAddress'],
+                        'address' => $r['destinationAddress'],
+                        'latitude' => $r['destinationLatitude'],
+                        'longitude' => $r['destinationLongitude'],
+                    ],
+                    'customer' => [
+                        'idCustomer' => (int)$r['userId'],
+                        'name' => $r['customerName'],
+                        'phone' => $r['customerPhone'],
+                        'profileImage' => $r['customerPhoto'],
+                    ],
+                    'driver' => $r['driverId'] ? [
+                        'driverId' => (int)$r['driverId'],
+                        'name' => $r['driverName'],
+                        'phone' => $r['driverPhone'],
+                        'profileImage' => $r['driverPhoto'],
+                    ] : null,
+                    'schedule' => $r['schedule'] ? ['schedule' => $r['schedule']] : null,
+                    'callingDriver' => $r['callingDriver'] ? explode(',', $r['callingDriver']) : [],
+                ];
+
+                echo $this->returnSuccess('Detalhes da viagem', $detail);
+                return;
+            }
+
+            // Otherwise: List of active trips with pagination & filters
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $perPage = max(1, (int)($_GET['perPage'] ?? 20));
+            $offset = ($page - 1) * $perPage;
+
+            $where = ["t.status NOT IN ('finished', 'canceled')"];
+            $params = [];
+
+            if ($cityId) {
+                $where[] = "t.cityId = :cityId";
+                $params[':cityId'] = $cityId;
+            }
+
+            $filterStatus = $_GET['status'] ?? null;
+            $excludeScheduled = !empty($_GET['excludeScheduled']) && $_GET['excludeScheduled'] !== 'false';
+
+            if ($filterStatus === 'scheduled') {
+                $where[] = "(t.status = 'scheduled' OR ts.tripReference IS NOT NULL)";
+            } elseif ($excludeScheduled) {
+                $where[] = "t.status != 'scheduled' AND ts.tripReference IS NULL";
+                $where[] = "t.status IN ('searching', 'pre_accepted', 'accepted', 'in_progress', 'waiting')";
+            } else {
+                $where[] = "t.status IN ('searching', 'pre_accepted', 'accepted', 'in_progress', 'waiting', 'scheduled')";
+            }
+
+            if (!empty($_GET['customerName'])) {
+                $where[] = "u.name LIKE :customerName";
+                $params[':customerName'] = '%' . trim($_GET['customerName']) . '%';
+            }
+
+            if (!empty($_GET['driverName'])) {
+                $where[] = "du.name LIKE :driverName";
+                $params[':driverName'] = '%' . trim($_GET['driverName']) . '%';
+            }
+
+            $whereStr = implode(' AND ', $where);
+
+            // Count scheduled total
+            $scheduledWhere = ["t.status NOT IN ('finished', 'canceled')", "(t.status = 'scheduled' OR ts.tripReference IS NOT NULL)"];
+            $schedParams = [];
+            if ($cityId) {
+                $scheduledWhere[] = "t.cityId = :cityId";
+                $schedParams[':cityId'] = $cityId;
+            }
+            $stmtSched = $pdo->prepare("SELECT COUNT(DISTINCT t.idTrip) FROM trip t LEFT JOIN tripScheduled ts ON t.tripReference = ts.tripReference WHERE " . implode(' AND ', $scheduledWhere));
+            $stmtSched->execute($schedParams);
+            $scheduledTotal = (int)$stmtSched->fetchColumn();
+
+            // Total count for current filter
+            $stmtCount = $pdo->prepare("
+                SELECT COUNT(DISTINCT t.idTrip) 
+                FROM trip t 
+                LEFT JOIN user u ON t.userId = u.idUser 
+                LEFT JOIN driver d ON t.driverId = d.idDriver 
+                LEFT JOIN user du ON d.userId = du.idUser 
+                LEFT JOIN tripScheduled ts ON t.tripReference = ts.tripReference 
+                WHERE {$whereStr}
+            ");
+            $stmtCount->execute($params);
+            $total = (int)$stmtCount->fetchColumn();
+
+            // Main Query
             $sql = "
-                SELECT t.idTrip, t.tripReference, t.status, t.price, t.date,
-                       u.name as customerName, u.phone as customerPhone,
-                       du.name as driverName, du.phone as driverPhone,
-                       c.plate as carPlate
+                SELECT 
+                    t.idTrip,
+                    t.tripReference,
+                    t.status,
+                    t.price,
+                    DATE_FORMAT(t.date, '%Y-%m-%d %H:%i:%s') AS date,
+                    t.userId,
+                    COALESCE(u.name, '') AS customerName,
+                    COALESCE(u.phone, '') AS customerPhone,
+                    u.profilePhoto AS customerPhoto,
+                    t.driverId,
+                    d.userId AS driverUserId,
+                    COALESCE(du.name, '') AS driverName,
+                    COALESCE(du.phone, '') AS driverPhone,
+                    du.profilePhoto AS driverPhoto,
+                    c.plate AS carPlate,
+                    t.tripTypeId,
+                    tt.type AS tripType,
+                    t.tripPaymentFormId,
+                    tPF.name AS paymentForm,
+                    t.originId,
+                    o.address AS originAddress,
+                    o.latitude AS originLatitude,
+                    o.longitude AS originLongitude,
+                    t.destinationId,
+                    dest.address AS destinationAddress,
+                    dest.latitude AS destinationLatitude,
+                    dest.longitude AS destinationLongitude,
+                    ts.schedule,
+                    t.callingDriver
                 FROM trip t
                 LEFT JOIN user u ON t.userId = u.idUser
                 LEFT JOIN driver d ON t.driverId = d.idDriver
                 LEFT JOIN user du ON d.userId = du.idUser
                 LEFT JOIN car c ON d.idDriver = c.driverId AND c.deleted_at IS NULL
-                WHERE t.status IN ('searching', 'pre_accepted', 'accepted', 'in_progress', 'waiting')
-                {$cityWhere}
+                LEFT JOIN tripType tt ON t.tripTypeId = tt.idTripType
+                LEFT JOIN tripPaymentForm tPF ON t.tripPaymentFormId = tPF.idTripPaymentForm
+                LEFT JOIN origin o ON t.originId = o.idOrigin
+                LEFT JOIN destination dest ON t.destinationId = dest.idDestination
+                LEFT JOIN tripScheduled ts ON t.tripReference = ts.tripReference
+                WHERE {$whereStr}
                 ORDER BY t.idTrip DESC
-                LIMIT 50
+                LIMIT :limit OFFSET :offset
             ";
-            $stmt = $pdo->query($sql);
-            $trips = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $pdo->prepare($sql);
+            foreach ($params as $k => $v) {
+                $stmt->bindValue($k, $v);
+            }
+            $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            echo $this->returnSuccess('Viagens ativas', $trips);
+            $mapped = [];
+            foreach ($rows as $r) {
+                $mapped[] = [
+                    'idTrip' => (int)$r['idTrip'],
+                    'tripReference' => $r['tripReference'],
+                    'status' => $r['status'],
+                    'price' => $r['price'] !== null ? (float)$r['price'] : null,
+                    'date' => $r['date'],
+                    'userId' => (int)$r['userId'],
+                    'customerName' => $r['customerName'],
+                    'customerPhone' => $r['customerPhone'],
+                    'customerPhoto' => $r['customerPhoto'],
+                    'driverId' => $r['driverId'] ? (int)$r['driverId'] : null,
+                    'driverUserId' => $r['driverUserId'] ? (int)$r['driverUserId'] : null,
+                    'driverName' => $r['driverName'],
+                    'driverPhone' => $r['driverPhone'],
+                    'driverPhoto' => $r['driverPhoto'],
+                    'carPlate' => $r['carPlate'],
+                    'tripTypeId' => $r['tripTypeId'] ? (int)$r['tripTypeId'] : null,
+                    'tripType' => $r['tripType'],
+                    'paymentForm' => $r['paymentForm'],
+                    'originAddress' => $r['originAddress'],
+                    'originLatitude' => $r['originLatitude'],
+                    'originLongitude' => $r['originLongitude'],
+                    'destinationAddress' => $r['destinationAddress'],
+                    'destinationLatitude' => $r['destinationLatitude'],
+                    'destinationLongitude' => $r['destinationLongitude'],
+                    'origin' => [
+                        'address' => $r['originAddress'],
+                        'latitude' => $r['originLatitude'],
+                        'longitude' => $r['originLongitude'],
+                    ],
+                    'destination' => [
+                        'name' => $r['destinationAddress'],
+                        'address' => $r['destinationAddress'],
+                        'latitude' => $r['destinationLatitude'],
+                        'longitude' => $r['destinationLongitude'],
+                    ],
+                    'customer' => [
+                        'idCustomer' => (int)$r['userId'],
+                        'name' => $r['customerName'],
+                        'phone' => $r['customerPhone'],
+                        'profileImage' => $r['customerPhoto'],
+                    ],
+                    'driver' => $r['driverId'] ? [
+                        'driverId' => (int)$r['driverId'],
+                        'name' => $r['driverName'],
+                        'phone' => $r['driverPhone'],
+                        'profileImage' => $r['driverPhoto'],
+                    ] : null,
+                    'schedule' => $r['schedule'] ? ['schedule' => $r['schedule']] : null,
+                    'callingDriver' => $r['callingDriver'] ? explode(',', $r['callingDriver']) : [],
+                ];
+            }
+
+            $lastPage = max(1, (int)ceil($total / $perPage));
+            $payload = [
+                'current_page' => $page,
+                'data' => $mapped,
+                'total' => $total,
+                'last_page' => $lastPage,
+                'next_page_url' => ($page < $lastPage) ? "/dashboard/activeTrips?page=" . ($page + 1) : null,
+                'prev_page_url' => ($page > 1) ? "/dashboard/activeTrips?page=" . ($page - 1) : null,
+                'scheduledTotal' => $scheduledTotal,
+            ];
+
+            echo $this->returnSuccess('Viagens ativas', $payload);
         } catch (Exception $e) {
             echo $this->returnError($e);
         }
