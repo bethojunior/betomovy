@@ -111,6 +111,24 @@ class ConfigController extends ApiController
             $conn = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
 
             if (!empty($reqKey)) {
+                if ($reqKey === 'textTripTypes') {
+                    $stmt = $conn->prepare("SELECT `key`, value FROM config WHERE `key` IN ('title_trip_types', 'description_trip_types')");
+                    $stmt->execute();
+                    $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                    $map = ['title_trip_types' => '', 'description_trip_types' => ''];
+                    foreach ($rows as $r) {
+                        $map[$r['key']] = $r['value'];
+                    }
+                    echo json_encode([
+                        'status' => true,
+                        'message' => 'Configurações de tipos de viagem',
+                        'data' => $map,
+                        'response' => $map,
+                        'errors' => null
+                    ]);
+                    return;
+                }
+
                 $stmt = $conn->prepare("SELECT `key`, value, description FROM config WHERE `key` = :k LIMIT 1");
                 $stmt->execute([':k' => $reqKey]);
                 $cfg = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -126,8 +144,8 @@ class ConfigController extends ApiController
                     ]);
                 } else {
                     echo json_encode([
-                        'status' => false,
-                        'message' => "Configuração '{$reqKey}' não encontrada",
+                        'status' => true,
+                        'message' => "Configuração '{$reqKey}' vazia",
                         'data' => null,
                         'response' => null,
                         'errors' => null

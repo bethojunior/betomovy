@@ -129,6 +129,8 @@ return [
         '/city/triptypes',
         '/city',
         '/triptype',
+        '/triptypedriver',
+        '/triptypedriver/index',
         '/pricedynamicscheduled',
         '/dynamicarea',
         '/driver/datasheet',
