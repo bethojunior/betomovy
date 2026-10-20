@@ -2061,33 +2061,33 @@ export default {
   },
   welcomeSpeedmob: {
     text_notice_terms:
-      'It is important for the proper functioning of the application that you accept all requests for permissions and to understand each permission requested, carefully read the terms below:',
+      'To provide a transparent and optimal experience, the app may request permissions for specific features. You have full control over your privacy and can manage or revoke permissions at any time in your device settings:',
     terms_box:
-      'We need some permissions from you, below our terms so you understand where it will be used and why these permissions are needed ok. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eveniet qui voluptas similique, illum harum perspiciatis esse fugiat tempore obcaecati, voluptatum autem, facere voluptatem. Earum nemo saepe iste itaque eum corporis.',
-    title_checkbox: 'I read and accept the terms',
-    text_button_next: 'Advance',
-    title_contacts: 'Share your contacts',
+      'We value your privacy. Below are the terms outlining how optional device permissions are used for app features such as routing, photo verification, and communications.',
+    title_checkbox: 'I have read and agree to the terms',
+    text_button_next: 'Continue',
+    title_contacts: 'Contacts Access',
     description_contacts_1:
-      'To enable messaging, invitations, and app referrals, allow access to your contacts.',
+      'Access to contacts allows you to easily invite friends and share trip details.',
     description_contacts_2:
-      'You can change or revoke this permission at any time in the app settings.',
-    title_camera: 'Allow access to the camera',
+      'You can change or revoke this permission at any time in your device settings.',
+    title_camera: 'Camera Access',
     description_camera_1:
-      'The camera is used to capture your profile photo, take pictures of documents for account validation, and attach images to support requests or other app features, whenever needed for those functionalities.',
+      'Camera access is used to take your profile picture, photograph documents for account validation, and attach images in support requests.',
     description_camera_2:
-      'You can change or revoke this permission at any time in the app settings.',
-    title_microphone: 'Allow access to the microphone',
+      'You can change or revoke this permission at any time in your device settings.',
+    title_microphone: 'Microphone Access',
     description_microphone_1:
-      'The microphone is used to record audio messages that may be sent between passengers and drivers or in support requests, whenever needed for those functionalities.',
+      'Microphone access is used to record audio messages for communicating during trips or support requests.',
     description_microphone_2:
-      'You can change or revoke this permission at any time in the app settings.',
-    title_localization: 'Allow access to your location',
+      'You can change or revoke this permission at any time in your device settings.',
+    title_localization: 'Location Access',
     description_localization_1:
-      'We use your location to find nearby drivers and calculate your trip route.',
+      'Location is used to set your pickup location, connect you with nearby drivers, and calculate trip routes.',
     description_localization_2:
-      'You can change or revoke this permission at any time in the app settings.',
-    text_button_refuse_terms: 'Refuse',
-    text_button_accept_terms: 'Accept',
+      'You can change or revoke this permission at any time in your device settings.',
+    text_button_refuse_terms: 'Not Now',
+    text_button_accept_terms: 'Accept & Continue',
     title_permissions_concluded: 'Permissions',
     text_permissions_concluded: 'OK!',
     text_button_finalize: 'Finalize',

@@ -2093,33 +2093,33 @@ export default {
   },
   welcomeSpeedmob: {
     text_notice_terms:
-      'Es importante para el buen funcionamiento de la aplicación que acepte todas las solicitudes de permisos y para comprender cada permiso solicitado, lea atentamente los términos a continuación:',
+      'Para brindarle una experiencia transparente, la aplicación puede solicitar permisos para funciones específicas. Tiene control total sobre su privacidad y puede gestionar o cambiar los permisos en cualquier momento en la configuración de su dispositivo:',
     terms_box:
-      'Necesitamos algunos permisos de usted, debajo de nuestros términos para que comprenda dónde se usará y por qué se necesitan estos permisos. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eveniet qui voluptas similique, illum harum perspiciatis esse fugiat tempore obcaecati, voluptatum autem, facere voluptatem. Earum nemo saepe iste itaque eum corporis.',
+      'Valoramos su privacidad. A continuación presentamos los términos que explican cómo se utilizan los permisos opcionales del dispositivo para funciones como navegación, verificación de fotos y soporte.',
     title_checkbox: 'He leído y acepto los términos',
-    text_button_next: 'Avance',
-    title_contacts: 'Comparte tus contactos',
+    text_button_next: 'Continuar',
+    title_contacts: 'Acceso a Contactos',
     description_contacts_1:
-      'Para habilitar el envío de mensajes, invitaciones y recomendaciones de la aplicación, permita el acceso a sus contactos.',
+      'El acceso a contactos le permite invitar amigos y compartir los detalles de sus viajes con facilidad.',
     description_contacts_2:
-      'Puede modificar o revocar este permiso en cualquier momento en la configuración de la aplicación.',
-    title_camera: 'Permita el acceso a la cámara',
+      'Puede modificar o revocar este permiso en cualquier momento en la configuración de su dispositivo.',
+    title_camera: 'Acceso a la Cámara',
     description_camera_1:
-      'La cámara se utiliza para capturar la foto de su perfil, fotografiar documentos para la validación del registro y adjuntar imágenes en solicitudes de soporte u otras funcionalidades de la aplicación, cuando sea necesario para el uso de estos recursos.',
+      'La cámara se utiliza para tomar la foto de perfil, fotografiar documentos para validar su cuenta y adjuntar imágenes en el soporte.',
     description_camera_2:
-      'Puede modificar o revocar este permiso en cualquier momento en la configuración de la aplicación.',
-    title_microphone: 'Permita el acceso al micrófono',
+      'Puede modificar o revocar este permiso en cualquier momento en la configuración de su dispositivo.',
+    title_microphone: 'Acceso al Micrófono',
     description_microphone_1:
-      'El micrófono se utiliza para grabar mensajes de audio que pueden enviarse en la comunicación entre pasajeros y conductores o en solicitudes de soporte, cuando sea necesario para el uso de estas funcionalidades.',
+      'El micrófono se utiliza para grabar mensajes de audio durante la comunicación en viajes o solicitudes de soporte.',
     description_microphone_2:
-      'Puede modificar o revocar este permiso en cualquier momento en la configuración de la aplicación.',
-    title_localization: 'Permita el acceso a tu ubicación',
+      'Puede modificar o revocar este permiso en cualquier momento en la configuración de su dispositivo.',
+    title_localization: 'Acceso a la Ubicación',
     description_localization_1:
-      'Usamos tu ubicación para encontrar conductores cercanos y calcular la ruta de tu viaje.',
+      'Su ubicación se utiliza para determinar el punto de partida, buscar conductores cercanos y calcular la ruta.',
     description_localization_2:
-      'Puedes cambiar o revocar este permiso en cualquier momento en la configuracion de la aplicacion.',
-    text_button_refuse_terms: 'Rechazar',
-    text_button_accept_terms: 'Aceptar',
+      'Puede modificar o revocar este permiso en cualquier momento en la configuración de su dispositivo.',
+    text_button_refuse_terms: 'Ahora No',
+    text_button_accept_terms: 'Aceptar y Continuar',
     title_permissions_concluded: 'Permisos',
     text_permissions_concluded: '¡DE ACUERDO!',
     text_button_finalize: 'Finalizar',

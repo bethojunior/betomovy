@@ -2114,31 +2114,31 @@ export default {
   },
   welcomeSpeedmob: {
     text_notice_terms:
-      "Il est important pour le bon fonctionnement de l'application que vous acceptiez toutes les demandes d'autorisations et pour comprendre chaque autorisation demandée, lisez attentivement les termes ci-dessous :",
+      "Pour garantir une expérience optimale et transparente, l'application peut demander des autorisations pour des fonctionnalités spécifiques. Vous avez le plein contrôle de votre vie privée et pouvez modifier les autorisations à tout moment dans les paramètres de votre appareil :",
     title_checkbox: "J'ai lu et j'accepte les termes",
-    text_button_next: 'Avance',
-    title_contacts: 'Partagez vos contacts',
+    text_button_next: 'Continuer',
+    title_contacts: 'Accès aux contacts',
     description_contacts_1:
-      'Pour activer l’envoi de messages, d’invitations et de recommandations de l’application, autorisez l’accès à vos contacts.',
+      'L’accès aux contacts vous permet d’inviter des amis et de partager facilement les détails de votre trajet.',
     description_contacts_2:
-      'Vous pouvez modifier ou révoquer cette autorisation à tout moment dans les paramètres de l’application.',
-    title_camera: 'Autorisez l’accès à la caméra',
+      'Vous pouvez modifier ou révoquer cette autorisation à tout moment dans les paramètres de votre appareil.',
+    title_camera: 'Accès à la caméra',
     description_camera_1:
-      'La caméra est utilisée pour capturer votre photo de profil, photographier des documents pour la validation de votre inscription et joindre des images dans les demandes d’assistance ou d’autres fonctionnalités de l’application, lorsque cela est nécessaire à leur utilisation.',
+      'La caméra est utilisée pour prendre votre photo de profil, photographier vos documents de vérification et joindre des photos au support.',
     description_camera_2:
-      'Vous pouvez modifier ou révoquer cette autorisation à tout moment dans les paramètres de l’application.',
-    title_microphone: 'Autorisez l’accès au microphone',
+      'Vous pouvez modifier ou révoquer cette autorisation à tout moment dans les paramètres de votre appareil.',
+    title_microphone: 'Accès au microphone',
     description_microphone_1:
-      'Le microphone est utilisé pour enregistrer des messages audio pouvant être envoyés dans la communication entre passagers et chauffeurs ou dans les demandes d’assistance, lorsque cela est nécessaire à ces fonctionnalités.',
+      'Le microphone est utilisé pour enregistrer des messages audio lors des communications ou des demandes d’assistance.',
     description_microphone_2:
-      'Vous pouvez modifier ou révoquer cette autorisation à tout moment dans les paramètres de l’application.',
-    title_localization: 'Autorisez l’accès à votre position',
+      'Vous pouvez modifier ou révoquer cette autorisation à tout moment dans les paramètres de votre appareil.',
+    title_localization: 'Accès à la localisation',
     description_localization_1:
-      "Nous utilisons votre position pour trouver des chauffeurs à proximité et calculer l'itinéraire de votre course.",
+      "Votre position est utilisée pour identifier le point de départ, trouver des chauffeurs à proximité et calculer l'itinéraire du trajet.",
     description_localization_2:
-      "Vous pouvez modifier ou révoquer cette autorisation à tout moment dans les paramètres de l'application.",
-    text_button_refuse_terms: 'Refuser',
-    text_button_accept_terms: 'Accepter',
+      "Vous pouvez modifier ou révoquer cette autorisation à tout moment dans les paramètres de votre appareil.",
+    text_button_refuse_terms: 'Pas maintenant',
+    text_button_accept_terms: 'Accepter et continuer',
     title_permissions_concluded: 'Autorisations',
     text_permissions_concluded: "D'ACCORD!",
     text_button_finalize: 'Finaliser',
