@@ -38,20 +38,44 @@ function cancelSearchTrip(status = STATUS_CANCELED) {
 function cancelTripByCustomer(status){
     viewController.elementProperty.addClass(".container-preload-main","active");
 
-    TripRepository.cancel(managerTrip.tripCurrent.tripReference)
-        .then(function ({status}) {
-            if (!status) {
+    const tripRef = managerTrip?.tripCurrent?.tripReference 
+        || Session.getLocal('tripReference')
+        || (typeof tripReference !== "undefined" ? tripReference : null);
+
+    if (!tripRef) {
+        stopProgressTrip();
+        if (typeof managerTrip !== "undefined") {
+            managerTrip.isSearch = false;
+            managerTrip.tripCurrent = null;
+        }
+        Session.deleteLocal('tripReference');
+        updateBtnCallTripVisibility();
+        viewController.elementProperty.removeClass(".container-preload-main","active");
+        return;
+    }
+
+    TripRepository.cancel(tripRef)
+        .then(function (res) {
+            const isSuccess = res && (res.status === true || res.status === 'true' || typeof res.status === "undefined" || res.data);
+            if (!isSuccess) {
                 SwalCustom.messageDialog("Ocorreu um erro ao tentar cancelar viagem", "Atenção", undefined, "warning");
                 return;
             }
             stopProgressTrip();
-            managerTrip.isSearch = false;
+            if (typeof managerTrip !== "undefined") {
+                managerTrip.isSearch = false;
+                managerTrip.tripCurrent = null;
+            }
             Session.deleteLocal('tripReference');
         }).catch(() => {
-        SwalCustom.messageDialog("Ocorreu um erro ao tentar cancelar viagem", "Atenção", undefined, "warning");
-    }).finally(()=>{
-        // Usa utilitário que verifica o estado do menu antes de alterar o botão
-        updateBtnCallTripVisibility();
-        viewController.elementProperty.removeClass(".container-preload-main","active");
-    });
+            stopProgressTrip();
+            if (typeof managerTrip !== "undefined") {
+                managerTrip.isSearch = false;
+            }
+            Session.deleteLocal('tripReference');
+            SwalCustom.messageDialog("Ocorreu um erro ao tentar cancelar viagem", "Atenção", undefined, "warning");
+        }).finally(()=>{
+            updateBtnCallTripVisibility();
+            viewController.elementProperty.removeClass(".container-preload-main","active");
+        });
 }

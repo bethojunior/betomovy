@@ -180,7 +180,92 @@ class TripController extends ApiController
     {
         try {
             $request = $this->request();
-            echo $this->returnSuccess("Viagem cancelada", $this->tripDao->cancel($request->tripReference, $request->dateEnd, $request->userId));
+            $tripReference = $request->tripReference 
+                ?? $_GET['tripReference'] 
+                ?? $_GET['reference'] 
+                ?? $_GET['id'] 
+                ?? null;
+
+            if (empty($tripReference)) {
+                echo $this->returnError(new Exception("Referência da viagem não informada"));
+                return;
+            }
+
+            $dateEnd = $request->dateEnd ?? date('Y-m-d H:i:s');
+            $userId = $request->userId ?? \app\utils\Headers::getUserId() ?? null;
+            $scope = $request->scope ?? null;
+
+            $pdo = \app\dao\GenericDao::getDatabase();
+
+            // 1. Localizar viagem no banco
+            $stmt = $pdo->prepare("SELECT * FROM trip WHERE tripReference = :ref LIMIT 1");
+            $stmt->execute([':ref' => $tripReference]);
+            $tripRow = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$tripRow) {
+                echo $this->returnSuccess("Viagem cancelada", ['status' => true, 'tripReference' => $tripReference]);
+                return;
+            }
+
+            // 2. Se já estiver cancelada
+            if (in_array(strtolower($tripRow['status'] ?? ''), ['canceled', 'finished', 'driver_canceled', 'customer_canceled', 'not_answered', 'back_off'])) {
+                echo $this->returnSuccess("Viagem já cancelada ou finalizada", ['status' => true, 'tripReference' => $tripReference]);
+                return;
+            }
+
+            // 3. Se for viagem de estabelecimento comercial com saldo retido
+            if (!empty($tripRow['establishmentId'])) {
+                try {
+                    $res = $this->tripDao->cancel($tripReference, $dateEnd, $userId ?? $tripRow['userId']);
+                    echo $this->returnSuccess("Viagem cancelada com sucesso", $res);
+                    return;
+                } catch (\Throwable $eEst) {
+                    \app\utils\Logger::error("Erro cancelamento estabelecimento: " . $eEst->getMessage());
+                }
+            }
+
+            // 4. Cancelamento de corrida padrão / central / app de passageiro
+            $updateSql = "UPDATE trip SET status = 'canceled', canceledBy = :canceledBy, endDate = :endDate WHERE tripReference = :ref";
+            $updateParams = [
+                ':canceledBy' => 'customer',
+                ':endDate' => $dateEnd,
+                ':ref' => $tripReference
+            ];
+
+            // Se for cancelamento de lote agendado
+            if ($scope === 'all' && !empty($tripRow['groupCode'])) {
+                $updateSql = "UPDATE trip SET status = 'canceled', canceledBy = :canceledBy, endDate = :endDate WHERE groupCode = :groupCode AND status IN ('pending', 'search', 'waiting_driver', 'scheduled')";
+                $updateParams = [
+                    ':canceledBy' => 'customer',
+                    ':endDate' => $dateEnd,
+                    ':groupCode' => $tripRow['groupCode']
+                ];
+            }
+
+            $stmtUpdate = $pdo->prepare($updateSql);
+            $stmtUpdate->execute($updateParams);
+
+            // 5. Se houver motorista vinculado, libera o motorista
+            if (!empty($tripRow['driverId'])) {
+                try {
+                    (new \app\dao\DriverDao())->putAvailable($tripRow['driverId']);
+                } catch (\Throwable $eDriver) {
+                    \app\utils\Logger::error("Erro ao liberar motorista {$tripRow['driverId']}: " . $eDriver->getMessage());
+                }
+            }
+
+            // 6. Limpa do realtime / redis se existir
+            try {
+                $tripRealtime = new \app\realtime\TripRealtime();
+                $tripRealtime->setTripReference($tripReference);
+                $tripRealtime->deleteTrip();
+            } catch (\Throwable $eRt) {}
+
+            echo $this->returnSuccess("Viagem cancelada com sucesso", [
+                'status' => true,
+                'tripReference' => $tripReference,
+                'statusTrip' => 'canceled'
+            ]);
         } catch (Exception $e) {
             echo $this->returnError($e);
         }

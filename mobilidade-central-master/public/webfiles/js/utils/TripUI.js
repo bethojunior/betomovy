@@ -10,13 +10,23 @@ function updateBtnCallTripVisibility() {
     const isTripSidebarActive = document
         .querySelector(".list-trips-active-partner")
         ?.classList.contains("active");
+    const isSearchingDriverActive = document
+        .querySelector(".search-driver-in-trip")
+        ?.classList.contains("active");
+    const isTripClientActive = document
+        .querySelector(".trip-client")
+        ?.classList.contains("active");
+    const isTripInProgress = typeof managerTrip !== "undefined" && (Boolean(managerTrip?.isSearch) || Boolean(managerTrip?.tripCurrent));
+
     const elementProperty = viewController?.elementProperty;
 
     if (!elementProperty) {
         return;
     }
 
-    const method = (isFooterActive || isAddressSearchActive || isAddressPanelActive || isTripSidebarActive) ? "addClass" : "removeClass";
+    const shouldHide = isFooterActive || isAddressSearchActive || isAddressPanelActive || 
+                       isTripSidebarActive || isSearchingDriverActive || isTripClientActive || isTripInProgress;
+    const method = shouldHide ? "addClass" : "removeClass";
     elementProperty[method](".btn-call-trip", "active");
 
     if (method === "addClass" && typeof FooterMonitorManager !== "undefined" && FooterMonitorManager.isExpanded()) {

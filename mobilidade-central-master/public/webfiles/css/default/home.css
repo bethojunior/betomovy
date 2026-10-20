@@ -633,11 +633,14 @@ div.pac-container>.pac-item>span {
 
 .search-driver-in-trip {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: transparent;
+    pointer-events: none;
+    z-index: 1050;
 }
 
 .search-driver-in-trip.active {
@@ -645,39 +648,75 @@ div.pac-container>.pac-item>span {
 }
 
 .search-driver-in-trip>div {
-    position: absolute;
-    bottom: -100vw;
+    position: fixed;
+    bottom: -300px;
     width: 90%;
-    margin: auto;
+    max-width: 480px;
+    margin: 0 auto;
     display: block;
-    background-color: var(--color-bg-surface);
-    padding: 2vw;
-    left: 0;
-    right: 0;
-    border-radius: 1vw 1vw 0 0;
-    transition: 1s;
-    z-index: 10;
+    background-color: var(--color-bg-surface, #ffffff);
+    padding: 20px 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1051;
+    pointer-events: auto;
+    text-align: center;
 }
 
 .search-driver-in-trip.active>div {
-    transition: 1s;
-    bottom: 10px;
+    bottom: 24px;
+}
+
+.search-driver-in-trip>div>p {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary, #111111);
+    line-height: 1.35;
 }
 
 .search-driver-in-trip>div>button {
     width: 100%;
     border: none;
-    padding: 2vw;
-    font-size: 6vw;
-    font-weight: 300;
-    background-color: var(--main-color);
-    color: var(--color-text-inverse);
-    border-radius: 1vw;
+    height: 48px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background-color: #00349A;
+    color: #ffffff !important;
+    border-radius: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 52, 154, 0.35);
+    transition: background-color 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.search-driver-in-trip>div>p {
-    margin: 0 0 2.5vw;
-    font-size: 5vw;
+.search-driver-in-trip>div>button:hover {
+    background-color: #111111 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+.search-driver-in-trip>div>button:active {
+    transform: translateY(1px);
+}
+
+/* Garante que os botões de ação e o footer monitor não colidam com a busca ativa */
+body:has(.search-driver-in-trip.active) .btn-call-trip,
+body:has(.search-driver-in-trip.active) .footer-monitoring-trip,
+body:has(.trip-client.active) .btn-call-trip,
+body:has(.trip-client.active) .footer-monitoring-trip,
+.search-driver-in-trip.active ~ .btn-call-trip,
+.search-driver-in-trip.active ~ .footer-monitoring-trip {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
 .container-search-driver {
@@ -1318,23 +1357,27 @@ div.pac-container>.pac-item>span {
     }
 
     .search-driver-in-trip>div {
-        width: 20%;
-        padding: 0.5vw;
-        border-radius: 5px;
+        width: 380px;
+        max-width: 90%;
+        padding: 20px 18px;
+        border-radius: 16px;
     }
 
     .search-driver-in-trip>div>p {
-        font-size: 12pt;
-        margin: 0 0 5px;
+        font-size: 16px;
+        margin: 0 0 16px;
         text-align: center;
     }
 
     .search-driver-in-trip>div>button {
-        padding: 0.5vw;
-        font-size: 15pt;
-        border-radius: 5px;
+        padding: 0 16px;
+        font-size: 15px;
+        height: 48px;
+        border-radius: 24px;
         width: 100%;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
         margin: auto;
     }

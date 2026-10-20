@@ -127,6 +127,8 @@ class RouteListener extends ApiController
             if (method_exists($class, $subAction)) {
                 $_GET['id'] = $path[1];
                 $_GET['groupCode'] = $path[1];
+                $_GET['tripReference'] = $path[1];
+                $_GET['reference'] = $path[1];
                 if (isset($path[3]) && !empty($path[3])) {
                     $_GET['idQuestion'] = $path[3];
                     $_GET['subId'] = $path[3];

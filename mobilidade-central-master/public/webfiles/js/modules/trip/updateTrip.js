@@ -163,6 +163,7 @@ function stopProgressTrip() {
     });
 
     viewController.elementProperty.removeClass(".search-driver-in-trip", "active");
+    updateBtnCallTripVisibility();
 
     if (mapService.pointCustomer != null)
         mapService.pointCustomer.setMap(mapService.map)
@@ -263,6 +264,7 @@ function handleSearchTrip(data) {
             ".search-driver-in-trip",
             "active"
         );
+        updateBtnCallTripVisibility();
 
         const tripReference = Session.getLocal("tripReference");
         if (tripReference && (typeof tripReference === 'string' ? tripReference.length > 0 : true)) {
