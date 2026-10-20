@@ -81,8 +81,8 @@ const EditTripTypeModal = ({
   const groups = responseDataUser?.role?.groups;
 
   const { canShowCentralTripCategory, canShowServicosTripCategory } = useMemo(
-    () => getTripTypeCategoryVisibility(groups),
-    [groups]
+    () => getTripTypeCategoryVisibility(groups, hasPermission, responseDataUser),
+    [groups, hasPermission, responseDataUser]
   );
 
   console.log("canShowCentralTripCategory", canShowCentralTripCategory);

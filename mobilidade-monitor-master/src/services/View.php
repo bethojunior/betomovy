@@ -135,6 +135,11 @@ class View extends Controller
 
     protected function hasPermission($nameGroup, $namePermission)
     {
+        $user = Session::get("user");
+        if (!empty($user->isRoot) || (isset($user->roleId) && $user->roleId == 1) || (isset($user->role) && ($user->role == 'Administrador' || $user->role == 'admin'))) {
+            return true;
+        }
+
         $roles = $this->JoinListRoles();
 
         if (!$roles)
@@ -165,6 +170,10 @@ class View extends Controller
      */
     protected function hasPermissionGroup($nameGroup)
     {
+        $user = Session::get("user");
+        if (!empty($user->isRoot) || (isset($user->roleId) && $user->roleId == 1) || (isset($user->role) && ($user->role == 'Administrador' || $user->role == 'admin'))) {
+            return true;
+        }
 
         $roles = $this->JoinListRoles();
 

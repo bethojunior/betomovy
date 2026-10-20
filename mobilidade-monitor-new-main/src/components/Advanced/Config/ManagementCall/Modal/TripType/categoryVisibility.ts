@@ -18,27 +18,55 @@ function hasPermissionAcrossSameNamedGroups(
   }
   return groups.some(
     (item) =>
-      item.name === groupName && item.permissions.includes(permissionName)
+      item.name?.toLowerCase() === groupName?.toLowerCase() &&
+      (!permissionName || item.permissions?.includes(permissionName))
   );
 }
 
 export function getTripTypeCategoryVisibility(
-  groups: Group[] | undefined
+  groups: Group[] | undefined,
+  hasPermission?: (nameGroup: string, namePermission?: string | null) => boolean,
+  user?: any
 ): TripTypeCategoryVisibility {
-  return {
-    canShowCentralTripCategory: CENTRAL_SUBMENU_PERMISSIONS.some((perm) =>
+  const isRootOrAdmin = Boolean(
+    user?.role?.isRoot ||
+    user?.role?.name === "Administrador" ||
+    user?.role?.name === "admin" ||
+    user?.roleId === 1
+  );
+
+  const canShowCentral =
+    isRootOrAdmin ||
+    Boolean(
+      hasPermission &&
+        (hasPermission(CENTRAL, null) ||
+          CENTRAL_SUBMENU_PERMISSIONS.some((perm) => hasPermission(CENTRAL, perm)))
+    ) ||
+    CENTRAL_SUBMENU_PERMISSIONS.some((perm) =>
       hasPermissionAcrossSameNamedGroups(groups, CENTRAL, perm)
-    ),
-    canShowServicosTripCategory:
-      hasPermissionAcrossSameNamedGroups(
-        groups,
-        CONFIGURACAO,
-        PERMISSION_SERVICOS
-      ) ||
-      hasPermissionAcrossSameNamedGroups(
-        groups,
-        CONFIGURACAO,
-        PERMISSION_SERVICOS_FALLBACK
-      ),
+    ) ||
+    hasPermissionAcrossSameNamedGroups(groups, CENTRAL, "");
+
+  const canShowServicos =
+    isRootOrAdmin ||
+    Boolean(
+      hasPermission &&
+        (hasPermission(CONFIGURACAO, PERMISSION_SERVICOS) ||
+          hasPermission(CONFIGURACAO, PERMISSION_SERVICOS_FALLBACK))
+    ) ||
+    hasPermissionAcrossSameNamedGroups(
+      groups,
+      CONFIGURACAO,
+      PERMISSION_SERVICOS
+    ) ||
+    hasPermissionAcrossSameNamedGroups(
+      groups,
+      CONFIGURACAO,
+      PERMISSION_SERVICOS_FALLBACK
+    );
+
+  return {
+    canShowCentralTripCategory: canShowCentral,
+    canShowServicosTripCategory: canShowServicos,
   };
 }

@@ -183,7 +183,7 @@
                             </label>
                         </div>
                     <?php } ?>
-                    <?php if ($this->hasPermission(GroupConst::CENTRAL, 'central_listagem')) { ?>
+                    <?php if ($this->hasPermission(GroupConst::CENTRAL, 'central_listagem') || $this->hasPermissionGroup(GroupConst::CENTRAL)) { ?>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="" id="onlyCentralOptionCheck">
                             <label class="form-check-label" for="onlyCentralOptionCheck">
@@ -310,7 +310,7 @@
                             </label>
                         </div>
                     <?php } ?>
-                    <?php if ($this->hasPermission(GroupConst::CENTRAL, 'central_listagem')) { ?>
+                    <?php if ($this->hasPermission(GroupConst::CENTRAL, 'central_listagem') || $this->hasPermissionGroup(GroupConst::CENTRAL)) { ?>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="" id="onlyCentralOptionCheckEdit">
                             <label class="form-check-label" for="onlyCentralOptionCheckEdit">
