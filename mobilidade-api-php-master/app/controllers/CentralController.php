@@ -1198,7 +1198,7 @@ class CentralController extends ApiController
                 SELECT COUNT(DISTINCT trip.idTrip)
                 FROM trip
                 LEFT JOIN `user` u ON trip.userId = u.idUser
-                LEFT JOIN tripCustomer tc ON trip.tripCustomerId = tc.idTripCustomer
+                LEFT JOIN tripCustomer tc ON trip.tripCustomerId = tc.id
                 LEFT JOIN centralCustomer cc ON trip.centralCustomerId = cc.id
                 LEFT JOIN driver d ON trip.driverId = d.idDriver
                 LEFT JOIN `user` ud ON d.userId = ud.idUser
@@ -1238,7 +1238,7 @@ class CentralController extends ApiController
                 LEFT JOIN tripPaymentForm tpf ON trip.tripPaymentFormId = tpf.idTripPaymentForm
                 LEFT JOIN tripAudit ta ON trip.tripAuditId = ta.id
                 LEFT JOIN `user` u ON trip.userId = u.idUser
-                LEFT JOIN tripCustomer tc ON trip.tripCustomerId = tc.idTripCustomer
+                LEFT JOIN tripCustomer tc ON trip.tripCustomerId = tc.id
                 LEFT JOIN centralCustomer cc ON trip.centralCustomerId = cc.id
                 LEFT JOIN driver d ON trip.driverId = d.idDriver
                 LEFT JOIN `user` ud ON d.userId = ud.idUser
