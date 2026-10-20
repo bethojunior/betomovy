@@ -42,7 +42,14 @@ const SectionsTable = ({
       dataIndex: "logo",
       key: "logo",
       render: (logo: string) => {
-        return <Image width={50} height={50} src={logo} />;
+        if (!logo || logo.trim() === '') {
+          return (
+            <div style={{ width: 50, height: 50, backgroundColor: '#f0f0f0', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: 11 }}>
+              Sem logo
+            </div>
+          );
+        }
+        return <Image width={50} height={50} src={logo} fallback="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'><rect width='50' height='50' fill='%23f0f0f0'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999999' font-size='10'>Logo</text></svg>" />;
       },
     },
     {

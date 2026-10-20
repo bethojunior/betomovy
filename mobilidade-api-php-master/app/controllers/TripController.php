@@ -67,6 +67,105 @@ class TripController extends ApiController
         }
     }
 
+    public function actionCancellationFeeFindAll()
+    {
+        try {
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $limit = 15;
+            $offset = ($page - 1) * $limit;
+
+            $dateStart = $_GET['dateStart'] ?? null;
+            $dateEnd = $_GET['dateEnd'] ?? null;
+            $userId = !empty($_GET['userId']) ? (int)$_GET['userId'] : null;
+            $driverId = !empty($_GET['driverId']) ? (int)$_GET['driverId'] : null;
+            $withTrash = !empty($_GET['withTrash']);
+
+            $where = [];
+            $params = [];
+
+            if (!$withTrash) {
+                $where[] = "cf.statusId = 1";
+            }
+            if ($userId) {
+                $where[] = "cf.userId = :uid";
+                $params[':uid'] = $userId;
+            }
+            if ($driverId) {
+                $where[] = "cf.driverId = :did";
+                $params[':did'] = $driverId;
+            }
+            if ($dateStart && $dateEnd) {
+                $where[] = "cf.created_at BETWEEN :dstart AND :dend";
+                $params[':dstart'] = $dateStart . ' 00:00:00';
+                $params[':dend'] = $dateEnd . ' 23:59:59';
+            }
+
+            $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+
+            $sql = "SELECT cf.id,
+                           cf.tripReference,
+                           cf.feeValue,
+                           cf.paid_tripReference,
+                           cf.statusId AS status,
+                           cf.created_at,
+                           COALESCE(cft.name, 'Cancelamento') AS tripCancellationFeeTypeName,
+                           COALESCE(u.name, 'Passageiro') AS userName,
+                           COALESCE(u.email, '') AS userEmail,
+                           COALESCE(u.phone, '') AS userPhone,
+                           COALESCE(ud.name, 'Motorista') AS driverName,
+                           COALESCE(ud.email, '') AS driverEmail,
+                           COALESCE(ud.phone, '') AS driverPhone,
+                           COALESCE(tt.name, 'PADRÃO') AS tripType
+                    FROM tripCancellationCustomerFee cf
+                    LEFT JOIN tripCancellationFeeType cft ON cft.id = cf.tripCancellationFeeTypeId
+                    LEFT JOIN user u ON u.idUser = cf.userId
+                    LEFT JOIN driver d ON d.idDriver = cf.driverId
+                    LEFT JOIN user ud ON ud.idUser = d.userId
+                    LEFT JOIN trip t ON t.tripReference = cf.tripReference
+                    LEFT JOIN tripType tt ON tt.idTripType = t.tripTypeId
+                    {$whereSql}
+                    ORDER BY cf.id DESC
+                    LIMIT {$limit} OFFSET {$offset}";
+
+            $rows = \app\dao\GenericDao::query($sql, $params);
+
+            $countSql = "SELECT COUNT(*) as total FROM tripCancellationCustomerFee cf {$whereSql}";
+            $totalRow = \app\dao\GenericDao::first($countSql, $params);
+            $total = (int)($totalRow['total'] ?? count($rows));
+            $lastPage = max(1, (int)ceil($total / $limit));
+
+            $result = [
+                'current_page' => $page,
+                'data' => $rows,
+                'total' => $total,
+                'last_page' => $lastPage,
+                'per_page' => $limit
+            ];
+
+            echo $this->returnSuccess("Taxas de cancelamento encontradas", $result);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    public function actionCancellationFee()
+    {
+        try {
+            $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+            $id = (int)($_GET['id'] ?? 0);
+
+            if ($method === 'DELETE' && $id > 0) {
+                \app\dao\GenericDao::execute("UPDATE tripCancellationCustomerFee SET statusId = 2, updated_at = NOW() WHERE id = :id", [':id' => $id]);
+                echo $this->returnSuccess("Taxa de cancelamento excluída com sucesso");
+                return;
+            }
+
+            echo $this->returnSuccess("Operação realizada");
+        } catch (\Throwable $e) {
+            echo $this->returnError($e);
+        }
+    }
+
     public function actionIncreaseArea()
     {
         $request = $this->request();
@@ -149,6 +248,83 @@ class TripController extends ApiController
             );
         } catch (Exception $e) {
             echo $this->returnError($e, "Erro ao detalhar financeiro da viagem");
+        }
+    }
+
+    public function actionReportValuesByDriver()
+    {
+        try {
+            $cityId = !empty($_GET['cityId']) ? (int)$_GET['cityId'] : null;
+            $driverId = !empty($_GET['driverId']) ? (int)$_GET['driverId'] : null;
+            $dateStart = $_GET['dateStart'] ?? null;
+            $dateEnd = $_GET['dateEnd'] ?? null;
+
+            $where = ["t.status IN ('finished')"];
+            $params = [];
+
+            if ($cityId) {
+                $where[] = "t.cityId = :cityId";
+                $params[':cityId'] = $cityId;
+            }
+            if ($driverId && $driverId > 0) {
+                $where[] = "t.driverId = :driverId";
+                $params[':driverId'] = $driverId;
+            }
+            if ($dateStart && $dateEnd) {
+                $where[] = "t.created_at BETWEEN :dstart AND :dend";
+                $params[':dstart'] = $dateStart . ' 00:00:00';
+                $params[':dend'] = $dateEnd . ' 23:59:59';
+            }
+
+            $whereSql = "WHERE " . implode(" AND ", $where);
+
+            $sql = "SELECT t.driverId,
+                           COALESCE(u.name, 'Motorista') AS name,
+                           COUNT(t.idTrip) AS totalTripQuantity,
+                           COALESCE(SUM(t.price), 0) AS totalTripValue,
+                           COALESCE(SUM(t.driverValue), 0) AS driverValue,
+                           COALESCE(SUM(t.appFee), 0) AS appFee,
+                           COALESCE(SUM(t.paymentFormFee), 0) AS paymentFormFee,
+                           COALESCE(SUM(t.otherFee), 0) AS otherFee,
+                           COALESCE(SUM(CASE WHEN t.paymentFormId = 1 THEN t.price ELSE 0 END), 0) AS taximeterPayment,
+                           COALESCE(SUM(CASE WHEN t.paymentFormId = 2 THEN t.price ELSE 0 END), 0) AS cardPayment,
+                           COALESCE(SUM(CASE WHEN t.paymentFormId = 3 THEN t.price ELSE 0 END), 0) AS voucherPayment,
+                           0 AS vehiclePayment,
+                           0 AS vehicleCardPayment,
+                           0 AS taxes,
+                           COALESCE(SUM(t.appFee), 0) AS totalTaxes
+                    FROM trip t
+                    LEFT JOIN driver d ON d.idDriver = t.driverId
+                    LEFT JOIN user u ON u.idUser = d.userId
+                    {$whereSql}
+                    GROUP BY t.driverId, u.name";
+
+            $rows = \app\dao\GenericDao::query($sql, $params);
+            $result = [];
+
+            foreach ($rows as $row) {
+                $result[] = [
+                    'driverId' => (int)$row['driverId'],
+                    'name' => $row['name'],
+                    'totalTripQuantity' => (int)$row['totalTripQuantity'],
+                    'totalTripValue' => (float)$row['totalTripValue'],
+                    'driverValue' => (float)$row['driverValue'],
+                    'appFee' => (float)$row['appFee'],
+                    'paymentFormFee' => (float)$row['paymentFormFee'],
+                    'otherFee' => (float)$row['otherFee'],
+                    'taximeterPayment' => (float)$row['taximeterPayment'],
+                    'cardPayment' => (float)$row['cardPayment'],
+                    'voucherPayment' => (float)$row['voucherPayment'],
+                    'vehiclePayment' => (float)$row['vehiclePayment'],
+                    'vehicleCardPayment' => (float)$row['vehicleCardPayment'],
+                    'taxes' => (float)$row['taxes'],
+                    'totalTaxes' => (float)$row['totalTaxes']
+                ];
+            }
+
+            echo $this->returnSuccess("Relatório de produção do motorista", $result);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e);
         }
     }
 

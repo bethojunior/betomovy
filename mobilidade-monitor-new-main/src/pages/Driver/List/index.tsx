@@ -185,15 +185,27 @@ const ListDrivers = () => {
       const responseOptionsStatus = await api.get(
         "report/select/driverRegisterStatus"
       );
-      if (responseOptionsStatus.status) {
-        setListOptions(Array.isArray(responseOptionsStatus.data?.response) ? responseOptionsStatus.data.response : []);
+      const items = responseOptionsStatus.data?.response || responseOptionsStatus.data?.data;
+      if (Array.isArray(items) && items.length > 0) {
+        setListOptions(items);
+      } else {
+        setListOptions([
+          { id: 1, name: "ATIVO" },
+          { id: 2, name: "PENDENTE" },
+          { id: 3, name: "BLOQUEADO" },
+          { id: 4, name: "AGUARDANDO RESPOSTA" },
+          { id: 5, name: "BLACKLIST" }
+        ]);
       }
     } catch (error) {
       console.error(error);
-      swal({
-        title: "Erro ao pegar opções de status",
-        icon: "error",
-      });
+      setListOptions([
+        { id: 1, name: "ATIVO" },
+        { id: 2, name: "PENDENTE" },
+        { id: 3, name: "BLOQUEADO" },
+        { id: 4, name: "AGUARDANDO RESPOSTA" },
+        { id: 5, name: "BLACKLIST" }
+      ]);
     }
     setLoading(false);
   };
