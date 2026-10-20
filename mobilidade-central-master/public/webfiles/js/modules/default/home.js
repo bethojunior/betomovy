@@ -772,26 +772,46 @@ document.addEventListener('DOMContentLoaded', function () {
     const distanceTrip = Session.getLocal('distanceTrip')
     TripController.getFee().then((res) => {
       preload(false)
-      if (!res.status) {
-        preload(false)
-        return SwalCustom.messageDialog('', 'Erro ao calcular valor da taxa', undefined, 'info')
-      }
-
-      if (res.response) {
+      if (res && res.status && res.response) {
+        const returnFee = Number(res.response?.returnFee || 0)
         const fee = res.response?.isByKm
-          ? (distanceTrip / 1000) * res.response?.returnFee * 1000
-          : res.response?.returnFee
-        const newPrice = Number(managerTrip.typeTaxi.price + fee).toFixed(2)
+          ? (distanceTrip / 1000) * returnFee * 1000
+          : returnFee
+        const currentPrice = Number(managerTrip.typeTaxi?.price || 0)
+        const newPrice = Number(currentPrice + fee).toFixed(2)
         paidByCentral = {
           paidByCentral: res.response?.paidByCentral,
           newPrice: Number(newPrice),
-          feePrice: res.response?.returnFee,
+          feePrice: returnFee,
           isByKm: res.response?.isByKm,
+        }
+        Session.setLocal('paidByCentral', paidByCentral)
+      } else {
+        paidByCentral = {
+          paidByCentral: false,
+          newPrice: Number(managerTrip.typeTaxi?.price || 0),
+          feePrice: 0,
+          isByKm: false,
         }
         Session.setLocal('paidByCentral', paidByCentral)
       }
 
-      document.querySelector('#haveReturnTrip').checked = false
+      if (document.querySelector('#haveReturnTrip')) {
+        document.querySelector('#haveReturnTrip').checked = false
+      }
+      initNewTrip(false, trip.customer)
+    }).catch(() => {
+      preload(false)
+      paidByCentral = {
+        paidByCentral: false,
+        newPrice: Number(managerTrip.typeTaxi?.price || 0),
+        feePrice: 0,
+        isByKm: false,
+      }
+      Session.setLocal('paidByCentral', paidByCentral)
+      if (document.querySelector('#haveReturnTrip')) {
+        document.querySelector('#haveReturnTrip').checked = false
+      }
       initNewTrip(false, trip.customer)
     })
   }

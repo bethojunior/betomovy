@@ -32,6 +32,41 @@ class TripController extends ApiController
         }
     }
 
+    public function actionFee()
+    {
+        try {
+            $conn = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+            $stmt = $conn->query("SELECT id, returnFee, isByKm, paidByCentral, statusId FROM centralFee WHERE statusId = 1 ORDER BY id DESC LIMIT 1");
+            $fee = $stmt ? $stmt->fetch(\PDO::FETCH_ASSOC) : null;
+
+            if (!$fee) {
+                $fee = [
+                    'id' => 0,
+                    'returnFee' => 0.0,
+                    'isByKm' => false,
+                    'paidByCentral' => false,
+                    'statusId' => 1
+                ];
+            } else {
+                $fee['id'] = (int)$fee['id'];
+                $fee['returnFee'] = (float)$fee['returnFee'];
+                $fee['isByKm'] = (bool)(int)$fee['isByKm'];
+                $fee['paidByCentral'] = (bool)(int)$fee['paidByCentral'];
+                $fee['statusId'] = (int)$fee['statusId'];
+            }
+
+            echo $this->returnSuccess("Taxa da central recuperada", $fee);
+        } catch (\Throwable $e) {
+            echo $this->returnSuccess("Taxa padrão recuperada", [
+                'id' => 0,
+                'returnFee' => 0.0,
+                'isByKm' => false,
+                'paidByCentral' => false,
+                'statusId' => 1
+            ]);
+        }
+    }
+
     public function actionIncreaseArea()
     {
         $request = $this->request();
