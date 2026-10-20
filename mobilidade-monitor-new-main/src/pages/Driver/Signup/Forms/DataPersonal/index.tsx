@@ -50,7 +50,7 @@ const DatasPersonal = ({
 
 	const handleCheckEmail = (email: string) => {
 		/* CHECK EMAIL */
-		api.post(`https://apiteste.taxireturn.com.br/Driver/CheckEmail`, {
+		api.post(`/driver/checkemail`, {
 			stdObject: [{ email }],
 		})
 			.then((response: any) => {
@@ -85,7 +85,7 @@ const DatasPersonal = ({
 		setLoading(true);
 
 		const response = await api.post(
-			`https://apiteste.taxireturn.com.br/Driver/CheckDocument`,
+			`/driver/checkdocument`,
 			{
 				document: data.cpf_cnpj,
 			},

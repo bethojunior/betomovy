@@ -3,6 +3,7 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import swal from 'sweetalert';
 import axios from 'axios';
+import api from '../../services/api';
 import Preload from '../../Utils/Preload';
 
 import {
@@ -212,10 +213,7 @@ const DocumentRequisited = ({
 			try {
 				console.log(formData);
 				setLoading(true);
-				axios({
-					method: 'post',
-					url: 'https://apiteste.taxireturn.com.br/Driver/Register',
-					data: formData,
+				api.post('/driver/register', formData, {
 					headers: { 'Content-Type': 'multipart/form-data' },
 				})
 					.then((response) => {
