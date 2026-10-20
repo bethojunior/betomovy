@@ -1227,10 +1227,10 @@ class CentralController extends ApiController
                     COALESCE(tc.phone, cc.phone, u.phone, '') AS customerPhone,
                     COALESCE(ud.nickname, ud.name, '') AS driverName,
                     COALESCE(ud.phone, '') AS driverPhone,
-                    COALESCE(orig.address, orig.name, '') AS originAddress,
+                    COALESCE(orig.address, '') AS originAddress,
                     orig.latitude AS originLat,
                     orig.longitude AS originLng,
-                    COALESCE(dest.address, dest.name, '') AS destinationAddress,
+                    COALESCE(dest.address, '') AS destinationAddress,
                     dest.latitude AS destinationLat,
                     dest.longitude AS destinationLng,
                     ts.schedule AS scheduledDate
@@ -1266,10 +1266,11 @@ class CentralController extends ApiController
                 $refs = array_column($rows, 'tripReference');
                 $placeholders = implode(',', array_fill(0, count($refs), '?'));
                 try {
-                    $stmtWay = $pdo->prepare("SELECT tripReference, latitude, longitude, address, name FROM tripWayPoints WHERE tripReference IN ({$placeholders}) ORDER BY id ASC");
+                    $stmtWay = $pdo->prepare("SELECT tripReference, latitude, longitude, address FROM tripWayPoints WHERE tripReference IN ({$placeholders}) ORDER BY id ASC");
                     $stmtWay->execute($refs);
                     $allWay = $stmtWay->fetchAll(PDO::FETCH_ASSOC);
                     foreach ($allWay as $way) {
+                        $way['name'] = $way['address'] ?? '';
                         $waypointMap[$way['tripReference']][] = (object)$way;
                     }
                 } catch (\Throwable $wEx) {}
