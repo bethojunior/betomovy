@@ -19,6 +19,34 @@ ini_set('memory_limit', '512M');
 
 $action = $_GET['action'] ?? 'status';
 
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
+
+if ($action === 'test_controller') {
+    $c = $_GET['c'] ?? 'AppConfigController';
+    $fullClass = "app\\controllers\\" . $c;
+    try {
+        if (!class_exists($fullClass)) {
+            echo json_encode(['status' => false, 'error' => "Classe não existe: $fullClass"]);
+            exit;
+        }
+        $obj = new $fullClass();
+        ob_start();
+        $obj->actionIndex();
+        $out = ob_get_clean();
+        echo json_encode(['status' => true, 'output' => $out]);
+    } catch (\Throwable $e) {
+        echo json_encode([
+            'status' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine()
+        ]);
+    }
+    exit;
+}
+
 // Config banco DigitalOcean
 $host = getenv('MYSQL_HOST') ?: 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com';
 $port = getenv('MYSQL_PORT') ?: '25060';
