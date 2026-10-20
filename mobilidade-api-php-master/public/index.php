@@ -18,9 +18,20 @@ if (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) 
     exit(0);
 }
 
-if (($_SERVER['REQUEST_URI'] ?? '') === '/test-diag') {
+if (strpos($_SERVER['REQUEST_URI'] ?? '', '/test-diag') === 0) {
     header("Content-Type: application/json; charset=utf-8");
-    echo json_encode(["status" => true, "msg" => "Top of index.php reached"]);
+    $daoFile = __DIR__ . '/../app/dao/TripDao.php';
+    $lines = file_exists($daoFile) ? file($daoFile) : [];
+    echo json_encode([
+        "status" => true,
+        "msg" => "Top of index.php reached",
+        "trip_dao_mtime" => file_exists($daoFile) ? date('Y-m-d H:i:s', filemtime($daoFile)) : null,
+        "trip_dao_line89" => trim($lines[88] ?? ''),
+        "trip_dao_line90" => trim($lines[89] ?? ''),
+        "trip_dao_line215" => trim($lines[214] ?? ''),
+        "php_version" => PHP_VERSION,
+        "time" => date('Y-m-d H:i:s')
+    ]);
     exit(0);
 }
 
