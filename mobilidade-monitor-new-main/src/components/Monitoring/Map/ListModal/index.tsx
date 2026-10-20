@@ -59,7 +59,11 @@ const isDriver = (item: ClientData | DriverRealtime): item is DriverRealtime => 
 const isClient = (item: ClientData | DriverRealtime): item is ClientData => {
   if (!item) return false
   const itemAny = item as any
-  return itemAny?.idCustomer !== undefined && itemAny?.idCustomer !== null
+  return (
+    (itemAny?.idCustomer !== undefined && itemAny?.idCustomer !== null) ||
+    (itemAny?.customerId !== undefined && itemAny?.customerId !== null) ||
+    (itemAny?.name !== undefined && itemAny?.idDriver === undefined)
+  )
 }
 
 const FETCH_INTERVAL = 10000
@@ -121,14 +125,27 @@ const ListModal: FC<ModalProps> = ({
 
   const fetchClients = async (filter: string) => {
     if (type !== 'client') return
-    
+
     try {
-      const response = await api.get(`customer?page=1&name=${encodeURIComponent(filter)}`)
-      const clients = response.data?.response?.data || []
+      setLoading(true)
+      const trimmed = filter ? filter.trim() : ''
+      const url = trimmed
+        ? `customer?page=1&name=${encodeURIComponent(trimmed)}`
+        : `customer?page=1`
+      const response = await api.get(url)
+      const raw =
+        response.data?.data?.data ||
+        response.data?.response?.data ||
+        response.data?.data ||
+        response.data?.response ||
+        []
+      const clients = Array.isArray(raw) ? raw : []
       setListData(clients)
     } catch (error) {
       console.error('Erro ao buscar clientes:', error)
       setListData([])
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -157,6 +174,8 @@ const ListModal: FC<ModalProps> = ({
       }
     } else if (isVisible && type === 'driver') {
       setListData(allDriversRef.current)
+    } else if (isVisible && type === 'client') {
+      fetchClients('')
     }
   }, [isVisible, type])
 
@@ -172,13 +191,9 @@ const ListModal: FC<ModalProps> = ({
         clearTimeout(searchTimeoutRef.current)
       }
 
-      if (searchValue.trim()) {
-        searchTimeoutRef.current = setTimeout(() => {
-          fetchClients(searchValue)
-        }, SEARCH_DEBOUNCE_MS)
-      } else {
-        setListData([])
-      }
+      searchTimeoutRef.current = setTimeout(() => {
+        fetchClients(searchValue)
+      }, SEARCH_DEBOUNCE_MS)
     }
 
     return () => {
@@ -241,11 +256,12 @@ const ListModal: FC<ModalProps> = ({
 
   const title = type === 'driver' ? 'Lista de motoristas' : 'Lista de clientes'
   const placeholder = 'Buscar por nome...'
-  const emptyMessage = type === 'driver' 
-    ? 'Nenhum motorista encontrado.'
-    : searchValue 
-      ? 'Nenhum cliente encontrado.' 
-      : 'Digite um nome para buscar.'
+  const emptyMessage =
+    type === 'driver'
+      ? 'Nenhum motorista encontrado.'
+      : searchValue.trim()
+        ? 'Nenhum cliente encontrado com esse nome.'
+        : 'Nenhum cliente cadastrado.'
 
   const renderDriverItem = (item: DriverRealtime) => (
     <CardDriver 

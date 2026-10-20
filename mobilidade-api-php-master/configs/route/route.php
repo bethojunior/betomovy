@@ -267,7 +267,9 @@ return [
         '/config_app_partners/',
         '/config_app_partners/find',
         '/config_apps_partners',
-        '/config_apps_partners/'
+        '/config_apps_partners/',
+        '/monitoringarea',
+        '/monitoringarea/'
     ]
 ];
 

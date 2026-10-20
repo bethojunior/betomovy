@@ -195,12 +195,8 @@ class TripController extends ApiController
             $userId = $request->userId ?? \app\utils\Headers::getUserId() ?? null;
             $scope = $request->scope ?? null;
 
-            $pdo = \app\dao\GenericDao::getDatabase();
-
             // 1. Localizar viagem no banco
-            $stmt = $pdo->prepare("SELECT * FROM trip WHERE tripReference = :ref LIMIT 1");
-            $stmt->execute([':ref' => $tripReference]);
-            $tripRow = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $tripRow = \app\dao\GenericDao::first("SELECT * FROM trip WHERE tripReference = :ref LIMIT 1", [':ref' => $tripReference]);
 
             if (!$tripRow) {
                 echo $this->returnSuccess("Viagem cancelada", ['status' => true, 'tripReference' => $tripReference]);
@@ -242,8 +238,7 @@ class TripController extends ApiController
                 ];
             }
 
-            $stmtUpdate = $pdo->prepare($updateSql);
-            $stmtUpdate->execute($updateParams);
+            \app\dao\GenericDao::execute($updateSql, $updateParams);
 
             // 5. Se houver motorista vinculado, libera o motorista
             if (!empty($tripRow['driverId'])) {

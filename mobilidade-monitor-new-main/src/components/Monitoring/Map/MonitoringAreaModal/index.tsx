@@ -39,8 +39,11 @@ const MonitoringAreaModal: FC<ModalProps> = ({ showMonitoringArea, setShowMonito
     setLoading(true)
     try {
       const result = await api.get(`monitoringArea`)
-      const areasData = result.data?.response?.data || result.data?.response || []
-      setAreas(Array.isArray(areasData) ? areasData : [])
+      const raw = result.data?.data || result.data?.response?.data || result.data?.response || []
+      const items = Array.isArray(raw)
+        ? raw.filter((item: any) => item && typeof item === 'object' && (item.id || item.name || item.area))
+        : []
+      setAreas(items)
     } catch (error) {
       console.error('Error fetching monitoring area data:', error)
       setAreas([])
@@ -84,33 +87,40 @@ const MonitoringAreaModal: FC<ModalProps> = ({ showMonitoringArea, setShowMonito
             </EmptyState>
           ) : (
             <ScrollableList>
-              {areas.map((area) => (
-                <AreaCard 
-                  key={area.id}
-                  onClick={() => {
-                    if (onAreaSelect) {
-                      onAreaSelect(area);
-                    }
-                    setShowMonitoringArea(false);
-                  }}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <AreaInfo>
-                    <p style={{ fontWeight: 600, fontSize: '16px', margin: 0 }}>
-                      {area.name}
-                    </p>
-                  </AreaInfo>
-                  <AreaStatus>
-                    <BsCircleFill
-                      color={area.active === 1 ? '#10b981' : '#ef4444'}
-                      size={12}
-                    />
-                    <span style={{ marginLeft: '6px', fontSize: '14px' }}>
-                      {area.active === 1 ? 'Ativa' : 'Inativa'}
-                    </span>
-                  </AreaStatus>
-                </AreaCard>
-              ))}
+              {areas.map((area) => {
+                const isActive =
+                  area.active === 1 ||
+                  (area as any).active === true ||
+                  String((area as any).active) === '1'
+
+                return (
+                  <AreaCard
+                    key={area.id}
+                    onClick={() => {
+                      if (onAreaSelect) {
+                        onAreaSelect(area)
+                      }
+                      setShowMonitoringArea(false)
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <AreaInfo>
+                      <p style={{ fontWeight: 600, fontSize: '16px', margin: 0 }}>
+                        {area.name || `Área #${area.id}`}
+                      </p>
+                    </AreaInfo>
+                    <AreaStatus>
+                      <BsCircleFill
+                        color={isActive ? '#10b981' : '#ef4444'}
+                        size={12}
+                      />
+                      <span style={{ marginLeft: '6px', fontSize: '14px' }}>
+                        {isActive ? 'Ativa' : 'Inativa'}
+                      </span>
+                    </AreaStatus>
+                  </AreaCard>
+                )
+              })}
             </ScrollableList>
           )}
         </ModalContainer>
