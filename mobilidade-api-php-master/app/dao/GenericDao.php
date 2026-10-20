@@ -2,14 +2,11 @@
 
 namespace app\dao;
 
-use app\utils\BaseDao;
 use app\utils\Connection;
 use PDO;
 
-class GenericDao extends BaseDao
+class GenericDao
 {
-    protected $table = 'config';
-
     public static function query(string $sql, array $params = []): array
     {
         $pdo = Connection::open();
