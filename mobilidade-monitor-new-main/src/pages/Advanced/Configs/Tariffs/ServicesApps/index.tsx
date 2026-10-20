@@ -160,15 +160,19 @@ export const ServicesApps = () => {
     setLoading(true);
     try {
       const responseTypesTravels = await api.get("tripType");
+      const rawTypes = responseTypesTravels.data?.response ?? responseTypesTravels.data?.data ?? [];
 
-      const typesTravels = responseTypesTravels.data.response.filter(
-        (data: TypesTravelsProps) => Number(data.serviceOption) === 1
+      const services = rawTypes.filter(
+        (data: TypesTravelsProps) =>
+          Number(data.serviceOption) === 1 ||
+          Number(data.deliveryOption) === 1 ||
+          Number(data.freightOption) === 1
       );
-      setTypesTravels(typesTravels);
+      setTypesTravels(services.length > 0 ? services : rawTypes);
     } catch (error) {
       const responseError = error as AxiosError;
       swal({
-        title: responseError.response?.data.message,
+        title: responseError.response?.data?.message || "Erro ao buscar tipos de serviços",
         icon: "error",
       });
     }
@@ -806,16 +810,20 @@ export const ServicesApps = () => {
   const getPrices = async () => {
     try {
       const responsePrices = await api.get(`price?cityId=${cityId}`);
+      const rawPrices = responsePrices.data?.response ?? responsePrices.data?.data ?? [];
 
-      const pricesTypes = (responsePrices.data.response || []).filter(
-        (data: ListPricesProps) => data?.trip_type?.serviceOption === 1
+      const pricesTypes = (rawPrices || []).filter(
+        (data: ListPricesProps) =>
+          Number(data?.trip_type?.serviceOption) === 1 ||
+          Number(data?.trip_type?.deliveryOption) === 1 ||
+          Number(data?.trip_type?.freightOption) === 1
       );
 
       setListPrices(pricesTypes);
     } catch (error) {
       const responseError = error as AxiosError;
       swal({
-        title: responseError.response?.data.message,
+        title: responseError.response?.data?.message || "Erro ao carregar preços",
         icon: "error",
       });
     }
