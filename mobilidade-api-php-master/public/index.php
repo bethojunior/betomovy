@@ -130,6 +130,41 @@ try {
         exit;
     }
 
+    if (strpos($uriPath, '/test-controller') === 0) {
+        ini_set('display_errors', 1);
+        error_reporting(E_ALL);
+        header('Content-Type: application/json; charset=utf-8');
+        try {
+            $name = $_GET['name'] ?? 'AppConfigController';
+            $file = realpath(__DIR__ . '/../app/controllers/' . $name . '.php');
+            if (!$file || !file_exists($file)) {
+                echo json_encode(['status' => false, 'error' => 'File does not exist: ' . $file]);
+                exit;
+            }
+            require_once $file;
+            $fullClass = '\\app\\controllers\\' . $name;
+            if (!class_exists($fullClass)) {
+                echo json_encode(['status' => false, 'error' => "Class $fullClass not found after require"]);
+                exit;
+            }
+            $ctl = new $fullClass();
+            ob_start();
+            $ctl->actionIndex();
+            $out = ob_get_clean();
+            echo json_encode(['status' => true, 'output' => $out]);
+        } catch (\Throwable $err) {
+            echo json_encode([
+                'status' => false,
+                'class' => get_class($err),
+                'message' => $err->getMessage(),
+                'file' => $err->getFile(),
+                'line' => $err->getLine(),
+                'trace' => $err->getTraceAsString()
+            ]);
+        }
+        exit;
+    }
+
     if ($uriPath === '/test-city') {
         ini_set('display_errors', 1);
         error_reporting(E_ALL);
