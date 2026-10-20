@@ -227,6 +227,33 @@ class TripController extends ApiController
             return;
         }
 
+        $singleRef = $_GET['tripReference'] ?? ($_GET['reference'] ?? null);
+        if (!$singleRef && isset($_GET['id']) && (!is_numeric($_GET['id']) || strlen((string)$_GET['id']) > 10)) {
+            $singleRef = $_GET['id'];
+        }
+
+        if (!empty($singleRef)) {
+            try {
+                $trip = (new \app\dao\TripDao())->find($singleRef, false);
+                echo $this->returnSuccess("Viagem encontrada", $trip);
+                return;
+            } catch (\Exception $e) {
+                try {
+                    $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+                    $stmt = $pdo->prepare("SELECT * FROM trip WHERE tripReference = :ref LIMIT 1");
+                    $stmt->execute([':ref' => $singleRef]);
+                    $tripRow = $stmt->fetch(\PDO::FETCH_ASSOC);
+                    if ($tripRow) {
+                        echo $this->returnSuccess("Viagem encontrada", (object)$tripRow);
+                        return;
+                    }
+                } catch (\Throwable $t) {}
+
+                echo $this->returnError($e);
+                return;
+            }
+        }
+
         try {
             $page = max(1, (int)($_GET['page'] ?? 1));
             $perPage = max(1, (int)($_GET['per_page'] ?? 10));

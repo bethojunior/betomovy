@@ -1125,8 +1125,257 @@ class CentralController extends ApiController
 
     public function actionTrip()
     {
+        $this->actionTripActivesRealtime();
+    }
+
+    public function actionTripActivesRealtime()
+    {
         header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['status' => true, 'response' => [], 'data' => []]);
+        try {
+            $centralId = (int)($_GET['id'] ?? ($_GET['idCentral'] ?? 0));
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $perPage = max(1, (int)($_GET['per_page'] ?? 15));
+            $offset = ($page - 1) * $perPage;
+
+            $statusFilter = $_GET['status'] ?? null;
+            $flowFilter = $_GET['flow'] ?? null;
+            $customerNameFilter = $_GET['customerName'] ?? null;
+            $driverNameFilter = $_GET['driverName'] ?? null;
+
+            $pdo = Connection::open(Connection::DB_MYSQL_RW);
+
+            $activeStatuses = ['searching', 'searching_favorite', 'pre_accepted', 'accepted', 'boarding', 'in_progress', 'scheduled'];
+
+            $where = ["1=1"];
+            $params = [];
+
+            if ($centralId > 0) {
+                $where[] = "(trip.centralId = :centralId OR trip.driverId IN (SELECT driverId FROM centralDriver WHERE centralId = :centralIdDrivers AND statusId = 1))";
+                $params[':centralId'] = $centralId;
+                $params[':centralIdDrivers'] = $centralId;
+            }
+
+            if (!empty($statusFilter)) {
+                $where[] = "trip.status = :status";
+                $params[':status'] = $statusFilter;
+            } else {
+                $inStatuses = "'" . implode("','", $activeStatuses) . "'";
+                $where[] = "trip.status IN ({$inStatuses})";
+            }
+
+            if (!empty($flowFilter)) {
+                $where[] = "trip.flow = :flow";
+                $params[':flow'] = $flowFilter;
+            }
+
+            if (!empty($customerNameFilter)) {
+                $where[] = "(u.nickname LIKE :cName OR u.name LIKE :cName2 OR tc.name LIKE :cName3 OR cc.name LIKE :cName4)";
+                $params[':cName'] = "%{$customerNameFilter}%";
+                $params[':cName2'] = "%{$customerNameFilter}%";
+                $params[':cName3'] = "%{$customerNameFilter}%";
+                $params[':cName4'] = "%{$customerNameFilter}%";
+            }
+
+            if (!empty($driverNameFilter)) {
+                $where[] = "(ud.nickname LIKE :dName OR ud.name LIKE :dName2)";
+                $params[':dName'] = "%{$driverNameFilter}%";
+                $params[':dName2'] = "%{$driverNameFilter}%";
+            }
+
+            $whereSql = implode(" AND ", $where);
+
+            // Count total scheduled trips for this central
+            $schedWhere = $centralId > 0
+                ? "trip.status = 'scheduled' AND (trip.centralId = :sCentralId OR trip.driverId IN (SELECT driverId FROM centralDriver WHERE centralId = :sCentralIdDrivers AND statusId = 1))"
+                : "trip.status = 'scheduled'";
+            $schedParams = $centralId > 0 ? [':sCentralId' => $centralId, ':sCentralIdDrivers' => $centralId] : [];
+            $stmtSched = $pdo->prepare("SELECT COUNT(*) FROM trip WHERE {$schedWhere}");
+            $stmtSched->execute($schedParams);
+            $scheduledTotal = (int)$stmtSched->fetchColumn();
+
+            // Count total matching active trips
+            $countSql = "
+                SELECT COUNT(DISTINCT trip.idTrip)
+                FROM trip
+                LEFT JOIN `user` u ON trip.userId = u.idUser
+                LEFT JOIN tripCustomer tc ON trip.tripCustomerId = tc.idTripCustomer
+                LEFT JOIN centralCustomer cc ON trip.centralCustomerId = cc.id
+                LEFT JOIN driver d ON trip.driverId = d.idDriver
+                LEFT JOIN `user` ud ON d.userId = ud.idUser
+                WHERE {$whereSql}
+            ";
+            $stmtCount = $pdo->prepare($countSql);
+            $stmtCount->execute($params);
+            $total = (int)$stmtCount->fetchColumn();
+
+            // Select matching trip references
+            $selectSql = "
+                SELECT 
+                    trip.idTrip,
+                    trip.tripReference,
+                    trip.status,
+                    trip.flow,
+                    trip.price,
+                    trip.date,
+                    trip.centralId,
+                    trip.driverId,
+                    trip.userId,
+                    trip.canceledBy,
+                    COALESCE(tpf.name, 'Dinheiro') AS paymentForm,
+                    COALESCE(ta.situation, '') AS situation,
+                    COALESCE(tc.name, cc.name, u.nickname, u.name, '') AS customerName,
+                    COALESCE(tc.phone, cc.phone, u.phone, '') AS customerPhone,
+                    COALESCE(ud.nickname, ud.name, '') AS driverName,
+                    COALESCE(ud.phone, '') AS driverPhone,
+                    COALESCE(orig.address, orig.name, '') AS originAddress,
+                    orig.latitude AS originLat,
+                    orig.longitude AS originLng,
+                    COALESCE(dest.address, dest.name, '') AS destinationAddress,
+                    dest.latitude AS destinationLat,
+                    dest.longitude AS destinationLng,
+                    ts.schedule AS scheduledDate
+                FROM trip
+                LEFT JOIN tripPaymentForm tpf ON trip.tripPaymentFormId = tpf.idTripPaymentForm
+                LEFT JOIN tripAudit ta ON trip.tripAuditId = ta.id
+                LEFT JOIN `user` u ON trip.userId = u.idUser
+                LEFT JOIN tripCustomer tc ON trip.tripCustomerId = tc.idTripCustomer
+                LEFT JOIN centralCustomer cc ON trip.centralCustomerId = cc.id
+                LEFT JOIN driver d ON trip.driverId = d.idDriver
+                LEFT JOIN `user` ud ON d.userId = ud.idUser
+                LEFT JOIN origin orig ON trip.originId = orig.idOrigin
+                LEFT JOIN destination dest ON trip.destinationId = dest.idDestination
+                LEFT JOIN tripScheduled ts ON trip.tripReference = ts.tripReference
+                WHERE {$whereSql}
+                ORDER BY 
+                    CASE WHEN trip.status = 'scheduled' THEN 0 ELSE 1 END ASC,
+                    trip.date DESC
+                LIMIT :limit OFFSET :offset
+            ";
+            $stmtSelect = $pdo->prepare($selectSql);
+            foreach ($params as $k => $v) {
+                $stmtSelect->bindValue($k, $v);
+            }
+            $stmtSelect->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmtSelect->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmtSelect->execute();
+            $rows = $stmtSelect->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fetch waypoints for retrieved trips
+            $waypointMap = [];
+            if (!empty($rows)) {
+                $refs = array_column($rows, 'tripReference');
+                $placeholders = implode(',', array_fill(0, count($refs), '?'));
+                try {
+                    $stmtWay = $pdo->prepare("SELECT tripReference, latitude, longitude, address, name FROM tripWayPoints WHERE tripReference IN ({$placeholders}) ORDER BY id ASC");
+                    $stmtWay->execute($refs);
+                    $allWay = $stmtWay->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($allWay as $way) {
+                        $waypointMap[$way['tripReference']][] = (object)$way;
+                    }
+                } catch (\Throwable $wEx) {}
+            }
+
+            // Build trip objects
+            $tripDao = new \app\dao\TripDao();
+            $trips = [];
+            foreach ($rows as $row) {
+                try {
+                    $foundTrip = $tripDao->find($row['tripReference'], false);
+                    if ($foundTrip) {
+                        $trips[] = $foundTrip;
+                        continue;
+                    }
+                } catch (\Throwable $e) {}
+
+                // Structured fallback trip object ensuring all properties needed by selectTrip.js exist
+                $trips[] = (object)[
+                    'idTrip' => $row['idTrip'],
+                    'tripReference' => $row['tripReference'],
+                    'status' => $row['status'],
+                    'flow' => $row['flow'],
+                    'price' => $row['price'] ?? '0.00',
+                    'date' => $row['date'],
+                    'paymentForm' => $row['paymentForm'],
+                    'situation' => $row['situation'],
+                    'canceledBy' => $row['canceledBy'],
+                    'customer' => (object)[
+                        'name' => $row['customerName'],
+                        'phone' => $row['customerPhone']
+                    ],
+                    'centralCustomer' => (object)[
+                        'name' => $row['customerName'],
+                        'phone' => $row['customerPhone']
+                    ],
+                    'driver' => !empty($row['driverId']) ? (object)[
+                        'id' => $row['driverId'],
+                        'name' => $row['driverName'],
+                        'phone' => $row['driverPhone']
+                    ] : null,
+                    'origin' => (object)[
+                        'address' => $row['originAddress'],
+                        'name' => $row['originAddress'],
+                        'latitude' => $row['originLat'],
+                        'longitude' => $row['originLng']
+                    ],
+                    'destination' => (object)[
+                        'address' => $row['destinationAddress'],
+                        'name' => $row['destinationAddress'],
+                        'latitude' => $row['destinationLat'],
+                        'longitude' => $row['destinationLng']
+                    ],
+                    'tripWayPoints' => $waypointMap[$row['tripReference']] ?? [],
+                    'schedule' => !empty($row['scheduledDate']) ? (object)[
+                        'schedule' => $row['scheduledDate']
+                    ] : null
+                ];
+            }
+
+            $lastPage = $total > 0 ? (int)ceil($total / $perPage) : 1;
+
+            echo json_encode([
+                'status' => true,
+                'message' => 'Viagens ativas',
+                'response' => [
+                    'trips' => [
+                        'current_page' => $page,
+                        'data' => $trips,
+                        'first_page_url' => null,
+                        'from' => $total > 0 ? $offset + 1 : null,
+                        'last_page' => $lastPage,
+                        'last_page_url' => null,
+                        'next_page_url' => $page < $lastPage ? true : null,
+                        'path' => null,
+                        'per_page' => $perPage,
+                        'prev_page_url' => $page > 1 ? true : null,
+                        'to' => min($offset + $perPage, $total),
+                        'total' => $total
+                    ],
+                    'scheduledTotal' => $scheduledTotal
+                ],
+                'data' => [
+                    'trips' => [
+                        'current_page' => $page,
+                        'data' => $trips,
+                        'last_page' => $lastPage,
+                        'total' => $total
+                    ],
+                    'scheduledTotal' => $scheduledTotal
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            echo json_encode([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'response' => [
+                    'trips' => [
+                        'current_page' => 1,
+                        'data' => [],
+                        'total' => 0
+                    ],
+                    'scheduledTotal' => 0
+                ]
+            ]);
+        }
     }
 
     public function actionPrice()

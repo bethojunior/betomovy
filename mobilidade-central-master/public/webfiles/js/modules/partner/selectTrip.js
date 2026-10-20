@@ -74,17 +74,17 @@ const tripListState = {
 function verifyListTripActivePartner() {
     tripListState.currentConfig = TRIP_LIST_CONFIG.default;
 
+    const setMessage = (message) => {
+        const msgEl = document.getElementById("listTripMessage");
+        if (msgEl) msgEl.textContent = message ?? "";
+    };
+
     const centralId = Session.getValueInSession("centralSelected", "id")?.toString();
     if (!centralId) {
         console.error("ID da central não encontrado na sessão.");
         setMessage("Não foi possível carregar as viagens. Tente recarregar a página.");
         return;
     }
-
-    const setMessage = (message) => {
-        const msgEl = document.getElementById("listTripMessage");
-        if (msgEl) msgEl.textContent = message ?? "";
-    };
 
     const setModalHeader = (config) => {
         const headerEl = document.querySelector(".header-trips");
@@ -277,7 +277,9 @@ function verifyListTripActivePartner() {
                         return;
                     }
 
-                    const trips = Array.isArray(response?.trips?.data) ? response.trips.data : [];
+                    const trips = Array.isArray(response?.trips?.data)
+                        ? response.trips.data
+                        : (Array.isArray(response) ? response : (Array.isArray(response?.data) ? response.data : []));
 
                     scheduledTripsTotal = response?.scheduledTotal ?? 0;
                     hasMoreTrips = Boolean(response?.trips?.next_page_url);

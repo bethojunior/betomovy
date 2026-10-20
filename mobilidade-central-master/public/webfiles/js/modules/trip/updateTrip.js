@@ -29,7 +29,7 @@ function verifyTrip(initialTrip) {
     Route.removeGroupComponent(COMPONENT_CREATE_TRIP);
 
     const tripReference = Session.getLocal("tripReference");
-    if (tripReference.length === 0) return;
+    if (!tripReference || (typeof tripReference === 'string' && tripReference.trim().length === 0) || (Array.isArray(tripReference) && tripReference.length === 0)) return;
 
     if (!unsubscribeIds.has(tripReference)) {
         subscribeToTrip(tripReference);
@@ -265,8 +265,8 @@ function handleSearchTrip(data) {
         );
 
         const tripReference = Session.getLocal("tripReference");
-        if (tripReference.length > 0) {
-            startSearchStatusPoll(tripReference);
+        if (tripReference && (typeof tripReference === 'string' ? tripReference.length > 0 : true)) {
+            startSearchStatusPoll(typeof tripReference === 'string' ? tripReference : String(tripReference));
         }
     }
 
@@ -274,11 +274,13 @@ function handleSearchTrip(data) {
         element.src = `webfiles/img/logo/return-${data.tripTypeId}-d.png`;
     });
 
-    if (Session.getLocal("dateInitTrip").length === 0) {
+    const dateInitTrip = Session.getLocal("dateInitTrip");
+    if (!dateInitTrip || (Array.isArray(dateInitTrip) && dateInitTrip.length === 0)) {
         Session.setLocal("dateInitTrip", DateCustom.getNow());
     }
 
-    if (Session.getLocal("timePhrase").length === 0) {
+    const timePhrase = Session.getLocal("timePhrase");
+    if (!timePhrase || (Array.isArray(timePhrase) && timePhrase.length === 0) || (typeof timePhrase === 'object' && Object.keys(timePhrase).length === 0)) {
         sortTimePhrase();
     }
 

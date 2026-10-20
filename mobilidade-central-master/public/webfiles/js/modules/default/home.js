@@ -670,18 +670,35 @@ document.addEventListener('DOMContentLoaded', function () {
         Session.setLocal('tripReference', response.tripReference)
 
         if (newTrip && newTrip.tripCustomer && newTrip.tripCustomer.phone) {
-          dispatchMessageWhatsApp(newTrip.tripCustomer.phone, response.tripReference)
+          try {
+            dispatchMessageWhatsApp(newTrip.tripCustomer.phone, response.tripReference)
+          } catch (wppErr) {
+            console.warn('Erro ao disparar WhatsApp:', wppErr)
+          }
         }
 
-        //managerTrip.isSearch = true;
-        initSearchTrip(response)
-        verifyListTripActivePartner()
+        try {
+          initSearchTrip(response)
+        } catch (searchErr) {
+          console.error('Erro ao inicializar busca de viagem:', searchErr)
+        }
 
-        trip.customer = null
-        SchedulePicker.reset()
-        ScheduleDriverPool.reset()
+        try {
+          verifyListTripActivePartner()
+        } catch (activeErr) {
+          console.error('Erro ao atualizar viagens ativas:', activeErr)
+        }
+
+        try {
+          trip.customer = null
+          SchedulePicker.reset()
+          ScheduleDriverPool.reset()
+        } catch (resetErr) {
+          console.warn('Erro ao resetar formulário de agendamento:', resetErr)
+        }
       })
       .catch((error) => {
+        console.error('Erro na criação da viagem:', error)
         SwalCustom.messageDialog(
           'Não foi possível confirmar a criação da(s) viagem(ns). Verifique sua conexão e confira em Viagens Ativas antes de tentar novamente.',
           'Atenção',

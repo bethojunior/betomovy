@@ -150,6 +150,13 @@ class RouteListener extends ApiController
 
         if (!method_exists($class, $action)) {
             if (method_exists($class, 'actionIndex')) {
+                if (isset($path[1]) && !empty($path[1])) {
+                    if (!isset($_GET['id'])) {
+                        $_GET['id'] = $path[1];
+                    }
+                    $_GET['reference'] = $path[1];
+                    $_GET['tripReference'] = $path[1];
+                }
                 return 'actionIndex';
             }
             return false;
