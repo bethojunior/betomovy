@@ -8,6 +8,7 @@ import {
 } from '../../../constants/whatsappTemplates'
 import { TripService } from '../../../services/TripService'
 import api from '../../../services/api'
+import Session from '../../../utils/Session'
 import { useClickOutside } from '../../../hooks/useClickOutside'
 import { formatPrice, formatTime } from '../../../utils/formatters'
 import { FooterDropdown } from './FooterDropdown'
@@ -195,15 +196,18 @@ const TripFooterStats: FC<Props> = ({
 
   const fetchDriverPositions = async () => {
     try {
+      const cityId = Session.getLocal('citySelected')?.cityId
       const response = await api.get(`/driver/positions`, {
         params: {
-          status: 'disponivel,corrida,boarding,in_progress,accepted,desligado',
+          status: 'disponivel,online,available,corrida,busy,boarding,in_progress,accepted,desligado',
+          cityId: cityId || undefined,
         }
       })
 
       const allResults: DriverRealtime[] = response.data?.response ?? []
 
       allDriversRef.current = allResults
+      forceUpdate((n) => n + 1)
     } catch (error) {
       console.error('Erro ao buscar motoristas:', error)
     }
@@ -215,6 +219,12 @@ const TripFooterStats: FC<Props> = ({
     fetchCanceledTrips()
     fetchUnattendedTrips()
     fetchAbandonedTrips()
+
+    const driverPollInterval = setInterval(() => {
+      fetchDriverPositions()
+    }, 10000)
+
+    return () => clearInterval(driverPollInterval)
   }, [])
 
   // Atualiza o timer a cada segundo
@@ -231,8 +241,16 @@ const TripFooterStats: FC<Props> = ({
   const stats = tripQuantitiesRef.current
   const statsLoading = !stats
   const drivers = allDriversRef.current
-  const onlineDrivers = drivers.filter((driver) => driver.status === 'disponivel').length
-  const busyDrivers = drivers.filter((driver) => driver.status === 'corrida').length
+  const isOnlineDriver = (d: DriverRealtime) => {
+    const s = String(d.status || '').toLowerCase().trim()
+    return s === 'disponivel' || s === 'online' || s === 'available'
+  }
+  const isBusyDriver = (d: DriverRealtime) => {
+    const s = String(d.status || '').toLowerCase().trim()
+    return s === 'corrida' || s === 'busy' || s === 'in_progress' || s === 'boarding' || s === 'accepted'
+  }
+  const onlineDrivers = drivers.filter(isOnlineDriver).length
+  const busyDrivers = drivers.filter(isBusyDriver).length
 
   const handleCanceledDropdownToggle = () => {
     if (canceledDropdownOpen) {

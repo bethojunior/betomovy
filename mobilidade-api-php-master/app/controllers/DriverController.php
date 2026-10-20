@@ -927,25 +927,96 @@ class DriverController extends ApiController
         try {
             $pdo = \app\utils\Connection::open();
             $headers = function_exists('getallheaders') ? getallheaders() : [];
-            $cityId = $headers['cityid'] ?? $headers['cityId'] ?? $_SERVER['HTTP_CITYID'] ?? $_GET['cityId'] ?? null;
+            $cityId = $_GET['cityId'] ?? $_GET['cityid'] ?? $headers['cityid'] ?? $headers['cityId'] ?? $_SERVER['HTTP_CITYID'] ?? null;
+            $statusParam = $_GET['status'] ?? null;
 
-            $cityWhere = $cityId ? "AND driver.cityId = " . (int)$cityId : "";
+            $whereParts = [
+                "user.statusId = 1",
+                "driver.last_lat IS NOT NULL",
+                "driver.last_lat != ''",
+                "driver.last_lat != 0",
+                "driver.last_lon IS NOT NULL",
+                "driver.last_lon != ''",
+                "driver.last_lon != 0"
+            ];
+
+            if (!empty($cityId) && is_numeric($cityId) && (int)$cityId > 0) {
+                $cid = (int)$cityId;
+                $whereParts[] = "(driver.cityId = {$cid} OR driver.cityId IS NULL OR driver.cityId = 0)";
+            }
+
+            if (!empty($statusParam)) {
+                $statusList = array_filter(array_map('trim', explode(',', $statusParam)));
+                if (!empty($statusList)) {
+                    $expandedStatuses = [];
+                    foreach ($statusList as $st) {
+                        $expandedStatuses[] = addslashes($st);
+                        if ($st === 'disponivel') {
+                            $expandedStatuses[] = 'online';
+                            $expandedStatuses[] = 'available';
+                        } elseif ($st === 'online') {
+                            $expandedStatuses[] = 'disponivel';
+                        } elseif ($st === 'corrida') {
+                            $expandedStatuses[] = 'busy';
+                            $expandedStatuses[] = 'in_progress';
+                            $expandedStatuses[] = 'boarding';
+                            $expandedStatuses[] = 'accepted';
+                        }
+                    }
+                    $expandedStatuses = array_unique($expandedStatuses);
+                    $inClause = "'" . implode("','", $expandedStatuses) . "'";
+                    $whereParts[] = "driver.status IN ({$inClause})";
+                }
+            }
+
+            $whereSql = implode(" AND ", $whereParts);
+
             $sql = "
-                SELECT driver.idDriver, driver.last_lat as latitude, driver.last_lon as longitude,
-                       user.name, user.phone, driver.status, car.plate
+                SELECT driver.idDriver, driver.userId, driver.cityId,
+                       driver.last_lat as latitude, driver.last_lon as longitude,
+                       user.name, user.phone,
+                       driver.status,
+                       driver.profileImage,
+                       IFNULL(driver.updated_at, NOW()) as updated_at,
+                       IFNULL(driver.updated_at, NOW()) as last_position_update,
+                       car.plate, car.model, car.color
                 FROM driver
                 JOIN user ON driver.userId = user.idUser
                 LEFT JOIN car ON driver.idDriver = car.driverId AND car.deleted_at IS NULL
-                WHERE user.statusId = 1
-                  AND driver.last_lat IS NOT NULL
-                  AND driver.last_lon IS NOT NULL
-                  {$cityWhere}
-                LIMIT 100
+                WHERE {$whereSql}
+                ORDER BY driver.updated_at DESC
+                LIMIT 300
             ";
             $stmt = $pdo->query($sql);
             $positions = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-            echo $this->returnSuccess('Posições dos motoristas', $positions);
+            $formatted = array_map(function($row) {
+                $status = $row['status'];
+                if ($status === 'online') {
+                    $status = 'disponivel';
+                }
+                return [
+                    'idDriver' => (int)$row['idDriver'],
+                    'userId' => (int)$row['userId'],
+                    'cityId' => $row['cityId'] ? (int)$row['cityId'] : null,
+                    'latitude' => (float)$row['latitude'],
+                    'longitude' => (float)$row['longitude'],
+                    'name' => $row['name'],
+                    'userName' => $row['name'],
+                    'phone' => $row['phone'],
+                    'status' => $status,
+                    'profileImage' => $row['profileImage'],
+                    'updated_at' => $row['updated_at'],
+                    'last_position_update' => $row['last_position_update'],
+                    'car' => [
+                        'plate' => $row['plate'],
+                        'model' => $row['model'],
+                        'color' => $row['color'],
+                    ]
+                ];
+            }, $positions);
+
+            echo $this->returnSuccess('Posições dos motoristas', $formatted);
         } catch (\Exception $e) {
             echo $this->returnError($e);
         }

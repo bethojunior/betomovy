@@ -243,8 +243,14 @@ const Monitoring: FC = () => {
         const shouldFilterByCity =
           selectedCityId != null || selectedCityPolygon != null;
 
-        if (shouldFilterByCity && !hasCityIdMatch && !hasPolygonMatch) {
-          return false;
+        if (shouldFilterByCity) {
+          if (hasCityIdMatch || hasPolygonMatch) {
+            // Match válido
+          } else if (driver.cityId == null && !selectedCityPolygon) {
+            // Aceita se o backend filtrou pela cidade
+          } else {
+            return false;
+          }
         }
 
         return (
@@ -263,7 +269,7 @@ const Monitoring: FC = () => {
         latitude: Number(driver.latitude),
         longitude: Number(driver.longitude),
       }));
-  }, [selectedCityId, driverRecencyMode]);
+  }, [selectedCityId, selectedCityPolygon, driverRecencyMode]);
 
   const handleWindowSizeChange = useCallback((): void => {
     setWidth(window.innerWidth);
@@ -485,11 +491,13 @@ const Monitoring: FC = () => {
     }
   }, [hasMoreTrips, handleGetAllTrip]);
 
-  const getDrivers = async () => {
+  const getDrivers = useCallback(async () => {
     try {
+      const cityId = Session.getLocal("citySelected")?.cityId;
       const response = await api.get('driver/positions', {
         params: {
-          status: 'disponivel,corrida,boarding,in_progress,accepted,desligado',
+          status: 'disponivel,online,available,corrida,busy,boarding,in_progress,accepted,desligado',
+          cityId: cityId || undefined,
         },
       });
       if (response.data?.response && Array.isArray(response.data.response)) {
@@ -500,7 +508,7 @@ const Monitoring: FC = () => {
     } catch (error) {
       console.error('getDrivers - Erro:', error);
     }
-  };
+  }, [normalizeDriversForMap]);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const handleGetAllTripRef = useRef(handleGetAllTrip);
@@ -546,9 +554,26 @@ const Monitoring: FC = () => {
     handleGetAllTrip({ silent: false, page: 1, reset: true });
   }, [activeTripsFilters, filterType, handleGetAllTrip]);
 
+  const driversIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     getDrivers();
-  }, []);
+
+    if (driversIntervalRef.current) {
+      clearInterval(driversIntervalRef.current);
+    }
+
+    driversIntervalRef.current = setInterval(() => {
+      getDrivers();
+    }, 10000);
+
+    return () => {
+      if (driversIntervalRef.current) {
+        clearInterval(driversIntervalRef.current);
+        driversIntervalRef.current = null;
+      }
+    };
+  }, [getDrivers]);
 
   const buildMappedTripFromRealtimeData = (tripData: any, existingTrip: TripDto | undefined, eventStatus: any): TripDto => {
     return {
