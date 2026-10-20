@@ -52,7 +52,13 @@ $(document).ready(function () {
             const code = id.replace("lang_", "");
             // Garantir que pelo menos o inglês (US) permaneça ativo
             if (code === "en" && !$(this).is(":checked")) {
-                alert("O idioma Inglês (Estados Unidos) deve permanecer ativo como idioma padrão.");
+                if (typeof SwalCustom !== "undefined" && SwalCustom.messageDialog) {
+                    SwalCustom.messageDialog("Atenção", "O idioma Inglês (Estados Unidos) deve permanecer ativo como idioma padrão.", undefined, "warning");
+                } else if (typeof swal !== "undefined") {
+                    swal("Atenção", "O idioma Inglês (Estados Unidos) deve permanecer ativo como idioma padrão.", "warning");
+                } else {
+                    alert("O idioma Inglês (Estados Unidos) deve permanecer ativo como idioma padrão.");
+                }
                 $(this).prop("checked", true);
                 return;
             }
@@ -72,14 +78,20 @@ $(document).ready(function () {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(configs));
             
-            if (typeof swal !== "undefined") {
+            if (typeof SwalCustom !== "undefined" && SwalCustom.messageDialog) {
+                SwalCustom.messageDialog("Sucesso!", "Configurações de idiomas atualizadas com sucesso!", undefined, "success");
+            } else if (typeof swal !== "undefined") {
                 swal("Sucesso!", "Configurações de idiomas atualizadas com sucesso!", "success");
             } else {
                 alert("Configurações de idiomas atualizadas com sucesso!");
             }
         } catch (e) {
             console.error("Erro ao salvar:", e);
-            alert("Erro ao salvar configurações.");
+            if (typeof SwalCustom !== "undefined" && SwalCustom.messageDialog) {
+                SwalCustom.messageDialog("Erro", "Erro ao salvar configurações de idiomas.", undefined, "error");
+            } else {
+                alert("Erro ao salvar configurações.");
+            }
         }
     });
 

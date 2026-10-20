@@ -1115,14 +1115,144 @@ class CentralController extends ApiController
 
     public function actionTripInfoQuestion()
     {
+        header('Content-Type: application/json; charset=utf-8');
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $centralId = (int)($_GET['id'] ?? 0);
+
+        preg_match('#/tripInfoQuestion/(\d+)#i', $_SERVER['REQUEST_URI'] ?? '', $m);
+        $questionId = !empty($m[1]) ? (int)$m[1] : (int)($_GET['idQuestion'] ?? ($_GET['subId'] ?? 0));
+
+        if ($method === 'POST') {
+            try {
+                $data = $this->request();
+                $title = trim($data->title ?? '');
+                $required = !empty($data->required) ? 1 : 0;
+
+                if (empty($title)) {
+                    throw new \Exception("Título da pergunta é obrigatório");
+                }
+
+                $pdo = Connection::open(Connection::DB_MYSQL_RW);
+                $stmt = $pdo->prepare("INSERT INTO centralTripInfoQuestion (title, required, centralId, created_at, updated_at) VALUES (:title, :required, :cid, NOW(), NOW())");
+                $stmt->execute([
+                    ':title' => $title,
+                    ':required' => $required,
+                    ':cid' => $centralId ?: null,
+                ]);
+
+                $newId = (int)$pdo->lastInsertId();
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Campo dinâmico cadastrado com sucesso',
+                    'response' => ['id' => $newId, 'title' => $title, 'required' => $required],
+                    'data' => ['id' => $newId, 'title' => $title, 'required' => $required],
+                    'errors' => null
+                ]);
+            } catch (\Throwable $e) {
+                echo json_encode([
+                    'status' => false,
+                    'message' => $e->getMessage(),
+                    'response' => null,
+                    'errors' => [$e->getMessage()]
+                ]);
+            }
+            return;
+        }
+
+        if ($method === 'PUT' || $method === 'PATCH') {
+            try {
+                $data = $this->request();
+                $title = trim($data->title ?? '');
+                $required = !empty($data->required) ? 1 : 0;
+
+                if (!$questionId) {
+                    throw new \Exception("ID da pergunta não informado");
+                }
+                if (empty($title)) {
+                    throw new \Exception("Título da pergunta é obrigatório");
+                }
+
+                $pdo = Connection::open(Connection::DB_MYSQL_RW);
+                $stmt = $pdo->prepare("UPDATE centralTripInfoQuestion SET title = :title, required = :required, updated_at = NOW() WHERE id = :qid");
+                $stmt->execute([
+                    ':title' => $title,
+                    ':required' => $required,
+                    ':qid' => $questionId,
+                ]);
+
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Campo dinâmico atualizado com sucesso',
+                    'response' => ['id' => $questionId, 'title' => $title, 'required' => $required],
+                    'data' => ['id' => $questionId, 'title' => $title, 'required' => $required],
+                    'errors' => null
+                ]);
+            } catch (\Throwable $e) {
+                echo json_encode([
+                    'status' => false,
+                    'message' => $e->getMessage(),
+                    'response' => null,
+                    'errors' => [$e->getMessage()]
+                ]);
+            }
+            return;
+        }
+
+        if ($method === 'DELETE') {
+            try {
+                if (!$questionId) {
+                    throw new \Exception("ID da pergunta não informado");
+                }
+
+                $pdo = Connection::open(Connection::DB_MYSQL_RW);
+                $stmt = $pdo->prepare("UPDATE centralTripInfoQuestion SET deleted_at = NOW(), updated_at = NOW() WHERE id = :qid");
+                $stmt->execute([':qid' => $questionId]);
+
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Campo dinâmico removido com sucesso',
+                    'response' => true,
+                    'data' => true,
+                    'errors' => null
+                ]);
+            } catch (\Throwable $e) {
+                echo json_encode([
+                    'status' => false,
+                    'message' => $e->getMessage(),
+                    'response' => null,
+                    'errors' => [$e->getMessage()]
+                ]);
+            }
+            return;
+        }
+
+        // GET single or list
         try {
             $pdo = Connection::open(Connection::DB_MYSQL_RO);
-            $centralId = (int)($_GET['id'] ?? 0);
-            $stmt = $pdo->prepare("SELECT * FROM centralTripInfoQuestion WHERE centralId = :cid OR centralId IS NULL OR centralId = 0");
+
+            if ($questionId > 0) {
+                $stmt = $pdo->prepare("SELECT id, title, required, centralId, created_at, updated_at FROM centralTripInfoQuestion WHERE id = :qid AND deleted_at IS NULL LIMIT 1");
+                $stmt->execute([':qid' => $questionId]);
+                $question = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$question) {
+                    throw new \Exception("Pergunta não encontrada");
+                }
+
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Pergunta encontrada',
+                    'response' => $question,
+                    'data' => $question,
+                    'errors' => null
+                ]);
+                return;
+            }
+
+            $stmt = $pdo->prepare("SELECT id, title, required, centralId, created_at, updated_at FROM centralTripInfoQuestion WHERE (centralId = :cid OR centralId IS NULL OR centralId = 0) AND deleted_at IS NULL ORDER BY id DESC");
             $stmt->execute([':cid' => $centralId]);
             $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Campos dinâmicos encontrados',
@@ -1131,7 +1261,6 @@ class CentralController extends ApiController
                 'errors' => null
             ]);
         } catch (\Throwable $e) {
-            header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'response' => [],
