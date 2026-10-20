@@ -167,6 +167,37 @@ class ConfigController extends ApiController
         }
     }
 
+    public function actionEnable_whatsapp_central()
+    {
+        try {
+            $conn = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+            $stmt = $conn->prepare("SELECT value FROM config WHERE `key` = 'enable_whatsapp_central' LIMIT 1");
+            $stmt->execute();
+            $val = $stmt->fetchColumn();
+            $enabled = ($val !== false && $val !== null && $val !== '') ? (string)$val : '1';
+            echo json_encode([
+                'status' => true,
+                'message' => 'Configuração enable_whatsapp_central',
+                'data' => $enabled,
+                'response' => $enabled,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            echo json_encode([
+                'status' => true,
+                'message' => 'Configuração padrão ativada',
+                'data' => '1',
+                'response' => '1',
+                'errors' => null
+            ]);
+        }
+    }
+
+    public function actionEnableWhatsappCentral()
+    {
+        $this->actionEnable_whatsapp_central();
+    }
+
     public function actionType()
     {
         $typeId = $_GET['id'] ?? null;
