@@ -259,14 +259,24 @@ class TripDao extends BaseDao
                 } catch (\Throwable $t) {}
             }
 
-            // 10. Fetch and return complete trip
-            $trip = $this->find($this->trip->getTripReference());
-
+            // 10. Commit transaction first so trip is committed in DB
             $this->commit();
+            $committed = true;
+
+            // 11. Fetch and return complete trip
+            try {
+                $trip = $this->find($this->trip->getTripReference());
+            } catch (\Throwable $e) {
+                $trip = $this->trip;
+            }
 
             return $trip;
         } catch (Exception $e) {
-            $this->rollback();
+            if (empty($committed)) {
+                try {
+                    $this->rollback();
+                } catch (\Throwable $t) {}
+            }
             (new LogDao())->logException($e);
             throw $e;
         }
@@ -1688,11 +1698,28 @@ class TripDao extends BaseDao
             } catch (\Throwable $t) {}
         }
 
+        if (empty($data->tripReference)) {
+            $data->tripReference = \app\utils\UUID::v4();
+        }
+
         /** @var Trip $trip */
         $trip = $this->create($data);
 
-        $trip->setTripReference($this->sqlSelect(['tripReference'], [['idTrip', '=', $trip->getIdTrip()]])
-            ->get(false)->tripReference);
+        $tripRef = null;
+        try {
+            $res = $this->sqlSelect(['tripReference'], [['idTrip', '=', $trip->getIdTrip()]])->get(false);
+            if (is_object($res) && !empty($res->tripReference)) {
+                $tripRef = $res->tripReference;
+            } elseif (is_array($res) && !empty($res[0]->tripReference)) {
+                $tripRef = $res[0]->tripReference;
+            }
+        } catch (\Throwable $t) {}
+
+        if (empty($tripRef)) {
+            $tripRef = $data->tripReference;
+        }
+
+        $trip->setTripReference($tripRef);
 
         return $trip;
     }
