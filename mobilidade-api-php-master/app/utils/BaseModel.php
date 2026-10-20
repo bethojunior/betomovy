@@ -24,8 +24,13 @@ class BaseModel
     {
         if (!empty($obj)) {
             foreach ($obj as $key => $value) {
-                if (property_exists($this, $key) && $value !== "")
-                    $this->$key = $value;
+                if (property_exists($this, $key) && $value !== "") {
+                    if (is_bool($value)) {
+                        $this->$key = $value ? 1 : 0;
+                    } else {
+                        $this->$key = $value;
+                    }
+                }
             }
         }
     }

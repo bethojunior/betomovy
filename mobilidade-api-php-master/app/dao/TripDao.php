@@ -219,6 +219,20 @@ class TripDao extends BaseDao
             if (isset($data->favoriteDrivers) && is_array($data->favoriteDrivers)) {
                 $data->favoriteDrivers = implode(',', $data->favoriteDrivers);
             }
+            if (isset($data->haveReturn)) {
+                $data->haveReturn = !empty($data->haveReturn) ? 1 : 0;
+            } else {
+                $data->haveReturn = 0;
+            }
+            if (isset($data->isCalling)) {
+                $data->isCalling = !empty($data->isCalling) ? 1 : 0;
+            }
+            if (isset($data->isOffer)) {
+                $data->isOffer = !empty($data->isOffer) ? 1 : 0;
+            }
+            if (isset($data->isOpenPriceTrip)) {
+                $data->isOpenPriceTrip = !empty($data->isOpenPriceTrip) ? 1 : 0;
+            }
 
             // 6. Create Trip Record
             $this->trip = $this->createTrip($data);

@@ -497,9 +497,9 @@ document.addEventListener('DOMContentLoaded', function () {
           estimatedTripTime: Session.getLocal('estimatedTripTime'),
           multiplierDynamic: managerTrip.typeTaxi.priceDynamicValue,
           isOpenPriceTrip:
-            document.querySelector('.footer-container-trip').classList.contains('no-destination') ||
-            managerTrip.typeTaxi.centralNeighborhoodId != null,
-          haveReturn: haveReturn,
+            (document.querySelector('.footer-container-trip').classList.contains('no-destination') ||
+            managerTrip.typeTaxi.centralNeighborhoodId != null) ? 1 : 0,
+          haveReturn: haveReturn ? 1 : 0,
           paidByCentral: fee.paidByCentral,
           schedules: schedules,
         }

@@ -67,7 +67,12 @@ trait SqlTrait
             ->prepare("INSERT INTO {$this->getTableName()} ({$inputsForQuery}) VALUES ({$values})");
 
         foreach (explode(',', $values) as $key => $value) {
-            $query->bindValue($value, $inputs[explode(',', $fields)[$key]]);
+            $val = $inputs[explode(',', $fields)[$key]];
+            if (is_bool($val)) {
+                $query->bindValue($value, $val ? 1 : 0, \PDO::PARAM_INT);
+            } else {
+                $query->bindValue($value, $val);
+            }
         }
 
         $query->execute();
@@ -96,7 +101,12 @@ trait SqlTrait
             $values = $this->removeNullValues($model->toArray());
 
             foreach (array_keys($inputs) as $key) {
-                $stmt->bindValue($bind, $values[$key] ?? null);
+                $val = $values[$key] ?? null;
+                if (is_bool($val)) {
+                    $stmt->bindValue($bind, $val ? 1 : 0, \PDO::PARAM_INT);
+                } else {
+                    $stmt->bindValue($bind, $val);
+                }
                 $bind++;
             }
         }
@@ -384,7 +394,11 @@ trait SqlTrait
     {
         if (!empty($bind)) {
             foreach ($bind as $key => $value) {
-                $this->stmt->bindValue($key, $value);
+                if (is_bool($value)) {
+                    $this->stmt->bindValue($key, $value ? 1 : 0, \PDO::PARAM_INT);
+                } else {
+                    $this->stmt->bindValue($key, $value);
+                }
             }
         }
     }
