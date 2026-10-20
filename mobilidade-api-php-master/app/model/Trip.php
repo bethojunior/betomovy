@@ -84,6 +84,12 @@ class Trip extends BaseModel
     protected $haveReturn;
     protected $oldDestinationId;
     protected $isOffer;
+    protected $centralId;
+    protected $centralCustomerId;
+    protected $centralNeighborhoodId;
+    protected $scheduledBatchId;
+    protected $isCalling;
+    protected $callingDriver;
 
 
     public function __construct($obj = null)
@@ -739,6 +745,72 @@ class Trip extends BaseModel
     public function setOldPrice($oldPrice)
     {
         $this->oldPrice = $oldPrice;
+        return $this;
+    }
+
+    public function getCentralId()
+    {
+        return $this->centralId;
+    }
+
+    public function setCentralId($centralId)
+    {
+        $this->centralId = $centralId;
+        return $this;
+    }
+
+    public function getCentralCustomerId()
+    {
+        return $this->centralCustomerId;
+    }
+
+    public function setCentralCustomerId($centralCustomerId)
+    {
+        $this->centralCustomerId = $centralCustomerId;
+        return $this;
+    }
+
+    public function getCentralNeighborhoodId()
+    {
+        return $this->centralNeighborhoodId;
+    }
+
+    public function setCentralNeighborhoodId($centralNeighborhoodId)
+    {
+        $this->centralNeighborhoodId = $centralNeighborhoodId;
+        return $this;
+    }
+
+    public function getScheduledBatchId()
+    {
+        return $this->scheduledBatchId;
+    }
+
+    public function setScheduledBatchId($scheduledBatchId)
+    {
+        $this->scheduledBatchId = $scheduledBatchId;
+        return $this;
+    }
+
+    public function getIsCalling()
+    {
+        return $this->isCalling;
+    }
+
+    public function setIsCalling($isCalling)
+    {
+        $this->isCalling = $isCalling;
+        return $this;
+    }
+
+    public function getCallingDriver()
+    {
+        return $this->callingDriver;
+    }
+
+    public function setCallingDriver($callingDriver)
+    {
+        $this->callingDriver = $callingDriver;
         return $this;
     }
     

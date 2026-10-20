@@ -212,7 +212,13 @@ class TripDao extends BaseDao
             }
 
             $data->date = $data->date ?? now();
-            $data->status = $data->status ?? 'search_driver';
+            $validStatuses = ['searching', 'searching_favorite', 'accepted', 'pre_accepted', 'boarding', 'in_progress', 'finished', 'canceled', 'not_answered', 'back_off', 'payment_refused', 'scheduled', 'stand_by', 'get_bid_by_drivers', 'waiting'];
+            if (empty($data->status) || !in_array($data->status, $validStatuses)) {
+                $data->status = !empty($data->schedule) ? 'scheduled' : 'searching';
+            }
+            if (isset($data->favoriteDrivers) && is_array($data->favoriteDrivers)) {
+                $data->favoriteDrivers = implode(',', $data->favoriteDrivers);
+            }
 
             // 6. Create Trip Record
             $this->trip = $this->createTrip($data);
