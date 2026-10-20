@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     CentralRepository.getTrips(centralId)
         .then((result) => {
-            const data = result?.response ?? result;
+            const data = result?.response?.trips ?? result?.response ?? result;
             createPagination(data);
             showListTrip(data);
         }).catch((err) => {
@@ -310,7 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showSkeletons();
         CentralRepository.getTripsByUrl(url)
             .then((result) => {
-                const data = result?.response ?? result;
+                const data = result?.response?.trips ?? result?.response ?? result;
                 createPagination(data);
                 showListTrip(data);
             })

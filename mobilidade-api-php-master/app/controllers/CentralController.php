@@ -932,32 +932,143 @@ class CentralController extends ApiController
             return;
         }
 
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+        if ($method === 'POST') {
+            try {
+                $data = $this->request();
+                $centralId = (int)($data->centralId ?? ($_GET['id'] ?? 0));
+                $driverId = (int)($data->driverId ?? 0);
+                $isFavorite = !empty($data->isFavorite) ? 1 : 0;
+
+                if (!$centralId || !$driverId) {
+                    throw new \Exception("Central e Motorista são obrigatórios");
+                }
+
+                $pdo = Connection::open(Connection::DB_MYSQL_RW);
+                $stmt = $pdo->prepare("SELECT id FROM centralDriver WHERE centralId = :cid AND driverId = :did");
+                $stmt->execute([':cid' => $centralId, ':did' => $driverId]);
+                $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($existing) {
+                    $upd = $pdo->prepare("UPDATE centralDriver SET deleted_at = NULL, isFavorite = :fav, updated_at = NOW() WHERE id = :id");
+                    $upd->execute([':fav' => $isFavorite, ':id' => $existing['id']]);
+                } else {
+                    $ins = $pdo->prepare("INSERT INTO centralDriver (centralId, driverId, isFavorite, created_at, updated_at) VALUES (:cid, :did, :fav, NOW(), NOW())");
+                    $ins->execute([':cid' => $centralId, ':did' => $driverId, ':fav' => $isFavorite]);
+                }
+
+                echo $this->returnSuccess("Motorista vinculado com sucesso à central");
+            } catch (\Throwable $e) {
+                echo $this->returnError($e);
+            }
+            return;
+        }
+
+        if ($method === 'DELETE') {
+            try {
+                $centralId = (int)($_GET['id'] ?? 0);
+                $driverId = (int)($_GET['driverId'] ?? ($_GET['idDriver'] ?? 0));
+                if (!$driverId && isset($_GET['reference'])) {
+                    $driverId = (int)$_GET['reference'];
+                }
+
+                if (!$centralId || !$driverId) {
+                    throw new \Exception("Central e Motorista são obrigatórios");
+                }
+
+                $pdo = Connection::open(Connection::DB_MYSQL_RW);
+                $stmt = $pdo->prepare("UPDATE centralDriver SET deleted_at = NOW() WHERE centralId = :cid AND driverId = :did");
+                $stmt->execute([':cid' => $centralId, ':did' => $driverId]);
+
+                echo $this->returnSuccess("Motorista removido da central com sucesso");
+            } catch (\Throwable $e) {
+                echo $this->returnError($e);
+            }
+            return;
+        }
+
         try {
             $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $centralId = (int)($_GET['id'] ?? 0);
             $page = max(1, (int)($_GET['page'] ?? 1));
-            $limit = 50;
+            $limit = 20;
             $offset = ($page - 1) * $limit;
 
-            $sql = "SELECT d.idDriver, d.userId, u.name, u.phone, u.document, u.email, d.status, d.last_lat, d.last_lon
+            $where = ["(d.driverRegisterStatusId = 1 OR d.driverRegisterStatusId IS NULL)"];
+            $params = [];
+            if ($centralId > 0) {
+                $where[] = "(d.idDriver IN (SELECT driverId FROM centralDriver WHERE centralId = :centralId AND deleted_at IS NULL) OR d.centralId = :centralId2)";
+                $params[':centralId'] = $centralId;
+                $params[':centralId2'] = $centralId;
+            }
+            $whereSql = implode(' AND ', $where);
+
+            $countStmt = $pdo->prepare("SELECT COUNT(*) FROM driver d INNER JOIN user u ON d.userId = u.idUser WHERE {$whereSql}");
+            $countStmt->execute($params);
+            $total = (int)$countStmt->fetchColumn();
+            $lastPage = max(1, (int)ceil($total / $limit));
+
+            $stmt = $pdo->prepare("SELECT d.idDriver, d.userId, u.name, u.phone, u.document, u.email, u.created_at, d.status, d.last_lat, d.last_lon, d.profileImageUrl
                     FROM driver d
                     INNER JOIN user u ON d.userId = u.idUser
-                    WHERE (d.driverRegisterStatusId = 1 OR d.driverRegisterStatusId IS NULL)
+                    WHERE {$whereSql}
                     ORDER BY u.name ASC
-                    LIMIT {$limit} OFFSET {$offset}";
-
-            $stmt = $pdo->query($sql);
+                    LIMIT {$limit} OFFSET {$offset}");
+            $stmt->execute($params);
             $drivers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $formatted = [];
+            foreach ($drivers as $d) {
+                $formatted[] = [
+                    'idDriver' => (int)$d['idDriver'],
+                    'userId' => (int)$d['userId'],
+                    'profileImageUrl' => $d['profileImageUrl'] ?? '',
+                    'name' => $d['name'],
+                    'user' => [
+                        'name' => $d['name'],
+                        'email' => $d['email'],
+                        'phone' => $d['phone'],
+                        'document' => $d['document'],
+                        'created_at' => $d['created_at'],
+                    ],
+                    'status' => $d['status'],
+                    'blockedId' => null,
+                ];
+            }
+
+            $prevPageUrl = $page > 1 ? "?page=" . ($page - 1) : null;
+            $nextPageUrl = $page < $lastPage ? "?page=" . ($page + 1) : null;
+
+            $resData = [
+                'current_page' => $page,
+                'last_page' => $lastPage,
+                'total' => $total,
+                'per_page' => $limit,
+                'prev_page_url' => $prevPageUrl,
+                'next_page_url' => $nextPageUrl,
+                'data' => $formatted,
+            ];
 
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
-                'response' => $drivers,
-                'data' => $drivers,
+                'response' => $resData,
+                'data' => $formatted,
+                'current_page' => $page,
+                'last_page' => $lastPage,
+                'total' => $total,
+                'prev_page_url' => $prevPageUrl,
+                'next_page_url' => $nextPageUrl,
                 'errors' => null
             ]);
         } catch (\Throwable $e) {
             header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(['status' => true, 'response' => [], 'data' => []]);
+            echo json_encode([
+                'status' => true,
+                'response' => ['current_page' => 1, 'last_page' => 1, 'total' => 0, 'data' => []],
+                'data' => []
+            ]);
         }
     }
 
@@ -1125,10 +1236,15 @@ class CentralController extends ApiController
 
     public function actionTrip()
     {
-        $this->actionTripActivesRealtime();
+        $this->fetchTrips(false);
     }
 
     public function actionTripActivesRealtime()
+    {
+        $this->fetchTrips(true);
+    }
+
+    private function fetchTrips(bool $onlyActivesByDefault = false)
     {
         header('Content-Type: application/json; charset=utf-8');
         try {
@@ -1141,6 +1257,8 @@ class CentralController extends ApiController
             $flowFilter = $_GET['flow'] ?? null;
             $customerNameFilter = $_GET['customerName'] ?? null;
             $driverNameFilter = $_GET['driverName'] ?? null;
+            $driverIdFilter = $_GET['driverId'] ?? null;
+            $dateFilter = $_GET['date'] ?? null;
 
             $pdo = Connection::open(Connection::DB_MYSQL_RW);
 
@@ -1158,9 +1276,25 @@ class CentralController extends ApiController
             if (!empty($statusFilter)) {
                 $where[] = "trip.status = :status";
                 $params[':status'] = $statusFilter;
-            } else {
+            } elseif ($onlyActivesByDefault) {
                 $inStatuses = "'" . implode("','", $activeStatuses) . "'";
                 $where[] = "trip.status IN ({$inStatuses})";
+            }
+
+            if (!empty($driverIdFilter)) {
+                $where[] = "trip.driverId = :driverIdFilter";
+                $params[':driverIdFilter'] = (int)$driverIdFilter;
+            }
+
+            if (!empty($dateFilter)) {
+                if (is_array($dateFilter) && count($dateFilter) >= 2 && !empty($dateFilter[0]) && !empty($dateFilter[1])) {
+                    $where[] = "DATE(trip.date) >= :dStart AND DATE(trip.date) <= :dEnd";
+                    $params[':dStart'] = $dateFilter[0];
+                    $params[':dEnd'] = $dateFilter[1];
+                } elseif (is_string($dateFilter) && !empty($dateFilter)) {
+                    $where[] = "DATE(trip.date) = :dSingle";
+                    $params[':dSingle'] = $dateFilter;
+                }
             }
 
             if (!empty($flowFilter)) {
@@ -1333,35 +1467,38 @@ class CentralController extends ApiController
 
             $lastPage = $total > 0 ? (int)ceil($total / $perPage) : 1;
 
+            $tripsPagination = [
+                'current_page' => $page,
+                'data' => $trips,
+                'first_page_url' => null,
+                'from' => $total > 0 ? $offset + 1 : null,
+                'last_page' => $lastPage,
+                'last_page_url' => null,
+                'next_page_url' => $page < $lastPage ? true : null,
+                'path' => null,
+                'per_page' => $perPage,
+                'prev_page_url' => $page > 1 ? true : null,
+                'to' => min($offset + $perPage, $total),
+                'total' => $total
+            ];
+
             echo json_encode([
                 'status' => true,
-                'message' => 'Viagens ativas',
+                'message' => 'Viagens listadas com sucesso',
                 'response' => [
-                    'trips' => [
-                        'current_page' => $page,
-                        'data' => $trips,
-                        'first_page_url' => null,
-                        'from' => $total > 0 ? $offset + 1 : null,
-                        'last_page' => $lastPage,
-                        'last_page_url' => null,
-                        'next_page_url' => $page < $lastPage ? true : null,
-                        'path' => null,
-                        'per_page' => $perPage,
-                        'prev_page_url' => $page > 1 ? true : null,
-                        'to' => min($offset + $perPage, $total),
-                        'total' => $total
-                    ],
+                    'trips' => $tripsPagination,
+                    'current_page' => $page,
+                    'last_page' => $lastPage,
+                    'total' => $total,
+                    'per_page' => $perPage,
+                    'data' => $trips,
                     'scheduledTotal' => $scheduledTotal
                 ],
-                'data' => [
-                    'trips' => [
-                        'current_page' => $page,
-                        'data' => $trips,
-                        'last_page' => $lastPage,
-                        'total' => $total
-                    ],
-                    'scheduledTotal' => $scheduledTotal
-                ]
+                'data' => $tripsPagination,
+                'current_page' => $page,
+                'last_page' => $lastPage,
+                'total' => $total,
+                'scheduledTotal' => $scheduledTotal
             ]);
         } catch (\Throwable $e) {
             echo json_encode([
@@ -1373,6 +1510,7 @@ class CentralController extends ApiController
                         'data' => [],
                         'total' => 0
                     ],
+                    'data' => [],
                     'scheduledTotal' => 0
                 ]
             ]);

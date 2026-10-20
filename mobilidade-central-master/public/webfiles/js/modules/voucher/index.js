@@ -26,8 +26,13 @@ document.addEventListener("DOMContentLoaded",function () {
         }
 
         VoucherController.getAll(central.latitude, central.longitude).then(({data}) => {
-            viewController.elementProperty.getElement('.content-voucher', element => {
-                element.innerHTML = data.filter(item => item.user === 'central').map(item => {
+            elementProperty.getElement('.content-voucher', element => {
+                const voucherList = Array.isArray(data) ? data.filter(item => item.user === 'central') : [];
+                if (voucherList.length === 0) {
+                    element.innerHTML = `<div class="col-12 text-center text-muted p-4"><i class="material-icons" style="font-size: 48px;">local_activity</i><p>Nenhum voucher disponível para compra no momento.</p></div>`;
+                    return;
+                }
+                element.innerHTML = voucherList.map(item => {
                     return `
                             <div class="card-voucher">
                                 <div class="money-content">
@@ -43,7 +48,7 @@ document.addEventListener("DOMContentLoaded",function () {
                 }).join("");
             });
 
-            viewController.elementProperty.addEventInElement('.buyVoucher', 'onclick', function() {
+            elementProperty.addEventInElement('.buyVoucher', 'onclick', function() {
                 preload(true);
 
                 CentralVoucherPurchasePaymentController.getVoucherPurchasePaymentForms().then(result => {
@@ -86,7 +91,7 @@ document.addEventListener("DOMContentLoaded",function () {
                     }, 10000);
                 });
 
-                viewController.elementProperty.addEventInElement('.btn-finish', 'onclick', function() {
+                elementProperty.addEventInElement('.btn-finish', 'onclick', function() {
                     preload(true);
                      if(typePayment === 'card'){
                         const cardHolder = document.querySelector('#cardHolderNameInput').value;
@@ -142,12 +147,12 @@ document.addEventListener("DOMContentLoaded",function () {
             preload(false)
         });
 
-        viewController.elementProperty.addEventInElement('#btn-pix', 'onclick', function() {
+        elementProperty.addEventInElement('#btn-pix', 'onclick', function() {
             document.querySelector('.flipper').style.transform = 'rotateY(180deg)';
             typePayment = 'pix';
         });
 
-        viewController.elementProperty.addEventInElement('#btn-card', 'onclick', function() {
+        elementProperty.addEventInElement('#btn-card', 'onclick', function() {
             document.querySelector('.flipper').style.transform = '';
             typePayment = 'card';
         });

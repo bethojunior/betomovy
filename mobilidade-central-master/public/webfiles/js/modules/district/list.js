@@ -61,8 +61,8 @@ function listFeeByNeighborhood () {
             const money = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || "R$";
             return `
             <tr>
-                <td>${escapeHtml(item.neighborhood?.name || "-")}</td>
-                <td>${escapeHtml(item.trip_type?.type || "-")}</td>
+                <td>${escapeHtml(item.neighborhood?.name || item.neighborhoodName || (typeof item.neighborhood === 'string' ? item.neighborhood : '-'))}</td>
+                <td>${escapeHtml(item.trip_type?.type || item.tripTypeName || (typeof item.tripType === 'string' ? item.tripType : '-'))}</td>
                 <td>${money} ${Mask.maskMoney(item.value)}</td>
                 <td>
                     <button class="dt-action-btn dt-action-btn--danger delete-neighborhood" value="${item.id}">Excluir</button>

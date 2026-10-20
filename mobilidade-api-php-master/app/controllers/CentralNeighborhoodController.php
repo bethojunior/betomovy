@@ -47,6 +47,18 @@ class CentralNeighborhoodController extends ApiController
             $stmt->execute($params);
             $fees = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            foreach ($fees as &$fee) {
+                $fee['neighborhood'] = [
+                    'id' => (int)$fee['neighborhoodId'],
+                    'name' => $fee['neighborhoodName']
+                ];
+                $fee['trip_type'] = [
+                    'id' => (int)$fee['tripTypeId'],
+                    'type' => $fee['tripTypeName']
+                ];
+            }
+            unset($fee);
+
             echo $this->returnSuccess("Taxas por bairro listadas", $fees);
         } catch (Exception $e) {
             echo $this->returnError($e);

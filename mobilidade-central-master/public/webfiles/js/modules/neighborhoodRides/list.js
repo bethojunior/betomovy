@@ -94,9 +94,17 @@ function listTypeTrip() {
 function listAllNeighborhood() {
     preload(true);
     NeighborhoodController.listAllNeighborhood(idCentral).then((response) => {
-        document.querySelector('#resultTable').innerHTML = response.response.map((item) => `
+        const items = response?.response || response?.data || [];
+        const resultTable = document.querySelector('#resultTable');
+        if (!resultTable) return;
+
+        if (!Array.isArray(items) || items.length === 0) {
+            resultTable.innerHTML = '<tr><td colspan="7" class="text-center p-4 text-muted">Nenhuma rota cadastrada entre bairros.</td></tr>';
+            return;
+        }
+
+        resultTable.innerHTML = items.map((item) => `
             <tr>
-                <td></td>
                 <td>${item.originName}</td>
                 <td>${item.destinyName}</td>
                 <td>${cityConfig?.typeMoney || 'R$'} ${Mask.maskMoney(item.price)}</td>
@@ -178,7 +186,8 @@ elementProperty.addEventInElement('#btnSearchLocal', 'onclick', function () {
         return;
     }
 
-    const host = `https://nominatim.openstreetmap.org/search.php?q=${searchValue} fortaleza&polygon_geojson=1&format=jsonv2`;
+    const cityName = cityConfig?.name || cityConfig?.nome || cityConfig?.city || 'Brasil';
+    const host = `https://nominatim.openstreetmap.org/search.php?q=${encodeURIComponent(searchValue + ' ' + cityName)}&polygon_geojson=1&format=jsonv2`;
 
     preload(true);
     fetch(host)

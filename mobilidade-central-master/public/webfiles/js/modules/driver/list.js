@@ -18,7 +18,8 @@ function createListDrivers(response) {
     const elementProperty = new ElementProperty();
 
     elementProperty.getElement("#resultTable", element => {
-        if (!response.data || response.data.length === 0) {
+        const drivers = Array.isArray(response) ? response : (response?.data || []);
+        if (drivers.length === 0) {
             element.innerHTML = `<tr>
                 <td colspan="6" class="drv-empty-state">
                     <div>
@@ -30,24 +31,28 @@ function createListDrivers(response) {
             return;
         }
 
-        element.innerHTML = response.data.map(driver => {
+        element.innerHTML = drivers.map(driver => {
             const isBlocked = !!driver?.blockedId;
             const toggleClass = isBlocked ? "unblocked-user-driver" : "blocked-user-driver";
             const toggleLabel = isBlocked ? "Desbloquear" : "Bloquear";
             const toggleIcon = isBlocked ? "lock_open" : "lock";
             const toggleBtnClass = isBlocked ? "drv-action-btn--success" : "drv-action-btn--warn";
+            const driverName = driver.user?.name || driver.name || '';
+            const driverEmail = driver.user?.email || driver.email || '';
+            const driverPhone = driver.user?.phone || driver.phone || '';
+            const createdAt = driver.user?.created_at || driver.created_at;
 
             return `<tr>
                 <td>
                     <div class="drv-name-cell">
                         <div class="drv-photo" style="background-image: url('${driver.profileImageUrl || ''}')"></div>
-                        <span>${escapeHtml(driver.user?.name)}</span>
+                        <span>${escapeHtml(driverName)}</span>
                     </div>
                 </td>
                 <td>${escapeHtml(Driver.code(driver))}</td>
-                <td>${escapeHtml(driver.user?.email)}</td>
-                <td>${escapeHtml(driver.user?.phone)}</td>
-                <td>${driver.user?.created_at ? moment(driver.user.created_at).format("DD/MM/YYYY HH:mm") : ''}</td>
+                <td>${escapeHtml(driverEmail)}</td>
+                <td>${escapeHtml(driverPhone)}</td>
+                <td>${createdAt ? moment(createdAt).format("DD/MM/YYYY HH:mm") : ''}</td>
                 <td>
                     <div class="drv-actions">
                         <button type="button" class="drv-action-btn drv-action-btn--danger remove-user-driver" value="${driver.idDriver}">
@@ -109,15 +114,22 @@ function createPagination(response) {
     const elementProperty = new ElementProperty();
 
     elementProperty.getElement(".container-pagination", element => {
-        const hasPrev = response.prev_page_url != null;
-        const hasNext = response.next_page_url != null;
+        if (!response || Array.isArray(response) || !response.last_page || response.last_page <= 1) {
+            element.innerHTML = "";
+            return;
+        }
+
+        const currentPage = response.current_page || 1;
+        const lastPage = response.last_page || 1;
+        const hasPrev = !!response.prev_page_url || currentPage > 1;
+        const hasNext = !!response.next_page_url || currentPage < lastPage;
 
         element.innerHTML = `<div class="drv-pager">
             <button class="drv-pager-btn ${hasPrev ? "prev-page" : ""}" ${hasPrev ? "" : "disabled"} aria-label="Página anterior">
                 <i class="material-icons">chevron_left</i>
                 <span>Anterior</span>
             </button>
-            <span class="drv-pager-count">${response.current_page} / ${response.last_page}</span>
+            <span class="drv-pager-count">${currentPage} / ${lastPage}</span>
             <button class="drv-pager-btn ${hasNext ? "next-page" : ""}" ${hasNext ? "" : "disabled"} aria-label="Próxima página">
                 <span>Próxima</span>
                 <i class="material-icons">chevron_right</i>
@@ -125,12 +137,12 @@ function createPagination(response) {
         </div>`;
 
         elementProperty.addEventInElement(".prev-page", "onclick", function () {
-            getNewPage(response.current_page - 1);
+            getNewPage(currentPage - 1);
             document.querySelector(".container-main").scrollTop = 0;
         });
 
         elementProperty.addEventInElement(".next-page", "onclick", function () {
-            getNewPage(response.current_page + 1);
+            getNewPage(currentPage + 1);
             document.querySelector(".container-main").scrollTop = 0;
         });
     });
