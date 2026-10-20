@@ -13,20 +13,51 @@ import { AppService } from './app.service';
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get<string>('MYSQL_DB_HOST', 'localhost'),
-        port: Number(configService.get<string>('MYSQL_DB_PORT', '3306')),
-        username: configService.get<string>('MYSQL_DB_USERNAME', 'root'),
-        password: configService.get<string>('MYSQL_DB_PASSWORD', ''),
-        database: configService.get<string>('MYSQL_DB_NAME', 'movy'),
-        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        autoLoadEntities: true,
-        synchronize: false,
-        logging: false,
-        retryAttempts: 3,
-        retryDelay: 3000,
-      }),
+      useFactory: (configService: ConfigService) => {
+        const host =
+          configService.get<string>('MYSQL_DB_HOST') ||
+          configService.get<string>('MYSQL_HOST') ||
+          configService.get<string>('DB_HOST') ||
+          'localhost';
+        const port = Number(
+          configService.get<string>('MYSQL_DB_PORT') ||
+          configService.get<string>('MYSQL_PORT') ||
+          configService.get<string>('DB_PORT') ||
+          (host.includes('ondigitalocean.com') ? 25060 : 3306),
+        );
+        const username =
+          configService.get<string>('MYSQL_DB_USERNAME') ||
+          configService.get<string>('MYSQL_USER') ||
+          configService.get<string>('DB_USER') ||
+          'root';
+        const password =
+          configService.get<string>('MYSQL_DB_PASSWORD') ||
+          configService.get<string>('MYSQL_PASS') ||
+          configService.get<string>('DB_PASS') ||
+          '';
+        const database =
+          configService.get<string>('MYSQL_DB_NAME') ||
+          configService.get<string>('MYSQL_NAME') ||
+          configService.get<string>('DB_NAME') ||
+          'defaultdb';
+        const isRemote = host !== 'localhost' && host !== '127.0.0.1';
+
+        return {
+          type: 'mysql',
+          host,
+          port,
+          username,
+          password,
+          database,
+          ssl: isRemote ? { rejectUnauthorized: false } : false,
+          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+          autoLoadEntities: true,
+          synchronize: false,
+          logging: false,
+          retryAttempts: 10,
+          retryDelay: 3000,
+        };
+      },
     }),
     DriverModule,
     TripModule,

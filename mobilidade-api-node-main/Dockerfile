@@ -54,9 +54,18 @@ USER node
 
 FROM node:18-alpine As production
 
-# Copy the bundled code from the build stage to the production image
+WORKDIR /usr/src/app
+
+ENV NODE_ENV=production
+ENV PORT=8080
+
+# Copy manifests and built artifacts
+COPY --from=build /usr/src/app/package*.json ./
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
+
+# Use node user
+USER node
 
 # Port exposure for DigitalOcean App Platform & local
 EXPOSE 8080 3000
