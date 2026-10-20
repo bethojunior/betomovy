@@ -222,6 +222,11 @@ class TripController extends ApiController
 
     public function actionIndex()
     {
+        if (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) === 'POST') {
+            $this->actionNew();
+            return;
+        }
+
         try {
             $page = max(1, (int)($_GET['page'] ?? 1));
             $perPage = max(1, (int)($_GET['per_page'] ?? 10));

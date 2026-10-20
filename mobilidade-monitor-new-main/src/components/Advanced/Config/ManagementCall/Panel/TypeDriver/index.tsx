@@ -46,26 +46,28 @@ const TypeDriver = ({ optionsAppPartners }: ITypeDriverProps) => {
     setShowAlert(true);
   };
 
-  const loadInformation = (): void => {
+  const loadInformation = async (): Promise<void> => {
     setLoading(true);
-    const requestDrivers = api("userType/drivers");
-    const requestIcons = api("iconMapDriver");
-    Promise.all([requestDrivers, requestIcons])
-      .then((result) => {
-        setLoading(false);
-        const driversData = result[0].data;
-        const iconsData = result[1].data;
-        if (!driversData.status || !iconsData.status) {
-          showFeedback(LOAD_INFORMATION_ERROR_MESSAGE, "error");
-          return;
-        }
-        setDriver(driversData.response);
-        setIconDriver(iconsData.response);
-      })
-      .catch(() => {
-        setLoading(false);
-        showFeedback(LOAD_INFORMATION_ERROR_MESSAGE, "error");
-      });
+    try {
+      const [driversRes, iconsRes] = await Promise.allSettled([
+        api("userType/drivers"),
+        api("iconMapDriver"),
+      ]);
+
+      if (driversRes.status === "fulfilled" && driversRes.value?.data?.status) {
+        const d = driversRes.value.data.response ?? driversRes.value.data.data ?? [];
+        setDriver(Array.isArray(d) ? d : []);
+      }
+
+      if (iconsRes.status === "fulfilled" && iconsRes.value?.data?.status) {
+        const ic = iconsRes.value.data.response ?? iconsRes.value.data.data ?? [];
+        setIconDriver(Array.isArray(ic) ? ic : []);
+      }
+    } catch {
+      showFeedback(LOAD_INFORMATION_ERROR_MESSAGE, "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

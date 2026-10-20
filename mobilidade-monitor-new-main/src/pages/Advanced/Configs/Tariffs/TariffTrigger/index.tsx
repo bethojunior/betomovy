@@ -45,7 +45,7 @@ export const TariffTrigger = () => {
 
       if (responsePricesDynamicScheduled.status) {
         setPricesDynamicsScheduled(
-          responsePricesDynamicScheduled.data.response
+          responsePricesDynamicScheduled.data.response ?? responsePricesDynamicScheduled.data.data ?? []
         );
       }
     } catch (error) {

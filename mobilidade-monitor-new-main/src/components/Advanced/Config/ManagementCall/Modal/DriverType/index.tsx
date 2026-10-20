@@ -149,8 +149,23 @@ const DriverTypeModal: FC<ModalProps> = ({
 
       setRenderImage(false);
       setSelectedFile(driverSelected?.picture);
+    } else if (typeModal === "create" && visibility) {
+      const defaultIconId = icon && icon.length > 0 ? icon[0].id : 1;
+      form.setFieldsValue({
+        iconMap: defaultIconId,
+        vehicleType: "car",
+        status: true,
+        acceptedText: "Seu motorista vai chegar em breve",
+        boardingText: "Seu carro está te aguardando",
+        inProgressText: "Você está no percurso do seu destino",
+        cancellationText: "Sua viagem foi cancelada",
+        exclusivity: "0",
+      });
+      setIconSelected(defaultIconId);
+      setRenderImage(false);
+      setSelectedFile(null);
     }
-  }, [driverSelected, visibility, typeModal, form]);
+  }, [driverSelected, visibility, typeModal, form, icon]);
 
   useEffect(() => {
     if (driverSelected?.user_type_linked_app_partner) {
@@ -170,21 +185,28 @@ const DriverTypeModal: FC<ModalProps> = ({
 
   const createTypeDriver = (values: ValuesForm) => {
     setLoading(true);
-    resizeFile(values.image.target.files[0], 250, 250).then((result) => {
+
+    const submitCreate = (pictureBlob?: Blob | null) => {
       const formData = new FormData();
-      formData.append("picture", result as Blob);
+      if (pictureBlob) {
+        formData.append("picture", pictureBlob);
+      }
       formData.append("name", values.name);
-      formData.append("boardingText", values.boardingText);
-      formData.append("acceptedText", values.acceptedText);
-      formData.append("inProgressText", values.inProgressText);
-      formData.append("cancellationText", values.cancellationText);
+      formData.append("boardingText", values.boardingText || "Seu carro está te aguardando");
+      formData.append("acceptedText", values.acceptedText || "Seu motorista vai chegar em breve");
+      formData.append("inProgressText", values.inProgressText || "Você está no percurso do seu destino");
+      formData.append("cancellationText", values.cancellationText || "Sua viagem foi cancelada");
       formData.append("vehicleType", values.vehicleType || "car");
       formData.append("isActive", values.status === true ? "1" : "0");
-      formData.append("iconMapDriverId", values.iconMap);
+      formData.append("iconMapDriverId", values.iconMap ? String(values.iconMap) : "1");
       formData.append(
         "isDeliveryMan",
-        import.meta.env.ISSPEEDMOB == "true" ? "0" : values.exclusivity || "0"
+        import.meta.env.ISSPEEDMOB == "true" ? "0" : (values.exclusivity ? String(values.exclusivity) : "0")
       );
+
+      idsAppPartners.forEach((id) => {
+        formData.append("idsAppPartners[]", String(id));
+      });
 
       const config = {
         headers: {
@@ -193,25 +215,44 @@ const DriverTypeModal: FC<ModalProps> = ({
         },
       };
 
-      api.post("userType", formData, config).then((value) => {
-        setLoading(false);
-        if (!value.data?.status) {
-          setMessageAlert(
-            "Não foi possível criar o tipo de motorista, tente novamente"
-          );
-          setTypeAlert("error");
-          return setShowAlert(true);
-        }
+      api.post("userType", formData, config)
+        .then((value) => {
+          setLoading(false);
+          if (!value.data?.status) {
+            setMessageAlert(
+              value.data?.message || "Não foi possível criar o tipo de motorista, tente novamente"
+            );
+            setTypeAlert("error");
+            return setShowAlert(true);
+          }
 
-        form.resetFields();
-        setSelectedFile(null);
-        setMessageAlert("Tipo de motorista criado com sucesso!");
-        setTypeAlert("success");
-        setShowAlert(true);
-        setVisibility(false);
-        return loadInformation();
-      });
-    });
+          form.resetFields();
+          setSelectedFile(null);
+          setMessageAlert("Tipo de motorista criado com sucesso!");
+          setTypeAlert("success");
+          setShowAlert(true);
+          setVisibility(false);
+          return loadInformation();
+        })
+        .catch((error) => {
+          setLoading(false);
+          setMessageAlert(error.response?.data?.message ?? "Não foi possível criar o tipo de motorista, tente novamente");
+          setTypeAlert("error");
+          setShowAlert(true);
+        });
+    };
+
+    const rawFile = (selectedFile && typeof selectedFile !== "string" && selectedFile[0])
+      || (values.image && (values.image as any)?.target?.files?.[0])
+      || (values.image as any)?.[0];
+
+    if (rawFile) {
+      resizeFile(rawFile, 250, 250)
+        .then((res) => submitCreate(res as Blob))
+        .catch(() => submitCreate(null));
+    } else {
+      submitCreate(null);
+    }
   };
 
   const updateTypeDriver = (values: ValuesForm) => {

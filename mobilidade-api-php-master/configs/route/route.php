@@ -254,7 +254,16 @@ return [
         '/neighborhoodrides',
         '/neighborhoodrides/',
         '/balance/overview',
-        '/publicity/advertising/customer'
+        '/publicity/advertising/customer',
+        '/iconmapdriver',
+        '/iconmapdriver/',
+        '/usertype',
+        '/usertype/',
+        '/config_app_partners',
+        '/config_app_partners/',
+        '/config_app_partners/find',
+        '/config_apps_partners',
+        '/config_apps_partners/'
     ]
 ];
 

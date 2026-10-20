@@ -18,6 +18,38 @@ class ConfigAppPartnerController extends ApiController
         }
     }
 
+    public function actionFind()
+    {
+        try {
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+            $stmt = $pdo->query("SELECT id, name_app, `key`, statusId FROM config_apps_partners WHERE (statusId = 1 OR statusId IS NULL)");
+            $partners = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            foreach ($partners as &$p) {
+                $p['id'] = (int)$p['id'];
+            }
+            unset($p);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Parceiros encontrados',
+                'response' => $partners,
+                'data' => $partners,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Nenhum parceiro',
+                'response' => [],
+                'data' => [],
+                'errors' => null
+            ]);
+        }
+    }
+
     public function actionFind_by_key()
     {
         try {
