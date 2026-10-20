@@ -35,6 +35,10 @@ class IconMapDriverController extends ApiController
             foreach ($icons as &$ic) {
                 $ic['id'] = (int)$ic['id'];
                 $ic['statusId'] = (int)$ic['statusId'];
+                if (!empty($ic['link']) && strpos($ic['link'], 'minio.704app.com.br') !== false) {
+                    $filename = basename(parse_url($ic['link'], PHP_URL_PATH));
+                    $ic['link'] = 'https://api.movymob.com/icons/' . $filename;
+                }
             }
             unset($ic);
 

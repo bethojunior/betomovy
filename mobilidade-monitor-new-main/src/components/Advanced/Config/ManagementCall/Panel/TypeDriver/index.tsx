@@ -22,6 +22,7 @@ import { useDriverTypeActions } from "./useDriverTypeActions";
 import api from "../../../../../../services/api";
 import Alert from "../../../../../Utils/Alert";
 import DriverTypeModal from "../../Modal/DriverType";
+import Blank from "../../../../../../assets/blank.png";
 
 const TypeDriver = ({ optionsAppPartners }: ITypeDriverProps) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -142,7 +143,17 @@ const TypeDriver = ({ optionsAppPartners }: ITypeDriverProps) => {
       title: "Logo",
       dataIndex: "picture",
       key: "picture",
-      render: (item: string) => <DriverLogoImage src={item} alt="logo" />,
+      render: (item: string) => (
+        <DriverLogoImage
+          src={item || Blank}
+          alt="logo"
+          style={{ objectFit: "contain" }}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = Blank;
+          }}
+        />
+      ),
     },
     {
       title: "Descrição",
@@ -200,6 +211,7 @@ const TypeDriver = ({ optionsAppPartners }: ITypeDriverProps) => {
       />
       <NewTypeDriverButton
         onClick={() => {
+          setTypeDriverSelected(undefined);
           setDriverTypeModal(true);
           setTypeModal("create");
           setTitleModal("Criar novo tipo de motorista");

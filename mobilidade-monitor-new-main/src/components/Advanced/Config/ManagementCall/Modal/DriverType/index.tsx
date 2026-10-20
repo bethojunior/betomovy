@@ -513,10 +513,19 @@ const DriverTypeModal: FC<ModalProps> = ({
                 src={
                   typeModal === "edit" && !renderImage
                     ? (selectedFile as string)
-                    : whatRender
+                    : whatRender || Blank
                 }
-                style={{ width: 100, height: 100, borderRadius: 5 }}
+                style={{
+                  width: 100,
+                  height: 100,
+                  borderRadius: 5,
+                  objectFit: "contain",
+                }}
                 alt="Ícone do chamado"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = Blank;
+                }}
               />
             )}
           </ContentImage>
@@ -530,8 +539,15 @@ const DriverTypeModal: FC<ModalProps> = ({
               },
             ]}
           >
-            <Radio.Group>
+            <Radio.Group value={iconSelected}>
               {icon.map((item) => {
+                const src =
+                  !item.link || item.link.includes("minio.704app.com.br")
+                    ? item.id === 2
+                      ? "/icons/moto.png"
+                      : "/icons/car.png"
+                    : item.link;
+
                 return (
                   <Radio
                     key={item.id}
@@ -539,9 +555,20 @@ const DriverTypeModal: FC<ModalProps> = ({
                     value={item.id}
                   >
                     <img
-                      style={{ width: 30, margin: 4 }}
-                      src={item.link}
-                      alt="icon"
+                      style={{
+                        width: 32,
+                        height: 32,
+                        objectFit: "contain",
+                        margin: 4,
+                        verticalAlign: "middle",
+                      }}
+                      src={src}
+                      alt={`icon-${item.id}`}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src =
+                          item.id === 2 ? "/icons/moto.png" : "/icons/car.png";
+                      }}
                     />
                   </Radio>
                 );
