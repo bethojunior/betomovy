@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
+use app\dao\GenericDao;
 use app\services\UserIndicationService;
-use app\utils\BaseDao;
 use app\utils\Headers;
 use Exception;
 
@@ -24,7 +24,6 @@ class UserIndicationController extends ApiController
     public function actionReportReferredUsers()
     {
         try {
-            $dao = new BaseDao();
             $name = isset($_GET['name']) ? trim($_GET['name']) : '';
 
             $where = ["ui.statusId = 1"];
@@ -51,7 +50,7 @@ class UserIndicationController extends ApiController
                     ORDER BY ui.id DESC
                     LIMIT 100";
 
-            $rows = $dao->sqlRawSelect($sql, $params)->get();
+            $rows = GenericDao::query($sql, $params);
             $result = is_array($rows) ? $rows : [];
 
             echo $this->returnSuccess("Usuários indicados", $result);
@@ -63,13 +62,12 @@ class UserIndicationController extends ApiController
     public function actionReportReferralEarnings()
     {
         try {
-            $dao = new BaseDao();
             $dateStart = isset($_GET['dateStart']) ? $_GET['dateStart'] . " 00:00:00" : date('Y-m-d 00:00:00', strtotime('-30 days'));
             $dateEnd = isset($_GET['dateEnd']) ? $_GET['dateEnd'] . " 23:59:59" : date('Y-m-d 23:59:59');
             $userId = isset($_GET['userId']) && !empty($_GET['userId']) ? (int)$_GET['userId'] : null;
 
             $where = [
-                "bf.balanceFlowTypeId = 5", // Comissão de indicação
+                "bf.balanceFlowTypeId = 5",
                 "bf.created_at >= :dateStart",
                 "bf.created_at <= :dateEnd"
             ];
@@ -97,20 +95,18 @@ class UserIndicationController extends ApiController
                     ORDER BY bf.idBalanceFlow DESC
                     LIMIT 200";
 
-            $rows = $dao->sqlRawSelect($sql, $params)->get();
+            $rows = GenericDao::query($sql, $params);
             $result = [];
 
-            if (is_array($rows)) {
-                foreach ($rows as $r) {
-                    $result[] = [
-                        'id' => (int)$r['id'],
-                        'value' => (float)$r['value'],
-                        'created_at' => $r['created_at'],
-                        'userId' => (int)$r['userId'],
-                        'userName' => $r['userName'],
-                        'userPhone' => $r['userPhone']
-                    ];
-                }
+            foreach ($rows as $r) {
+                $result[] = [
+                    'id' => (int)$r['id'],
+                    'value' => (float)$r['value'],
+                    'created_at' => $r['created_at'],
+                    'userId' => (int)$r['userId'],
+                    'userName' => $r['userName'],
+                    'userPhone' => $r['userPhone']
+                ];
             }
 
             echo $this->returnSuccess("Ganhos por indicação", $result);

@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class List_contacts_generalController extends ApiController
@@ -10,7 +10,6 @@ class List_contacts_generalController extends ApiController
     public function actionList()
     {
         try {
-            $dao = new BaseDao();
             $page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
             $limit = 20;
             $offset = ($page - 1) * $limit;
@@ -32,7 +31,7 @@ class List_contacts_generalController extends ApiController
 
             $whereStr = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
 
-            $countRow = $dao->sqlRawSelect("SELECT COUNT(*) AS total FROM list_contacts_general {$whereStr}", $params)->first();
+            $countRow = GenericDao::first("SELECT COUNT(*) AS total FROM list_contacts_general {$whereStr}", $params);
             $total = $countRow ? (int)$countRow['total'] : 0;
             $lastPage = $total > 0 ? (int)ceil($total / $limit) : 1;
 
@@ -42,7 +41,7 @@ class List_contacts_generalController extends ApiController
                     ORDER BY id DESC 
                     LIMIT {$limit} OFFSET {$offset}";
 
-            $rows = $dao->sqlRawSelect($sql, $params)->get();
+            $rows = GenericDao::query($sql, $params);
             $data = is_array($rows) ? $rows : [];
 
             $response = [
@@ -67,8 +66,7 @@ class List_contacts_generalController extends ApiController
                 throw new Exception("ID do contato não informado.");
             }
 
-            $dao = new BaseDao();
-            $dao->sqlRawSelect("DELETE FROM list_contacts_general WHERE id = :id", [':id' => $id]);
+            GenericDao::execute("DELETE FROM list_contacts_general WHERE id = :id", [':id' => $id]);
             echo $this->returnSuccess("Contato excluído com sucesso");
         } catch (Exception $e) {
             echo $this->returnError($e);

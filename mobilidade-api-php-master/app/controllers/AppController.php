@@ -1,33 +1,26 @@
 <?php
 
 namespace app\controllers;
+
+use app\dao\GenericDao;
 use app\services\AppVersionService;
 use Exception;
 
-/**
- * Created by PhpStorm.
- * User: Eduardo Roseo
- * Date: 07/03/2019
- * Time: 11:27
- */
 class AppController extends ApiController
 {
     public function actionIndex()
     {
         try {
-            $dao = new \app\utils\BaseDao();
-            $rows = $dao->sqlRawSelect("SELECT idApp, name, version, isCritical, link_store, statusId FROM app WHERE statusId = 1 ORDER BY idApp ASC")->get();
+            $rows = GenericDao::query("SELECT idApp, name, version, isCritical, link_store, statusId FROM app WHERE statusId = 1 ORDER BY idApp ASC");
             $result = [];
-            if (is_array($rows)) {
-                foreach ($rows as $r) {
-                    $r['id'] = (int)$r['idApp'];
-                    $r['idApp'] = (int)$r['idApp'];
-                    $r['statusId'] = (int)$r['statusId'];
-                    $result[] = $r;
-                }
+            foreach ($rows as $r) {
+                $r['id'] = (int)$r['idApp'];
+                $r['idApp'] = (int)$r['idApp'];
+                $r['statusId'] = (int)$r['statusId'];
+                $result[] = $r;
             }
             echo $this->returnSuccess("Aplicativos", $result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo $this->returnError($e);
         }
     }
@@ -54,20 +47,7 @@ class AppController extends ApiController
                 $service->getAppClientVersions()
             );
         } catch (Exception $e) {
-            echo $this->returnError($e, "Erro ao inserir informação");
-        }
-    }
-
-    public function actionGetAppIOSClientVersions()
-    {
-        $service = new AppVersionService;
-
-        try {
-            echo $this->returnSuccess("Versões do app Cliente",
-                $service->findAppIOSClientVersions()
-            );
-        } catch (Exception $e) {
-            echo $this->returnError($e, "Erro ao inserir informação");
+            echo $this->returnError($e, "Erro ao buscar versões");
         }
     }
 
@@ -80,20 +60,33 @@ class AppController extends ApiController
                 $service->getAppDriverVersions()
             );
         } catch (Exception $e) {
-            echo $this->returnError($e, "Erro ao inserir informação");
+            echo $this->returnError($e, "Erro ao buscar versões");
         }
     }
 
-    public function actionGetDefaultAppLogo()
+    public function actionGetAppIosClientVersions()
     {
         $service = new AppVersionService;
 
         try {
-            echo $this->returnSuccess("Logo da aplicação",
-                $service->getDefaultAppLogo()
+            echo $this->returnSuccess("Versões do app Cliente IOS",
+                $service->getAppIosClientVersions()
             );
         } catch (Exception $e) {
-            echo $this->returnError($e, "Erro ao buscar logo");
+            echo $this->returnError($e, "Erro ao buscar versões");
+        }
+    }
+
+    public function actionGetAppIosDriverVersions()
+    {
+        $service = new AppVersionService;
+
+        try {
+            echo $this->returnSuccess("Versões do app Motorista IOS",
+                $service->getAppIosDriverVersions()
+            );
+        } catch (Exception $e) {
+            echo $this->returnError($e, "Erro ao buscar versões");
         }
     }
 }

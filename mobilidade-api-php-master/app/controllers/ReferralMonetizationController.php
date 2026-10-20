@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class ReferralMonetizationController extends ApiController
@@ -11,7 +11,6 @@ class ReferralMonetizationController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $cityId = isset($_GET['cityId']) && !empty($_GET['cityId']) ? (int)$_GET['cityId'] : null;
@@ -39,18 +38,16 @@ class ReferralMonetizationController extends ApiController
                         WHERE {$whereStr}
                         ORDER BY r.id DESC";
 
-                $rows = $dao->sqlRawSelect($sql, $params)->get();
+                $rows = GenericDao::query($sql, $params);
                 $result = [];
 
-                if (is_array($rows)) {
-                    foreach ($rows as $row) {
-                        $row['id'] = (int)$row['id'];
-                        $row['indications'] = (int)$row['indications'];
-                        $row['value'] = (float)$row['value'];
-                        $row['statusId'] = (int)$row['statusId'];
-                        $row['cityId'] = $row['cityId'] !== null ? (int)$row['cityId'] : null;
-                        $result[] = $row;
-                    }
+                foreach ($rows as $row) {
+                    $row['id'] = (int)$row['id'];
+                    $row['indications'] = (int)$row['indications'];
+                    $row['value'] = (float)$row['value'];
+                    $row['statusId'] = (int)$row['statusId'];
+                    $row['cityId'] = $row['cityId'] !== null ? (int)$row['cityId'] : null;
+                    $result[] = $row;
                 }
 
                 echo $this->returnSuccess("Regras de monetização por indicação", $result);
@@ -65,7 +62,7 @@ class ReferralMonetizationController extends ApiController
                 $valueType = in_array($data->valueType ?? '', ['$', '%']) ? $data->valueType : '$';
                 $cityId = !empty($data->cityId) ? (int)$data->cityId : null;
 
-                $dao->sqlRawSelect("INSERT INTO referralMonetization (label, indications, value, valueType, statusId, cityId, created_at, updated_at) 
+                GenericDao::execute("INSERT INTO referralMonetization (label, indications, value, valueType, statusId, cityId, created_at, updated_at) 
                                     VALUES (:label, :indications, :value, :valueType, 1, :cityId, NOW(), NOW())", [
                     ':label' => $label,
                     ':indications' => $indications,
@@ -99,7 +96,7 @@ class ReferralMonetizationController extends ApiController
                 if (isset($data->cityId)) { $fields[] = "cityId = :cityId"; $params[':cityId'] = !empty($data->cityId) ? (int)$data->cityId : null; }
 
                 $sql = "UPDATE referralMonetization SET " . implode(", ", $fields) . " WHERE id = :id";
-                $dao->sqlRawSelect($sql, $params);
+                GenericDao::execute($sql, $params);
 
                 echo $this->returnSuccess("Regra de monetização atualizada com sucesso");
                 return;
@@ -111,7 +108,7 @@ class ReferralMonetizationController extends ApiController
                     throw new Exception("ID da regra não informado.");
                 }
 
-                $dao->sqlRawSelect("UPDATE referralMonetization SET statusId = 2, updated_at = NOW() WHERE id = :id", [':id' => $id]);
+                GenericDao::execute("UPDATE referralMonetization SET statusId = 2, updated_at = NOW() WHERE id = :id", [':id' => $id]);
                 echo $this->returnSuccess("Regra de monetização removida com sucesso");
                 return;
             }

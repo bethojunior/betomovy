@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class PublicitiesAppController extends ApiController
@@ -11,15 +11,15 @@ class PublicitiesAppController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $sql = "SELECT * FROM publicities_app WHERE deleted_at IS NULL ORDER BY id DESC";
-                $rows = $dao->sqlRawSelect($sql)->get();
-                $result = is_array($rows) ? $rows : [];
+                $rows = GenericDao::query($sql);
+                $result = [];
 
-                foreach ($result as &$r) {
+                foreach ($rows as $r) {
                     $r['id'] = (int)$r['id'];
+                    $result[] = $r;
                 }
 
                 echo $this->returnSuccess("Anúncios de aplicativo", $result);
@@ -33,7 +33,7 @@ class PublicitiesAppController extends ApiController
                 $subtitle = $data->subtitle ?? '';
                 $link = $data->link ?? '';
 
-                $dao->sqlRawSelect("INSERT INTO publicities_app (company_name, title, subtitle, link, created_at, updated_at) 
+                GenericDao::execute("INSERT INTO publicities_app (company_name, title, subtitle, link, created_at, updated_at) 
                                     VALUES (:company_name, :title, :subtitle, :link, NOW(), NOW())", [
                     ':company_name' => $companyName,
                     ':title' => $title,
@@ -51,7 +51,7 @@ class PublicitiesAppController extends ApiController
                     throw new Exception("ID do anúncio não informado.");
                 }
 
-                $dao->sqlRawSelect("UPDATE publicities_app SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
+                GenericDao::execute("UPDATE publicities_app SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
                 echo $this->returnSuccess("Anúncio removido com sucesso");
                 return;
             }

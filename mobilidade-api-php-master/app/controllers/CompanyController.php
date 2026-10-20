@@ -1,22 +1,17 @@
 <?php
 
 namespace app\controllers;
+
+use app\dao\GenericDao;
 use app\services\CompanyService;
 use app\services\RegisterCompanyService;
 use Exception;
 
-/**
- * Created by PhpStorm.
- * User: Eduardo Roseo
- * Date: 12/07/2019
- * Time: 17:21
- */
 class CompanyController extends ApiController
 {
     public function actionIndex()
     {
         try {
-            $dao = new \app\utils\BaseDao();
             $cityId = isset($_GET['cityId']) && !empty($_GET['cityId']) ? (int)$_GET['cityId'] : null;
 
             $where = ["c.statusId = 1"];
@@ -34,16 +29,17 @@ class CompanyController extends ApiController
                     ORDER BY c.idCompany DESC 
                     LIMIT 200";
 
-            $rows = $dao->sqlRawSelect($sql, $params)->get();
-            $result = is_array($rows) ? $rows : [];
+            $rows = GenericDao::query($sql, $params);
+            $result = [];
 
-            foreach ($result as &$r) {
+            foreach ($rows as $r) {
                 $r['id'] = (int)$r['id'];
                 $r['idCompany'] = (int)$r['idCompany'];
+                $result[] = $r;
             }
 
             echo $this->returnSuccess("Empresas", $result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo $this->returnError($e);
         }
     }
@@ -63,11 +59,12 @@ class CompanyController extends ApiController
     public function actionFieldCheck()
     {
         try {
-            echo $this->returnSuccess("Campo permitido",
-                (new CompanyService)->fieldCheck($this->requestQuery())
+            echo $this->returnSuccess("Status do campo",
+                (new CompanyService)
+                    ->fieldCheck($this->request(false))
             );
         } catch (Exception $e) {
-            echo $this->returnError($e, "Erro na verificação do campo");
+            echo $this->returnError($e, "Erro ao verificar o campo");
         }
     }
 }

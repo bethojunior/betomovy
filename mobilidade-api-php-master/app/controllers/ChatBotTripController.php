@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
+use app\dao\GenericDao;
 use app\services\ChatBotTripService;
-use app\utils\BaseDao;
 use Exception;
 
 class ChatBotTripController extends ApiController
@@ -12,7 +12,6 @@ class ChatBotTripController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $sql = "SELECT c.idChatBotTrip,
@@ -25,16 +24,14 @@ class ChatBotTripController extends ApiController
                         WHERE c.statusId = 1
                         ORDER BY c.idChatBotTrip ASC";
 
-                $rows = $dao->sqlRawSelect($sql)->get();
+                $rows = GenericDao::query($sql);
                 $result = [];
 
-                if (is_array($rows)) {
-                    foreach ($rows as $row) {
-                        $row['idChatBotTrip'] = (int)$row['idChatBotTrip'];
-                        $row['statusId'] = (int)$row['statusId'];
-                        $row['chatBotTripTypeId'] = (int)$row['chatBotTripTypeId'];
-                        $result[] = $row;
-                    }
+                foreach ($rows as $row) {
+                    $row['idChatBotTrip'] = (int)$row['idChatBotTrip'];
+                    $row['statusId'] = (int)$row['statusId'];
+                    $row['chatBotTripTypeId'] = (int)$row['chatBotTripTypeId'];
+                    $result[] = $row;
                 }
 
                 echo $this->returnSuccess("Mensagens automáticas", $result);
@@ -50,7 +47,7 @@ class ChatBotTripController extends ApiController
                     throw new Exception("Mensagem é obrigatória.");
                 }
 
-                $dao->sqlRawSelect("INSERT INTO chatBotTrip (message, chatBotTripTypeId, statusId) VALUES (:message, :typeId, 1)", [
+                GenericDao::execute("INSERT INTO chatBotTrip (message, chatBotTripTypeId, statusId) VALUES (:message, :typeId, 1)", [
                     ':message' => $message,
                     ':typeId' => $typeId
                 ]);
@@ -76,18 +73,11 @@ class ChatBotTripController extends ApiController
                 $fields = [];
                 $params = [':id' => $id];
 
-                if ($message !== null) {
-                    $fields[] = "message = :message";
-                    $params[':message'] = $message;
-                }
-                if ($typeId !== null) {
-                    $fields[] = "chatBotTripTypeId = :typeId";
-                    $params[':typeId'] = $typeId;
-                }
+                if ($message !== null) { $fields[] = "message = :message"; $params[':message'] = $message; }
+                if ($typeId !== null) { $fields[] = "chatBotTripTypeId = :typeId"; $params[':typeId'] = $typeId; }
 
                 if (!empty($fields)) {
-                    $sql = "UPDATE chatBotTrip SET " . implode(", ", $fields) . " WHERE idChatBotTrip = :id";
-                    $dao->sqlRawSelect($sql, $params);
+                    GenericDao::execute("UPDATE chatBotTrip SET " . implode(", ", $fields) . " WHERE idChatBotTrip = :id", $params);
                 }
 
                 echo $this->returnSuccess("Mensagem atualizada com sucesso");
@@ -100,7 +90,7 @@ class ChatBotTripController extends ApiController
                     throw new Exception("ID da mensagem não informado.");
                 }
 
-                $dao->sqlRawSelect("UPDATE chatBotTrip SET statusId = 2 WHERE idChatBotTrip = :id", [':id' => $id]);
+                GenericDao::execute("UPDATE chatBotTrip SET statusId = 2 WHERE idChatBotTrip = :id", [':id' => $id]);
                 echo $this->returnSuccess("Mensagem removida com sucesso");
                 return;
             }

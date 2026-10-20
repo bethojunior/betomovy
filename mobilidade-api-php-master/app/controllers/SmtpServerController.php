@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class SmtpServerController extends ApiController
@@ -11,22 +11,20 @@ class SmtpServerController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $sql = "SELECT id, mailer, fromMailer, fromName, username, host, port, encryption, statusId, `default`, retry, created_at, updated_at 
                         FROM smtpServer 
                         WHERE statusId = 1 
                         ORDER BY id DESC";
-                $result = $dao->sqlRawSelect($sql)->get();
-                if (!is_array($result)) {
-                    $result = [];
-                } else {
-                    foreach ($result as &$r) {
-                        $r['id'] = (int)$r['id'];
-                        $r['default'] = (int)$r['default'];
-                        $r['statusId'] = (int)$r['statusId'];
-                    }
+                $rows = GenericDao::query($sql);
+                $result = [];
+
+                foreach ($rows as $r) {
+                    $r['id'] = (int)$r['id'];
+                    $r['default'] = (int)$r['default'];
+                    $r['statusId'] = (int)$r['statusId'];
+                    $result[] = $r;
                 }
 
                 echo $this->returnSuccess("Servidores SMTP", $result);
@@ -46,10 +44,10 @@ class SmtpServerController extends ApiController
                 $default = !empty($data->default) ? 1 : 0;
 
                 if ($default) {
-                    $dao->sqlRawSelect("UPDATE smtpServer SET `default` = 0");
+                    GenericDao::execute("UPDATE smtpServer SET `default` = 0");
                 }
 
-                $dao->sqlRawSelect("INSERT INTO smtpServer (mailer, fromMailer, fromName, host, port, username, password, encryption, statusId, `default`, created_at, updated_at) 
+                GenericDao::execute("INSERT INTO smtpServer (mailer, fromMailer, fromName, host, port, username, password, encryption, statusId, `default`, created_at, updated_at) 
                                     VALUES (:mailer, :fromMailer, :fromName, :host, :port, :username, :password, :encryption, 1, :default, NOW(), NOW())", [
                     ':mailer' => $mailer,
                     ':fromMailer' => $fromMailer,
@@ -75,8 +73,7 @@ class SmtpServerController extends ApiController
     public function actionDisable()
     {
         try {
-            $dao = new BaseDao();
-            $dao->sqlRawSelect("UPDATE smtpServer SET `default` = 0 WHERE statusId = 1");
+            GenericDao::execute("UPDATE smtpServer SET `default` = 0 WHERE statusId = 1");
             echo $this->returnSuccess("Padrão desativado com sucesso");
         } catch (Exception $e) {
             echo $this->returnError($e);
@@ -96,7 +93,6 @@ class SmtpServerController extends ApiController
                 throw new Exception("ID do serviço SMTP não informado.");
             }
 
-            $dao = new BaseDao();
             $mailer = $data->mailer ?? ($data->host ?? null);
             $fromMailer = $data->fromMailer ?? ($data->emailRemetent ?? null);
             $fromName = $data->fromName ?? ($data->nameRemetent ?? null);
@@ -108,7 +104,7 @@ class SmtpServerController extends ApiController
             $default = isset($data->default) ? (!empty($data->default) ? 1 : 0) : null;
 
             if ($default === 1) {
-                $dao->sqlRawSelect("UPDATE smtpServer SET `default` = 0");
+                GenericDao::execute("UPDATE smtpServer SET `default` = 0");
             }
 
             $fields = ["updated_at = NOW()"];
@@ -124,8 +120,7 @@ class SmtpServerController extends ApiController
             if ($encryption !== null) { $fields[] = "encryption = :encryption"; $params[':encryption'] = $encryption; }
             if ($default !== null) { $fields[] = "`default` = :default"; $params[':default'] = $default; }
 
-            $sql = "UPDATE smtpServer SET " . implode(", ", $fields) . " WHERE id = :id";
-            $dao->sqlRawSelect($sql, $params);
+            GenericDao::execute("UPDATE smtpServer SET " . implode(", ", $fields) . " WHERE id = :id", $params);
 
             echo $this->returnSuccess("Serviço SMTP atualizado com sucesso");
         } catch (Exception $e) {
@@ -141,9 +136,7 @@ class SmtpServerController extends ApiController
                 throw new Exception("ID do serviço SMTP não informado.");
             }
 
-            $dao = new BaseDao();
-            $dao->sqlRawSelect("UPDATE smtpServer SET statusId = 2, updated_at = NOW() WHERE id = :id", [':id' => $id]);
-
+            GenericDao::execute("UPDATE smtpServer SET statusId = 2, updated_at = NOW() WHERE id = :id", [':id' => $id]);
             echo $this->returnSuccess("Serviço deletado com sucesso!");
         } catch (Exception $e) {
             echo $this->returnError($e);

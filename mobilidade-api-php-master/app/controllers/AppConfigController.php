@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\dao\AppConfigDao;
+use app\dao\GenericDao;
 use app\services\AppConfigService;
 use Exception;
 
@@ -11,7 +11,6 @@ class AppConfigController extends ApiController
     public function actionIndex()
     {
         try {
-            $dao = new AppConfigDao();
             $sql = "SELECT a.idApp AS appId,
                            a.name AS appName,
                            COALESCE(c.id, a.idApp) AS id,
@@ -25,14 +24,13 @@ class AppConfigController extends ApiController
                     LEFT JOIN appConfig c ON c.appId = a.idApp AND c.deleted_at IS NULL
                     WHERE a.statusId = 1";
 
-            $result = $dao->sqlRawSelect($sql)->get();
-            if (!is_array($result)) {
-                $result = [];
-            } else {
-                foreach ($result as &$row) {
-                    $row['id'] = (int)$row['id'];
-                    $row['appId'] = (int)$row['appId'];
-                }
+            $rows = GenericDao::query($sql);
+            $result = [];
+
+            foreach ($rows as $row) {
+                $row['id'] = (int)$row['id'];
+                $row['appId'] = (int)$row['appId'];
+                $result[] = $row;
             }
 
             echo $this->returnSuccess("Configurações de aplicativos", $result);

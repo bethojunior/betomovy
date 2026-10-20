@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
+use app\dao\GenericDao;
 use app\services\RiskAreaService;
-use app\utils\BaseDao;
 use Exception;
 
 class RiskAreaController extends ApiController
@@ -12,7 +12,6 @@ class RiskAreaController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
@@ -30,7 +29,7 @@ class RiskAreaController extends ApiController
 
                 $whereStr = implode(" AND ", $where);
 
-                $countRow = $dao->sqlRawSelect("SELECT COUNT(*) AS total FROM riskArea ra WHERE {$whereStr}", $params)->first();
+                $countRow = GenericDao::first("SELECT COUNT(*) AS total FROM riskArea ra WHERE {$whereStr}", $params);
                 $total = $countRow ? (int)$countRow['total'] : 0;
                 $lastPage = $total > 0 ? (int)ceil($total / $limit) : 1;
 
@@ -54,28 +53,26 @@ class RiskAreaController extends ApiController
                         ORDER BY ra.id DESC
                         LIMIT {$limit} OFFSET {$offset}";
 
-                $rows = $dao->sqlRawSelect($sql, $params)->get();
+                $rows = GenericDao::query($sql, $params);
                 $data = [];
 
-                if (is_array($rows)) {
-                    foreach ($rows as $row) {
-                        $item = [
-                            'id' => (int)$row['id'],
-                            'address' => $row['address'],
-                            'latitude' => $row['latitude'],
-                            'longitude' => $row['longitude'],
-                            'radius' => (int)($row['radius'] ?? 100),
-                            'status' => $row['status'],
-                            'cityId' => (int)$row['cityId'],
-                            'cityName' => $row['cityName'] ?? '',
-                            'created_at' => $row['created_at'] ? date('c', strtotime($row['created_at'])) : date('c'),
-                            'user' => [
-                                'name' => $row['userName'] ?? 'Administrador',
-                                'phone' => $row['userPhone'] ?? ''
-                            ]
-                        ];
-                        $data[] = $item;
-                    }
+                foreach ($rows as $row) {
+                    $item = [
+                        'id' => (int)$row['id'],
+                        'address' => $row['address'],
+                        'latitude' => $row['latitude'],
+                        'longitude' => $row['longitude'],
+                        'radius' => (int)($row['radius'] ?? 100),
+                        'status' => $row['status'],
+                        'cityId' => (int)$row['cityId'],
+                        'cityName' => $row['cityName'] ?? '',
+                        'created_at' => $row['created_at'] ? date('c', strtotime($row['created_at'])) : date('c'),
+                        'user' => [
+                            'name' => $row['userName'] ?? 'Administrador',
+                            'phone' => $row['userPhone'] ?? ''
+                        ]
+                    ];
+                    $data[] = $item;
                 }
 
                 $response = [
@@ -111,7 +108,7 @@ class RiskAreaController extends ApiController
                 if ($radius !== null) { $fields[] = "radius = :radius"; $params[':radius'] = $radius; }
 
                 $sql = "UPDATE riskArea SET " . implode(", ", $fields) . " WHERE id = :id";
-                $dao->sqlRawSelect($sql, $params);
+                GenericDao::execute($sql, $params);
 
                 echo $this->returnSuccess("Área de risco atualizada com sucesso");
                 return;
@@ -123,7 +120,7 @@ class RiskAreaController extends ApiController
                     throw new Exception("ID da área de risco não informado.");
                 }
 
-                $dao->sqlRawSelect("UPDATE riskArea SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
+                GenericDao::execute("UPDATE riskArea SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
                 echo $this->returnSuccess("Área de risco removida com sucesso");
                 return;
             }

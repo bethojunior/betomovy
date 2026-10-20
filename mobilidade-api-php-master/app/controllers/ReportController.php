@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class ReportController extends ApiController
@@ -10,16 +10,10 @@ class ReportController extends ApiController
     public function actionSelectDriverRegisterStatus()
     {
         try {
-            $dao = new BaseDao();
-            $rows = $dao->sqlRawSelect("SELECT idDriverRegisterStatus AS id, name, description FROM driverRegisterStatus ORDER BY idDriverRegisterStatus ASC")->get();
-            if (!is_array($rows)) {
-                $rows = [];
-            } else {
-                foreach ($rows as &$r) {
-                    $r['id'] = (int)$r['id'];
-                }
+            $rows = GenericDao::query("SELECT idDriverRegisterStatus AS id, name, description FROM driverRegisterStatus ORDER BY idDriverRegisterStatus ASC");
+            foreach ($rows as &$r) {
+                $r['id'] = (int)$r['id'];
             }
-
             echo $this->returnSuccess("Status de cadastro de motoristas", $rows);
         } catch (Exception $e) {
             echo $this->returnError($e);
@@ -29,7 +23,6 @@ class ReportController extends ApiController
     public function actionDriverSynthetic()
     {
         try {
-            $dao = new BaseDao();
             $dateStart = isset($_GET['dateStart']) ? $_GET['dateStart'] . " 00:00:00" : date('Y-m-d 00:00:00', strtotime('-30 days'));
             $dateEnd = isset($_GET['dateEnd']) ? $_GET['dateEnd'] . " 23:59:59" : date('Y-m-d 23:59:59');
 
@@ -37,7 +30,7 @@ class ReportController extends ApiController
             $drivers = isset($_GET['drivers']) && is_array($_GET['drivers']) ? array_filter($_GET['drivers']) : [];
 
             $where = [
-                "t.statusTripId = 2", // finalizada
+                "t.statusTripId = 2",
                 "t.dateInitTrip >= :dateStart",
                 "t.dateInitTrip <= :dateEnd"
             ];
@@ -84,22 +77,20 @@ class ReportController extends ApiController
                     GROUP BY t.driverId, u.name, u.phone, ci.name
                     ORDER BY grossTotal DESC";
 
-            $rows = $dao->sqlRawSelect($sql, $params)->get();
+            $rows = GenericDao::query($sql, $params);
             $result = [];
 
-            if (is_array($rows)) {
-                foreach ($rows as $r) {
-                    $result[] = [
-                        'driverId' => (int)$r['driverId'],
-                        'driverName' => $r['driverName'],
-                        'driverPhone' => $r['driverPhone'],
-                        'cityName' => $r['cityName'],
-                        'totalTrips' => (int)$r['totalTrips'],
-                        'grossTotal' => (float)$r['grossTotal'],
-                        'appFeeTotal' => (float)$r['appFeeTotal'],
-                        'netTotal' => (float)$r['netTotal']
-                    ];
-                }
+            foreach ($rows as $r) {
+                $result[] = [
+                    'driverId' => (int)$r['driverId'],
+                    'driverName' => $r['driverName'],
+                    'driverPhone' => $r['driverPhone'],
+                    'cityName' => $r['cityName'],
+                    'totalTrips' => (int)$r['totalTrips'],
+                    'grossTotal' => (float)$r['grossTotal'],
+                    'appFeeTotal' => (float)$r['appFeeTotal'],
+                    'netTotal' => (float)$r['netTotal']
+                ];
             }
 
             echo $this->returnSuccess("Relatório sintético de motoristas", $result);

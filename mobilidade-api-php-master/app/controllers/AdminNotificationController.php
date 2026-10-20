@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class AdminNotificationController extends ApiController
@@ -11,7 +11,6 @@ class AdminNotificationController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $page = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
@@ -29,7 +28,7 @@ class AdminNotificationController extends ApiController
 
                 $whereStr = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
 
-                $countRow = $dao->sqlRawSelect("SELECT COUNT(*) AS total FROM adminNotification n {$whereStr}", $params)->first();
+                $countRow = GenericDao::first("SELECT COUNT(*) AS total FROM adminNotification n {$whereStr}", $params);
                 $total = $countRow ? (int)$countRow['total'] : 0;
                 $lastPage = $total > 0 ? (int)ceil($total / $limit) : 1;
 
@@ -50,32 +49,30 @@ class AdminNotificationController extends ApiController
                         ORDER BY n.id DESC
                         LIMIT {$limit} OFFSET {$offset}";
 
-                $rows = $dao->sqlRawSelect($sql, $params)->get();
+                $rows = GenericDao::query($sql, $params);
                 $data = [];
 
-                if (is_array($rows)) {
-                    foreach ($rows as $row) {
-                        $item = [
-                            'id' => (int)$row['id'],
-                            'adminNotificationTypeId' => (int)$row['adminNotificationTypeId'],
-                            'title' => $row['title'],
-                            'message' => $row['message'],
-                            'read' => (int)$row['read'],
-                            'created_at' => $row['created_at'] ? date('c', strtotime($row['created_at'])) : date('c'),
-                            'user' => [
-                                'name' => $row['user_name'] ?? 'Usuário',
-                                'phone' => $row['user_phone'] ?? ''
-                            ]
+                foreach ($rows as $row) {
+                    $item = [
+                        'id' => (int)$row['id'],
+                        'adminNotificationTypeId' => (int)$row['adminNotificationTypeId'],
+                        'title' => $row['title'],
+                        'message' => $row['message'],
+                        'read' => (int)$row['read'],
+                        'created_at' => $row['created_at'] ? date('c', strtotime($row['created_at'])) : date('c'),
+                        'user' => [
+                            'name' => $row['user_name'] ?? 'Usuário',
+                            'phone' => $row['user_phone'] ?? ''
+                        ]
+                    ];
+
+                    if (!empty($row['driver_idDriver'])) {
+                        $item['driver'] = [
+                            'idDriver' => (int)$row['driver_idDriver']
                         ];
-
-                        if (!empty($row['driver_idDriver'])) {
-                            $item['driver'] = [
-                                'idDriver' => (int)$row['driver_idDriver']
-                            ];
-                        }
-
-                        $data[] = $item;
                     }
+
+                    $data[] = $item;
                 }
 
                 $response = [
@@ -104,8 +101,7 @@ class AdminNotificationController extends ApiController
                 throw new Exception("ID da notificação não informado.");
             }
 
-            $dao = new BaseDao();
-            $dao->sqlRawSelect("UPDATE adminNotification SET `read` = 1, updated_at = NOW() WHERE id = :id", [':id' => $id]);
+            GenericDao::execute("UPDATE adminNotification SET `read` = 1, updated_at = NOW() WHERE id = :id", [':id' => $id]);
 
             echo $this->returnSuccess("Notificação marcada como lida");
         } catch (Exception $e) {

@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class BalanceFlowTypeController extends ApiController
@@ -15,20 +15,17 @@ class BalanceFlowTypeController extends ApiController
     public function actionSearchable()
     {
         try {
-            $dao = new BaseDao();
             $sql = "SELECT idBalanceFlowType, name, flow, flowId, balanceFlowReferenceId 
                     FROM balanceFlowType 
                     ORDER BY idBalanceFlowType ASC";
-            $rows = $dao->sqlRawSelect($sql)->get();
+            $rows = GenericDao::query($sql);
             $result = [];
 
-            if (is_array($rows)) {
-                foreach ($rows as $row) {
-                    $row['idBalanceFlowType'] = (int)$row['idBalanceFlowType'];
-                    $row['flowId'] = (int)$row['flowId'];
-                    $row['balanceFlowReferenceId'] = (int)$row['balanceFlowReferenceId'];
-                    $result[] = $row;
-                }
+            foreach ($rows as $row) {
+                $row['idBalanceFlowType'] = (int)$row['idBalanceFlowType'];
+                $row['flowId'] = (int)$row['flowId'];
+                $row['balanceFlowReferenceId'] = (int)$row['balanceFlowReferenceId'];
+                $result[] = $row;
             }
 
             echo $this->returnSuccess("Tipos de movimentação de saldo", $result);

@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
+use app\dao\GenericDao;
 use app\model\Config;
-use app\utils\BaseDao;
 use Exception;
 
 class WebMapKeyController extends ApiController
@@ -12,10 +12,9 @@ class WebMapKeyController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
-                $row = $dao->sqlRawSelect("SELECT * FROM webMapKey WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 1")->first();
+                $row = GenericDao::first("SELECT * FROM webMapKey WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 1");
                 $key = $row['key'] ?? null;
 
                 if (empty($key)) {
@@ -23,7 +22,7 @@ class WebMapKeyController extends ApiController
                 }
 
                 $response = [
-                    'id' => $row['id'] ?? 1,
+                    'id' => (int)($row['id'] ?? 1),
                     'key' => $key
                 ];
 
@@ -35,7 +34,7 @@ class WebMapKeyController extends ApiController
                 $data = $this->request(false);
                 $key = $data->key ?? '';
 
-                $dao->sqlRawSelect("INSERT INTO webMapKey (`key`, created_at, updated_at) VALUES (:key, NOW(), NOW())", [
+                GenericDao::execute("INSERT INTO webMapKey (`key`, created_at, updated_at) VALUES (:key, NOW(), NOW())", [
                     ':key' => $key
                 ]);
 

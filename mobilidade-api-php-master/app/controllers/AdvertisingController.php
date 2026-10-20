@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
+use app\dao\GenericDao;
 use app\services\AdvertisingService;
-use app\utils\BaseDao;
 use Exception;
 
 class AdvertisingController extends ApiController
@@ -11,7 +11,6 @@ class AdvertisingController extends ApiController
     public function actionIndex()
     {
         try {
-            $dao = new BaseDao();
             $cityId = isset($_GET['cityId']) && !empty($_GET['cityId']) ? (int)$_GET['cityId'] : null;
 
             $where = ["a.statusId = 1"];
@@ -33,13 +32,14 @@ class AdvertisingController extends ApiController
                     WHERE {$whereStr}
                     ORDER BY a.id DESC";
 
-            $rows = $dao->sqlRawSelect($sql, $params)->get();
-            $result = is_array($rows) ? $rows : [];
+            $rows = GenericDao::query($sql, $params);
+            $result = [];
 
-            foreach ($result as &$r) {
+            foreach ($rows as $r) {
                 $r['id'] = (int)$r['id'];
                 $r['companyId'] = (int)$r['companyId'];
                 $r['statusId'] = (int)$r['statusId'];
+                $result[] = $r;
             }
 
             echo $this->returnSuccess("Publicidades", $result);

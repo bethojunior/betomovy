@@ -1033,11 +1033,9 @@ class DriverController extends ApiController
                 throw new \Exception("Tipo de movimentação é obrigatório.");
             }
 
-            $dao = new \app\utils\BaseDao();
-
             // Se for lançamento com dia de faturamento, grava em balancePosting
             if ($billingDay !== null) {
-                $dao->sqlRawSelect("INSERT INTO balancePosting (userTypeId, balanceFlowTypeId, value, billingDay, active, created_at, updated_at) 
+                \app\dao\GenericDao::execute("INSERT INTO balancePosting (userTypeId, balanceFlowTypeId, value, billingDay, active, created_at, updated_at) 
                                     VALUES (:userTypeId, :balanceFlowTypeId, :value, :billingDay, 1, NOW(), NOW())", [
                     ':userTypeId' => $userTypeId,
                     ':balanceFlowTypeId' => $balanceFlowTypeId,
@@ -1046,7 +1044,7 @@ class DriverController extends ApiController
                 ]);
             } else {
                 // Lançamento avulso: buscar flow (entrada/saida)
-                $flowType = $dao->sqlRawSelect("SELECT * FROM balanceFlowType WHERE idBalanceFlowType = :id", [':id' => $balanceFlowTypeId])->first();
+                $flowType = \app\dao\GenericDao::first("SELECT * FROM balanceFlowType WHERE idBalanceFlowType = :id", [':id' => $balanceFlowTypeId]);
                 $isCredit = $flowType && strtolower($flowType['flow']) === 'entrada';
 
                 $where = ["d.driverRegisterStatusId = 1"];
@@ -1056,24 +1054,22 @@ class DriverController extends ApiController
                     $params[':userTypeId'] = $userTypeId;
                 }
 
-                $drivers = $dao->sqlRawSelect("SELECT d.idDriver, d.userId FROM driver d WHERE " . implode(" AND ", $where), $params)->get();
-                if (is_array($drivers)) {
-                    foreach ($drivers as $dr) {
-                        $balRow = $dao->sqlRawSelect("SELECT idBalance, value FROM balance WHERE userId = :userId", [':userId' => $dr['userId']])->first();
-                        if ($balRow) {
-                            $newVal = $isCredit ? ((float)$balRow['value'] + $cleanVal) : ((float)$balRow['value'] - $cleanVal);
-                            $dao->sqlRawSelect("UPDATE balance SET value = :val, updated_at = NOW() WHERE idBalance = :id", [
-                                ':val' => $newVal,
-                                ':id' => $balRow['idBalance']
-                            ]);
+                $drivers = \app\dao\GenericDao::query("SELECT d.idDriver, d.userId FROM driver d WHERE " . implode(" AND ", $where), $params);
+                foreach ($drivers as $dr) {
+                    $balRow = \app\dao\GenericDao::first("SELECT idBalance, value FROM balance WHERE userId = :userId", [':userId' => $dr['userId']]);
+                    if ($balRow) {
+                        $newVal = $isCredit ? ((float)$balRow['value'] + $cleanVal) : ((float)$balRow['value'] - $cleanVal);
+                        \app\dao\GenericDao::execute("UPDATE balance SET value = :val, updated_at = NOW() WHERE idBalance = :id", [
+                            ':val' => $newVal,
+                            ':id' => $balRow['idBalance']
+                        ]);
 
-                            $dao->sqlRawSelect("INSERT INTO balanceFlow (balanceId, balanceFlowTypeId, value, created_at) 
-                                                VALUES (:balanceId, :typeId, :value, NOW())", [
-                                ':balanceId' => $balRow['idBalance'],
-                                ':typeId' => $balanceFlowTypeId,
-                                ':value' => $cleanVal
-                            ]);
-                        }
+                        \app\dao\GenericDao::execute("INSERT INTO balanceFlow (balanceId, balanceFlowTypeId, value, created_at) 
+                                            VALUES (:balanceId, :typeId, :value, NOW())", [
+                            ':balanceId' => $balRow['idBalance'],
+                            ':typeId' => $balanceFlowTypeId,
+                            ':value' => $cleanVal
+                        ]);
                     }
                 }
             }

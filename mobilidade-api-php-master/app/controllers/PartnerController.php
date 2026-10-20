@@ -2,9 +2,9 @@
 
 namespace app\controllers;
 
+use app\dao\GenericDao;
 use app\services\PartnerService;
 use app\services\PartnerTripService;
-use app\utils\BaseDao;
 use app\utils\Headers;
 use Exception;
 
@@ -13,12 +13,11 @@ class PartnerController extends ApiController
     public function actionIndex()
     {
         try {
-            $dao = new BaseDao();
             $name = isset($_GET['name']) ? trim($_GET['name']) : '';
             $phone = isset($_GET['phone']) ? trim($_GET['phone']) : '';
             $email = isset($_GET['email']) ? trim($_GET['email']) : '';
 
-            $where = ["p.statusId != 3"]; // não deletados
+            $where = ["p.statusId != 3"];
             $params = [];
 
             if (!empty($name)) {
@@ -52,15 +51,16 @@ class PartnerController extends ApiController
                     ORDER BY p.idPartner DESC
                     LIMIT 200";
 
-            $rows = $dao->sqlRawSelect($sql, $params)->get();
-            $result = is_array($rows) ? $rows : [];
+            $rows = GenericDao::query($sql, $params);
+            $result = [];
 
-            foreach ($result as &$r) {
+            foreach ($rows as $r) {
                 $r['id'] = (int)$r['id'];
                 $r['idPartner'] = (int)$r['idPartner'];
                 $r['userId'] = (int)$r['userId'];
                 $r['statusId'] = (int)$r['statusId'];
                 $r['partnerRegisterStatusId'] = (int)$r['partnerRegisterStatusId'];
+                $result[] = $r;
             }
 
             echo $this->returnSuccess("Lista de parceiros", $result);
@@ -77,14 +77,13 @@ class PartnerController extends ApiController
                 throw new Exception("ID do parceiro não informado.");
             }
 
-            $dao = new BaseDao();
-            $partner = $dao->sqlRawSelect("SELECT idPartner, statusId FROM partner WHERE idPartner = :id", [':id' => $id])->first();
+            $partner = GenericDao::first("SELECT idPartner, statusId FROM partner WHERE idPartner = :id", [':id' => $id]);
             if (!$partner) {
                 throw new Exception("Parceiro não encontrado.");
             }
 
             $newStatus = ((int)$partner['statusId'] === 1) ? 2 : 1;
-            $dao->sqlRawSelect("UPDATE partner SET statusId = :statusId, updated_at = NOW() WHERE idPartner = :id", [
+            GenericDao::execute("UPDATE partner SET statusId = :statusId, updated_at = NOW() WHERE idPartner = :id", [
                 ':statusId' => $newStatus,
                 ':id' => $id
             ]);

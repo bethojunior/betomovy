@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
+use app\dao\GenericDao;
 use app\services\TripRatingService;
-use app\utils\BaseDao;
 use Exception;
 
 class TripRatingController extends ApiController
@@ -11,7 +11,6 @@ class TripRatingController extends ApiController
     public function actionIndex()
     {
         try {
-            $dao = new BaseDao();
             $driverId = isset($_GET['driverId']) && !empty($_GET['driverId']) ? (int)$_GET['driverId'] : null;
             $ratedUser = isset($_GET['ratedUser']) && !empty($_GET['ratedUser']) ? (int)$_GET['ratedUser'] : null;
 
@@ -19,8 +18,7 @@ class TripRatingController extends ApiController
             $params = [];
 
             if ($driverId) {
-                // Obter userId do motorista se necessário
-                $driverRow = $dao->sqlRawSelect("SELECT userId FROM driver WHERE idDriver = :driverId", [':driverId' => $driverId])->first();
+                $driverRow = GenericDao::first("SELECT userId FROM driver WHERE idDriver = :driverId", [':driverId' => $driverId]);
                 if ($driverRow && !empty($driverRow['userId'])) {
                     $where[] = "tr.ratedUser = :userId";
                     $params[':userId'] = (int)$driverRow['userId'];
@@ -48,20 +46,18 @@ class TripRatingController extends ApiController
                     ORDER BY tr.idTripRating DESC
                     LIMIT 100";
 
-            $rows = $dao->sqlRawSelect($sql, $params)->get();
+            $rows = GenericDao::query($sql, $params);
             $result = [];
 
-            if (is_array($rows)) {
-                foreach ($rows as $row) {
-                    $result[] = [
-                        'idTripRating' => (int)$row['idTripRating'],
-                        'tripReference' => $row['tripReference'],
-                        'rating' => (int)$row['rating'],
-                        'comment' => $row['comment'] ?? '',
-                        'created_at' => $row['created_at'],
-                        'evaluatorName' => $row['evaluatorName'] ?? 'Passageiro'
-                    ];
-                }
+            foreach ($rows as $row) {
+                $result[] = [
+                    'idTripRating' => (int)$row['idTripRating'],
+                    'tripReference' => $row['tripReference'],
+                    'rating' => (int)$row['rating'],
+                    'comment' => $row['comment'] ?? '',
+                    'created_at' => $row['created_at'],
+                    'evaluatorName' => $row['evaluatorName'] ?? 'Passageiro'
+                ];
             }
 
             echo $this->returnSuccess("Avaliações encontradas", $result);

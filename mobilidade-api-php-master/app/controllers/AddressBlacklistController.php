@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
+use app\dao\GenericDao;
 use app\services\AddressBlacklistService;
-use app\utils\BaseDao;
 use Exception;
 
 class AddressBlacklistController extends ApiController
@@ -12,22 +12,19 @@ class AddressBlacklistController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $sql = "SELECT id, address, approved, latitude, longitude, created_at, updated_at 
                         FROM addressBlacklist 
                         WHERE deleted_at IS NULL 
                         ORDER BY id DESC";
-                $rows = $dao->sqlRawSelect($sql)->get();
+                $rows = GenericDao::query($sql);
                 $result = [];
 
-                if (is_array($rows)) {
-                    foreach ($rows as $row) {
-                        $row['id'] = (int)$row['id'];
-                        $row['approved'] = (int)$row['approved'];
-                        $result[] = $row;
-                    }
+                foreach ($rows as $row) {
+                    $row['id'] = (int)$row['id'];
+                    $row['approved'] = (int)$row['approved'];
+                    $result[] = $row;
                 }
 
                 echo $this->returnSuccess("Endereços na blacklist", $result);
@@ -40,7 +37,7 @@ class AddressBlacklistController extends ApiController
                     throw new Exception("ID do endereço não informado.");
                 }
 
-                $dao->sqlRawSelect("UPDATE addressBlacklist SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
+                GenericDao::execute("UPDATE addressBlacklist SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
                 echo $this->returnSuccess("Endereço removido da blacklist");
                 return;
             }

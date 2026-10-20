@@ -2,9 +2,8 @@
 
 namespace app\controllers;
 
+use app\dao\GenericDao;
 use app\services\CreditPrepaidPurchaseService;
-use app\services\CreditPrepaidService;
-use app\utils\BaseDao;
 use Exception;
 
 class CreditPrepaidController extends ApiController
@@ -13,15 +12,14 @@ class CreditPrepaidController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
                 if ($id) {
-                    $item = $dao->sqlRawSelect("SELECT c.*, ci.name AS cityName 
+                    $item = GenericDao::first("SELECT c.*, ci.name AS cityName 
                                                 FROM creditPrepaid c 
                                                 LEFT JOIN city ci ON ci.idCity = c.cityId 
-                                                WHERE c.id = :id AND c.deleted_at IS NULL", [':id' => $id])->first();
+                                                WHERE c.id = :id AND c.deleted_at IS NULL", [':id' => $id]);
                     echo $this->returnSuccess('Crédito pré-pago encontrado', $item);
                     return;
                 }
@@ -42,15 +40,16 @@ class CreditPrepaidController extends ApiController
                         WHERE {$whereStr} 
                         ORDER BY c.id DESC";
 
-                $rows = $dao->sqlRawSelect($sql, $params)->get();
-                $result = is_array($rows) ? $rows : [];
+                $rows = GenericDao::query($sql, $params);
+                $result = [];
 
-                foreach ($result as &$r) {
+                foreach ($rows as $r) {
                     $r['id'] = (int)$r['id'];
                     $r['purchasePrice'] = (float)$r['purchasePrice'];
                     $r['sellPrice'] = (float)$r['sellPrice'];
                     $r['quantityDaysSold'] = $r['quantityDaysSold'] !== null ? (int)$r['quantityDaysSold'] : null;
                     $r['quantityDaysPurchased'] = $r['quantityDaysPurchased'] !== null ? (int)$r['quantityDaysPurchased'] : null;
+                    $result[] = $r;
                 }
 
                 echo $this->returnSuccess('Créditos pré-pago encontrados', $result);
@@ -70,7 +69,7 @@ class CreditPrepaidController extends ApiController
                 $quantityDaysSold = isset($data->quantityDaysSold) ? (int)$data->quantityDaysSold : null;
                 $quantityDaysPurchased = isset($data->quantityDaysPurchased) ? (int)$data->quantityDaysPurchased : null;
 
-                $dao->sqlRawSelect("INSERT INTO creditPrepaid (title, superTitle, stripe, purchasePrice, sellPrice, accountInformation, cityId, type, quantityDaysSold, quantityDaysPurchased, created_at, updated_at) 
+                GenericDao::execute("INSERT INTO creditPrepaid (title, superTitle, stripe, purchasePrice, sellPrice, accountInformation, cityId, type, quantityDaysSold, quantityDaysPurchased, created_at, updated_at) 
                                     VALUES (:title, :superTitle, :stripe, :purchasePrice, :sellPrice, :accountInformation, :cityId, :type, :quantityDaysSold, :quantityDaysPurchased, NOW(), NOW())", [
                     ':title' => $title,
                     ':superTitle' => $superTitle,
@@ -115,7 +114,7 @@ class CreditPrepaidController extends ApiController
                 if (isset($data->quantityDaysPurchased)) { $fields[] = "quantityDaysPurchased = :quantityDaysPurchased"; $params[':quantityDaysPurchased'] = (int)$data->quantityDaysPurchased; }
 
                 $sql = "UPDATE creditPrepaid SET " . implode(", ", $fields) . " WHERE id = :id";
-                $dao->sqlRawSelect($sql, $params);
+                GenericDao::execute($sql, $params);
 
                 echo $this->returnSuccess('Pré-pago atualizado com sucesso');
                 return;
@@ -127,7 +126,7 @@ class CreditPrepaidController extends ApiController
                     throw new Exception("ID do crédito pré-pago não informado.");
                 }
 
-                $dao->sqlRawSelect("UPDATE creditPrepaid SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
+                GenericDao::execute("UPDATE creditPrepaid SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
                 echo $this->returnSuccess('Pré-pago apagado com sucesso');
                 return;
             }

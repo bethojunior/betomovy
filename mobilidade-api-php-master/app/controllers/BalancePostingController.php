@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class BalancePostingController extends ApiController
@@ -11,7 +11,6 @@ class BalancePostingController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $sql = "SELECT bp.id,
@@ -31,19 +30,17 @@ class BalancePostingController extends ApiController
                         WHERE bp.deleted_at IS NULL
                         ORDER BY bp.id DESC";
 
-                $rows = $dao->sqlRawSelect($sql)->get();
+                $rows = GenericDao::query($sql);
                 $result = [];
 
-                if (is_array($rows)) {
-                    foreach ($rows as $row) {
-                        $row['id'] = (int)$row['id'];
-                        $row['userTypeId'] = $row['userTypeId'] !== null ? (int)$row['userTypeId'] : null;
-                        $row['balanceFlowTypeId'] = (int)$row['balanceFlowTypeId'];
-                        $row['value'] = (float)$row['value'];
-                        $row['active'] = (int)$row['active'];
-                        $row['billingDay'] = $row['billingDay'] !== null ? (int)$row['billingDay'] : null;
-                        $result[] = $row;
-                    }
+                foreach ($rows as $row) {
+                    $row['id'] = (int)$row['id'];
+                    $row['userTypeId'] = $row['userTypeId'] !== null ? (int)$row['userTypeId'] : null;
+                    $row['balanceFlowTypeId'] = (int)$row['balanceFlowTypeId'];
+                    $row['value'] = (float)$row['value'];
+                    $row['active'] = (int)$row['active'];
+                    $row['billingDay'] = $row['billingDay'] !== null ? (int)$row['billingDay'] : null;
+                    $result[] = $row;
                 }
 
                 echo $this->returnSuccess("Lançamentos de saldo agendados", $result);
@@ -62,7 +59,7 @@ class BalancePostingController extends ApiController
                     throw new Exception("Tipo de movimentação é obrigatório.");
                 }
 
-                $dao->sqlRawSelect("INSERT INTO balancePosting (userTypeId, balanceFlowTypeId, value, billingDay, active, created_at, updated_at) 
+                GenericDao::execute("INSERT INTO balancePosting (userTypeId, balanceFlowTypeId, value, billingDay, active, created_at, updated_at) 
                                     VALUES (:userTypeId, :balanceFlowTypeId, :value, :billingDay, :active, NOW(), NOW())", [
                     ':userTypeId' => $userTypeId,
                     ':balanceFlowTypeId' => $balanceFlowTypeId,
@@ -81,7 +78,7 @@ class BalancePostingController extends ApiController
                     throw new Exception("ID do agendamento não informado.");
                 }
 
-                $dao->sqlRawSelect("UPDATE balancePosting SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
+                GenericDao::execute("UPDATE balancePosting SET deleted_at = NOW() WHERE id = :id", [':id' => $id]);
                 echo $this->returnSuccess("Agendamento excluído com sucesso");
                 return;
             }

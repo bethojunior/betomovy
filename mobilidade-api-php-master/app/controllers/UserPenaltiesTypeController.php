@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class UserPenaltiesTypeController extends ApiController
@@ -11,23 +11,20 @@ class UserPenaltiesTypeController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
                 $sql = "SELECT idUserPenaltyType, name, statusId, valueRating 
                         FROM userPenaltiesType 
                         WHERE statusId = 1 
                         ORDER BY idUserPenaltyType ASC";
-                $rows = $dao->sqlRawSelect($sql)->get();
+                $rows = GenericDao::query($sql);
                 $result = [];
 
-                if (is_array($rows)) {
-                    foreach ($rows as $row) {
-                        $row['idUserPenaltyType'] = (int)$row['idUserPenaltyType'];
-                        $row['statusId'] = (int)$row['statusId'];
-                        $row['valueRating'] = (float)$row['valueRating'];
-                        $result[] = $row;
-                    }
+                foreach ($rows as $row) {
+                    $row['idUserPenaltyType'] = (int)$row['idUserPenaltyType'];
+                    $row['statusId'] = (int)$row['statusId'];
+                    $row['valueRating'] = (float)$row['valueRating'];
+                    $result[] = $row;
                 }
 
                 echo $this->returnSuccess("Tipos de penalidade", $result);
@@ -50,7 +47,7 @@ class UserPenaltiesTypeController extends ApiController
                     throw new Exception("Valor da penalidade não informado.");
                 }
 
-                $dao->sqlRawSelect("UPDATE userPenaltiesType SET valueRating = :value WHERE idUserPenaltyType = :id", [
+                GenericDao::execute("UPDATE userPenaltiesType SET valueRating = :value WHERE idUserPenaltyType = :id", [
                     ':value' => $value,
                     ':id' => $id
                 ]);

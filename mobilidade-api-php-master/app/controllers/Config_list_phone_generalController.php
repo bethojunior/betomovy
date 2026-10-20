@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\utils\BaseDao;
+use app\dao\GenericDao;
 use Exception;
 
 class Config_list_phone_generalController extends ApiController
@@ -11,10 +11,9 @@ class Config_list_phone_generalController extends ApiController
     {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
-            $dao = new BaseDao();
 
             if ($method === 'GET') {
-                $row = $dao->sqlRawSelect("SELECT id, messageContacts, created_at, updated_at FROM config_list_contacts_general ORDER BY id DESC LIMIT 1")->first();
+                $row = GenericDao::first("SELECT id, messageContacts, created_at, updated_at FROM config_list_contacts_general ORDER BY id DESC LIMIT 1");
                 if (!$row) {
                     $row = [
                         'id' => 1,
@@ -30,7 +29,7 @@ class Config_list_phone_generalController extends ApiController
             if ($method === 'POST' || $method === 'PUT') {
                 $data = $this->request(false);
                 $msg = $data->messageContacts ?? ($data->message ?? '');
-                $dao->sqlRawSelect("UPDATE config_list_contacts_general SET messageContacts = :msg, updated_at = NOW()", [':msg' => $msg]);
+                GenericDao::execute("UPDATE config_list_contacts_general SET messageContacts = :msg, updated_at = NOW()", [':msg' => $msg]);
                 echo $this->returnSuccess("Configuração atualizada com sucesso");
                 return;
             }
