@@ -135,11 +135,18 @@ class ApiController
 
     private function getJson($json)
     {
+        if (!is_object($json) || !isset($json->stdObject)) {
+            return $json;
+        }
+
         $obj = $json->stdObject;
 
-        if (count($obj) > 1)
+        if (is_array($obj) && count($obj) > 1)
             return $obj;
 
-        return $obj[0];
+        if (is_array($obj) && isset($obj[0]))
+            return $obj[0];
+
+        return $obj;
     }
 }
