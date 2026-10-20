@@ -931,7 +931,7 @@ class DriverController extends ApiController
             $statusParam = $_GET['status'] ?? null;
 
             $whereParts = [
-                "user.statusId = 1",
+                "(user.statusId = 1 OR user.statusId IS NULL)",
                 "driver.last_lat IS NOT NULL",
                 "driver.last_lat != ''",
                 "driver.last_lat != 0",
@@ -1003,9 +1003,13 @@ class DriverController extends ApiController
                     'longitude' => (float)$row['longitude'],
                     'name' => $row['name'],
                     'userName' => $row['name'],
+                    'nickname' => $row['name'],
+                    'userNickname' => $row['name'],
                     'phone' => $row['phone'],
+                    'userPhone' => $row['phone'],
                     'status' => $status,
                     'profileImage' => $row['profileImage'],
+                    'userType' => 'Motorista',
                     'updated_at' => $row['updated_at'],
                     'last_position_update' => $row['last_position_update'],
                     'car' => [

@@ -1354,6 +1354,7 @@ const MapMonitoring: any = (props: MonitoringMapProps) => {
                 onDriverSelect={handleDriverFocus}
                 onClientSelect={handleClientSelect}
                 driverRecencyMode={props.driverRecencyMode}
+                initialDrivers={effectiveDriversRef.current}
               />
             )}
             <MonitoringAreaModal

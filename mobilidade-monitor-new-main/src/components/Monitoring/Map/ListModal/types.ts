@@ -35,4 +35,5 @@ export interface ModalProps {
   onDriverSelect?: (driver: DriverRealtime) => void
   onClientSelect?: (client: ClientData) => void
   driverRecencyMode?: 'all' | 'recent'
+  initialDrivers?: DriverRealtime[]
 }

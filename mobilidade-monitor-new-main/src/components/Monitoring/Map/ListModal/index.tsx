@@ -5,6 +5,7 @@ import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { BsCircleFill } from 'react-icons/bs'
 import { Loader } from '../../../../components/Loader'
 import api from '../../../../services/api'
+import Session from '../../../../utils/Session'
 import { ClientData, ModalProps } from './types'
 import Utils from '../../../../utils/Utils'
 import {filterDriversByOfflineRecency} from '../../../../utils/driverPosition'
@@ -71,12 +72,16 @@ const ListModal: FC<ModalProps> = ({
   selectedArea,
   onDriverSelect,
   onClientSelect,
-  driverRecencyMode = 'recent'
+  driverRecencyMode = 'recent',
+  initialDrivers = []
 }) => {
   const [searchValue, setSearchValue] = useState('')
-  const [listData, setListData] = useState<(DriverRealtime | ClientData)[]>([])
+  const [listData, setListData] = useState<(DriverRealtime | ClientData)[]>(() => {
+    return type === 'driver' && initialDrivers?.length ? initialDrivers : []
+  })
+  const [loading, setLoading] = useState(false)
   
-  const allDriversRef = useRef<DriverRealtime[]>([])
+  const allDriversRef = useRef<DriverRealtime[]>(initialDrivers || [])
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
   
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -87,9 +92,12 @@ const ListModal: FC<ModalProps> = ({
     }
     
     try {
+      setLoading(true)
+      const cityId = Session.getLocal('citySelected')?.cityId
       const response = await api.get(`/driver/positions`, {
         params: {
-          status: 'disponivel,corrida,boarding,in_progress,accepted,desligado',
+          status: 'disponivel,online,available,corrida,busy,boarding,in_progress,accepted,desligado',
+          cityId: cityId || undefined,
         }
       })
 
@@ -98,13 +106,16 @@ const ListModal: FC<ModalProps> = ({
         driverRecencyMode === 'recent'
           ? filterDriversByOfflineRecency(allResults)
           : allResults
-      allDriversRef.current = filteredResults
+      const finalResults = filteredResults.length > 0 ? filteredResults : allResults
+      allDriversRef.current = finalResults
 
       if (isVisible && type === 'driver') {
-        setListData(filteredResults)
+        setListData(finalResults)
       }
     } catch (error) {
       console.error('Erro ao buscar motoristas:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -214,8 +225,12 @@ const ListModal: FC<ModalProps> = ({
         itemAny?.nickname,
         itemAny?.userNickname,
         itemAny?.userName,
+        itemAny?.name,
         itemAny?.userPhone,
-        itemAny?.userType
+        itemAny?.phone,
+        itemAny?.userType,
+        itemAny?.car?.plate,
+        itemAny?.plate
       ]
 
       return candidates.some((candidate) => normalize(candidate).includes(normalizedSearch))
@@ -256,7 +271,7 @@ const ListModal: FC<ModalProps> = ({
         </DriverAvatar>
         <DriverInfo>
           <TextCard>
-            {item.nickname || item.userName} - {item.userType}
+            {(item as any).userName || (item as any).name || item.nickname || 'Motorista'}{(item as any).userType ? ` - ${(item as any).userType}` : ''}{(item as any).car?.plate ? ` (${(item as any).car.plate})` : ''}
           </TextCard>
         </DriverInfo>
         <CircleStatus status={item.status}>
@@ -333,7 +348,7 @@ const ListModal: FC<ModalProps> = ({
           />
         </ModalHeader>
 
-        {type === 'driver' && allDriversRef.current.length === 0 ? (
+        {loading && listData.length === 0 ? (
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
             <Loader spinning />
           </div>
