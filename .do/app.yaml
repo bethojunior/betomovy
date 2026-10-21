@@ -1,5 +1,6 @@
 name: movy-app
 region: nyc
+# Deploy trigger: 2026-10-21 15:25 UTC - update app spec and backend fixes
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
