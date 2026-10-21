@@ -75,7 +75,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useWaypoints } from '../../hooks/useWaypoints';
 import { useInputSelection } from '../../hooks/useInputSelection';
 import { useKeyboardHeight } from '../../hooks/useKeyboardHeight';
-import { maskCpf, maskPhone } from '../../utils/format';
+import { maskPhone } from '../../utils/format';
 import { SkeletonAddressSuggestions, SkeletonDoorHandleForm } from '../SkeletonLoader';
 import { TripTypePickerModal } from '../TripTypePickerModal';
 import {
@@ -86,6 +86,10 @@ import {
 import { ZafiraValidationResultModal } from '../Modal/ZafiraValidationResult';
 import { resolveZafiraValidationErrorMessage } from '../Modal/ZafiraValidationResult/constants';
 import { isCityConfigFlagEnabled, getCityConfigValue } from '../../../../utils/city-config';
+
+const t = (key: string, options?: any) => {
+  return translate(key, { locale: 'en_US', ...options });
+};
 
 const DEFAULT_ZAFIRA_VALIDATION_PRICE = 0.99;
 const CPF_MIN_LENGTH = 11;
@@ -154,7 +158,6 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
   const pendingRowRef = useRef<RefObject<any> | null>(null);
   const nameRowRef = useRef<any>(null);
   const phoneRowRef = useRef<any>(null);
-  const cpfRowRef = useRef<any>(null);
   const emailRowRef = useRef<any>(null);
   const priceInputRef = useRef<any>(null);
 
@@ -377,7 +380,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
         waypointsForApi,
       )
         .catch(() => {
-          customToast(translate('driverTrip.text_error_update_trip'), 'danger');
+          customToast(t('driverTrip.text_error_update_trip') || 'Error updating trip', 'danger');
         })
         .finally(() => setLoadingCalculate(false));
       Keyboard.dismiss();
@@ -458,7 +461,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
       tripCustomer: {
         name: form.name,
         phone: form.phone,
-        document: form.cpf,
+        document: '',
         email: form.email,
       },
       tripPaymentFormId: form.idTripPaymentForm,
@@ -476,7 +479,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
   const handleOfflineDoorHandle = () => {
     offlineTripQueue.addDoorHandleManual(buildOfflinePayload());
     customToast(
-      translate('doorHandle.queued_offline') || 'Corrida salva. Será iniciada ao reconectar.',
+      t('doorHandle.queued_offline') || 'Trip saved offline. Will sync when reconnected.',
       'success',
     );
     setSelectedTripType({} as TripType);
@@ -487,16 +490,9 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
     const normalizedName = form.name.trim();
     const normalizedEmail = form.email.trim();
     const phoneDigits = form.phone;
-    const documentDigits = form.cpf;
-    if (!normalizedName || !phoneDigits || !documentDigits || !normalizedEmail) {
+    if (!normalizedName || !phoneDigits || !normalizedEmail) {
       return customToast(
-        translate('doorHandle.fill_in_the_fields_for_validation'),
-        'warning',
-      );
-    }
-    if (documentDigits.length !== CPF_MIN_LENGTH) {
-      return customToast(
-        translate('doorHandle.invalid_cpf'),
+        t('doorHandle.fill_in_the_fields_for_validation'),
         'warning',
       );
     }
@@ -507,7 +503,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
       const payloadZafira = {
         name: normalizedName,
         phone: form.phone,
-        document: form.cpf,
+        document: '',
         email: normalizedEmail,
       };
       const result = await validateRegistration(payloadZafira);
@@ -556,7 +552,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
     const result = await validateRegistration({
       name: form.name.trim(),
       phone: form.phone,
-      document: form.cpf,
+      document: '',
       email: form.email.trim(),
     });
     if (result.status && result.data?.match) {
@@ -590,7 +586,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
           <BackBtn onPress={handleBack}>
             <Ionicons name="chevron-back-sharp" size={RFValue(20)} color={theme.colors.secondary} />
           </BackBtn>
-          <HeaderTitle>{translate('doorHandle.manual_doorknob_trip')}</HeaderTitle>
+          <HeaderTitle>{t('doorHandle.manual_doorknob_trip') || 'Manual Trip'}</HeaderTitle>
         </Header>
 
         <ScrollContent
@@ -621,7 +617,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                       <InputAddress
                         ref={originSel.ref}
                         value={originValue}
-                        placeholder={translate('trip.a11y_origin')}
+                        placeholder={t('trip.a11y_origin') || 'Origin'}
                         placeholderTextColor={theme.colors.input_placeholder}
                         onChangeText={text => onChangeAddress(text, setOriginValue, setListAddresses)}
                         onFocus={() => setOriginFocused(true)}
@@ -663,7 +659,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                         <>
                           <InputInRow
                             value={waypoint.value}
-                            placeholder={translate('trip.a11y_waypoint', { n: index + 1 })}
+                            placeholder={t('trip.a11y_waypoint', { n: index + 1 }) || `Stop ${index + 1}`}
                             placeholderTextColor={theme.colors.input_placeholder}
                             onChangeText={text => onChangeWaypointAddress(waypoint.id, text)}
                             onFocus={() => setActiveWaypointId(waypoint.id)}
@@ -715,7 +711,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                         <InputInRow
                           ref={destinationSel.ref}
                           value={destinationValue}
-                          placeholder={translate('trip.a11y_destination')}
+                          placeholder={t('trip.a11y_destination') || 'Destination'}
                           placeholderTextColor={theme.colors.input_placeholder}
                           onChangeText={text => onChangeAddress(text, setDestinationValue, setListAddressesDestiny)}
                           onFocus={() => setDestinationFocused(true)}
@@ -846,7 +842,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
               <Card>
                 <SectionHeader>
                   <Ionicons name="person-circle-outline" size={RFValue(20)} color={theme.colors.primary} />
-                  <SectionLabel>{translate('sharedTrips.modal_passenger_title')}</SectionLabel>
+                  <SectionLabel>{t('sharedTrips.modal_passenger_title') || 'Passenger Information'}</SectionLabel>
                 </SectionHeader>
 
                 {/* Forma de pagamento */}
@@ -855,7 +851,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                     <Ionicons name="wallet-outline" size={RFValue(18)} color={theme.colors.placeholder} />
                   </FieldIconCircle>
                   <FieldContent>
-                    <FieldLabel>{translate('doorHandle.payment_method')}</FieldLabel>
+                    <FieldLabel>{t('doorHandle.payment_method') || 'Payment Method'}</FieldLabel>
                     <PickerContainer>
                       <StyledPicker
                         selectedValue={selectedPaymentForm?.idTripPaymentForm}
@@ -879,14 +875,14 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                     />
                   </FieldIconCircle>
                   <FieldContent>
-                    <FieldLabel focused={focusedField === 'name'}>{translate('doorHandle.name')}</FieldLabel>
+                    <FieldLabel focused={focusedField === 'name'}>{t('doorHandle.name') || 'Name'}</FieldLabel>
                     <FieldTextInput
                       value={form.name}
                       onChangeText={text => setForm(f => ({ ...f, name: text }))}
                       onFocus={() => setFocusedField('name')}
                       onPressIn={() => scrollToRow(nameRowRef)}
                       onBlur={() => setFocusedField(null)}
-                      placeholder={translate('sharedTrips.modal_name_placeholder')}
+                      placeholder={t('sharedTrips.modal_name_placeholder') || "Passenger's name"}
                       placeholderTextColor={theme.colors.input_placeholder}
                     />
                     <FieldLine focused={focusedField === 'name'} />
@@ -903,43 +899,18 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                     />
                   </FieldIconCircle>
                   <FieldContent>
-                    <FieldLabel focused={focusedField === 'phone'}>{translate('doorHandle.phone')}</FieldLabel>
+                    <FieldLabel focused={focusedField === 'phone'}>{t('doorHandle.phone') || 'Phone'}</FieldLabel>
                     <FieldTextInput
                       value={maskPhone(form.phone)}
                       onChangeText={text => setForm(f => ({ ...f, phone: text.replace(/\D/g, '') }))}
                       onFocus={() => setFocusedField('phone')}
                       onPressIn={() => scrollToRow(phoneRowRef)}
                       onBlur={() => setFocusedField(null)}
-                      placeholder={translate('sharedTrips.modal_phone_placeholder')}
+                      placeholder={t('sharedTrips.modal_phone_placeholder') || '(00) 00000-0000'}
                       placeholderTextColor={theme.colors.input_placeholder}
                       keyboardType="phone-pad"
                     />
                     <FieldLine focused={focusedField === 'phone'} />
-                  </FieldContent>
-                </FieldRow>
-
-                {/* CPF */}
-                <FieldRow ref={cpfRowRef}>
-                  <FieldIconCircle focused={focusedField === 'cpf'}>
-                    <Ionicons
-                      name="card-outline"
-                      size={RFValue(18)}
-                      color={focusedField === 'cpf' ? theme.colors.primary : theme.colors.placeholder}
-                    />
-                  </FieldIconCircle>
-                  <FieldContent>
-                    <FieldLabel focused={focusedField === 'cpf'}>{translate('doorHandle.document')}</FieldLabel>
-                    <FieldTextInput
-                      value={maskCpf(form.cpf)}
-                      onChangeText={text => setForm(f => ({ ...f, cpf: text.replace(/\D/g, '') }))}
-                      onFocus={() => setFocusedField('cpf')}
-                      onPressIn={() => scrollToRow(cpfRowRef)}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder={translate('sharedTrips.modal_cpf_placeholder')}
-                      placeholderTextColor={theme.colors.input_placeholder}
-                      keyboardType="number-pad"
-                    />
-                    <FieldLine focused={focusedField === 'cpf'} />
                   </FieldContent>
                 </FieldRow>
 
@@ -953,14 +924,14 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                     />
                   </FieldIconCircle>
                   <FieldContent>
-                    <FieldLabel focused={focusedField === 'email'}>{translate('doorHandle.email')}</FieldLabel>
+                    <FieldLabel focused={focusedField === 'email'}>{t('doorHandle.email') || 'Email'}</FieldLabel>
                     <FieldTextInput
                       value={form.email}
                       onChangeText={text => setForm(f => ({ ...f, email: text }))}
                       onFocus={() => setFocusedField('email')}
                       onPressIn={() => scrollToRow(emailRowRef)}
                       onBlur={() => setFocusedField(null)}
-                      placeholder={translate('sharedTrips.modal_email_placeholder')}
+                      placeholder={t('sharedTrips.modal_email_placeholder') || 'example@email.com'}
                       placeholderTextColor={theme.colors.input_placeholder}
                       keyboardType="email-address"
                       autoCapitalize="none"
@@ -981,8 +952,8 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                     />
                     <ZafiraButtonText>
                       {loadingZafira
-                        ? translate('doorHandle.validating')
-                        : `${translate('doorHandle.check_registration')} (${formatZafiraValidationPrice(
+                        ? (t('doorHandle.validating') || 'Validating...')
+                        : `${t('doorHandle.check_registration') || 'Check Registration'} (${formatZafiraValidationPrice(
                             getCityConfigValue(cityConfig, 'zafiraValidationPrice') as
                               | string
                               | number
@@ -1003,14 +974,14 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
               activeOpacity={0.85}
               onPress={async () => {
                 if (!form.name || !form.paymentForm || !form.idTripPaymentForm) {
-                  return customToast(translate('doorHandle.fill_in_the_fields'), 'warning');
+                  return customToast(t('doorHandle.fill_in_the_fields') || 'Fill in required fields', 'warning');
                 }
 
                 if (
                   requireCustomerDataKnobTrip &&
-                  (!form.phone || !form.cpf || !form.email)
+                  (!form.phone || !form.email)
                 ) {
-                  return customToast(translate('doorHandle.fill_in_the_fields'), 'warning');
+                  return customToast(t('doorHandle.fill_in_the_fields') || 'Fill in required fields', 'warning');
                 }
 
                 const hasZafiraMatch = await ensureZafiraMatchIfRequired();
@@ -1030,7 +1001,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                 } catch (error) {
                   console.error('newTripDoorHandle failed', error);
                   customToast(
-                    (error as Error)?.message || translate('driverTrip.text_error_update_trip'),
+                    (error as Error)?.message || t('driverTrip.text_error_update_trip') || 'Error updating trip',
                     'danger',
                   );
                 } finally {
@@ -1038,7 +1009,7 @@ export const ModalDoorHandleManual = ({ setVisible, visible }: ModalDoorHandleMa
                 }
               }}
             >
-              <ConfirmText>{translate('doorHandle.confirm')}</ConfirmText>
+              <ConfirmText>{t('doorHandle.confirm') || 'Confirm'}</ConfirmText>
             </ConfirmButton>
           </IfLoaderInsideScreen>
         )}

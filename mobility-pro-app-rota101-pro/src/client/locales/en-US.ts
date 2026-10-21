@@ -1723,7 +1723,7 @@ export default {
   },
 
   doorHandle: {
-    manual_doorknob_trip: 'Manual doorknob trip',
+    manual_doorknob_trip: 'Manual Trip',
     fill_in_the_fields: 'Fill in your name and payment method',
     confirm: 'Confirm',
     name: 'Name',

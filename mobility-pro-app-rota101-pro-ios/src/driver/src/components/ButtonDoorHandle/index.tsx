@@ -30,8 +30,8 @@ export const ButtonDoorHandle = ({
     <ContainerPanic>
       <ButtonPanic onPress={handleOpenDoor} activeOpacity={0.8}>
         <FontAwesome
-          name="car"
-          size={46}
+          name="qrcode"
+          size={50}
           style={{
             color: theme.colors.primaryText,
           }}
