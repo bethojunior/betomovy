@@ -43,6 +43,7 @@ import { customToast } from '../../../../utils/FlashMessage';
 import { offlineTripQueue } from '~/hooks/useOfflineTripActions';
 import { emitDriverStatusChange } from '../../utils/driverStatusChangeEmitter';
 import { emitTripStatusChange } from '../../utils/tripStatusChangeEmitter';
+import { setIniTripModal } from '../../store/iniTripModal';
 import { translate } from '../../../../client/locales';
 import { searchNative, updateRoute } from './directionRoute';
 import { calculateDistanceFromLatLonInMeters } from '../../../../client/utils/position';
@@ -332,7 +333,9 @@ export const TripProvider = ({ children }: TripContextChildren) => {
 
   const notifyTripAccepted = (acceptedTrip: TripInfo, chatBotTripTypeId: number) => {
     setTimeout(() => {
-      sendMessage(Number(acceptedTrip.driver.userId), acceptedTrip.tripReference, chatBotTripTypeId);
+      if (acceptedTrip?.driver?.userId) {
+        sendMessage(Number(acceptedTrip.driver.userId), acceptedTrip.tripReference, chatBotTripTypeId);
+      }
     }, 6000);
   };
 
@@ -728,6 +731,7 @@ export const TripProvider = ({ children }: TripContextChildren) => {
         tripPaymentFormId: dataCustomer?.idTripPaymentForm,
         tripTypeId: dataCalculate?.data?.price?.tripType?.idTripType,
         userId: userDriverFind?.userId,
+        driverId: userDriverFind?.idDriver,
         multiplierDynamic: multiplierDynamic ? parseFloat(multiplierDynamic) : null,
         waypoints: waypoints.length > 0 ? waypoints : null,
       };
@@ -740,9 +744,18 @@ export const TripProvider = ({ children }: TripContextChildren) => {
       dispatchTrip({ type: 'update', field: 'dataCalculate', arg: {} });
       dispatchTrip({ type: 'update', field: 'destination', arg: {} });
 
-      // return postPerOrigin();
+      const tripCreated = data?.data || data?.response;
+      if (tripCreated) {
+        await AsyncStorage.setItem('tripDriver', JSON.stringify(tripCreated));
+        await AsyncStorage.removeItem('trip');
+        dispatchTrip({ type: 'acceptTrip', arg: tripCreated });
+        notifyTripAccepted(tripCreated, 1);
+        startMapSuggestionTimeout();
+        setIniTripModal(true);
+      }
+      return tripCreated;
     },
-    [destination, origin, userDriverFind, dataCalculate],
+    [destination, origin, userDriverFind, dataCalculate, startMapSuggestionTimeout, notifyTripAccepted],
   );
 
   const getTripTypes = useCallback(async location => {

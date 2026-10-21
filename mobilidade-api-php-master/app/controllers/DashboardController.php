@@ -303,9 +303,9 @@ class DashboardController extends ApiController
                 $where[] = "(t.status = 'scheduled' OR ts.tripReference IS NOT NULL)";
             } elseif ($excludeScheduled) {
                 $where[] = "t.status != 'scheduled' AND ts.tripReference IS NULL";
-                $where[] = "t.status IN ('searching', 'pre_accepted', 'accepted', 'in_progress', 'waiting')";
+                $where[] = "t.status IN ('searching', 'searching_favorite', 'pre_accepted', 'accepted', 'boarding', 'in_progress', 'waiting', 'get_bid_by_drivers')";
             } else {
-                $where[] = "t.status IN ('searching', 'pre_accepted', 'accepted', 'in_progress', 'waiting', 'scheduled')";
+                $where[] = "t.status IN ('searching', 'searching_favorite', 'pre_accepted', 'accepted', 'boarding', 'in_progress', 'waiting', 'scheduled', 'get_bid_by_drivers')";
             }
 
             if (!empty($_GET['customerName'])) {
@@ -617,7 +617,7 @@ class DashboardController extends ApiController
         $sql = "
             SELECT
                 count(idTrip) as totalTrips,
-                sum(if(status IN ('accepted', 'finished', 'in_progress', 'waiting') OR (status = 'canceled' AND driverId IS NOT NULL), 1, 0)) as tripAccepted,
+                sum(if(status IN ('accepted', 'boarding', 'finished', 'in_progress', 'waiting') OR (status = 'canceled' AND driverId IS NOT NULL), 1, 0)) as tripAccepted,
                 sum(if(status = 'finished', 1, 0)) as tripFinished,
                 sum(if(status = 'canceled', 1, 0)) as totalCanceled,
                 sum(if(status = 'canceled' AND canceledBy = 'driver', 1, 0)) as canceledbyDriver,

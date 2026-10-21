@@ -1,9 +1,7 @@
-import {useState} from 'react';
 import {useAuth} from '../../../../context/auth';
 import {useTripProvider} from '../../context/Trip';
 import {useUserDriver} from '../../context/userDriver';
 import {If} from '../If';
-import {ModalDoorHandle} from '../ModalDoorHandle';
 import {ModalDoorHandleManual} from '../ModalDoorHandleManual';
 import {useModals} from '../../../../context/Modals';
 
@@ -14,7 +12,6 @@ export const DoorHandleComponent = ({setVisibleQrCode, visibleQrCode}) => {
     (context: any) => context.stateTrip.tripAccepted,
   );
   const {containerTaximeter} = useModals();
-  const [modalManual, setModalManual] = useState(false);
 
   return (
     <If
@@ -25,22 +22,12 @@ export const DoorHandleComponent = ({setVisibleQrCode, visibleQrCode}) => {
         Object.keys(tripAccepted).length === 0
       }
     >
-      {/* Objetos da Macaneta */}
-      {!containerTaximeter && (
-        <>
-          {/* SE O MÓDULO SPEEDMOB NÃO ESTIVER ATIVADO CAI NESSA CONDIÇÃO AQUI */}
-          <ModalDoorHandle
-            setVisible={setVisibleQrCode}
-            visible={visibleQrCode}
-            setVisibleManual={setModalManual}
-          />
-          {modalManual && (
-            <ModalDoorHandleManual
-              setVisible={setModalManual}
-              visible={modalManual}
-            />
-          )}
-        </>
+      {/* Viagem Manual de Maçaneta direta sem necessidade de ler QR Code */}
+      {!containerTaximeter && visibleQrCode && (
+        <ModalDoorHandleManual
+          setVisible={setVisibleQrCode}
+          visible={visibleQrCode}
+        />
       )}
     </If>
   );
