@@ -87,6 +87,10 @@ class CentralRepository {
     })
   }
 
+  static updateZone(idCentral, idZone, data) {
+    return this.updateZoneZone(idCentral, idZone, data)
+  }
+
   static updateZoneZone(idCentral, idZone, data) {
     return new Promise((resolve, reject) => {
       ConnectionServer.sendRequest(

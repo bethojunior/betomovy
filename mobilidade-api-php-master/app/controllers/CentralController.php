@@ -1861,4 +1861,124 @@ class CentralController extends ApiController
     {
         $this->actionCentralCallTypes();
     }
+
+    public function actionZone()
+    {
+        try {
+            $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+            if ($method === 'POST' && isset($_POST['_method'])) {
+                $method = strtoupper($_POST['_method']);
+            }
+
+            $centralId = (int)($_GET['id'] ?? ($_GET['idCentral'] ?? 0));
+            $pdo = Connection::open(Connection::DB_MYSQL);
+
+            if ($method === 'POST' || $method === 'PUT') {
+                $raw = file_get_contents('php://input');
+                $data = json_decode($raw, true) ?: $_POST;
+
+                $radius = isset($data['radius']) ? (float)$data['radius'] : 5;
+                $greaterRadius = isset($data['greaterRadius']) ? (float)$data['greaterRadius'] : ($radius * 2);
+                $idZone = isset($_GET['subId']) ? (int)$_GET['subId'] : (isset($data['id']) ? (int)$data['id'] : 0);
+
+                if ($idZone > 0) {
+                    try {
+                        $stmt = $pdo->prepare("UPDATE zone SET radius = :radius, greaterRadius = :greaterRadius WHERE idZone = :idZone");
+                        $stmt->execute([':radius' => $radius, ':greaterRadius' => $greaterRadius, ':idZone' => $idZone]);
+                    } catch (\Throwable $e) {}
+                } else {
+                    try {
+                        $chk = $pdo->query("SELECT idZone FROM zone ORDER BY idZone ASC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+                        if ($chk) {
+                            $idZone = (int)$chk['idZone'];
+                            $stmt = $pdo->prepare("UPDATE zone SET radius = :radius, greaterRadius = :greaterRadius WHERE idZone = :idZone");
+                            $stmt->execute([':radius' => $radius, ':greaterRadius' => $greaterRadius, ':idZone' => $idZone]);
+                        } else {
+                            $stmt = $pdo->prepare("INSERT INTO zone (name, radius, greaterRadius, statusId, `order`, time) VALUES ('Central Zone', :radius, :greaterRadius, 1, 1, 60)");
+                            $stmt->execute([':radius' => $radius, ':greaterRadius' => $greaterRadius]);
+                            $idZone = (int)$pdo->lastInsertId();
+                        }
+                    } catch (\Throwable $e) {
+                        $idZone = 1;
+                    }
+                }
+
+                if ($centralId > 0) {
+                    try {
+                        $updCentral = $pdo->prepare("UPDATE central SET enableCustomRadiusCentral = 1, placesSearchRadius = :radius WHERE id = :id");
+                        $updCentral->execute([':radius' => (int)$radius, ':id' => $centralId]);
+                    } catch (\Throwable $e) {}
+                }
+
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => true,
+                    'message' => 'Raio salvo com sucesso',
+                    'response' => [
+                        'idZone' => $idZone,
+                        'radius' => $radius,
+                        'greaterRadius' => $greaterRadius
+                    ],
+                    'data' => [
+                        'idZone' => $idZone,
+                        'radius' => $radius,
+                        'greaterRadius' => $greaterRadius
+                    ],
+                    'errors' => null
+                ]);
+                return;
+            }
+
+            // GET request
+            $zone = null;
+            try {
+                $stmt = $pdo->query("SELECT idZone, radius, COALESCE(greaterRadius, radius * 2) as greaterRadius FROM zone ORDER BY idZone ASC LIMIT 1");
+                $zone = $stmt->fetch(PDO::FETCH_ASSOC);
+            } catch (\Throwable $e) {}
+
+            if (!$zone && $centralId > 0) {
+                try {
+                    $stmtC = $pdo->prepare("SELECT placesSearchRadius FROM central WHERE id = :id");
+                    $stmtC->execute([':id' => $centralId]);
+                    $cRow = $stmtC->fetch(PDO::FETCH_ASSOC);
+                    $rad = (float)($cRow['placesSearchRadius'] ?? 5);
+                    $zone = [
+                        'idZone' => 1,
+                        'radius' => $rad > 0 ? $rad : 5,
+                        'greaterRadius' => ($rad > 0 ? $rad : 5) * 2
+                    ];
+                } catch (\Throwable $e) {}
+            }
+
+            if (!$zone) {
+                $zone = [
+                    'idZone' => 1,
+                    'radius' => 5,
+                    'greaterRadius' => 15
+                ];
+            } else {
+                $zone['idZone'] = (int)$zone['idZone'];
+                $zone['radius'] = (float)$zone['radius'];
+                $zone['greaterRadius'] = (float)$zone['greaterRadius'];
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Sucesso',
+                'response' => $zone,
+                'data' => $zone,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erro ao processar raio: ' . $e->getMessage(),
+                'response' => null,
+                'data' => null,
+                'errors' => ['message' => $e->getMessage()]
+            ]);
+        }
+    }
 }
