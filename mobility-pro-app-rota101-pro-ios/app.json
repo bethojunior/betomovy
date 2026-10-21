@@ -3,7 +3,7 @@
     "name": "Route 95Pro",
     "scheme": "rota101pro",
     "slug": "expoappv2",
-    "version": "8.1",
+    "version": "8.1.4",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "splash": {
