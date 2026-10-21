@@ -11,7 +11,7 @@ const DOCUMENT_SCREENS = ['DocumentPending', 'DocumentSend', 'MyProfile'];
 
 export function useProfileCompletionGuard() {
   const navigation = useNavigation<any>();
-  const { user } = useAuth();
+  const { user, generalSettings } = useAuth();
   const { refreshCustomerData } = useRefreshCustomerData();
   const validationExecutedRef = useRef(false);
 
@@ -30,9 +30,7 @@ export function useProfileCompletionGuard() {
 
         if (isInDocumentScreens) return;
 
-        // Busca o Customer/Find fresco em vez do userData do contexto (só
-        // preenchido no login) — senão uma aprovação feita no backend depois
-        // do login continuava mostrando "pendente" até deslogar e logar de novo.
+        // Fresh data from backend
         const freshUserData = await refreshCustomerData();
 
         const redirectToMyProfile = (message: string) => {
@@ -40,29 +38,38 @@ export function useProfileCompletionGuard() {
           requestAnimationFrame(() => navigation.navigate('MyProfile'));
         };
 
-        const userDataValid = validateUserData(freshUserData, user);
-        if (userDataValid) {
-          redirectToMyProfile(translate('trip.alert_document_incomplete'));
-          return;
-        }
-
-        if (String(freshUserData?.customerRegisterStatusId) === '2') {
-          redirectToMyProfile(translate('trip.alert_document_pending_approval'));
-          return;
-        }
-
+        // 1. Account explicitly blocked
         if (String(freshUserData?.customerRegisterStatusId) === '3') {
           redirectToMyProfile(translate('trip.alert_account_blocked'));
           return;
         }
 
+        // 2. Customer unblocked or active status - allow normal access
+        const customerRegisterUnblocked = generalSettings?.find?.(
+          (item: any) => item?.key === 'customer_register_unblocked',
+        )?.value;
+
+        const isCustomerActiveOrUnblocked =
+          customerRegisterUnblocked === '1' ||
+          String(freshUserData?.customerRegisterStatusId) === '1';
+
+        if (isCustomerActiveOrUnblocked) {
+          return;
+        }
+
+        // 3. Pending approval
+        if (String(freshUserData?.customerRegisterStatusId) === '2') {
+          redirectToMyProfile(translate('trip.alert_document_pending_approval'));
+          return;
+        }
+
         const docValidation = await validateDocumentsEnhanced(freshUserData);
-        if (!docValidation.isValid) {
+        if (!docValidation.isValid && docValidation.message) {
           redirectToMyProfile(docValidation.message);
         }
       };
 
       checkUserValidation();
-    }, [user, navigation, refreshCustomerData]),
+    }, [user, navigation, refreshCustomerData, generalSettings]),
   );
 }

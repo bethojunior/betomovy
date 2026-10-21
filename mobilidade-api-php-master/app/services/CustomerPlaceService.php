@@ -63,6 +63,10 @@ class CustomerPlaceService
      */
     public function getAll()
     {
+        if (!$this->customer || !$this->customer->getIdCustomer()) {
+            return [];
+        }
+
         return $this->dao->getByCustomer(
             $this->customer->getIdCustomer()
         );

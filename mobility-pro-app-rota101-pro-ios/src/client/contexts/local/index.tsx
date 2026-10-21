@@ -12,6 +12,7 @@ import { customToast } from '../../../utils/FlashMessage';
 import { translate } from '../../locales';
 import { calculateDistance } from '../../../utils/geolocation';
 import { TIMEOUT_SHORT } from '~/common/constants/timeouts';
+import { loadSession } from '../../../utils/Storage/sessionStorage';
 
 interface IPlace {
   [key: string]: any;
@@ -86,20 +87,21 @@ export const LocalProvider: React.FC<LocalProviderProps> = ({ children }) => {
     getLocalByPosition(position.latitude, position.longitude);
   }, [position?.latitude, position?.longitude, placeUser?.latitude, placeUser?.longitude]);
 
-  function getLocals() {
-    return apiMain
-      .get('CustomerPlace/getAll')
-      .then(({ data }) => {
-        if (!data.status) {
-          customToast(translate('contexts.error_local'), 'error');
-          return;
-        }
-        setPlaces(data.data);
-      })
-      .catch(error => {
-        console.error('Erro ao buscar lugares:', error?.message || error);
-        customToast(translate('contexts.error_local'), 'error');
-      });
+  async function getLocals() {
+    try {
+      const session = await loadSession();
+      if (!session?.token) {
+        return;
+      }
+      const response = await apiMain.get('CustomerPlace/getAll', {
+        metadata: { skipSessionCheck: true },
+      } as any);
+      if (response?.data?.status && Array.isArray(response?.data?.data)) {
+        setPlaces(response.data.data);
+      }
+    } catch (error: any) {
+      console.warn('Erro ao buscar lugares salvos:', error?.message || error);
+    }
   }
 
   async function addLocal(place) {

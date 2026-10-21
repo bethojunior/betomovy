@@ -943,7 +943,7 @@ export default {
   trip: {
     show_more_button: 'search for more addresses',
     text_set_location_on_map: 'Set location on map',
-    alert_document_incomplete: "Driver's document is incomplete",
+    alert_document_incomplete: 'Profile information is incomplete',
     alert_document_pending_approval: 'Your documents are pending approval.',
     alert_account_blocked:
       'Your account is blocked. Please contact support for more information.',
