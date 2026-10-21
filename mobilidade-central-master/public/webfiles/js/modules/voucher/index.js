@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded",function () {
                     cobrancePixId = response.pedido.id;
 
                     document.querySelector('#pixCopyAndPaste').innerHTML = response.pedido.qrCodePix;
-                    document.querySelector('#qrCodeImage').src = `https://chart.googleapis.com/chart?cht=qr&chl=${response.pedido.qrCodePix}&chs=160x160&chld=L|0`;
+                    document.querySelector('#qrCodeImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(response.pedido.qrCodePix)}`;
 
                     document.querySelector('.value-label').innerHTML = `Valor: <b>${Mask.maskMoney(parseFloat(data.value))}</b>`
                     $("#buyVoucherModal").modal("show");

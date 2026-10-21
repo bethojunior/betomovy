@@ -88,7 +88,7 @@
                                 <div class="back vc-pix">
                                     <p class="vc-pix__title">Leia o QR Code</p>
                                     <img id="qrCodeImage"
-                                         src="https://chart.googleapis.com/chart?cht=qr&chl=Hello+World&chs=160x160&chld=L|0"
+                                         src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=MOVY"
                                          class="qr-code vc-pix__qr">
                                     <div class="vc-pix__copy">
                                         <p class="vc-pix__hint">Ou copie e cole no seu app do banco</p>
