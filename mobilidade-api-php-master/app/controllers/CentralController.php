@@ -1072,6 +1072,154 @@ class CentralController extends ApiController
         }
     }
 
+    public function actionDriverActive()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $centralId = (int)($_GET['id'] ?? 0);
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $limit = 20;
+            $offset = ($page - 1) * $limit;
+            $filter = trim($_GET['filter'] ?? '');
+
+            // Base query for active / approved drivers
+            $where = ["(d.driverRegisterStatusId = 1 OR d.driverRegisterStatusId IS NULL)"];
+            $params = [':centralId' => $centralId];
+
+            // If central has explicit records in centralDriver, prioritize them; else show active drivers in city / system
+            if ($centralId > 0) {
+                $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM centralDriver WHERE centralId = :cid AND deleted_at IS NULL");
+                $checkStmt->execute([':cid' => $centralId]);
+                $hasExplicit = ((int)$checkStmt->fetchColumn()) > 0;
+
+                if ($hasExplicit) {
+                    $where[] = "cd.id IS NOT NULL";
+                }
+            }
+
+            // Apply filter
+            if ($filter === 'favorite') {
+                $where[] = "COALESCE(cd.isFavorite, 0) = 1";
+            } elseif ($filter === 'disponivel' || $filter === 'online') {
+                $where[] = "d.status = 'disponivel'";
+            } elseif ($filter === 'corrida') {
+                $where[] = "d.status = 'corrida'";
+            } elseif ($filter === 'desligado' || $filter === 'offline') {
+                $where[] = "d.status = 'desligado'";
+            }
+
+            $whereSql = implode(' AND ', $where);
+
+            $countSql = "SELECT COUNT(*)
+                         FROM driver d
+                         INNER JOIN user u ON d.userId = u.idUser
+                         LEFT JOIN centralDriver cd ON cd.driverId = d.idDriver AND cd.centralId = :centralId AND cd.deleted_at IS NULL
+                         WHERE {$whereSql}";
+            $countStmt = $pdo->prepare($countSql);
+            $countStmt->execute($params);
+            $total = (int)$countStmt->fetchColumn();
+            $lastPage = max(1, (int)ceil($total / $limit));
+
+            $sql = "SELECT d.idDriver, d.userId, u.name, u.phone, u.document, u.email, u.created_at,
+                           d.status, d.last_lat, d.last_lon, d.profileImage, d.profileImageUrl,
+                           COALESCE(cd.isFavorite, 0) AS isFavorite
+                    FROM driver d
+                    INNER JOIN user u ON d.userId = u.idUser
+                    LEFT JOIN centralDriver cd ON cd.driverId = d.idDriver AND cd.centralId = :centralId AND cd.deleted_at IS NULL
+                    WHERE {$whereSql}
+                    ORDER BY COALESCE(cd.isFavorite, 0) DESC, (d.status = 'disponivel') DESC, (d.status = 'corrida') DESC, u.name ASC
+                    LIMIT {$limit} OFFSET {$offset}";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $formatted = [];
+            foreach ($rows as $row) {
+                $profilePic = $row['profileImageUrl'] ?? '';
+                if (!$profilePic && !empty($row['profileImage'])) {
+                    $profilePic = 'https://api.movymob.com/uploads/driver/' . $row['profileImage'];
+                }
+                $formatted[] = [
+                    'idDriver' => (int)$row['idDriver'],
+                    'userId' => (int)$row['userId'],
+                    'name' => $row['name'],
+                    'phone' => $row['phone'],
+                    'email' => $row['email'],
+                    'status' => $row['status'] ?: 'desligado',
+                    'isFavorite' => (int)$row['isFavorite'],
+                    'profileImageUrl' => $profilePic,
+                    'code' => 'MO' . str_pad($row['idDriver'], 5, '0', STR_PAD_LEFT),
+                    'user' => [
+                        'name' => $row['name'],
+                        'phone' => $row['phone'],
+                        'email' => $row['email'],
+                        'created_at' => $row['created_at']
+                    ]
+                ];
+            }
+
+            $prevPageUrl = $page > 1 ? "?page=" . ($page - 1) : null;
+            $nextPageUrl = $page < $lastPage ? "?page=" . ($page + 1) : null;
+
+            $resData = [
+                'current_page' => $page,
+                'last_page' => $lastPage,
+                'total' => $total,
+                'per_page' => $limit,
+                'prev_page_url' => $prevPageUrl,
+                'next_page_url' => $nextPageUrl,
+                'data' => $formatted
+            ];
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'response' => $resData,
+                'data' => $formatted
+            ]);
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'response' => ['current_page' => 1, 'last_page' => 1, 'total' => 0, 'data' => []],
+                'data' => []
+            ]);
+        }
+    }
+
+    public function actionFavoriteDriver()
+    {
+        try {
+            $data = $this->request();
+            $centralId = (int)($data->centralId ?? ($data['centralId'] ?? 0));
+            $driverId = (int)($data->driverId ?? ($data['driverId'] ?? 0));
+            $isFavorite = isset($data->isFavorite) ? (int)$data->isFavorite : (isset($data['isFavorite']) ? (int)$data['isFavorite'] : 1);
+
+            if (!$centralId || !$driverId) {
+                throw new \Exception("Central e Motorista são obrigatórios");
+            }
+
+            $pdo = Connection::open(Connection::DB_MYSQL_RW);
+            $stmt = $pdo->prepare("SELECT id FROM centralDriver WHERE centralId = :cid AND driverId = :did");
+            $stmt->execute([':cid' => $centralId, ':did' => $driverId]);
+            $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($existing) {
+                $upd = $pdo->prepare("UPDATE centralDriver SET isFavorite = :fav, deleted_at = NULL, updated_at = NOW() WHERE id = :id");
+                $upd->execute([':fav' => $isFavorite, ':id' => $existing['id']]);
+            } else {
+                $ins = $pdo->prepare("INSERT INTO centralDriver (centralId, driverId, isFavorite, created_at, updated_at) VALUES (:cid, :did, :fav, NOW(), NOW())");
+                $ins->execute([':cid' => $centralId, ':did' => $driverId, ':fav' => $isFavorite]);
+            }
+
+            echo $this->returnSuccess("Status de favorito atualizado com sucesso");
+        } catch (\Throwable $e) {
+            echo $this->returnError($e);
+        }
+    }
+
     public function actionDriverPositions()
     {
         try {
