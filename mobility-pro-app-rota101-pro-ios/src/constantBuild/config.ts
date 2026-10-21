@@ -8,7 +8,7 @@ const nameBucket = isMigrated ? 'rota101fb704' : 'rota101';
 export const isBeta = false;
 export const dataExpired = '2023-10-15T16:42:10.436Z';
 export const dataNow = new Date().getTime();
-const BASE_URL_SITE = `https://${nameApp}-new.prod.704apps.com.br/`;
+const BASE_URL_SITE = `https://movymob.com/`;
 const pulseCodeHomolog = '5a0a39bf-5115-432c-ae71-9153bc8855c2';
 const pulseCode704 = 'd5096670-ac06-482d-8919-36901ac36e92';
 const APP_PARTNER = false;
@@ -20,14 +20,14 @@ const IS_APP_DEMO = false;
 
 export const buildApp = () => {
   if (appProccess === 'development') {
-    const HOST_API_DELIVERY = `https://v2.apiteste.${nameApp}.com.br/`;
-    const HOST_API_APP = `https://apiteste.${nameApp}.com.br/`;
-    const HOST_SOCKET = `http://v2.apiteste.${nameApp}.com.br:3000`;
-    const HOST_SOCKETV2 = `http://v2.apiteste.${nameApp}.com.br:3000`;
+    const HOST_API_DELIVERY = `https://delivery-api-${nameApp}.prod.704apps.com.br/`;
+    const HOST_API_APP = `https://api.movymob.com/`;
+    const HOST_SOCKET = `https://socket.movymob.com/`;
+    const HOST_SOCKETV2 = `https://socket.movymob.com/`;
     const HOST_AUDIO_MESSAGE = `https://s3-sa-east-1.amazonaws.com/${nameApp}teste/chat/trip/`;
-    const HOST_SITE = `https://${nameApp}-mobilidade.dev.704apps.com.br/`;
+    const HOST_SITE = `https://movymob.com/`;
     const HOST_API_IFOOD = 'https://api-ifood.704app.com.br/ifood/';
-    const HOST_API_CENTRAL = `https://central-${nameApp}-api.prod.704apps.com.br/`;
+    const HOST_API_CENTRAL = `https://movycentral.com/`;
 
     const HOST_IMAGE_DRIVER = `https://s3-sa-east-1.amazonaws.com/${nameApp}teste/driver/profile/compressed/`;
     const HOST_IMAGE_CUSTOMER = `https://s3-sa-east-1.amazonaws.com/${nameApp}teste/customer/profile/compressed/`;
@@ -127,11 +127,12 @@ export const buildApp = () => {
       IS_APP_DEMO,
     };
   }
-  const HOST_API_DELIVERY = `https://v2.${nameApp}api.${linkApp}.com.br/`;
-  const HOST_API_APP = `https://${nameApp}api.${linkApp}.com.br/`;
-  const HOST_SOCKET = `https://${nameApp}api.${linkApp}.com.br:3000`;
-  const HOST_SOCKETV2 = `https://${nameApp}api.${linkApp}.com.br:3000/`;
-  const HOST_SITE = `https://${nameApp}-mobilidade.dev.704apps.com.br/`;
+  const HOST_API_DELIVERY = `https://delivery-api-${nameApp}.prod.704apps.com.br/`;
+  const HOST_API_APP = `https://api.movymob.com/`;
+  const HOST_SOCKET = `https://socket.movymob.com/`;
+  const HOST_SOCKETV2 = `https://socket.movymob.com/`;
+  const HOST_SITE = `https://movymob.com/`;
+  const HOST_API_CENTRAL = `https://movycentral.com/`;
 
   const HOST_AUDIO_MESSAGE = `https://minio.704app.com.br/rota101fb704/chat/trip/`;
   const HOST_IMAGE_DRIVER = `https://minio.704app.com.br/rota101fb704/driver/profile/compressed/`;
