@@ -25,10 +25,10 @@ class AdvertisingController extends ApiController
             $sql = "SELECT a.*, 
                            c.name AS companyName,
                            c.fantasyName AS companyFantasyName,
-                           ci.name AS cityName
+                           ci.nome AS cityName
                     FROM advertising a
                     LEFT JOIN company c ON c.idCompany = a.companyId
-                    LEFT JOIN city ci ON ci.idCity = a.cityId
+                    LEFT JOIN city ci ON ci.id = a.cityId
                     WHERE {$whereStr}
                     ORDER BY a.id DESC";
 

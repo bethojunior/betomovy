@@ -16,9 +16,9 @@ class CreditPrepaidController extends ApiController
             if ($method === 'GET') {
                 $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
                 if ($id) {
-                    $item = GenericDao::first("SELECT c.*, ci.name AS cityName 
+                    $item = GenericDao::first("SELECT c.*, ci.nome AS cityName 
                                                 FROM creditPrepaid c 
-                                                LEFT JOIN city ci ON ci.idCity = c.cityId 
+                                                LEFT JOIN city ci ON ci.id = c.cityId 
                                                 WHERE c.id = :id AND c.deleted_at IS NULL", [':id' => $id]);
                     echo $this->returnSuccess('Crédito pré-pago encontrado', $item);
                     return;
@@ -34,9 +34,9 @@ class CreditPrepaidController extends ApiController
                 }
 
                 $whereStr = implode(" AND ", $where);
-                $sql = "SELECT c.*, ci.name AS cityName 
+                $sql = "SELECT c.*, ci.nome AS cityName 
                         FROM creditPrepaid c 
-                        LEFT JOIN city ci ON ci.idCity = c.cityId 
+                        LEFT JOIN city ci ON ci.id = c.cityId 
                         WHERE {$whereStr} 
                         ORDER BY c.id DESC";
 

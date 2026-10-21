@@ -45,10 +45,10 @@ class RiskAreaController extends ApiController
                                ra.updated_at,
                                u.name AS userName,
                                u.phone AS userPhone,
-                               ci.name AS cityName
+                               ci.nome AS cityName
                         FROM riskArea ra
                         LEFT JOIN user u ON u.idUser = ra.userId
-                        LEFT JOIN city ci ON ci.idCity = ra.cityId
+                        LEFT JOIN city ci ON ci.id = ra.cityId
                         WHERE {$whereStr}
                         ORDER BY ra.id DESC
                         LIMIT {$limit} OFFSET {$offset}";

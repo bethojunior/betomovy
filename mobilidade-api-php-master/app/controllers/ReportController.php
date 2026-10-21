@@ -64,7 +64,7 @@ class ReportController extends ApiController
             $sql = "SELECT t.driverId,
                            u.name AS driverName,
                            u.phone AS driverPhone,
-                           ci.name AS cityName,
+                           ci.nome AS cityName,
                            COUNT(t.idTrip) AS totalTrips,
                            COALESCE(SUM(t.tripPrice), 0) AS grossTotal,
                            COALESCE(SUM(t.appPrice), 0) AS appFeeTotal,
@@ -72,9 +72,9 @@ class ReportController extends ApiController
                     FROM trip t
                     INNER JOIN driver d ON d.idDriver = t.driverId
                     INNER JOIN user u ON u.idUser = d.userId
-                    LEFT JOIN city ci ON ci.idCity = t.cityId
+                    LEFT JOIN city ci ON ci.id = t.cityId
                     WHERE {$whereStr}
-                    GROUP BY t.driverId, u.name, u.phone, ci.name
+                    GROUP BY t.driverId, u.name, u.phone, ci.nome
                     ORDER BY grossTotal DESC";
 
             $rows = GenericDao::query($sql, $params);

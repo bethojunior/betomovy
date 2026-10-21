@@ -29,10 +29,10 @@ class NeighborhoodRidesController extends ApiController
                     nr.price,
                     nr.tripTypeId,
                     nr.active,
-                    COALESCE(c.name, '') as cityName,
+                    COALESCE(c.nome, '') as cityName,
                     COALESCE(tt.type, 'Padrão') as tripTypeName
                 FROM neighborhoodRides nr
-                LEFT JOIN city c ON nr.cityId = c.idCity
+                LEFT JOIN city c ON nr.cityId = c.id
                 LEFT JOIN tripType tt ON nr.tripTypeId = tt.idTripType
                 WHERE nr.idCentral = :idCentral AND nr.deleted_at IS NULL
                 ORDER BY nr.id DESC

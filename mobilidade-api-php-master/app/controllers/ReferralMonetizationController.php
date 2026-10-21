@@ -32,9 +32,9 @@ class ReferralMonetizationController extends ApiController
                                r.cityId,
                                r.created_at,
                                r.updated_at,
-                               c.name AS cityName
+                               c.nome AS cityName
                         FROM referralMonetization r
-                        LEFT JOIN city c ON c.idCity = r.cityId
+                        LEFT JOIN city c ON c.id = r.cityId
                         WHERE {$whereStr}
                         ORDER BY r.id DESC";
 
