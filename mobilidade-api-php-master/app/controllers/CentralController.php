@@ -951,7 +951,7 @@ class CentralController extends ApiController
                 $existing = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($existing) {
-                    $upd = $pdo->prepare("UPDATE centralDriver SET deleted_at = NULL, isFavorite = :fav, updated_at = NOW() WHERE id = :id");
+                    $upd = $pdo->prepare("UPDATE centralDriver SET isFavorite = :fav, updated_at = NOW() WHERE id = :id");
                     $upd->execute([':fav' => $isFavorite, ':id' => $existing['id']]);
                 } else {
                     $ins = $pdo->prepare("INSERT INTO centralDriver (centralId, driverId, isFavorite, created_at, updated_at) VALUES (:cid, :did, :fav, NOW(), NOW())");
@@ -978,7 +978,7 @@ class CentralController extends ApiController
                 }
 
                 $pdo = Connection::open(Connection::DB_MYSQL_RW);
-                $stmt = $pdo->prepare("UPDATE centralDriver SET deleted_at = NOW() WHERE centralId = :cid AND driverId = :did");
+                $stmt = $pdo->prepare("DELETE FROM centralDriver WHERE centralId = :cid AND driverId = :did");
                 $stmt->execute([':cid' => $centralId, ':did' => $driverId]);
 
                 echo $this->returnSuccess("Motorista removido da central com sucesso");
@@ -998,7 +998,7 @@ class CentralController extends ApiController
             $where = ["(d.driverRegisterStatusId = 1 OR d.driverRegisterStatusId IS NULL)"];
             $params = [];
             if ($centralId > 0) {
-                $where[] = "(d.idDriver IN (SELECT driverId FROM centralDriver WHERE centralId = :centralId AND deleted_at IS NULL) OR d.centralId = :centralId2)";
+                $where[] = "(d.idDriver IN (SELECT driverId FROM centralDriver WHERE centralId = :centralId) OR d.centralId = :centralId2)";
                 $params[':centralId'] = $centralId;
                 $params[':centralId2'] = $centralId;
             }
@@ -1088,7 +1088,7 @@ class CentralController extends ApiController
 
             // If central has explicit records in centralDriver, prioritize them; else show active drivers in city / system
             if ($centralId > 0) {
-                $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM centralDriver WHERE centralId = :cid AND deleted_at IS NULL");
+                $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM centralDriver WHERE centralId = :cid");
                 $checkStmt->execute([':cid' => $centralId]);
                 $hasExplicit = ((int)$checkStmt->fetchColumn()) > 0;
 
@@ -1113,7 +1113,7 @@ class CentralController extends ApiController
             $countSql = "SELECT COUNT(*)
                          FROM driver d
                          INNER JOIN user u ON d.userId = u.idUser
-                         LEFT JOIN centralDriver cd ON cd.driverId = d.idDriver AND cd.centralId = :centralId AND cd.deleted_at IS NULL
+                         LEFT JOIN centralDriver cd ON cd.driverId = d.idDriver AND cd.centralId = :centralId
                          WHERE {$whereSql}";
             $countStmt = $pdo->prepare($countSql);
             $countStmt->execute($params);
@@ -1125,7 +1125,7 @@ class CentralController extends ApiController
                            COALESCE(cd.isFavorite, 0) AS isFavorite
                     FROM driver d
                     INNER JOIN user u ON d.userId = u.idUser
-                    LEFT JOIN centralDriver cd ON cd.driverId = d.idDriver AND cd.centralId = :centralId AND cd.deleted_at IS NULL
+                    LEFT JOIN centralDriver cd ON cd.driverId = d.idDriver AND cd.centralId = :centralId
                     WHERE {$whereSql}
                     ORDER BY COALESCE(cd.isFavorite, 0) DESC, (d.status = 'disponivel') DESC, (d.status = 'corrida') DESC, u.name ASC
                     LIMIT {$limit} OFFSET {$offset}";
@@ -1207,7 +1207,7 @@ class CentralController extends ApiController
             $existing = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($existing) {
-                $upd = $pdo->prepare("UPDATE centralDriver SET isFavorite = :fav, deleted_at = NULL, updated_at = NOW() WHERE id = :id");
+                $upd = $pdo->prepare("UPDATE centralDriver SET isFavorite = :fav, updated_at = NOW() WHERE id = :id");
                 $upd->execute([':fav' => $isFavorite, ':id' => $existing['id']]);
             } else {
                 $ins = $pdo->prepare("INSERT INTO centralDriver (centralId, driverId, isFavorite, created_at, updated_at) VALUES (:cid, :did, :fav, NOW(), NOW())");

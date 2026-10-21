@@ -163,7 +163,38 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
                     </a>
                 </div>
             </li>
-            <li id="menuItemDriver"></li>
+            <li id="menuItemDriver">
+                <div>
+                    <a href="<?php echo Host::getLocal() ?>driver/list">
+                        <i class="material-icons nav-icon">person</i>
+                        Motoristas
+                    </a>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <a href="<?php echo Host::getLocal() ?>rate/add">
+                        <i class="material-icons nav-icon">attach_money</i>
+                        Tarifas
+                    </a>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <a href="<?php echo Host::getLocal() ?>radius">
+                        <i class="material-icons nav-icon">track_changes</i>
+                        Raio de Atendimento
+                    </a>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <a href="<?php echo Host::getLocal() ?>keys/list">
+                        <i class="material-icons nav-icon">vpn_key</i>
+                        Chaves de Integração
+                    </a>
+                </div>
+            </li>
             <li>
                 <div>
                     <a href="<?php echo Host::getLocal() ?>dynamicfields/list">
