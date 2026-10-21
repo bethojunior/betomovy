@@ -269,7 +269,9 @@ return [
         '/config_apps_partners',
         '/config_apps_partners/',
         '/monitoringarea',
-        '/monitoringarea/'
+        '/monitoringarea/',
+        '/ifood/keys',
+        '/ifood/keys/'
     ]
 ];
 
