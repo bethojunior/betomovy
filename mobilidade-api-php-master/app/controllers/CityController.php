@@ -426,6 +426,31 @@ class CityController extends ApiController
     public function actionDelete()
     {
         try {
+            $id = (int)($_GET['cityId'] ?? $_GET['id'] ?? 0);
+            if ($id <= 0) {
+                $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+                $id = (int)($input['cityId'] ?? $input['id'] ?? 0);
+            }
+
+            if ($id > 0) {
+                try {
+                    $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+                    // 1. Remover vinculo da cidade em roleCity
+                    $stmtRole = $pdo->prepare("DELETE FROM roleCity WHERE cityId = :cityId");
+                    $stmtRole->execute([':cityId' => $id]);
+
+                    // 2. Desativar areas da cidade
+                    $stmtArea = $pdo->prepare("UPDATE cityArea SET statusId = 2 WHERE cityId = :cityId");
+                    $stmtArea->execute([':cityId' => $id]);
+
+                    // 3. Desativar cidade do sistema
+                    $stmtCity = $pdo->prepare("UPDATE city SET active = 0, statusId = 2 WHERE id = :id");
+                    $stmtCity->execute([':id' => $id]);
+                } catch (\Throwable $t) {
+                }
+            }
+
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
@@ -437,6 +462,11 @@ class CityController extends ApiController
         } catch (Exception $e) {
             echo $this->returnError($e);
         }
+    }
+
+    public function actionDeleteCityName()
+    {
+        $this->actionDelete();
     }
 
     public function actionGetByEstate($estateId = null)
@@ -938,7 +968,7 @@ class CityController extends ApiController
                         ST_AsText(ca.polygon) as polygon
                     FROM city c
                     INNER JOIN cityArea ca ON (c.id = ca.cityId AND ca.statusId = 1)
-                    WHERE ca.polygon IS NOT NULL
+                    WHERE ca.polygon IS NOT NULL AND c.active = 1 AND (c.statusId = 1 OR c.statusId IS NULL)
                     ORDER BY c.nome ASC
                 ");
                 $cities = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -983,11 +1013,13 @@ class CityController extends ApiController
             }
         }
 
-        foreach ($defaultCities as $key => $def) {
-            $lowerName = strtolower($def['nome']);
-            if (!isset($existingNames[$lowerName])) {
-                $rawList[] = $def;
-                $existingNames[$lowerName] = true;
+        if (empty($rawList)) {
+            foreach ($defaultCities as $key => $def) {
+                $lowerName = strtolower($def['nome']);
+                if (!isset($existingNames[$lowerName])) {
+                    $rawList[] = $def;
+                    $existingNames[$lowerName] = true;
+                }
             }
         }
 

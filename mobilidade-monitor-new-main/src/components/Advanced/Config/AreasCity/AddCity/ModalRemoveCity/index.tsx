@@ -35,10 +35,24 @@ export const ModalRemoveCity = ({
 
     try {
       setLoading(true);
+      let success = false;
+      try {
+        const responseRemoveCity = await api.delete(`role/city/delete/${idCity}`);
+        if (responseRemoveCity.status === 200 || responseRemoveCity.data?.status) {
+          success = true;
+        }
+      } catch (e1) {
+        try {
+          const res2 = await api.delete(`city/${idCity}`);
+          if (res2.status === 200 || res2.data?.status) {
+            success = true;
+          }
+        } catch (e2) {
+          throw e1;
+        }
+      }
 
-      const responseRemoveCity = await api.delete(`role/city/delete/${idCity}`);
-
-      if (responseRemoveCity.status) {
+      if (success) {
         swal({
           title: "Cidade removida com sucesso!",
           icon: "success",
@@ -48,9 +62,12 @@ export const ModalRemoveCity = ({
         setVisibleModal(false);
       }
     } catch (error) {
-      const responseError = error as AxiosError;
+      const responseError = error as AxiosError<any>;
+      const errMsg = Array.isArray(responseError.response?.data?.response)
+        ? responseError.response?.data?.response[0]
+        : (responseError.response?.data?.message || "Erro ao remover cidade");
       swal({
-        title: responseError.response?.data.response[0],
+        title: errMsg,
         icon: "error",
       });
     } finally {

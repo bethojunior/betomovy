@@ -217,9 +217,25 @@ export const EditCity = () => {
       if (willDelete) {
         try {
           setLoading(true);
-          const response = await api.delete(`role/city/delete/${cityId}`);
+          let success = false;
+          try {
+            const response = await api.delete(`role/city/delete/${cityId}`);
+            if (response.status === 200 || response.data?.status) {
+              success = true;
+            }
+          } catch (e1) {
+            try {
+              const res2 = await api.delete(`city/${cityId}`);
+              if (res2.status === 200 || res2.data?.status) {
+                success = true;
+              }
+            } catch (e2) {
+              throw e1;
+            }
+          }
 
-          if (response.status) {
+          if (success) {
+            setCitiesFully((prev) => prev.filter((c) => Number(c.cityId || c.id) !== Number(cityId)));
             swal({
               title: "Cidade removida com sucesso!",
               icon: "success",

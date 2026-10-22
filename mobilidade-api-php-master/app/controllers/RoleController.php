@@ -422,4 +422,45 @@ class RoleController extends ApiController
             echo $this->returnError($e);
         }
     }
+
+    public function actionCityDelete()
+    {
+        try {
+            $cityId = (int)($_GET['cityId'] ?? $_GET['id'] ?? 0);
+            if ($cityId <= 0) {
+                $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+                $cityId = (int)($input['cityId'] ?? $input['id'] ?? 0);
+            }
+
+            if ($cityId > 0) {
+                try {
+                    $pdo = Connection::getConnection(Connection::DB_MYSQL_RW);
+
+                    // 1. Remover vínculo da cidade em roleCity
+                    $stmtRole = $pdo->prepare("DELETE FROM roleCity WHERE cityId = :cityId");
+                    $stmtRole->execute([':cityId' => $cityId]);
+
+                    // 2. Desativar áreas da cidade
+                    $stmtArea = $pdo->prepare("UPDATE cityArea SET statusId = 2 WHERE cityId = :cityId");
+                    $stmtArea->execute([':cityId' => $cityId]);
+
+                    // 3. Desativar cidade do sistema
+                    $stmtCity = $pdo->prepare("UPDATE city SET active = 0, statusId = 2 WHERE id = :cityId");
+                    $stmtCity->execute([':cityId' => $cityId]);
+                } catch (\Throwable $t) {
+                }
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Cidade removida com sucesso',
+                'data' => true,
+                'response' => ['Cidade removida com sucesso'],
+                'errors' => null
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
 }
