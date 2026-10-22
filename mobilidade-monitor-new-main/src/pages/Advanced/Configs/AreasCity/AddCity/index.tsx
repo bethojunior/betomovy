@@ -230,18 +230,49 @@ export const AddCity = () => {
   const selectSearchResult = (item: any) => {
     setShowSearchAreaModal(false);
     
-    const coordinates = item.geojson.type === "Polygon" 
-      ? item.geojson.coordinates[0]
-      : item.geojson.coordinates[0][0];
+    let coordinates: [number, number][] = [];
+    if (item.geojson?.type === "Polygon" && Array.isArray(item.geojson?.coordinates?.[0])) {
+      coordinates = item.geojson.coordinates[0];
+    } else if (item.geojson?.type === "MultiPolygon" && Array.isArray(item.geojson?.coordinates)) {
+      let bestRing: [number, number][] = [];
+      for (const poly of item.geojson.coordinates) {
+        if (Array.isArray(poly) && Array.isArray(poly[0]) && poly[0].length > bestRing.length) {
+          bestRing = poly[0];
+        }
+      }
+      coordinates = bestRing;
+    }
     
+    if (coordinates.length === 0) return;
+
     setCoordinatesCaptured(coordinates);
-    setPlaceSelected(coordinates);
+    setPlaceSelected(coordinates as any);
     
     if (map.current) {
-      map.current.flyTo({
-        center: [parseFloat(item.lon), parseFloat(item.lat)],
-        zoom: 12,
-      });
+      try {
+        let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+        for (const pt of coordinates) {
+          const lng = pt[0];
+          const lat = pt[1];
+          if (lng < minLng) minLng = lng;
+          if (lng > maxLng) maxLng = lng;
+          if (lat < minLat) minLat = lat;
+          if (lat > maxLat) maxLat = lat;
+        }
+        if (minLng !== Infinity && maxLng !== -Infinity && (maxLng - minLng > 0.0001)) {
+          map.current.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 40, duration: 1000 });
+        } else {
+          map.current.flyTo({
+            center: [parseFloat(item.lon), parseFloat(item.lat)],
+            zoom: 12,
+          });
+        }
+      } catch (e) {
+        map.current.flyTo({
+          center: [parseFloat(item.lon), parseFloat(item.lat)],
+          zoom: 12,
+        });
+      }
     }
     
     if (draw.current) {
@@ -369,48 +400,182 @@ export const AddCity = () => {
 
       // Se a cidade já tem um polígono salvo no banco de dados
       if (parsedCity.polygon && parsedCity.polygon.length > 0) {
-        const valuePolygon = JSON.parse(parsedCity.polygon);
-        setCoordinatesCaptured(valuePolygon);
-        setPlaceSelected(valuePolygon);
-        const centerCoordinates = Utils.CenterCoordinates(valuePolygon);
-
-        if (map.current) {
-          map.current.flyTo({
-            center: centerCoordinates as any,
-            zoom: 11,
-          });
+        let valuePolygon: any = null;
+        try {
+          valuePolygon = typeof parsedCity.polygon === "string"
+            ? JSON.parse(parsedCity.polygon)
+            : parsedCity.polygon;
+        } catch (e) {
+          valuePolygon = null;
         }
 
-        if (draw.current) {
-          draw.current.deleteAll();
-          const defaultPolygon = {
-            type: "Feature",
-            geometry: {
-              type: "Polygon",
-              coordinates: [valuePolygon],
-            },
-          };
-          draw.current.add(defaultPolygon as any);
+        if (Array.isArray(valuePolygon) && valuePolygon.length > 0) {
+          setCoordinatesCaptured(valuePolygon);
+          setPlaceSelected(valuePolygon);
+          const centerCoordinates = Utils.CenterCoordinates(valuePolygon);
+
+          if (map.current) {
+            try {
+              let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+              for (const pt of valuePolygon) {
+                const lng = pt[0];
+                const lat = pt[1];
+                if (lng < minLng) minLng = lng;
+                if (lng > maxLng) maxLng = lng;
+                if (lat < minLat) minLat = lat;
+                if (lat > maxLat) maxLat = lat;
+              }
+              if (minLng !== Infinity && maxLng !== -Infinity && (maxLng - minLng > 0.0001)) {
+                map.current.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 40, duration: 800 });
+              } else {
+                map.current.flyTo({
+                  center: centerCoordinates as any,
+                  zoom: 11,
+                });
+              }
+            } catch (err) {
+              map.current.flyTo({
+                center: centerCoordinates as any,
+                zoom: 11,
+              });
+            }
+          }
+
+          if (draw.current) {
+            draw.current.deleteAll();
+            const defaultPolygon = {
+              type: "Feature",
+              geometry: {
+                type: "Polygon",
+                coordinates: [valuePolygon],
+              },
+            };
+            draw.current.add(defaultPolygon as any);
+          }
+          return;
         }
-        return;
       }
 
-      // Cidade não possui polígono prévio: busca localização e limites automaticamente via Mapbox Geocoding
-      const cityName = parsedCity.name || "";
-      const stateName = selectedStateObj?.name || "";
-      const countryName = selectedCountryObj?.name || "";
+      // Cidade não possui polígono prévio: busca a fronteira/limite municipal exato via OpenStreetMap Nominatim
+      const cityName = parsedCity.name || parsedCity.nome || "";
+      const stateName = selectedStateObj?.name || selectedStateObj?.nome || "";
+      const stateSigla = (selectedStateObj as any)?.sigla || "";
+      const countryName = selectedCountryObj?.name || selectedCountryObj?.nome || "";
 
       setSearchLoading(true);
-      const query = `${cityName}, ${stateName}, ${countryName}`.trim();
+
+      const candidateQueries: string[] = [];
+      if (cityName && stateName && countryName) {
+        candidateQueries.push(`${cityName}, ${stateName}, ${countryName}`);
+      }
+      if (cityName && stateSigla && countryName) {
+        candidateQueries.push(`${cityName}, ${stateSigla}, ${countryName}`);
+      }
+      if (cityName && stateName) {
+        candidateQueries.push(`${cityName}, ${stateName}`);
+      }
+      if (cityName && stateSigla) {
+        candidateQueries.push(`${cityName}, ${stateSigla}`);
+      }
+      if (cityName) {
+        candidateQueries.push(cityName);
+      }
 
       let foundCoords: [number, number][] | null = null;
       let centerLng: number | null = null;
       let centerLat: number | null = null;
 
-      // 1. Tenta Mapbox Geocoding oficial (rápido, nativo do token, sem bloqueio de CORS)
-      if (mapboxToken) {
+      const extractPolygonFromItem = (item: any): [number, number][] | null => {
+        if (!item?.geojson) return null;
+        if (item.geojson.type === "Polygon" && Array.isArray(item.geojson.coordinates?.[0])) {
+          return item.geojson.coordinates[0];
+        }
+        if (item.geojson.type === "MultiPolygon" && Array.isArray(item.geojson.coordinates)) {
+          let bestRing: [number, number][] = [];
+          for (const poly of item.geojson.coordinates) {
+            if (Array.isArray(poly) && Array.isArray(poly[0]) && poly[0].length > bestRing.length) {
+              bestRing = poly[0];
+            }
+          }
+          if (bestRing.length > 0) return bestRing;
+        }
+        return null;
+      };
+
+      // 1. Tenta OpenStreetMap Nominatim oficial (fronteira exata da cidade)
+      for (const q of candidateQueries) {
         try {
-          const mapboxUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxToken}&types=place,locality`;
+          const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&polygon_geojson=1&format=json`;
+          const response = await fetch(url, {
+            headers: {
+              Accept: "application/json",
+            },
+          });
+          if (!response.ok) continue;
+          const data = await response.json();
+          if (!Array.isArray(data) || data.length === 0) continue;
+
+          const polygonItems = data.filter(
+            (item: any) => item.geojson && (item.geojson.type === "Polygon" || item.geojson.type === "MultiPolygon")
+          );
+
+          if (polygonItems.length > 0) {
+            const preferred = polygonItems.find(
+              (it: any) =>
+                it.type === "administrative" ||
+                it.class === "boundary" ||
+                it.addresstype === "city" ||
+                it.addresstype === "municipality" ||
+                it.addresstype === "town"
+            ) || polygonItems[0];
+
+            const coords = extractPolygonFromItem(preferred);
+            if (coords && coords.length >= 3) {
+              foundCoords = coords;
+              centerLng = parseFloat(preferred.lon);
+              centerLat = parseFloat(preferred.lat);
+              break;
+            }
+          } else if (centerLng === null && data[0]?.lon && data[0]?.lat) {
+            centerLng = parseFloat(data[0].lon);
+            centerLat = parseFloat(data[0].lat);
+          }
+        } catch (nomErr) {
+          console.warn("Nominatim fetch warning for", q, nomErr);
+        }
+      }
+
+      // 2. Fallback via proxy da API backend se Nominatim direto tiver sido bloqueado por CORS ou adblocker
+      if (!foundCoords) {
+        for (const q of candidateQueries.slice(0, 2)) {
+          try {
+            const proxyRes = await api.get(`city/boundary?q=${encodeURIComponent(q)}`);
+            const data = proxyRes?.data;
+            if (Array.isArray(data) && data.length > 0) {
+              const polygonItems = data.filter(
+                (item: any) => item.geojson && (item.geojson.type === "Polygon" || item.geojson.type === "MultiPolygon")
+              );
+              if (polygonItems.length > 0) {
+                const coords = extractPolygonFromItem(polygonItems[0]);
+                if (coords && coords.length >= 3) {
+                  foundCoords = coords;
+                  centerLng = parseFloat(polygonItems[0].lon);
+                  centerLat = parseFloat(polygonItems[0].lat);
+                  break;
+                }
+              }
+            }
+          } catch (proxyErr) {
+            // Silencioso se backend não responder
+          }
+        }
+      }
+
+      // 3. Fallback Mapbox Geocoding se absolutamente nenhum polígono foi retornado
+      if (!foundCoords && mapboxToken) {
+        try {
+          const primaryQuery = candidateQueries[0] || cityName;
+          const mapboxUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(primaryQuery)}.json?access_token=${mapboxToken}&types=place,locality`;
           const mbRes = await fetch(mapboxUrl);
           const mbData = await mbRes.json();
           if (mbData?.features && mbData.features.length > 0) {
@@ -439,45 +604,11 @@ export const AddCity = () => {
             }
           }
         } catch (mbErr) {
-          console.warn("Mapbox geocoding warning:", mbErr);
+          console.warn("Mapbox fallback geocoding warning:", mbErr);
         }
       }
 
-      // 2. Se Mapbox não encontrou ou não retornou coords, tenta Nominatim
-      if (!foundCoords) {
-        try {
-          const url = `https://nominatim.openstreetmap.org/search.php?q=${encodeURIComponent(query)}&polygon_geojson=1&format=json`;
-          const response = await fetch(url);
-          const data = await response.json();
-
-          const polygonItem = data.find(
-            (item: any) => item.geojson && (item.geojson.type === "Polygon" || item.geojson.type === "MultiPolygon")
-          );
-
-          if (polygonItem) {
-            foundCoords = polygonItem.geojson.type === "Polygon"
-              ? polygonItem.geojson.coordinates[0]
-              : polygonItem.geojson.coordinates[0][0];
-            centerLng = parseFloat(polygonItem.lon);
-            centerLat = parseFloat(polygonItem.lat);
-          } else if (data.length > 0) {
-            centerLng = parseFloat(data[0].lon);
-            centerLat = parseFloat(data[0].lat);
-            const delta = 0.04;
-            foundCoords = [
-              [centerLng - delta, centerLat - delta],
-              [centerLng + delta, centerLat - delta],
-              [centerLng + delta, centerLat + delta],
-              [centerLng - delta, centerLat + delta],
-              [centerLng - delta, centerLat - delta],
-            ];
-          }
-        } catch (nomErr) {
-          console.warn("Nominatim fetch warning:", nomErr);
-        }
-      }
-
-      // 3. Fallback inteligente baseado no país/estado caso não haja resposta de rede
+      // 4. Fallback final geográfico padrão caso não haja resposta de rede
       if (!foundCoords || centerLng === null || centerLat === null) {
         const isUS = selectedCountryObj?.id === 2 || selectedCountryObj?.name?.toLowerCase().includes("estados unidos");
         centerLng = isUS ? -98.5795 : -47.8827;
@@ -496,10 +627,30 @@ export const AddCity = () => {
       setPlaceSelected(foundCoords as any);
 
       if (map.current) {
-        map.current.flyTo({
-          center: [centerLng, centerLat],
-          zoom: 11,
-        });
+        try {
+          let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+          for (const pt of foundCoords) {
+            const lng = pt[0];
+            const lat = pt[1];
+            if (lng < minLng) minLng = lng;
+            if (lng > maxLng) maxLng = lng;
+            if (lat < minLat) minLat = lat;
+            if (lat > maxLat) maxLat = lat;
+          }
+          if (minLng !== Infinity && maxLng !== -Infinity && (maxLng - minLng > 0.0001)) {
+            map.current.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 40, duration: 1000 });
+          } else {
+            map.current.flyTo({
+              center: [centerLng, centerLat],
+              zoom: 12,
+            });
+          }
+        } catch (fitErr) {
+          map.current.flyTo({
+            center: [centerLng, centerLat],
+            zoom: 12,
+          });
+        }
       }
 
       if (draw.current) {
@@ -513,7 +664,7 @@ export const AddCity = () => {
         } as any);
       }
     } catch (error) {
-      console.error("Erro ao centralizar mapa para a cidade:", error);
+      console.error("Erro ao centralizar mapa e delimitar a cidade:", error);
     } finally {
       setSearchLoading(false);
     }

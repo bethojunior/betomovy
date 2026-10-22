@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-22 12:55 UTC - fix Google Play privacy policy static routes and page
+# Deploy trigger: 2026-10-22 14:00 UTC - fix municipal boundaries polygon for AddCity in MovyMonitor
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

@@ -90,6 +90,7 @@ return [
         '/driver/changepassword',
         '/city',
         '/city/getall',
+        '/city/boundary',
         '/country',
         '/country/getall',
         '/estate',

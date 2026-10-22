@@ -1027,6 +1027,38 @@ class CityController extends ApiController
         }
     }
 
+    public function actionBoundary()
+    {
+        try {
+            $q = trim($_GET['q'] ?? '');
+            if (empty($q)) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([]);
+                return;
+            }
+            $url = 'https://nominatim.openstreetmap.org/search?q=' . urlencode($q) . '&polygon_geojson=1&format=json';
+            $opts = [
+                'http' => [
+                    'method' => 'GET',
+                    'header' => "User-Agent: MovyApp/1.0\r\nAccept: application/json\r\n",
+                    'timeout' => 8
+                ]
+            ];
+            $context = stream_context_create($opts);
+            $response = @file_get_contents($url, false, $context);
+            if ($response === false) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([]);
+                return;
+            }
+            header('Content-Type: application/json; charset=utf-8');
+            echo $response;
+        } catch (\Throwable $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([]);
+        }
+    }
+
     private function formatCities($cities, bool $withPolygon = false)
     {
         $defaultCities = [
