@@ -14,6 +14,7 @@ import {
   LabelText,
   ContentMap,
   ActionButtons,
+  SelectionActionBar,
 } from "./styles";
 
 import { useEffect, useRef, useState, useContext, useMemo } from "react";
@@ -37,7 +38,8 @@ import {
   FaMapMarkedAlt, 
   FaCheckCircle, 
   FaExclamationTriangle,
-  FaDrawPolygon
+  FaDrawPolygon,
+  FaCheckSquare
 } from "react-icons/fa";
 
 import api from "../../../../../services/api";
@@ -252,6 +254,88 @@ export const EditCity = () => {
           const errMsg = Array.isArray(responseError.response?.data?.response)
             ? responseError.response?.data?.response[0]
             : (responseError.response?.data?.message || "Erro ao remover cidade");
+          swal({
+            title: errMsg,
+            icon: "error",
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
+  };
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  const handleSelectAll = () => {
+    const allKeys = filteredCities.map((c) => c.cityId);
+    setSelectedRowKeys(allKeys);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedRowKeys([]);
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedRowKeys.length === 0) {
+      swal({
+        title: "Nenhuma cidade selecionada",
+        text: "Selecione as cidades que deseja excluir marcando as caixas de seleção.",
+        icon: "info",
+      });
+      return;
+    }
+
+    swal({
+      title: `Excluir ${selectedRowKeys.length} cidades selecionadas?`,
+      text: `Tem certeza que deseja remover as ${selectedRowKeys.length} cidades selecionadas do sistema? As áreas e atendimentos dessas cidades serão desativados.`,
+      icon: "warning",
+      buttons: ["Cancelar", `Sim, Excluir (${selectedRowKeys.length})`],
+      dangerMode: true,
+    }).then(async (willDelete) => {
+      if (willDelete) {
+        try {
+          setLoading(true);
+          const keysToDelete = [...selectedRowKeys];
+
+          let batchSuccess = false;
+          try {
+            const respBatch = await api.post("city/deletebatch", { ids: keysToDelete });
+            if (respBatch.status === 200 || respBatch.data?.status) {
+              batchSuccess = true;
+            }
+          } catch (eBatch) {
+            console.warn("Batch delete endpoint fallback:", eBatch);
+          }
+
+          if (!batchSuccess) {
+            // Fallback: delete individually in parallel chunks of 10
+            const chunkSize = 10;
+            for (let i = 0; i < keysToDelete.length; i += chunkSize) {
+              const chunk = keysToDelete.slice(i, i + chunkSize);
+              await Promise.allSettled(
+                chunk.map((id) =>
+                  api.delete(`role/city/delete/${id}`).catch(() => api.delete(`city/${id}`))
+                )
+              );
+            }
+          }
+
+          const setKeys = new Set(keysToDelete.map((k) => Number(k)));
+          setCitiesFully((prev) => prev.filter((c) => !setKeys.has(Number(c.cityId || c.id))));
+          setSelectedRowKeys([]);
+
+          swal({
+            title: `${keysToDelete.length} cidades removidas com sucesso!`,
+            icon: "success",
+          });
+
+          getCitiesFully();
+        } catch (error) {
+          const responseError = error as AxiosError<any>;
+          const errMsg = Array.isArray(responseError.response?.data?.response)
+            ? responseError.response?.data?.response[0]
+            : (responseError.response?.data?.message || "Erro ao remover cidades selecionadas");
           swal({
             title: errMsg,
             icon: "error",
@@ -627,17 +711,71 @@ export const EditCity = () => {
               allowClear
               style={{ maxWidth: 360, height: 40, borderRadius: 6 }}
             />
+            {filteredCities.length > 0 && (
+              <Button
+                onClick={selectedRowKeys.length === filteredCities.length ? handleDeselectAll : handleSelectAll}
+                icon={<FaCheckSquare style={{ marginRight: 6, color: "#0284c7" }} />}
+                style={{ height: 40, borderRadius: 6, fontWeight: 500 }}
+              >
+                {selectedRowKeys.length === filteredCities.length
+                  ? "Desmarcar Todas"
+                  : `Selecionar Todas (${filteredCities.length})`}
+              </Button>
+            )}
+            {selectedRowKeys.length > 0 && (
+              <Button
+                type="primary"
+                danger
+                onClick={handleDeleteSelected}
+                icon={<FaTrash style={{ marginRight: 6 }} />}
+                style={{ height: 40, borderRadius: 6, fontWeight: 600 }}
+              >
+                Excluir Selecionadas ({selectedRowKeys.length})
+              </Button>
+            )}
           </SearchGroup>
         </FilterBar>
 
+        {selectedRowKeys.length > 0 && (
+          <SelectionActionBar>
+            <div className="selection-info">
+              <FaCheckSquare style={{ color: "#0284c7", fontSize: 16 }} />
+              <span>
+                <strong>{selectedRowKeys.length}</strong> de {filteredCities.length} cidade(s) selecionada(s)
+              </span>
+            </div>
+            <div className="selection-actions">
+              <Button size="middle" onClick={handleDeselectAll} style={{ borderRadius: 6 }}>
+                Desmarcar Todas
+              </Button>
+              <Button
+                type="primary"
+                danger
+                size="middle"
+                icon={<FaTrash style={{ marginRight: 6 }} />}
+                onClick={handleDeleteSelected}
+                loading={loading}
+                style={{ fontWeight: 600, borderRadius: 6 }}
+              >
+                Excluir {selectedRowKeys.length} Selecionadas
+              </Button>
+            </div>
+          </SelectionActionBar>
+        )}
+
         <Table
+          rowSelection={{
+            selectedRowKeys,
+            onChange: (newKeys) => setSelectedRowKeys(newKeys),
+            preserveSelectedRowKeys: true,
+          }}
           dataSource={filteredCities}
           columns={columns}
           rowKey="cityId"
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50"],
+            pageSizeOptions: ["10", "20", "50", "100"],
             showTotal: (total) => `Total de ${total} cidades`,
           }}
           locale={{

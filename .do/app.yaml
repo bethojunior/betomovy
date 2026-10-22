@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-21 23:00 UTC - fix city CRUD and delete endpoints in PHP API and Monitor Web
+# Deploy trigger: 2026-10-21 23:25 UTC - add select all and batch delete cities in MovyMonitor
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

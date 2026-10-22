@@ -469,6 +469,43 @@ class CityController extends ApiController
         $this->actionDelete();
     }
 
+    public function actionDeletebatch()
+    {
+        try {
+            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+            $ids = $input['ids'] ?? $input['cityIds'] ?? [];
+            if (!is_array($ids)) {
+                $ids = explode(',', (string)$ids);
+            }
+            $cleanIds = array_filter(array_map('intval', $ids), function($id) {
+                return $id > 0;
+            });
+
+            if (!empty($cleanIds)) {
+                try {
+                    $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+                    $inClause = implode(',', $cleanIds);
+
+                    $pdo->exec("DELETE FROM roleCity WHERE cityId IN ($inClause)");
+                    $pdo->exec("UPDATE cityArea SET statusId = 2 WHERE cityId IN ($inClause)");
+                    $pdo->exec("UPDATE city SET active = 0, statusId = 2 WHERE id IN ($inClause)");
+                } catch (\Throwable $t) {
+                }
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => count($cleanIds) . ' cidades removidas com sucesso',
+                'data' => true,
+                'response' => ['Cidades removidas com sucesso'],
+                'errors' => null
+            ]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
     public function actionGetByEstate($estateId = null)
     {
         try {
