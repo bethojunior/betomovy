@@ -137,7 +137,7 @@ const Monitoring: FC = () => {
     setLoadingMoreTrips(value);
   }, []);
   const tripsContainerRef = useRef<HTMLDivElement>(null);
-  const [driverRecencyMode, setDriverRecencyMode] = useState<'all' | 'recent'>('recent');
+  const [driverRecencyMode, setDriverRecencyMode] = useState<'all' | 'recent'>('all');
   const [selectedArea, setSelectedArea] = useState<SelectedMonitoringArea | null>(null);
   const handleClearArea = useCallback(() => setSelectedArea(null), []);
   const driversRef = useRef<DriverRealtime[]>([]);
@@ -230,6 +230,7 @@ const Monitoring: FC = () => {
 
         const hasCityIdMatch =
           selectedCityId != null &&
+          Number(selectedCityId) !== 0 &&
           driver.cityId != null &&
           Number(driver.cityId) === Number(selectedCityId);
 
@@ -241,11 +242,11 @@ const Monitoring: FC = () => {
           Utils.pointInPolygon({ lat, lng }, selectedCityPolygon.latLng));
 
         const shouldFilterByCity =
-          selectedCityId != null || selectedCityPolygon != null;
+          Boolean(selectedCityId && Number(selectedCityId) !== 0) || selectedCityPolygon != null;
 
         if (shouldFilterByCity) {
           if (hasCityIdMatch || hasPolygonMatch) {
-            // Match válido
+            // Match valido
           } else if (driver.cityId == null && !selectedCityPolygon) {
             // Aceita se o backend filtrou pela cidade
           } else {

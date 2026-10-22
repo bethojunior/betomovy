@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-22 21:32 UTC - fix driver positions query and driver detail columns in API and call button visibility
+# Deploy trigger: 2026-10-22 23:08 UTC - modernize notification modal and enable all-drivers view on Everest map
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

@@ -187,7 +187,20 @@ const SelectAndButtonNotification: FC<SelectAndButtonNotificationProps> = ({
     }
   }, [signed, fullyList]);
 
-  const changeCity = (value: number) => {
+  const changeCity = (value: number | string) => {
+    if (value === 0 || value === "ALL") {
+      const allCitiesObj = {
+        cityId: 0,
+        nome: "Todas as Cidades",
+        polygon: null,
+      };
+      Session.setLocal("citySelected", JSON.stringify(allCitiesObj));
+      Session.removeLocal("pointsCity");
+      setIsSearching(false);
+      window.location.reload();
+      return;
+    }
+
     const cityActive = citiesActives?.find((el) => el.cityId === value);
     if (!cityActive) return;
 
@@ -249,6 +262,9 @@ const SelectAndButtonNotification: FC<SelectAndButtonNotificationProps> = ({
         onBlur={() => setIsSearching(false)}
         dropdownStyle={citySelectDropdownStyle}
       >
+        <Option key="ALL" value={0}>
+          🌐 Todas as Cidades
+        </Option>
         {citiesActives?.map((cityActive) => {
           const isUS =
             (cityActive as any).country === "US" ||
