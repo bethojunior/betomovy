@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Linking, TouchableOpacity, Text, View } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { useTheme } from 'styled-components/native';
 import apiMain from '../../api/apiMain';
@@ -17,7 +17,9 @@ export function TermsOfUse() {
 
     try {
       const response = await apiMain.get('termsUsePolicy/findByType?type=partner');
-      setTerms(response.data.data.description);
+      if (response?.data?.data?.description) {
+        setTerms(response.data.data.description);
+      }
     } catch (error) {
       console.warn(error);
     } finally {
@@ -40,7 +42,25 @@ export function TermsOfUse() {
   return (
     <Container>
       <Content>
-        <SimpleText colorText={colorText}>{terms}</SimpleText>
+        <View style={{ marginBottom: 16 }}>
+          <TouchableOpacity
+            onPress={() => Linking.openURL('https://movymob.com/privacy')}
+            style={{
+              padding: 12,
+              backgroundColor: '#0284c7',
+              borderRadius: 8,
+              alignItems: 'center',
+              marginBottom: 16,
+            }}
+          >
+            <Text style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 14 }}>
+              Ver Política de Privacidade Online (Web)
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <SimpleText colorText={colorText}>
+          {terms || 'Carregando termos e políticas de privacidade...'}
+        </SimpleText>
       </Content>
     </Container>
   );

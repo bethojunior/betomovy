@@ -18,6 +18,18 @@ if (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) 
     exit(0);
 }
 
+$uriLowerPath = strtolower(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH));
+if (in_array($uriLowerPath, ['/privacy', '/privacidade', '/privacy-policy', '/politica-de-privacidade', '/privacy.html', '/privacidade.html'])) {
+    header("Content-Type: text/html; charset=utf-8");
+    $privacyFile = __DIR__ . '/privacy.html';
+    if (file_exists($privacyFile)) {
+        readfile($privacyFile);
+    } else {
+        echo "<!DOCTYPE html><html><head><title>Privacy Policy - Movie</title></head><body><h1>Privacy Policy - Movie (br.com.client.rota101)</h1><p>Contact: suporte@movymob.com</p></body></html>";
+    }
+    exit(0);
+}
+
 if (strpos($_SERVER['REQUEST_URI'] ?? '', '/test-diag') === 0) {
     header("Content-Type: application/json; charset=utf-8");
     $daoFile = __DIR__ . '/../app/dao/TripDao.php';

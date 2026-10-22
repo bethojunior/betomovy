@@ -88,6 +88,10 @@ const RoutesApplication = () => {
       <Route path="/trip/:id/share" element={<TravelTracking onlyTracking />} />
       <Route path="/share" element={<Share />} />
       <Route path="/privacidade" element={<Privacy />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/privacy-policy" element={<Privacy />} />
+      <Route path="/politica-de-privacidade" element={<Privacy />} />
+      <Route path="/politica" element={<Privacy />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

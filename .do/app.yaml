@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-21 23:25 UTC - add select all and batch delete cities in MovyMonitor
+# Deploy trigger: 2026-10-22 12:55 UTC - fix Google Play privacy policy static routes and page
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
