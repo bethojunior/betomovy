@@ -64,10 +64,17 @@ document.addEventListener("DOMContentLoaded", function () {
         };
     }
 
-    showLoading();
-    CentralRepository.getCustomer(Session.getValueInSession("centralSelected", "id"))
-        .then(handleCustomerResponse)
-        .catch(handleCustomerError);
+    const centralId = Session.getValueInSession("centralSelected", "id");
+    if (!centralId) {
+        elementProperty.getElement("#resultTable", element => {
+            element.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-muted">Selecione uma central para visualizar os clientes.</td></tr>`;
+        });
+    } else {
+        showLoading();
+        CentralRepository.getCustomer(centralId)
+            .then(handleCustomerResponse)
+            .catch(handleCustomerError);
+    }
 
     function showListCustomer(response) {
 

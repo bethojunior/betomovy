@@ -1,5 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
     const central = Session.get("centralSelected");
+    if (!central || !central.id) {
+        const table = document.querySelector("#resultTable");
+        if (table) {
+            table.innerHTML = `<tr><td colspan="6" class="text-center p-4 text-muted">Selecione uma central para visualizar os motoristas.</td></tr>`;
+        }
+        return;
+    }
     showList(central.id);
 });
 
@@ -8,9 +15,13 @@ const escapeHtml = (str) => str
     : '';
 
 function showList(idCentral) {
+    if (!idCentral) return;
     DriverRepository.list(idCentral).then(({ status, response }) => {
         createPagination(response);
         createListDrivers(response);
+    }).catch(err => {
+        console.error("Erro ao listar motoristas:", err);
+        createListDrivers({ data: [] });
     });
 }
 

@@ -16,6 +16,7 @@ class TripController extends View
                 "trip/list"
             ],
             [
+                "repositories/CentralRepository",
                 "repositories/DriverRepository",
                 "modules/trip/list"
             ],

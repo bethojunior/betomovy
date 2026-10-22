@@ -280,15 +280,17 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
 <script>
     function clearCache() {
         $('#myModal').modal('hide');
-        setTimeout(function() {
+        try {
             localStorage.clear();
             sessionStorage.clear();
             document.cookie.split(";").forEach(cookie => {
                 const name = cookie.split("=")[0].trim();
-                if (name) $.removeCookie(name, {path: '/'});
+                if (name && window.$ && $.removeCookie) $.removeCookie(name, {path: '/'});
             });
-            window.location.reload(true);
-        }, 2000);
+        } catch (e) {}
+        setTimeout(function() {
+            window.location.href = '/logout';
+        }, 300);
     }
 
     function modal() {

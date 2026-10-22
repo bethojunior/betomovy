@@ -11,6 +11,7 @@ class VoucherController extends View
                 'preload/index',
             ],
             [
+                'repositories/CentralRepository',
                 'repositories/VoucherRepository',
                 'controllers/VoucherController',
                 'controllers/CentralVoucherPurchasePaymentController',

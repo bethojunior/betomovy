@@ -11,13 +11,24 @@ document.addEventListener("DOMContentLoaded",function(){
     updateListPrices();
 
     function updateListPrices(){
-        CentralRepository.getPrices(Session.getValueInSession("centralSelected", "id"))
+        const centralId = Session.getValueInSession("centralSelected", "id");
+        if (!centralId) {
+            managerRate.rates = [];
+            return;
+        }
+        CentralRepository.getPrices(centralId)
             .then(({response})=>{
-                managerRate.rates = response;
-            })
+                managerRate.rates = Array.isArray(response) ? response : [];
+            }).catch((err) => {
+                console.error("Erro ao carregar tarifas:", err);
+                managerRate.rates = [];
+            });
     }
 
     elementProperty.addEventInElement("#tripTypeId","onchange",function(){
+        if (!Array.isArray(managerRate.rates)) {
+            managerRate.rates = [];
+        }
         const rate = managerRate.rates.filter((type)=>{
             return parseInt(type.tripTypeId) === parseInt(this.value);
         });
@@ -113,18 +124,24 @@ document.addEventListener("DOMContentLoaded",function(){
 
         if(managerRate.typeRateSelected == null) {
             CentralRepository.addPrice(rate).then(({status, response,message}) => {
-                SwalCustom.messageDialog("",message,undefined,"success");
+                SwalCustom.messageDialog("",message || "Tarifa salva com sucesso!",undefined,"success");
                 updateListPrices();
                 clearForm();
                 createTypes();
+            }).catch((err) => {
+                console.error("Erro ao salvar tarifa:", err);
+                SwalCustom.messageDialog("","Não foi possível salvar a tarifa.",undefined,"error");
             });
         }else{
             CentralRepository.updatePrice(managerRate.typeRateSelected.id,rate).then(({status, response,message}) => {
-                SwalCustom.messageDialog("",message,undefined,"success");
+                SwalCustom.messageDialog("",message || "Tarifa atualizada com sucesso!",undefined,"success");
                 updateListPrices();
                 clearForm();
                 createTypes();
-            })
+            }).catch((err) => {
+                console.error("Erro ao atualizar tarifa:", err);
+                SwalCustom.messageDialog("","Não foi possível atualizar a tarifa.",undefined,"error");
+            });
         }
     });
 });

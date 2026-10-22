@@ -92,6 +92,13 @@ function listTypeTrip() {
 }
 
 function listAllNeighborhood() {
+    if (!idCentral) {
+        const resultTable = document.querySelector('#resultTable');
+        if (resultTable) {
+            resultTable.innerHTML = '<tr><td colspan="7" class="text-center p-4 text-muted">Selecione uma central para visualizar as rotas entre bairros.</td></tr>';
+        }
+        return;
+    }
     preload(true);
     NeighborhoodController.listAllNeighborhood(idCentral).then((response) => {
         const items = response?.response || response?.data || [];
@@ -152,6 +159,12 @@ function listAllNeighborhood() {
                     .finally(() => preload(false));
             });
         });
+    }).catch(err => {
+        console.error("Erro ao listar bairros:", err);
+        const resultTable = document.querySelector('#resultTable');
+        if (resultTable) {
+            resultTable.innerHTML = '<tr><td colspan="7" class="text-center p-4 text-muted">Nenhuma rota cadastrada entre bairros.</td></tr>';
+        }
     }).finally(() => preload(false));
 }
 
@@ -162,7 +175,9 @@ neighborhoodRidesStatus();
 function neighborhoodRidesStatus() {
     const val = localStorage.getItem('neighborhoodRidesStatus');
     const el = document.getElementById('activeNeighborhoodRide');
-    el.innerHTML = (!val || val === '0') ? 'Ativar bairro para bairro' : 'Desativar bairro para bairro';
+    if (el) {
+        el.innerHTML = (!val || val === '0') ? 'Ativar bairro para bairro' : 'Desativar bairro para bairro';
+    }
 }
 
 elementProperty.addEventInElement('#activeNeighborhoodRide', 'onclick', function () {

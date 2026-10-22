@@ -28,6 +28,7 @@ class DriverController extends View
                 "controllers/CooperativeController",
                 "controllers/UtilController",
                 "repositories/CentralRepository",
+                "repositories/PlaceRepository",
                 "service/MapService",
                 "utils/FormGroup",
                 "utils/Preload",

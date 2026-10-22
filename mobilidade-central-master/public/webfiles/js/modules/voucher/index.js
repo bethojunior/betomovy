@@ -13,19 +13,32 @@ document.addEventListener("DOMContentLoaded",function () {
     listVoucher();
 
     function listVoucher() {
+        central = Session.get("centralSelected");
+        if (!central || !central.id) {
+            elementProperty.getElement('.content-voucher', element => {
+                element.innerHTML = `<div class="col-12 text-center text-muted p-4"><p>Selecione uma central para visualizar os vouchers.</p></div>`;
+            });
+            return;
+        }
+
         preload(true);
 
-        if(central.responsibleId) {
-            CentralRepository.getBalance(central.responsibleId).then(({response}) => {
-                const voucherElement = document.querySelector('#saldVoucher')
-                const typeMoney = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || 'R$';
-                if(response.tripBalance && response.tripBalance !== 0 && voucherElement){
-                    document.querySelector('#saldVoucher').innerHTML = `Saldo: ${typeMoney} ${Mask.maskMoney(response.tripBalance)}`
-                }
-            });
+        if (central && central.responsibleId) {
+            try {
+                CentralRepository.getBalance(central.responsibleId).then(({response}) => {
+                    const voucherElement = document.querySelector('#saldVoucher')
+                    const typeMoney = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || 'R$';
+                    if(response && response.tripBalance && response.tripBalance !== 0 && voucherElement){
+                        voucherElement.innerHTML = `Saldo: ${typeMoney} ${Mask.maskMoney(response.tripBalance)}`
+                    }
+                }).catch(console.error);
+            } catch (e) {
+                console.error(e);
+            }
         }
 
         VoucherController.getAll(central.latitude, central.longitude).then(({data}) => {
+            preload(false);
             elementProperty.getElement('.content-voucher', element => {
                 const voucherList = Array.isArray(data) ? data.filter(item => item.user === 'central') : [];
                 if (voucherList.length === 0) {

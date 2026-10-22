@@ -7,27 +7,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
     showSkeletons();
 
-    CentralRepository.getTrips(centralId)
-        .then((result) => {
-            const data = result?.response?.trips ?? result?.response ?? result;
-            createPagination(data);
-            showListTrip(data);
-        }).catch((err) => {
-            console.error("Erro ao carregar viagens:", err);
-            createPagination(null);
-            showListTrip({ data: [] });
+    if (!centralId) {
+        elementProperty.getElement(".list-trips", element => {
+            element.innerHTML = '<li class="text-center p-4 text-muted" style="list-style:none;">Selecione uma central para visualizar as viagens.</li>';
         });
+        createPagination(null);
+        return;
+    }
 
-    DriverRepository.list(centralId).then((result) => {
-        const drivers = result?.response?.data ?? result?.response ?? result?.data;
-        if (!Array.isArray(drivers)) return;
+    try {
+        CentralRepository.getTrips(centralId)
+            .then((result) => {
+                const data = result?.response?.trips ?? result?.response ?? result;
+                createPagination(data);
+                showListTrip(data);
+            }).catch((err) => {
+                console.error("Erro ao carregar viagens:", err);
+                createPagination(null);
+                showListTrip({ data: [] });
+            });
+    } catch (e) {
+        console.error("Exceção ao chamar CentralRepository.getTrips:", e);
+        createPagination(null);
+        showListTrip({ data: [] });
+    }
 
-        elementProperty.getElement("#filterDriverId", element => {
-            element.innerHTML += drivers.map(driver =>
-                `<option value="${driver.idDriver}">${escapeHtml(driver.user?.name)}</option>`
-            ).join("");
-        });
-    }).catch(console.error);
+    try {
+        DriverRepository.list(centralId).then((result) => {
+            const drivers = result?.response?.data ?? result?.response ?? result?.data;
+            if (!Array.isArray(drivers)) return;
+
+            elementProperty.getElement("#filterDriverId", element => {
+                element.innerHTML += drivers.map(driver =>
+                    `<option value="${driver.idDriver}">${escapeHtml(driver.user?.name)}</option>`
+                ).join("");
+            });
+        }).catch(console.error);
+    } catch (e) {
+        console.error("Exceção ao chamar DriverRepository.list:", e);
+    }
 
 
     function getFilter() {

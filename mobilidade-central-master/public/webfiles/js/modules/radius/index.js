@@ -10,7 +10,10 @@ document.addEventListener("DOMContentLoaded",function(){
     getZone();
 
     function getZone(){
-        CentralRepository.getZone(Session.getValueInSession("centralSelected", "id"))
+        const centralId = Session.getValueInSession("centralSelected", "id");
+        if (!centralId) return;
+
+        CentralRepository.getZone(centralId)
             .then(({status,response})=>{
                 if(response == null){
                     manager.id = null;
@@ -21,43 +24,59 @@ document.addEventListener("DOMContentLoaded",function(){
                 manager.radius = response.radius;
                 manager.greaterRadius = response.greaterRadius;
                 fillForm();
-            })
+            }).catch((err) => {
+                console.error("Erro ao carregar raio de atendimento:", err);
+            });
     }
 
     function fillForm(){
-        document.getElementById("radius").value = manager.radius;
-        document.getElementById("greaterRadius").value = manager.greaterRadius;
+        const radEl = document.getElementById("radius");
+        const greatRadEl = document.getElementById("greaterRadius");
+        if (radEl) radEl.value = manager.radius ?? "";
+        if (greatRadEl) greatRadEl.value = manager.greaterRadius ?? "";
     }
 
     elementProperty.addEventInElement("#saveRadius","onclick",function(){
-        manager.radius = document.getElementById("radius").value;
-        manager.greaterRadius = document.getElementById("greaterRadius").value;
+        const centralId = Session.getValueInSession("centralSelected", "id");
+        if (!centralId) {
+            SwalCustom.messageDialog("","Selecione uma central para salvar o raio.",undefined,"warning");
+            return;
+        }
 
-        if(manager.radius.length === "" || manager.radius <= 0){
+        const radEl = document.getElementById("radius");
+        const greatRadEl = document.getElementById("greaterRadius");
+        manager.radius = radEl ? radEl.value : "";
+        manager.greaterRadius = greatRadEl ? greatRadEl.value : "";
+
+        if(!manager.radius || manager.radius <= 0){
             SwalCustom.messageDialog("","O raio nominal deve ser maior que zero!",undefined,"info");
             return;
         }
 
-        if(manager.greaterRadius.length === "" || manager.greaterRadius <= 0){
+        if(!manager.greaterRadius || manager.greaterRadius <= 0){
             SwalCustom.messageDialog("","O raio bloco deve ser maior que zero!",undefined,"info");
             return;
         }
 
         if(manager.id == null) {
-            CentralRepository.insertZone(Session.getValueInSession("centralSelected", "id"),manager)
+            CentralRepository.insertZone(centralId, manager)
                 .then(({status,response,message})=>{
-                    SwalCustom.messageDialog("",message,undefined,"success");
+                    SwalCustom.messageDialog("",message || "Raio salvo com sucesso!",undefined,"success");
                     getZone();
-                })
+                }).catch(() => {
+                    SwalCustom.messageDialog("","Erro ao salvar raio de atendimento.",undefined,"error");
+                });
         }else{
             CentralRepository.updateZoneZone(
-                Session.getValueInSession("centralSelected", "id"),
+                centralId,
                 manager.id,
                 manager)
                 .then(({status,response,message})=>{
-                    SwalCustom.messageDialog("",message,undefined,"success");
+                    SwalCustom.messageDialog("",message || "Raio atualizado com sucesso!",undefined,"success");
                     getZone();
-                })
+                }).catch(() => {
+                    SwalCustom.messageDialog("","Erro ao atualizar raio de atendimento.",undefined,"error");
+                });
         }
     });
 });
