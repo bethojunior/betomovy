@@ -18,7 +18,7 @@ import api from '../../../../../services/api';
 
 interface InputProps {
 	name: string;
-	cpf_cnpj: string;
+	cpf_cnpj?: string;
 	gender: string;
 	email: string;
 	phone: string;
@@ -45,8 +45,6 @@ const DatasPersonal = ({
 	} = useForm<InputProps>();
 
 	const [loading, setLoading] = useState<boolean>(false);
-	//@ts-ignore
-	const [cpfOrcnpj, setCpfOrCnpj] = useState<string>('');
 
 	const handleCheckEmail = (email: string) => {
 		/* CHECK EMAIL */
@@ -84,27 +82,28 @@ const DatasPersonal = ({
 
 		setLoading(true);
 
-		const response = await api.post(
-			`/driver/checkdocument`,
-			{
-				document: data.cpf_cnpj,
-			},
-		);
+		if (data.cpf_cnpj && data.cpf_cnpj.trim().length > 0) {
+			try {
+				const response = await api.post(`/driver/checkdocument`, {
+					document: data.cpf_cnpj,
+				});
 
-		if (response.data.status) {
-			swal({
-				title: 'Esse documento já existe',
-				icon: 'warning',
-			});
-			setCpfOrCnpj('');
-			setLoading(false);
-			return;
+				if (response.data?.status) {
+					swal({
+						title: 'Esse documento já existe',
+						icon: 'warning',
+					});
+					setLoading(false);
+					return;
+				}
+			} catch (err) {
+				console.error(err);
+			}
 		}
 
-		if (!loading) {
-			setDatasUser({ ...datasUser, dataPersonal: data });
-			setIndexForm(indexForm + 1);
-		}
+		setDatasUser({ ...datasUser, dataPersonal: data });
+		setIndexForm(indexForm + 1);
+		setLoading(false);
 	};
 
 	return (
@@ -124,20 +123,6 @@ const DatasPersonal = ({
 					/>
 					{errors.name && (
 						<TextErrorField>Nome é obrigatório</TextErrorField>
-					)}
-
-					<Input
-						{...register('cpf_cnpj', { required: true })}
-						placeholder="CPF/CNPJ"
-						onChange={(event) => {
-							const { value } = event.target;
-							event.target.value = Mask.setMaskCPFCNPJ(value);
-						}}
-						aria-invalid={errors.cpf_cnpj ? 'true' : 'false'}
-						autoComplete="off"
-					/>
-					{errors.cpf_cnpj && (
-						<TextErrorField>CPF/CNPJ é obrigatório</TextErrorField>
 					)}
 
 					<Select {...register('gender', { required: true })}>

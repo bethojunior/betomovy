@@ -35,7 +35,7 @@ export function useDriverList(): UseDriverListReturn {
           : searchValue;
       const statusParam = idStatusSearch > 0 ? idStatusSearch : "";
       const typeParam = driverType > 0 ? driverType : "";
-      return `driver?page=${page}&driverRegisterStatusId=${statusParam}&driverType=${typeParam}&${searchBy}=${formattedSearch}`;
+      return `driver?page=${page}&allCities=1&driverRegisterStatusId=${statusParam}&driverType=${typeParam}&${searchBy}=${encodeURIComponent(formattedSearch)}`;
     },
     [searchBy, idStatusSearch, driverType]
   );
@@ -45,11 +45,11 @@ export function useDriverList(): UseDriverListReturn {
     pageRef.current = 1;
     api.get(buildUrl(1, debouncedValueSearch))
       .then((response) => {
-        if (response.data?.status && response.data?.response) {
-          const resp = response.data.response;
-          const data = Array.isArray(resp) ? resp : (Array.isArray(resp.data) ? resp.data : []);
-          const last_page = resp.last_page || 1;
-          const current_page = resp.current_page || 1;
+        if (response.data?.status && (response.data?.response || response.data?.data)) {
+          const resp = response.data.response ?? response.data.data;
+          const data = Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []);
+          const last_page = resp?.last_page || (resp?.total ? Math.ceil(resp.total / (resp.per_page || 10)) : 1);
+          const current_page = resp?.current_page || 1;
           setListDrivers(data);
           setHasMore(current_page < last_page);
         } else {
@@ -69,11 +69,11 @@ export function useDriverList(): UseDriverListReturn {
     pageRef.current += 1;
     api.get(buildUrl(pageRef.current, debouncedValueSearch))
       .then((response) => {
-        if (response.data?.status && response.data?.response) {
-          const resp = response.data.response;
-          const data = Array.isArray(resp) ? resp : (Array.isArray(resp.data) ? resp.data : []);
-          const last_page = resp.last_page || 1;
-          const current_page = resp.current_page || 1;
+        if (response.data?.status && (response.data?.response || response.data?.data)) {
+          const resp = response.data.response ?? response.data.data;
+          const data = Array.isArray(resp) ? resp : (Array.isArray(resp?.data) ? resp.data : []);
+          const last_page = resp?.last_page || (resp?.total ? Math.ceil(resp.total / (resp.per_page || 10)) : 1);
+          const current_page = resp?.current_page || 1;
           setListDrivers((prev) => [...(Array.isArray(prev) ? prev : []), ...data]);
           setHasMore(current_page < last_page);
         }

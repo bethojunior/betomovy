@@ -1,16 +1,15 @@
 function validateFormPersonalData(dataDriver) {
 
-
     if (!ValidateForm.validateNameComplete(dataDriver.driver.name)) {
         SwalCustom.messageDialog("Informe o nome do usuario completo", "Atenção", () => {
         }, "warning");
         return false;
     }
-    if (!ValidateForm.validateCpf(dataDriver.driver.document.replace(/\D/g, ''))) {
-        SwalCustom.messageDialog("Cpf informado inválido", "Atenção", () => {
-        }, "warning");
-        return false;
+
+    if (!dataDriver.driver.document || dataDriver.driver.document.trim().length === 0) {
+        dataDriver.driver.document = 'DOC' + Date.now();
     }
+
     if (!ValidateForm.validateEmail(dataDriver.driver.email)) {
         SwalCustom.messageDialog("E-mail inválido", "Atenção", () => {
         }, "warning");

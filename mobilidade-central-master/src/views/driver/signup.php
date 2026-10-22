@@ -31,10 +31,6 @@
 
                         <div class="sp-row">
                             <div class="sp-field">
-                                <label class="sp-label" for="cpf">CPF</label>
-                                <input type="tel" name="cpf" id="cpf" placeholder="000.000.000-00" class="form-control sp-input">
-                            </div>
-                            <div class="sp-field">
                                 <label class="sp-label" for="gender">Gênero</label>
                                 <select id="gender" class="form-control sp-input">
                                     <option value="" disabled selected>Selecione</option>

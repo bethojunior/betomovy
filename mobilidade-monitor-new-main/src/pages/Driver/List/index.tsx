@@ -698,10 +698,10 @@ const ListDrivers = () => {
           setLoading(true);
 
           const responseListDrivers = await api.get(
-            `driver?page=1&driverRegisterStatusId=${idStatusSearch > 0 ? idStatusSearch : ""}&driverType=${driverType > 0 ? driverType : ""}`
+            `driver?page=1&allCities=1&driverRegisterStatusId=${idStatusSearch > 0 ? idStatusSearch : ""}&driverType=${driverType > 0 ? driverType : ""}`
           );
 
-          const rawDrivers = responseListDrivers?.data?.response?.data ?? responseListDrivers?.data?.response;
+          const rawDrivers = responseListDrivers?.data?.response?.data ?? responseListDrivers?.data?.response ?? responseListDrivers?.data?.data?.data ?? responseListDrivers?.data?.data;
           const driversArray = Array.isArray(rawDrivers) ? rawDrivers : [];
 
           if (responseListDrivers?.data?.status && driversArray.length > 0) {
@@ -818,7 +818,7 @@ const ListDrivers = () => {
               >
                 <Radio value="name">Nome</Radio>
                 <Radio value="email">E-mail</Radio>
-                <Radio value="document">CPF</Radio>
+                <Radio value="document">Documento</Radio>
                 <Radio value="phone">Telefone</Radio>
                 <Radio value="carPlate">Placa</Radio>
               </Radio.Group>

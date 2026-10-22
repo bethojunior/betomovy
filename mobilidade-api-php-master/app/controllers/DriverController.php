@@ -714,6 +714,13 @@ class DriverController extends ApiController
             $headers = function_exists('getallheaders') ? getallheaders() : [];
             $cityId = $headers['cityid'] ?? $headers['cityId'] ?? $_SERVER['HTTP_CITYID'] ?? $_GET['cityId'] ?? null;
 
+            if (isset($_GET['allCities']) && ($_GET['allCities'] === '1' || $_GET['allCities'] === 'true')) {
+                $cityId = null;
+            }
+            if ($cityId === 'all' || $cityId === '0' || $cityId === 0 || $cityId === '') {
+                $cityId = null;
+            }
+
             $where = ["user.statusId = 1"];
             $params = [];
 
@@ -870,7 +877,13 @@ class DriverController extends ApiController
                 'total' => $total,
             ];
 
-            echo $this->returnSuccess('Lista de motoristas', $response);
+            echo json_encode([
+                'status' => true,
+                'message' => 'Lista de motoristas',
+                'response' => $response,
+                'data' => $response,
+            ]);
+            return;
         } catch (\Exception $e) {
             echo $this->returnError($e);
         }

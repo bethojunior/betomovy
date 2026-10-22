@@ -7,7 +7,6 @@ $(document).ready(function () {
     const responseKeyAppPartnerParsed = JSON.parse(responseKeyAppPartner);
 
     Mask.setMaskPhone("#phone");
-    Mask.setMaskCpf("#cpf");
     $("#licensePlate").inputmask({mask: ['AAA-9999', 'AAA9A99']});
 
     const elementProperty = new ElementProperty();
@@ -15,19 +14,6 @@ $(document).ready(function () {
     const stationTypeController = new StationTypeController();
     const supportController = new SupportController();
     const cooperativeController = new CooperativeController();
-
-    elementProperty.addEventInElement('#cpf', 'onblur', () => {
-        elementProperty.getElement('#cpf', res => {
-            let document = res.value;
-
-            DriverController.checkCpf({document}).then(resolve => {
-                if (resolve.status) {
-                    swal('ops', 'Cpf já cadastrado', 'info');
-                    res.value = "";
-                }
-            })
-        });
-    });
 
     const formGroup = new FormGroup(".group-signup");
 
@@ -150,7 +136,7 @@ $(document).ready(function () {
                     });
                     formGroup.validate.isRegistered = false;
                     isFormFinish = false;
-                    SwalCustom.messageDialog(result.message, "Atenção", () => {
+                    SwalCustom.messageDialog(result.message || "Não foi possível concluir o cadastro do motorista", "Atenção", () => {
                     }, "warning");
                     formGroup.beforeGroup();
                     return;
@@ -165,6 +151,11 @@ $(document).ready(function () {
                 elementProperty.addEventInElement(".finish-form", "onclick", function () {
                     location.href = '/driver/list';
                 });
+            }).catch(err => {
+                console.error("Erro no cadastro de motorista:", err);
+                formGroup.validate.isRegistered = false;
+                isFormFinish = false;
+                SwalCustom.messageDialog("Erro ao enviar dados do motorista. Tente novamente.", "Atenção", () => {}, "error");
             });
         }
     }
@@ -172,15 +163,14 @@ $(document).ready(function () {
     function isCompletePersonalData() {
         const inputs = [
             document.getElementById("name"),
-            document.getElementById("cpf"),
             document.getElementById("email"),
             document.getElementById("phone")
-        ];
+        ].filter(Boolean);
 
         for (let i in inputs) {
             const input = inputs[i];
 
-            if (input.value.length === 0) {
+            if (input.value.trim().length === 0) {
                 input.focus();
                 return false;
             }
@@ -208,8 +198,9 @@ $(document).ready(function () {
                 dataDriver.driver.nickname = dataDriver.driver.name.split(" ")[0];
                 dataDriver.driver.phone = document.getElementById("phone").value;
                 dataDriver.driver.email = document.getElementById("email").value;
-                dataDriver.driver.gender = document.getElementById("gender").value;
-                dataDriver.driver.document = document.getElementById("cpf").value;
+                dataDriver.driver.gender = document.getElementById("gender") ? document.getElementById("gender").value : "";
+                const docInput = document.getElementById("cpf");
+                dataDriver.driver.document = (docInput && docInput.value.trim().length > 0) ? docInput.value.trim() : ("DOC" + Date.now());
 
                 formGroup.validate.PERSONAL_DATA.wasValidated = validateFormPersonalData(dataDriver);
 

@@ -170,11 +170,9 @@ class DriverDao extends BaseDao
         $driver = $data->driver;
         $requiredFilds = (bool) Config::get('requirement_filds_on_register');
 
-        if (!isset($driver->document) && !$requiredFilds) {
-            throw new DriverException(507);
-        }
-
-        if (!$requiredFilds) {
+        if (empty($driver->document)) {
+            $driver->document = 'DOC' . time() . rand(100, 999);
+        } else {
             $this->documentIsValid($driver->document);
         }
 
@@ -395,13 +393,11 @@ class DriverDao extends BaseDao
     {
         $requiredFilds = (bool)Config::get('requirement_filds_on_register');
 
-        if (!isset($data->document) && !$requiredFilds) {
-            throw new DriverException(507);
-        }
-
-        if (!$requiredFilds) {
+        if (empty($data->document)) {
+            $data->document = 'DOC' . time() . rand(100, 999);
+        } else {
             $this->documentIsValid($data->document);
-        };
+        }
 
         if (!isset($data->email)) {
             throw new DriverException(508);
