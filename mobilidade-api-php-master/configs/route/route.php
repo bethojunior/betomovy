@@ -120,6 +120,7 @@ return [
         '/direction/search',
         '/usertype/drivers',
         '/config',
+        '/config/additional',
         '/config/general',
         '/config/getapppartner',
         '/configmenuapp/search',

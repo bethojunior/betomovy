@@ -49,6 +49,117 @@ class ConfigController extends ApiController
         }
     }
 
+    public function actionAdditional()
+    {
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        if ($method === 'PUT' || $method === 'POST') {
+            $this->actionIndex();
+            return;
+        }
+
+        try {
+            $conn = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+
+            $additionalKeys = [
+                'minimum_value_for_withdraw',
+                'minimum_value_for_partner_withdraw',
+                'max_amount_for_receipt_in_vehicle',
+                'fast_finger_call',
+                'time_in_seconds_to_call_driver',
+                'enable_floating_price_recalculation',
+                'whatsapp_message_client',
+                'whatsapp_message_driver',
+                'scheduled_trip_interval',
+                'time_to_notify_driver_trip_scheduled',
+                'time_to_call_driver_trip_scheduled_in_seconds',
+                'enable_social_networks_on_monitor',
+                'enable_operation_manual_and_youtube_channel',
+                'time_to_cancel_trip_bid_in_seconds',
+                'travel_only_by_offer',
+                'title_for_home',
+                'how_many_times_alert_will_be_shown',
+                'show_more_calcs_driver',
+                'text_the_end_trip_with_bonus',
+                'text_whatsapp_trip_list_unanswered_support',
+                'whatsapp_parabens_driver_message',
+                'whatsapp_parabens_client_message',
+                'whatsapp_zafira_validated_driver_message',
+                'whatsapp_zafira_validated_client_message',
+                'minimum_value_for_pix',
+                'enable_pix_trip_end_ipag',
+                'pulse_group',
+                'enable_button_panic_by_city',
+                'enable_publicity',
+                'enable-button-bills-menu',
+                'interval-to-get-trips',
+                'link_manager_indication',
+                'enable_account_deletion_request',
+                'enable_account_menu',
+                'enable_favorite_customer_and_driver',
+                'enable_favorite_driver_with_referral_link',
+                'enable_voucher_payment_type_inDriver_trip',
+                'enable_transform_km_for_mi',
+                'call_driver_without_credit',
+                'customer_register_unblocked',
+                'driver_terms_of_use',
+                'customer_terms_of_use'
+            ];
+
+            $inPlaceholders = implode(',', array_fill(0, count($additionalKeys), '?'));
+            $sql = "
+                SELECT c.idConfig, c.configTypeId, ct.name AS typeName, c.`key`, c.value, c.description, c.inputTypePro
+                FROM config c
+                LEFT JOIN configType ct ON ct.idConfigType = c.configTypeId
+                WHERE c.`key` IN ($inPlaceholders) OR ct.name = 'GESTOR'
+                ORDER BY c.`key` ASC
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($additionalKeys);
+            $configs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            foreach ($configs as &$cfg) {
+                $k = $cfg['key'];
+                $v = (string)($cfg['value'] ?? '');
+
+                if (empty($cfg['description'])) {
+                    $cleanDesc = ucwords(str_replace(['_', '-'], ' ', $k));
+                    $cfg['description'] = $cleanDesc;
+                }
+
+                if (empty($cfg['inputTypePro'])) {
+                    $isBoolName = (
+                        strpos($k, 'enable') === 0 ||
+                        strpos($k, 'is_') === 0 ||
+                        in_array($k, [
+                            'fast_finger_call',
+                            'travel_only_by_offer',
+                            'show_more_calcs_driver',
+                            'enable_pix_trip_end_ipag',
+                            'call_driver_without_credit',
+                            'customer_register_unblocked'
+                        ])
+                    );
+                    if ($isBoolName || $v === '0' || $v === '1') {
+                        if (!in_array($k, ['scheduled_trip_interval', 'time_in_seconds_to_call_driver', 'interval-to-get-trips', 'time_to_cancel_trip_bid_in_seconds', 'how_many_times_alert_will_be_shown'])) {
+                            $cfg['inputTypePro'] = 'boolean';
+                        }
+                    }
+                }
+            }
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Configurações adicionais encontradas',
+                'data' => $configs,
+                'response' => $configs,
+                'errors' => null
+            ]);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, "Erro ao buscar configurações adicionais");
+        }
+    }
+
     public function actionIndex()
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');

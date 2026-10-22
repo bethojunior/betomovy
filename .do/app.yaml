@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-22 14:00 UTC - fix municipal boundaries polygon for AddCity in MovyMonitor
+# Deploy trigger: 2026-10-22 14:40 UTC - fix additionalSettings page and config/additional backend endpoint
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
