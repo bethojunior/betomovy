@@ -211,8 +211,9 @@ function getTaxiType() {
     managerTrip.typeTaxi.priceId = object.idPrice;
     managerTrip.typeTaxi.price = parseFloat(object.price);
     managerTrip.typeTaxi.tripTypeId = object.tripTypeId;
-    managerTrip.typeTaxi.priceName = object.priceName;
+    managerTrip.typeTaxi.priceName = object.priceName || object.name;
     managerTrip.typeTaxi.tripType = object.tripType;
+    managerTrip.typeTaxi.picture = object.picture || (object.tripType && object.tripType.picture);
     managerTrip.typeTaxi.priceDynamicValue = object.priceDynamicValue;
     if (object.centralNeighborhoodId) {
         managerTrip.typeTaxi.centralNeighborhoodId = object.centralNeighborhoodId;
@@ -225,6 +226,87 @@ function getTaxiType() {
     viewController.elementProperty.getElement(".trip-type", element => element.classList.remove("active"));
 
     this.classList.add("active");
+}
+
+function populateSearchDriverCard(data) {
+    try {
+        const typeTaxi = managerTrip?.typeTaxi || {};
+        const categoryName = typeTaxi.priceName || typeTaxi.name || "Movy";
+        const isMoto = /moto|motocicleta|bike|entrega/i.test(categoryName) || 
+                       /moto/i.test(String(typeTaxi.picture || '')) ||
+                       /moto/i.test(String(data?.tripTypeId || ''));
+
+        const vehicleImgEl = document.getElementById("searchTripVehicleImg");
+        if (vehicleImgEl) {
+            let pic = typeTaxi.picture || (typeTaxi.tripType && typeTaxi.tripType.picture);
+            if (isMoto) {
+                vehicleImgEl.src = "webfiles/img/icon/moto.png";
+            } else if (pic && typeof pic === "string" && (pic.startsWith("http") || pic.startsWith("webfiles/"))) {
+                vehicleImgEl.src = pic;
+            } else {
+                vehicleImgEl.src = "webfiles/img/icon/carro_eco.png";
+            }
+            vehicleImgEl.onerror = function() {
+                this.onerror = null;
+                this.src = isMoto ? "webfiles/img/icon/moto.png" : "webfiles/img/icon/carro_eco.png";
+            };
+        }
+
+        const catBadgeEl = document.getElementById("searchTripCategoryName");
+        if (catBadgeEl) catBadgeEl.innerText = categoryName;
+
+        const phraseEl = document.getElementById("pharseTrip");
+        if (phraseEl) {
+            phraseEl.innerText = isMoto 
+                ? "Procurando uma moto ideal para você" 
+                : "Procurando um carro ideal para você";
+        }
+
+        let typeMoney = 'R$';
+        try {
+            const config = JSON.parse(localStorage.getItem('cityConfig')) || Session.getLocal('cityConfig');
+            if (config && config.typeMoney) typeMoney = config.typeMoney;
+        } catch (e) {
+            const config = Session.getLocal('cityConfig');
+            if (config && config.typeMoney) typeMoney = config.typeMoney;
+        }
+
+        const priceVal = (data?.price !== undefined && data?.price !== null) 
+            ? data.price 
+            : ((data?.priceValue !== undefined && data?.priceValue !== null) 
+                ? data.priceValue 
+                : (typeTaxi.price || 0));
+
+        const priceEl = document.getElementById("searchTripPriceValue");
+        if (priceEl) {
+            priceEl.innerText = `${typeMoney} ${typeof Mask !== "undefined" ? Mask.maskMoney(priceVal) : Number(priceVal).toFixed(2)}`;
+        }
+
+        const dist = Session.getLocal("distanceTrip");
+        const duration = Session.getLocal("estimatedTripTime");
+        const etaEl = document.getElementById("searchTripEta");
+        if (etaEl) {
+            let parts = [];
+            if (duration) parts.push(duration);
+            if (dist) parts.push(dist);
+            etaEl.innerText = parts.length > 0 ? parts.join(" • ") : "Calculando...";
+        }
+
+        const paymentFormEl = document.getElementById("namePaymentForm");
+        const payEl = document.getElementById("searchTripPayment");
+        if (payEl) {
+            payEl.innerText = (paymentFormEl && paymentFormEl.innerText.trim()) ? paymentFormEl.innerText.trim() : "Dinheiro";
+        }
+
+        const originInput = document.querySelector("*[place='origin']");
+        const destInput = document.querySelector("*[place='destination']");
+        const originTxt = document.getElementById("searchTripOriginText");
+        const destTxt = document.getElementById("searchTripDestText");
+        if (originTxt && originInput) originTxt.innerText = originInput.value || "Local de embarque";
+        if (destTxt && destInput) destTxt.innerText = destInput.value || "Destino final";
+    } catch (e) {
+        console.error("Erro ao preencher dados do card de busca:", e);
+    }
 }
 
 function initSearchTrip(data) {
@@ -257,6 +339,7 @@ function initSearchTrip(data) {
 }
 
 function handleSearchTrip(data) {
+    populateSearchDriverCard(data);
     mapService.searchDriver(data);
 
     if (data?.status !== STATUS_SCHEDULED) {

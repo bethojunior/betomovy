@@ -76,7 +76,7 @@ const ListModal: FC<ModalProps> = ({
   selectedArea,
   onDriverSelect,
   onClientSelect,
-  driverRecencyMode = 'recent',
+  driverRecencyMode = 'all',
   initialDrivers = []
 }) => {
   const [searchValue, setSearchValue] = useState('')
@@ -101,13 +101,30 @@ const ListModal: FC<ModalProps> = ({
       const response = await api.get(`/driver/positions`, {
         params: {
           status: 'disponivel,online,available,corrida,busy,boarding,in_progress,accepted,desligado',
-          cityId: cityId || undefined,
+          cityId: (cityId && Number(cityId) !== 0) ? cityId : undefined,
         }
       })
 
-      const allResults: DriverRealtime[] = Array.isArray(response.data)
+      let allResults: DriverRealtime[] = Array.isArray(response.data)
         ? response.data
         : (response.data?.response ?? response.data?.data ?? []);
+
+      // Se a cidade atual não possuir motoristas no momento, busca de todas as cidades como fallback
+      if ((!allResults || allResults.length === 0) && cityId && Number(cityId) !== 0) {
+        try {
+          const fallbackResponse = await api.get(`/driver/positions`, {
+            params: {
+              status: 'disponivel,online,available,corrida,busy,boarding,in_progress,accepted,desligado',
+            }
+          })
+          allResults = Array.isArray(fallbackResponse.data)
+            ? fallbackResponse.data
+            : (fallbackResponse.data?.response ?? fallbackResponse.data?.data ?? []);
+        } catch (e) {
+          console.warn('Fallback all drivers error:', e);
+        }
+      }
+
       const filteredResults =
         driverRecencyMode === 'recent'
           ? filterDriversByOfflineRecency(allResults)

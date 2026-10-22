@@ -494,21 +494,48 @@ const Monitoring: FC = () => {
 
   const getDrivers = useCallback(async () => {
     try {
-      const cityId = Session.getLocal("citySelected")?.cityId;
-      const response = await api.get('driver/positions', {
+      const cityId = Session.getLocal('citySelected')?.cityId;
+      let response = await api.get('driver/positions', {
         params: {
           status: 'disponivel,online,available,corrida,busy,boarding,in_progress,accepted,desligado',
-          cityId: cityId || undefined,
+          cityId: (cityId && Number(cityId) !== 0) ? cityId : undefined,
         },
       });
-      const driversData = Array.isArray(response.data)
+      let driversData = Array.isArray(response.data)
         ? response.data
         : (Array.isArray(response.data?.response)
             ? response.data.response
             : (Array.isArray(response.data?.data) ? response.data.data : []));
+
+      // Fallback: se a cidade selecionada nao trouxer motoristas, busca geral
+      if ((!driversData || driversData.length === 0) && cityId && Number(cityId) !== 0) {
+        try {
+          const fallbackResp = await api.get('driver/positions', {
+            params: {
+              status: 'disponivel,online,available,corrida,busy,boarding,in_progress,accepted,desligado',
+            },
+          });
+          driversData = Array.isArray(fallbackResp.data)
+            ? fallbackResp.data
+            : (Array.isArray(fallbackResp.data?.response)
+                ? fallbackResp.data.response
+                : (Array.isArray(fallbackResp.data?.data) ? fallbackResp.data.data : []));
+        } catch (e) {
+          console.warn('Fallback getDrivers error:', e);
+        }
+      }
+
       if (driversData) {
         const normalizedDrivers = normalizeDriversForMap(driversData);
-        driversRef.current = normalizedDrivers;
+        if (normalizedDrivers.length === 0 && driversData.length > 0) {
+          driversRef.current = driversData.map((d: any) => ({
+            ...d,
+            latitude: Number(d.latitude ?? d.lat ?? d.last_lat ?? d.position?.lat ?? d.position?.latitude),
+            longitude: Number(d.longitude ?? d.lng ?? d.last_lon ?? d.position?.lng ?? d.position?.longitude),
+          })).filter((d: any) => !isNaN(d.latitude) && !isNaN(d.longitude) && d.latitude !== 0 && d.longitude !== 0);
+        } else {
+          driversRef.current = normalizedDrivers;
+        }
         setDriversUpdateKey(prev => prev + 1);
       }
     } catch (error) {

@@ -254,23 +254,30 @@ class PriceTrip {
             const tagText = object.tag || object.name || object.priceName || '';
             const tagBg = object.color ? `background-color: ${object.color}` : 'background-color: #333';
             
-            // Resolucao robusta da imagem do tipo de viagem
+            // Resolucao robusta da imagem do tipo de viagem (carro ou moto)
             let rawPicture = object.picture || (object.tripType && object.tripType.picture) || '';
-            let pictureUrl = 'webfiles/img/icon/carro_eco.png';
+            const isMoto = /moto|motocicleta|bike|entrega/i.test(tagText) || /moto/i.test(String(rawPicture));
+            const defaultImg = isMoto ? 'webfiles/img/icon/moto.png' : 'webfiles/img/icon/carro_eco.png';
+            let pictureUrl = defaultImg;
 
             if (rawPicture && typeof rawPicture === 'string') {
                 if (rawPicture.startsWith('http://') || rawPicture.startsWith('https://')) {
-                    if (rawPicture.includes('s3-sa-east-1.amazonaws.com/voutehomologar') || rawPicture.includes('s3.amazonaws.com/voutehomologar')) {
+                    if (rawPicture.includes('s3-sa-east-1.amazonaws.com') || rawPicture.includes('s3.amazonaws.com') || rawPicture.includes('minio.704app')) {
                         const filename = rawPicture.split('/').pop();
-                        pictureUrl = 'https://minio.704app.com.br/rota101fb704/tripType/' + filename;
+                        pictureUrl = isMoto ? 'webfiles/img/icon/moto.png' : 'https://api.movymob.com/uploads/tripType/' + filename;
                     } else {
                         pictureUrl = rawPicture;
                     }
                 } else if (rawPicture.startsWith('webfiles/') || rawPicture.startsWith('/')) {
                     pictureUrl = rawPicture;
                 } else {
-                    pictureUrl = 'https://minio.704app.com.br/rota101fb704/tripType/' + rawPicture;
+                    pictureUrl = isMoto ? 'webfiles/img/icon/moto.png' : 'https://api.movymob.com/uploads/tripType/' + rawPicture;
                 }
+            }
+            object.picture = pictureUrl;
+
+            if (index === 0 && existItemActive) {
+                managerTrip.typeTaxi.picture = pictureUrl;
             }
 
             const priceVal = (object.price !== undefined && object.price !== null) ? object.price : 0;
@@ -279,7 +286,7 @@ class PriceTrip {
             return `<div class="trip-type ${className}"
                             value='${JSON.stringify(object)}'>
                             <span style="${tagBg}">${tagText}</span>
-                            <img src="${pictureUrl}" onerror="this.onerror=null; this.src='webfiles/img/icon/carro_eco.png';">
+                            <img src="${pictureUrl}" onerror="this.onerror=null; this.src='${defaultImg}';">
                             <p  
                                 class="label-prices-trip"
                                 id="valueTypeTrip${tripTypeIdVal}" 
