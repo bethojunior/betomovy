@@ -87,7 +87,7 @@
             </div>
         </div>
         <div id="mapClient" class="map-client map-loading"></div>
-        <div class="btn-call-trip active">
+        <div class="btn-call-trip">
             <button type="button" class="option-selected-customer-trip" id="openModalFindCustomer">PROCURAR CLIENTE</button>
             <button type="button" class="option-selected-customer-trip" id="openModalFindDriver">PROCURAR MOTORISTA</button>
             <button type="button" class="option-selected-customer-trip" id="callToCentral">CHAMAR PARA CENTRAL</button>

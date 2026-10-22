@@ -105,7 +105,9 @@ const ListModal: FC<ModalProps> = ({
         }
       })
 
-      const allResults: DriverRealtime[] = response.data?.response ?? []
+      const allResults: DriverRealtime[] = Array.isArray(response.data)
+        ? response.data
+        : (response.data?.response ?? response.data?.data ?? []);
       const filteredResults =
         driverRecencyMode === 'recent'
           ? filterDriversByOfflineRecency(allResults)

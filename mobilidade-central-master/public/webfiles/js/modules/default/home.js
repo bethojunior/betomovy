@@ -170,55 +170,74 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function loadCentralCallTypes() {
-    CentralController.getAllCentralCallTypes()
-      .then(({ response }) => {
-        if (response) {
-          // Primeiro, ocultar todos os botões
-          const btnFindCustomer = document.querySelector('#openModalFindCustomer')
-          const btnCallToCentral = document.querySelector('#callToCentral')
-          const btnFindDriver = document.querySelector('#openModalFindDriver')
+    const bindCallButtons = (items) => {
+      const btnFindCustomer = document.querySelector('#openModalFindCustomer')
+      const btnCallToCentral = document.querySelector('#callToCentral')
+      const btnFindDriver = document.querySelector('#openModalFindDriver')
+      if (!btnFindCustomer || !btnCallToCentral || !btnFindDriver) return
 
-          btnFindCustomer.style.display = 'none'
-          btnCallToCentral.style.display = 'none'
-          btnFindDriver.style.display = 'none'
+      let list = Array.isArray(items) ? items : (items?.data || [])
+      let hasActive = list.some((it) => it.isActive == true || it.isActive == 1)
+      if (!hasActive || list.length === 0) {
+        list = [
+          { centralCallTypeId: 1, isActive: true },
+          { centralCallTypeId: 2, isActive: true },
+          { centralCallTypeId: 3, isActive: true },
+        ]
+      }
 
-          response.forEach((item) => {
-            if (item.centralCallTypeId === 1 && item.isActive == true) {
-              // Exibir botão "Procurar Cliente"
-              btnFindCustomer.style.display = 'block'
-              btnFindCustomer.innerHTML = 'PROCURAR CLIENTE'
-              elementProperty.addEventInElement('#openModalFindCustomer', 'onclick', function () {
-                clearOptimized()
-                document.querySelector('.modal-find-customer').classList.add('active')
-              })
-            }
-            if (item.centralCallTypeId === 2 && item.isActive == true) {
-              // Exibir botão "Chamar para Central"
-              btnCallToCentral.style.display = 'block'
-              btnCallToCentral.innerHTML = 'CHAMAR PARA CENTRAL'
-              elementProperty.addEventInElement('#callToCentral', 'onclick', function () {
-                DynamicFieldsController.get(idCentral).then((response) => {
-                  dynamicFieldsResponse = response
-                })
-                trip.customer = null
-                initProcessingCallTrip(false)
-                updateBtnCallTripVisibility()
-                viewController.elementProperty.removeClass('.trip-item ', 'active')
-                viewController.elementProperty.removeClass('.list-trips-active-partner', 'active')
-                $('#modalChoiceTax').modal('show')
-              })
-            }
-            if (item.centralCallTypeId === 3 && item.isActive == true) {
-              // Exibir botão "Procurar Motorista"
-              btnFindDriver.style.display = 'block'
-              btnFindDriver.innerHTML = 'PROCURAR MOTORISTA'
-              elementProperty.addEventInElement('#openModalFindDriver', 'onclick', function () {
-                clearOptimized()
-                getPlaceCustomer()
-              })
-            }
-          })
+      btnFindCustomer.style.display = 'none'
+      btnCallToCentral.style.display = 'none'
+      btnFindDriver.style.display = 'none'
+
+      list.forEach((item) => {
+        if (item.centralCallTypeId === 1 && (item.isActive == true || item.isActive == 1)) {
+          btnFindCustomer.style.display = 'inline-flex'
+          btnFindCustomer.innerHTML = 'PROCURAR CLIENTE'
+          btnFindCustomer.onclick = function () {
+            clearOptimized()
+            document.querySelector('.modal-find-customer')?.classList.add('active')
+          }
         }
+        if (item.centralCallTypeId === 2 && (item.isActive == true || item.isActive == 1)) {
+          btnCallToCentral.style.display = 'inline-flex'
+          btnCallToCentral.innerHTML = 'CHAMAR PARA CENTRAL'
+          btnCallToCentral.onclick = function () {
+            DynamicFieldsController.get(idCentral).then((response) => {
+              dynamicFieldsResponse = response
+            })
+            trip.customer = null
+            initProcessingCallTrip(false)
+            updateBtnCallTripVisibility()
+            viewController.elementProperty.removeClass('.trip-item ', 'active')
+            viewController.elementProperty.removeClass('.list-trips-active-partner', 'active')
+            $('#modalChoiceTax').modal('show')
+          }
+        }
+        if (item.centralCallTypeId === 3 && (item.isActive == true || item.isActive == 1)) {
+          btnFindDriver.style.display = 'inline-flex'
+          btnFindDriver.innerHTML = 'PROCURAR MOTORISTA'
+          btnFindDriver.onclick = function () {
+            clearOptimized()
+            getPlaceCustomer()
+          }
+        }
+      })
+      updateBtnCallTripVisibility()
+    }
+
+    CentralController.getAllCentralCallTypes()
+      .then((res) => {
+        const payload = res?.response ?? res?.data ?? res
+        bindCallButtons(payload)
+      })
+      .catch((err) => {
+        console.warn('getAllCentralCallTypes error, fallback to default:', err)
+        bindCallButtons([
+          { centralCallTypeId: 1, isActive: true },
+          { centralCallTypeId: 2, isActive: true },
+          { centralCallTypeId: 3, isActive: true },
+        ])
       })
       .finally(() => {
         preload(false)

@@ -500,8 +500,13 @@ const Monitoring: FC = () => {
           cityId: cityId || undefined,
         },
       });
-      if (response.data?.response && Array.isArray(response.data.response)) {
-        const normalizedDrivers = normalizeDriversForMap(response.data.response);
+      const driversData = Array.isArray(response.data)
+        ? response.data
+        : (Array.isArray(response.data?.response)
+            ? response.data.response
+            : (Array.isArray(response.data?.data) ? response.data.data : []));
+      if (driversData) {
+        const normalizedDrivers = normalizeDriversForMap(driversData);
         driversRef.current = normalizedDrivers;
         setDriversUpdateKey(prev => prev + 1);
       }

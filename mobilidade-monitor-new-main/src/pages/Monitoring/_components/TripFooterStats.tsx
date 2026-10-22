@@ -204,7 +204,9 @@ const TripFooterStats: FC<Props> = ({
         }
       })
 
-      const allResults: DriverRealtime[] = response.data?.response ?? []
+      const allResults: DriverRealtime[] = Array.isArray(response.data)
+        ? response.data
+        : (response.data?.response ?? response.data?.data ?? []);
 
       allDriversRef.current = allResults
       forceUpdate((n) => n + 1)

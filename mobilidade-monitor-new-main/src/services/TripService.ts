@@ -33,7 +33,7 @@ export const TripService = {
  async getActiveAllTrip(filters?: ActiveTripsFilters): Promise<ActiveTripsResponse> {
     try {
       const response = await api.get(`dashboard/activeTrips`, { params: filters })
-      return response.data.response
+      return response.data?.response ?? response.data?.data ?? response.data
     } catch (error) {
       console.error('❌ TripService - Erro na API:', error)
       throw error
@@ -42,7 +42,7 @@ export const TripService = {
  async getActiveTripDetail(tripReference: string): Promise<TripDto | null> {
     try {
       const response = await api.get(`dashboard/activeTrips/${tripReference}`)
-      return response.data.response
+      return response.data?.response ?? response.data?.data ?? response.data
     } catch (error: any) {
       if (error?.response?.status === 404) {
         return null
@@ -715,7 +715,7 @@ export const TripService = {
     try {
       const response = await api.get<{ response: TripActive[] }>(`/dashboard/tripQuantities`)
 
-      return response.data.response
+      return response.data?.response ?? response.data?.data ?? response.data
     } catch (error) {
       console.error('Erro ao buscar as quantidades das viagens:', error)
       throw error

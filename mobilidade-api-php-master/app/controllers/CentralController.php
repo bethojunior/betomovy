@@ -998,9 +998,15 @@ class CentralController extends ApiController
             $where = ["(d.driverRegisterStatusId = 1 OR d.driverRegisterStatusId IS NULL)"];
             $params = [];
             if ($centralId > 0) {
-                $where[] = "(d.idDriver IN (SELECT driverId FROM centralDriver WHERE centralId = :centralId) OR d.centralId = :centralId2)";
-                $params[':centralId'] = $centralId;
-                $params[':centralId2'] = $centralId;
+                $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM centralDriver WHERE centralId = :cid");
+                $checkStmt->execute([':cid' => $centralId]);
+                $hasExplicit = ((int)$checkStmt->fetchColumn()) > 0;
+
+                if ($hasExplicit) {
+                    $where[] = "(d.idDriver IN (SELECT driverId FROM centralDriver WHERE centralId = :centralId) OR d.centralId = :centralId2)";
+                    $params[':centralId'] = $centralId;
+                    $params[':centralId2'] = $centralId;
+                }
             }
             $whereSql = implode(' AND ', $where);
 

@@ -906,8 +906,8 @@ class DriverController extends ApiController
                 coalesce(car.plate, '') as plate,
                 coalesce(car.color, '') as color,
                 coalesce(car.year, '') as year,
-                coalesce(car.crlv, driver.crlv, '') as crlv,
-                coalesce(car.crlvPicture, driver.crlvPicture, '') as crlvPicture,
+                coalesce(driver.crlv, '') as crlv,
+                coalesce(driver.crlvPicture, '') as crlvPicture,
                 coalesce(balance.balance, 0) as balance,
                 coalesce(balance.blockedBalance, 0) as blockedBalance,
                 coalesce(city.nome, '') as city,
@@ -990,14 +990,14 @@ class DriverController extends ApiController
                        user.name, user.phone,
                        driver.status,
                        driver.profileImage,
-                       IFNULL(driver.updated_at, NOW()) as updated_at,
-                       IFNULL(driver.updated_at, NOW()) as last_position_update,
+                       IFNULL(user.updated_at, NOW()) as updated_at,
+                       IFNULL(user.updated_at, NOW()) as last_position_update,
                        car.plate, car.model, car.color
                 FROM driver
                 JOIN user ON driver.userId = user.idUser
                 LEFT JOIN car ON driver.idDriver = car.driverId AND car.deleted_at IS NULL
                 WHERE {$whereSql}
-                ORDER BY driver.updated_at DESC
+                ORDER BY driver.idDriver DESC
                 LIMIT 300
             ";
             $stmt = $pdo->query($sql);
