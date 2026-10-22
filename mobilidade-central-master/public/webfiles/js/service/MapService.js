@@ -92,8 +92,13 @@ class MapService {
     // ─── Criação e inicialização do mapa ─────────────────────────────────────
 
     initMap(id, position, callback = undefined) {
-        if (!position || isNaN(parseFloat(position.lat)) || isNaN(parseFloat(position.lng))) {
-            position = { lat: -3.7319, lng: -38.5267 };
+        if (!position || isNaN(parseFloat(position.lat)) || isNaN(parseFloat(position.lng)) || (parseFloat(position.lat) === -3.7319 && parseFloat(position.lng) === -38.5267)) {
+            const centralSelected = Session.get('centralSelected');
+            if (centralSelected && !isNaN(parseFloat(centralSelected.latitude)) && parseFloat(centralSelected.latitude) !== 0 && parseFloat(centralSelected.latitude) !== -3.7319) {
+                position = { lat: parseFloat(centralSelected.latitude), lng: parseFloat(centralSelected.longitude) };
+            } else {
+                position = { lat: 42.40843, lng: -71.0536625 };
+            }
         } else {
             position = { lat: parseFloat(position.lat), lng: parseFloat(position.lng) };
         }

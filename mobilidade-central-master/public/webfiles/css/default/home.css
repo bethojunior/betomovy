@@ -651,55 +651,76 @@ div.pac-container>.pac-item>span {
     position: fixed;
     bottom: -300px;
     width: 90%;
-    max-width: 480px;
+    max-width: 440px;
     margin: 0 auto;
     display: block;
-    background-color: var(--color-bg-surface, #ffffff);
-    padding: 20px 18px;
+    background-color: #ffffff;
+    padding: 24px 22px;
     left: 50%;
     transform: translateX(-50%);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--color-border);
     transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 1051;
     pointer-events: auto;
     text-align: center;
+    overflow: hidden;
+}
+
+.search-driver-in-trip>div::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #000000, transparent);
+    animation: search-radar-line 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes search-radar-line {
+    0% { left: -100%; }
+    100% { left: 100%; }
 }
 
 .search-driver-in-trip.active>div {
-    bottom: 24px;
+    bottom: 28px;
 }
 
 .search-driver-in-trip>div>p {
     margin: 0 0 16px;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-text-primary, #111111);
-    line-height: 1.35;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text-primary, #0f172a);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
 }
 
 .search-driver-in-trip>div>button {
     width: 100%;
-    border: none;
-    height: 48px;
-    font-size: 15px;
+    border: 1.5px solid #fecaca;
+    height: 46px;
+    font-size: 13.5px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    background-color: #00349A;
-    color: #ffffff !important;
-    border-radius: 24px;
+    letter-spacing: 0.3px;
+    background-color: #ffffff;
+    color: #dc2626 !important;
+    border-radius: 9999px;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 52, 154, 0.35);
-    transition: background-color 0.2s, transform 0.15s;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .search-driver-in-trip>div>button:hover {
-    background-color: #111111 !important;
-    color: #ffffff !important;
+    background-color: #fef2f2 !important;
+    border-color: #dc2626 !important;
+    color: #b91c1c !important;
     transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.16);
 }
 
 .search-driver-in-trip>div>button:active {
@@ -968,7 +989,8 @@ body:has(.trip-client.active) .footer-monitoring-trip,
     transform-origin: center center;
     transition: transform 0.5s;
     position: relative;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 @keyframes text-progress {
@@ -1009,26 +1031,25 @@ body:has(.trip-client.active) .footer-monitoring-trip,
 
 #showMessageTripActive {
     flex: 0 0 auto;
-    border-radius: 20px;
+    border-radius: 9999px;
     font-size: 13px;
     font-weight: 700;
-    padding: 8px 20px;
+    padding: 9px 22px;
     white-space: nowrap;
-    background: #00349A !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: #000000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 14px rgba(0, 52, 154, 0.35);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hover PRETO PROFUNDO com borda ciano */
 #showMessageTripActive:hover,
 #showMessageTripActive:focus {
-    background: #111111 !important;
-    border-color: #04F3FA !important;
+    background: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
     color: #FFFFFF !important;
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
     outline: none;
 }
 
@@ -1096,8 +1117,8 @@ body:has(.trip-client.active) .footer-monitoring-trip,
 @media (min-width: 992px) {
 
     .search-driver-in-trip.active>div {
-        top: 1vw;
-        bottom: unset;
+        bottom: 32px;
+        top: unset;
     }
 
     div.pac-container>.pac-item {
@@ -1513,7 +1534,7 @@ body:has(.trip-client.active) .footer-monitoring-trip,
     }
 }
 
-/* ── Estilização refinada dos botões de ação (MOVY V2) ── */
+/* ── Estilização refinada dos botões de ação (Uber / 99 Style) ── */
 .btn-call-trip > button {
     pointer-events: auto;
     cursor: pointer;
@@ -1521,17 +1542,17 @@ body:has(.trip-client.active) .footer-monitoring-trip,
     min-width: 170px;
     max-width: 250px;
     height: 48px;
-    padding: 0 20px;
-    border-radius: 24px;
+    padding: 0 22px;
+    border-radius: 9999px;
     color: #FFFFFF !important;
-    background: #00349A;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #000000;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    font-family: var(--font-family-base, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
     font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    box-shadow: 0 8px 24px rgba(0, 52, 154, 0.35);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.3px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
     text-align: center;
     display: inline-flex;
@@ -1539,13 +1560,12 @@ body:has(.trip-client.active) .footer-monitoring-trip,
     justify-content: center;
 }
 
-/* REGRA: Quando passar o mouse em cima, a cor DEVE SER PRETA (#111111) */
 .btn-call-trip > button:hover {
-    background: #111111 !important;
+    background: #1e293b !important;
     color: #FFFFFF !important;
-    border-color: #04F3FA !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32) !important;
 }
 
 .btn-call-trip > button:active {

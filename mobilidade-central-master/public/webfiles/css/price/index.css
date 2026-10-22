@@ -77,28 +77,32 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 16px 6px 14px;
-    border: 1.5px solid #e8e8e8;
-    border-radius: 14px;
-    background: #fdfdfd;
+    padding: 14px 8px 12px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md, 12px);
+    background: #ffffff;
     cursor: pointer;
     position: relative;
     float: none;
     margin: 0;
-    opacity: 1;
-    transition: border-color 0.15s, background 0.15s, opacity 0.2s, transform 0.15s;
+    opacity: 0.9;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .footer-container-trip > .container-box-price > .type-cars > div > div > div:hover {
-    border-color: #bbb;
+    border-color: #94a3b8;
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
 }
 
 /* ── Card ativo ── */
 .footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active {
-    border: 2px solid var(--color-text-primary);
-    background: var(--color-bg-surface);
-    transform: none;
+    border: 2px solid #000000;
+    background: #ffffff;
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 /* Sem destino */
@@ -113,18 +117,17 @@
     display: block;
     width: 100%;
     max-width: 88px;
-    height: 60px;
+    height: 56px;
     object-fit: contain;
-    margin: 0 auto 4px;
+    margin: 0 auto 6px;
     transition: transform 0.22s;
 }
 
 .footer-container-trip > .container-box-price > .type-cars > div > div > div.active > img {
-    transform: scale(1.06);
+    transform: scale(1.08);
 }
 
 /* ── Nome do tipo ── */
-/* background-color inline tem !important para sobrescrever */
 .footer-container-trip > .container-box-price > .type-cars > div > div > div > span {
     order: 2;
     display: block;
@@ -134,22 +137,21 @@
     left: auto !important;
     width: 100%;
     text-align: center;
-    font-size: 10px;
+    font-size: 11.5px;
     font-weight: 700;
-    line-height: 1.35;
-    color: #888 !important;
+    line-height: 1.3;
+    color: var(--color-text-secondary) !important;
     background-color: transparent !important;
-    padding: 6px 2px 0;
+    padding: 4px 2px 0;
     margin: 0;
     border-radius: 0;
     white-space: normal;
     word-break: break-word;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    letter-spacing: -0.01em;
 }
 
 .footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active > span {
-    color: var(--color-text-primary) !important;
+    color: #000000 !important;
     font-weight: 800;
 }
 
@@ -159,16 +161,17 @@
     text-align: center;
     font-size: 15px;
     font-weight: 800;
-    color: #bbb;
-    margin: 5px 0 0;
+    color: var(--color-text-primary);
+    margin: 4px 0 0;
     padding: 0;
     line-height: 1.1;
     white-space: nowrap;
+    letter-spacing: -0.02em;
 }
 
 .footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active > p {
-    color: var(--color-text-primary);
-    font-size: 16px;
+    color: #000000;
+    font-size: 16.5px;
 }
 
 /* prefixo "R$" */

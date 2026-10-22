@@ -95,27 +95,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const lat = pos.coords.latitude
             const lng = pos.coords.longitude
             Session.setLocal('location', { lat, lng })
-
-            let centralSelected = Session.get('centralSelected')
-            if (centralSelected) {
-              const cLat = parseFloat(centralSelected.latitude)
-              const cLng = parseFloat(centralSelected.longitude)
-              if (
-                isNaN(cLat) ||
-                isNaN(cLng) ||
-                (cLat === 0 && cLng === 0) ||
-                (cLat === -3.7319 && cLng === -38.5267)
-              ) {
-                centralSelected.latitude = lat
-                centralSelected.longitude = lng
-                Session.set('centralSelected', centralSelected)
-                if (window.mapService && window.mapService.map) {
-                  try {
-                    window.mapService.map.setCenter([lng, lat])
-                  } catch (e) {}
-                }
-              }
-            }
           }
         },
         function (err) {
@@ -129,26 +108,6 @@ document.addEventListener('DOMContentLoaded', function () {
                   const lng = parseFloat(parts[1])
                   if (!isNaN(lat) && !isNaN(lng)) {
                     Session.setLocal('location', { lat, lng })
-                    let centralSelected = Session.get('centralSelected')
-                    if (centralSelected) {
-                      const cLat = parseFloat(centralSelected.latitude)
-                      const cLng = parseFloat(centralSelected.longitude)
-                      if (
-                        isNaN(cLat) ||
-                        isNaN(cLng) ||
-                        (cLat === 0 && cLng === 0) ||
-                        (cLat === -3.7319 && cLng === -38.5267)
-                      ) {
-                        centralSelected.latitude = lat
-                        centralSelected.longitude = lng
-                        Session.set('centralSelected', centralSelected)
-                        if (window.mapService && window.mapService.map) {
-                          try {
-                            window.mapService.map.setCenter([lng, lat])
-                          } catch (e) {}
-                        }
-                      }
-                    }
                   }
                 }
               })
@@ -178,23 +137,16 @@ document.addEventListener('DOMContentLoaded', function () {
     let lat = parseFloat(centralSelected.latitude)
     let lng = parseFloat(centralSelected.longitude)
 
-    const userLoc = Session.getLocal('location')
-    if (userLoc && !isNaN(parseFloat(userLoc.lat)) && !isNaN(parseFloat(userLoc.lng))) {
-      if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0) || (lat === -3.7319 && lng === -38.5267)) {
-        lat = parseFloat(userLoc.lat)
-        lng = parseFloat(userLoc.lng)
-        centralSelected.latitude = lat
-        centralSelected.longitude = lng
-        Session.set('centralSelected', centralSelected)
-      }
-    }
-
-    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
-      lat = -3.7319
-      lng = -38.5267
+    // Coordenadas padrão da central (Everett, MA) quando não configurada ou se mantinha fallback antigo
+    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0) || (lat === -3.7319 && lng === -38.5267)) {
+      lat = 42.40843
+      lng = -71.0536625
       centralSelected.latitude = lat
       centralSelected.longitude = lng
       Session.set('centralSelected', centralSelected)
+      try {
+        localStorage.setItem('centralSelected', JSON.stringify(centralSelected))
+      } catch (e) {}
     }
 
     initMap({ lat, lng })
