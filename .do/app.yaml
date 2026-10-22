@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-22 14:40 UTC - fix additionalSettings page and config/additional backend endpoint
+# Deploy trigger: 2026-10-22 21:32 UTC - fix driver positions query and driver detail columns in API and call button visibility
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
