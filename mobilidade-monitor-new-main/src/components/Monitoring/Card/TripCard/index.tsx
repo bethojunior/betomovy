@@ -310,7 +310,7 @@ const TripCard: FC<TripCardProps> = ({ tripReference, tripData }) => {
         return 'calling'
       }
       // Se o status da última chamada é calling e coincide ou não há callingDriver explícito
-      if (rawStatus === 'calling' && (callingDriverIds.size === 0 || callingDriverIds.has(idStr))) {
+      if (rawStatus === 'calling' && callingDriverIds.size === 0) {
         return 'calling'
       }
       if (rawStatus === 'refused') {
