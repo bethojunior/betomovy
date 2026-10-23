@@ -254,24 +254,23 @@ class PriceTrip {
             const tagText = object.tag || object.name || object.priceName || '';
             const tagBg = object.color ? `background-color: ${object.color}` : 'background-color: #333';
             
-            // Resolucao robusta da imagem do tipo de viagem (carro ou moto)
+            // Resolucao robusta da imagem do tipo de viagem (carro como padrao, moto apenas se explicitamente mototaxi/moto)
             let rawPicture = object.picture || (object.tripType && object.tripType.picture) || '';
-            const isMoto = /moto|motocicleta|bike|entrega/i.test(tagText) || /moto/i.test(String(rawPicture));
+            const isMoto = /\bmoto\b|mototaxi|motocicleta|motoboy/i.test(tagText) || /\bmoto\b/i.test(String(rawPicture));
             const defaultImg = isMoto ? 'webfiles/img/icon/moto.png' : 'webfiles/img/icon/carro_eco.png';
             let pictureUrl = defaultImg;
 
             if (rawPicture && typeof rawPicture === 'string') {
-                if (rawPicture.startsWith('http://') || rawPicture.startsWith('https://')) {
+                if (rawPicture.startsWith('webfiles/') || rawPicture.startsWith('/')) {
+                    pictureUrl = rawPicture;
+                } else if (rawPicture.startsWith('http://') || rawPicture.startsWith('https://')) {
                     if (rawPicture.includes('s3-sa-east-1.amazonaws.com') || rawPicture.includes('s3.amazonaws.com') || rawPicture.includes('minio.704app')) {
-                        const filename = rawPicture.split('/').pop();
-                        pictureUrl = isMoto ? 'webfiles/img/icon/moto.png' : 'https://api.movymob.com/uploads/tripType/' + filename;
+                        pictureUrl = defaultImg;
                     } else {
                         pictureUrl = rawPicture;
                     }
-                } else if (rawPicture.startsWith('webfiles/') || rawPicture.startsWith('/')) {
-                    pictureUrl = rawPicture;
                 } else {
-                    pictureUrl = isMoto ? 'webfiles/img/icon/moto.png' : 'https://api.movymob.com/uploads/tripType/' + rawPicture;
+                    pictureUrl = defaultImg;
                 }
             }
             object.picture = pictureUrl;

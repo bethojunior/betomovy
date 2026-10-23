@@ -232,9 +232,9 @@ function populateSearchDriverCard(data) {
     try {
         const typeTaxi = managerTrip?.typeTaxi || {};
         const categoryName = typeTaxi.priceName || typeTaxi.name || "Movy";
-        const isMoto = /moto|motocicleta|bike|entrega/i.test(categoryName) || 
-                       /moto/i.test(String(typeTaxi.picture || '')) ||
-                       /moto/i.test(String(data?.tripTypeId || ''));
+        const isMoto = /\bmoto\b|mototaxi|motocicleta|motoboy/i.test(categoryName) || 
+                       /\bmoto\b/i.test(String(typeTaxi.picture || '')) ||
+                       /\bmoto\b/i.test(String(data?.tripTypeId || ''));
 
         const vehicleImgEl = document.getElementById("searchTripVehicleImg");
         if (vehicleImgEl) {
