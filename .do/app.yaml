@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-23 17:00 UTC - client list fix global city header, driver docs modal & docUser CRUD, driver balance adjustment and block reasons
+# Deploy trigger: 2026-10-23 17:17 UTC - fix balance columns (remove updated_at)
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

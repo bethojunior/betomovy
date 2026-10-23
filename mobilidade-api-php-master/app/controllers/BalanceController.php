@@ -170,8 +170,8 @@ class BalanceController extends ApiController
             // Se ainda não tiver balanceId ou balance não existir, cria o registro de saldo
             if ($balanceId <= 0) {
                 $stmtNewB = $pdo->prepare("
-                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance, created_at, updated_at)
-                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00, NOW(), NOW())
+                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance)
+                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00)
                 ");
                 $stmtNewB->execute();
                 $balanceId = (int)$pdo->lastInsertId();
@@ -187,8 +187,8 @@ class BalanceController extends ApiController
 
             if (!$bal) {
                 $stmtNewB = $pdo->prepare("
-                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance, created_at, updated_at)
-                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00, NOW(), NOW())
+                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance)
+                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00)
                 ");
                 $stmtNewB->execute();
                 $balanceId = (int)$pdo->lastInsertId();
@@ -220,7 +220,7 @@ class BalanceController extends ApiController
             }
 
             // Atualiza balance
-            $stmtUpd = $pdo->prepare("UPDATE balance SET tripBalance = :tripBalance, updated_at = NOW() WHERE idBalance = :idBalance");
+            $stmtUpd = $pdo->prepare("UPDATE balance SET tripBalance = :tripBalance WHERE idBalance = :idBalance");
             $stmtUpd->execute([
                 ':tripBalance' => $newTripBalance,
                 ':idBalance' => $balanceId
@@ -300,8 +300,8 @@ class BalanceController extends ApiController
             // 2. Criar registro em balance caso não exista
             if ($balanceId <= 0) {
                 $stmtNewB = $pdo->prepare("
-                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance, created_at, updated_at)
-                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00, NOW(), NOW())
+                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance)
+                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00)
                 ");
                 $stmtNewB->execute();
                 $balanceId = (int)$pdo->lastInsertId();
@@ -317,8 +317,8 @@ class BalanceController extends ApiController
 
             if (!$bal) {
                 $stmtNewB = $pdo->prepare("
-                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance, created_at, updated_at)
-                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00, NOW(), NOW())
+                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance)
+                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00)
                 ");
                 $stmtNewB->execute();
                 $balanceId = (int)$pdo->lastInsertId();
@@ -335,7 +335,7 @@ class BalanceController extends ApiController
             $newBalance = round($currentBalance + $value, 2);
 
             // 4. Atualizar balance
-            $stmtUpd = $pdo->prepare("UPDATE balance SET balance = :balance, updated_at = NOW() WHERE idBalance = :idBalance");
+            $stmtUpd = $pdo->prepare("UPDATE balance SET balance = :balance WHERE idBalance = :idBalance");
             $stmtUpd->execute([
                 ':balance' => $newBalance,
                 ':idBalance' => $balanceId
