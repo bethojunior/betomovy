@@ -265,84 +265,134 @@ const TripCard: FC<TripCardProps> = ({ tripReference, tripData }) => {
 
 
   const renderDriversCalled = () => {
-    if (!config.showDriversCalled || !trip?.driversCalled || trip.driversCalled.length === 0) return null
+    const rawDriversCalled =
+      (Array.isArray(trip?.driversCalled) && trip.driversCalled.length > 0 ? trip.driversCalled : null) ||
+      (Array.isArray((trip as any)?.driverCalleds) && (trip as any).driverCalleds.length > 0 ? (trip as any).driverCalleds : null) ||
+      (Array.isArray(tripData?.driversCalled) && tripData.driversCalled.length > 0 ? tripData.driversCalled : null) ||
+      (Array.isArray((tripData as any)?.driverCalleds) && (tripData as any).driverCalleds.length > 0 ? (tripData as any).driverCalleds : null) ||
+      []
+
+    if (!config.showDriversCalled || rawDriversCalled.length === 0) return null
 
     type DriverCalledStatus = 'default' | 'not_answered' | 'refused' | 'calling'
 
-    const callingDriverIds = new Set(
-      (Array.isArray(trip.callingDriver)
-        ? trip.callingDriver
-        : typeof trip.callingDriver === 'string'
-        ? trip.callingDriver.split(',')
-        : []
-      )
-        .map((id: string | number) => String(id).trim())
-        .filter(Boolean)
-    )
+    // Extrai os IDs dos motoristas que estão tocando atualmente
+    const rawCalling = trip?.callingDriver ?? tripData?.callingDriver
+    const callingDriverIds = new Set<string>()
+
+    if (Array.isArray(rawCalling)) {
+      rawCalling.forEach((item) => {
+        if (typeof item === 'object' && item !== null) {
+          callingDriverIds.add(String((item as any).idDriver ?? (item as any).driverId ?? (item as any).id ?? ''))
+        } else if (item != null) {
+          callingDriverIds.add(String(item).trim())
+        }
+      })
+    } else if (typeof rawCalling === 'string') {
+      rawCalling.split(',').forEach((id) => {
+        const clean = id.trim()
+        if (clean) callingDriverIds.add(clean)
+      })
+    } else if (typeof rawCalling === 'number') {
+      callingDriverIds.add(String(rawCalling))
+    } else if (typeof rawCalling === 'object' && rawCalling !== null) {
+      callingDriverIds.add(String((rawCalling as any).idDriver ?? (rawCalling as any).driverId ?? (rawCalling as any).id ?? ''))
+    }
+    callingDriverIds.delete('')
 
     const resolveDriverCalledStatus = (
       driverId: number | string | null | undefined,
       rawStatus: DriverCalledStatus | undefined
     ): DriverCalledStatus => {
-      if (rawStatus === 'calling' && (driverId == null || !callingDriverIds.has(String(driverId)))) {
-        return 'default'
+      const idStr = String(driverId ?? '')
+      // Se este motorista é o que está chamando agora -> VERDE
+      if (idStr && callingDriverIds.has(idStr)) {
+        return 'calling'
       }
-      return rawStatus ?? 'default'
+      // Se o status da última chamada é calling e coincide ou não há callingDriver explícito
+      if (rawStatus === 'calling' && (callingDriverIds.size === 0 || callingDriverIds.has(idStr))) {
+        return 'calling'
+      }
+      if (rawStatus === 'refused') {
+        return 'refused'
+      }
+      // Não atendida / em espera -> CINZA
+      return 'not_answered'
     }
 
-    if (status === 'scheduled') {
-      return (
-        <S.DriversCalledContainer>
-          <S.DriversCalledSection>
-            {trip.driversCalled.map((driver) => {
-              const validStatuses = ['not_answered', 'refused', 'calling']
-              const rawStatus = validStatuses.includes(driver.status) ? driver.status : 'default'
-              const driverStatus = resolveDriverCalledStatus(driver.driverId, rawStatus)
-              return (
-                <S.DriversCalled status={driverStatus} key={`key_driver_${driver.id}`}>
-                  {driver.name} <br /> {driver.proximity?.toFixed(2)}km ({driver.touched + 1}x)
-                </S.DriversCalled>
-              )
-            })}
-          </S.DriversCalledSection>
-        </S.DriversCalledContainer>
-      )
+    // Formata proximidade em Milhas (mi) para viagens nos EUA ou quando configurado, e km no Brasil
+    const formatProximity = (proximity: number | null | undefined) => {
+      if (proximity == null || isNaN(Number(proximity))) return '--'
+      const num = Number(proximity)
+      const fullAddress = `${trip?.originAddress || ''} ${trip?.destinationAddress || ''} ${tripData?.originAddress || ''} ${tripData?.destinationAddress || ''}`
+      const isUsa = /EUA|USA|United States|Massachusetts|Everett|Boston|\bMA\b/i.test(fullAddress)
+
+      if (isUsa) {
+        // Conversão exata: 1 km = 0.621371 milhas
+        const miles = num * 0.621371
+        return `${miles.toFixed(2)} mi`
+      }
+      return `${num.toFixed(2)} km`
     }
 
-    const groupedByDriver: Record<string, (typeof trip.driversCalled)[0][]> = {}
-    trip.driversCalled.forEach((driver) => {
-      if (!driver.driverId) return
-      const key = String(driver.driverId)
+    // Agrupa chamadas por motorista mantendo a última chamada e quantidade de toques
+    const groupedByDriver: Record<string, (typeof rawDriversCalled)[0][]> = {}
+    rawDriversCalled.forEach((driver: any) => {
+      const id = driver.driverId || driver.idDriver || driver.id
+      if (!id) return
+      const key = String(id)
       if (!groupedByDriver[key]) {
         groupedByDriver[key] = []
       }
       groupedByDriver[key].push(driver)
     })
 
+    const driverEntries = Object.entries(groupedByDriver)
+      .map(([driverId, calls]) => {
+        const lastCall = calls.reduce((prev: any, curr: any) => ((curr.id ?? 0) > (prev.id ?? 0) ? curr : prev))
+        const driverName = lastCall.name || lastCall.nickname || `Motorista #${driverId}`
+        const count = calls.length || lastCall.touched || 1
+        const rawStatus = (lastCall.status as DriverCalledStatus) || 'default'
+        const status = resolveDriverCalledStatus(driverId, rawStatus)
+        const firstName = getFirstName(driverName)
+        const proximity = lastCall.proximity != null ? Number(lastCall.proximity) : null
+
+        return {
+          driverId,
+          firstName,
+          count,
+          status,
+          proximity,
+          formattedDistance: formatProximity(proximity),
+        }
+      })
+      .filter(Boolean)
+
+    // Ordenação: primeiro quem está chamando (verde), seguido pelos mais próximos (menor distância)
+    const sortedDrivers = driverEntries.sort((a, b) => {
+      if (a.status === 'calling' && b.status !== 'calling') return -1
+      if (b.status === 'calling' && a.status !== 'calling') return 1
+      const proxA = a.proximity ?? 999999
+      const proxB = b.proximity ?? 999999
+      return proxA - proxB
+    })
+
+    // Exibe os motoristas mais perto (mínimo 2)
+    const displayedDrivers = sortedDrivers.slice(0, Math.max(2, sortedDrivers.filter((d) => d.status === 'calling').length))
+
     return (
       <S.DriversCalledContainer>
         <S.DriversCalledSection>
-          {Object.entries(groupedByDriver)
-            .map(([driverId, calls]) => {
-              const lastCall = calls.reduce((prev, curr) => (curr.id > prev.id ? curr : prev))
-              const driverName = lastCall.name || lastCall.nickname
-
-              if (!driverName) return null
-
-              const count = calls.length
-              const status = resolveDriverCalledStatus(driverId, lastCall.status)
-              const firstName = getFirstName(driverName)
-
-              return (
-                <S.DriversCalled status={status} key={`driver_${driverId}`}>
-                  <S.DriversCalledText>{firstName}</S.DriversCalledText>
-                  <S.DriversCalledText>
-                    {lastCall.proximity != null ? `${lastCall.proximity.toFixed(2)}km` : '--'} ({count}x)
-                  </S.DriversCalledText>
-                </S.DriversCalled>
-              )
-            })
-            .filter(Boolean)}
+          {displayedDrivers.map((driver) => (
+            <S.DriversCalled status={driver.status} key={`driver_${driver.driverId}`}>
+              <S.DriversCalledText title={driver.firstName}>
+                {driver.firstName}
+              </S.DriversCalledText>
+              <S.DriversCalledSubtext>
+                {driver.formattedDistance} ({driver.count}x)
+              </S.DriversCalledSubtext>
+            </S.DriversCalled>
+          ))}
         </S.DriversCalledSection>
       </S.DriversCalledContainer>
     )
