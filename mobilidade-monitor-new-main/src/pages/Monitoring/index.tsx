@@ -701,7 +701,25 @@ const Monitoring: FC = () => {
         !== normalizeCallingDriver(existingTrip.callingDriver).join(',');
 
       if (callingDriverChanged) {
-        updateSingleTripInRef({ ...existingTrip, callingDriver: tripData.callingDriver });
+        const newCallingIds = new Set(
+          normalizeCallingDriver(tripData.callingDriver).map(String)
+        );
+        const updatedDriversCalled = Array.isArray(existingTrip.driversCalled)
+          ? existingTrip.driversCalled.map((d: any) => {
+              const id = String(d.driverId ?? d.idDriver ?? d.id ?? '');
+              if (!id) return d;
+              const isCallingNow = newCallingIds.has(id);
+              return {
+                ...d,
+                status: isCallingNow ? 'calling' : (d.status === 'calling' ? 'not_answered' : (d.status ?? 'not_answered')),
+              };
+            })
+          : existingTrip.driversCalled;
+        updateSingleTripInRef({
+          ...existingTrip,
+          callingDriver: tripData.callingDriver,
+          driversCalled: updatedDriversCalled,
+        });
         return;
       }
     }
