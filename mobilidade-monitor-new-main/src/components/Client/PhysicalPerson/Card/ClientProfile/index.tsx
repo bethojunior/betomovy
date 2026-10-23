@@ -11,6 +11,7 @@ import Mask from "../../../../../services/Mask";
 
 import IconWhatsApp from "../../../../../assets/whatsappIcon.svg";
 import IconGmail from "../../../../../assets/gmailIcon.svg";
+import { Constants } from "../../../../../utils/constants";
 
 export const ClientProfile = ({
   profileImage,
@@ -19,16 +20,18 @@ export const ClientProfile = ({
   email,
   message,
 }: ClientProfileProps) => {
-  const iconClient = import.meta.env.S3_LINK;
+  const imgSrc = profileImage
+    ? (profileImage.startsWith("http") ? profileImage : `${baseImageLink || ""}${profileImage}`)
+    : Constants.defaultImgNotFound;
 
   return (
     <ProfileCard>
       <ContentImage>
         <Avatar
-          src={`${baseImageLink}${profileImage}`}
+          src={imgSrc}
           onError={(e) => {
             e.currentTarget.onerror = null;
-            e.currentTarget.src = `${iconClient}default.jpg`;
+            e.currentTarget.src = Constants.defaultImgNotFound;
           }}
         />
       </ContentImage>

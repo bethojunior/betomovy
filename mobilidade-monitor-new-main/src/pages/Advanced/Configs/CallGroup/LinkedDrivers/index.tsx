@@ -188,10 +188,16 @@ export function LinkedDrivers() {
       title: "Foto",
       render: (_, linkedDrivers) => (
         <Avatar
-          src={baseImageLink + linkedDrivers?.drivers?.profileImage}
+          src={
+            linkedDrivers?.drivers?.profileImage
+              ? (linkedDrivers.drivers.profileImage.startsWith("http")
+                  ? linkedDrivers.drivers.profileImage
+                  : `${baseImageLink || ""}${linkedDrivers.drivers.profileImage}`)
+              : Constants.defaultImgNotFound
+          }
           onError={(e: any) => {
             e.currentTarget.onerror = null;
-            e.currentTarget.src = `${iconClient}default.jpg`;
+            e.currentTarget.src = Constants.defaultImgNotFound;
           }}
         />
       ),

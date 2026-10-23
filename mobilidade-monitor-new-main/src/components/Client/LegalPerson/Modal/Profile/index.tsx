@@ -1,6 +1,7 @@
 import { Button, Modal } from 'antd';
 import { FC } from 'react';
 import Mask from '../../../../../services/Mask';
+import { Constants } from '../../../../../utils/constants';
 import {
 	ModalBody,
 	ImageContainer,
@@ -62,10 +63,10 @@ const ClientProfileModal: FC<ProfileProps> = ({
 				]}
 			>
 				<ModalBody>
-					<ImageContainer src={userInformation?.profileImage}
+					<ImageContainer src={userInformation?.profileImage || Constants.defaultImgNotFound}
 						onError={(e) => {
 						e.currentTarget.onerror = null;
-						e.currentTarget.src = `${iconClient}default.jpg`;
+						e.currentTarget.src = Constants.defaultImgNotFound;
 					}}
 					/>
 					<div style={{ width: '100%' }}>

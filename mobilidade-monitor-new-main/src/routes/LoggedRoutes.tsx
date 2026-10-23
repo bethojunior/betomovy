@@ -205,12 +205,12 @@ const LoggedRoutes: FC = () => {
       link = document.createElement("link") as HTMLLinkElement;
       link.type = "image/x-icon";
       link.rel = "icon";
-      link.href = `${appEnv.s3Link}/default.jpg`;
+      link.href = "/favicon.ico";
       document.head.appendChild(link);
     } else {
       link.type = "image/x-icon";
       link.rel = "icon";
-      link.href = `${appEnv.s3Link}/default.jpg`;
+      link.href = "/favicon.ico";
     }
   }, []);
 

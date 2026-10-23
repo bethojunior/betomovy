@@ -110,7 +110,7 @@ class ApiController
         header('Content-Type: application/json');
 
         if ($paramMessage == "" && $exception instanceof PDOException)
-            $message = 'Falha de comunicação. Cód: [50]';
+            $message = 'Erro de banco de dados (Cód: 50): ' . $exception->getMessage();
 
         if ($paramMessage == "" && $exception instanceof ServiceException)
             $message = 'Falha de comunicação. Cód: [40]';
