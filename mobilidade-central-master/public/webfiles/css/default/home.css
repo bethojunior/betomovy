@@ -37,91 +37,147 @@ body {
     background: none !important;
 }
 
-/* ── Botões de zoom customizados ── */
+/* ── Botões de zoom customizados (Estilo Uber/99 Pill Card) ── */
 .map-zoom-controls {
     position: fixed;
-    right: 14px;
-    bottom: 90px;
-    display: flex;
+    right: 20px;
+    bottom: 100px;
+    display: inline-flex;
     flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14), 0 1px 3px rgba(0, 0, 0, 0.06);
     z-index: 1001;
-    transition: bottom 0.3s ease, top 0.3s ease;
+    overflow: hidden;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 40px;
+    box-sizing: border-box;
+    transition: bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1), right 0.25s ease, transform 0.25s ease;
     pointer-events: auto;
 }
 
 /* Sobe junto com o footer de monitoramento no desktop */
 .map-zoom-controls.monitoring-active {
-    bottom: 110px;
+    bottom: 120px;
 }
 
 .map-zoom-controls.monitoring-active.monitoring-expanded {
-    bottom: calc(var(--footer-height, 220px) + 14px);
+    bottom: calc(var(--footer-height, 220px) + 20px);
 }
 
-@media (min-width: 992px) {
-    .map-zoom-controls {
-        right: 18px;
-        bottom: 90px;
-    }
-
-    .map-zoom-controls.monitoring-active {
-        bottom: 110px;
-    }
-
-    .map-zoom-controls.monitoring-active.monitoring-expanded {
-        bottom: calc(var(--footer-height, 220px) + 14px);
-    }
-}
-
-/* No mobile: controles de zoom ficam na lateral direita centralizados verticalmente para NUNCA sobrepor botões inferiores */
-@media (max-width: 768px) {
-    .map-zoom-controls,
-    .map-zoom-controls.monitoring-active,
-    .map-zoom-controls.monitoring-active.monitoring-expanded {
-        top: 50% !important;
-        bottom: auto !important;
-        transform: translateY(-50%) !important;
-        right: 12px !important;
-    }
+.map-zoom-divider {
+    width: 26px;
+    height: 1px;
+    background: #E5E7EB;
+    margin: 0 auto;
+    flex-shrink: 0;
 }
 
 .map-zoom-btn {
-    width: 36px;
-    height: 36px;
-    background: #00349A;
-    color: #FFFFFF;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    font-size: 20px;
-    font-weight: 300;
-    line-height: 1;
+    width: 40px;
+    height: 40px;
+    background: #FFFFFF;
+    color: #1F2937;
+    border: none !important;
+    border-radius: 0 !important;
+    font-size: 0;
+    line-height: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s ease;
-    font-family: Arial, sans-serif;
+    box-shadow: none !important;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+    outline: none !important;
+}
+
+.map-zoom-btn .map-zoom-icon {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: block;
+    pointer-events: none;
 }
 
 .map-zoom-btn:hover {
-    background: #111111 !important;
-    border-color: #04F3FA !important;
-    color: #04F3FA !important;
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6) !important;
+    background: #F3F4F6 !important;
+    color: #00349A !important;
 }
 
 .map-zoom-btn:active {
+    background: #E5E7EB !important;
+    color: #00349A !important;
     transform: scale(0.95);
 }
 
 .map-zoom-btn:focus,
 .map-zoom-btn:focus-visible {
     outline: none !important;
-    box-shadow: 0 2px 8px var(--color-shadow-lg);
+    box-shadow: none !important;
+}
+
+@media (min-width: 992px) {
+    .map-zoom-controls {
+        right: 24px;
+        bottom: 100px;
+    }
+
+    .map-zoom-controls.monitoring-active {
+        bottom: 120px;
+    }
+
+    .map-zoom-controls.monitoring-active.monitoring-expanded {
+        bottom: calc(var(--footer-height, 220px) + 20px);
+    }
+}
+
+/* No mobile: controles de zoom alinhados à direita, acessíveis para o polegar e acima de painéis */
+@media (max-width: 768px) {
+    .map-zoom-controls,
+    .map-zoom-controls.monitoring-active,
+    .map-zoom-controls.monitoring-active.monitoring-expanded {
+        top: auto !important;
+        transform: none !important;
+        right: 16px !important;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 120px) !important;
+        width: 44px;
+        border-radius: 14px;
+    }
+
+    .map-zoom-controls.monitoring-active {
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 140px) !important;
+    }
+
+    .map-zoom-controls.monitoring-active.monitoring-expanded {
+        bottom: calc(var(--footer-height, 240px) + 16px) !important;
+    }
+
+    .map-zoom-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .map-zoom-btn .map-zoom-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .map-zoom-divider {
+        width: 28px;
+    }
 }
 
 .map-client {

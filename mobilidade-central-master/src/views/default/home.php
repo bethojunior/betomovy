@@ -367,9 +367,19 @@
         <button type="button" class="schedule-picker-apply" id="btnApplyScheduleForm">APLICAR</button>
     </div>
 </div>
-    <div class="map-zoom-controls">
-        <button type="button" class="map-zoom-btn" id="mapZoomIn" aria-label="Ampliar">+</button>
-        <button type="button" class="map-zoom-btn" id="mapZoomOut" aria-label="Diminuir">−</button>
+    <div class="map-zoom-controls" id="mapZoomControls" role="group" aria-label="Controles de zoom do mapa">
+        <button type="button" class="map-zoom-btn map-zoom-btn-in" id="mapZoomIn" aria-label="Aumentar zoom" title="Aumentar zoom">
+            <svg class="map-zoom-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+        <div class="map-zoom-divider" aria-hidden="true"></div>
+        <button type="button" class="map-zoom-btn map-zoom-btn-out" id="mapZoomOut" aria-label="Diminuir zoom" title="Diminuir zoom">
+            <svg class="map-zoom-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
     </div>
 <div class="container-cancel-request-trip">
     <div>
