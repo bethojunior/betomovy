@@ -1,16 +1,28 @@
 import styled from "styled-components";
-
 import { Menu } from "antd";
 
-export const Container = styled.div``;
+export const Container = styled.div`
+  width: 100%;
+`;
+
+export const ContentHeader = styled.div`
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+`;
 
 export const ContentSearch = styled.div`
   width: 100%;
   display: flex;
-  gap: 2rem;
+  align-items: flex-end;
+  gap: 1.25rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     flex-direction: column;
+    align-items: stretch;
     gap: 1rem;
 
     div {
@@ -25,11 +37,6 @@ export const ContentTypesSearch = styled.div`
   }
 `;
 
-export const ContentHeader = styled.div`
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgb(224, 224, 224);
-`;
-
 export const ContentInput = styled.div``;
 
 export const FlexContentInput = styled(ContentInput)`
@@ -37,19 +44,39 @@ export const FlexContentInput = styled(ContentInput)`
 `;
 
 export const RadioContentInput = styled(ContentInput)`
-  margin-top: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+
+  .ant-radio-wrapper {
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    margin-right: 18px;
+  }
 `;
 
 export const SearchLottieWrapper = styled.div`
   width: 30%;
 `;
 
-export const LabelText = styled.p``;
+export const LabelText = styled.label`
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+  margin: 0 0 6px 0;
+`;
 
 export const ContentDrivers = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 `;
 
 export const ItemMenuSettings = styled(Menu.Item)`
@@ -83,17 +110,33 @@ export const ContentIconSearch = styled.div`
 export const ContentInstructionsSearch = styled.div`
   display: flex;
   justify-content: center;
+  margin-top: 1rem;
+
   > div {
     max-width: 600px;
     width: 100%;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.75rem;
   }
   span {
     display: block;
     margin: 0.5rem 0;
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.5;
   }
   @media (max-width: 768px) {
     h3 {
-      font-size: 16px;
+      font-size: 14px;
     }
     span {
       font-size: 12px;

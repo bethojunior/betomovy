@@ -44,12 +44,12 @@ export const DriverSummary = ({
       </SectionTitleRow>
       <SectionFieldsGrid>
         <FieldRow>
-          <FieldIcon>
+          <FieldIcon style={{ color: "#f59e0b" }}>
             <FiStar size={16} />
           </FieldIcon>
           <Field>
             <FieldLabel>Pontuação</FieldLabel>
-            <FieldValue>{rating}</FieldValue>
+            <FieldValue title={String(rating || "-")} style={{ fontWeight: 600 }}>{rating || "-"}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -58,16 +58,24 @@ export const DriverSummary = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Saldo bloqueado</FieldLabel>
-            <FieldValue>{formatCurrency(blockedBalance)}</FieldValue>
+            <FieldValue title={formatCurrency(blockedBalance)}>{formatCurrency(blockedBalance)}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
-          <FieldIcon>
+          <FieldIcon style={{ color: balance && balance > 0 ? "#16a34a" : undefined }}>
             <FiCreditCard size={16} />
           </FieldIcon>
           <Field>
             <FieldLabel>Saldo disponível</FieldLabel>
-            <FieldValue>{formatCurrency(balance)}</FieldValue>
+            <FieldValue
+              title={formatCurrency(balance)}
+              style={{
+                color: balance && balance > 0 ? "#16a34a" : (balance && balance < 0 ? "#dc2626" : "#0f172a"),
+                fontWeight: 700,
+              }}
+            >
+              {formatCurrency(balance)}
+            </FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -76,7 +84,13 @@ export const DriverSummary = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Limite de saldo negativo</FieldLabel>
-            <FieldValue>
+            <FieldValue
+              title={
+                maximumAmountNegativeBalanceDriver != null
+                  ? formatCurrency(maximumAmountNegativeBalanceDriver)
+                  : "-"
+              }
+            >
               {maximumAmountNegativeBalanceDriver != null
                 ? formatCurrency(maximumAmountNegativeBalanceDriver)
                 : "-"}
@@ -89,7 +103,7 @@ export const DriverSummary = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Versão do App</FieldLabel>
-            <FieldValue>{appVersion || "-"}</FieldValue>
+            <FieldValue title={appVersion || "-"}>{appVersion || "-"}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -109,7 +123,7 @@ export const DriverSummary = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Horas trabalhadas</FieldLabel>
-            <FieldValue>{Utils.convertMinutesToHours(hours_worked)}</FieldValue>
+            <FieldValue title={Utils.convertMinutesToHours(hours_worked)}>{Utils.convertMinutesToHours(hours_worked)}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -118,7 +132,7 @@ export const DriverSummary = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Horas limite</FieldLabel>
-            <FieldValue>{Utils.convertMinutesToHours(hours_open)}</FieldValue>
+            <FieldValue title={Utils.convertMinutesToHours(hours_open)}>{Utils.convertMinutesToHours(hours_open)}</FieldValue>
           </Field>
         </FieldRow>
       </SectionFieldsGrid>

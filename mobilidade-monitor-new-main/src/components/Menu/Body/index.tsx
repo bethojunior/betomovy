@@ -288,17 +288,19 @@ const Menu = ({ children, titlePage }: MenuProps) => {
             )}
             <TitleMenu level={4}>{t(titlePage)}</TitleMenu>
           </HeaderSection>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, height: "100%" }}>
             <div
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 backgroundColor: "rgba(255, 255, 255, 0.08)",
-                borderRadius: 24,
-                padding: "3px 4px",
+                borderRadius: 20,
+                padding: "2px",
                 border: "1px solid rgba(255, 255, 255, 0.15)",
-                gap: 4,
+                gap: 2,
+                height: 32,
                 userSelect: "none",
+                boxSizing: "border-box",
               }}
             >
               <button
@@ -306,19 +308,21 @@ const Menu = ({ children, titlePage }: MenuProps) => {
                 onClick={() => setLanguage("pt")}
                 style={{
                   border: "none",
-                  background: language === "pt" ? "#00349A" : "transparent",
-                  color: language === "pt" ? "#FFFFFF" : "#CBD5E1",
-                  borderRadius: 18,
-                  padding: "4px 10px",
+                  background: language === "pt" ? "#0284c7" : "transparent",
+                  color: language === "pt" ? "#FFFFFF" : "#94a3b8",
+                  borderRadius: 16,
+                  padding: "0 10px",
+                  height: 26,
+                  lineHeight: "26px",
                   cursor: "pointer",
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
                   gap: 5,
                   fontWeight: 700,
-                  fontSize: 12,
+                  fontSize: 11,
                   letterSpacing: "0.5px",
                   transition: "all 0.2s ease",
-                  boxShadow: language === "pt" ? "0 2px 8px rgba(0, 52, 154, 0.6)" : "none",
+                  boxShadow: language === "pt" ? "0 2px 6px rgba(2, 132, 199, 0.4)" : "none",
                 }}
                 title="Português (Brasil)"
               >
@@ -330,19 +334,21 @@ const Menu = ({ children, titlePage }: MenuProps) => {
                 onClick={() => setLanguage("en")}
                 style={{
                   border: "none",
-                  background: language === "en" ? "#00349A" : "transparent",
-                  color: language === "en" ? "#FFFFFF" : "#CBD5E1",
-                  borderRadius: 18,
-                  padding: "4px 10px",
+                  background: language === "en" ? "#0284c7" : "transparent",
+                  color: language === "en" ? "#FFFFFF" : "#94a3b8",
+                  borderRadius: 16,
+                  padding: "0 10px",
+                  height: 26,
+                  lineHeight: "26px",
                   cursor: "pointer",
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
                   gap: 5,
                   fontWeight: 700,
-                  fontSize: 12,
+                  fontSize: 11,
                   letterSpacing: "0.5px",
                   transition: "all 0.2s ease",
-                  boxShadow: language === "en" ? "0 2px 8px rgba(0, 52, 154, 0.6)" : "none",
+                  boxShadow: language === "en" ? "0 2px 6px rgba(2, 132, 199, 0.4)" : "none",
                 }}
                 title="English (United States)"
               >

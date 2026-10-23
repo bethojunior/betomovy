@@ -145,6 +145,9 @@ export const HeaderLayout = styled(Layout.Header)`
   background: #070A1A !important;
   border-bottom: 1px solid rgba(4, 243, 250, 0.12);
   height: 64px;
+  line-height: normal !important;
+  position: relative;
+  z-index: 100;
 `;
 
 export const User = styled.div`

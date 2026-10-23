@@ -56,6 +56,21 @@ export const DriverInfo = ({
     DRIVER_STATUSES_WITH_WHITE_TEXT
   );
 
+  const formattedDate = created_at
+    ? new Date(created_at).toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+    : "-";
+
+  const formattedPhone = phone ? Mask.setMaskPhoneValue(phone) : "-";
+  const carDescription = carModel ? `${carModel}${carBrand ? ` - ${carBrand}` : ""}` : "-";
+
   return (
     <SectionCard>
       <SectionTitleRow>
@@ -69,7 +84,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Motorista</FieldLabel>
-            <FieldValue>{name}</FieldValue>
+            <FieldValue title={name}>{name || "-"}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -103,7 +118,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>CPF</FieldLabel>
-            <FieldValue>{document}</FieldValue>
+            <FieldValue title={document}>{document || "-"}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -112,17 +127,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Data de cadastro</FieldLabel>
-            <FieldValue>
-              {new Date(created_at).toLocaleString("pt-BR", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false,
-              })}
-            </FieldValue>
+            <FieldValue title={formattedDate}>{formattedDate}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -131,7 +136,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Telefone</FieldLabel>
-            <FieldValue>{phone ? Mask.setMaskPhoneValue(phone) : phone}</FieldValue>
+            <FieldValue title={formattedPhone}>{formattedPhone}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -140,9 +145,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Carro</FieldLabel>
-            <FieldValue>
-              {carModel} - {carBrand}
-            </FieldValue>
+            <FieldValue title={carDescription}>{carDescription}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -151,7 +154,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>E-mail</FieldLabel>
-            <FieldValue>{email}</FieldValue>
+            <FieldValue title={email}>{email || "-"}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -160,7 +163,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Placa</FieldLabel>
-            <FieldValue>{carPlate}</FieldValue>
+            <FieldValue title={carPlate}>{carPlate || "-"}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -169,7 +172,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Cidade</FieldLabel>
-            <FieldValue>{city}</FieldValue>
+            <FieldValue title={city}>{city || "-"}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -178,7 +181,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Cor</FieldLabel>
-            <FieldValue>{carColor}</FieldValue>
+            <FieldValue title={carColor}>{carColor || "-"}</FieldValue>
           </Field>
         </FieldRow>
         <FieldRow>
@@ -187,7 +190,7 @@ export const DriverInfo = ({
           </FieldIcon>
           <Field>
             <FieldLabel>Ano</FieldLabel>
-            <FieldValue>{carYear}</FieldValue>
+            <FieldValue title={String(carYear || "-")}>{carYear || "-"}</FieldValue>
           </Field>
         </FieldRow>
       </SectionFieldsGrid>
