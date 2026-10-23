@@ -71,7 +71,7 @@ class Controller
         $socketUrl = getenv('ROUTE_HOST_TRIP_SHARE_URL');
         $socketUrl = ($socketUrl && $socketUrl !== false && trim($socketUrl) !== '') 
             ? trim($socketUrl) 
-            : 'https://realtime.704apps.com.br';
+            : 'https://socket.movymob.com';
         $hostUtils = str_replace("<ROUTE_HOST_TRIP_SHARE_URL>", $socketUrl, $hostUtils);
         file_put_contents(PROJECT_PUBLIC_DIR . "/webfiles/js/config/host.js", $hostUtils);
     }

@@ -95,7 +95,6 @@
 
 .footer-container-trip > .container-box-price > .type-cars > div > div > div:hover {
     border-color: #94a3b8;
-    transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
 }
 
@@ -104,7 +103,6 @@
     border: 2px solid #000000;
     background: #ffffff;
     opacity: 1;
-    transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 

@@ -1508,7 +1508,7 @@ document.addEventListener('DOMContentLoaded', function () {
               bucketName = urlParts[3]
             }
           }
-          const dashboardUrl = `https://monitor-new-${bucketName}.prod.704apps.com.br/trip/list/details/${trip.tripReference || ''}`
+          const dashboardUrl = `https://movymonitor.com/trip/list/details/${trip.tripReference || ''}`
 
           if (cardId === 'showCancelledTrips') {
             html += `

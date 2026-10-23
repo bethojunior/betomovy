@@ -10,6 +10,38 @@ function initPositionDrivers() {
     };
 
     getPositionDrivers();
+    initSocketDrivers();
+
+    function initSocketDrivers() {
+        try {
+            if (typeof SocketConnection !== 'undefined') {
+                const sc = new SocketConnection();
+                sc.on('driver.positions', function (data) {
+                    if (!data) return;
+                    const list = Array.isArray(data) ? data : [data];
+                    list.forEach(driver => {
+                        const rawLat = driver.latitude ?? driver.lat ?? driver.last_lat;
+                        const rawLng = driver.longitude ?? driver.lng ?? driver.last_lon;
+                        if (rawLat && rawLng && driver.idDriver) {
+                            const lat = parseFloat(rawLat);
+                            const lng = parseFloat(rawLng);
+                            if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) return;
+                            if (!drivers[driver.idDriver]) {
+                                drivers[driver.idDriver] = createCar(driver, lat, lng);
+                            } else {
+                                if (window.mapService && window.mapService.map) {
+                                    drivers[driver.idDriver].setMap(window.mapService.map);
+                                }
+                                moveCar(driver.idDriver, lat, lng);
+                            }
+                        }
+                    });
+                });
+            }
+        } catch (e) {
+            console.warn('Socket drivers listener warning:', e);
+        }
+    }
 
     function getPositionDrivers() {
         if (!window.mapService || !window.mapService.map) {
@@ -52,10 +84,17 @@ function initPositionDrivers() {
         initPop();
 
         const driverName = driver.name || driver.nickname || 'Motorista';
+        const rawIcon = driver?.iconMapDriver;
+        const hasValidIcon = rawIcon && typeof rawIcon === 'string' &&
+            !rawIcon.endsWith('/') &&
+            /\.(png|jpe?g|webp|svg)$/i.test(rawIcon) &&
+            !rawIcon.includes('default.jpg') &&
+            !rawIcon.includes('minio.704app');
+
         const pop = new Popup(
             { lat, lng },
             `<div class="container-car tooltip-customer" driverId="${driver.idDriver}" title="${driverName}"
-                ${driver?.iconMapDriver ? `style="background-image: url('${driver.iconMapDriver}')"` : ''}>
+                ${hasValidIcon ? `style="background-image: url('${rawIcon}')"` : ''}>
                 <span class="tooltiptext">${driverName}</span>
             </div>`
         );

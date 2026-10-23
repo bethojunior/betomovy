@@ -718,7 +718,7 @@ export const PublicityApp = () => {
                                       src={
                                         urlImgBanner1.length > 1
                                           ? urlImgBanner1
-                                          : "https://return704appsmonitor.fb704.com.br/webfiles/img/icon/default.png"
+                                          : "/default-trip-icon.png"
                                       }
                                     />
                                     <LabelText>
@@ -771,7 +771,7 @@ export const PublicityApp = () => {
                                       src={
                                         urlImgBanner2.length > 1
                                           ? urlImgBanner2
-                                          : "https://return704appsmonitor.fb704.com.br/webfiles/img/icon/default.png"
+                                          : "/default-trip-icon.png"
                                       }
                                     />
                                     <LabelText>
@@ -825,7 +825,7 @@ export const PublicityApp = () => {
                                       src={
                                         urlImgBanner3.length > 1
                                           ? urlImgBanner3
-                                          : "https://return704appsmonitor.fb704.com.br/webfiles/img/icon/default.png"
+                                          : "/default-trip-icon.png"
                                       }
                                     />
                                     <LabelText>
@@ -879,7 +879,7 @@ export const PublicityApp = () => {
                                       src={
                                         urlImgBanner4.length > 1
                                           ? urlImgBanner4
-                                          : "https://return704appsmonitor.fb704.com.br/webfiles/img/icon/default.png"
+                                          : "/default-trip-icon.png"
                                       }
                                     />
                                     <LabelText>

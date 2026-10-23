@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const sessionWhatsApp = WhatsappSession.getSessionName()
 
-  const site = `https://${centralName}-new.prod.704app.com.br/share`
+  const site = `https://movymob.com/share`
 
   const btnCloseDriverNotFoundModal = document.getElementById('btnCloseDriverNotFoundModal')
   if (btnCloseDriverNotFoundModal) {

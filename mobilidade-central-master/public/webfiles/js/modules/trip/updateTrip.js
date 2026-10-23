@@ -100,23 +100,28 @@ function initRace(trip) {
     viewController.elementProperty.getElement(".footer-payment-form", element =>
         element.classList.remove("active"));
 
+    const driver = trip.driver || {};
+    const driverName = driver.nickname || driver.name || "Motorista";
     viewController.elementProperty.getElement(".name-driver-trip", element => {
-        element.innerHTML = trip.driver.nickname;
+        element.innerHTML = driverName;
     });
 
-    if (!Array.isArray(trip.driver.car)) {
-        viewController.elementProperty.getElement(".car-plate-driver", element => {
-            element.innerHTML = trip.driver.car.plate;
-        });
-        viewController.elementProperty.getElement(".car-brand-driver", element => {
-            element.innerHTML = `<span>Marca:${trip.driver.car.brand}</span>
-                <span>Modelo:${trip.driver.car.model}</span>
-                <span>Cor:${trip.driver.car.color}</span>`;
-        });
-    }
+    const car = Array.isArray(driver.car) ? (driver.car[0] || {}) : (driver.car || {});
+    viewController.elementProperty.getElement(".car-plate-driver", element => {
+        element.innerHTML = car.plate || "";
+    });
+    viewController.elementProperty.getElement(".car-brand-driver", element => {
+        const brand = car.brand ? `<span>Marca: ${car.brand}</span>` : "";
+        const model = car.model ? `<span>Modelo: ${car.model}</span>` : "";
+        const color = car.color ? `<span>Cor: ${car.color}</span>` : "";
+        element.innerHTML = `${brand} ${model} ${color}`.trim();
+    });
     viewController.elementProperty.getElement(".image-profile-driver", element => {
-        //element.src = PATH_PROFILE_DRIVER + trip.driver.profileImage;
-        element.style.backgroundImage = `url('${environment.hosts.hostImageDriver + trip.driver.profileImage}')`;
+        if (driver.profileImage) {
+            element.style.backgroundImage = `url('${environment.hosts.hostImageDriver + driver.profileImage}')`;
+        } else {
+            element.style.backgroundImage = `url('/webfiles/img/icon/default.png')`;
+        }
     });
     mapService.removeRoute();
 
@@ -231,23 +236,37 @@ function getTaxiType() {
 function populateSearchDriverCard(data) {
     try {
         const typeTaxi = managerTrip?.typeTaxi || {};
-        const categoryName = typeTaxi.priceName || typeTaxi.name || "Movy";
-        const isCentral = /central/i.test(categoryName) || /central/i.test(typeTaxi.type || '');
-        const isMoto = /\bmoto\b|mototaxi|motocicleta|motoboy/i.test(categoryName) || 
-                       /\bmoto\b/i.test(String(typeTaxi.picture || '')) ||
-                       /\bmoto\b/i.test(String(data?.tripTypeId || ''));
-        const defaultCarImg = isCentral ? "webfiles/img/icon/carro_eco.png" : "webfiles/img/icon/carro_drive.png";
-        const vehicleDefault = isMoto ? "webfiles/img/icon/moto.png" : defaultCarImg;
+        const rawCategoryName = typeTaxi.priceName || typeTaxi.name || "Movy";
+        let categoryName = rawCategoryName.trim();
+        if (categoryName) {
+            categoryName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1).toLowerCase();
+        }
+
+        const isCentral = /central/i.test(rawCategoryName) || /central/i.test(typeTaxi.type || '');
+        const isEntregaOrDrive = /entrega|drive|particular|carro/i.test(rawCategoryName);
+        const isMoto = !isEntregaOrDrive && !isCentral && (
+            /\bmoto\b|mototaxi|motocicleta|motoboy/i.test(rawCategoryName) || 
+            /\bmoto\b/i.test(String(typeTaxi.picture || '')) ||
+            /\bmoto\b/i.test(String(data?.tripTypeId || ''))
+        );
+        const defaultCarImg = isCentral ? "/webfiles/img/icon/carro_eco.png" : "/webfiles/img/icon/carro_drive.png";
+        const vehicleDefault = isMoto ? "/webfiles/img/icon/moto.png" : defaultCarImg;
 
         const vehicleImgEl = document.getElementById("searchTripVehicleImg");
         if (vehicleImgEl) {
-            let pic = typeTaxi.picture || (typeTaxi.tripType && typeTaxi.tripType.picture);
-            if (isMoto) {
-                vehicleImgEl.src = "webfiles/img/icon/moto.png";
-            } else if (pic && typeof pic === "string" && (pic.startsWith("http") || pic.startsWith("webfiles/"))) {
-                vehicleImgEl.src = pic;
+            if (isEntregaOrDrive) {
+                vehicleImgEl.src = "/webfiles/img/icon/carro_drive.png";
+            } else if (isCentral) {
+                vehicleImgEl.src = "/webfiles/img/icon/carro_eco.png";
+            } else if (isMoto) {
+                vehicleImgEl.src = "/webfiles/img/icon/moto.png";
             } else {
-                vehicleImgEl.src = defaultCarImg;
+                let pic = typeTaxi.picture || (typeTaxi.tripType && typeTaxi.tripType.picture);
+                if (pic && typeof pic === "string" && !pic.includes("minio.704app") && (pic.startsWith("http") || pic.startsWith("/"))) {
+                    vehicleImgEl.src = pic;
+                } else {
+                    vehicleImgEl.src = defaultCarImg;
+                }
             }
             vehicleImgEl.onerror = function() {
                 this.onerror = null;

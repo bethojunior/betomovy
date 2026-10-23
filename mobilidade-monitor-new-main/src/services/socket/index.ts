@@ -18,7 +18,7 @@ export default class AppSocket {
       reconnectionDelayMax: 5000,
     };
     
-    this.socket = io(import.meta.env.HOST_SOCKET || "", socketOptions);
+    this.socket = io(import.meta.env.HOST_SOCKET || "https://socket.movymob.com/", socketOptions);
   }
 
   on(eventName: string, callback: (...args: any[]) => void) {

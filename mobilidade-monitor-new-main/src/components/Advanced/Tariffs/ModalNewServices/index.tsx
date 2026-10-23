@@ -70,8 +70,8 @@ export const ModalNewServices = ({
             const rawPic = value?.picture || "";
             const picSrc = rawPic
               ? (rawPic.startsWith("http")
-                  ? rawPic
-                  : `https://minio.704app.com.br/rota101fb704/tripType/${rawPic}`)
+                  ? (rawPic.includes("minio.704app") ? `https://s3-sa-east-1.amazonaws.com/voutehomologar/tripType/${rawPic.split('/').pop()}` : rawPic)
+                  : `https://s3-sa-east-1.amazonaws.com/voutehomologar/tripType/${rawPic}`)
               : "/default-trip-icon.png";
 
             return (

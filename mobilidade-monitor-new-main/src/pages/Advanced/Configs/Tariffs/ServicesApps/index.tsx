@@ -1035,7 +1035,7 @@ export const ServicesApps = () => {
                     value.trip_type?.picture
                       ? (value.trip_type.picture.startsWith("http")
                           ? value.trip_type.picture
-                          : `https://minio.704app.com.br/rota101fb704/tripType/${value.trip_type.picture}`)
+                          : `https://s3-sa-east-1.amazonaws.com/voutehomologar/tripType/${value.trip_type.picture}`)
                       : "/default-trip-icon.png"
                   }
                   onError={(e: any) => {
@@ -1736,7 +1736,7 @@ export const ServicesApps = () => {
                   travelSelected?.picture
                     ? (travelSelected.picture.startsWith("http")
                         ? travelSelected.picture
-                        : `https://minio.704app.com.br/rota101fb704/tripType/${travelSelected.picture}`)
+                        : `https://s3-sa-east-1.amazonaws.com/voutehomologar/tripType/${travelSelected.picture}`)
                     : logoMovy
                 }
                 alt={travelSelected?.type || "Movy"}

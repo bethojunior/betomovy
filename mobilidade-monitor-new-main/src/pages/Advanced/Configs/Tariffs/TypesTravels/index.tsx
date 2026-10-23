@@ -728,7 +728,7 @@ export const TypesTravels = () => {
                       pic
                         ? (pic.startsWith("http")
                             ? pic
-                            : `https://minio.704app.com.br/rota101fb704/tripType/${pic}`)
+                            : `https://s3-sa-east-1.amazonaws.com/voutehomologar/tripType/${pic}`)
                         : "/default-trip-icon.png"
                     }
                     onError={(e: any) => {
@@ -767,7 +767,7 @@ export const TypesTravels = () => {
                 travelSelected?.picture
                   ? (travelSelected.picture.startsWith('http')
                       ? travelSelected.picture
-                      : 'https://minio.704app.com.br/rota101fb704/tripType/' + travelSelected.picture)
+                      : 'https://s3-sa-east-1.amazonaws.com/voutehomologar/tripType/' + travelSelected.picture)
                   : logoMovy
               }
               alt={travelSelected?.type || 'Tarifa Movy'}
@@ -971,7 +971,7 @@ export const TypesTravels = () => {
                   travelSelected?.picture
                     ? (travelSelected.picture.startsWith('http')
                         ? travelSelected.picture
-                        : 'https://minio.704app.com.br/rota101fb704/tripType/' + travelSelected.picture)
+                        : 'https://s3-sa-east-1.amazonaws.com/voutehomologar/tripType/' + travelSelected.picture)
                     : logoMovy
                 }
                 alt={travelSelected?.type || 'Tarifa'}

@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateTrip() {
-        const ROUTE_HOST_TRIP_SHARE_URL = environment.hosts.socketRealtime || 'https://realtime.704apps.com.br';
+        const ROUTE_HOST_TRIP_SHARE_URL = environment.hosts.socketRealtime || 'https://socket.movymob.com';
 
         const socket = io(ROUTE_HOST_TRIP_SHARE_URL, {
             query: { tripReference },

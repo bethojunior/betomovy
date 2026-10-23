@@ -7,7 +7,7 @@ function getEnvironment() {
             hostRequestApi: "<APIAPP_HOST>",
             hostSocketApi: "<API_SOCKET_HOST>",
             hostRequest: "<API_HOST>",
-            hostNodeWhats : "https://api-notifier.704app.com.br/",
+            hostNodeWhats : "<API_SOCKET_HOST>",
             hostImageDriver: "<STORAGE_PRIMARY_HOST>/<BUCKET_NAME>/driver/profile/compressed/",
             hostImageClient: "<STORAGE_PRIMARY_HOST>/<BUCKET_NAME>/customer/profile/compressed/",
             hostImageDefault: "<STORAGE_PRIMARY_HOST>/<BUCKET_NAME>/default.jpg",

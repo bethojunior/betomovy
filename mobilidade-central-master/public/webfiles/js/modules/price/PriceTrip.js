@@ -251,23 +251,36 @@ class PriceTrip {
                 if (config && config.typeMoney) typeMoney = config.typeMoney;
             }
 
-            const tagText = object.tag || object.name || object.priceName || '';
+            const rawTagText = object.tag || object.name || object.priceName || '';
+            const isCentral = /central/i.test(rawTagText) || /central/i.test(object.type || '');
+            const isEntregaOrDrive = /entrega|drive|particular|carro/i.test(rawTagText);
+            
+            let tagText = rawTagText.trim();
+            if (tagText) {
+                tagText = tagText.charAt(0).toUpperCase() + tagText.slice(1).toLowerCase();
+            }
+
             const tagBg = object.color ? `background-color: ${object.color}` : 'background-color: #333';
             
             // Resolucao robusta da imagem do tipo de viagem:
             // Central = carro amarelo (carro_eco.png)
             // Entregas / Particular / Drive = carro azul (carro_drive.png)
-            // Moto = moto.png
+            // Moto = moto.png (apenas quando expressamente categoria de moto)
             let rawPicture = object.picture || (object.tripType && object.tripType.picture) || '';
-            const isCentral = /central/i.test(tagText) || /central/i.test(object.type || '');
-            const isMoto = /\bmoto\b|mototaxi|motocicleta|motoboy/i.test(tagText) || /\bmoto\b/i.test(String(rawPicture));
-            const defaultCarImg = isCentral ? 'webfiles/img/icon/carro_eco.png' : 'webfiles/img/icon/carro_drive.png';
-            const defaultImg = isMoto ? 'webfiles/img/icon/moto.png' : defaultCarImg;
+            const isMoto = !isEntregaOrDrive && !isCentral && (/\bmoto\b|mototaxi|motocicleta|motoboy/i.test(rawTagText) || /\bmoto\b/i.test(String(rawPicture)));
+            const defaultCarImg = isCentral ? '/webfiles/img/icon/carro_eco.png' : '/webfiles/img/icon/carro_drive.png';
+            const defaultImg = isMoto ? '/webfiles/img/icon/moto.png' : defaultCarImg;
             let pictureUrl = defaultImg;
 
-            if (rawPicture && typeof rawPicture === 'string') {
-                if (rawPicture.startsWith('webfiles/') || rawPicture.startsWith('/')) {
-                    pictureUrl = rawPicture;
+            if (isEntregaOrDrive) {
+                pictureUrl = '/webfiles/img/icon/carro_drive.png';
+            } else if (isCentral) {
+                pictureUrl = '/webfiles/img/icon/carro_eco.png';
+            } else if (isMoto) {
+                pictureUrl = '/webfiles/img/icon/moto.png';
+            } else if (rawPicture && typeof rawPicture === 'string') {
+                if (rawPicture.startsWith('/') || rawPicture.startsWith('webfiles/')) {
+                    pictureUrl = rawPicture.startsWith('/') ? rawPicture : '/' + rawPicture;
                 } else if (rawPicture.startsWith('http://') || rawPicture.startsWith('https://')) {
                     if (rawPicture.includes('s3-sa-east-1.amazonaws.com') || rawPicture.includes('s3.amazonaws.com') || rawPicture.includes('minio.704app')) {
                         pictureUrl = defaultImg;

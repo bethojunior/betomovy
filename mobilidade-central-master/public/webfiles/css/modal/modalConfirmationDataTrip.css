@@ -55,6 +55,49 @@
     opacity: 0.8;
 }
 
+/* ── Vehicle Illustration Header ── */
+.confirmation-vehicle-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px 6px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.confirmation-vehicle-img-wrap {
+    width: 70px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.confirmation-vehicle-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.confirmation-vehicle-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.confirmation-category-badge {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+}
+
+.confirmation-category-eta {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
 /* ── Body ── */
 .modal-confirmation-data-trip > div > .data-trip {
     padding: 16px 18px 8px;

@@ -1230,35 +1230,83 @@ class CentralController extends ApiController
     {
         try {
             $pdo = Connection::open(Connection::DB_MYSQL_RO);
-            $statusParam = $_GET['status'] ?? 'disponivel,corrida';
+            $statusParam = $_GET['status'] ?? 'disponivel,corrida,online,available,busy,in_progress';
             $statusList = array_filter(array_map('trim', explode(',', $statusParam)));
             if (empty($statusList)) {
-                $statusList = ['disponivel', 'corrida'];
+                $statusList = ['disponivel', 'corrida', 'online', 'available', 'busy', 'in_progress'];
             }
-            $inClause = "'" . implode("','", array_map('addslashes', $statusList)) . "'";
+            $expandedStatuses = [];
+            foreach ($statusList as $st) {
+                $expandedStatuses[] = addslashes($st);
+                if ($st === 'disponivel') {
+                    $expandedStatuses[] = 'online';
+                    $expandedStatuses[] = 'available';
+                } elseif ($st === 'online') {
+                    $expandedStatuses[] = 'disponivel';
+                    $expandedStatuses[] = 'available';
+                } elseif ($st === 'corrida') {
+                    $expandedStatuses[] = 'busy';
+                    $expandedStatuses[] = 'in_progress';
+                    $expandedStatuses[] = 'boarding';
+                    $expandedStatuses[] = 'accepted';
+                }
+            }
+            $expandedStatuses = array_unique($expandedStatuses);
+            $inClause = "'" . implode("','", $expandedStatuses) . "'";
 
-            $sql = "SELECT d.idDriver, d.last_lat AS latitude, d.last_lon AS longitude, 
-                           d.status, u.name, d.profileImage,
-                           CONCAT('https://api.movymob.com/uploads/driver/', d.profileImage) AS iconMapDriver
+            $sql = "SELECT d.idDriver, d.userId, d.cityId, d.last_lat AS latitude, d.last_lon AS longitude, 
+                           d.status, u.name, u.phone, d.profileImage,
+                           CASE 
+                               WHEN d.profileImage IS NOT NULL AND d.profileImage != '' AND d.profileImage NOT LIKE '%/%'
+                               THEN CONCAT('https://api.movymob.com/uploads/driver/', d.profileImage)
+                               ELSE NULL 
+                           END AS iconMapDriver,
+                           c.plate, c.model, c.color
                     FROM driver d
                     INNER JOIN user u ON d.userId = u.idUser
+                    LEFT JOIN car c ON d.idDriver = c.driverId AND c.deleted_at IS NULL
                     WHERE d.last_lat IS NOT NULL 
                       AND d.last_lat != '' 
+                      AND d.last_lat != 0
                       AND d.last_lon IS NOT NULL 
                       AND d.last_lon != ''
+                      AND d.last_lon != 0
                       AND (d.driverRegisterStatusId = 1 OR d.driverRegisterStatusId IS NULL)
+                      AND (u.statusId = 1 OR u.statusId IS NULL)
                       AND d.status IN ({$inClause})
+                    ORDER BY d.idDriver DESC
                     LIMIT 200";
 
             $stmt = $pdo->query($sql);
-            $drivers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $drivers = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+            $formatted = array_map(function($row) {
+                return [
+                    'idDriver' => (int)$row['idDriver'],
+                    'userId' => (int)$row['userId'],
+                    'cityId' => $row['cityId'] ? (int)$row['cityId'] : null,
+                    'latitude' => (float)$row['latitude'],
+                    'longitude' => (float)$row['longitude'],
+                    'name' => $row['name'],
+                    'nickname' => $row['name'],
+                    'phone' => $row['phone'] ?? '',
+                    'status' => $row['status'],
+                    'profileImage' => $row['profileImage'],
+                    'iconMapDriver' => $row['iconMapDriver'],
+                    'car' => [
+                        'plate' => $row['plate'] ?? '',
+                        'model' => $row['model'] ?? '',
+                        'color' => $row['color'] ?? '',
+                    ]
+                ];
+            }, $drivers);
 
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
                 'status' => true,
                 'message' => 'Posições encontradas',
-                'response' => $drivers,
-                'data' => $drivers,
+                'response' => $formatted,
+                'data' => $formatted,
                 'errors' => null
             ]);
         } catch (\Throwable $e) {
