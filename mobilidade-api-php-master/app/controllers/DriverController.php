@@ -929,6 +929,62 @@ class DriverController extends ApiController
             throw new \Exception("Motorista não encontrado");
         }
 
+        // Buscar documentos fornecidos do motorista
+        $stmtDocs = $pdo->prepare("
+            SELECT
+                du.id,
+                du.docId,
+                du.userId,
+                coalesce(du.text, '') as text,
+                coalesce(du.image, '') as image,
+                coalesce(du.pdf, '') as pdf,
+                coalesce(du.docStatusId, 2) as docStatusId,
+                coalesce(ds.name, 'EM ANÁLISE') as docStatus,
+                coalesce(d.label, 'Documento') as label,
+                coalesce(d.description, '') as description,
+                coalesce(d.image, 1) as isImage,
+                coalesce(d.text, 0) as isText,
+                coalesce(d.pdf, 0) as isPdf
+            FROM docUser du
+            INNER JOIN doc d ON du.docId = d.id
+            LEFT JOIN docStatus ds ON du.docStatusId = ds.id
+            WHERE du.userId = :userId AND du.statusId = 1 AND du.deleted_at IS NULL
+            ORDER BY du.id DESC
+        ");
+        $stmtDocs->execute([':userId' => $driver['userId']]);
+        $docs = $stmtDocs->fetchAll(PDO::FETCH_ASSOC);
+
+        $storageUrl = 'https://minio.704app.com.br/rota101fb704/';
+        foreach ($docs as &$docItem) {
+            $docItem['id'] = (int)$docItem['id'];
+            $docItem['docId'] = (int)$docItem['docId'];
+            $docItem['userId'] = (int)$docItem['userId'];
+            $docItem['docStatusId'] = (int)$docItem['docStatusId'];
+            $docItem['isImage'] = (int)$docItem['isImage'];
+            $docItem['isText'] = (int)$docItem['isText'];
+            $docItem['isPdf'] = (int)$docItem['isPdf'];
+
+            if (!empty($docItem['image'])) {
+                if (!preg_match('/^https?:\/\//i', $docItem['image'])) {
+                    $docItem['image'] = $storageUrl . 'user/' . $docItem['userId'] . '/docs/' . $docItem['image'];
+                }
+            } else {
+                $docItem['image'] = '';
+            }
+
+            if (!empty($docItem['pdf'])) {
+                if (!preg_match('/^https?:\/\//i', $docItem['pdf'])) {
+                    $docItem['pdf'] = $storageUrl . 'user/' . $docItem['userId'] . '/docs/' . $docItem['pdf'];
+                }
+            } else {
+                $docItem['pdf'] = '';
+            }
+        }
+        unset($docItem);
+
+        $driver['docs_user'] = $docs;
+        $driver['idUser'] = (int)$driver['userId'];
+
         return $driver;
     }
 
@@ -1078,9 +1134,16 @@ class DriverController extends ApiController
             if (!$id) {
                 throw new \Exception("ID do motorista não informado");
             }
-            $pdo = \app\utils\Connection::open();
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
             $stmt = $pdo->prepare("UPDATE driver SET driverRegisterStatusId = 1 WHERE idDriver = :id");
             $stmt->execute([':id' => $id]);
+
+            // Desbloqueia o usuário e desativa registros em blockReasons
+            $stmtUser = $pdo->prepare("UPDATE user JOIN driver ON user.idUser = driver.userId SET user.blocked = 0 WHERE driver.idDriver = :id");
+            $stmtUser->execute([':id' => $id]);
+
+            $stmtBlock = $pdo->prepare("UPDATE blockReasons SET statusId = 0 WHERE driverId = :id");
+            $stmtBlock->execute([':id' => $id]);
 
             echo $this->returnSuccess('Cadastro ativado com sucesso');
         } catch (\Exception $e) {

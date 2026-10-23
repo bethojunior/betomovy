@@ -254,4 +254,119 @@ class BalanceController extends ApiController
             echo $this->returnError($e, "Erro ao atualizar voucher");
         }
     }
+
+    /**
+     * PUT/POST /balance/driver/{driverId}
+     * Altera saldo da carteira do motorista (inserção ou retirada de saldo)
+     */
+    public function actionDriver()
+    {
+        try {
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+
+            $rawInput = file_get_contents('php://input');
+            $payload = json_decode($rawInput, true);
+            if (!is_array($payload)) {
+                $payload = $_POST;
+            }
+
+            $driverId = (int)($_GET['id'] ?? ($payload['driverId'] ?? 0));
+            $value = (float)($payload['value'] ?? ($payload['amount'] ?? 0));
+            $observation = trim((string)($payload['observation'] ?? 'Movimentação manual pelo monitor'));
+
+            if ($driverId <= 0) {
+                throw new Exception("Motorista não informado");
+            }
+            if ($value == 0) {
+                throw new Exception("O valor deve ser diferente de zero");
+            }
+
+            // 1. Localizar o motorista
+            $stmtDrv = $pdo->prepare("
+                SELECT idDriver, userId, balanceId 
+                FROM driver 
+                WHERE idDriver = :id OR userId = :id 
+                LIMIT 1
+            ");
+            $stmtDrv->execute([':id' => $driverId]);
+            $driver = $stmtDrv->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$driver) {
+                throw new Exception("Motorista não encontrado");
+            }
+
+            $balanceId = !empty($driver['balanceId']) ? (int)$driver['balanceId'] : 0;
+
+            // 2. Criar registro em balance caso não exista
+            if ($balanceId <= 0) {
+                $stmtNewB = $pdo->prepare("
+                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance, created_at, updated_at)
+                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00, NOW(), NOW())
+                ");
+                $stmtNewB->execute();
+                $balanceId = (int)$pdo->lastInsertId();
+
+                $stmtUpDrv = $pdo->prepare("UPDATE driver SET balanceId = :balanceId WHERE idDriver = :idDriver");
+                $stmtUpDrv->execute([':balanceId' => $balanceId, ':idDriver' => (int)$driver['idDriver']]);
+            }
+
+            // 3. Obter saldo atual com lock
+            $stmtBal = $pdo->prepare("SELECT idBalance, balance FROM balance WHERE idBalance = :id LIMIT 1 FOR UPDATE");
+            $stmtBal->execute([':id' => $balanceId]);
+            $bal = $stmtBal->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$bal) {
+                $stmtNewB = $pdo->prepare("
+                    INSERT INTO balance (balance, blockedBalance, blockedBalanceToPay, tripBalance, withheldBalance, created_at, updated_at)
+                    VALUES (0.00, 0.00, 0.00, 0.00, 0.00, NOW(), NOW())
+                ");
+                $stmtNewB->execute();
+                $balanceId = (int)$pdo->lastInsertId();
+
+                $stmtUpDrv = $pdo->prepare("UPDATE driver SET balanceId = :balanceId WHERE idDriver = :idDriver");
+                $stmtUpDrv->execute([':balanceId' => $balanceId, ':idDriver' => (int)$driver['idDriver']]);
+
+                $stmtBal = $pdo->prepare("SELECT idBalance, balance FROM balance WHERE idBalance = :id LIMIT 1 FOR UPDATE");
+                $stmtBal->execute([':id' => $balanceId]);
+                $bal = $stmtBal->fetch(\PDO::FETCH_ASSOC);
+            }
+
+            $currentBalance = (float)($bal['balance'] ?? 0);
+            $newBalance = round($currentBalance + $value, 2);
+
+            // 4. Atualizar balance
+            $stmtUpd = $pdo->prepare("UPDATE balance SET balance = :balance, updated_at = NOW() WHERE idBalance = :idBalance");
+            $stmtUpd->execute([
+                ':balance' => $newBalance,
+                ':idBalance' => $balanceId
+            ]);
+
+            // 5. Inserir registro em balanceFlow
+            try {
+                $flowType = $value >= 0 ? 1 : 2;
+                $stmtFlow = $pdo->prepare("
+                    INSERT INTO balanceFlow (`date`, `value`, `balanceFlowTypeId`, `balanceId`, `observation`)
+                    VALUES (NOW(), :val, :type, :balanceId, :obs)
+                ");
+                $stmtFlow->execute([
+                    ':val' => abs($value),
+                    ':type' => $flowType,
+                    ':balanceId' => $balanceId,
+                    ':obs' => $observation
+                ]);
+            } catch (\Throwable $tf) {
+                // Registro de fluxo opcional
+            }
+
+            echo $this->returnSuccess("O saldo foi atualizado!", [
+                'driverId' => (int)$driver['idDriver'],
+                'balanceId' => $balanceId,
+                'previousBalance' => $currentBalance,
+                'newBalance' => $newBalance,
+                'balance' => $newBalance
+            ]);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, "Erro ao alterar o saldo do motorista");
+        }
+    }
 }

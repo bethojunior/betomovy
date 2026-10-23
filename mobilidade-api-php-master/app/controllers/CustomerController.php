@@ -606,15 +606,15 @@ class CustomerController extends ApiController
             $limit = max(1, min(100, (int)($_GET['per_page'] ?? $_GET['limit'] ?? 10)));
             $offset = ($page - 1) * $limit;
 
-            $headers = function_exists('getallheaders') ? getallheaders() : [];
-            $cityId = $headers['cityid'] ?? $headers['cityId'] ?? $_SERVER['HTTP_CITYID'] ?? $_GET['cityId'] ?? null;
+            // Clientes são exibidos de forma global no monitor, a menos que haja filtro explícito via query param
+            $explicitCityId = !empty($_GET['cityId']) && is_numeric($_GET['cityId']) ? (int)$_GET['cityId'] : null;
 
-            $where = ["user.statusId = 1"];
+            $where = ["(user.statusId IS NULL OR user.statusId != 0)"];
             $params = [];
 
-            if ($cityId) {
+            if ($explicitCityId) {
                 $where[] = "user.cityId = :cityId";
-                $params[':cityId'] = (int)$cityId;
+                $params[':cityId'] = $explicitCityId;
             }
 
             if (!empty($_GET['customerRegisterStatusId'])) {

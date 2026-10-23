@@ -273,7 +273,19 @@ return [
         '/monitoringarea',
         '/monitoringarea/',
         '/ifood/keys',
-        '/ifood/keys/'
+        '/ifood/keys/',
+        '/balance',
+        '/balance/',
+        '/balance/driver',
+        '/balance/driver/',
+        '/docuser',
+        '/docuser/',
+        '/docstatus',
+        '/docstatus/',
+        '/doc',
+        '/doc/',
+        '/blockreasons',
+        '/blockreasons/'
     ]
 ];
 
