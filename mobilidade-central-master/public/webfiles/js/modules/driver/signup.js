@@ -627,21 +627,26 @@ $(document).ready(function () {
                 element.style.display = "block";
             });
 
-            RequiredFieldController.get(dataDriver.driver.userTypeId).then(({status, data}) => {
-                if (!status)
+            RequiredFieldController.get(dataDriver.driver.userTypeId).then((result) => {
+                const status = result?.status !== false;
+                const fields = result?.data || result?.response || (Array.isArray(result) ? result : []);
+                if (!status || !Array.isArray(fields)) {
+                    formGroup.nextGroup();
                     return;
+                }
 
                 formGroup.validate = {};
 
-                data.map(item => {
-
+                fields.map(item => {
                     formGroup.validate[item.description] = {
                         wasValidated: false,
                         required: item.compelField,
                     };
                 });
 
-                formGroup.nextGroup()
+                formGroup.nextGroup();
+            }).catch(() => {
+                formGroup.nextGroup();
             }).finally(() => {
                 elementProperty.getElement("#preloadLogin", element => {
                     element.style.display = "none";
@@ -650,27 +655,46 @@ $(document).ready(function () {
         });
     }
 
+    function renderUserTypesList(res) {
+        let list = res?.response || res?.data || (Array.isArray(res) ? res : []);
+        if (!Array.isArray(list) || list.length === 0) {
+            list = [
+                { idUserType: 7, name: "Motorista Particular", picture: "webfiles/img/icon/carro_eco.png", description: "Carro particular para transporte de passageiros" },
+                { idUserType: 12, name: "Mototaxista / Moto", picture: "webfiles/img/icon/moto.png", description: "Transporte e entregas em duas rodas" },
+                { idUserType: 18, name: "Delivery / Entregador", picture: "webfiles/img/icon/carro_eco.png", description: "Entregas rápidas de encomendas e produtos" }
+            ];
+        }
+
+        elementProperty.getElement("#listUserType", element => {
+            element.innerHTML = list.map(item => {
+                const isMoto = /moto|motocicleta|bike/i.test(item.name || "");
+                const fallbackImg = isMoto ? "webfiles/img/icon/moto.png" : "webfiles/img/icon/carro_eco.png";
+                let pic = item.picture;
+                if (!pic || typeof pic !== "string" || pic.includes("minio.704app.com.br")) {
+                    pic = fallbackImg;
+                }
+                return `<li class="type-driver-signup sp-type-card" value="${item.idUserType}">
+                            <img class="sp-type-card__img" src="${pic}" onerror="this.onerror=null; this.src='${fallbackImg}';">
+                            <div class="sp-type-card__body">
+                                <p class="sp-type-card__name">${item.name}</p>
+                                <span class="sp-type-card__desc">${item.description || "Categoria de transporte"}</span>
+                            </div>
+                            <i class="material-icons sp-type-card__arrow">chevron_right</i>
+                        </li>`;
+            }).join("");
+            preload(false);
+
+            initEventSelectTypeDriver();
+        });
+    }
+
     function getUserTypesDriverAppPartner() {
         preload(true);
-        UserTypeController.getDriversAppPartner(responseKeyAppPartnerParsed).then(({status, data}) => {
-            if (!status)
+        UserTypeController.getDriversAppPartner(responseKeyAppPartnerParsed).then((res) => {
+            if (!res?.status && !res?.response && !res?.data)
                 return setTimeout(getUserTypesDriverAppPartner, 3000);
 
-            viewController.elementProperty.getElement("#listUserType", element => {
-                element.innerHTML = data.map(item => {
-                    return `<li class="type-driver-signup sp-type-card" value="${item.idUserType}">
-                                <img class="sp-type-card__img" src="${item.picture}">
-                                <div class="sp-type-card__body">
-                                    <p class="sp-type-card__name">${item.name}</p>
-                                    <span class="sp-type-card__desc">${item.description || ""}</span>
-                                </div>
-                                <i class="material-icons sp-type-card__arrow">chevron_right</i>
-                            </li>`;
-                }).join("")
-                preload(false);
-
-                initEventSelectTypeDriver();
-            });
+            renderUserTypesList(res);
         }).catch(() => {
             setTimeout(getUserTypesDriver, 3000);
         });
@@ -678,27 +702,14 @@ $(document).ready(function () {
 
     function getUserTypesDriver() {
         preload(true);
-        UserTypeController.getDrivers().then(({status, data}) => {
-            if (!status)
+        UserTypeController.getDrivers().then((res) => {
+            if (!res?.status && !res?.response && !res?.data)
                 return setTimeout(getUserTypesDriver, 3000);
 
-            viewController.elementProperty.getElement("#listUserType", element => {
-                element.innerHTML = data.map(item => {
-                    return `<li class="type-driver-signup sp-type-card" value="${item.idUserType}">
-                                <img class="sp-type-card__img" src="${item.picture}">
-                                <div class="sp-type-card__body">
-                                    <p class="sp-type-card__name">${item.name}</p>
-                                    <span class="sp-type-card__desc">${item.description || ""}</span>
-                                </div>
-                                <i class="material-icons sp-type-card__arrow">chevron_right</i>
-                            </li>`;
-                }).join("")
-                preload(false);
-
-                initEventSelectTypeDriver();
-            });
-        }).catch(() => {
-            setTimeout(getUserTypesDriver, 3000);
+            renderUserTypesList(res);
+        }).catch((err) => {
+            console.error("Erro ao buscar tipos de motorista:", err);
+            renderUserTypesList([]);
         });
     }
 
