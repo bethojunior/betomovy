@@ -53,7 +53,25 @@ export const ContentDrivers = styled.div`
 `;
 
 export const ItemMenuSettings = styled(Menu.Item)`
-  margin-top: -5px;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px !important;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  margin: 2px 4px !important;
+
+  svg {
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background-color: #f1f5f9 !important;
+    color: #0284c7 !important;
+  }
 `;
 
 export const ContentIconSearch = styled.div`

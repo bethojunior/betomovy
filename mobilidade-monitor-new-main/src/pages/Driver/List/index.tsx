@@ -522,8 +522,9 @@ const ListDrivers = () => {
           <ItemMenuSettings
             key="1"
             onClick={() => handlePrepareEditModal(item.idDriver)}
+            style={{ fontWeight: 600, color: "#0284c7" }}
           >
-            <HiPencil /> Editar
+            <HiPencil style={{ fontSize: 16, color: "#0284c7" }} /> Configurações / Editar
           </ItemMenuSettings>
         )}
         {hasPermission(MOTORISTA, "listar") && (

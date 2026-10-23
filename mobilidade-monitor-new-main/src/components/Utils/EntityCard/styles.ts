@@ -62,8 +62,19 @@ export const SettingsButton = styled(Button)`
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #000000;
-  border-color: #000000;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #0284c7;
+    border-color: #0284c7;
+    background-color: #f0f9ff;
+  }
 `;
 
 export const TopRow = styled.div`

@@ -1,25 +1,59 @@
 import { FC, useContext, useEffect, useState } from "react";
-import { Button, Image, Input, Modal, Select } from "antd";
+import { Button, Image, Input, Modal, Select, Steps, Tooltip } from "antd";
 import swal from "sweetalert";
 import { SelectValue } from "antd/lib/select";
 import {
+  UserOutlined,
+  HomeOutlined,
+  CarOutlined,
+  CheckCircleOutlined,
+  ArrowRightOutlined,
+  ArrowLeftOutlined,
+  SaveOutlined,
+  CameraOutlined,
+  EditOutlined,
+  CheckOutlined,
+  IdcardOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  CalendarOutlined,
+  EnvironmentOutlined,
+  SafetyCertificateOutlined,
+} from "@ant-design/icons";
+
+import {
   ContentModalEdit,
-  ModalEditSectionImage,
-  ModalEditStatusDriver,
-  ModalEditSectionInformation,
-  SectionInformation,
-  ModalEditLabel,
+  WizardHeaderBanner,
+  WizardHeaderLeft,
+  WizardHeaderIcon,
+  WizardHeaderTitle,
+  WizardHeaderRight,
+  StepsContainer,
+  FormCard,
+  FormSectionHeader,
+  FormGrid,
+  FieldGroup,
+  FieldLabel,
+  FieldError,
+  PhotoManagerCard,
+  PhotoActionsBox,
+  StatusPill,
+  SummaryOverviewGrid,
+  SummaryCard,
+  SummaryCardHeader,
+  SummaryRow,
+  FooterContainer,
+  FooterActionsRight,
   SelectModalEdit,
   InputPhone,
-  ModalEditSectionAddress,
-  ModalEditSection,
 } from "./styles";
+
 import api from "../../../../services/api";
-import apiv1 from "../../../../services/apiv1";
 import Preload from "../../../Utils/Preload";
 import Alert from "../../../Utils/Alert";
 import Mask from "../../../../services/Mask";
 import Utils from "../../../../utils/Utils";
+import { Constants } from "../../../../utils/constants";
 import cep from "cep-promise";
 
 import { ModalChangedPhoto } from "../ModalChangedPhoto";
@@ -30,16 +64,8 @@ import AuthContext from "../../../../contexts/auth";
 import { ZAFIRA, ZAFIRA_VISUALIZAR_VALIDACAO } from "../../../../constants/permissions";
 import { City, ModalProps } from "./types";
 
-const initialAddress = {
-  zipCode: "",
-  street: "",
-  number: "",
-  complement: "",
-  cityId: "",
-  neighborhood: "",
-};
-
 const { Option } = Select;
+const { Step } = Steps;
 
 const EditDataModal: FC<ModalProps> = ({
   visibility,
@@ -52,6 +78,7 @@ const EditDataModal: FC<ModalProps> = ({
   enableZafiraValidationMonitor,
 }) => {
   const { hasPermission } = useContext(AuthContext);
+  const [currentStep, setCurrentStep] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [messageAlert, setMessageAlert] = useState("");
@@ -276,7 +303,6 @@ const EditDataModal: FC<ModalProps> = ({
       return false;
     } else {
       setValidationErrors((prevErrors) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { dateOfBirth, ...otherErrors } = prevErrors;
         return otherErrors;
       });
@@ -335,8 +361,17 @@ const EditDataModal: FC<ModalProps> = ({
       setValidationErrors(errors);
       setLoading(false);
       setTypeAlert("warning");
-      setMessageAlert("Por favor, preencha todos os campos obrigatórios.");
+      setMessageAlert("Por favor, preencha todos os campos obrigatórios destacados.");
       setShowAlert(true);
+
+      // Auto-navigate to step containing the first error
+      if (errors.name || errors.document || errors.nickname || errors.email || errors.phone || errors.dateOfBirth) {
+        setCurrentStep(0);
+      } else if (errors.zipCode || errors.street || errors.number || errors.neighborhood || errors.cityId) {
+        setCurrentStep(1);
+      } else if (errors.year || errors.plate || errors.model || errors.color || errors.brand || errors.renavam) {
+        setCurrentStep(2);
+      }
       return;
     }
 
@@ -449,14 +484,15 @@ const EditDataModal: FC<ModalProps> = ({
         setMessageAlert(
           Array.isArray(apiMessages) && apiMessages.length > 0
             ? apiMessages.join(" | ")
-            : "Erro ao atualizar os dados, tente novamente"
+            : "Houve um erro ao atualizar os dados, tente novamente mais tarde"
         );
       });
   };
 
-  const handleRequestNewPhoto = (idDriver: number | undefined) => {
+  const handleRequestNewPhoto = (idDriver: number) => {
     swal({
-      title: "Você realmente deseja solicitar uma nova foto?",
+      title: "Solicitar nova foto",
+      text: "Deseja solicitar uma nova foto de perfil para o motorista? O motorista será bloqueado temporariamente até que envie uma nova foto.",
       icon: "info",
       buttons: ["Cancelar", "Confirmar"],
     }).then((answer) => {
@@ -506,6 +542,17 @@ const EditDataModal: FC<ModalProps> = ({
     }
   };
 
+  const driverImgUrl = driverSelected?.profileImage
+    ? (driverSelected.profileImage.startsWith("http")
+        ? driverSelected.profileImage
+        : `${baseImageLink}${driverSelected.profileImage}`)
+    : Constants.defaultImgNotFound;
+
+  const currentCityName =
+    cities.find((c) => String(c.id) === String(editCityId))?.name || "—";
+  const currentUserTypeName =
+    typeOfDriver?.find((t) => Number(t.idUserType) === Number(editTypeOfDriver))?.name || "—";
+
   return (
     <>
       <Preload visible={loading} />
@@ -516,442 +563,670 @@ const EditDataModal: FC<ModalProps> = ({
         typeAlert={typeAlert}
       />
       <Modal
-        title="Edição de dados"
+        title={null}
         visible={visibility}
-        width={800}
+        width={860}
+        centered
+        destroyOnClose={false}
         onCancel={() => {
           handleCloseModal();
           setIfSelectModalEditIsChanged(0);
         }}
-        footer={[
-          <Button
-            key="back"
-            onClick={() => {
-              handleCloseModal();
-              setIfSelectModalEditIsChanged(0);
-            }}
-          >
-            Voltar
-          </Button>,
-          <Button
-            type="primary"
-            key="submit"
-            style={{ marginRight: "10px" }}
-            onClick={() => handleEditDriverData()}
-          >
-            Salvar
-          </Button>,
-        ]}
-      >
-        <ContentModalEdit>
-          <ModalEditSection>
-            <ModalEditSectionImage>
-              <ModalEditStatusDriver status={driverSelected?.registerStatus}>
-                {driverSelected?.registerStatus}
-              </ModalEditStatusDriver>
-              <Image
-                width={200}
-                height={200}
-                style={{ borderRadius: 10, objectFit: "cover" }}
-                src={baseImageLink + driverSelected.profileImage}
-              />
-              <Button
-                onClick={() => handleRequestNewPhoto(driverSelected?.idDriver)}
-                type="link"
-              >
-                Solicitar nova foto
-              </Button>
-              <Button
-                onClick={() => setVisibleProfilePhotoEditModal(true)}
-                type="link"
-              >
-                Editar foto de perfil
-              </Button>
-              {driverSelected.profileImageTemp !== null ? (
+        footer={
+          <FooterContainer>
+            <Button
+              key="back"
+              onClick={() => {
+                handleCloseModal();
+                setIfSelectModalEditIsChanged(0);
+              }}
+            >
+              Cancelar
+            </Button>
+            <FooterActionsRight>
+              {currentStep > 0 && (
                 <Button
-                  onClick={() => setVisibleModalChangePhoto(true)}
-                  type="link"
+                  icon={<ArrowLeftOutlined />}
+                  onClick={() => setCurrentStep((prev) => Math.max(0, prev - 1))}
                 >
-                  Verificar mudança na imagem de perfil
+                  Etapa Anterior
+                </Button>
+              )}
+              {currentStep < 3 ? (
+                <Button
+                  type="primary"
+                  icon={<ArrowRightOutlined />}
+                  onClick={() => setCurrentStep((prev) => Math.min(3, prev + 1))}
+                  style={{ backgroundColor: "#0284c7", borderColor: "#0284c7" }}
+                >
+                  Próxima Etapa
                 </Button>
               ) : null}
-            </ModalEditSectionImage>
-            <ModalEditSectionInformation>
-              <h3>
-                <b>Dados Pessoais</b>
-              </h3>
-              <SectionInformation>
-                <div>
-                  <ModalEditLabel>Nome</ModalEditLabel>
-                  <Input
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    style={{
-                      borderColor: validationErrors.name ? "red" : undefined,
-                    }}
-                  />
-                  {validationErrors.name && (
-                    <p style={{ color: "red" }}>{validationErrors.name}</p>
-                  )}
-                </div>
-                <div>
-                  <ModalEditLabel>CPF/CNPJ</ModalEditLabel>
-                  <Input
-                    maxLength={18}
-                    value={editDocument}
-                    onChange={(e) =>
-                      setEditDocument(Mask.setMaskCPFCNPJ(e.target.value))
-                    }
-                    style={{
-                      borderColor: validationErrors.document
-                        ? "red"
-                        : undefined,
-                    }}
-                  />
-                  {validationErrors.document && (
-                    <p style={{ color: "red" }}>{validationErrors.document}</p>
-                  )}
-                </div>
-              </SectionInformation>
-              <SectionInformation>
-                <div>
-                  <ModalEditLabel>Apelido</ModalEditLabel>
-                  <Input
-                    value={editNickname}
-                    onChange={(e) => setEditNickname(e.target.value)}
-                    style={{
-                      borderColor: validationErrors.nickname
-                        ? "red"
-                        : undefined,
-                    }}
-                  />
-                  {validationErrors.nickname && (
-                    <p style={{ color: "red" }}>{validationErrors.nickname}</p>
-                  )}
-                </div>
-                <div>
-                  <ModalEditLabel>CNH</ModalEditLabel>
-                  <Input
-                    maxLength={11}
-                    value={editCnh}
-                    onChange={(e) => setEditCnh(e.target.value)}
-                    style={{
-                      borderColor: validationErrors.cnh ? "red" : undefined,
-                    }}
-                  />
-                  {validationErrors.cnh && (
-                    <p style={{ color: "red" }}>{validationErrors.cnh}</p>
-                  )}
-                </div>
-              </SectionInformation>
-              <SectionInformation>
-                <div>
-                  <ModalEditLabel>E-mail</ModalEditLabel>
-                  <Input
-                    value={editEmail}
-                    onChange={(e) => setEditEmail(e.target.value)}
-                    style={{
-                      borderColor: validationErrors.email ? "red" : undefined,
-                    }}
-                  />
-                  {validationErrors.email && (
-                    <p style={{ color: "red" }}>{validationErrors.email}</p>
-                  )}
-                </div>
-                <div>
-                  <ModalEditLabel>Telefone</ModalEditLabel>
-                  <InputPhone
-                    value={editPhone}
-                    onChange={(event) =>
-                      setEditPhone(Mask.setMaskPhoneValue(event.target.value))
-                    }
-                    style={{
-                      borderColor: validationErrors.phone ? "red" : undefined,
-                    }}
-                  />
-                  {validationErrors.phone && (
-                    <p style={{ color: "red" }}>{validationErrors.phone}</p>
-                  )}
-                </div>
-              </SectionInformation>
-              <SectionInformation>
-                <div>
-                  <ModalEditLabel>Gênero</ModalEditLabel>
-                  <SelectModalEdit
-                    value={editGender}
-                    onChange={(value) => setEditGender(value as string)}
-                  >
-                    <Option value="feminino">Feminino</Option>
-                    <Option value="masculino">Masculino</Option>
-                  </SelectModalEdit>
-                </div>
-                <div>
-                  <ModalEditLabel>Tipo de motorista</ModalEditLabel>
-                  <SelectModalEdit
-                    value={
-                      editTypeOfDriver !== "" && editTypeOfDriver !== undefined
-                        ? Number(editTypeOfDriver)
-                        : undefined
-                    }
-                    placeholder="Selecione o tipo de motorista"
-                    onChange={(value) => {
-                      setEditTypeOfDriver(value ? Number(value) : "");
-                      setIfSelectModalEditIsChanged(1);
-                    }}
-                  >
-                    {typeOfDriver?.map((item) => (
-                      <Option key={item.idUserType} value={Number(item.idUserType)}>
-                        {item.name}
-                      </Option>
-                    ))}
-                  </SelectModalEdit>
-                </div>
-              </SectionInformation>
-              <SectionInformation>
-                <div>
-                  <ModalEditLabel>Data de Nascimento</ModalEditLabel>
-                  <Input
-                    value={editDateOfBirth}
-                    onChange={(e) => {
-                      const inputDate = e.target.value;
-                      const maskedDate = Mask.setMaskDate(inputDate);
-                      setEditDateOfBirth(maskedDate);
-                      validateDateOfBirth(maskedDate);
-                    }}
-                    style={{
-                      borderColor: validationErrors.dateOfBirth
-                        ? "red"
-                        : undefined,
-                    }}
-                  />
-                  {validationErrors.dateOfBirth && (
-                    <p style={{ color: "red" }}>
-                      {validationErrors.dateOfBirth}
-                    </p>
-                  )}
-                </div>
-              </SectionInformation>
-              <SectionInformation>
-                <div>
-                  <ModalEditLabel>Cidade</ModalEditLabel>
-                  <SelectModalEdit
-                    showSearch
-                    value={editCityId}
-                    onChange={(value) => setEditCityId(value as string)}
-                    placeholder="Selecione uma cidade"
-                    filterOption={(input, option) =>
-                      (option?.children as unknown as string)
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    {cities.map((city) => (
-                      <Option key={city.id} value={city.id}>
-                        {city.name}
-                      </Option>
-                    ))}
-                  </SelectModalEdit>
-                </div>
-              </SectionInformation>
-              {enableZafiraValidationMonitor && hasPermission(ZAFIRA, ZAFIRA_VISUALIZAR_VALIDACAO) && (
-                <SectionInformation>
-                  <ZafiraValidationStatus zafiraValidated={zafiraValidated} />
-                </SectionInformation>
-              )}
+              <Button
+                type="primary"
+                icon={<SaveOutlined />}
+                style={{
+                  backgroundColor: "#10b981",
+                  borderColor: "#10b981",
+                  fontWeight: 600,
+                }}
+                onClick={handleEditDriverData}
+              >
+                Salvar Configurações
+              </Button>
+            </FooterActionsRight>
+          </FooterContainer>
+        }
+      >
+        {/* Wizard Header Banner */}
+        <WizardHeaderBanner>
+          <WizardHeaderLeft>
+            <WizardHeaderIcon>
+              <UserOutlined />
+            </WizardHeaderIcon>
+            <WizardHeaderTitle>
+              <h2>Configurações do Motorista</h2>
+              <p>
+                {driverSelected?.name ? `${driverSelected.name} • ID #${driverSelected.idDriver}` : "Assistente Passo a Passo"}
+              </p>
+            </WizardHeaderTitle>
+          </WizardHeaderLeft>
+          <WizardHeaderRight>
+            <StatusPill status={driverSelected?.registerStatus}>
+              {driverSelected?.registerStatus || "STATUS INDEFINIDO"}
+            </StatusPill>
+          </WizardHeaderRight>
+        </WizardHeaderBanner>
 
-            </ModalEditSectionInformation>
-          </ModalEditSection>
-          <ModalEditSectionAddress>
-            <h3>
-              <b>Endereço</b>
-            </h3>
-            <SectionInformation>
-              <div>
-                <ModalEditLabel>CEP</ModalEditLabel>
-                <Input
-                  value={editZipCode}
-                  onChange={(e) => handleCepChange(e.target.value)}
-                  style={{
-                    borderColor: validationErrors.zipCode ? "red" : undefined,
-                  }}
-                />
-                {validationErrors.zipCode && (
-                  <p style={{ color: "red" }}>{validationErrors.zipCode}</p>
+        {/* Steps Navigation Bar */}
+        <StepsContainer>
+          <Steps current={currentStep} onChange={setCurrentStep} size="small">
+            <Step
+              title="Dados & Perfil"
+              subTitle="Cadastro"
+              icon={<UserOutlined />}
+            />
+            <Step
+              title="Endereço"
+              subTitle="Localização"
+              icon={<HomeOutlined />}
+            />
+            <Step
+              title="Veículo"
+              subTitle="Carro e CNH"
+              icon={<CarOutlined />}
+            />
+            <Step
+              title="Revisão Geral"
+              subTitle="Confirmar"
+              icon={<CheckCircleOutlined />}
+            />
+          </Steps>
+        </StepsContainer>
+
+        <ContentModalEdit>
+          {/* PASSO 1: DADOS PESSOAIS & PERFIL */}
+          {currentStep === 0 && (
+            <div>
+              <PhotoManagerCard>
+                <div>
+                  <Image
+                    width={130}
+                    height={130}
+                    style={{ borderRadius: 10, objectFit: "cover" }}
+                    src={driverImgUrl}
+                    fallback={Constants.defaultImgNotFound}
+                  />
+                </div>
+                <PhotoActionsBox>
+                  <div>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
+                      Gerenciamento de Foto
+                    </span>
+                    <p style={{ margin: "2px 0 8px 0", fontSize: 12, color: "#64748b" }}>
+                      Atualize ou solicite o reenvio da foto oficial de perfil do motorista.
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    <Button
+                      size="small"
+                      icon={<CameraOutlined />}
+                      onClick={() => handleRequestNewPhoto(driverSelected?.idDriver)}
+                    >
+                      Solicitar nova foto
+                    </Button>
+                    <Button
+                      size="small"
+                      icon={<EditOutlined />}
+                      type="primary"
+                      ghost
+                      onClick={() => setVisibleProfilePhotoEditModal(true)}
+                    >
+                      Editar foto de perfil
+                    </Button>
+                    {driverSelected?.profileImageTemp !== null && (
+                      <Button
+                        size="small"
+                        icon={<CheckOutlined />}
+                        type="dashed"
+                        onClick={() => setVisibleModalChangePhoto(true)}
+                      >
+                        Verificar foto temporária
+                      </Button>
+                    )}
+                  </div>
+                </PhotoActionsBox>
+              </PhotoManagerCard>
+
+              <FormCard>
+                <FormSectionHeader>
+                  <IdcardOutlined />
+                  <h3>Identificação e Acesso</h3>
+                  <span>Campos com * são obrigatórios</span>
+                </FormSectionHeader>
+
+                <FormGrid columns={2}>
+                  <FieldGroup>
+                    <FieldLabel>
+                      Nome Completo <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Nome do motorista"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      style={{ borderColor: validationErrors.name ? "red" : undefined }}
+                    />
+                    {validationErrors.name && <FieldError>{validationErrors.name}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      CPF / CNPJ <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      maxLength={18}
+                      placeholder="000.000.000-00"
+                      value={editDocument}
+                      onChange={(e) => setEditDocument(Mask.setMaskCPFCNPJ(e.target.value))}
+                      style={{ borderColor: validationErrors.document ? "red" : undefined }}
+                    />
+                    {validationErrors.document && <FieldError>{validationErrors.document}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Apelido <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Como prefere ser chamado"
+                      value={editNickname}
+                      onChange={(e) => setEditNickname(e.target.value)}
+                      style={{ borderColor: validationErrors.nickname ? "red" : undefined }}
+                    />
+                    {validationErrors.nickname && <FieldError>{validationErrors.nickname}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Número da CNH
+                    </FieldLabel>
+                    <Input
+                      maxLength={11}
+                      placeholder="Registro CNH"
+                      value={editCnh}
+                      onChange={(e) => setEditCnh(e.target.value)}
+                      style={{ borderColor: validationErrors.cnh ? "red" : undefined }}
+                    />
+                    {validationErrors.cnh && <FieldError>{validationErrors.cnh}</FieldError>}
+                  </FieldGroup>
+                </FormGrid>
+              </FormCard>
+
+              <FormCard>
+                <FormSectionHeader>
+                  <PhoneOutlined />
+                  <h3>Contato e Classificação</h3>
+                </FormSectionHeader>
+
+                <FormGrid columns={2}>
+                  <FieldGroup>
+                    <FieldLabel>
+                      E-mail <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="exemplo@email.com"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      style={{ borderColor: validationErrors.email ? "red" : undefined }}
+                    />
+                    {validationErrors.email && <FieldError>{validationErrors.email}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Telefone <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <InputPhone
+                      placeholder="(00) 00000-0000"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(Mask.setMaskPhoneValue(e.target.value))}
+                      style={{ borderColor: validationErrors.phone ? "red" : undefined }}
+                    />
+                    {validationErrors.phone && <FieldError>{validationErrors.phone}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>Gênero</FieldLabel>
+                    <SelectModalEdit
+                      value={editGender}
+                      placeholder="Selecione o gênero"
+                      onChange={(value) => setEditGender(value as string)}
+                    >
+                      <Option value="feminino">Feminino</Option>
+                      <Option value="masculino">Masculino</Option>
+                    </SelectModalEdit>
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>Tipo de Motorista</FieldLabel>
+                    <SelectModalEdit
+                      value={
+                        editTypeOfDriver !== "" && editTypeOfDriver !== undefined
+                          ? Number(editTypeOfDriver)
+                          : undefined
+                      }
+                      placeholder="Selecione a categoria"
+                      onChange={(value) => {
+                        setEditTypeOfDriver(value ? Number(value) : "");
+                        setIfSelectModalEditIsChanged(1);
+                      }}
+                    >
+                      {typeOfDriver?.map((item) => (
+                        <Option key={item.idUserType} value={Number(item.idUserType)}>
+                          {item.name}
+                        </Option>
+                      ))}
+                    </SelectModalEdit>
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Data de Nascimento
+                    </FieldLabel>
+                    <Input
+                      placeholder="DD/MM/AAAA"
+                      value={editDateOfBirth}
+                      onChange={(e) => {
+                        const maskedDate = Mask.setMaskDate(e.target.value);
+                        setEditDateOfBirth(maskedDate);
+                        validateDateOfBirth(maskedDate);
+                      }}
+                      style={{ borderColor: validationErrors.dateOfBirth ? "red" : undefined }}
+                    />
+                    {validationErrors.dateOfBirth && <FieldError>{validationErrors.dateOfBirth}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>Cidade Base</FieldLabel>
+                    <SelectModalEdit
+                      showSearch
+                      value={editCityId || undefined}
+                      onChange={(value) => setEditCityId(value as string)}
+                      placeholder="Selecione a cidade base"
+                      filterOption={(input, option) =>
+                        (option?.children as unknown as string)
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                    >
+                      {cities.map((city) => (
+                        <Option key={city.id} value={city.id}>
+                          {city.name}
+                        </Option>
+                      ))}
+                    </SelectModalEdit>
+                  </FieldGroup>
+                </FormGrid>
+
+                {enableZafiraValidationMonitor && hasPermission(ZAFIRA, ZAFIRA_VISUALIZAR_VALIDACAO) && (
+                  <div style={{ marginTop: 16 }}>
+                    <ZafiraValidationStatus zafiraValidated={zafiraValidated} />
+                  </div>
                 )}
+              </FormCard>
+            </div>
+          )}
+
+          {/* PASSO 2: ENDEREÇO */}
+          {currentStep === 1 && (
+            <div>
+              <FormCard>
+                <FormSectionHeader>
+                  <HomeOutlined />
+                  <h3>Endereço Residencial do Motorista</h3>
+                  <span>Preenchimento automático por CEP</span>
+                </FormSectionHeader>
+
+                <FormGrid columns={3}>
+                  <FieldGroup>
+                    <FieldLabel>
+                      CEP <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="00000-000"
+                      value={editZipCode}
+                      onChange={(e) => handleCepChange(e.target.value)}
+                      style={{ borderColor: validationErrors.zipCode ? "red" : undefined }}
+                    />
+                    {validationErrors.zipCode && <FieldError>{validationErrors.zipCode}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup style={{ gridColumn: "span 2" }}>
+                    <FieldLabel>
+                      Rua / Logradouro <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Avenida, rua, travessa..."
+                      value={editStreet}
+                      onChange={(e) => setEditStreet(e.target.value)}
+                      style={{ borderColor: validationErrors.street ? "red" : undefined }}
+                    />
+                    {validationErrors.street && <FieldError>{validationErrors.street}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Número <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Nº ou S/N"
+                      value={editNumber}
+                      onChange={(e) => setEditNumber(e.target.value)}
+                      style={{ borderColor: validationErrors.number ? "red" : undefined }}
+                    />
+                    {validationErrors.number && <FieldError>{validationErrors.number}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>Complemento</FieldLabel>
+                    <Input
+                      placeholder="Apto, bloco, casa..."
+                      value={editComplement}
+                      onChange={(e) => setEditComplement(e.target.value)}
+                    />
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Bairro <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Bairro"
+                      value={editNeighborhood}
+                      onChange={(e) => setEditNeighborhood(e.target.value)}
+                      style={{ borderColor: validationErrors.neighborhood ? "red" : undefined }}
+                    />
+                    {validationErrors.neighborhood && <FieldError>{validationErrors.neighborhood}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup style={{ gridColumn: "span 3" }}>
+                    <FieldLabel>
+                      Cidade / Município <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <SelectModalEdit
+                      showSearch
+                      value={editCityId || undefined}
+                      onChange={(value) => setEditCityId(value as string)}
+                      placeholder="Selecione a cidade do endereço"
+                      style={{ borderColor: validationErrors.cityId ? "red" : undefined }}
+                      filterOption={(input, option) =>
+                        (option?.children as unknown as string)
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                    >
+                      {cities.map((city) => (
+                        <Option key={city.id} value={city.id}>
+                          {city.name}
+                        </Option>
+                      ))}
+                    </SelectModalEdit>
+                    {validationErrors.cityId && <FieldError>{validationErrors.cityId}</FieldError>}
+                  </FieldGroup>
+                </FormGrid>
+              </FormCard>
+            </div>
+          )}
+
+          {/* PASSO 3: DADOS DO VEÍCULO */}
+          {currentStep === 2 && (
+            <div>
+              <FormCard>
+                <FormSectionHeader>
+                  <CarOutlined />
+                  <h3>Dados do Veículo Vinculado</h3>
+                  <span>Identificação e registro do veículo</span>
+                </FormSectionHeader>
+
+                <FormGrid columns={3}>
+                  <FieldGroup>
+                    <FieldLabel>
+                      Ano do Veículo <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      maxLength={4}
+                      placeholder="Ex: 2021"
+                      value={editYear}
+                      onChange={(e) => setEditYear(e.target.value)}
+                      style={{ borderColor: validationErrors.year ? "red" : undefined }}
+                    />
+                    {validationErrors.year && <FieldError>{validationErrors.year}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Placa <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="ABC1D23 ou ABC-1234"
+                      value={editPlate}
+                      onChange={(e) => {
+                        const maskedPlate = applyPlateMask(e.target.value);
+                        setEditPlate(maskedPlate);
+                      }}
+                      onBlur={() => {
+                        const errors = { ...validationErrors };
+                        if (!validatePlate(editPlate)) {
+                          errors.plate = "Placa inválida.";
+                        } else {
+                          delete errors.plate;
+                        }
+                        setValidationErrors(errors);
+                      }}
+                      style={{ borderColor: validationErrors.plate ? "red" : undefined }}
+                    />
+                    {validationErrors.plate && <FieldError>{validationErrors.plate}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Renavam <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Código Renavam"
+                      value={editRenavam}
+                      onChange={(e) => setEditRenavam(e.target.value)}
+                      style={{ borderColor: validationErrors.renavam ? "red" : undefined }}
+                    />
+                    {validationErrors.renavam && <FieldError>{validationErrors.renavam}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Marca <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Ex: Chevrolet, Toyota..."
+                      value={editBrand}
+                      onChange={(e) => setEditBrand(e.target.value)}
+                      style={{ borderColor: validationErrors.brand ? "red" : undefined }}
+                    />
+                    {validationErrors.brand && <FieldError>{validationErrors.brand}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Modelo <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Ex: Onix Plus, Corolla..."
+                      value={editModel}
+                      onChange={(e) => setEditModel(e.target.value)}
+                      style={{ borderColor: validationErrors.model ? "red" : undefined }}
+                    />
+                    {validationErrors.model && <FieldError>{validationErrors.model}</FieldError>}
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <FieldLabel>
+                      Cor <span style={{ color: "red" }}>*</span>
+                    </FieldLabel>
+                    <Input
+                      placeholder="Ex: Prata, Branco, Preto..."
+                      value={editColor}
+                      onChange={(e) => setEditColor(e.target.value)}
+                      style={{ borderColor: validationErrors.color ? "red" : undefined }}
+                    />
+                    {validationErrors.color && <FieldError>{validationErrors.color}</FieldError>}
+                  </FieldGroup>
+                </FormGrid>
+              </FormCard>
+            </div>
+          )}
+
+          {/* PASSO 4: REVISÃO GERAL */}
+          {currentStep === 3 && (
+            <div>
+              <div style={{ marginBottom: 14 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b" }}>
+                  Revisão das Configurações
+                </span>
+                <p style={{ margin: "2px 0 0 0", fontSize: 12.5, color: "#64748b" }}>
+                  Verifique atentamente os dados antes de gravar as alterações.
+                </p>
               </div>
-              <div>
-                <ModalEditLabel>Rua</ModalEditLabel>
-                <Input
-                  value={editStreet}
-                  onChange={(e) => setEditStreet(e.target.value)}
-                  style={{
-                    borderColor: validationErrors.street ? "red" : undefined,
-                  }}
-                />
-                {validationErrors.street && (
-                  <p style={{ color: "red" }}>{validationErrors.street}</p>
-                )}
-              </div>
-              <div>
-                <ModalEditLabel>Número</ModalEditLabel>
-                <Input
-                  value={editNumber}
-                  onChange={(e) => setEditNumber(e.target.value)}
-                  style={{
-                    borderColor: validationErrors.number ? "red" : undefined,
-                  }}
-                />
-                {validationErrors.number && (
-                  <p style={{ color: "red" }}>{validationErrors.number}</p>
-                )}
-              </div>
-            </SectionInformation>
-            <SectionInformation>
-              <div>
-                <ModalEditLabel>Complemento</ModalEditLabel>
-                <Input
-                  value={editComplement}
-                  onChange={(e) => setEditComplement(e.target.value)}
-                />
-              </div>
-              <div>
-                <ModalEditLabel>Bairro</ModalEditLabel>
-                <Input
-                  value={editNeighborhood}
-                  onChange={(e) => setEditNeighborhood(e.target.value)}
-                  style={{
-                    borderColor: validationErrors.neighborhood
-                      ? "red"
-                      : undefined,
-                  }}
-                />
-                {validationErrors.neighborhood && (
-                  <p style={{ color: "red" }}>
-                    {validationErrors.neighborhood}
-                  </p>
-                )}
-              </div>
-              <div>
-                <ModalEditLabel>Cidade</ModalEditLabel>
-                <SelectModalEdit
-                  value={editCityId}
-                  onChange={(value) => setEditCityId(value as string)}
-                  style={{
-                    borderColor: validationErrors.cityId ? "red" : undefined,
-                  }}
-                >
-                  {cities.map((city) => (
-                    <Option key={city.id} value={city.id}>
-                      {city.name}
-                    </Option>
-                  ))}
-                </SelectModalEdit>
-                {validationErrors.cityId && (
-                  <p style={{ color: "red" }}>{validationErrors.cityId}</p>
-                )}
-              </div>
-            </SectionInformation>
-          </ModalEditSectionAddress>
-          <ModalEditSectionAddress>
-            <h3>
-              <b>Dados do Veículo</b>
-            </h3>
-            <SectionInformation>
-              <div>
-                <ModalEditLabel>Ano</ModalEditLabel>
-                <Input
-                  value={editYear}
-                  onChange={(e) => setEditYear(e.target.value)}
-                  style={{
-                    borderColor: validationErrors.year ? "red" : undefined,
-                  }}
-                />
-                {validationErrors.year && (
-                  <p style={{ color: "red" }}>{validationErrors.year}</p>
-                )}
-              </div>
-              <div>
-                <ModalEditLabel>Placa</ModalEditLabel>
-                <Input
-                  value={editPlate}
-                  onChange={(e) => {
-                    const maskedPlate = applyPlateMask(e.target.value);
-                    setEditPlate(maskedPlate);
-                  }}
-                  onBlur={() => {
-                    const errors = { ...validationErrors };
-                    if (!validatePlate(editPlate)) {
-                      errors.plate = "Placa inválida.";
-                    } else {
-                      delete errors.plate;
-                    }
-                    setValidationErrors(errors);
-                  }}
-                  style={{
-                    borderColor: validationErrors.plate ? "red" : undefined,
-                  }}
-                />
-                {validationErrors.plate && (
-                  <p style={{ color: "red" }}>{validationErrors.plate}</p>
-                )}
-              </div>
-            </SectionInformation>
-            <SectionInformation>
-              <div>
-                <ModalEditLabel>Modelo</ModalEditLabel>
-                <Input
-                  value={editModel}
-                  onChange={(e) => setEditModel(e.target.value)}
-                  style={{
-                    borderColor: validationErrors.model ? "red" : undefined,
-                  }}
-                />
-                {validationErrors.model && (
-                  <p style={{ color: "red" }}>{validationErrors.model}</p>
-                )}
-              </div>
-              <div>
-                <ModalEditLabel>Cor</ModalEditLabel>
-                <Input
-                  value={editColor}
-                  onChange={(e) => setEditColor(e.target.value)}
-                  style={{
-                    borderColor: validationErrors.color ? "red" : undefined,
-                  }}
-                />
-                {validationErrors.color && (
-                  <p style={{ color: "red" }}>{validationErrors.color}</p>
-                )}
-              </div>
-              <div>
-                <ModalEditLabel>Marca</ModalEditLabel>
-                <Input
-                  value={editBrand}
-                  onChange={(e) => setEditBrand(e.target.value)}
-                  style={{
-                    borderColor: validationErrors.brand ? "red" : undefined,
-                  }}
-                />
-                {validationErrors.brand && (
-                  <p style={{ color: "red" }}>{validationErrors.brand}</p>
-                )}
-              </div>
-              <div>
-                <ModalEditLabel>Renavam</ModalEditLabel>
-                <Input
-                  value={editRenavam}
-                  onChange={(e) => setEditRenavam(e.target.value)}
-                  style={{
-                    borderColor: validationErrors.renavam ? "red" : undefined,
-                  }}
-                />
-                {validationErrors.renavam && (
-                  <p style={{ color: "red" }}>{validationErrors.renavam}</p>
-                )}
-              </div>
-            </SectionInformation>
-          </ModalEditSectionAddress>
+
+              <SummaryOverviewGrid>
+                {/* Card 1: Motorista */}
+                <SummaryCard>
+                  <SummaryCardHeader>
+                    <h4>
+                      <UserOutlined /> Dados Pessoais
+                    </h4>
+                    <Button size="small" type="link" onClick={() => setCurrentStep(0)}>
+                      Editar
+                    </Button>
+                  </SummaryCardHeader>
+                  <SummaryRow>
+                    <span className="label">Nome:</span>
+                    <span className="val">{editName || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">CPF/CNPJ:</span>
+                    <span className="val">{editDocument || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Telefone:</span>
+                    <span className="val">{editPhone || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">E-mail:</span>
+                    <span className="val">{editEmail || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Tipo:</span>
+                    <span className="val">{currentUserTypeName}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">CNH:</span>
+                    <span className="val">{editCnh || "—"}</span>
+                  </SummaryRow>
+                </SummaryCard>
+
+                {/* Card 2: Endereço */}
+                <SummaryCard>
+                  <SummaryCardHeader>
+                    <h4>
+                      <HomeOutlined /> Endereço
+                    </h4>
+                    <Button size="small" type="link" onClick={() => setCurrentStep(1)}>
+                      Editar
+                    </Button>
+                  </SummaryCardHeader>
+                  <SummaryRow>
+                    <span className="label">CEP:</span>
+                    <span className="val">{editZipCode || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Logradouro:</span>
+                    <span className="val">{editStreet ? `${editStreet}, ${editNumber || "S/N"}` : "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Complemento:</span>
+                    <span className="val">{editComplement || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Bairro:</span>
+                    <span className="val">{editNeighborhood || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Cidade:</span>
+                    <span className="val">{currentCityName}</span>
+                  </SummaryRow>
+                </SummaryCard>
+
+                {/* Card 3: Veículo */}
+                <SummaryCard>
+                  <SummaryCardHeader>
+                    <h4>
+                      <CarOutlined /> Veículo
+                    </h4>
+                    <Button size="small" type="link" onClick={() => setCurrentStep(2)}>
+                      Editar
+                    </Button>
+                  </SummaryCardHeader>
+                  <SummaryRow>
+                    <span className="label">Marca:</span>
+                    <span className="val">{editBrand || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Modelo:</span>
+                    <span className="val">{editModel || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Ano:</span>
+                    <span className="val">{editYear || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Placa:</span>
+                    <span className="val" style={{ fontWeight: 700, color: "#0284c7" }}>
+                      {editPlate || "—"}
+                    </span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Cor:</span>
+                    <span className="val">{editColor || "—"}</span>
+                  </SummaryRow>
+                  <SummaryRow>
+                    <span className="label">Renavam:</span>
+                    <span className="val">{editRenavam || "—"}</span>
+                  </SummaryRow>
+                </SummaryCard>
+              </SummaryOverviewGrid>
+            </div>
+          )}
         </ContentModalEdit>
+
         <ModalChangedPhoto
           handlePrepareEditModal={handlePrepareEditModal}
           visible={visibleModalChangePhoto}
@@ -964,7 +1239,7 @@ const EditDataModal: FC<ModalProps> = ({
             onClose={() => setVisibleProfilePhotoEditModal(false)}
             entityType="driver"
             entityId={driverSelected.idDriver}
-            currentImageUrl={baseImageLink + driverSelected.profileImage}
+            currentImageUrl={driverImgUrl}
             onSuccess={() => handlePrepareEditModal(driverSelected.idDriver)}
           />
         )}

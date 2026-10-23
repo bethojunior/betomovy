@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-23 19:22 UTC - fix code 50 on driver save, virtual generated columns, and default.jpg fallbacks
+# Deploy trigger: 2026-10-23 19:59 UTC - new step-by-step wizard layout for driver configuration modal
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
