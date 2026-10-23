@@ -80,6 +80,14 @@ const EditDataModal: FC<ModalProps> = ({
   const [editColor, setEditColor] = useState<string>("");
   const [editBrand, setEditBrand] = useState<string>("");
   const [editRenavam, setEditRenavam] = useState<string>("");
+  const [addressBaseline, setAddressBaseline] = useState({
+    zipCode: "",
+    street: "",
+    number: "",
+    complement: "",
+    cityId: "" as SelectValue,
+    neighborhood: "",
+  });
 
   const originalFields = {
     name: driverSelected?.name || "",
@@ -195,20 +203,44 @@ const EditDataModal: FC<ModalProps> = ({
       setEditDocument(driverSelected?.document || "");
       setEditCnh(driverSelected?.cnh || "");
       setEditGender(driverSelected?.gender || "");
-      setEditTypeOfDriver(driverSelected?.userTypeId || "");
+      setEditTypeOfDriver(
+        driverSelected?.userTypeId !== undefined && driverSelected?.userTypeId !== null && driverSelected?.userTypeId !== ""
+          ? Number(driverSelected.userTypeId)
+          : ""
+      );
+      setIfSelectModalEditIsChanged(0);
       setEditDateOfBirth(
         driverSelected?.dateOfBirth
           ? Utils.formatDateFromBackend(driverSelected.dateOfBirth)
           : ""
       );
 
-      if (driverSelected?.driver_address) {
-        setEditZipCode(driverSelected.driver_address.zipCode || "");
-        setEditStreet(driverSelected.driver_address.street || "");
-        setEditNumber(driverSelected.driver_address.number || "");
-        setEditComplement(driverSelected.driver_address.complement || "");
-        setEditNeighborhood(driverSelected.driver_address.neighborhood || "");
+      const addr = driverSelected?.driver_address || {};
+      const zip = addr.zipCode || driverSelected?.zipCode || "";
+      const street = addr.street || driverSelected?.street || "";
+      const num = addr.number || driverSelected?.number || "";
+      const comp = addr.complement || driverSelected?.complement || "";
+      const neigh = addr.neighborhood || driverSelected?.neighborhood || "";
+      const dCityId = driverSelected?.cityId ? Number(driverSelected.cityId) : "";
+
+      if (dCityId) {
+        setEditCityId(dCityId);
       }
+
+      setEditZipCode(zip);
+      setEditStreet(street);
+      setEditNumber(num);
+      setEditComplement(comp);
+      setEditNeighborhood(neigh);
+
+      setAddressBaseline({
+        zipCode: zip,
+        street: street,
+        number: num,
+        complement: comp,
+        neighborhood: neigh,
+        cityId: dCityId,
+      });
 
       setEditYear(driverSelected?.year || "");
       setEditPlate(driverSelected?.plate || "");
@@ -310,25 +342,6 @@ const EditDataModal: FC<ModalProps> = ({
 
     setValidationErrors({});
 
-    if (ifSelectModalEditIsChanged) {
-      apiv1
-        .put(`user/${driverSelected?.userId}/changeType`, {
-          userId: driverSelected?.userId,
-          userTypeId: editTypeOfDriver?.toString(),
-        })
-        .then((result) => {
-          if (!result.data.status) {
-            setLoading(false);
-            setTypeAlert("error");
-            setShowAlert(true);
-            return setMessageAlert(
-              "Não foi possível alterar o tipo de motorista"
-            );
-          }
-          return "";
-        });
-    }
-
     const updateDriverInfo = () => {
       const formattedDateOfBirth = editDateOfBirth
         ? Utils.formatDateToBackend(editDateOfBirth)
@@ -343,20 +356,31 @@ const EditDataModal: FC<ModalProps> = ({
         nickname: editNickname,
         phone: editPhone,
         dateOfBirth: formattedDateOfBirth,
+        userTypeId: editTypeOfDriver ? Number(editTypeOfDriver) : null,
         ...(editCityId ? { cityId: Number(editCityId) } : {}),
       };
 
       return api.put(`driver/${driverSelected?.idDriver}`, payload);
     };
 
+    const updateDriverType = () => {
+      if (ifSelectModalEditIsChanged && editTypeOfDriver) {
+        return api.put(`user/${driverSelected?.userId}/changeType`, {
+          userId: driverSelected?.userId,
+          userTypeId: editTypeOfDriver?.toString(),
+        });
+      }
+      return Promise.resolve({ data: { status: true } });
+    };
+
     const verifyAddressChange = () => {
       return (
-        initialAddress.zipCode !== editZipCode ||
-        initialAddress.street !== editStreet ||
-        initialAddress.number !== editNumber ||
-        initialAddress.complement !== editComplement ||
-        initialAddress.cityId !== editCityId ||
-        initialAddress.neighborhood !== editNeighborhood
+        addressBaseline.zipCode !== editZipCode ||
+        addressBaseline.street !== editStreet ||
+        addressBaseline.number !== editNumber ||
+        addressBaseline.complement !== editComplement ||
+        addressBaseline.cityId !== editCityId ||
+        addressBaseline.neighborhood !== editNeighborhood
       );
     };
 
@@ -375,6 +399,9 @@ const EditDataModal: FC<ModalProps> = ({
     };
 
     const updateCarInfo = () => {
+      if (!driverSelected?.idCar || Number(driverSelected.idCar) <= 0) {
+        return Promise.resolve({ data: { status: true } });
+      }
       return api.put(`car/${driverSelected.idCar}`, {
         year: editYear,
         plate: editPlate,
@@ -385,7 +412,12 @@ const EditDataModal: FC<ModalProps> = ({
       });
     };
 
-    const promises = [updateDriverInfo(), updateAddress(), updateCarInfo()];
+    const promises = [
+      updateDriverInfo(),
+      updateAddress(),
+      updateCarInfo(),
+      updateDriverType(),
+    ];
 
     Promise.all(promises)
       .then((results) => {
@@ -453,23 +485,23 @@ const EditDataModal: FC<ModalProps> = ({
 
   const handleCepChange = (cepValue: string) => {
     setEditZipCode(cepValue);
-    if (cepValue.length === 8) {
-      cep(cepValue)
+    const cleanDigits = cepValue.replace(/\D/g, "");
+    if (cleanDigits.length === 8) {
+      cep(cleanDigits)
         .then((address) => {
-          setEditStreet(address.street);
-          setEditNeighborhood(address.neighborhood);
-          const city = cities.find((city) => city.name === address.city);
-          if (city) {
-            setEditCityId(city.id);
+          if (address.street) setEditStreet(address.street);
+          if (address.neighborhood) setEditNeighborhood(address.neighborhood);
+          if (address.city && cities.length > 0) {
+            const city = cities.find(
+              (c) => c.name.toLowerCase() === address.city.toLowerCase()
+            );
+            if (city) {
+              setEditCityId(city.id);
+            }
           }
         })
         .catch((error) => {
-          console.error("Erro ao buscar o endereço:", error);
-          setShowAlert(true);
-          setTypeAlert("error");
-          setMessageAlert(
-            "Erro ao buscar o endereço. Verifique o CEP e tente novamente."
-          );
+          console.warn("CEP não encontrado:", error);
         });
     }
   };
@@ -656,19 +688,22 @@ const EditDataModal: FC<ModalProps> = ({
                 <div>
                   <ModalEditLabel>Tipo de motorista</ModalEditLabel>
                   <SelectModalEdit
-                    value={editTypeOfDriver}
+                    value={
+                      editTypeOfDriver !== "" && editTypeOfDriver !== undefined
+                        ? Number(editTypeOfDriver)
+                        : undefined
+                    }
+                    placeholder="Selecione o tipo de motorista"
                     onChange={(value) => {
-                      setEditTypeOfDriver(value as string);
+                      setEditTypeOfDriver(value ? Number(value) : "");
                       setIfSelectModalEditIsChanged(1);
                     }}
                   >
-                    {typeOfDriver?.map((item) => {
-                      return (
-                        <Option key={item.idUserType} value={item.idUserType}>
-                          {item.name}
-                        </Option>
-                      );
-                    })}
+                    {typeOfDriver?.map((item) => (
+                      <Option key={item.idUserType} value={Number(item.idUserType)}>
+                        {item.name}
+                      </Option>
+                    ))}
                   </SelectModalEdit>
                 </div>
               </SectionInformation>

@@ -388,4 +388,70 @@ class UserController extends ApiController
             ]);
         }
     }
+
+    public function actionChangeType()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $userId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true) ?: [];
+
+            if (!$userId) {
+                $userId = (int)($data['id'] ?? $data['userId'] ?? 0);
+            }
+
+            $userTypeId = (int)($data['userTypeId'] ?? 0);
+
+            if ($userId <= 0) {
+                throw new Exception("ID do usuário inválido");
+            }
+            if ($userTypeId <= 0) {
+                throw new Exception("Tipo de usuário inválido");
+            }
+
+            // Validar se o userType existe
+            $stmtType = $pdo->prepare("SELECT idUserType, name FROM userType WHERE idUserType = :id LIMIT 1");
+            $stmtType->execute([':id' => $userTypeId]);
+            $typeRow = $stmtType->fetch(\PDO::FETCH_ASSOC);
+            if (!$typeRow) {
+                throw new Exception("Tipo de motorista/usuário não encontrado");
+            }
+
+            // Atualizar ou inserir em levelAccess
+            $stmtCheck = $pdo->prepare("SELECT idLevelAccess FROM levelAccess WHERE userId = :userId LIMIT 1");
+            $stmtCheck->execute([':userId' => $userId]);
+            $laId = $stmtCheck->fetchColumn();
+
+            if ($laId) {
+                $stmtUp = $pdo->prepare("UPDATE levelAccess SET userTypeId = :userTypeId WHERE idLevelAccess = :id");
+                $stmtUp->execute([':userTypeId' => $userTypeId, ':id' => $laId]);
+            } else {
+                $stmtIns = $pdo->prepare("INSERT INTO levelAccess (userId, userTypeId) VALUES (:userId, :userTypeId)");
+                $stmtIns->execute([':userId' => $userId, ':userTypeId' => $userTypeId]);
+            }
+
+            // Atualiza data de modificação do usuário
+            $stmtUser = $pdo->prepare("UPDATE user SET updated_at = NOW() WHERE idUser = :userId");
+            $stmtUser->execute([':userId' => $userId]);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => true,
+                'message' => 'Tipo do usuário alterado com sucesso',
+                'response' => [
+                    'userId' => $userId,
+                    'userTypeId' => $userTypeId,
+                    'userTypeName' => $typeRow['name']
+                ]
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => false,
+                'message' => 'Não foi possível alterar o tipo do usuário: ' . $e->getMessage(),
+                'response' => false
+            ]);
+        }
+    }
 }

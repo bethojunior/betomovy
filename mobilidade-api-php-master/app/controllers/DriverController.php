@@ -702,6 +702,11 @@ class DriverController extends ApiController
             // If a specific ID is requested in route (e.g. /driver/123)
             $driverId = $_GET['id'] ?? null;
             if ($driverId && is_numeric($driverId)) {
+                $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+                if ($method === 'PUT') {
+                    $this->handleUpdateDriver($pdo, (int)$driverId);
+                    return;
+                }
                 $driver = $this->findDriverDetail($pdo, (int)$driverId);
                 echo $this->returnSuccess('Motorista encontrado', $driver);
                 return;
@@ -906,14 +911,19 @@ class DriverController extends ApiController
                 coalesce(car.plate, '') as plate,
                 coalesce(car.color, '') as color,
                 coalesce(car.year, '') as year,
+                coalesce(car.renavam, '') as renavam,
                 coalesce(driver.crlv, '') as crlv,
                 coalesce(driver.crlvPicture, '') as crlvPicture,
                 coalesce(balance.balance, 0) as balance,
                 coalesce(balance.blockedBalance, 0) as blockedBalance,
                 coalesce(city.nome, '') as city,
-                coalesce(drs.name, 'Pendente') as registerStatus
+                coalesce(drs.name, 'Pendente') as registerStatus,
+                coalesce(levelAccess.userTypeId, 7) as userTypeId,
+                coalesce(userType.name, 'MOTORISTA PARTICULAR') as userType
             FROM driver
             JOIN user ON driver.userId = user.idUser
+            LEFT JOIN levelAccess ON user.idUser = levelAccess.userId
+            LEFT JOIN userType ON levelAccess.userTypeId = userType.idUserType
             LEFT JOIN car ON driver.idDriver = car.driverId AND car.deleted_at IS NULL
             LEFT JOIN balance ON driver.balanceId = balance.idBalance
             LEFT JOIN city ON driver.cityId = city.id
@@ -927,6 +937,33 @@ class DriverController extends ApiController
 
         if (!$driver) {
             throw new \Exception("Motorista não encontrado");
+        }
+
+        $driver['userTypeId'] = (int)($driver['userTypeId'] ?? 7);
+
+        // Buscar endereço do motorista
+        $stmtAddr = $pdo->prepare("SELECT * FROM driverAddress WHERE driverId = :driverId AND deleted_at IS NULL ORDER BY id DESC LIMIT 1");
+        $stmtAddr->execute([':driverId' => $driverId]);
+        $addr = $stmtAddr->fetch(PDO::FETCH_ASSOC);
+
+        if ($addr) {
+            $driver['driver_address'] = [
+                'id' => (int)$addr['id'],
+                'zipCode' => $addr['zipCode'] ?? '',
+                'street' => $addr['street'] ?? '',
+                'number' => $addr['number'] ?? '',
+                'neighborhood' => $addr['neighborhood'] ?? '',
+                'complement' => $addr['complement'] ?? '',
+                'city' => $addr['city'] ?? '',
+                'state' => $addr['state'] ?? '',
+            ];
+            $driver['zipCode'] = $addr['zipCode'] ?? '';
+            $driver['street'] = $addr['street'] ?? '';
+            $driver['number'] = $addr['number'] ?? '';
+            $driver['neighborhood'] = $addr['neighborhood'] ?? '';
+            $driver['complement'] = $addr['complement'] ?? '';
+        } else {
+            $driver['driver_address'] = null;
         }
 
         // Buscar documentos fornecidos do motorista
@@ -986,6 +1023,198 @@ class DriverController extends ApiController
         $driver['idUser'] = (int)$driver['userId'];
 
         return $driver;
+    }
+
+    /**
+     * Atualiza dados cadastrais do motorista e usuário associado
+     */
+    private function handleUpdateDriver(PDO $pdo, int $driverId)
+    {
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true) ?: [];
+
+        $stmtDriver = $pdo->prepare("SELECT idDriver, userId, cityId FROM driver WHERE idDriver = :id LIMIT 1");
+        $stmtDriver->execute([':id' => $driverId]);
+        $currDriver = $stmtDriver->fetch(PDO::FETCH_ASSOC);
+
+        if (!$currDriver) {
+            throw new \Exception("Motorista não encontrado");
+        }
+
+        $userId = (int)$currDriver['userId'];
+
+        // Atualizar driver
+        $driverUpdates = [];
+        $driverParams = [':id' => $driverId];
+
+        if (array_key_exists('cnh', $data)) {
+            $driverUpdates[] = "cnh = :cnh";
+            $driverParams[':cnh'] = $data['cnh'];
+        }
+        if (!empty($data['cityId'])) {
+            $driverUpdates[] = "cityId = :cityId";
+            $driverParams[':cityId'] = (int)$data['cityId'];
+        }
+
+        if (!empty($driverUpdates)) {
+            $sqlD = "UPDATE driver SET " . implode(', ', $driverUpdates) . " WHERE idDriver = :id";
+            $stmtD = $pdo->prepare($sqlD);
+            $stmtD->execute($driverParams);
+        }
+
+        // Atualizar user
+        $userUpdates = ["updated_at = NOW()"];
+        $userParams = [':userId' => $userId];
+
+        if (isset($data['name'])) {
+            $userUpdates[] = "name = :name";
+            $userParams[':name'] = trim((string)$data['name']);
+        }
+        if (isset($data['nickname'])) {
+            $userUpdates[] = "nickname = :nickname";
+            $userParams[':nickname'] = trim((string)$data['nickname']);
+        }
+        if (isset($data['email'])) {
+            $userUpdates[] = "email = :email";
+            $userParams[':email'] = trim((string)$data['email']);
+        }
+        if (isset($data['phone'])) {
+            $cleanPhone = preg_replace('/\D/', '', (string)$data['phone']);
+            $userUpdates[] = "phone = :phone";
+            $userUpdates[] = "phone_digits = :phoneDig";
+            $userParams[':phone'] = trim((string)$data['phone']);
+            $userParams[':phoneDig'] = $cleanPhone;
+        }
+        if (isset($data['document'])) {
+            $cleanDoc = preg_replace('/\D/', '', (string)$data['document']);
+            $userUpdates[] = "document = :doc";
+            $userUpdates[] = "document_digits = :docDig";
+            $userParams[':doc'] = trim((string)$data['document']);
+            $userParams[':docDig'] = $cleanDoc;
+        }
+        if (isset($data['gender'])) {
+            $userUpdates[] = "gender = :gender";
+            $userParams[':gender'] = $data['gender'];
+        }
+        if (isset($data['dateOfBirth'])) {
+            $userUpdates[] = "dateOfBirth = :dob";
+            $userParams[':dob'] = $data['dateOfBirth'] ? date('Y-m-d', strtotime($data['dateOfBirth'])) : null;
+        }
+        if (!empty($data['cityId'])) {
+            $userUpdates[] = "cityId = :userCityId";
+            $userParams[':userCityId'] = (int)$data['cityId'];
+        }
+
+        $sqlU = "UPDATE user SET " . implode(', ', $userUpdates) . " WHERE idUser = :userId";
+        $stmtU = $pdo->prepare($sqlU);
+        $stmtU->execute($userParams);
+
+        // Se veio userTypeId, atualiza levelAccess
+        if (!empty($data['userTypeId'])) {
+            $uTypeId = (int)$data['userTypeId'];
+            $stmtChkLa = $pdo->prepare("SELECT idLevelAccess FROM levelAccess WHERE userId = :userId LIMIT 1");
+            $stmtChkLa->execute([':userId' => $userId]);
+            $laId = $stmtChkLa->fetchColumn();
+
+            if ($laId) {
+                $pdo->prepare("UPDATE levelAccess SET userTypeId = :ut WHERE idLevelAccess = :id")
+                    ->execute([':ut' => $uTypeId, ':id' => $laId]);
+            } else {
+                $pdo->prepare("INSERT INTO levelAccess (userId, userTypeId) VALUES (:userId, :ut)")
+                    ->execute([':userId' => $userId, ':ut' => $uTypeId]);
+            }
+        }
+
+        echo $this->returnSuccess('Dados do motorista atualizados com sucesso', $this->findDriverDetail($pdo, $driverId));
+    }
+
+    /**
+     * POST /driver/:id/address
+     */
+    public function actionAddress()
+    {
+        try {
+            $pdo = \app\utils\Connection::open();
+            $driverId = (int)($_GET['id'] ?? 0);
+            if (!$driverId) {
+                throw new \Exception("ID do motorista não informado");
+            }
+
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true) ?: [];
+
+            $zipCode = preg_replace('/\D/', '', (string)($data['zipCode'] ?? ''));
+            $street = trim((string)($data['street'] ?? ''));
+            $number = trim((string)($data['number'] ?? ''));
+            $neighborhood = trim((string)($data['neighborhood'] ?? ''));
+            $complement = trim((string)($data['complement'] ?? ''));
+            $cityId = !empty($data['cityId']) ? (int)$data['cityId'] : null;
+
+            $cityName = '';
+            $state = '';
+            if ($cityId) {
+                $stmtCity = $pdo->prepare("SELECT c.nome, e.sigla FROM city c LEFT JOIN estate e ON c.estado = e.id WHERE c.id = :id LIMIT 1");
+                $stmtCity->execute([':id' => $cityId]);
+                $cRow = $stmtCity->fetch(PDO::FETCH_ASSOC);
+                if ($cRow) {
+                    $cityName = $cRow['nome'];
+                    $state = $cRow['sigla'] ?? '';
+                }
+            }
+
+            $stmtCheck = $pdo->prepare("SELECT id FROM driverAddress WHERE driverId = :driverId AND deleted_at IS NULL LIMIT 1");
+            $stmtCheck->execute([':driverId' => $driverId]);
+            $addrId = $stmtCheck->fetchColumn();
+
+            if ($addrId) {
+                $stmtUp = $pdo->prepare("
+                    UPDATE driverAddress 
+                    SET zipCode = :zipCode,
+                        street = :street,
+                        number = :number,
+                        neighborhood = :neighborhood,
+                        complement = :complement,
+                        city = COALESCE(NULLIF(:city, ''), city),
+                        state = COALESCE(NULLIF(:state, ''), state),
+                        updated_at = NOW()
+                    WHERE id = :id
+                ");
+                $stmtUp->execute([
+                    ':zipCode' => $zipCode,
+                    ':street' => $street,
+                    ':number' => $number,
+                    ':neighborhood' => $neighborhood,
+                    ':complement' => $complement,
+                    ':city' => $cityName,
+                    ':state' => $state,
+                    ':id' => $addrId
+                ]);
+            } else {
+                $stmtIns = $pdo->prepare("
+                    INSERT INTO driverAddress (driverId, zipCode, street, number, neighborhood, complement, city, state, created_at, updated_at)
+                    VALUES (:driverId, :zipCode, :street, :number, :neighborhood, :complement, :city, :state, NOW(), NOW())
+                ");
+                $stmtIns->execute([
+                    ':driverId' => $driverId,
+                    ':zipCode' => $zipCode,
+                    ':street' => $street,
+                    ':number' => $number,
+                    ':neighborhood' => $neighborhood,
+                    ':complement' => $complement,
+                    ':city' => $cityName,
+                    ':state' => $state
+                ]);
+            }
+
+            if ($cityId) {
+                $pdo->prepare("UPDATE driver SET cityId = :cityId WHERE idDriver = :driverId")
+                    ->execute([':cityId' => $cityId, ':driverId' => $driverId]);
+            }
+
+            echo $this->returnSuccess('Endereço atualizado com sucesso');
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao atualizar endereço');
+        }
     }
 
     /**

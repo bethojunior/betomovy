@@ -13,6 +13,81 @@ use Exception;
  */
 class CarController extends ApiController
 {
+    public function actionIndex()
+    {
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        $idCar = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+        if ($method === 'PUT' && $idCar > 0) {
+            try {
+                $conn = \app\utils\Connection::open();
+                $raw = file_get_contents('php://input');
+                $data = json_decode($raw, true) ?: [];
+
+                $updates = [];
+                $params = [':idCar' => $idCar];
+
+                if (isset($data['year'])) {
+                    $updates[] = "year = :year";
+                    $params[':year'] = trim((string)$data['year']);
+                }
+                if (isset($data['plate'])) {
+                    $cleanPlate = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string)$data['plate']));
+                    $updates[] = "plate = :plate";
+                    $params[':plate'] = $cleanPlate;
+                }
+                if (isset($data['model'])) {
+                    $updates[] = "model = :model";
+                    $params[':model'] = trim((string)$data['model']);
+                }
+                if (isset($data['color'])) {
+                    $updates[] = "color = :color";
+                    $params[':color'] = trim((string)$data['color']);
+                }
+                if (isset($data['brand'])) {
+                    $updates[] = "brand = :brand";
+                    $params[':brand'] = trim((string)$data['brand']);
+                }
+                if (isset($data['renavam'])) {
+                    $updates[] = "renavam = :renavam";
+                    $params[':renavam'] = trim((string)$data['renavam']);
+                }
+
+                if (!empty($updates)) {
+                    $updates[] = "updated_at = NOW()";
+                    $sql = "UPDATE car SET " . implode(', ', $updates) . " WHERE idCar = :idCar";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute($params);
+                }
+
+                $stmtSelect = $conn->prepare("SELECT * FROM car WHERE idCar = :idCar LIMIT 1");
+                $stmtSelect->execute([':idCar' => $idCar]);
+                $updatedCar = $stmtSelect->fetch(\PDO::FETCH_ASSOC);
+
+                echo $this->returnSuccess("Dados do veículo atualizados com sucesso", $updatedCar);
+                return;
+            } catch (\Throwable $e) {
+                echo $this->returnError($e, "Erro ao atualizar dados do veículo");
+                return;
+            }
+        }
+
+        if ($idCar > 0) {
+            try {
+                $conn = \app\utils\Connection::open();
+                $stmt = $conn->prepare("SELECT * FROM car WHERE idCar = :idCar LIMIT 1");
+                $stmt->execute([':idCar' => $idCar]);
+                $car = $stmt->fetch(\PDO::FETCH_ASSOC);
+                echo $this->returnSuccess("Carro encontrado", $car);
+                return;
+            } catch (\Throwable $e) {
+                echo $this->returnError($e);
+                return;
+            }
+        }
+
+        $this->actionGetAll();
+    }
     public function actionInsert()
     {
         try {
