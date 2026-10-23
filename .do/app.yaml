@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-23 11:55 UTC - restore car image for deliveries category
+# Deploy trigger: 2026-10-23 12:24 UTC - apply blue car for delivery and private drive, yellow car for central taxi
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

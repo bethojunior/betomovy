@@ -659,16 +659,16 @@ $(document).ready(function () {
         let list = res?.response || res?.data || (Array.isArray(res) ? res : []);
         if (!Array.isArray(list) || list.length === 0) {
             list = [
-                { idUserType: 7, name: "Motorista Particular", picture: "webfiles/img/icon/carro_eco.png", description: "Carro particular para transporte de passageiros" },
+                { idUserType: 7, name: "Motorista Particular", picture: "webfiles/img/icon/carro_drive.png", description: "Carro particular para transporte de passageiros" },
                 { idUserType: 12, name: "Mototaxista / Moto", picture: "webfiles/img/icon/moto.png", description: "Transporte e entregas em duas rodas" },
-                { idUserType: 18, name: "Delivery / Entregador", picture: "webfiles/img/icon/carro_eco.png", description: "Entregas rápidas de encomendas e produtos" }
+                { idUserType: 18, name: "Delivery / Entregador", picture: "webfiles/img/icon/carro_drive.png", description: "Entregas rápidas de encomendas e produtos" }
             ];
         }
 
         elementProperty.getElement("#listUserType", element => {
             element.innerHTML = list.map(item => {
                 const isMoto = /moto|motocicleta|bike/i.test(item.name || "");
-                const fallbackImg = isMoto ? "webfiles/img/icon/moto.png" : "webfiles/img/icon/carro_eco.png";
+                const fallbackImg = isMoto ? "webfiles/img/icon/moto.png" : "webfiles/img/icon/carro_drive.png";
                 let pic = item.picture;
                 if (!pic || typeof pic !== "string" || pic.includes("minio.704app.com.br")) {
                     pic = fallbackImg;

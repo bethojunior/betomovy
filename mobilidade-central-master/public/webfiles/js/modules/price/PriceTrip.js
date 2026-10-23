@@ -254,10 +254,15 @@ class PriceTrip {
             const tagText = object.tag || object.name || object.priceName || '';
             const tagBg = object.color ? `background-color: ${object.color}` : 'background-color: #333';
             
-            // Resolucao robusta da imagem do tipo de viagem (carro como padrao, moto apenas se explicitamente mototaxi/moto)
+            // Resolucao robusta da imagem do tipo de viagem:
+            // Central = carro amarelo (carro_eco.png)
+            // Entregas / Particular / Drive = carro azul (carro_drive.png)
+            // Moto = moto.png
             let rawPicture = object.picture || (object.tripType && object.tripType.picture) || '';
+            const isCentral = /central/i.test(tagText) || /central/i.test(object.type || '');
             const isMoto = /\bmoto\b|mototaxi|motocicleta|motoboy/i.test(tagText) || /\bmoto\b/i.test(String(rawPicture));
-            const defaultImg = isMoto ? 'webfiles/img/icon/moto.png' : 'webfiles/img/icon/carro_eco.png';
+            const defaultCarImg = isCentral ? 'webfiles/img/icon/carro_eco.png' : 'webfiles/img/icon/carro_drive.png';
+            const defaultImg = isMoto ? 'webfiles/img/icon/moto.png' : defaultCarImg;
             let pictureUrl = defaultImg;
 
             if (rawPicture && typeof rawPicture === 'string') {

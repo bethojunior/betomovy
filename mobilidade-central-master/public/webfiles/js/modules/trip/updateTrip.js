@@ -232,9 +232,12 @@ function populateSearchDriverCard(data) {
     try {
         const typeTaxi = managerTrip?.typeTaxi || {};
         const categoryName = typeTaxi.priceName || typeTaxi.name || "Movy";
+        const isCentral = /central/i.test(categoryName) || /central/i.test(typeTaxi.type || '');
         const isMoto = /\bmoto\b|mototaxi|motocicleta|motoboy/i.test(categoryName) || 
                        /\bmoto\b/i.test(String(typeTaxi.picture || '')) ||
                        /\bmoto\b/i.test(String(data?.tripTypeId || ''));
+        const defaultCarImg = isCentral ? "webfiles/img/icon/carro_eco.png" : "webfiles/img/icon/carro_drive.png";
+        const vehicleDefault = isMoto ? "webfiles/img/icon/moto.png" : defaultCarImg;
 
         const vehicleImgEl = document.getElementById("searchTripVehicleImg");
         if (vehicleImgEl) {
@@ -244,11 +247,11 @@ function populateSearchDriverCard(data) {
             } else if (pic && typeof pic === "string" && (pic.startsWith("http") || pic.startsWith("webfiles/"))) {
                 vehicleImgEl.src = pic;
             } else {
-                vehicleImgEl.src = "webfiles/img/icon/carro_eco.png";
+                vehicleImgEl.src = defaultCarImg;
             }
             vehicleImgEl.onerror = function() {
                 this.onerror = null;
-                this.src = isMoto ? "webfiles/img/icon/moto.png" : "webfiles/img/icon/carro_eco.png";
+                this.src = vehicleDefault;
             };
         }
 
