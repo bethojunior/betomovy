@@ -259,7 +259,7 @@ export const Config = () => {
           paymentFormId: 1,
         },
         {
-          isActive: pix,
+          isActive: 0,
           paymentFormId: 4,
         },
       ])
@@ -531,13 +531,7 @@ export const Config = () => {
                 >
                   Cartão
                 </Checkbox>
-                <Checkbox
-                  key={2}
-                  checked={pix === 1}
-                  onChange={(e) => setPix(e.target.checked === true ? 1 : 0)}
-                >
-                  Pix
-                </Checkbox>
+
               </div>
               <Button
                 style={{

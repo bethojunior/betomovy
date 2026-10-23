@@ -28,7 +28,6 @@
                         <div class="vc-pay-header">
                             <div class="vc-pay-tabs">
                                 <button class="vc-pay-tab form-payment-button btn-flipper" id="btn-card">Cartão</button>
-                                <button class="vc-pay-tab form-payment-button btn-flipper" id="btn-pix">PIX</button>
                             </div>
                             <span class="value-label"></span>
                         </div>

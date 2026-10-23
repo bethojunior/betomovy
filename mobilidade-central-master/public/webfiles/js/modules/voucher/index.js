@@ -62,47 +62,24 @@ document.addEventListener("DOMContentLoaded",function () {
             });
 
             elementProperty.addEventInElement('.buyVoucher', 'onclick', function() {
-                preload(true);
-
-                CentralVoucherPurchasePaymentController.getVoucherPurchasePaymentForms().then(result => {
-                    if (result.response) {
-                        result.response.forEach((item) => {
-                            if (item.paymentFormId === 1 && item.isActive) {
-                                document.querySelector("#btn-card").style.display = 'block';
-                            } else if (item.paymentFormId === 1 && !item.isActive) {
-                                document.querySelector("#btn-card").style.display = 'none';
-                                document.querySelector(".front").style.display = 'none';
-                                document.querySelector('.flipper').style.transform = 'rotateY(180deg)';
-                            } else if (item.paymentFormId === 4 && item.isActive) {
-                                document.querySelector("#btn-pix").style.display = 'block';
-                            } else if (item.paymentFormId === 4 && !item.isActive) {
-                                document.querySelector("#btn-pix").style.display = 'none';
-                            }
-                        });
-                    }
-                });
-
                 const data = JSON.parse(this.getAttribute("data"));
+                typePayment = 'card';
 
-                VoucherController.generateChargePix(data.value, central.responsibleId, data.amount).then(({status, response}) => {
-                    preload(false);
-                    if(!status){
-                        return SwalCustom.messageDialog('Recarregue a página e tente novamente', 'Não foi possível gerar o pagamento via pix', undefined, 'error');
-                    }
+                if (document.querySelector("#btn-pix")) {
+                    document.querySelector("#btn-pix").style.display = 'none';
+                }
+                if (document.querySelector("#btn-card")) {
+                    document.querySelector("#btn-card").style.display = 'block';
+                }
+                if (document.querySelector(".front")) {
+                    document.querySelector(".front").style.display = 'block';
+                }
+                if (document.querySelector('.flipper')) {
+                    document.querySelector('.flipper').style.transform = '';
+                }
 
-                    cobrancePixId = response.pedido.id;
-
-                    document.querySelector('#pixCopyAndPaste').innerHTML = response.pedido.qrCodePix;
-                    document.querySelector('#qrCodeImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(response.pedido.qrCodePix)}`;
-
-                    document.querySelector('.value-label').innerHTML = `Valor: <b>${Mask.maskMoney(parseFloat(data.value))}</b>`
-                    $("#buyVoucherModal").modal("show");
-
-                }).catch(() => {
-                    setTimeout(() => {
-                        SwalCustom.messageDialog('Recarregue a página e tente novamente', 'Estamos com problema para gerar sua cobrança em pix', (preload(false)), "error");
-                    }, 10000);
-                });
+                document.querySelector('.value-label').innerHTML = `Valor: <b>${Mask.maskMoney(parseFloat(data.value))}</b>`;
+                $("#buyVoucherModal").modal("show");
 
                 elementProperty.addEventInElement('.btn-finish', 'onclick', function() {
                     preload(true);
@@ -158,11 +135,6 @@ document.addEventListener("DOMContentLoaded",function () {
             })
         }).finally(() => {
             preload(false)
-        });
-
-        elementProperty.addEventInElement('#btn-pix', 'onclick', function() {
-            document.querySelector('.flipper').style.transform = 'rotateY(180deg)';
-            typePayment = 'pix';
         });
 
         elementProperty.addEventInElement('#btn-card', 'onclick', function() {

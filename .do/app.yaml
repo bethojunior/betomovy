@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-23 14:20 UTC - comprehensive audit fixes for monitor, central, driver positions and trip details
+# Deploy trigger: 2026-10-23 14:45 UTC - remove pix from payment methods across central, monitor and api
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

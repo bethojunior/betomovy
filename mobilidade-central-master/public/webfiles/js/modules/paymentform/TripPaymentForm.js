@@ -9,6 +9,10 @@ document.addEventListener("DOMContentLoaded",function () {
 function getPaymentFormSelect(element) {
     const paymentForm = JSON.parse(element.getAttribute("payment"));
 
+    if (paymentForm && paymentForm.name) {
+        paymentForm.name = paymentForm.name.replace(/\s*(ou|\/|\+)?\s*pix\b/gi, '').trim() || paymentForm.name;
+    }
+
     Session.setLocal("paymentForm", paymentForm);
 
     closePaymentForm();
@@ -85,9 +89,18 @@ function closePaymentForm() {
 }
 
 function showPaymentForm() {
-    const paymentForm = Session.getLocal("paymentForm");
+    let paymentForm = Session.getLocal("paymentForm");
 
-    if (paymentForm.length !== 0) {
+    if (paymentForm && typeof paymentForm === "object" && !Array.isArray(paymentForm)) {
+        const name = (paymentForm.name || '').toLowerCase();
+        if (name.includes('pix') || paymentForm.paymentFormTypeId === 12) {
+            Session.delete("paymentForm");
+            paymentForm = null;
+        }
+    }
+
+    if (paymentForm && paymentForm.length !== 0 && paymentForm.name) {
+        paymentForm.name = paymentForm.name.replace(/\s*(ou|\/|\+)?\s*pix\b/gi, '').trim() || paymentForm.name;
         viewController.elementProperty.getElement("#namePaymentForm", element => {
             element.innerHTML = paymentForm.name;
         });
@@ -192,9 +205,27 @@ function getPaymentForm(callback) {
             return;
 
         viewController.elementProperty.getElement(".list-payment-forms", element => {
-            element.innerHTML = response.filter(payment =>  {
-                return payment.paymentFormTypeId === 2 || payment.paymentFormTypeId === 4 ||payment.paymentFormTypeId === 11
+            const rawList = Array.isArray(response) ? response : [];
+            const filteredPayments = rawList.filter(payment => {
+                if (!payment) return false;
+                const name = (payment.name || '').toLowerCase();
+                const desc = (payment.description || '').toLowerCase();
+
+                // Bloquear terminantemente qualquer forma de pagamento PIX
+                if (name.includes('pix') || desc.includes('pix')) return false;
+                if (payment.paymentFormTypeId === 12) return false;
+
+                // Permitir apenas Dinheiro (2), Pagamento no Local (4) e Voucher Central (11)
+                return payment.paymentFormTypeId === 2 || payment.paymentFormTypeId === 4 || payment.paymentFormTypeId === 11;
             }).map(payment => {
+                let cleanName = (payment.name || '').replace(/\s*(ou|\/|\+)?\s*pix\b/gi, '').trim();
+                return {
+                    ...payment,
+                    name: cleanName || payment.name
+                };
+            });
+
+            element.innerHTML = filteredPayments.map(payment => {
                 return `<li class="payment-form-trip" 
                             value="${payment.idTripPaymentForm}" 
                             payment='${JSON.stringify(payment)}'>

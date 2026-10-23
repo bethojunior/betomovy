@@ -50,23 +50,41 @@ class TripPaymentFormController extends ApiController
             ");
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $result = array_map(function ($row) {
-                return [
+            $result = [];
+            foreach ($rows as $row) {
+                $rawName = trim($row['name'] ?? '');
+                $nameLower = strtolower($rawName);
+                $typeId = (int)($row['paymentFormTypeId'] ?? 0);
+
+                // Excluir terminantemente formas de pagamento PIX
+                if ($typeId === 12 || $nameLower === 'pix' || preg_match('/^\s*pix\s*$/i', $rawName)) {
+                    continue;
+                }
+
+                // Normalizar caso haja menção como "Dinheiro ou Pix" ou "Dinheiro / Pix"
+                $cleanName = trim(preg_replace('/\s*(ou|\/|\+)?\s*pix\b/i', '', $rawName));
+                if (empty($cleanName)) {
+                    continue; // Se só sobrava pix, exclui
+                }
+
+                $cleanDesc = trim(preg_replace('/\s*(ou|\/|\+)?\s*pix\b/i', '', $row['typeDescription'] ?? $cleanName));
+
+                $result[] = [
                     'idTripPaymentForm' => (int)$row['idTripPaymentForm'],
-                    'name' => $row['name'],
-                    'paymentFormTypeId' => (int)$row['paymentFormTypeId'],
+                    'name' => $cleanName,
+                    'paymentFormTypeId' => $typeId,
                     'active' => (int)$row['active'],
                     'statusId' => (int)$row['statusId'],
-                    'description' => $row['typeDescription'] ?? $row['name'],
+                    'description' => $cleanDesc ?: $cleanName,
                     'payment_form_type' => [
-                        'id' => (int)($row['typeId'] ?: $row['paymentFormTypeId']),
-                        'name' => $row['typeName'] ?? $row['name'],
-                        'description' => $row['typeDescription'] ?? $row['name'],
+                        'id' => (int)($row['typeId'] ?: $typeId),
+                        'name' => $cleanName,
+                        'description' => $cleanDesc ?: $cleanName,
                         'showable' => (int)($row['showable'] ?? 1),
                         'isGeneral' => (int)($row['isGeneral'] ?? 0),
                     ]
                 ];
-            }, $rows);
+            }
 
             echo $this->returnSuccess("Listando formas de pagamento da viagem", $result);
         } catch (Exception $e) {

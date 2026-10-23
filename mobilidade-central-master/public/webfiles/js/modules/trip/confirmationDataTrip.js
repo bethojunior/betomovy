@@ -99,7 +99,9 @@ function getTravelCustomer(trip, customer) {
 
     const paymentFormEl = document.getElementById("namePaymentForm");
     elementProperty.getElement("#paymentCustomerTripConfirmation", element => {
-        element.innerHTML = (paymentFormEl && paymentFormEl.innerText.trim()) ? paymentFormEl.innerText.trim() : "Dinheiro";
+        let payText = (paymentFormEl && paymentFormEl.innerText.trim()) ? paymentFormEl.innerText.trim() : "Dinheiro";
+        payText = payText.replace(/\s*(ou|\/|\+)?\s*pix\b/gi, '').trim();
+        element.innerHTML = payText || "Dinheiro";
     });
 
     elementProperty.getElement("#routeTrip", element => {
