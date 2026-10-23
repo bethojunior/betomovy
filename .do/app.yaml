@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-23 12:24 UTC - apply blue car for delivery and private drive, yellow car for central taxi
+# Deploy trigger: 2026-10-23 12:41 UTC - harmonize central and delivery vehicle cards alignment and baselines
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
