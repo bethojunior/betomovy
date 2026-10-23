@@ -217,6 +217,8 @@ return [
         '/paymentformtype/getall',
         '/customer/central',
         '/customer/central/',
+        '/user',
+        '/user/',
         '/user/central',
         '/user/central/',
         '/dashboard',
