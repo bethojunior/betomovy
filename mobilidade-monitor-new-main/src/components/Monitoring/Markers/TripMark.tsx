@@ -119,14 +119,14 @@ export const TripMark = (props: TripMarkProps) => {
 
   const getTripLineCor = (status: string) => {
     if ([TripStatus.STATUS_SEARCHING_FAVORITE, TripStatus.STATUS_SEARCHING].includes(status))
-      return 'rgba(27, 183, 245, 0.356)'
+      return '#0284c7'
     if ([TripStatus.STATUS_BOARDING, TripStatus.STATUS_ACCEPTED].includes(status))
-      return 'rgba(255, 187, 1, 0.39)'
+      return '#f59e0b'
     if (status === TripStatus.STATUS_IN_PROGRESS || 
         status === 'corrida' || 
-        status === 'in_progress') return 'rgba(47, 238, 56, 0.5)'
-    if (status === 'scheduled') return 'rgba(27, 183, 245, 0.356)'
-    return 'rgba(27, 183, 245, 0.356)'
+        status === 'in_progress') return '#22c55e'
+    if (status === 'scheduled') return '#0284c7'
+    return '#0284c7'
   }
 
   const hasValidCoordinates = (lat: number | string, lng: number | string) => {
@@ -269,7 +269,7 @@ export const TripMark = (props: TripMarkProps) => {
                 }}
                 paint={{
                   'line-color': getTripLineCor(props.tripStatus),
-                  'line-width': 1.4
+                  'line-width': 3.5
                 }}
               />
             )
