@@ -350,6 +350,7 @@ const TripCard: FC<TripCardProps> = ({ tripReference, tripData }) => {
     const driverEntries = Object.entries(groupedByDriver)
       .map(([driverId, calls]) => {
         const lastCall = calls.reduce((prev: any, curr: any) => ((curr.id ?? 0) > (prev.id ?? 0) ? curr : prev))
+        const firstCall = calls.reduce((prev: any, curr: any) => ((curr.id ?? 0) < (prev.id ?? 0) ? curr : prev))
         const driverName = lastCall.name || lastCall.nickname || `Motorista #${driverId}`
         const count = calls.length || lastCall.touched || 1
         const rawStatus = (lastCall.status as DriverCalledStatus) || 'default'
@@ -364,21 +365,21 @@ const TripCard: FC<TripCardProps> = ({ tripReference, tripData }) => {
           status,
           proximity,
           formattedDistance: formatProximity(proximity),
+          firstCallId: Number(firstCall?.id ?? 0),
         }
       })
       .filter(Boolean)
 
-    // Ordenação: primeiro quem está chamando (verde), seguido pelos mais próximos (menor distância)
+    // Ordenação: pela ordem cronológica de chamada (primeiro motorista chamado à esquerda, próximo à direita)
     const sortedDrivers = driverEntries.sort((a, b) => {
-      if (a.status === 'calling' && b.status !== 'calling') return -1
-      if (b.status === 'calling' && a.status !== 'calling') return 1
-      const proxA = a.proximity ?? 999999
-      const proxB = b.proximity ?? 999999
-      return proxA - proxB
+      if (a.firstCallId && b.firstCallId) {
+        return a.firstCallId - b.firstCallId
+      }
+      return 0
     })
 
-    // Exibe os motoristas mais perto (mínimo 2)
-    const displayedDrivers = sortedDrivers.slice(0, Math.max(2, sortedDrivers.filter((d) => d.status === 'calling').length))
+    // Exibe os motoristas chamados (mantém pelo menos 2 se disponíveis)
+    const displayedDrivers = sortedDrivers.slice(0, Math.max(2, sortedDrivers.length))
 
     return (
       <S.DriversCalledContainer>

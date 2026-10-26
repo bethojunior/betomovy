@@ -705,277 +705,66 @@ div.pac-container>.pac-item>span {
 
 .search-driver-in-trip>div {
     position: fixed;
-    bottom: -400px;
-    width: 92%;
-    max-width: 440px;
+    top: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 360px;
     margin: 0 auto;
     display: block;
     background-color: #ffffff;
-    padding: 16px 20px 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(0, 0, 0, 0.08);
-    transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 1051;
     pointer-events: auto;
     text-align: center;
-    overflow: hidden;
-}
-
-.search-driver-in-trip>div::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, #000000, #04F3FA, transparent);
-    animation: search-radar-line 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes search-radar-line {
-    0% { left: -100%; }
-    100% { left: 100%; }
 }
 
 .search-driver-in-trip.active>div {
-    bottom: 24px;
-}
-
-/* Pulsing radar wrapper with vehicle image */
-.search-pulse-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 4px auto 8px;
-    width: 72px;
-    height: 72px;
-}
-
-.search-pulse-ring {
-    position: absolute;
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    border: 2px solid rgba(0, 0, 0, 0.12);
-    animation: pulse-ring 2s infinite ease-out;
-}
-
-@keyframes pulse-ring {
-    0% {
-        transform: scale(0.85);
-        opacity: 0.8;
-    }
-    50% {
-        transform: scale(1.18);
-        opacity: 0.2;
-    }
-    100% {
-        transform: scale(0.85);
-        opacity: 0.8;
-    }
-}
-
-.search-vehicle-img-box {
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    z-index: 2;
-}
-
-.search-vehicle-img {
-    max-width: 44px;
-    max-height: 44px;
-    object-fit: contain;
-}
-
-.search-trip-info-header {
-    margin-bottom: 10px;
-}
-
-.search-category-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 12px;
-    background: #0f172a;
-    color: #ffffff;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
+    display: block;
 }
 
 .search-driver-in-trip>div>p,
 #pharseTrip {
-    margin: 4px 0 0;
-    font-size: 14.5px;
-    font-weight: 700;
-    color: #0f172a;
-    line-height: 1.35;
-    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #1f2937;
+    line-height: 1.4;
+    text-align: center;
 }
 
-/* Meta stats row */
-.search-trip-meta-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 8px 12px;
-    margin: 10px 0;
-    gap: 6px;
-}
-
-.search-meta-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-}
-
-.search-meta-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-bottom: 2px;
-    white-space: nowrap;
-}
-
-.search-meta-val {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: #0f172a;
-    white-space: nowrap;
-}
-
-#searchTripPriceValue {
-    color: #059669;
-    font-size: 14px;
-}
-
-/* Route preview */
-.search-trip-route-preview {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 7px 12px;
-    margin-bottom: 12px;
-    text-align: left;
-}
-
-.route-line-decor {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 30px;
-    padding: 2px 0;
-}
-
-.dot-origin {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #10b981;
-}
-
-.route-dash {
-    width: 1px;
-    flex: 1;
-    background: #cbd5e1;
-    margin: 2px 0;
-}
-
-.dot-dest {
-    width: 7px;
-    height: 7px;
-    border-radius: 2px;
-    background: #0f172a;
-}
-
-.route-texts {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-    min-width: 0;
-}
-
-.route-txt-origin,
-.route-txt-dest {
-    margin: 0;
-    font-size: 11.5px;
-    color: #475569;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
-}
-
-.route-txt-dest {
-    font-weight: 600;
-    color: #0f172a;
-}
-
-.search-driver-in-trip>div>button {
+.search-driver-in-trip>div>button,
+.search-driver-in-trip button.cancel-search-trip {
     width: 100%;
-    border: 1.5px solid #fecaca;
-    height: 44px;
-    font-size: 13px;
+    border: none;
+    height: 40px;
+    font-size: 14px;
     font-weight: 700;
-    letter-spacing: 0.3px;
-    background-color: #ffffff;
-    color: #dc2626 !important;
-    border-radius: 9999px;
+    letter-spacing: 0.5px;
+    background-color: #111827;
+    color: #ffffff !important;
+    border-radius: 6px;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    text-transform: uppercase;
 }
 
-.search-driver-in-trip>div>button:hover {
-    background-color: #fef2f2 !important;
-    border-color: #dc2626 !important;
-    color: #b91c1c !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.16);
+.search-driver-in-trip>div>button:hover,
+.search-driver-in-trip button.cancel-search-trip:hover {
+    background-color: #000000 !important;
+    color: #ffffff !important;
 }
 
-.search-driver-in-trip>div>button:active {
+.search-driver-in-trip>div>button:active,
+.search-driver-in-trip button.cancel-search-trip:active {
     transform: translateY(1px);
-}
-
-/* Garante que os botões de ação e o footer monitor não colidam com a busca ativa */
-body:has(.search-driver-in-trip.active) .btn-call-trip,
-body:has(.search-driver-in-trip.active) .footer-monitoring-trip,
-body:has(.trip-client.active) .btn-call-trip,
-body:has(.trip-client.active) .footer-monitoring-trip,
-.search-driver-in-trip.active ~ .btn-call-trip,
-.search-driver-in-trip.active ~ .footer-monitoring-trip {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
 }
 
 .container-search-driver {
@@ -1355,8 +1144,8 @@ body:has(.trip-client.active) .footer-monitoring-trip,
 @media (min-width: 992px) {
 
     .search-driver-in-trip.active>div {
-        bottom: 32px;
-        top: unset;
+        top: 75px;
+        bottom: unset;
     }
 
     div.pac-container>.pac-item {
@@ -1616,23 +1405,21 @@ body:has(.trip-client.active) .footer-monitoring-trip,
     }
 
     .search-driver-in-trip>div {
-        width: 380px;
-        max-width: 90%;
-        padding: 20px 18px;
-        border-radius: 16px;
+        width: 360px;
+        padding: 16px 20px;
+        border-radius: 8px;
     }
 
     .search-driver-in-trip>div>p {
-        font-size: 16px;
-        margin: 0 0 16px;
+        font-size: 15px;
+        margin: 0 0 12px;
         text-align: center;
     }
 
     .search-driver-in-trip>div>button {
-        padding: 0 16px;
-        font-size: 15px;
-        height: 48px;
-        border-radius: 24px;
+        height: 40px;
+        font-size: 14px;
+        border-radius: 6px;
         width: 100%;
         display: flex;
         align-items: center;

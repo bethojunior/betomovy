@@ -389,10 +389,10 @@ export const DriversCalledSection = styled.div`
 `
 
 enum DriversCalledBackgrounds {
-  'default' = 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
-  'not_answered' = 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
-  'refused' = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-  'calling' = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+  'default' = '#aaaaaa',
+  'not_answered' = '#8c8c89',
+  'refused' = '#ee4839',
+  'calling' = '#269900'
 }
 
 interface DriversCalledProps {
@@ -400,35 +400,27 @@ interface DriversCalledProps {
 }
 
 export const DriversCalled = styled.div<DriversCalledProps>`
+  background-color: ${({ status }) => (status ? DriversCalledBackgrounds[status] : '#8c8c89')};
+  color: ${({ status }) => (status === 'calling' ? '#fff' : '#000')};
+  padding: 2px 4px;
+  text-align: center;
+  border-radius: 5px;
+  width: 100px;
+  min-width: 100px;
+  height: 60px;
+  font-size: 15px;
+  box-shadow: #808080 1px 1px 5px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-width: 116px;
-  max-width: 140px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  text-align: center;
-  transition: all 0.25s ease;
   cursor: default;
   user-select: none;
-  background: ${({ status }) => (status ? DriversCalledBackgrounds[status] : DriversCalledBackgrounds.default)};
-  color: #ffffff;
-  border: 1px solid ${({ status }) => (status === 'calling' ? '#15803d' : 'rgba(255, 255, 255, 0.25)')};
-  box-shadow: ${({ status }) =>
-    status === 'calling'
-      ? '0 0 14px rgba(34, 197, 94, 0.45), 0 3px 6px rgba(0, 0, 0, 0.12)'
-      : '0 2px 4px rgba(0, 0, 0, 0.08)'};
+  box-sizing: border-box;
 
-  ${({ status }) =>
-    status === 'calling' &&
-    `
-    transform: translateY(-2px) scale(1.03);
-  `}
-
-  @media (max-width: 360px) {
-    min-width: 95px;
-    padding: 6px 8px;
+  @media (max-width: 320px) {
+    width: 85px;
+    min-width: 85px;
   }
 `
 
@@ -437,32 +429,32 @@ export const DriversCalledText = styled.p`
   width: 100%;
   padding: 0;
   text-align: center;
-  color: #ffffff;
-  font-size: 13px;
+  color: inherit;
+  font-size: 13.5px;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 
-  @media (max-width: 360px) {
-    font-size: 11.5px;
+  @media (max-width: 320px) {
+    font-size: 12px;
   }
 `
 
 export const DriversCalledSubtext = styled.span`
-  margin-top: 3px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: inherit;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  letter-spacing: 0.2px;
+  gap: 2px;
+  line-height: 1.2;
 
-  @media (max-width: 360px) {
-    font-size: 10px;
+  @media (max-width: 320px) {
+    font-size: 10.5px;
   }
 `
 

@@ -24,8 +24,7 @@ function updateBtnCallTripVisibility() {
         return;
     }
 
-    const shouldHide = isFooterActive || isAddressSearchActive || isAddressPanelActive || 
-                       isTripSidebarActive || isSearchingDriverActive || isTripClientActive || isTripInProgress;
+    const shouldHide = isFooterActive || isAddressSearchActive || isAddressPanelActive || isTripSidebarActive;
     const method = shouldHide ? "addClass" : "removeClass";
     elementProperty[method](".btn-call-trip", "active");
 
