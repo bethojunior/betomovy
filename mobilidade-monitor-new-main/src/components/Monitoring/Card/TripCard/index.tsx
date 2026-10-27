@@ -265,14 +265,14 @@ const TripCard: FC<TripCardProps> = ({ tripReference, tripData }) => {
 
 
   const renderDriversCalled = () => {
-    const rawDriversCalled =
+    const baseDriversCalled =
       (Array.isArray(trip?.driversCalled) && trip.driversCalled.length > 0 ? trip.driversCalled : null) ||
       (Array.isArray((trip as any)?.driverCalleds) && (trip as any).driverCalleds.length > 0 ? (trip as any).driverCalleds : null) ||
       (Array.isArray(tripData?.driversCalled) && tripData.driversCalled.length > 0 ? tripData.driversCalled : null) ||
       (Array.isArray((tripData as any)?.driverCalleds) && (tripData as any).driverCalleds.length > 0 ? (tripData as any).driverCalleds : null) ||
       []
 
-    if (!config.showDriversCalled || rawDriversCalled.length === 0) return null
+    if (!config.showDriversCalled) return null
 
     type DriverCalledStatus = 'default' | 'not_answered' | 'refused' | 'calling'
 
@@ -299,6 +299,24 @@ const TripCard: FC<TripCardProps> = ({ tripReference, tripData }) => {
       callingDriverIds.add(String((rawCalling as any).idDriver ?? (rawCalling as any).driverId ?? (rawCalling as any).id ?? ''))
     }
     callingDriverIds.delete('')
+
+    // Se a lista de chamadas ainda não carregou do backend mas há callingDriver ativo, cria entrada sintética para exibir o botão imediatamente
+    const rawDriversCalled = [...baseDriversCalled]
+    if (rawDriversCalled.length === 0 && callingDriverIds.size > 0) {
+      Array.from(callingDriverIds).forEach((id, index) => {
+        rawDriversCalled.push({
+          id: index + 1,
+          driverId: id,
+          name: 'Motorista',
+          nickname: 'Motorista',
+          status: 'calling',
+          touched: 1,
+          proximity: null,
+        })
+      })
+    }
+
+    if (rawDriversCalled.length === 0) return null
 
     const resolveDriverCalledStatus = (
       driverId: number | string | null | undefined,

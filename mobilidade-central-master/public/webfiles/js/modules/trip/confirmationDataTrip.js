@@ -124,7 +124,6 @@ function getTravelCustomer(trip, customer) {
 
     elementProperty.addEventInElement("#btnConfirmationTrip", "onclick", function () {
         elementProperty.removeClass(".modal-confirmation-data-trip", "active");
-        if (typeof mapService !== "undefined") mapService.resetToCentralView();
         const haveReturn = document.querySelector("#haveReturnTrip").checked
         trip.haveReturn = document.querySelector("#haveReturnTrip").checked ? 1 : 0
         trip.tripCustomer = {

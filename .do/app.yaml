@@ -45,7 +45,7 @@ services:
       - key: APIAPP_HOST
         value: https://api.movymob.com/
       - key: API_SOCKET_HOST
-        value: https://movymob.com/ws/
+        value: https://socket.movymob.com/
       - key: APP_PARTNER
         value: "true"
       - key: BUCKET_NAME
@@ -115,7 +115,7 @@ services:
       - key: S3_URL
         value: https://s3-sa-east-1.amazonaws.com/
       - key: API_SOCKET_URL
-        value: https://movymob.com/ws/
+        value: https://socket.movymob.com
       - key: APP_NAME
         value: Movy
       - key: ADMIN704APPS_API_URL

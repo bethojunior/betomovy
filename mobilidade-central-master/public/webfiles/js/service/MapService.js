@@ -471,8 +471,9 @@ class MapService {
             this.pointCustomer = null;
         }
 
-        this._removeRouteLayer(this._routeSourceId, this._routeLayerId);
-        this._routeAdded = false;
+        // Preserva a rota visível no mapa durante a busca pelo motorista conforme o vídeo de referência
+        // this._removeRouteLayer(this._routeSourceId, this._routeLayerId);
+        // this._routeAdded = false;
 
         const position = {
             lat: parseFloat(trip.origin.latitude),

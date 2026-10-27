@@ -256,7 +256,8 @@ function initSearchTrip(data) {
     managerTripViewCurrent.isVisible = true;
     managerTrip.tripCurrent = data;
 
-    mapService.removeRoute();
+    // Preserva a rota e os marcadores de origem/destino desenhados no mapa conforme vídeo de referência
+    // mapService.removeRoute();
 
     viewController.elementProperty.removeClass(".footer-container-trip", "active");
     updateBtnCallTripVisibility();
