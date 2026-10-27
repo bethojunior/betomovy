@@ -194,6 +194,36 @@ class TripDao extends BaseDao
                 }
             }
 
+            // 3.1 Resolve Zone (Required for tripDrivers and driver search)
+            if (empty($data->zoneId) && !empty($data->cityId)) {
+                try {
+                    $zoneRow = \app\dao\GenericDao::first(
+                        "SELECT idZone FROM zone WHERE cityId = :cityId AND statusId = 1 ORDER BY `order` ASC LIMIT 1",
+                        [':cityId' => $data->cityId]
+                    );
+                    if ($zoneRow && !empty($zoneRow['idZone'])) {
+                        $data->zoneId = (int)$zoneRow['idZone'];
+                    } else {
+                        \app\dao\GenericDao::execute(
+                            "INSERT INTO zone (`order`, `name`, `radius`, `time`, `cityId`, `statusId`, `callClose`, `allowsFavorite`, `greaterRadius`, `created_at`, `updated_at`, `radiusReturn`) VALUES (1, 'Zona Geral', 15.0, 30, :cityId, 1, 0, 1, 30.0, NOW(), NOW(), 1.00)",
+                            [':cityId' => $data->cityId]
+                        );
+                        $newZone = \app\dao\GenericDao::first("SELECT idZone FROM zone WHERE cityId = :cityId ORDER BY idZone DESC LIMIT 1", [':cityId' => $data->cityId]);
+                        if ($newZone && !empty($newZone['idZone'])) {
+                            $data->zoneId = (int)$newZone['idZone'];
+                        }
+                    }
+                } catch (\Throwable $t) {}
+            }
+            if (empty($data->zoneId)) {
+                try {
+                    $fallbackZone = \app\dao\GenericDao::first("SELECT idZone FROM zone WHERE statusId = 1 LIMIT 1");
+                    if ($fallbackZone && !empty($fallbackZone['idZone'])) {
+                        $data->zoneId = (int)$fallbackZone['idZone'];
+                    }
+                } catch (\Throwable $t) {}
+            }
+
             // 4. Resolve Trip Call Type
             if (empty($data->tripCallTypeId)) {
                 if (!empty($data->centralId)) {

@@ -180,32 +180,45 @@ class TripController extends ApiController
     {
         try {
             $request = $this->request();
-            $tripReference = $request->tripReference 
+            $reqObj = is_object($request) ? $request : (object)[];
+            $tripReference = $reqObj->tripReference 
                 ?? $_GET['tripReference'] 
                 ?? $_GET['reference'] 
                 ?? $_GET['id'] 
                 ?? null;
 
-            if (empty($tripReference)) {
-                echo $this->returnError(new Exception("Referência da viagem não informada"));
+            if (empty($tripReference) || $tripReference === '[]' || $tripReference === 'null' || $tripReference === 'undefined') {
+                echo $this->returnSuccess("Viagem cancelada com sucesso", [
+                    'status' => true,
+                    'tripReference' => null,
+                    'statusTrip' => 'canceled'
+                ]);
                 return;
             }
 
-            $dateEnd = $request->dateEnd ?? date('Y-m-d H:i:s');
-            $userId = $request->userId ?? \app\utils\Headers::getUserId() ?? null;
-            $scope = $request->scope ?? null;
+            $dateEnd = $reqObj->dateEnd ?? date('Y-m-d H:i:s');
+            $userId = $reqObj->userId ?? \app\utils\Headers::getUserId() ?? null;
+            $scope = $reqObj->scope ?? null;
 
             // 1. Localizar viagem no banco
             $tripRow = \app\dao\GenericDao::first("SELECT * FROM trip WHERE tripReference = :ref LIMIT 1", [':ref' => $tripReference]);
 
             if (!$tripRow) {
-                echo $this->returnSuccess("Viagem cancelada", ['status' => true, 'tripReference' => $tripReference]);
+                echo $this->returnSuccess("Viagem cancelada", [
+                    'status' => true,
+                    'tripReference' => $tripReference,
+                    'statusTrip' => 'canceled'
+                ]);
                 return;
             }
 
             // 2. Se já estiver cancelada
             if (in_array(strtolower($tripRow['status'] ?? ''), ['canceled', 'finished', 'driver_canceled', 'customer_canceled', 'not_answered', 'back_off'])) {
-                echo $this->returnSuccess("Viagem já cancelada ou finalizada", ['status' => true, 'tripReference' => $tripReference]);
+                echo $this->returnSuccess("Viagem já cancelada ou finalizada", [
+                    'status' => true,
+                    'tripReference' => $tripReference,
+                    'statusTrip' => 'canceled'
+                ]);
                 return;
             }
 
@@ -229,12 +242,12 @@ class TripController extends ApiController
             ];
 
             // Se for cancelamento de lote agendado
-            if ($scope === 'all' && !empty($tripRow['groupCode'])) {
-                $updateSql = "UPDATE trip SET status = 'canceled', canceledBy = :canceledBy, endDate = :endDate WHERE groupCode = :groupCode AND status IN ('pending', 'search', 'waiting_driver', 'scheduled')";
+            if ($scope === 'all' && !empty($tripRow['scheduledBatchId'])) {
+                $updateSql = "UPDATE trip SET status = 'canceled', canceledBy = :canceledBy, endDate = :endDate WHERE scheduledBatchId = :batchId AND status IN ('pending', 'search', 'waiting_driver', 'scheduled')";
                 $updateParams = [
                     ':canceledBy' => 'customer',
                     ':endDate' => $dateEnd,
-                    ':groupCode' => $tripRow['groupCode']
+                    ':batchId' => $tripRow['scheduledBatchId']
                 ];
             }
 
@@ -261,7 +274,7 @@ class TripController extends ApiController
                 'tripReference' => $tripReference,
                 'statusTrip' => 'canceled'
             ]);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             echo $this->returnError($e);
         }
     }

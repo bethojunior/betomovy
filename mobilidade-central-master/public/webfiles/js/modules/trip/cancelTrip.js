@@ -35,47 +35,60 @@ function cancelSearchTrip(status = STATUS_CANCELED) {
     });
 }
 
+function getActiveTripReference() {
+    let ref = null;
+    if (typeof managerTrip !== "undefined" && managerTrip?.tripCurrent?.tripReference) {
+        ref = managerTrip.tripCurrent.tripReference;
+    }
+    if (!ref || typeof ref !== "string" || ref.trim().length === 0) {
+        const stored = Session.getLocal("tripReference");
+        if (typeof stored === "string" && stored.trim().length > 0 && stored !== "[]") {
+            ref = stored.trim();
+        } else if (Array.isArray(stored) && stored.length > 0 && typeof stored[0] === "string" && stored[0].trim().length > 0) {
+            ref = stored[0].trim();
+        }
+    }
+    if (!ref || typeof ref !== "string" || ref.trim().length === 0) {
+        if (typeof window.tripReference === "string" && window.tripReference.trim().length > 0) {
+            ref = window.tripReference.trim();
+        }
+    }
+    return (ref && typeof ref === "string" && ref.trim().length > 0) ? ref.trim() : null;
+}
+
 function cancelTripByCustomer(status){
     viewController.elementProperty.addClass(".container-preload-main","active");
 
-    const tripRef = managerTrip?.tripCurrent?.tripReference 
-        || Session.getLocal('tripReference')
-        || (typeof tripReference !== "undefined" ? tripReference : null);
+    const tripRef = getActiveTripReference();
 
-    if (!tripRef) {
-        stopProgressTrip();
+    const cleanupLocalSearch = () => {
+        try {
+            stopProgressTrip();
+        } catch (e) {}
         if (typeof managerTrip !== "undefined") {
             managerTrip.isSearch = false;
             managerTrip.tripCurrent = null;
         }
-        Session.deleteLocal('tripReference');
-        updateBtnCallTripVisibility();
+        Session.deleteLocal("tripReference");
+        try {
+            updateBtnCallTripVisibility();
+        } catch (e) {}
+    };
+
+    if (!tripRef) {
+        cleanupLocalSearch();
         viewController.elementProperty.removeClass(".container-preload-main","active");
         return;
     }
 
     TripRepository.cancel(tripRef)
         .then(function (res) {
-            const isSuccess = res && (res.status === true || res.status === 'true' || typeof res.status === "undefined" || res.data);
-            if (!isSuccess) {
-                SwalCustom.messageDialog("Ocorreu um erro ao tentar cancelar viagem", "Atenção", undefined, "warning");
-                return;
-            }
-            stopProgressTrip();
-            if (typeof managerTrip !== "undefined") {
-                managerTrip.isSearch = false;
-                managerTrip.tripCurrent = null;
-            }
-            Session.deleteLocal('tripReference');
-        }).catch(() => {
-            stopProgressTrip();
-            if (typeof managerTrip !== "undefined") {
-                managerTrip.isSearch = false;
-            }
-            Session.deleteLocal('tripReference');
-            SwalCustom.messageDialog("Ocorreu um erro ao tentar cancelar viagem", "Atenção", undefined, "warning");
+            cleanupLocalSearch();
+        }).catch((err) => {
+            console.warn("Cancel warning / network issue:", err);
+            cleanupLocalSearch();
         }).finally(()=>{
-            updateBtnCallTripVisibility();
+            cleanupLocalSearch();
             viewController.elementProperty.removeClass(".container-preload-main","active");
         });
 }

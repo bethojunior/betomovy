@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-27 20:48 UTC - fix trip dispatch, driverCalled queueing, realtime sync and background call trigger
+# Deploy trigger: 2026-10-27 21:35 UTC - fix cancel search trip error modal and driver call zone matching
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

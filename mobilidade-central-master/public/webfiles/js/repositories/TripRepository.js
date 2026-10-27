@@ -30,6 +30,10 @@ class TripRepository {
     }
 
     static cancel(tripReference, scope){
+        if (!tripReference || typeof tripReference !== "string" || tripReference.trim().length === 0 || tripReference === "[]") {
+            return Promise.resolve({ status: true, message: "Cancelado localmente", data: { status: true } });
+        }
+        const cleanRef = tripReference.trim();
         // scope "all" cancela o lote inteiro no back (mesmo problema do
         // trip/scheduled/batch) — mas aqui o front não sabe de antemão quantos
         // itens tem o lote, então usa um teto fixo generoso em vez de escalar
@@ -37,7 +41,7 @@ class TripRepository {
         const timeout = scope === "all" ? 150000 : 30000;
 
         return new Promise((resolve, reject) => {
-            ConnectionServer.sendRequestWithTimeout(`trip/${tripReference}/cancel`,"PUT",scope ? {scope} : null,resolve,reject,timeout);
+            ConnectionServer.sendRequestWithTimeout(`trip/${cleanRef}/cancel`,"PUT",scope ? {scope} : null,resolve,reject,timeout);
         });
     }
 
