@@ -41,8 +41,8 @@ class TripAdapter {
 
             centralId: trip.centralId,
             priceId: trip.priceId,
-            distance: parseFloat(trip.distance),
-            estimatedTripTime: parseFloat(trip.estimatedTripTime),
+            distance: isNaN(parseFloat(trip.distance)) ? 0 : parseFloat(trip.distance),
+            estimatedTripTime: isNaN(parseFloat(trip.estimatedTripTime)) ? 0 : parseFloat(trip.estimatedTripTime),
 
             centralCustomer,
             tripWayPoints,
@@ -50,7 +50,7 @@ class TripAdapter {
             price: trip.price,
 
             tripDiscountCoupon: trip.tripDiscountCoupon || null,
-            haveReturn: trip.haveReturn == '1' ? true : false,
+            haveReturn: (trip.haveReturn == '1' || trip.haveReturn === true || trip.haveReturn === 1) ? 1 : 0,
             paidByCentral: false,
             deliveryInfo: deliveryInfo,
             tripItems: tripItems,

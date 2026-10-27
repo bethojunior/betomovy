@@ -27,6 +27,12 @@ class BaseModel
                 if (property_exists($this, $key) && $value !== "") {
                     if (is_bool($value)) {
                         $this->$key = $value ? 1 : 0;
+                    } elseif (in_array($key, ['estimatedTripTime', 'estimatedTimeDriverArrival', 'distance', 'price', 'oldPrice', 'multiplierDynamic']) && is_string($value)) {
+                        if (preg_match('/([0-9]+(?:\.[0-9]+)?)/', str_replace(',', '.', $value), $matches)) {
+                            $this->$key = (float)$matches[1];
+                        } else {
+                            $this->$key = 0.0;
+                        }
                     } else {
                         $this->$key = $value;
                     }

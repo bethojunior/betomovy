@@ -150,7 +150,10 @@ class PriceTrip {
                 }
 
                 if (data && data.distance) Session.setLocal("distanceTrip", data.distance);
-                if (data && data.duration) Session.setLocal("estimatedTripTime", data.duration);
+                if (data && data.duration) {
+                    const durNum = parseFloat(String(data.duration).replace(',', '.'));
+                    Session.setLocal("estimatedTripTime", isNaN(durNum) ? data.duration : durNum);
+                }
 
                 this.createIndicationsContainer(containerPrices);
                 this.initEventScrollPrice();

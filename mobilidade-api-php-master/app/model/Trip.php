@@ -276,6 +276,15 @@ class Trip extends BaseModel
      */
     public function setEstimatedTripTime($estimatedTripTime)
     {
+        if (is_string($estimatedTripTime)) {
+            if (preg_match('/([0-9]+(?:\.[0-9]+)?)/', str_replace(',', '.', $estimatedTripTime), $matches)) {
+                $estimatedTripTime = (float)$matches[1];
+            } else {
+                $estimatedTripTime = 0.0;
+            }
+        } elseif ($estimatedTripTime !== null) {
+            $estimatedTripTime = (float)$estimatedTripTime;
+        }
         $this->estimatedTripTime = $estimatedTripTime;
         return $this;
     }

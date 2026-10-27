@@ -464,8 +464,16 @@ document.addEventListener('DOMContentLoaded', function () {
           price: managerTrip.typeTaxi.price,
           cityId: cityConfig.cityId,
           waypoints,
-          distance: Session.getLocal('distanceTrip'),
-          estimatedTripTime: Session.getLocal('estimatedTripTime'),
+          distance: (function(val) {
+            if (!val) return 0;
+            const num = parseFloat(String(val).replace(',', '.'));
+            return isNaN(num) ? 0 : num;
+          })(Session.getLocal('distanceTrip')),
+          estimatedTripTime: (function(val) {
+            if (!val) return 0;
+            const num = parseFloat(String(val).replace(',', '.'));
+            return isNaN(num) ? 0 : num;
+          })(Session.getLocal('estimatedTripTime')),
           multiplierDynamic: managerTrip.typeTaxi.priceDynamicValue,
           isOpenPriceTrip:
             (document.querySelector('.footer-container-trip').classList.contains('no-destination') ||

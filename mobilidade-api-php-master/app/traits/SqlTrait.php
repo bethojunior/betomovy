@@ -67,9 +67,19 @@ trait SqlTrait
             ->prepare("INSERT INTO {$this->getTableName()} ({$inputsForQuery}) VALUES ({$values})");
 
         foreach (explode(',', $values) as $key => $value) {
-            $val = $inputs[explode(',', $fields)[$key]];
+            $fieldKey = explode(',', $fields)[$key];
+            $val = $inputs[$fieldKey];
             if (is_bool($val)) {
                 $query->bindValue($value, $val ? 1 : 0, \PDO::PARAM_INT);
+            } elseif (in_array($fieldKey, ['estimatedTripTime', 'estimatedTimeDriverArrival', 'distance', 'price', 'multiplierDynamic'])) {
+                if (is_string($val)) {
+                    if (preg_match('/([0-9]+(?:\.[0-9]+)?)/', str_replace(',', '.', $val), $matches)) {
+                        $val = (float)$matches[1];
+                    } else {
+                        $val = null;
+                    }
+                }
+                $query->bindValue($value, $val);
             } else {
                 $query->bindValue($value, $val);
             }

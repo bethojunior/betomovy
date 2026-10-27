@@ -256,6 +256,29 @@ class PartnerTripService
      */
     private function createTrip($data, ?Origin &$origin): Trip
     {
+        if (isset($data->estimatedTripTime)) {
+            if (is_string($data->estimatedTripTime)) {
+                if (preg_match('/([0-9]+(?:\.[0-9]+)?)/', str_replace(',', '.', $data->estimatedTripTime), $matches)) {
+                    $data->estimatedTripTime = (float)$matches[1];
+                } else {
+                    $data->estimatedTripTime = 0.0;
+                }
+            } else {
+                $data->estimatedTripTime = (float)$data->estimatedTripTime;
+            }
+        }
+        if (isset($data->distance)) {
+            if (is_string($data->distance)) {
+                if (preg_match('/([0-9]+(?:\.[0-9]+)?)/', str_replace(',', '.', $data->distance), $matches)) {
+                    $data->distance = (float)$matches[1];
+                } else {
+                    $data->distance = 0.0;
+                }
+            } else {
+                $data->distance = (float)$data->distance;
+            }
+        }
+
         $data->destinationId = $this->createDestination($data)->getIdDestination();
         $origin = $this->createOrigin($data);
 
