@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-27 22:38 UTC - Uber design reconstruction, light theme, category cards and searching sheet
+# Deploy trigger: 2026-10-27 22:50 UTC - fix TripRealtimeApiClient baseUrl null on mobile login and php-fpm clear_env
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
@@ -115,6 +115,8 @@ services:
       - key: S3_URL
         value: https://s3-sa-east-1.amazonaws.com/
       - key: API_SOCKET_URL
+        value: https://socket.movymob.com
+      - key: API_SOCKET_HOST
         value: https://socket.movymob.com
       - key: APP_NAME
         value: Movy

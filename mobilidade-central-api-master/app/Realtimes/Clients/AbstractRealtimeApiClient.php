@@ -7,8 +7,8 @@ use App\Utils\Pulse\GroupIds;
 
 abstract class AbstractRealtimeApiClient
 {
-    protected string $baseUrl;
-    protected int $timeout;
+    protected string $baseUrl = 'https://socket.movymob.com';
+    protected int $timeout = 60000;
     protected PulseProvider $pulse;
 
     abstract protected function getEndpoint(): string;
@@ -17,7 +17,8 @@ abstract class AbstractRealtimeApiClient
     public function __construct()
     {
         $this->timeout = 60 * 1000; // Default timeout in milliseconds
-        $this->baseUrl = env('API_SOCKET_URL', '');
+        $rawUrl = env('API_SOCKET_URL') ?: env('API_SOCKET_HOST');
+        $this->baseUrl = (!empty($rawUrl) && is_string($rawUrl)) ? rtrim($rawUrl, '/') : 'https://socket.movymob.com';
 
         $pulseApp =  'central-' . env('APP_NAME', 'laravel');
 
