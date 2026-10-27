@@ -26,13 +26,14 @@ class Host
 
     public static function getVersion($file = null)
     {
+        $deployTimestamp = '4.2.0_' . time();
         if ($file === null) {
-            return '3.0.1.0';
+            return $deployTimestamp;
         }
 
         $mtime = @filemtime(__DIR__ . '/../../public/webfiles/' . ltrim($file, '/'));
 
-        return $mtime ? (string) $mtime : '3.0.1.0';
+        return ($mtime ? (string)$mtime : '1.0') . '_' . $deployTimestamp;
     }
 
 }

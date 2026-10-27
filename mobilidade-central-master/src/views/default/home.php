@@ -1,4 +1,4 @@
-<!-- Movy Central Deploy: 2026-10-27 16:25 UTC -->
+<!-- Movy Central Deploy: 2026-10-27 16:55 UTC -->
 <div class="container-main-map">
     <div class="list-trips-active-partner">
         <div class="container-trips">
@@ -179,7 +179,7 @@
                                 <b id="carPlateDriver" class="car-plate-driver"></b>
                                 <p id="carBrandDriver" class="car-brand-driver"></p>
                             </div>
-                            <div class="description-title">Fazemos mais, melhor e mais barato.</div>
+                            <div class="description-title">MOVY &bull; Central de Mobilidade Inteligente</div>
                         </div>
                     </div>
                 </div>
