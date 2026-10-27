@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-23 20:27 UTC - fix container startup zero exit code and immediate keepalive in api-node
+# Deploy trigger: 2026-10-27 12:55 UTC - deploy fixes for trip creation, driver call and monitoring
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
