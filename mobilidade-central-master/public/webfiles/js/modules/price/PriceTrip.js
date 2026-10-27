@@ -139,14 +139,25 @@ class PriceTrip {
             try {
                 data = this.verifyOrderPrices(data);
 
-                let containerPrices = this.separateInContainer(data);
+                let pricesList = [];
+                if (data && Array.isArray(data.prices)) {
+                    pricesList = data.prices;
+                } else if (Array.isArray(data)) {
+                    pricesList = data;
+                } else if (data && typeof data === 'object') {
+                    if (Array.isArray(data.response)) {
+                        pricesList = data.response;
+                    } else if (Array.isArray(data.data)) {
+                        pricesList = data.data;
+                    }
+                }
+                if (!Array.isArray(pricesList)) pricesList = [];
+                const flatPrices = pricesList.filter(item => item != null);
 
-                if (!containerPrices || containerPrices.length === 0) {
-                    element.innerHTML = '<p class="no-prices-msg" style="padding:15px;text-align:center;color:#666;font-size:13px;width:100%;">Nenhuma categoria disponível no momento</p>';
+                if (flatPrices.length === 0) {
+                    element.innerHTML = '<p class="no-prices-msg" style="padding:24px;text-align:center;color:#6b7280;font-size:14px;width:100%;">Nenhuma categoria disponível no momento</p>';
                 } else {
-                    element.innerHTML = containerPrices.map((prices, index) => {
-                        return `<div><div>${this.buildListPrices(prices, index === 0)}</div></div>`;
-                    }).join("");
+                    element.innerHTML = this.buildListPrices(flatPrices, true);
                 }
 
                 if (data && data.distance) Session.setLocal("distanceTrip", data.distance);
@@ -155,12 +166,14 @@ class PriceTrip {
                     Session.setLocal("estimatedTripTime", isNaN(durNum) ? data.duration : durNum);
                 }
 
+                // Mantém compatibilidade com controle de container se existir
+                const containerPrices = this.separateInContainer(data);
                 this.createIndicationsContainer(containerPrices);
                 this.initEventScrollPrice();
                 this.verifyIndicationContainerPrice();
             } catch (e) {
                 console.error("Erro ao renderizar precos:", e);
-                element.innerHTML = '<p class="no-prices-msg" style="padding:15px;text-align:center;color:#666;font-size:13px;width:100%;">Nenhuma categoria disponível</p>';
+                element.innerHTML = '<p class="no-prices-msg" style="padding:24px;text-align:center;color:#6b7280;font-size:14px;width:100%;">Nenhuma categoria disponível</p>';
             } finally {
                 viewController.elementProperty.removeClass(".container-box-price", "update");
                 scheduleMapResize();
@@ -263,12 +276,7 @@ class PriceTrip {
                 tagText = tagText.charAt(0).toUpperCase() + tagText.slice(1).toLowerCase();
             }
 
-            const tagBg = object.color ? `background-color: ${object.color}` : 'background-color: #333';
-            
-            // Resolucao robusta da imagem do tipo de viagem:
-            // Central = carro amarelo (carro_eco.png)
-            // Entregas / Particular / Drive = carro azul (carro_drive.png)
-            // Moto = moto.png (apenas quando expressamente categoria de moto)
+            // Resolução robusta da imagem do tipo de viagem
             let rawPicture = object.picture || (object.tripType && object.tripType.picture) || '';
             const isMoto = !isEntregaOrDrive && !isCentral && (/\bmoto\b|mototaxi|motocicleta|motoboy/i.test(rawTagText) || /\bmoto\b/i.test(String(rawPicture)));
             const defaultCarImg = isCentral ? '/webfiles/img/icon/carro_eco.png' : '/webfiles/img/icon/carro_drive.png';
@@ -298,21 +306,72 @@ class PriceTrip {
 
             if (index === 0 && existItemActive) {
                 managerTrip.typeTaxi.picture = pictureUrl;
+                try {
+                    const btnConfirm = document.querySelector(".switch-type-trip .btn-search-trip:last-child");
+                    if (btnConfirm) btnConfirm.innerHTML = `Escolha ${tagText || 'Viagem'}`;
+                } catch(e) {}
             }
 
             const priceVal = (object.price !== undefined && object.price !== null) ? object.price : 0;
             const tripTypeIdVal = object.tripTypeId || object.idTripType || index;
 
-            return `<div class="trip-type ${className}"
+            let durationMins = 3;
+            try {
+                const estTime = Session.getLocal("estimatedTripTime");
+                if (estTime) {
+                    const parsed = parseInt(String(estTime).replace(/\D+/g, ''));
+                    if (!isNaN(parsed) && parsed > 0) durationMins = parsed;
+                }
+            } catch (e) {}
+
+            let dropoffTime = "";
+            try {
+                if (typeof moment !== "undefined") {
+                    dropoffTime = moment().add(durationMins, 'minutes').format("HH:mm");
+                }
+            } catch (e) {}
+            if (!dropoffTime) {
+                const d = new Date();
+                d.setMinutes(d.getMinutes() + durationMins);
+                dropoffTime = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            }
+
+            const capacityNum = isMoto ? 1 : 4;
+            let cardSubtitle = "Opção acessível para o seu dia a dia";
+            if (isMoto) cardSubtitle = "Rápido e econômico para 1 pessoa";
+            else if (isEntregaOrDrive) cardSubtitle = "Carros confortáveis e bem avaliados";
+            else if (isCentral) cardSubtitle = "Mais comodidade e tranquilidade";
+
+            return `<div class="trip-type uber-ride-card ${className}"
                             value='${JSON.stringify(object)}'>
-                            <span style="${tagBg}">${tagText}</span>
-                            <img src="${pictureUrl}" onerror="this.onerror=null; this.src='${defaultImg}';">
+                        <div class="urc-left">
+                            <img class="urc-vehicle-img" src="${pictureUrl}" alt="${tagText}" onerror="this.onerror=null; this.src='${defaultImg}';">
+                        </div>
+                        <div class="urc-center">
+                            <div class="urc-name-row">
+                                <span class="urc-name">${tagText}</span>
+                                <span class="urc-capacity">
+                                    <i class="material-icons urc-capacity-icon">person</i>
+                                    <span>${capacityNum}</span>
+                                </span>
+                            </div>
+                            <div class="urc-eta-row">
+                                <span class="urc-eta-time">${dropoffTime}</span>
+                                <span class="urc-eta-sep">•</span>
+                                <span class="urc-eta-dist">${durationMins} min de distância</span>
+                            </div>
+                            <div class="urc-desc">${cardSubtitle}</div>
+                        </div>
+                        <div class="urc-right">
                             <p  
-                                class="label-prices-trip"
+                                class="label-prices-trip urc-price"
                                 id="valueTypeTrip${tripTypeIdVal}" 
                                 valueDefault="${Mask.maskMoney(priceVal)}">
-                                    <span>${typeMoney}</span> ${Mask.maskMoney(priceVal)}</p>
-                        </div>`;
+                                    <span class="urc-currency">${typeMoney}</span>
+                                    <span class="urc-amount">${Mask.maskMoney(priceVal)}</span>
+                            </p>
+                        </div>
+                    </div>`;
         }).join("");
     }
 

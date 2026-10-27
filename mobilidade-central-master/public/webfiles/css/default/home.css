@@ -1391,7 +1391,7 @@ div.pac-container>.pac-item>span {
 
 @media (min-width: 992px) {
 
-    .search-driver-in-trip.active>div {
+    .search-driver-in-trip.active > div.legacy-search-driver-box {
         top: 75px;
         bottom: unset;
     }
@@ -1652,7 +1652,7 @@ div.pac-container>.pac-item>span {
         border-color: green;
     }
 
-    .search-driver-in-trip>div,
+    .search-driver-in-trip > div.legacy-search-driver-box,
     .search-driver-card {
         width: 380px;
         max-width: 90%;
@@ -1660,15 +1660,13 @@ div.pac-container>.pac-item>span {
         border-radius: 12px;
     }
 
-    .search-driver-in-trip>div>p,
-    #pharseTrip {
+    .search-driver-in-trip > div.legacy-search-driver-box > p {
         font-size: 14.5px;
         margin: 4px 0 8px;
         text-align: center;
     }
 
-    .search-driver-in-trip>div>button,
-    .search-driver-in-trip button.cancel-search-trip {
+    .search-driver-in-trip > div.legacy-search-driver-box > button {
         height: 38px;
         font-size: 13px;
         border-radius: 6px;
@@ -3397,3 +3395,598 @@ div.pac-container>.pac-item>span {
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   UBER DESIGN SYSTEM (LIGHT THEME) — CENTRAL MOVY
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. MAP ORIGIN PIN ("Partida aqui") & DESTINATION PIN ── */
+.uber-origin-marker-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    pointer-events: auto;
+    user-select: none;
+    transform: translateY(6px);
+}
+
+.uber-origin-bubble {
+    background: #000000;
+    color: #FFFFFF;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    position: relative;
+    margin-bottom: 4px;
+    animation: uber-bubble-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.uber-origin-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 4px 4px 0 4px;
+    border-style: solid;
+    border-color: #000000 transparent transparent transparent;
+}
+
+.uber-origin-pin {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.uber-origin-dot {
+    width: 10px;
+    height: 10px;
+    background: #000000;
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    z-index: 2;
+}
+
+.uber-origin-pulse {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.18);
+    animation: uber-origin-pulse-anim 2s infinite ease-out;
+    z-index: 1;
+}
+
+@keyframes uber-origin-pulse-anim {
+    0%   { transform: scale(0.6); opacity: 0.9; }
+    70%  { transform: scale(1.3); opacity: 0.1; }
+    100% { transform: scale(1.6); opacity: 0;   }
+}
+
+@keyframes uber-bubble-pop {
+    0%   { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+.uber-dest-marker-wrap {
+    width: 16px;
+    height: 16px;
+    background: #000000;
+    border: 2.5px solid #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.uber-dest-inner {
+    width: 6px;
+    height: 6px;
+    background: #FFFFFF;
+    border-radius: 1px;
+}
+
+/* ── 2. CARS OF DRIVERS ON MAP ── */
+.container-car {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    transition: transform 0.35s ease;
+}
+
+/* ── 3. UBER BOTTOM SHEET (RIDE SELECTION) ── */
+.footer-container-trip {
+    background: #FFFFFF !important;
+    border-radius: 24px 24px 0 0 !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14) !important;
+    border-top: 1px solid #E5E7EB !important;
+    padding: 0 !important;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-container-trip > label {
+    display: none !important;
+}
+
+.uber-sheet-handle {
+    width: 44px;
+    height: 5px;
+    background: #E5E7EB;
+    border-radius: 999px;
+    margin: 12px auto 8px;
+    flex-shrink: 0;
+}
+
+.uber-sheet-header {
+    padding: 4px 20px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.uber-sheet-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+.uber-sheet-subtitle {
+    font-size: 13px;
+    color: #6B7280;
+    font-weight: 400;
+}
+
+.container-box-price {
+    padding: 0 16px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 380px;
+}
+
+.container-box-price::-webkit-scrollbar {
+    width: 5px;
+}
+.container-box-price::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 10px;
+}
+
+.type-cars {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+    padding: 2px 0 10px !important;
+}
+
+/* ── 4. UBER CATEGORY RIDE CARD (.trip-type) ── */
+.trip-type.uber-ride-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-height: 72px !important;
+    padding: 10px 16px !important;
+    background: #FFFFFF !important;
+    border: 1.5px solid #E5E7EB !important;
+    border-radius: 14px !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative !important;
+    margin: 0 !important;
+}
+
+.trip-type.uber-ride-card:hover {
+    background: #F9FAFB !important;
+    border-color: #D1D5DB !important;
+    transform: translateY(-1px);
+}
+
+.trip-type.uber-ride-card.active {
+    background: #F9FAFB !important;
+    border: 2px solid #000000 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+.urc-left {
+    width: 64px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 14px;
+    flex-shrink: 0;
+}
+
+.urc-vehicle-img {
+    max-width: 64px;
+    max-height: 46px;
+    object-fit: contain;
+}
+
+.urc-center {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.urc-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.urc-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.2px;
+}
+
+.urc-capacity {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4B5563;
+    background: #F3F4F6;
+    padding: 1px 6px;
+    border-radius: 6px;
+}
+
+.urc-capacity-icon {
+    font-size: 13px !important;
+    color: #4B5563;
+}
+
+.urc-eta-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #6B7280;
+    font-weight: 500;
+}
+
+.urc-eta-time {
+    font-weight: 600;
+    color: #1F2937;
+}
+
+.urc-eta-sep {
+    color: #9CA3AF;
+}
+
+.urc-eta-dist {
+    color: #6B7280;
+}
+
+.urc-desc {
+    font-size: 11.5px;
+    color: #9CA3AF;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.urc-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+.label-prices-trip.urc-price {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
+    margin: 0 !important;
+    letter-spacing: -0.3px !important;
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 3px !important;
+}
+
+.urc-currency {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4B5563;
+}
+
+.urc-amount {
+    font-size: 17px;
+    font-weight: 800;
+    color: #111827;
+}
+
+/* ── 5. UBER COMBINED BOTTOM ACTION BAR ── */
+.uber-bottom-action-bar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 12px 18px 20px !important;
+    background: #FFFFFF !important;
+    border-top: 1px solid #F3F4F6 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+}
+
+.payment-trip#choicePaymentTrip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    height: 48px !important;
+    padding: 0 14px !important;
+    background: #F3F4F6 !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 9999px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.payment-trip#choicePaymentTrip:hover {
+    background: #E5E7EB !important;
+    border-color: #D1D5DB !important;
+}
+
+.payment-pill-icon {
+    font-size: 18px !important;
+    color: #111827 !important;
+}
+
+#namePaymentForm {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+
+.payment-pill-chevron {
+    font-size: 18px !important;
+    color: #9CA3AF !important;
+}
+
+.switch-type-trip {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.switch-type-trip > .btn-search-trip.btn-search {
+    flex: 1 1 auto !important;
+    height: 48px !important;
+    background: #000000 !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    letter-spacing: 0.2px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+}
+
+.switch-type-trip > .btn-search-trip.btn-search:hover {
+    background: #1F2937 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
+}
+
+.switch-type-trip > .btn-search-trip.btn-search:active {
+    transform: scale(0.98);
+}
+
+.switch-type-trip > .btn-qrcode-driver-trip {
+    height: 48px !important;
+    width: 48px !important;
+    border-radius: 12px !important;
+    background: #F3F4F6 !important;
+    border: 1px solid #E5E7EB !important;
+    color: #111827 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    transition: background 0.2s !important;
+}
+
+.switch-type-trip > .btn-qrcode-driver-trip:hover {
+    background: #E5E7EB !important;
+}
+
+.schedule-trip#choiceScheduleTrip {
+    height: 48px !important;
+    width: 48px !important;
+    border-radius: 12px !important;
+    background: #F3F4F6 !important;
+    border: 1px solid #E5E7EB !important;
+    color: #111827 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    transition: background 0.2s !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.schedule-trip#choiceScheduleTrip:hover {
+    background: #E5E7EB !important;
+}
+
+.schedule-trip#choiceScheduleTrip > i {
+    font-size: 22px !important;
+    color: #111827 !important;
+}
+
+/* ── 6. UBER SEARCHING DRIVER SHEET (.search-driver-in-trip) ── */
+.search-driver-in-trip {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    pointer-events: none;
+}
+
+.search-driver-in-trip.active {
+    display: block !important;
+    pointer-events: auto !important;
+}
+
+.sdit-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+}
+
+.sdit-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border-radius: 24px 24px 0 0;
+    padding: 0 20px 28px;
+    box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.22);
+    max-width: 520px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    animation: sdit-sheet-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (min-width: 992px) {
+    .sdit-sheet {
+        bottom: 0 !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        max-width: 480px !important;
+        border-radius: 24px 24px 0 0 !important;
+    }
+}
+
+/* Linear Indeterminate Progress Bar */
+.sdit-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: #E5E7EB;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    margin: 0 0 16px;
+}
+
+.sdit-progress-indeterminate {
+    position: absolute;
+    height: 100%;
+    width: 45%;
+    background: #000000;
+    border-radius: 2px;
+    animation: sdit-linear-progress 1.6s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395);
+}
+
+@keyframes sdit-linear-progress {
+    0%   { left: -45%; width: 45%; }
+    50%  { left: 30%;  width: 60%; }
+    100% { left: 105%; width: 45%; }
+}
+
+.sdit-handle {
+    width: 44px;
+    height: 5px;
+    background: #E5E7EB;
+    border-radius: 999px;
+    margin: 12px auto 14px;
+}
+
+.sdit-header {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.sdit-title {
+    font-size: 19px !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    margin: 6px 0 3px !important;
+    letter-spacing: -0.3px !important;
+}
+
+.sdit-subtitle {
+    font-size: 13px !important;
+    color: #6B7280 !important;
+    margin: 0 !important;
+}
+
+.sdit-cancel-btn {
+    width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    background: #F3F4F6;
+    border: 1px solid #E5E7EB;
+    color: #EF4444;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-top: 18px;
+    transition: all 0.2s ease;
+}
+
+.sdit-cancel-btn:hover {
+    background: #FEE2E2;
+    border-color: #FCA5A5;
+}
+
+/* ── 7. STRICT BUTTON HIDING (NEVER BLEED THROUGH) ── */
+.search-driver-in-trip.active ~ .btn-call-trip,
+.btn-call-trip.active,
+.container-menu.active ~ .btn-call-trip,
+.footer-container-trip.active ~ .btn-call-trip {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+

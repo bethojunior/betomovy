@@ -231,6 +231,12 @@ function getTaxiType() {
     viewController.elementProperty.getElement(".trip-type", element => element.classList.remove("active"));
 
     this.classList.add("active");
+
+    try {
+        const catName = (object.priceName || object.name || "Viagem").trim();
+        const btnConfirm = document.querySelector(".switch-type-trip .btn-search-trip:last-child");
+        if (btnConfirm) btnConfirm.innerHTML = `Escolha ${catName}`;
+    } catch (e) {}
 }
 
 function populateSearchDriverCard(data) {

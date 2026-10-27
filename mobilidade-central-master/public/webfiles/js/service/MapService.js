@@ -205,7 +205,21 @@ class MapService {
             this.locationClient.remove();
             this.map.setCenter([position.lng, position.lat]);
         }
-        this.locationClient = this._createMarker(position, this.icons.origin, 25);
+        const { lat, lng } = this._getPointLatLng(position);
+        const container = document.createElement('div');
+        container.className = 'uber-origin-marker-wrap';
+        container.innerHTML = `
+            <div class="uber-origin-bubble">
+                <span>Partida aqui</span>
+            </div>
+            <div class="uber-origin-pin">
+                <span class="uber-origin-dot"></span>
+                <span class="uber-origin-pulse"></span>
+            </div>
+        `;
+        const marker = new mapboxgl.Marker({ element: container, anchor: 'bottom' })
+            .setLngLat([lng, lat]);
+        this.locationClient = this._wrapMarker(marker);
         if (this.locationClient) this.locationClient.setMap(this.map);
     }
 
@@ -214,13 +228,37 @@ class MapService {
             this.locationClientTrip.setLngLat([position.lng, position.lat]);
             return;
         }
-        this.locationClientTrip = this._createMarker(position, this.icons.clientWait, 25);
+        const { lat, lng } = this._getPointLatLng(position);
+        const container = document.createElement('div');
+        container.className = 'uber-origin-marker-wrap';
+        container.innerHTML = `
+            <div class="uber-origin-bubble">
+                <span>Partida aqui</span>
+            </div>
+            <div class="uber-origin-pin">
+                <span class="uber-origin-dot"></span>
+                <span class="uber-origin-pulse"></span>
+            </div>
+        `;
+        const marker = new mapboxgl.Marker({ element: container, anchor: 'bottom' })
+            .setLngLat([lng, lat]);
+        this.locationClientTrip = this._wrapMarker(marker);
         if (this.locationClientTrip) this.locationClientTrip.setMap(this.map);
     }
 
     addPointDestination(position) {
         if (this.locationDestination) this.locationDestination.remove();
-        this.locationDestination = this._createMarker(position, this.icons.destination, 25);
+        const { lat, lng } = this._getPointLatLng(position);
+        const container = document.createElement('div');
+        container.className = 'uber-dest-marker-wrap';
+        container.innerHTML = `
+            <div class="uber-dest-square">
+                <span class="uber-dest-inner"></span>
+            </div>
+        `;
+        const marker = new mapboxgl.Marker({ element: container, anchor: 'center' })
+            .setLngLat([lng, lat]);
+        this.locationDestination = this._wrapMarker(marker);
         if (this.locationDestination) this.locationDestination.setMap(this.map);
     }
 

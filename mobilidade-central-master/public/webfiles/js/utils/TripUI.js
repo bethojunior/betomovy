@@ -28,6 +28,19 @@ function updateBtnCallTripVisibility() {
     const method = shouldHide ? "addClass" : "removeClass";
     elementProperty[method](".btn-call-trip", "active");
 
+    const btnCallTripEl = document.querySelector(".btn-call-trip");
+    if (btnCallTripEl) {
+        if (shouldHide) {
+            btnCallTripEl.style.setProperty("display", "none", "important");
+            btnCallTripEl.style.setProperty("visibility", "hidden", "important");
+            btnCallTripEl.style.setProperty("pointer-events", "none", "important");
+        } else {
+            btnCallTripEl.style.removeProperty("display");
+            btnCallTripEl.style.removeProperty("visibility");
+            btnCallTripEl.style.removeProperty("pointer-events");
+        }
+    }
+
     if (method === "addClass" && typeof FooterMonitorManager !== "undefined" && FooterMonitorManager.isExpanded()) {
         FooterMonitorManager.collapse();
     }

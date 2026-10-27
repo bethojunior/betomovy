@@ -104,8 +104,22 @@
                 <!-- Handle bar -->
                 <div class="sdit-handle"></div>
 
+                <!-- Linear Indeterminate Progress Bar (Uber Style) -->
+                <div class="sdit-progress-bar">
+                    <div class="sdit-progress-indeterminate"></div>
+                </div>
+
                 <!-- ══════ STATE: SEARCHING ══════ -->
                 <div class="sdit-state sdit-state-searching">
+
+                    <!-- Header com Título e Subtítulo -->
+                    <div class="sdit-header">
+                        <span class="sdit-category-badge" id="searchTripCategoryPill">
+                            <span id="searchTripCategoryName">Movy</span>
+                        </span>
+                        <h3 class="sdit-title" id="pharseTrip">Procurando motoristas por perto...</h3>
+                        <p class="sdit-subtitle">Aguarde, estamos conectando você ao motorista mais próximo</p>
+                    </div>
 
                     <!-- Animação do carro + radar -->
                     <div class="sdit-anim-wrap">
@@ -129,23 +143,7 @@
                         </div>
                     </div>
 
-                    <!-- Badge categoria + status -->
-                    <div class="sdit-header">
-                        <span class="sdit-category-badge" id="searchTripCategoryPill">
-                            <span id="searchTripCategoryName">Movy</span>
-                        </span>
-                        <h3 class="sdit-title" id="pharseTrip">Procurando motorista...</h3>
-                        <p class="sdit-subtitle">Aguarde, estamos conectando você ao melhor motorista disponível</p>
-                    </div>
-
-                    <!-- Dots loader -->
-                    <div class="sdit-dots-loader">
-                        <span class="sdit-dot"></span>
-                        <span class="sdit-dot"></span>
-                        <span class="sdit-dot"></span>
-                    </div>
-
-                    <!-- Meta row: Preço / Tempo / Pagamento -->
+                    <!-- Meta row: Preço / Duração / Pagamento -->
                     <div class="sdit-meta-row">
                         <div class="sdit-meta-item">
                             <span class="sdit-meta-icon">💰</span>
@@ -166,7 +164,7 @@
                         </div>
                     </div>
 
-                    <!-- Rota -->
+                    <!-- Rota de Origem e Destino -->
                     <div class="sdit-route">
                         <div class="sdit-route-item">
                             <span class="sdit-route-dot sdit-route-dot-origin"></span>
@@ -179,8 +177,9 @@
                         </div>
                     </div>
 
-                    <!-- Botão cancelar -->
+                    <!-- Botão cancelar busca -->
                     <button type="button" class="sdit-cancel-btn cancel-search-trip">
+                        <i class="material-icons">close</i>
                         <span>Cancelar busca</span>
                     </button>
                 </div>
@@ -281,79 +280,88 @@
         </div>
     </div>
     <div class="footer-container-trip">
-        <label>Valor fixo</label>
-        <div class="container-box-price">
-            <div class="type-cars"></div>
-            <div class="indication-list-prices"></div>
-            <div class="arrows-indication-list">
-                <div class="prev-container-price">
-                    <i class="material-icons">
-                        keyboard_arrow_left
-                    </i>
-                </div>
-                <div class="next-container-price">
-                    <i class="material-icons">
-                        keyboard_arrow_right
-                    </i>
-                </div>
-            </div>
-        </div>
-        <div class="payment-trip">
-            <div id="choicePaymentTrip">
-                <i class="material-icons">attach_money</i>  
-                <p id="namePaymentForm">Pagamento</p>
-                <i class="material-icons">expand_more</i>
-            </div>
-            <div id="cardSelectedPayTrip"></div>
-        </div>
-        <div class="schedule-trip">
-            <div id="choiceScheduleTrip">
-                <i class="material-icons">event</i>
-                <p id="nameScheduleTrip">Agendar</p>
-                <i class="material-icons">expand_more</i>
-            </div>
-        </div>
-        <div id="container-anti-uber" style="display: none">
-        <hr class="anti-uber-section-sep">
-        <div class="title-anti-uber">
-            <h4>Analisador de concorrente</h4>
-            <div id="div-get-cookies" class="anti-uber-cookie-row">
-                <input class="form-control" type="text" id="cookie-anti-uber" autocomplete="off" placeholder="Cole o JSON do cookie aqui">
-                <button type="button" class="btn btn-info anti-uber-search-btn" id="generate-value-au" aria-label="Pesquisar preços do concorrente">
-                    <span class="anti-uber-search-label">Pesquisar</span>
-                    <i class="material-icons anti-uber-search-icon" aria-hidden="true">search</i>
-                </button>
-            </div>
-        </div>
-        <hr class="anti-uber-section-sep">
-        <div class="anti-uber-items" id="can-show-antiuber">
-            <p id="anti-uber-placeholder" class="anti-uber-placeholder">
-                Cole o cookie no campo acima.
-            </p>
-            <div class="anti-uber-results-wrap anti-uber-results-wrap--hidden">
-                <button type="button" class="anti-uber-scroll-btn anti-uber-scroll-btn--prev" id="antiUberScrollPrev" aria-label="Ver opções anteriores">
-                    <i class="material-icons" aria-hidden="true">chevron_left</i>
-                </button>
-                <div class="anti-uber-results-inner">
-                    <div id="anti-uber-results" class="anti-uber-results" aria-live="polite"></div>
-                    <div id="spinner-antiuber" class="anti-uber-spinner" role="status" style="display: none;" aria-hidden="true">
-                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                    </div>
-                </div>
-                <button type="button" class="anti-uber-scroll-btn anti-uber-scroll-btn--next" id="antiUberScrollNext" aria-label="Ver próximas opções">
-                    <i class="material-icons" aria-hidden="true">chevron_right</i>
-                </button>
-            </div>
-        </div>
+        <!-- Uber Drag Handle -->
+        <div class="uber-sheet-handle"></div>
+
+        <!-- Uber Header -->
+        <div class="uber-sheet-header">
+            <h3 class="uber-sheet-title">Opções de viagem</h3>
+            <span class="uber-sheet-subtitle">Selecione uma categoria para confirmar</span>
         </div>
 
-        <div class="switch-type-trip">
-            <button type="button" class="btn-qrcode-driver-trip"><i class="material-icons">fullscreen</i></button>
-            <button type="button" class="btn-search-trip btn-search" style="display: none" id="list-active-drivers">
-                BUSCA PERSONALIZADA
-            </button>
-            <button type="button" class="btn-search-trip btn-search">CONFIRMAR</button>
+        <div class="container-box-price">
+            <div class="type-cars"></div>
+            <div class="indication-list-prices" style="display: none;"></div>
+            <div class="arrows-indication-list" style="display: none;">
+                <div class="prev-container-price">
+                    <i class="material-icons">keyboard_arrow_left</i>
+                </div>
+                <div class="next-container-price">
+                    <i class="material-icons">keyboard_arrow_right</i>
+                </div>
+            </div>
         </div>
+
+        <!-- Uber-Style Combined Bottom Action Bar -->
+        <div class="uber-bottom-action-bar">
+            <!-- Payment Method Pill -->
+            <div class="payment-trip" id="choicePaymentTrip" role="button" tabindex="0" title="Forma de pagamento">
+                <i class="material-icons payment-pill-icon">payments</i>  
+                <p id="namePaymentForm">Dinheiro</p>
+                <i class="material-icons payment-pill-chevron">chevron_right</i>
+            </div>
+            <div id="cardSelectedPayTrip" style="display: none;"></div>
+
+            <!-- Confirm Ride Primary Button -->
+            <div class="switch-type-trip">
+                <button type="button" class="btn-qrcode-driver-trip" title="Escanear QR Code"><i class="material-icons">qr_code_scanner</i></button>
+                <button type="button" class="btn-search-trip btn-search" style="display: none" id="list-active-drivers">
+                    BUSCA PERSONALIZADA
+                </button>
+                <button type="button" class="btn-search-trip btn-search">CONFIRMAR</button>
+            </div>
+
+            <!-- Schedule Button next to Confirm Button -->
+            <div class="schedule-trip" id="choiceScheduleTrip" role="button" tabindex="0" title="Agendar viagem">
+                <i class="material-icons">event</i>
+                <p id="nameScheduleTrip" style="display: none;">Agendar</p>
+            </div>
+        </div>
+
+        <div id="container-anti-uber" style="display: none">
+            <hr class="anti-uber-section-sep">
+            <div class="title-anti-uber">
+                <h4>Analisador de concorrente</h4>
+                <div id="div-get-cookies" class="anti-uber-cookie-row">
+                    <input class="form-control" type="text" id="cookie-anti-uber" autocomplete="off" placeholder="Cole o JSON do cookie aqui">
+                    <button type="button" class="btn btn-info anti-uber-search-btn" id="generate-value-au" aria-label="Pesquisar preços do concorrente">
+                        <span class="anti-uber-search-label">Pesquisar</span>
+                        <i class="material-icons anti-uber-search-icon" aria-hidden="true">search</i>
+                    </button>
+                </div>
+            </div>
+            <hr class="anti-uber-section-sep">
+            <div class="anti-uber-items" id="can-show-antiuber">
+                <p id="anti-uber-placeholder" class="anti-uber-placeholder">
+                    Cole o cookie no campo acima.
+                </p>
+                <div class="anti-uber-results-wrap anti-uber-results-wrap--hidden">
+                    <button type="button" class="anti-uber-scroll-btn anti-uber-scroll-btn--prev" id="antiUberScrollPrev" aria-label="Ver opções anteriores">
+                        <i class="material-icons" aria-hidden="true">chevron_left</i>
+                    </button>
+                    <div class="anti-uber-results-inner">
+                        <div id="anti-uber-results" class="anti-uber-results" aria-live="polite"></div>
+                        <div id="spinner-antiuber" class="anti-uber-spinner" role="status" style="display: none;" aria-hidden="true">
+                            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <button type="button" class="anti-uber-scroll-btn anti-uber-scroll-btn--next" id="antiUberScrollNext" aria-label="Ver próximas opções">
+                        <i class="material-icons" aria-hidden="true">chevron_right</i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="list-drivers-favorite">
             <h4>Motoristas favoritos disponíveis</h4>
             <ul id="listDriversFavorites"></ul>
