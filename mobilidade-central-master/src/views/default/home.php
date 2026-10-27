@@ -1,4 +1,4 @@
-<!-- Movy Central Deploy: 2026-10-27 12:55 UTC -->
+<!-- Movy Central Deploy: 2026-10-27 13:45 UTC -->
 <div class="container-main-map">
     <div class="list-trips-active-partner">
         <div class="container-trips">
@@ -94,8 +94,48 @@
             <button type="button" class="option-selected-customer-trip" id="callToCentral">CHAMAR PARA CENTRAL</button>
         </div>
         <div class="search-driver-in-trip">
-            <div>
-                <p id="pharseTrip">Procurando um carro ideal para você</p>
+            <div class="search-driver-card">
+                <div class="search-pulse-wrap">
+                    <div class="search-pulse-ring"></div>
+                    <div class="search-vehicle-img-box">
+                        <img id="searchTripVehicleImg" src="webfiles/img/icon/carro_eco.png" alt="Veículo" class="search-vehicle-img" />
+                    </div>
+                </div>
+
+                <div class="search-trip-info-header">
+                    <div class="search-category-pill" id="searchTripCategoryPill">
+                        <span id="searchTripCategoryName">Movy</span>
+                    </div>
+                    <p id="pharseTrip">Procurando motorista para sua viagem</p>
+                </div>
+
+                <div class="search-trip-meta-row">
+                    <div class="search-meta-item">
+                        <span class="search-meta-label">Valor estimado</span>
+                        <b id="searchTripPriceValue" class="search-meta-val">-</b>
+                    </div>
+                    <div class="search-meta-item">
+                        <span class="search-meta-label">Tempo • Distância</span>
+                        <span id="searchTripEta" class="search-meta-val">-</span>
+                    </div>
+                    <div class="search-meta-item">
+                        <span class="search-meta-label">Pagamento</span>
+                        <span id="searchTripPayment" class="search-meta-val">-</span>
+                    </div>
+                </div>
+
+                <div class="search-trip-route-preview">
+                    <div class="route-line-decor">
+                        <span class="dot-origin"></span>
+                        <span class="route-dash"></span>
+                        <span class="dot-dest"></span>
+                    </div>
+                    <div class="route-texts">
+                        <p id="searchTripOriginText" class="route-txt-origin">Origem...</p>
+                        <p id="searchTripDestText" class="route-txt-dest">Destino...</p>
+                    </div>
+                </div>
+
                 <button type="button" class="cancel-search-trip">CANCELAR</button>
             </div>
         </div>
