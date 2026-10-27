@@ -1461,42 +1461,6 @@ div.pac-container>.pac-item>span {
         width: 100%;
     }
 
-    .footer-container-trip>.type-cars>div.trip-type>span {
-        position: absolute;
-        top: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 10px;
-        border-radius: 20px;
-        padding: 2px 7px;
-        width: auto;
-    }
-
-    .footer-container-trip>.type-cars>div {
-        width: 28%;
-        flex: 1;
-        max-width: 120px;
-        border: 1px solid var(--color-border);
-        border-radius: 10px;
-        padding: 12px 8px;
-        margin: 0 4px 6px;
-    }
-
-    .footer-container-trip>.type-cars>div>img {
-        width: 64px;
-        height: 36px;
-        object-fit: contain;
-    }
-
-    .footer-container-trip>.type-cars>div>p {
-        font-size: 14px;
-        padding: 0;
-    }
-
-    .footer-container-trip>.type-cars>div>p>span {
-        font-size: 12px;
-    }
-
     .footer-container-trip>.switch-type-trip>button:first-child {
         display: none;
     }
@@ -3507,14 +3471,28 @@ div.pac-container>.pac-item>span {
 
 /* ── 3. UBER BOTTOM SHEET (RIDE SELECTION) ── */
 .footer-container-trip {
+    position: fixed !important;
+    bottom: -100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1200 !important;
     background: #FFFFFF !important;
-    border-radius: 24px 24px 0 0 !important;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14) !important;
+    border-radius: 20px 20px 0 0 !important;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18) !important;
     border-top: 1px solid #E5E7EB !important;
     padding: 0 !important;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
+    max-height: min(480px, 60vh) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 auto !important;
+    max-width: 520px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.footer-container-trip.active {
+    bottom: 0 !important;
 }
 
 .footer-container-trip > label {
@@ -3526,12 +3504,12 @@ div.pac-container>.pac-item>span {
     height: 5px;
     background: #E5E7EB;
     border-radius: 999px;
-    margin: 12px auto 8px;
+    margin: 10px auto 6px;
     flex-shrink: 0;
 }
 
 .uber-sheet-header {
-    padding: 4px 20px 10px;
+    padding: 2px 20px 8px;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -3539,7 +3517,7 @@ div.pac-container>.pac-item>span {
 }
 
 .uber-sheet-title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: #111827;
     margin: 0;
@@ -3547,25 +3525,27 @@ div.pac-container>.pac-item>span {
 }
 
 .uber-sheet-subtitle {
-    font-size: 13px;
+    font-size: 12.5px;
     color: #6B7280;
     font-weight: 400;
+    margin: 0;
 }
 
 .container-box-price {
-    padding: 0 16px;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 380px;
+    padding: 0 !important;
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: 240px !important;
+    box-sizing: border-box !important;
 }
 
 .container-box-price::-webkit-scrollbar {
-    width: 5px;
+    width: 4px;
 }
 .container-box-price::-webkit-scrollbar-thumb {
     background: #D1D5DB;
-    border-radius: 10px;
+    border-radius: 4px;
 }
 
 .type-cars {
@@ -3573,7 +3553,9 @@ div.pac-container>.pac-item>span {
     flex-direction: column !important;
     gap: 8px !important;
     width: 100% !important;
-    padding: 2px 0 10px !important;
+    padding: 4px 16px 8px !important;
+    box-sizing: border-box !important;
+    white-space: normal !important;
 }
 
 /* ── 4. UBER CATEGORY RIDE CARD (.trip-type) ── */
@@ -3583,181 +3565,215 @@ div.pac-container>.pac-item>span {
     align-items: center !important;
     justify-content: space-between !important;
     width: 100% !important;
-    min-height: 72px !important;
-    padding: 10px 16px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    height: 64px !important;
+    padding: 8px 14px !important;
     background: #FFFFFF !important;
     border: 1.5px solid #E5E7EB !important;
-    border-radius: 14px !important;
+    border-radius: 12px !important;
     box-sizing: border-box !important;
     cursor: pointer !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
     position: relative !important;
     margin: 0 !important;
+    white-space: normal !important;
+    flex-shrink: 0 !important;
 }
 
 .trip-type.uber-ride-card:hover {
     background: #F9FAFB !important;
     border-color: #D1D5DB !important;
-    transform: translateY(-1px);
 }
 
 .trip-type.uber-ride-card.active {
     background: #F9FAFB !important;
     border: 2px solid #000000 !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
 }
 
 .urc-left {
-    width: 64px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 14px;
-    flex-shrink: 0;
+    width: 56px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-right: 12px !important;
+    flex-shrink: 0 !important;
 }
 
 .urc-vehicle-img {
-    max-width: 64px;
-    max-height: 46px;
-    object-fit: contain;
+    max-width: 54px !important;
+    max-height: 40px !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 !important;
 }
 
 .urc-center {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    overflow: hidden !important;
+    text-align: left !important;
 }
 
 .urc-name-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .urc-name {
-    font-size: 15px;
-    font-weight: 700;
-    color: #111827;
-    letter-spacing: -0.2px;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 .urc-capacity {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #4B5563;
-    background: #F3F4F6;
-    padding: 1px 6px;
-    border-radius: 6px;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #4B5563 !important;
+    background: #F3F4F6 !important;
+    padding: 1px 5px !important;
+    border-radius: 4px !important;
+    line-height: 1.2 !important;
+    flex-shrink: 0 !important;
 }
 
 .urc-capacity-icon {
     font-size: 13px !important;
-    color: #4B5563;
+    color: #4B5563 !important;
 }
 
 .urc-eta-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    color: #6B7280;
-    font-weight: 500;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: 12px !important;
+    color: #6B7280 !important;
+    line-height: 1.2 !important;
 }
 
 .urc-eta-time {
-    font-weight: 600;
-    color: #1F2937;
+    font-weight: 600 !important;
+    color: #1F2937 !important;
 }
 
 .urc-eta-sep {
-    color: #9CA3AF;
+    color: #9CA3AF !important;
 }
 
 .urc-eta-dist {
-    color: #6B7280;
+    color: #6B7280 !important;
 }
 
 .urc-desc {
-    font-size: 11.5px;
-    color: #9CA3AF;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 11px !important;
+    color: #9CA3AF !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
 }
 
 .urc-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: center;
-    margin-left: 12px;
-    flex-shrink: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    margin-left: 10px !important;
+    flex-shrink: 0 !important;
+    text-align: right !important;
 }
 
 .label-prices-trip.urc-price {
-    font-size: 17px !important;
+    font-size: 16px !important;
     font-weight: 800 !important;
     color: #111827 !important;
     margin: 0 !important;
+    padding: 0 !important;
     letter-spacing: -0.3px !important;
     display: flex !important;
     align-items: baseline !important;
-    gap: 3px !important;
+    gap: 2px !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
 }
 
 .urc-currency {
-    font-size: 12px;
-    font-weight: 600;
-    color: #4B5563;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #4B5563 !important;
 }
 
 .urc-amount {
-    font-size: 17px;
-    font-weight: 800;
-    color: #111827;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
 }
 
-/* ── 5. UBER COMBINED BOTTOM ACTION BAR ── */
+/* ── 5. UBER BOTTOM ACTION BAR (2 ROWS) ── */
 .uber-bottom-action-bar {
     display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 12px 18px 20px !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 8px 16px max(12px, env(safe-area-inset-bottom, 12px)) !important;
     background: #FFFFFF !important;
     border-top: 1px solid #F3F4F6 !important;
     width: 100% !important;
     box-sizing: border-box !important;
     flex-shrink: 0 !important;
+    z-index: 1250 !important;
+}
+
+.uber-payment-row {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
 .payment-trip#choicePaymentTrip {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    height: 48px !important;
-    padding: 0 14px !important;
+    width: 100% !important;
+    height: 42px !important;
     background: #F3F4F6 !important;
     border: 1px solid #E5E7EB !important;
-    border-radius: 9999px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 14px !important;
     cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    flex-shrink: 0 !important;
     box-sizing: border-box !important;
+    transition: background 0.15s !important;
+    margin: 0 !important;
 }
 
 .payment-trip#choicePaymentTrip:hover {
     background: #E5E7EB !important;
-    border-color: #D1D5DB !important;
+}
+
+.uber-payment-pill-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
 }
 
 .payment-pill-icon {
-    font-size: 18px !important;
+    font-size: 19px !important;
     color: #111827 !important;
 }
 
@@ -3766,24 +3782,33 @@ div.pac-container>.pac-item>span {
     font-weight: 700 !important;
     color: #111827 !important;
     margin: 0 !important;
-    white-space: nowrap !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
 }
 
 .payment-pill-chevron {
-    font-size: 18px !important;
+    font-size: 19px !important;
     color: #9CA3AF !important;
 }
 
-.switch-type-trip {
+.uber-confirm-row {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.uber-confirm-row .switch-type-trip {
     flex: 1 1 auto !important;
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
     margin: 0 !important;
     padding: 0 !important;
+    border: none !important;
 }
 
-.switch-type-trip > .btn-search-trip.btn-search {
+.uber-confirm-row .btn-search-trip.btn-search {
     flex: 1 1 auto !important;
     height: 48px !important;
     background: #000000 !important;
@@ -3792,28 +3817,27 @@ div.pac-container>.pac-item>span {
     border-radius: 12px !important;
     font-size: 15px !important;
     font-weight: 700 !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    letter-spacing: 0.2px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22) !important;
+    transition: background 0.15s, transform 0.1s !important;
 }
 
-.switch-type-trip > .btn-search-trip.btn-search:hover {
+.uber-confirm-row .btn-search-trip.btn-search:hover {
     background: #1F2937 !important;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
 }
 
-.switch-type-trip > .btn-search-trip.btn-search:active {
+.uber-confirm-row .btn-search-trip.btn-search:active {
     transform: scale(0.98);
 }
 
-.switch-type-trip > .btn-qrcode-driver-trip {
-    height: 48px !important;
+.uber-confirm-row .schedule-trip#choiceScheduleTrip {
     width: 48px !important;
+    height: 48px !important;
     border-radius: 12px !important;
     background: #F3F4F6 !important;
     border: 1px solid #E5E7EB !important;
@@ -3823,37 +3847,42 @@ div.pac-container>.pac-item>span {
     justify-content: center !important;
     cursor: pointer !important;
     flex-shrink: 0 !important;
-    transition: background 0.2s !important;
-}
-
-.switch-type-trip > .btn-qrcode-driver-trip:hover {
-    background: #E5E7EB !important;
-}
-
-.schedule-trip#choiceScheduleTrip {
-    height: 48px !important;
-    width: 48px !important;
-    border-radius: 12px !important;
-    background: #F3F4F6 !important;
-    border: 1px solid #E5E7EB !important;
-    color: #111827 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    flex-shrink: 0 !important;
-    transition: background 0.2s !important;
     padding: 0 !important;
     margin: 0 !important;
+    transition: background 0.15s !important;
 }
 
-.schedule-trip#choiceScheduleTrip:hover {
+.uber-confirm-row .schedule-trip#choiceScheduleTrip:hover {
     background: #E5E7EB !important;
 }
 
-.schedule-trip#choiceScheduleTrip > i {
+.uber-confirm-row .schedule-trip#choiceScheduleTrip > i {
     font-size: 22px !important;
     color: #111827 !important;
+}
+
+.uber-confirm-row .btn-qrcode-driver-trip {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+    background: #F3F4F6 !important;
+    border: 1px solid #E5E7EB !important;
+    color: #111827 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transition: background 0.15s !important;
+}
+
+@media (max-width: 991px) {
+    .footer-container-trip.active ~ .map-zoom-controls,
+    .search-driver-in-trip.active ~ .map-zoom-controls {
+        display: none !important;
+    }
 }
 
 /* ── 6. UBER SEARCHING DRIVER SHEET (.search-driver-in-trip) ── */

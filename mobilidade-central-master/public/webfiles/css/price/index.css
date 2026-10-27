@@ -1,35 +1,50 @@
-/* ─────────────────────────────────────
-   Tipos de viagem — sidebar Valor fixo
-───────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   UBER DESIGN SYSTEM — PRICE / CATEGORY CARDS (LIGHT THEME)
+   ───────────────────────────────────────────────────────────────────────────── */
 
 .container-box-price {
     position: relative;
     width: 100%;
+    box-sizing: border-box;
 }
 
-/* Carousel */
-.footer-container-trip > .container-box-price > .type-cars {
-    width: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-    display: block;
+/* Container de cards — lista vertical limpa */
+.footer-container-trip .type-cars {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 6px 16px !important;
+    box-sizing: border-box !important;
+    max-height: 240px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    white-space: normal !important;
+}
+
+.footer-container-trip .type-cars::-webkit-scrollbar {
+    width: 4px;
+}
+.footer-container-trip .type-cars::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 4px;
 }
 
 /* Spinner de loading */
-.footer-container-trip > .container-box-price > .type-cars:empty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 160px;
-    white-space: normal;
+.footer-container-trip .type-cars:empty {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 120px !important;
+    white-space: normal !important;
 }
 
-.footer-container-trip > .container-box-price > .type-cars:empty::before {
+.footer-container-trip .type-cars:empty::before {
     content: "";
-    width: 36px;
-    height: 36px;
-    border: 3px solid #e9e9e9;
-    border-top-color: var(--color-text-primary);
+    width: 32px;
+    height: 32px;
+    border: 3px solid #E5E7EB;
+    border-top-color: #000000;
     border-radius: 50%;
     animation: price-spin 0.85s linear infinite;
 }
@@ -39,209 +54,192 @@
 }
 
 /* Esconde pagamento/botões durante loading */
+.footer-container-trip > .container-box-price.update ~ .uber-bottom-action-bar,
 .footer-container-trip > .container-box-price.update ~ .payment-trip,
-.footer-container-trip > .container-box-price.update ~ .schedule-trip,
 .footer-container-trip > .container-box-price.update ~ .switch-type-trip {
-    display: none;
+    display: none !important;
 }
 
-/* ── Página (bloco de 3 cards, carousel por scroll) ── */
-.footer-container-trip > .container-box-price > .type-cars > div {
-    width: 100%;
-    display: inline-block;
-    padding: 18px 14px 10px;
-    vertical-align: top;
-    white-space: normal;
-    box-sizing: border-box;
+/* ── Uber Category Card (.trip-type) ── */
+.trip-type.uber-ride-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    height: 64px !important;
+    padding: 8px 14px !important;
+    box-sizing: border-box !important;
+    border: 1.5px solid #E5E7EB !important;
+    border-radius: 12px !important;
+    background: #FFFFFF !important;
+    cursor: pointer !important;
+    position: relative !important;
+    float: none !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+    white-space: normal !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* ── Linha de 3 cards ── */
-.footer-container-trip > .container-box-price > .type-cars > div > div {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: stretch;
-    gap: 10px;
+.trip-type.uber-ride-card:hover {
+    background: #F9FAFB !important;
+    border-color: #D1D5DB !important;
 }
 
-/* Outros com boa visibilidade quando há seleção */
-.footer-container-trip > .container-box-price > .type-cars.trip-type-selected
-> div > div > div:not(.active) {
-    opacity: 0.75;
+.trip-type.uber-ride-card.active {
+    border: 2px solid #000000 !important;
+    background: #F9FAFB !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
 }
 
-/* ── Card ── */
-.footer-container-trip > .container-box-price > .type-cars > div > div > div {
-    flex: 1 1 0;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 8px 12px;
-    min-height: 126px;
-    box-sizing: border-box;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md, 12px);
-    background: #ffffff;
-    cursor: pointer;
-    position: relative;
-    float: none;
-    margin: 0;
-    opacity: 0.95;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* Esquerda: Carro */
+.trip-type.uber-ride-card .urc-left {
+    width: 56px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-right: 12px !important;
+    flex-shrink: 0 !important;
 }
 
-.footer-container-trip > .container-box-price > .type-cars > div > div > div:hover {
-    border-color: #94a3b8;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+.trip-type.uber-ride-card .urc-vehicle-img {
+    max-width: 54px !important;
+    max-height: 40px !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 !important;
+    transform: none !important;
 }
 
-/* ── Card ativo ── */
-.footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active {
-    border: 2px solid #000000;
-    background: #ffffff;
-    opacity: 1;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+/* Centro: Nome, Capacidade, Tempo */
+.trip-type.uber-ride-card .urc-center {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    overflow: hidden !important;
+    text-align: left !important;
 }
 
-/* Sem destino */
-.footer-container-trip.no-destination > .container-box-price > .type-cars
-> div > div > div.trip-type > p {
-    display: none;
+.trip-type.uber-ride-card .urc-name-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-height: unset !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
-/* ── Imagem do carro ── */
-.footer-container-trip > .container-box-price > .type-cars > div > div > div > img {
-    order: 1;
-    display: block;
-    width: 100%;
-    max-width: 80px;
-    height: 48px;
-    object-fit: contain;
-    margin: 0 auto 4px;
-    transition: transform 0.22s;
+.trip-type.uber-ride-card .urc-name {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
-.footer-container-trip > .container-box-price > .type-cars > div > div > div.active > img {
-    transform: scale(1.05);
+.trip-type.uber-ride-card .urc-capacity {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #4B5563 !important;
+    background: #F3F4F6 !important;
+    padding: 1px 5px !important;
+    border-radius: 4px !important;
+    line-height: 1.2 !important;
+    flex-shrink: 0 !important;
 }
 
-/* ── Nome do tipo ── */
-.footer-container-trip > .container-box-price > .type-cars > div > div > div > span {
-    order: 2;
-    display: block;
-    position: static  !important;
-    transform: none   !important;
-    top: auto  !important;
-    left: auto !important;
-    width: 100%;
-    text-align: center;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.25;
-    color: var(--color-text-secondary) !important;
-    background-color: transparent !important;
-    padding: 2px 2px 0;
-    margin: 0;
-    border-radius: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    letter-spacing: -0.01em;
-    text-transform: capitalize;
+.trip-type.uber-ride-card .urc-capacity-icon {
+    font-size: 13px !important;
+    color: #4B5563 !important;
+    vertical-align: middle !important;
 }
 
-.footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active > span {
-    color: #000000 !important;
-    font-weight: 800;
+.trip-type.uber-ride-card .urc-eta-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: 12px !important;
+    color: #6B7280 !important;
+    line-height: 1.2 !important;
 }
 
-/* ── Preço ── */
-.footer-container-trip > .container-box-price > .type-cars > div > div > div > p {
-    order: 3;
-    text-align: center;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin: 4px 0 0;
-    padding: 0;
-    line-height: 1.1;
-    white-space: nowrap;
-    letter-spacing: -0.02em;
+.trip-type.uber-ride-card .urc-eta-time {
+    font-weight: 600 !important;
+    color: #1F2937 !important;
 }
 
-.footer-container-trip > .container-box-price > .type-cars > div > div > div.trip-type.active > p {
-    color: #000000;
-    font-size: 15px;
-    font-weight: 800;
+.trip-type.uber-ride-card .urc-eta-sep {
+    color: #9CA3AF !important;
 }
 
-/* prefixo "R$" */
-.footer-container-trip > .container-box-price > .type-cars > div > div > div > p > span {
-    font-size: 10px;
-    font-weight: 600;
-    margin-right: 1px;
-    vertical-align: 1px;
+.trip-type.uber-ride-card .urc-eta-dist {
+    color: #6B7280 !important;
 }
 
-/* ── Dots ── */
-.indication-list-prices {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 0 12px;
+.trip-type.uber-ride-card .urc-desc {
+    font-size: 11px !important;
+    color: #9CA3AF !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
 }
 
-.indication-list-prices > div {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--color-border-input);
-    transition: background 0.15s, width 0.2s;
+/* Direita: Preço */
+.trip-type.uber-ride-card .urc-right {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    margin-left: 10px !important;
+    flex-shrink: 0 !important;
+    text-align: right !important;
 }
 
-.indication-list-prices > div.active {
-    background: var(--color-primary);
-    width: 18px;
-    border-radius: 3px;
+.trip-type.uber-ride-card .label-prices-trip.urc-price {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    letter-spacing: -0.3px !important;
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 2px !important;
+    white-space: nowrap !important;
+    order: unset !important;
+    line-height: 1.2 !important;
 }
 
-/* ── Setas prev/next ── */
+.trip-type.uber-ride-card .urc-currency {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #4B5563 !important;
+}
+
+.trip-type.uber-ride-card .urc-amount {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
+}
+
+/* Oculta controles de paginação horizontal legados */
+.indication-list-prices,
 .arrows-indication-list {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none;
+    display: none !important;
 }
-
-.arrows-indication-list > div {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    visibility: hidden;
-    cursor: pointer;
-    border: 1px solid #ddd;
-    background: var(--color-bg-surface);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-    pointer-events: auto;
-    transition: box-shadow 0.12s, background 0.12s;
-    z-index: 5;
-}
-
-.arrows-indication-list > div:hover {
-    background: #f5f5f5;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.14);
-}
-
-.arrows-indication-list > div.active         { visibility: visible; }
-.arrows-indication-list > div .material-icons { font-size: 16px; color: var(--color-text-muted); }
-.arrows-indication-list > .prev-container-price { left: 4px; }
-.arrows-indication-list > div:last-child        { right: 4px; }

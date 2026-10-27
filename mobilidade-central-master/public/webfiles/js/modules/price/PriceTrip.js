@@ -267,13 +267,15 @@ class PriceTrip {
                 if (config && config.typeMoney) typeMoney = config.typeMoney;
             }
 
-            const rawTagText = object.tag || object.name || object.priceName || '';
+            const rawTagText = object.tag || object.name || object.priceName || (object.tripType && object.tripType.name) || 'Movy Padrão';
             const isCentral = /central/i.test(rawTagText) || /central/i.test(object.type || '');
             const isEntregaOrDrive = /entrega|drive|particular|carro/i.test(rawTagText);
             
             let tagText = rawTagText.trim();
             if (tagText) {
                 tagText = tagText.charAt(0).toUpperCase() + tagText.slice(1).toLowerCase();
+            } else {
+                tagText = 'Movy Padrão';
             }
 
             // Resolução robusta da imagem do tipo de viagem

@@ -1,4 +1,4 @@
-<!-- Movy Central Deploy: 2026-10-27 16:55 UTC -->
+<!-- Movy Central Deploy: 2026-10-27 23:45 UTC - Uber Layout Alignments Fix -->
 <div class="container-main-map">
     <div class="list-trips-active-partner">
         <div class="container-trips">
@@ -302,29 +302,33 @@
             </div>
         </div>
 
-        <!-- Uber-Style Combined Bottom Action Bar -->
+        <!-- Uber-Style Bottom Action Bar (2 Rows) -->
         <div class="uber-bottom-action-bar">
-            <!-- Payment Method Pill -->
-            <div class="payment-trip" id="choicePaymentTrip" role="button" tabindex="0" title="Forma de pagamento">
-                <i class="material-icons payment-pill-icon">payments</i>  
-                <p id="namePaymentForm">Dinheiro</p>
-                <i class="material-icons payment-pill-chevron">chevron_right</i>
-            </div>
-            <div id="cardSelectedPayTrip" style="display: none;"></div>
-
-            <!-- Confirm Ride Primary Button -->
-            <div class="switch-type-trip">
-                <button type="button" class="btn-qrcode-driver-trip" title="Escanear QR Code"><i class="material-icons">qr_code_scanner</i></button>
-                <button type="button" class="btn-search-trip btn-search" style="display: none" id="list-active-drivers">
-                    BUSCA PERSONALIZADA
-                </button>
-                <button type="button" class="btn-search-trip btn-search">CONFIRMAR</button>
+            <!-- Row 1: Payment Method Pill -->
+            <div class="uber-payment-row">
+                <div class="payment-trip" id="choicePaymentTrip" role="button" tabindex="0" title="Forma de pagamento">
+                    <div class="uber-payment-pill-left">
+                        <i class="material-icons payment-pill-icon">credit_card</i>  
+                        <p id="namePaymentForm">Dinheiro</p>
+                    </div>
+                    <i class="material-icons payment-pill-chevron">chevron_right</i>
+                </div>
+                <div id="cardSelectedPayTrip" style="display: none;"></div>
             </div>
 
-            <!-- Schedule Button next to Confirm Button -->
-            <div class="schedule-trip" id="choiceScheduleTrip" role="button" tabindex="0" title="Agendar viagem">
-                <i class="material-icons">event</i>
-                <p id="nameScheduleTrip" style="display: none;">Agendar</p>
+            <!-- Row 2: Confirm Primary Button + Schedule + QR -->
+            <div class="uber-confirm-row">
+                <div class="switch-type-trip">
+                    <button type="button" class="btn-qrcode-driver-trip" title="Escanear QR Code"><i class="material-icons">qr_code_scanner</i></button>
+                    <button type="button" class="btn-search-trip btn-search" style="display: none" id="list-active-drivers">
+                        BUSCA PERSONALIZADA
+                    </button>
+                    <button type="button" class="btn-search-trip btn-search">CONFIRMAR</button>
+                </div>
+                <div class="schedule-trip" id="choiceScheduleTrip" role="button" tabindex="0" title="Agendar viagem">
+                    <i class="material-icons">event</i>
+                    <p id="nameScheduleTrip" style="display: none;">Agendar</p>
+                </div>
             </div>
         </div>
 
