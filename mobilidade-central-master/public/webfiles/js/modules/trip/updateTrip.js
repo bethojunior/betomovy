@@ -360,8 +360,19 @@ function initSearchTrip(data) {
 }
 
 function handleSearchTrip(data) {
-    populateSearchDriverCard(data);
-    mapService.searchDriver(data);
+    try {
+        populateSearchDriverCard(data);
+    } catch (e) {
+        console.warn("populateSearchDriverCard error:", e);
+    }
+
+    try {
+        if (typeof mapService !== "undefined" && typeof mapService.searchDriver === "function") {
+            mapService.searchDriver(data);
+        }
+    } catch (e) {
+        console.warn("mapService.searchDriver error:", e);
+    }
 
     try {
         if (typeof showToastByStatusTrip === "function") {
@@ -384,9 +395,11 @@ function handleSearchTrip(data) {
         }
     }
 
-    viewController.elementProperty.getElement(".car-return", (element) => {
-        element.src = `webfiles/img/logo/return-${data.tripTypeId}-d.png`;
-    });
+    try {
+        viewController.elementProperty.getElement(".car-return", (element) => {
+            element.src = `webfiles/img/logo/return-${data?.tripTypeId || 1}-d.png`;
+        });
+    } catch (e) {}
 
     const dateInitTrip = Session.getLocal("dateInitTrip");
     if (!dateInitTrip || (Array.isArray(dateInitTrip) && dateInitTrip.length === 0)) {

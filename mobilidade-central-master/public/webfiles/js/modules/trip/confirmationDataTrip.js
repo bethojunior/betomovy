@@ -1,11 +1,13 @@
 function getTravelCustomer(trip, customer) {
     const elementProperty = new ElementProperty();
+    const userLogged = Session.get("user") || {};
+    customer = customer || trip.customer || { name: userLogged.name || 'Cliente', phone: userLogged.phone || '' };
     const escapeHtml = (str) => str
         ? String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
         : '';
 
     elementProperty.getElement("#nameCustomerTripConfirmation", element => {
-        element.innerHTML = customer.name;
+        element.innerHTML = escapeHtml(customer.name || 'Cliente');
     });
 
     elementProperty.getElement("#phoneCustomerTripConfirmation", element => {
@@ -124,29 +126,53 @@ function getTravelCustomer(trip, customer) {
 
     elementProperty.addEventInElement("#btnConfirmationTrip", "onclick", function () {
         elementProperty.removeClass(".modal-confirmation-data-trip", "active");
-        const haveReturn = document.querySelector("#haveReturnTrip").checked
-        trip.haveReturn = document.querySelector("#haveReturnTrip").checked ? 1 : 0
+
+        const userLogged = Session.get("user") || {};
+        const safeCustomer = customer || trip.customer || {};
+        const haveReturn = document.querySelector("#haveReturnTrip")?.checked || false;
+        trip.haveReturn = haveReturn ? 1 : 0;
+
+        const custUserId = safeCustomer.userId || userLogged.idUser || 1;
+        trip.userId = parseInt(trip.userId || custUserId);
+        trip.tripTypeId = parseInt(trip.tripTypeId || managerTrip?.typeTaxi?.tripTypeId || 1);
+        trip.tripPaymentFormId = parseInt(trip.tripPaymentFormId || managerTrip?.paymentFormIdSelected || 1);
+
         trip.tripCustomer = {
-            id: customer.id ?? null,
-            userId: customer.userId ?? userLogged.idUser,
-            name: customer.name ?? userLogged?.name ?? '',
-            phone: customer.phone ?? userLogged?.phone ?? '',
+            id: safeCustomer.id ?? null,
+            userId: custUserId,
+            name: safeCustomer.name ?? userLogged?.name ?? '',
+            phone: safeCustomer.phone ?? userLogged?.phone ?? '',
         };
 
-        if(document.querySelector(".footer-container-trip").classList.contains("no-destination") || managerTrip.typeTaxi.centralNeighborhoodId != null){
+        if (document.querySelector(".footer-container-trip")?.classList.contains("no-destination") || managerTrip?.typeTaxi?.centralNeighborhoodId != null) {
             const { customer: deliveryCustomer } = Session.get("customerData") ?? {};
 
             trip.tripCustomer = {
-                id: deliveryCustomer ? null : (customer.id ?? null),
-                userId: deliveryCustomer ? userLogged.idUser : (customer.userId ?? userLogged.idUser),
-                name: customer.name ?? userLogged?.name ?? '',
-                phone: deliveryCustomer?.phone ?? customer.phone ?? userLogged?.phone ?? '',
-            }
+                id: deliveryCustomer ? null : (safeCustomer.id ?? null),
+                userId: deliveryCustomer ? (userLogged.idUser || custUserId) : (safeCustomer.userId ?? userLogged.idUser ?? custUserId),
+                name: safeCustomer.name ?? userLogged?.name ?? '',
+                phone: deliveryCustomer?.phone ?? safeCustomer.phone ?? userLogged?.phone ?? '',
+            };
         }
 
-        if(haveReturn){
+        if (haveReturn) {
+            trip.waypoints = trip.waypoints || [];
             trip.waypoints.push(trip.destination);
             trip.destination = trip.origin;
+        }
+
+        // Ativa feedback imediato de busca para o usuario
+        try {
+            if (typeof populateSearchDriverCard === "function") {
+                populateSearchDriverCard(trip);
+            }
+            elementProperty.addClass(".search-driver-in-trip", "active");
+            elementProperty.removeClass(".footer-container-trip", "active");
+            if (typeof updateBtnCallTripVisibility === "function") {
+                updateBtnCallTripVisibility();
+            }
+        } catch (e) {
+            console.warn("Erro ao ativar card de busca imediato:", e);
         }
 
         checkTypeCustomerByTrip(trip);

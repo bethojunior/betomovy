@@ -587,6 +587,8 @@ document.addEventListener('DOMContentLoaded', function () {
         sortTimePhrase()
 
         if (!status) {
+          viewController.elementProperty.removeClass('.search-driver-in-trip', 'active')
+          updateBtnCallTripVisibility()
           const messages = Object.values(response || {}).flat()
           const messagesFormated = messages.join('\n')
 
@@ -631,6 +633,8 @@ document.addEventListener('DOMContentLoaded', function () {
         sortTimePhrase()
 
         if (!status) {
+          viewController.elementProperty.removeClass('.search-driver-in-trip', 'active')
+          updateBtnCallTripVisibility()
           const messages = Object.values(response || {}).flat()
           const messagesFormated = messages.join('\n')
 
@@ -677,6 +681,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       })
       .catch((error) => {
+        viewController.elementProperty.removeClass('.search-driver-in-trip', 'active')
+        updateBtnCallTripVisibility()
         console.error('Erro na criação da viagem:', error)
         SwalCustom.messageDialog(
           'Não foi possível confirmar a criação da(s) viagem(ns). Verifique sua conexão e confira em Viagens Ativas antes de tentar novamente.',

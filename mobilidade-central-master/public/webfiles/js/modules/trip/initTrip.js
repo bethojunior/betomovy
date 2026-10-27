@@ -16,17 +16,32 @@ function initTrip(trip) {
  * @returns {boolean}
  */
 function validateTrip(trip) {
-    if (trip.userId === null) {
-        SwalCustom.messageDialog("Error ao tentar confirmar corrida", "Atenção", undefined, "warning");
-        return false;
+    if (!trip) return false;
+
+    if (trip.userId === null || trip.userId === undefined) {
+        const user = Session.get("user");
+        if (user && user.idUser) {
+            trip.userId = parseInt(user.idUser);
+        } else {
+            SwalCustom.messageDialog("Error ao tentar confirmar corrida: usuário não identificado", "Atenção", undefined, "warning");
+            return false;
+        }
     }
-    if (trip.tripPaymentFormId === null) {
-        SwalCustom.messageDialog("Informe a forma de pagamento", "Atenção", undefined, "warning");
-        return false;
+
+    if (trip.tripPaymentFormId === null || trip.tripPaymentFormId === undefined) {
+        if (typeof managerTrip !== "undefined" && managerTrip?.paymentFormIdSelected) {
+            trip.tripPaymentFormId = managerTrip.paymentFormIdSelected;
+        } else {
+            trip.tripPaymentFormId = 1; // Fallback padrão
+        }
     }
-    if (trip.tripTypeId === null) {
-        SwalCustom.messageDialog("Informe o tipo da corrida", "Atenção", undefined, "warning");
-        return false;
+
+    if (trip.tripTypeId === null || trip.tripTypeId === undefined) {
+        if (typeof managerTrip !== "undefined" && managerTrip?.typeTaxi?.tripTypeId) {
+            trip.tripTypeId = managerTrip.typeTaxi.tripTypeId;
+        } else {
+            trip.tripTypeId = 1; // Fallback padrão
+        }
     }
 
     return true;

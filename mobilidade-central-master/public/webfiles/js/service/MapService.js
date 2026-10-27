@@ -464,33 +464,48 @@ class MapService {
     }
 
     searchDriver(trip) {
-        initPop();
+        if (typeof initPop === "function") {
+            try { initPop(); } catch (e) {}
+        }
 
         if (this.pointCustomer) {
-            this.pointCustomer.remove();
+            try { this.pointCustomer.remove(); } catch (e) {}
             this.pointCustomer = null;
         }
 
-        // Preserva a rota visível no mapa durante a busca pelo motorista conforme o vídeo de referência
-        // this._removeRouteLayer(this._routeSourceId, this._routeLayerId);
-        // this._routeAdded = false;
+        const rawLat = trip?.origin?.latitude ?? trip?.origin?.lat ?? 0;
+        const rawLng = trip?.origin?.longitude ?? trip?.origin?.lng ?? 0;
+        const lat = parseFloat(rawLat);
+        const lng = parseFloat(rawLng);
 
-        const position = {
-            lat: parseFloat(trip.origin.latitude),
-            lng: parseFloat(trip.origin.longitude),
-        };
+        if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
+            console.warn("searchDriver: Coordenadas de origem inválidas", trip?.origin);
+            return;
+        }
 
-        this.infoSearch = new Popup(
-            position,
-            `<div class="point-local-customer">
-                <div class="container-search-driver">
-                    <span class="time-search-trip"></span>
-                </div>
-            </div>`
-        );
+        const position = { lat, lng };
 
-        this.map.setCenter([position.lng, position.lat]);
-        this.infoSearch.setMap(this.map);
+        if (typeof Popup !== "undefined") {
+            try {
+                this.infoSearch = new Popup(
+                    position,
+                    `<div class="point-local-customer">
+                        <div class="container-search-driver">
+                            <span class="time-search-trip"></span>
+                        </div>
+                    </div>`
+                );
+
+                if (this.map && typeof this.map.setCenter === "function") {
+                    this.map.setCenter([position.lng, position.lat]);
+                }
+                if (this.infoSearch && typeof this.infoSearch.setMap === "function") {
+                    this.infoSearch.setMap(this.map);
+                }
+            } catch (popErr) {
+                console.warn("Erro ao instanciar Popup de busca:", popErr);
+            }
+        }
     }
 
     // ─── Remoção de overlays ──────────────────────────────────────────────────

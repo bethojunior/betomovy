@@ -700,7 +700,7 @@ div.pac-container>.pac-item>span {
 }
 
 .search-driver-in-trip.active {
-    display: block;
+    display: block !important;
 }
 
 .search-driver-in-trip>div,
@@ -712,7 +712,7 @@ div.pac-container>.pac-item>span {
     width: 92%;
     max-width: 380px;
     margin: 0 auto;
-    display: block;
+    display: block !important;
     background-color: #ffffff;
     padding: 16px 18px 14px;
     border-radius: 12px;
@@ -725,7 +725,7 @@ div.pac-container>.pac-item>span {
 }
 
 .search-driver-in-trip.active>div {
-    display: block;
+    display: block !important;
 }
 
 /* Radar pulse com imagem do veículo (Carro / Moto) */
