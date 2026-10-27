@@ -19,6 +19,10 @@ class RadiusController extends View
             [
                 "repositories/CentralRepository",
                 'modules/radius/index'
-            ]);
+            ],
+            [
+                'radius/radius'
+            ]
+        );
     }
 }

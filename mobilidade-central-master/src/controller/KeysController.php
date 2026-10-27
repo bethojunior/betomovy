@@ -12,6 +12,9 @@ class KeysController extends View
             [
                 'repositories/KeyRepository',
                 'modules/keys/index'
+            ],
+            [
+                'keys/keys'
             ]
         );
     }
