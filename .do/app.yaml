@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-27 16:55 UTC - force cache buster in Host::getVersion, no-cache nginx headers and modernized home branding
+# Deploy trigger: 2026-10-27 20:48 UTC - fix trip dispatch, driverCalled queueing, realtime sync and background call trigger
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
