@@ -1,137 +1,463 @@
-.container-details-trip{
-    display: flex;
-    justify-content: center;
+/* ── Estilos da Página de Detalhes da Viagem (Movy Central) ── */
+
+.td-page {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+    box-sizing: border-box;
+    font-family: var(--font-family-base, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
 }
 
-.container-details-trip > div > p{
-    font-weight: 600;
-    font-size: 12pt;
-}
-
-.container-details-trip > div{
-    padding: 10px;
-    margin: 0 10px;
-}
-
-.container-details-trip > div > div > #haveReturn{
-    background-color: var(--color-bg-muted);
-    color: var(--color-primary-hover);
-    padding: 7px;
-    border-radius: 10px;
-}
-
-.container-details-trip > div:first-child{
-    width: 50%;
-}
-
-.container-details-trip > div:first-child > .container-info-trip{
+/* ── Cabeçalho ── */
+.td-header {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-border, #e2e8f0);
 }
 
-.container-details-trip > div:first-child > .container-info-trip > div{
-    text-align: center;
-    width: 25%;
-}
-
-.container-details-trip > div:first-child > .container-info-trip > div > span{
-    color: var(--color-text-muted);
-    font-size: 11pt;
-}
-
-
-.container-details-trip > div:first-child > .container-info-trip > div > p{
-    font-weight:600;
-}
-
-.container-details-trip > div:first-child > img{
-    width: 100%;
-    height: 300px;
-    background-color: var(--color-bg-muted);
-}
-
-.container-details-trip > div:last-child{
-    width: 40%;
-}
-
-.container-details-trip > div:first-child > ul{
-    list-style:none;
-    font-weight:500;
-    margin-top: 10px;
-}
-
-.container-details-trip > div:first-child > ul > li{
-    font-size:11pt;
+.td-header__left {
     display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.td-back {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md, 10px);
+    background-color: #ffffff;
+    border: 1px solid var(--color-border, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0f172a;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.td-back:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    color: #000000;
+}
+
+.td-header__badge-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.td-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-radius: var(--radius-sm, 6px);
+}
+
+.td-badge--primary {
+    background-color: #0f172a;
+    color: #ffffff;
+}
+
+.td-badge--return {
+    background-color: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+
+.td-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.td-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+    display: block;
+}
+
+.td-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--radius-md, 10px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.td-btn--outline {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+}
+
+.td-btn--outline:hover {
+    background-color: #f8fafc;
+    border-color: #0f172a;
+    color: #0f172a;
+}
+
+/* ── Grid Principal ── */
+.td-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.td-col-main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.td-card {
+    background: #ffffff;
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+}
+
+/* ── Card do Mapa ── */
+.td-map-wrap {
     position: relative;
-    margin-top: 10px;
+    width: 100%;
+    height: 280px;
+    background-color: #f1f5f9;
+    overflow: hidden;
 }
 
-.container-details-trip > div:first-child > ul > li:before{
-    content:"";
-    width:10px;
-    height:10px;
-    border-radius:100%;
-    background-color:var(--color-border-input);
-    margin-top:15px;
+.td-map-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.td-map-overlay {
     position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 2;
 }
 
-.container-details-trip > div:first-child > ul > li:first-child:after{
-    content:"";
-    height: 70%;
+.td-map-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 9999px;
+}
+
+.td-map-tag i {
+    font-size: 14px;
+}
+
+/* ── Métricas ── */
+.td-metrics {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 16px;
+    background-color: #ffffff;
+    border-top: 1px solid var(--color-border, #e2e8f0);
+}
+
+.td-metric-item {
+    text-align: center;
+    flex: 1;
+}
+
+.td-metric-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+}
+
+.td-metric-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.td-metric-value--price {
+    color: #059669;
+}
+
+/* ── Timeline de Itinerário ── */
+.td-card__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 24px;
+    background-color: #f8fafc;
+    border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.td-card__icon {
+    font-size: 22px;
+    color: #0f172a;
+}
+
+.td-card__title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.td-card__desc {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+}
+
+.td-card__body {
+    padding: 24px;
+}
+
+.td-route-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.td-route-list::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    bottom: 24px;
+    left: 9px;
     width: 2px;
-    background-color: var(--color-border-input);
-    position: absolute;
-    margin-top: 30px;
-    margin-left: 4px;
+    background: #cbd5e1;
+    z-index: 1;
 }
 
-.container-details-trip > div:first-child > ul > li > div{
-    display:flex;
-    flex-direction:column;
-    padding:10px;
-    margin-left: 10px;
+.td-route-item,
+.route-waypoint {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 22px;
+    z-index: 2;
 }
 
-
-.container-details-trip > div:first-child > ul > li > div > span:first-child{
-    font-weight:600;
-    font-size:11.5pt
+.td-route-item:last-child {
+    padding-bottom: 0;
 }
 
-.container-details-trip > div:first-child > ul > li:last-child:before{
-    border-radius:0;
+.td-route-pin {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 3px solid #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
-
-.container-details-trip > div:last-child > ul{
-    list-style:none;
-    font-weight:600;
+.td-route-pin--origin {
+    background-color: #10b981;
 }
 
-
-.container-details-trip > div:last-child > ul > li{
-    font-size:11pt;
-    padding:15px;
-    display:flex;
-    justify-content:space-between;
-    border-bottom:1px solid var(--color-border);
+.td-route-pin--dest {
+    background-color: #ef4444;
 }
 
-@media (max-width: 768px) {
-    .container-details-trip {
-        flex-direction: column;
+.route-waypoint::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: #f59e0b;
+    border: 3px solid #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    margin-left: 3px;
+    margin-top: 2px;
+}
+
+.td-route-info,
+.route-waypoint > div {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.td-route-addr,
+.route-waypoint span:first-child {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.4;
+}
+
+.td-route-time,
+.route-waypoint span:last-child {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* ── Card Recibo Financeiro ── */
+.td-card--receipt {
+    padding: 24px;
+    background: #ffffff;
+}
+
+.td-receipt-header {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #cbd5e1;
+}
+
+.td-receipt-logo img {
+    height: 38px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+.td-receipt-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+}
+
+.td-receipt-sub {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+}
+
+.td-receipt-body {
+    padding: 20px 0;
+}
+
+.td-receipt-items {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.td-receipt-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.td-receipt-item__name {
+    color: #64748b;
+}
+
+.td-receipt-item__value {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.td-receipt-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background-color: #f8fafc;
+    border-radius: var(--radius-md, 12px);
+    border: 1px solid #e2e8f0;
+}
+
+.td-receipt-total__label strong {
+    display: block;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+.td-receipt-total__label small {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.td-receipt-total__amount {
+    font-size: 20px;
+    font-weight: 900;
+    color: #059669;
+}
+
+.td-receipt-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 18px;
+    border-top: 1px dashed #cbd5e1;
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+.td-receipt-footer i {
+    font-size: 16px;
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+/* ── Responsividade & Impressão ── */
+@media (max-width: 860px) {
+    .td-grid {
+        grid-template-columns: 1fr;
     }
 
-    .container-details-trip > div:first-child,
-    .container-details-trip > div:last-child {
-        width: 100%;
-        margin: 0;
+    .td-page {
+        padding: 20px 14px 40px;
+    }
+}
+
+@media print {
+    .td-back,
+    .td-header__actions,
+    .app-header,
+    .container-menu-options {
+        display: none !important;
     }
 
-    .container-details-trip > div:first-child > img {
-        height: 220px;
+    .td-page {
+        padding: 0;
+        max-width: 100%;
+    }
+
+    .td-card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
     }
 }

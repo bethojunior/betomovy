@@ -1,44 +1,83 @@
 <div class="container-main">
-    <div class="container">
-        <h5 class="mt-3 mb-4">Cadastrar cliente</h5>
-        <div class="row mb-3">
-            <div class="form-group col-sm-2">
-                <input class="form-check-input" type="radio" id="isCompanyCustomerPf" name="find-customer-by" checked>
-                <label class="form-check-label" for="isCompanyCustomerPf">Pessoa Física</label>
-            </div>
-            <div class="form-group col-sm-2">
-                <input class="form-check-input" type="radio" id="isCompanyCustomerPj" name="find-customer-by">
-                <label class="form-check-label" for="isCompanyCustomerPj">Pessoa Jurídica</label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="form-group col-sm-6">
-                <label id="descriptionName" for="nameCustomer" class="mb-0">Nome do cliente</label>
-                <input type="text" class="form-control" id="nameCustomer">
-            </div>
-        </div>
-        <div class="row" style="display: none;">
-            <div class="form-group col-sm-4">
-                <label id="descriptionDocument" for="documentCustomer" class="mb-0">CPF</label>
-                <input type="hidden" class="form-control" id="documentCustomer" value="">
-            </div>
-        </div>
-        <div class="row">
-            <div class="form-group col-sm-4">
-                <label for="phoneCustomer" class="mb-0">Telefone</label>
-                <input type="text" class="form-control" id="phoneCustomer">
+    <div class="ce-page">
+
+        <div class="ce-header">
+            <div class="ce-header__left">
+                <a href="/customer/list" class="ce-back" title="Voltar">
+                    <i class="material-icons">arrow_back</i>
+                </a>
+                <div class="ce-header__info">
+                    <h1 class="ce-title">Novo Cliente</h1>
+                    <span class="ce-subtitle">Cadastre um passageiro ou cliente corporativo na central</span>
+                </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="form-group col-sm-4">
-                <label id="descriptionDate" for="dateOfBirthCustomer" class="mb-0">Data de nascimento</label>
-                <input type="date" class="form-control" id="dateOfBirthCustomer">
+        <div class="ce-card">
+
+            <!-- Tipo de pessoa -->
+            <div class="ce-section">
+                <p class="ce-section-label">Tipo de cadastro</p>
+                <div class="ce-type-group">
+                    <label class="ce-type-pill" for="isCompanyCustomerPf">
+                        <input type="radio" id="isCompanyCustomerPf" name="find-customer-by" checked>
+                        <i class="material-icons">person</i>
+                        Pessoa Física
+                    </label>
+                    <label class="ce-type-pill" for="isCompanyCustomerPj">
+                        <input type="radio" id="isCompanyCustomerPj" name="find-customer-by">
+                        <i class="material-icons">business</i>
+                        Pessoa Jurídica
+                    </label>
+                </div>
             </div>
+
+            <div class="ce-divider"></div>
+
+            <!-- Dados cadastrais -->
+            <div class="ce-section">
+                <p class="ce-section-label">Dados cadastrais</p>
+                <div class="ce-form">
+
+                    <div class="ce-field">
+                        <label class="ce-label" id="descriptionName" for="nameCustomer">Nome do cliente <span class="ce-required">*</span></label>
+                        <input type="text" class="ce-input form-control" id="nameCustomer" placeholder="Nome completo ou razão social">
+                    </div>
+
+                    <div class="ce-row">
+                        <div class="ce-field">
+                            <label class="ce-label" id="descriptionDocument" for="documentCustomer">CPF</label>
+                            <input type="text" class="ce-input form-control" id="documentCustomer" placeholder="000.000.000-00">
+                        </div>
+                        <div class="ce-field">
+                            <label class="ce-label" for="phoneCustomer">Telefone celular <span class="ce-required">*</span></label>
+                            <input type="text" class="ce-input form-control" id="phoneCustomer" placeholder="(00) 99999-9999">
+                        </div>
+                    </div>
+
+                    <div class="ce-row">
+                        <div class="ce-field">
+                            <label class="ce-label" id="descriptionDate" for="dateOfBirthCustomer">Data de nascimento <span class="ce-required">*</span></label>
+                            <input type="date" class="ce-input form-control" id="dateOfBirthCustomer">
+                        </div>
+                        <div class="ce-field">
+                            <label class="ce-label" for="emailCustomer">E-mail (opcional)</label>
+                            <input type="email" class="ce-input form-control" id="emailCustomer" placeholder="exemplo@email.com">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="ce-card-footer">
+                <a class="ce-btn ce-btn--cancel" href="/customer/list">Cancelar</a>
+                <button type="button" class="ce-btn ce-btn--save" id="saveCustomer">
+                    <i class="material-icons">save</i>
+                    Salvar Cliente
+                </button>
+            </div>
+
         </div>
-        <div class="mt-3">
-            <button type="button" class="btn btn-primary" id="saveCustomer">Salvar</button>
-            <a class="btn btn-secondary ml-2" href="/customer/list">Cancelar</a>
-        </div>
+
     </div>
 </div>

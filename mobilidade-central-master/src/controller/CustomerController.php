@@ -35,6 +35,9 @@ class CustomerController extends View
             [
                 'repositories/CentralRepository',
                 'modules/customer/new'
+            ],
+            [
+                'customer/edit'
             ]
         );
     }
