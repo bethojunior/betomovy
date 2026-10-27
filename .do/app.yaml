@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-27 13:45 UTC - update central search driver card with vehicle image and status
+# Deploy trigger: 2026-10-27 15:20 UTC - fix socket driver room auto-join and trip notifications dispatch
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

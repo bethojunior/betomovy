@@ -565,7 +565,7 @@ class TripCallDriverCommand extends Command
         $driverModel = new Driver;
         $deviceTokens = array();
 
-        if ($key == 0)
+        if (!empty($drivers[$key]->deviceToken))
             $deviceTokens[] = $drivers[$key]->deviceToken;
 
         //        if (isset($drivers[$key + 1]))

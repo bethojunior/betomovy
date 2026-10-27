@@ -80,6 +80,15 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnModu
     }
 
     if (driverId || userId) {
+      if (driverId) {
+        this.eventsRoomService.joinDriverRoom(client, String(driverId));
+      }
+      if (userId) {
+        this.eventsRoomService.joinUserRoom(client, String(userId));
+      }
+      if (cityId) {
+        this.eventsRoomService.joinCityRoom(client, String(cityId));
+      }
       this.eventListenerService.connectClient(this.server, client);
       return;
     }
