@@ -277,9 +277,13 @@ function populateSearchDriverCard(data) {
         const catBadgeEl = document.getElementById("searchTripCategoryName");
         if (catBadgeEl) catBadgeEl.innerText = categoryName;
 
+        // Atualiza o badge pill wrapper
+        const pillEl = document.getElementById("searchTripCategoryPill");
+        if (pillEl) pillEl.setAttribute('data-category', categoryName);
+
         const phraseEl = document.getElementById("pharseTrip");
         if (phraseEl) {
-            phraseEl.innerText = "Procurando motorista para sua viagem";
+            phraseEl.innerText = "Procurando motorista...";
         }
 
         let typeMoney = 'R$';

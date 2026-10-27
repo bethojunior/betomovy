@@ -93,52 +93,100 @@
             <button type="button" class="option-selected-customer-trip" id="openModalFindDriver">PROCURAR MOTORISTA</button>
             <button type="button" class="option-selected-customer-trip" id="callToCentral">CHAMAR PARA CENTRAL</button>
         </div>
+        <!-- MOVY SEARCH DRIVER — UBER-STYLE BOTTOM SHEET -->
         <div class="search-driver-in-trip">
-            <div class="search-driver-card">
-                <div class="search-pulse-wrap">
-                    <div class="search-pulse-ring"></div>
-                    <div class="search-vehicle-img-box">
-                        <img id="searchTripVehicleImg" src="webfiles/img/icon/carro_eco.png" alt="Veículo" class="search-vehicle-img" />
+            <!-- Overlay escuro atrás do sheet -->
+            <div class="sdit-overlay"></div>
+
+            <!-- Bottom Sheet principal -->
+            <div class="sdit-sheet">
+
+                <!-- Handle bar -->
+                <div class="sdit-handle"></div>
+
+                <!-- ══════ STATE: SEARCHING ══════ -->
+                <div class="sdit-state sdit-state-searching">
+
+                    <!-- Animação do carro + radar -->
+                    <div class="sdit-anim-wrap">
+                        <!-- Radar rings -->
+                        <div class="radar-ring radar-ring-1"></div>
+                        <div class="radar-ring radar-ring-2"></div>
+                        <div class="radar-ring radar-ring-3"></div>
+                        <!-- Estrada -->
+                        <div class="road-track">
+                            <div class="road-dashes">
+                                <span class="road-dash"></span>
+                                <span class="road-dash"></span>
+                                <span class="road-dash"></span>
+                                <span class="road-dash"></span>
+                                <span class="road-dash"></span>
+                            </div>
+                        </div>
+                        <!-- Carro animado -->
+                        <div class="car-anim-container">
+                            <img id="searchTripVehicleImg" src="webfiles/img/icon/carro_eco.png" alt="Veículo" class="car-anim-img" />
+                        </div>
                     </div>
+
+                    <!-- Badge categoria + status -->
+                    <div class="sdit-header">
+                        <span class="sdit-category-badge" id="searchTripCategoryPill">
+                            <span id="searchTripCategoryName">Movy</span>
+                        </span>
+                        <h3 class="sdit-title" id="pharseTrip">Procurando motorista...</h3>
+                        <p class="sdit-subtitle">Aguarde, estamos conectando você ao melhor motorista disponível</p>
+                    </div>
+
+                    <!-- Dots loader -->
+                    <div class="sdit-dots-loader">
+                        <span class="sdit-dot"></span>
+                        <span class="sdit-dot"></span>
+                        <span class="sdit-dot"></span>
+                    </div>
+
+                    <!-- Meta row: Preço / Tempo / Pagamento -->
+                    <div class="sdit-meta-row">
+                        <div class="sdit-meta-item">
+                            <span class="sdit-meta-icon">💰</span>
+                            <span class="sdit-meta-label">Valor</span>
+                            <b class="sdit-meta-val sdit-price" id="searchTripPriceValue">—</b>
+                        </div>
+                        <div class="sdit-meta-sep"></div>
+                        <div class="sdit-meta-item">
+                            <span class="sdit-meta-icon">⏱</span>
+                            <span class="sdit-meta-label">Duração</span>
+                            <span class="sdit-meta-val" id="searchTripEta">—</span>
+                        </div>
+                        <div class="sdit-meta-sep"></div>
+                        <div class="sdit-meta-item">
+                            <span class="sdit-meta-icon">💳</span>
+                            <span class="sdit-meta-label">Pagamento</span>
+                            <span class="sdit-meta-val" id="searchTripPayment">—</span>
+                        </div>
+                    </div>
+
+                    <!-- Rota -->
+                    <div class="sdit-route">
+                        <div class="sdit-route-item">
+                            <span class="sdit-route-dot sdit-route-dot-origin"></span>
+                            <p class="sdit-route-text" id="searchTripOriginText">Local de embarque</p>
+                        </div>
+                        <div class="sdit-route-line-wrap"><div class="sdit-route-line"></div></div>
+                        <div class="sdit-route-item">
+                            <span class="sdit-route-dot sdit-route-dot-dest"></span>
+                            <p class="sdit-route-text sdit-route-dest" id="searchTripDestText">Destino final</p>
+                        </div>
+                    </div>
+
+                    <!-- Botão cancelar -->
+                    <button type="button" class="sdit-cancel-btn cancel-search-trip">
+                        <span>Cancelar busca</span>
+                    </button>
                 </div>
 
-                <div class="search-trip-info-header">
-                    <div class="search-category-pill" id="searchTripCategoryPill">
-                        <span id="searchTripCategoryName">Movy</span>
-                    </div>
-                    <p id="pharseTrip">Procurando motorista para sua viagem</p>
-                </div>
-
-                <div class="search-trip-meta-row">
-                    <div class="search-meta-item">
-                        <span class="search-meta-label">Valor estimado</span>
-                        <b id="searchTripPriceValue" class="search-meta-val">-</b>
-                    </div>
-                    <div class="search-meta-item">
-                        <span class="search-meta-label">Tempo • Distância</span>
-                        <span id="searchTripEta" class="search-meta-val">-</span>
-                    </div>
-                    <div class="search-meta-item">
-                        <span class="search-meta-label">Pagamento</span>
-                        <span id="searchTripPayment" class="search-meta-val">-</span>
-                    </div>
-                </div>
-
-                <div class="search-trip-route-preview">
-                    <div class="route-line-decor">
-                        <span class="dot-origin"></span>
-                        <span class="route-dash"></span>
-                        <span class="dot-dest"></span>
-                    </div>
-                    <div class="route-texts">
-                        <p id="searchTripOriginText" class="route-txt-origin">Origem...</p>
-                        <p id="searchTripDestText" class="route-txt-dest">Destino...</p>
-                    </div>
-                </div>
-
-                <button type="button" class="cancel-search-trip">CANCELAR</button>
-            </div>
-        </div>
+            </div><!-- /sdit-sheet -->
+        </div><!-- /search-driver-in-trip -->
 
         <div class="trip-client">
             <div class="info-trip">
