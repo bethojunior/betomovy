@@ -246,7 +246,32 @@ class TripDao extends BaseDao
                 } catch (\Throwable $t) {}
             }
 
-            // 8. Push to Drivers (Fail-safe)
+            // 8. Queue drivers in driverCalled table so drivers are found by searchTrip
+            if (empty($origin) || !($origin instanceof Origin)) {
+                if (!empty($data->originId)) {
+                    try {
+                        $originData = (new OriginDao())->find($data->originId);
+                        if ($originData) {
+                            $origin = new Origin($originData);
+                        }
+                    } catch (\Throwable $t) {}
+                } elseif (isset($data->origin)) {
+                    try {
+                        $origin = new Origin($data->origin);
+                    } catch (\Throwable $t) {}
+                }
+            }
+
+            if ($origin instanceof Origin && in_array($this->trip->getStatus(), ['searching', 'searching_favorite'])) {
+                try {
+                    (new \app\services\CustomerTripCallService())
+                        ->callDrivers($this->trip, $origin);
+                } catch (\Throwable $t) {
+                    (new LogDao())->logException($t);
+                }
+            }
+
+            // 8.1 Push to Drivers (Fail-safe)
             $vehicleCategory = null;
             try {
                 $vehicleCategory = (new TripTypeDao())->find($this->trip->getTripTypeId())->type ?? null;
@@ -283,6 +308,29 @@ class TripDao extends BaseDao
                 $trip = $this->find($this->trip->getTripReference());
             } catch (\Throwable $e) {
                 $trip = $this->trip;
+            }
+
+            // 12. Realtime sync (Firebase/Socket) and launch background driver calling process
+            if (in_array($this->trip->getStatus(), ['searching', 'searching_favorite'])) {
+                try {
+                    $tripObj = is_object($trip) && method_exists($trip, 'toStdClass') ? $trip->toStdClass() : (object)$trip;
+                    if (!isset($tripObj->date)) {
+                        $tripObj->date = now();
+                    }
+                    (new \app\realtime\TripRealtime())
+                        ->hydrate($tripObj)
+                        ->createTrip();
+                } catch (\Throwable $t) {
+                    (new LogDao())->logException($t);
+                }
+
+                try {
+                    exec(
+                        "nohup php ../console/command.php trip-call {$this->trip->getTripReference()} > /dev/null 2>&1 & echo $! "
+                    );
+                } catch (\Throwable $t) {
+                    (new LogDao())->logException($t);
+                }
             }
 
             return $trip;
