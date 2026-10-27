@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-27 21:35 UTC - fix cancel search trip error modal and driver call zone matching
+# Deploy trigger: 2026-10-27 22:38 UTC - Uber design reconstruction, light theme, category cards and searching sheet
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
