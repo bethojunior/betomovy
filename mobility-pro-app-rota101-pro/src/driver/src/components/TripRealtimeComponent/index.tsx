@@ -73,7 +73,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   const { userDriverFind, getDriverFind, song } = useUserDriver();
   const { isOffline, isInTrip } = useDriverStatus();
   const { location } = useLocal();
-  const { playSong } = useSong();
+  const { playSong, stopSong } = useSong();
 
   const {
     data: tripsActives,
@@ -204,20 +204,40 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   const playSongActive = async () => {
     if (AppState.currentState !== 'active') return;
 
-    Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      staysActiveInBackground: true,
-      playsInSilentModeIOS: true,
-      shouldDuckAndroid: true,
-      playThroughEarpieceAndroid: false,
-    });
+    try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: true,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
 
-    await song?.setIsLoopingAsync(true);
-    await song?.playAsync();
+      if (song) {
+        await song.setIsLoopingAsync(true);
+        await song.playAsync();
+      } else {
+        await playSong('whistle', true);
+      }
+    } catch (e) {
+      console.warn('[TripRealtime] Erro ao tocar som de chamada:', e);
+      try {
+        await playSong('whistle', true);
+      } catch (err) {
+        console.error('[TripRealtime] Fallback playSong whistle falhou:', err);
+      }
+    }
   };
 
   const stopSongActive = async () => {
-    await song?.stopAsync();
+    try {
+      if (song) {
+        await song.stopAsync();
+      }
+      await stopSong('whistle');
+    } catch (e) {
+      console.warn('[TripRealtime] Erro ao parar som:', e);
+    }
   };
 
   const handleTrip = async (userId: number, callType?: string | number | null) => {

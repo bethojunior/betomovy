@@ -7,25 +7,27 @@ export const mountSong = async (
   uriRemote = false,
   songAlias = '',
 ): Promise<Audio.Sound> => {
-  await Audio.setAudioModeAsync({
-    allowsRecordingIOS: false,
-    staysActiveInBackground: true,
-    playsInSilentModeIOS: true,
-    shouldDuckAndroid: true,
-    playThroughEarpieceAndroid: false,
-  });
-
-  let sound: Audio.Sound | null = null;
+  try {
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      staysActiveInBackground: true,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+      playThroughEarpieceAndroid: false,
+    });
+  } catch (e) {
+    console.warn('[mountSong] setAudioModeAsync:', e);
+  }
 
   if (uriRemote && songAlias) {
     try {
       const songUri = await getSongAlias(songAlias);
       if (songUri != null) {
         const result = await Audio.Sound.createAsync({uri: songUri});
-        return result.sound;
+        if (result?.sound) return result.sound;
       }
     } catch (error) {
-      console.warn('[mountSong] Remote falhou, usando fallback local');
+      console.warn('[mountSong] Remote falhou, usando fallback local:', error);
     }
   }
 
@@ -33,15 +35,25 @@ export const mountSong = async (
     return new Audio.Sound();
   }
 
-  try {
-    const result = await Audio.Sound.createAsync(uri);
-    return result.sound;
-  } catch (error) {
-    console.error('[mountSong] Local também falhou:', error);
+  if (uri) {
+    try {
+      const result = await Audio.Sound.createAsync(uri);
+      if (result?.sound) return result.sound;
+    } catch (error) {
+      console.error('[mountSong] Local também falhou:', error);
+    }
   }
 
-  sound = new Audio.Sound();
-  return sound;
+  // Fallback garantido para o áudio padrão de chamado de corrida
+  try {
+    const defaultUri = require('../assets/songs/assobio.mp3');
+    const fallbackResult = await Audio.Sound.createAsync(defaultUri);
+    if (fallbackResult?.sound) return fallbackResult.sound;
+  } catch (fallbackError) {
+    console.error('[mountSong] Fallback padrão assobio falhou:', fallbackError);
+  }
+
+  return new Audio.Sound();
 };
 
 const getSongAlias = async (alias: string): Promise<string | null> => {
