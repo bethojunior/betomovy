@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-28 01:17 UTC - Switch database to movy_db with required SSL
+# Deploy trigger: 2026-10-28 01:49 UTC - Enforce AVNS_ODYdiYw4rvg6gfvKYOO and movy_db
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
