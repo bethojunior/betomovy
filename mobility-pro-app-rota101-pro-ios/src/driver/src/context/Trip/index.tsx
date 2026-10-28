@@ -394,6 +394,8 @@ export const TripProvider = ({ children }: TripContextChildren) => {
     });
   };
 
+  const isFetchingTripRef = useRef(false);
+
   const getDriverTrip = useCallback(async (
     driverId: number,
     location: { latitude: number; longitude: number },
@@ -403,59 +405,47 @@ export const TripProvider = ({ children }: TripContextChildren) => {
     if (callDriverModal) return false;
     if (isAcceptingTripRef.current) return false;
     if (Object.keys(tripAccepted || {}).length > 0) return false;
+    if (isFetchingTripRef.current) return false;
 
-    if (!hasRun) {
-      await Helper.timeout(5000).then(() => {
-        dispatchTrip({ type: 'update', field: 'hasRun', arg: true });
-      });
-      return false;
-    }
+    isFetchingTripRef.current = true;
+    try {
+      const listTripsDenied = await getTripDenied();
+      const response = await service.search(
+        driverId,
+        listTripsDenied,
+        location,
+        userId,
+      );
 
-    if (hasRun) {
-      dispatchTrip({ type: 'update', field: 'hasRun', arg: false });
-
-      try {
-        const listTripsDenied = await getTripDenied();
-        const response = await service.search(
-          driverId,
-          listTripsDenied,
-          location,
-          userId,
-        );
-
-        if (response === null || response === undefined) {
-          dispatchTrip({ type: 'update', field: 'trip', arg: {} });
-          return false;
-        }
-
-        if (callType && callType === TRIP_CALL_PARTNER) {
-          response.callType = 'partner';
-        }
-
-        if (response.risk_area && !response.riskArea) {
-          response.riskArea = response.risk_area;
-          delete response.risk_area;
-        }
-
-        if (!response.riskArea) {
-          response.riskArea = { origin: false, destination: false };
-        }
-
-        await AsyncStorage.setItem('trip', JSON.stringify(response));
-        dispatchTrip({ type: 'update', field: 'trip', arg: response });
-
-        return true;
-      } catch (error) {
-        console.log(error);
+      if (response === null || response === undefined) {
+        dispatchTrip({ type: 'update', field: 'trip', arg: {} });
         return false;
-      } finally {
-        InteractionManager.runAfterInteractions(() => {
-          dispatchTrip({ type: 'update', field: 'hasRun', arg: true });
-        });
       }
+
+      if (callType && callType === TRIP_CALL_PARTNER) {
+        response.callType = 'partner';
+      }
+
+      if (response.risk_area && !response.riskArea) {
+        response.riskArea = response.risk_area;
+        delete response.risk_area;
+      }
+
+      if (!response.riskArea) {
+        response.riskArea = { origin: false, destination: false };
+      }
+
+      await AsyncStorage.setItem('trip', JSON.stringify(response));
+      dispatchTrip({ type: 'update', field: 'trip', arg: response });
+
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    } finally {
+      isFetchingTripRef.current = false;
     }
-    return false;
-  }, [callDriverModal, hasRun, song, tripAccepted]);
+  }, [callDriverModal, song, tripAccepted]);
 
   useEffect(() => {
     if (tripAccepted && Object.keys(tripAccepted).length > 0) {

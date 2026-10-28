@@ -63,9 +63,12 @@ async function registerForPushNotificationsAsync() {
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
         name: 'default',
-        importance: Notifications.AndroidImportance.DEFAULT,
-        vibrationPattern: [0, 250, 250, 250],
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 500, 250, 500],
         lightColor: '#FF231F7C',
+        sound: 'assobio.mp3',
+        enableVibrate: true,
+        showBadge: true,
       });
     }
 

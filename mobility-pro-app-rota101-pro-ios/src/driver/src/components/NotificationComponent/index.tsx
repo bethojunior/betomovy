@@ -214,12 +214,45 @@ export const NotificationComponent = ({ onPress }: NotificationComponentProps) =
   useEffect(() => {
     notificationsActions();
 
-    const subscription = Notifications.addNotificationResponseReceivedListener(
+    const responseSubscription = Notifications.addNotificationResponseReceivedListener(
       handleNotificationResponse,
     );
 
+    const receivedSubscription = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        const data = notification?.request?.content?.data ?? {};
+        let parsedData = data;
+        try {
+          if (data?.additionalData) {
+            parsedData = typeof data.additionalData === 'string' ? JSON.parse(data.additionalData) : data.additionalData;
+          }
+        } catch {}
+
+        const tag = data?.tag || parsedData?.tag;
+        const action = data?.action || parsedData?.action;
+
+        const isRideCall =
+          tag === 'rideRequest' ||
+          tag === 'notifyDriversClose' ||
+          action === 'rideRequest' ||
+          action === 'tripCall' ||
+          parsedData?.tripReference;
+
+        if (isRideCall && (parsedData?.userId != null || data?.userId != null)) {
+          const userId = parsedData?.userId ?? data?.userId;
+          const callType = parsedData?.tripCallTypeId ?? data?.tripCallTypeId;
+          dispatchTrip({
+            type: 'update',
+            field: 'notificationTripCallRequest',
+            arg: { userId: parseInt(userId), callType },
+          });
+        }
+      },
+    );
+
     return () => {
-      subscription.remove();
+      responseSubscription.remove();
+      receivedSubscription.remove();
     };
   }, []);
 

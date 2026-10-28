@@ -256,14 +256,13 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   useEffect(() => {
     if (!notificationTripCallRequest) return;
 
+    const request = notificationTripCallRequest;
     dispatchTrip({ type: 'update', field: 'notificationTripCallRequest', arg: null });
-
-    if (Platform.OS !== 'ios') return;
 
     setPreloadVisible(true);
     handleTrip(
-      notificationTripCallRequest.userId,
-      notificationTripCallRequest.callType,
+      request.userId,
+      request.callType,
     ).finally(() => {
       setPreloadVisible(false);
     });

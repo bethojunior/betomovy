@@ -7,6 +7,8 @@ import App from './src/App';
 
 const OPEN_APP_TAGS = new Set([
   PushConstants.PushNotificationTags.CHAT_MESSAGE,
+  PushConstants.PushNotificationTags.RIDE_REQUEST,
+  PushConstants.PushNotificationTags.DRIVERS_CLOSE,
   PushConstants.PushNotificationTags.RIDE_OFFER,
   PushConstants.PushNotificationTags.RIDE_CANCELLED,
   PushConstants.PushNotificationTags.SCHEDULED_RIDE,
