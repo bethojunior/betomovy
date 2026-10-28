@@ -3939,9 +3939,10 @@ div.pac-container>.pac-item>span {
 .sdit-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(1.5px);
-    -webkit-backdrop-filter: blur(1.5px);
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: none !important;
 }
 
 .sdit-sheet {
@@ -3951,8 +3952,8 @@ div.pac-container>.pac-item>span {
     right: 0;
     background: #FFFFFF;
     border-radius: 24px 24px 0 0;
-    padding: 0 20px 28px;
-    box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.22);
+    padding: 0 20px 24px;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.18);
     max-width: 520px;
     margin: 0 auto;
     box-sizing: border-box;
@@ -3961,11 +3962,13 @@ div.pac-container>.pac-item>span {
 
 @media (min-width: 992px) {
     .sdit-sheet {
-        bottom: 0 !important;
+        bottom: 24px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        max-width: 480px !important;
-        border-radius: 24px 24px 0 0 !important;
+        max-width: 440px !important;
+        border-radius: 20px !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22) !important;
+        border: 1px solid #E5E7EB !important;
     }
 }
 

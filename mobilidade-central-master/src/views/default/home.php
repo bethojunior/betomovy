@@ -146,19 +146,16 @@
                     <!-- Meta row: Preço / Duração / Pagamento -->
                     <div class="sdit-meta-row">
                         <div class="sdit-meta-item">
-                            <span class="sdit-meta-icon">💰</span>
                             <span class="sdit-meta-label">Valor</span>
                             <b class="sdit-meta-val sdit-price" id="searchTripPriceValue">—</b>
                         </div>
                         <div class="sdit-meta-sep"></div>
                         <div class="sdit-meta-item">
-                            <span class="sdit-meta-icon">⏱</span>
                             <span class="sdit-meta-label">Duração</span>
                             <span class="sdit-meta-val" id="searchTripEta">—</span>
                         </div>
                         <div class="sdit-meta-sep"></div>
                         <div class="sdit-meta-item">
-                            <span class="sdit-meta-icon">💳</span>
                             <span class="sdit-meta-label">Pagamento</span>
                             <span class="sdit-meta-val" id="searchTripPayment">—</span>
                         </div>

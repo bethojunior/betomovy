@@ -318,7 +318,12 @@ function populateSearchDriverCard(data) {
             let parts = [];
             if (duration !== null && duration !== undefined && duration !== "") {
                 const durStr = String(duration).trim();
-                parts.push(durStr.toLowerCase().includes("min") ? durStr : `${Math.round(parseFloat(durStr))} min`);
+                const durNum = parseFloat(durStr);
+                if (!isNaN(durNum)) {
+                    parts.push(`${Math.round(durNum)} min`);
+                } else if (!durStr.toLowerCase().includes("nan")) {
+                    parts.push(durStr.toLowerCase().includes("min") ? durStr : `${durStr} min`);
+                }
             }
             if (dist !== null && dist !== undefined && dist !== "") {
                 const distStr = String(dist).trim();
@@ -326,7 +331,11 @@ function populateSearchDriverCard(data) {
                     parts.push(distStr);
                 } else {
                     const distNum = parseFloat(distStr);
-                    parts.push(!isNaN(distNum) ? `${distNum.toFixed(2)} km` : distStr);
+                    if (!isNaN(distNum)) {
+                        parts.push(`${distNum.toFixed(2)} km`);
+                    } else if (!distStr.toLowerCase().includes("nan")) {
+                        parts.push(distStr);
+                    }
                 }
             }
             etaEl.innerText = parts.length > 0 ? parts.join(" • ") : "Calculando...";
