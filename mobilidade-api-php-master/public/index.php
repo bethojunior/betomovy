@@ -33,14 +33,68 @@ if (in_array($uriLowerPath, ['/privacy', '/privacidade', '/privacy-policy', '/po
 
 if (strpos($_SERVER['REQUEST_URI'] ?? '', '/test-diag') === 0) {
     header("Content-Type: application/json; charset=utf-8");
-    $daoFile = __DIR__ . '/../app/dao/TripDao.php';
-    $clientFile = __DIR__ . '/../app/utils/TripRealtimeApiClient.php';
-    $lines = file_exists($daoFile) ? file($daoFile) : [];
+    if (file_exists(__DIR__ . '/env.php')) {
+        require_once __DIR__ . '/env.php';
+    }
+
+    $host = function_exists('env') ? env('MYSQL_HOST', 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com') : 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com';
+    $port = function_exists('env') ? env('MYSQL_PORT', '25060') : '25060';
+    $user = function_exists('env') ? env('MYSQL_USER', 'doadmin') : 'doadmin';
+    $pass1 = function_exists('env') ? env('MYSQL_PASS', 'AVNS_ODYdiYw4rvg6gfvKYOO') : 'AVNS_ODYdiYw4rvg6gfvKYOO';
+    $pass2 = 'AVNS_ODYdIYW4rvg6gfvKYO0'; // Legacy commit password variation
+    $dbname = function_exists('env') ? env('MYSQL_NAME', 'defaultdb') : 'defaultdb';
+
+    $results = [];
+
+    // Test 1: Current pass with standard options
+    try {
+        $p1 = new PDO("mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4", $user, $pass1, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_SSL_CA => true,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+        ]);
+        $stmt = $p1->query("SELECT 1 as ok");
+        $results['pass1_ssl_ca_true'] = 'SUCCESS (' . $stmt->fetchColumn() . ')';
+    } catch (\Throwable $e) {
+        $results['pass1_ssl_ca_true'] = $e->getMessage();
+    }
+
+    // Test 2: Variation pass2 with standard options
+    try {
+        $p2 = new PDO("mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4", $user, $pass2, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_SSL_CA => true,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+        ]);
+        $stmt = $p2->query("SELECT 1 as ok");
+        $results['pass2_ssl_ca_true'] = 'SUCCESS (' . $stmt->fetchColumn() . ')';
+    } catch (\Throwable $e) {
+        $results['pass2_ssl_ca_true'] = $e->getMessage();
+    }
+
+    // Test 3: System cert path
+    try {
+        $caPath = '/etc/pki/tls/certs/ca-bundle.crt';
+        $opt = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+        if (file_exists($caPath)) {
+            $opt[PDO::MYSQL_ATTR_SSL_CA] = $caPath;
+        }
+        $opt[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+        $p3 = new PDO("mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4", $user, $pass1, $opt);
+        $stmt = $p3->query("SELECT 1 as ok");
+        $results['pass1_ca_bundle'] = 'SUCCESS (' . $stmt->fetchColumn() . ')';
+    } catch (\Throwable $e) {
+        $results['pass1_ca_bundle'] = $e->getMessage();
+    }
+
     echo json_encode([
         "status" => true,
-        "msg" => "Top of index.php reached",
-        "trip_dao_mtime" => file_exists($daoFile) ? date('Y-m-d H:i:s', filemtime($daoFile)) : null,
-        "trip_realtime_api_client_preview" => file_exists($clientFile) ? substr(file_get_contents($clientFile), 0, 250) : null,
+        "results" => $results,
+        "host" => $host,
+        "port" => $port,
+        "user" => $user,
+        "pass1_len" => strlen($pass1),
+        "pass1_preview" => substr($pass1, 0, 8) . '...' . substr($pass1, -4),
         "php_version" => PHP_VERSION,
         "time" => date('Y-m-d H:i:s')
     ]);
