@@ -48,6 +48,9 @@ final class Connection
                 $name = env('MYSQL_NAME') ?: getenv('MYSQL_NAME') ?: 'movy_db';
                 $user = env('MYSQL_USER') ?: getenv('MYSQL_USER') ?: 'doadmin';
                 $pass = env('MYSQL_PASS') ?: getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
+                if ($pass === 'AVNS_ODYdiYw4rvg6gfvKYO0' || $pass === 'AVNS_ODYdIYW4rvg6gfvKYO0') {
+                    $pass = 'AVNS_ODYdiYw4rvg6gfvKYOO';
+                }
                 $port = env('MYSQL_PORT') ?: getenv('MYSQL_PORT') ?: '25060';
                 break;
             case self::DB_MYSQL_RO:
@@ -56,6 +59,9 @@ final class Connection
                 $name = env('MYSQL_NAME_RO') ?: env('MYSQL_NAME') ?: getenv('MYSQL_NAME') ?: 'movy_db';
                 $user = env('MYSQL_USER_RO') ?: env('MYSQL_USER') ?: getenv('MYSQL_USER') ?: 'doadmin';
                 $pass = env('MYSQL_PASS_RO') ?: env('MYSQL_PASS') ?: getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
+                if ($pass === 'AVNS_ODYdiYw4rvg6gfvKYO0' || $pass === 'AVNS_ODYdIYW4rvg6gfvKYO0') {
+                    $pass = 'AVNS_ODYdiYw4rvg6gfvKYOO';
+                }
                 $port = env('MYSQL_PORT_RO') ?: env('MYSQL_PORT') ?: getenv('MYSQL_PORT') ?: '25060';
                 break;
             default:

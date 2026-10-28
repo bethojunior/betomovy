@@ -40,23 +40,40 @@ if (strpos($_SERVER['REQUEST_URI'] ?? '', '/test-diag') === 0) {
     $host = function_exists('env') ? env('MYSQL_HOST', 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com') : 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com';
     $port = function_exists('env') ? env('MYSQL_PORT', '25060') : '25060';
     $user = function_exists('env') ? env('MYSQL_USER', 'doadmin') : 'doadmin';
-    $pass1 = function_exists('env') ? env('MYSQL_PASS', 'AVNS_ODYdiYw4rvg6gfvKYOO') : 'AVNS_ODYdiYw4rvg6gfvKYOO';
-    $pass2 = 'AVNS_ODYdIYW4rvg6gfvKYO0'; // Legacy commit password variation
+    $envPass = function_exists('env') ? env('MYSQL_PASS', '') : '';
+    // If env has the old typo with 0 at the end, override it
+    $correctPass = 'AVNS_ODYdiYw4rvg6gfvKYOO';
+    $pass1 = ($envPass && substr($envPass, -1) !== '0') ? $envPass : $correctPass;
+    $pass_with_O = 'AVNS_ODYdiYw4rvg6gfvKYOO';
+    $pass_with_0 = 'AVNS_ODYdiYw4rvg6gfvKYO0';
     $dbname = function_exists('env') ? env('MYSQL_NAME', 'movy_db') : 'movy_db';
 
     $results = [];
 
-    // Test 1: Current pass with standard options
+    // Test with letter O:
     try {
-        $p1 = new PDO("mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4", $user, $pass1, [
+        $p1 = new PDO("mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4", $user, $pass_with_O, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_SSL_CA => true,
             PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
         ]);
         $stmt = $p1->query("SELECT 1 as ok");
-        $results['pass1_ssl_ca_true'] = 'SUCCESS (' . $stmt->fetchColumn() . ')';
+        $results['pass_with_letter_O'] = 'SUCCESS (' . $stmt->fetchColumn() . ')';
     } catch (\Throwable $e) {
-        $results['pass1_ssl_ca_true'] = $e->getMessage();
+        $results['pass_with_letter_O'] = $e->getMessage();
+    }
+
+    // Test with zero 0:
+    try {
+        $p2 = new PDO("mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4", $user, $pass_with_0, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_SSL_CA => true,
+            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+        ]);
+        $stmt = $p2->query("SELECT 1 as ok");
+        $results['pass_with_zero_0'] = 'SUCCESS (' . $stmt->fetchColumn() . ')';
+    } catch (\Throwable $e) {
+        $results['pass_with_zero_0'] = $e->getMessage();
     }
 
     // Test 2: Variation pass2 with standard options
