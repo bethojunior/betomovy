@@ -1,6 +1,6 @@
 <?php
 
-function env($key)
+function env($key, $default = null)
 {
     $val = getenv($key);
     if ($val !== false && $val !== null && $val !== '') {
@@ -23,5 +23,5 @@ function env($key)
         }
     }
 
-    return null;
+    return $default;
 }

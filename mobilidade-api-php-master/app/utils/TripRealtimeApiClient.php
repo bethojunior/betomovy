@@ -7,7 +7,7 @@ use app\utils\Pulse\PulseService;
 
 class TripRealtimeApiClient
 {
-    protected string $baseUrl = 'https://socket.movymob.com';
+    protected string $baseUrl = '';
     protected int $timeout = 60000;
     protected ?PulseService $pulse = null;
 
@@ -15,17 +15,19 @@ class TripRealtimeApiClient
     {
         $this->timeout = 60 * 1000; // Default timeout in milliseconds
 
-        $envSocket = env('API_SOCKET_URL') ?: env('API_SOCKET_HOST');
-        if (!empty($envSocket) && is_string($envSocket)) {
-            $this->baseUrl = rtrim($envSocket, '/');
-        } else {
-            $this->baseUrl = 'https://socket.movymob.com';
-        }
+        $rawUrl = env('API_SOCKET_URL')
+            ?: (env('API_SOCKET_HOST')
+            ?: (env('SOCKET_URL')
+            ?: (Config::get('socket_url')
+            ?: (Config::get('api_socket_url')
+            ?: 'https://socket.movymob.com'))));
+
+        $this->baseUrl = rtrim((string)$rawUrl, '/');
 
         try {
-            $appTitle = Config::get('app_title');
-            $pulseApp = 'api-php-' . (!empty($appTitle) ? $appTitle : 'movy');
-            $groupId = env('PULSE_GROUP_ID') ?: 'movy';
+            $appName = Config::get('app_title') ?: 'movy';
+            $pulseApp = 'api-php-' . $appName;
+            $groupId = (string)(env('PULSE_GROUP_ID') ?: '29384825-08d7-4e7f-8cfc-8dfe713b842a');
             $this->pulse = new PulseService($pulseApp, $groupId);
         } catch (\Throwable $e) {
             $this->pulse = null;
@@ -36,7 +38,7 @@ class TripRealtimeApiClient
     {
         try {
             if (empty($this->baseUrl)) {
-                return ['status' => 0, 'response' => null, 'error' => 'API_SOCKET_URL not configured'];
+                return ['status' => 0, 'response' => null, 'error' => 'API_SOCKET_URL is not configured'];
             }
 
             $url = $this->baseUrl . "/webhook/trip";
@@ -45,14 +47,14 @@ class TripRealtimeApiClient
             $ch = curl_init($url);
             curl_setopt_array($ch, [
                 CURLOPT_TIMEOUT_MS => $this->timeout,
-                CURLOPT_CONNECTTIMEOUT_MS => 5000,
+                CURLOPT_CONNECTTIMEOUT_MS => $this->timeout,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => $json,
-                CURLOPT_HTTPHEADER => [
+                CURLOPT_HTTPHEADER => array_merge([
                     'Content-Type: application/json',
                     'Content-Length: ' . strlen($json)
-                ],
+                ]),
             ]);
 
             $body = curl_exec($ch);
@@ -67,8 +69,8 @@ class TripRealtimeApiClient
 
             return ['status' => $status, 'response' => $body, 'error' => $error];
         } catch (\Throwable $e) {
+            $message = "Exceção ao enviar webhook trip: {$e->getMessage()}";
             if ($this->pulse) {
-                $message = "Exceção ao enviar webhook trip: {$e->getMessage()}";
                 $this->pulse->handle($message, static::class, 'critical');
             }
             return ['status' => 0, 'response' => null, 'error' => $e->getMessage()];

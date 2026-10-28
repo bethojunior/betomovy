@@ -7,9 +7,9 @@ use App\Utils\Pulse\GroupIds;
 
 abstract class AbstractRealtimeApiClient
 {
-    protected string $baseUrl = 'https://socket.movymob.com';
+    protected string $baseUrl = '';
     protected int $timeout = 60000;
-    protected PulseProvider $pulse;
+    protected ?PulseProvider $pulse = null;
 
     abstract protected function getEndpoint(): string;
     abstract protected function getWebhookType(): string;
@@ -17,12 +17,15 @@ abstract class AbstractRealtimeApiClient
     public function __construct()
     {
         $this->timeout = 60 * 1000; // Default timeout in milliseconds
-        $rawUrl = env('API_SOCKET_URL') ?: env('API_SOCKET_HOST');
-        $this->baseUrl = (!empty($rawUrl) && is_string($rawUrl)) ? rtrim($rawUrl, '/') : 'https://socket.movymob.com';
+        $rawUrl = env('API_SOCKET_URL') ?: (env('API_SOCKET_HOST') ?: (env('SOCKET_URL') ?: 'https://socket.movymob.com'));
+        $this->baseUrl = rtrim((string)$rawUrl, '/');
 
-        $pulseApp =  'central-' . env('APP_NAME', 'laravel');
-
-        $this->pulse = new PulseProvider($pulseApp, GroupIds::CENTRAL_PROD);
+        try {
+            $pulseApp = 'central-' . (env('APP_NAME') ?: 'laravel');
+            $this->pulse = new PulseProvider($pulseApp, GroupIds::CENTRAL_PROD);
+        } catch (\Throwable $e) {
+            $this->pulse = null;
+        }
     }
 
     public function sendEvent(array $payload): array
