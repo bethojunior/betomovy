@@ -42,7 +42,7 @@ if (strpos($_SERVER['REQUEST_URI'] ?? '', '/test-diag') === 0) {
     $user = function_exists('env') ? env('MYSQL_USER', 'doadmin') : 'doadmin';
     $pass1 = function_exists('env') ? env('MYSQL_PASS', 'AVNS_ODYdiYw4rvg6gfvKYOO') : 'AVNS_ODYdiYw4rvg6gfvKYOO';
     $pass2 = 'AVNS_ODYdIYW4rvg6gfvKYO0'; // Legacy commit password variation
-    $dbname = function_exists('env') ? env('MYSQL_NAME', 'defaultdb') : 'defaultdb';
+    $dbname = function_exists('env') ? env('MYSQL_NAME', 'movy_db') : 'movy_db';
 
     $results = [];
 
@@ -113,7 +113,7 @@ if (strpos($_SERVER['REQUEST_URI'] ?? '', '/db-mig') === 0) {
     $dbPort = getenv('MYSQL_PORT') ?: '25060';
     $dbUser = getenv('MYSQL_USER') ?: 'doadmin';
     $dbPass = getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
-    $dbName = getenv('MYSQL_NAME') ?: 'defaultdb';
+    $dbName = getenv('MYSQL_NAME') ?: 'movy_db';
     try {
         $pdo = new PDO("mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4", $dbUser, $dbPass,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::MYSQL_ATTR_SSL_CA => true, PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false]);

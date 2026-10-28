@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-28 00:22 UTC - Fix TripRealtimeApiClient baseUrl null on mobile app login
+# Deploy trigger: 2026-10-28 01:17 UTC - Switch database to movy_db with required SSL
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
@@ -107,7 +107,7 @@ services:
       - key: MYSQL_PASS
         value: AVNS_ODYdiYw4rvg6gfvKYOO
       - key: MYSQL_NAME
-        value: defaultdb
+        value: movy_db
       - key: S3_BUCKET_NAME
         value: voutehomologar
       - key: S3_REGION
@@ -166,7 +166,7 @@ services:
       - key: MYSQL_DB_PASSWORD
         value: AVNS_ODYdiYw4rvg6gfvKYOO
       - key: MYSQL_DB_NAME
-        value: defaultdb
+        value: movy_db
       - key: MONGO_DB_HOST
         value: movy-mongodb-79fd3aab.mongo.ondigitalocean.com
       - key: MONGO_DB_PORT

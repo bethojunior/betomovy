@@ -52,7 +52,7 @@ $host = getenv('MYSQL_HOST') ?: 'movy-mysql-do-user-45837300-0.f.db.ondigitaloce
 $port = getenv('MYSQL_PORT') ?: '25060';
 $user = getenv('MYSQL_USER') ?: 'doadmin';
 $pass = getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
-$dbname = getenv('MYSQL_NAME') ?: 'defaultdb';
+$dbname = getenv('MYSQL_NAME') ?: 'movy_db';
 
 try {
     $pdo = new PDO(

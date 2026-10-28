@@ -45,7 +45,7 @@ final class Connection
             case self::DB_MYSQL:
                 $type = self::DB_MYSQL;
                 $host = env('MYSQL_HOST') ?: getenv('MYSQL_HOST') ?: 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com';
-                $name = env('MYSQL_NAME') ?: getenv('MYSQL_NAME') ?: 'defaultdb';
+                $name = env('MYSQL_NAME') ?: getenv('MYSQL_NAME') ?: 'movy_db';
                 $user = env('MYSQL_USER') ?: getenv('MYSQL_USER') ?: 'doadmin';
                 $pass = env('MYSQL_PASS') ?: getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
                 $port = env('MYSQL_PORT') ?: getenv('MYSQL_PORT') ?: '25060';
@@ -53,7 +53,7 @@ final class Connection
             case self::DB_MYSQL_RO:
                 $type = self::DB_MYSQL_RO;
                 $host = env('MYSQL_HOST_RO') ?: env('MYSQL_HOST') ?: getenv('MYSQL_HOST') ?: 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com';
-                $name = env('MYSQL_NAME_RO') ?: env('MYSQL_NAME') ?: getenv('MYSQL_NAME') ?: 'defaultdb';
+                $name = env('MYSQL_NAME_RO') ?: env('MYSQL_NAME') ?: getenv('MYSQL_NAME') ?: 'movy_db';
                 $user = env('MYSQL_USER_RO') ?: env('MYSQL_USER') ?: getenv('MYSQL_USER') ?: 'doadmin';
                 $pass = env('MYSQL_PASS_RO') ?: env('MYSQL_PASS') ?: getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
                 $port = env('MYSQL_PORT_RO') ?: env('MYSQL_PORT') ?: getenv('MYSQL_PORT') ?: '25060';
@@ -77,8 +77,8 @@ final class Connection
 
     public static function getDatabaseName($sql = self::SQL)
     {
-        $db = ($sql == self::SQL || $sql == self::DB_MYSQL) ? (env('MYSQL_NAME') ?: 'defaultdb') : (env('MONGODB_NAME') ?: 'defaultdb');
-        return (string)($db ?: 'defaultdb');
+        $db = ($sql == self::SQL || $sql == self::DB_MYSQL) ? (env('MYSQL_NAME') ?: 'movy_db') : (env('MONGODB_NAME') ?: 'defaultdb');
+        return (string)($db ?: 'movy_db');
     }
 
     /**
