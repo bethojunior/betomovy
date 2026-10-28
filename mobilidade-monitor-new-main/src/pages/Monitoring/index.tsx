@@ -46,6 +46,36 @@ import { MOBILE_BREAKPOINT } from "../../styles/layout-tokens";
 
 const DEFAULT_ACTIVE_TRIPS_POLLING_INTERVAL_MS = 15000;
 
+const playNewTripSound = () => {
+  try {
+    const audio = new Audio('/songCallTaxi.mp3');
+    audio.play().catch(() => {
+      // Fallback para sintetizador Web Audio API caso o browser restrinja áudio direto
+      try {
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioContext) {
+          const ctx = new AudioContext();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        }
+      } catch (synthErr) {
+        console.warn('Não foi possível reproduzir som da corrida:', synthErr);
+      }
+    });
+  } catch (err) {
+    console.warn('Erro ao tocar áudio no monitor:', err);
+  }
+};
+
 const resolveIfNotNull = <T,>(incoming?: T, existing?: T) => {
   if (incoming === null) return existing;
   return incoming !== undefined ? incoming : existing;
@@ -752,6 +782,11 @@ const Monitoring: FC = () => {
     if (!matchesActiveFilters(resolvedTrip, activeFiltersSnapshotRef.current)) {
       removeTripFromRef(tripData.tripReference);
       return;
+    }
+
+    const isNewTrip = !existingTrip || eventType === 'added';
+    if (isNewTrip && (tripData.status === 'searching' || tripData.status === 'searching_driver_offer' || tripData.isCalling === '1' || tripData.isCalling === 1)) {
+      playNewTripSound();
     }
 
     updateSingleTripInRef(resolvedTrip);

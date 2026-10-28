@@ -1001,6 +1001,12 @@ class DriverDao extends BaseDao
             $tripDao = new TripDao();
             $trip = $tripDao->find($tripReference, false);
 
+            if ($trip->status == Trip::BOARDING) {
+                // Já está em boarding (idempotente)
+                $this->commit();
+                return $trip;
+            }
+
             if ($trip->status != Trip::ACCEPTED) {
                 throw new Exception("CORRIDA NÃO ESTA MAIS ATIVA");
             }
@@ -1010,15 +1016,27 @@ class DriverDao extends BaseDao
 
             $tripDao->informArrival($tripReference, $trip->tripAuditId);
 
-            $this->sendPushOnArrival($trip);
+            try {
+                $this->sendPushOnArrival($trip);
+            } catch (\Exception $pushEx) {
+                (new LogDao())->logException($pushEx);
+            }
 
             if ($trip->tripCustomerId) {
-                $trip->resultSms = (new TripCustomerService())
-                    ->notifyOnDriverArrival(new Trip($trip), new TripCustomer($trip->customer));
+                try {
+                    $trip->resultSms = (new TripCustomerService())
+                        ->notifyOnDriverArrival(new Trip($trip), new TripCustomer($trip->customer));
+                } catch (\Exception $smsEx) {
+                    (new LogDao())->logException($smsEx);
+                }
             }
 
             if ($trip->tripPaymentFormId == TripPaymentFormConst::CREDIT_CARD) {
-                $trip->paymentInfo = $this->getCustomerCardInfo(new Trip($trip));
+                try {
+                    $trip->paymentInfo = $this->getCustomerCardInfo(new Trip($trip));
+                } catch (\Exception $cardEx) {
+                    $trip->paymentInfo = null;
+                }
             }
 
             Queue::dispatch(

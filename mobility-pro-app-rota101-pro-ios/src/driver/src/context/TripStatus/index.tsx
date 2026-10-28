@@ -287,28 +287,36 @@ export const TripStatusProvider = ({ children }: TripStatusContextChildren) => {
       const meters = await getDistanceLocation(driverPosition, clientPosition);
 
       if (meters > 100) {
-        Alert.alert(
-          translate('trip.too_distance_to_arrive_title'),
-          translate('trip.too_distance_to_arrive_description'),
-          [
-            {
-              text: translate('finishTrip.text_yes'),
-              onPress: () => {
-                return showArrivalDriver().catch(() => false);
+        return new Promise<boolean>((resolve) => {
+          Alert.alert(
+            translate('trip.too_distance_to_arrive_title'),
+            translate('trip.too_distance_to_arrive_description'),
+            [
+              {
+                text: translate('finishTrip.text_yes'),
+                onPress: async () => {
+                  try {
+                    const success = await showArrivalDriver();
+                    resolve(!!success);
+                  } catch {
+                    resolve(false);
+                  }
+                },
               },
-            },
-            {
-              text: translate('finishTrip.text_no'),
-              onPress: () => {
-                tripAccepted.status = 'accepted';
-                return setStatusTrip(
-                  translate('driverTrip.text_signal_arrival'),
-                );
+              {
+                text: translate('finishTrip.text_no'),
+                onPress: () => {
+                  tripAccepted.status = 'accepted';
+                  setStatusTrip(
+                    translate('driverTrip.text_signal_arrival'),
+                  );
+                  resolve(true);
+                },
               },
-            },
-          ],
-        );
-        return true;
+            ],
+            { cancelable: false },
+          );
+        });
       }
       return await showArrivalDriver();
     } catch {

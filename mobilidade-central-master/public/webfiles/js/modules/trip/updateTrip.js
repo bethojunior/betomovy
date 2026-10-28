@@ -390,6 +390,11 @@ function initSearchTrip(data) {
 
 function handleSearchTrip(data) {
     try {
+        const audio = new Audio('/webfiles/songs/songCallTaxi.mp3');
+        audio.play().catch(() => {});
+    } catch (e) {}
+
+    try {
         populateSearchDriverCard(data);
     } catch (e) {
         console.warn("populateSearchDriverCard error:", e);

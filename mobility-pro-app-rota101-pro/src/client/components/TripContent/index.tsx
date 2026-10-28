@@ -49,14 +49,16 @@ function TripContent({ setModalDriverData }: TripContentProps) {
 
   const lastTripPartner = tripPartnerList[tripPartnerList.length - 1];
 
-  let tripUpdateEvent: string | null = null;
-  let statusType: string | null = null;
+  const tripUpdateEventRef = useRef<string | null>(null);
+  const statusTypeRef = useRef<string | null>(null);
 
-  const conditionComponentTrip = [
-    STATUS_SEARCHING,
-    STATUS_SCHEDULED && trip?.driver === null,
-    STATUS_SEARCHING_DRIVER_OFFER,
-  ].includes(trip?.status || lastTripPartner?.status);
+  const isSearching = [STATUS_SEARCHING, STATUS_SEARCHING_DRIVER_OFFER].includes(
+    trip?.status || lastTripPartner?.status,
+  );
+  const isScheduledWithoutDriver =
+    (trip?.status === STATUS_SCHEDULED || lastTripPartner?.status === STATUS_SCHEDULED) &&
+    (trip?.driver === null || lastTripPartner?.driver === null);
+  const conditionComponentTrip = isSearching || isScheduledWithoutDriver;
 
   const mountSong = async () => {
     const { sound } = await Audio.Sound.createAsync(
@@ -67,18 +69,18 @@ function TripContent({ setModalDriverData }: TripContentProps) {
   };
 
   const clearTripUpdateEvent = () => {
-    if (!!tripUpdateEvent) {
-      tripRealtime.unsubscribe(tripUpdateEvent);
-      tripUpdateEvent = null;
+    if (tripUpdateEventRef.current) {
+      tripRealtime.unsubscribe(tripUpdateEventRef.current);
+      tripUpdateEventRef.current = null;
     }
-    statusType = null;
+    statusTypeRef.current = null;
   };
 
   const onTripUpdate: TripCallback = async ({ data, type }) => {
     const statusTypes = ['accepted', 'boarding', 'in_progress', 'finished'];
 
     if (statusTypes.includes(data.status)) {
-      if (statusType !== data.status) {
+      if (statusTypeRef.current !== data.status) {
         mountSong().then(async (soung) => {
           Audio.setAudioModeAsync({
             allowsRecordingIOS: false,
@@ -90,13 +92,17 @@ function TripContent({ setModalDriverData }: TripContentProps) {
           await soung?.playAsync().then(() => {});
         });
 
-        statusType = data.status;
+        statusTypeRef.current = data.status;
       }
     }
 
     if (['added', 'modified'].includes(type)) {
       dispatchTripCustomer({ type: 'update', field: 'trip', arg: data });
       await AsyncStorage.setItem('trip', JSON.stringify(data));
+      // Se a corrida for aceita ou avançar e o objeto completo do motorista não estiver presente, sincroniza via API
+      if (['accepted', 'boarding', 'in_progress'].includes(data.status) && (!data.driver || !data.driver?.nickname)) {
+        handleTripStateChange(data.tripReference);
+      }
     }
 
     if (type === 'removed') {
@@ -106,9 +112,12 @@ function TripContent({ setModalDriverData }: TripContentProps) {
   };
 
   useEffect(() => {
-    if (!!tripReference && !tripUpdateEvent) {
-      tripUpdateEvent = tripRealtime.getTrip(tripReference, onTripUpdate);
+    if (!!tripReference && !tripUpdateEventRef.current) {
+      tripUpdateEventRef.current = tripRealtime.getTrip(tripReference, onTripUpdate);
     }
+    return () => {
+      clearTripUpdateEvent();
+    };
   }, [tripReference]);
 
   const updateTripPartnerList = (trips: TripProps[]) => {

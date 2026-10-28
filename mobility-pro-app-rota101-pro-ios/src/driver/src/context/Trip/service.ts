@@ -29,7 +29,7 @@ export const TripService = () => {
     });
 
     if (!response.data.status) {
-      return response.data.message;
+      return { status: false, message: response.data.message || '' };
     }
 
     return response.data;
