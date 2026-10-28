@@ -1,8 +1,11 @@
 function showInfoDelivery(trip, customer) {
     document.querySelector("#obsOriginDelivery").value = "";
+    // Oculta a bottom-sheet de opções para não sobrepor nem bugar a tela
+    viewController.elementProperty.removeClass(".footer-container-trip", "active");
     viewController.elementProperty.addClass("#info-delivery", "active");
     viewController.elementProperty.addEventInElement(".go-back-delivery-info", "onclick", function () {
         viewController.elementProperty.removeClass("#info-delivery", "active");
+        viewController.elementProperty.addClass(".footer-container-trip", "active");
     });
 
     const listAddressDeliveryObs = document.querySelector("#listAddressDeliveryObs");
@@ -45,6 +48,7 @@ function showInfoDelivery(trip, customer) {
 
             return waypoint;
         });
+        viewController.elementProperty.removeClass("#info-delivery", "active");
         getTravelCustomer(trip, customer);
     });
 }
