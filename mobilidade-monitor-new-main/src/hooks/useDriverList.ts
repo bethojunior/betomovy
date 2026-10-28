@@ -35,7 +35,7 @@ export function useDriverList(): UseDriverListReturn {
           : searchValue;
       const statusParam = idStatusSearch > 0 ? idStatusSearch : "";
       const typeParam = driverType > 0 ? driverType : "";
-      return `driver?page=${page}&allCities=1&driverRegisterStatusId=${statusParam}&driverType=${typeParam}&${searchBy}=${encodeURIComponent(formattedSearch)}`;
+      return `driver/getAll?page=${page}&allCities=0&driverRegisterStatusId=${statusParam}&driverType=${typeParam}&${searchBy}=${encodeURIComponent(formattedSearch)}`;
     },
     [searchBy, idStatusSearch, driverType]
   );
