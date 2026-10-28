@@ -227,6 +227,18 @@ class DashboardController extends ApiController
                     return;
                 }
 
+                // Fetch driversCalled for this specific trip
+                $dcStmt = $pdo->prepare("
+                    SELECT dc.id, dc.driverId, dc.status, dc.proximity, u.name, u.nickname
+                    FROM driverCalled dc
+                    JOIN driver d ON d.idDriver = dc.driverId
+                    JOIN user u ON u.idUser = d.userId
+                    WHERE dc.tripReference = :ref
+                    ORDER BY dc.id ASC
+                ");
+                $dcStmt->execute([':ref' => $r['tripReference']]);
+                $driversCalled = $dcStmt->fetchAll(PDO::FETCH_ASSOC);
+
                 $detail = [
                     'idTrip' => (int)$r['idTrip'],
                     'tripReference' => $r['tripReference'],
@@ -277,6 +289,7 @@ class DashboardController extends ApiController
                     ] : null,
                     'schedule' => $r['schedule'] ? ['schedule' => $r['schedule']] : null,
                     'callingDriver' => $r['callingDriver'] ? explode(',', $r['callingDriver']) : [],
+                    'driversCalled' => $driversCalled,
                 ];
 
                 echo $this->returnSuccess('Detalhes da viagem', $detail);
@@ -399,8 +412,29 @@ class DashboardController extends ApiController
             $stmt->execute();
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Fetch driversCalled for all returned trips in a single query
+            $tripRefs = array_filter(array_column($rows, 'tripReference'));
+            $driversCalledByRef = [];
+            if (!empty($tripRefs)) {
+                $inPlaceholders = implode(',', array_fill(0, count($tripRefs), '?'));
+                $dcStmt = $pdo->prepare("
+                    SELECT dc.id, dc.driverId, dc.tripReference, dc.status, dc.proximity, u.name, u.nickname
+                    FROM driverCalled dc
+                    JOIN driver d ON d.idDriver = dc.driverId
+                    JOIN user u ON u.idUser = d.userId
+                    WHERE dc.tripReference IN ({$inPlaceholders})
+                    ORDER BY dc.id ASC
+                ");
+                $dcStmt->execute(array_values($tripRefs));
+                $allCalled = $dcStmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($allCalled as $dc) {
+                    $driversCalledByRef[$dc['tripReference']][] = $dc;
+                }
+            }
+
             $mapped = [];
             foreach ($rows as $r) {
+                $ref = $r['tripReference'];
                 $mapped[] = [
                     'idTrip' => (int)$r['idTrip'],
                     'tripReference' => $r['tripReference'],
@@ -451,6 +485,7 @@ class DashboardController extends ApiController
                     ] : null,
                     'schedule' => $r['schedule'] ? ['schedule' => $r['schedule']] : null,
                     'callingDriver' => $r['callingDriver'] ? explode(',', $r['callingDriver']) : [],
+                    'driversCalled' => $driversCalledByRef[$ref] ?? [],
                 ];
             }
 

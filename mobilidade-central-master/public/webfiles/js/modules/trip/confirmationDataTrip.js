@@ -94,8 +94,19 @@ function getTravelCustomer(trip, customer) {
     const duration = trip.estimatedTripTime || Session.getLocal("estimatedTripTime");
     elementProperty.getElement("#etaTripConfirmation", element => {
         let parts = [];
-        if (duration) parts.push(duration);
-        if (dist) parts.push(dist);
+        if (duration !== null && duration !== undefined && duration !== "") {
+            const durStr = String(duration).trim();
+            parts.push(durStr.toLowerCase().includes("min") ? durStr : `${Math.round(parseFloat(durStr))} min`);
+        }
+        if (dist !== null && dist !== undefined && dist !== "") {
+            const distStr = String(dist).trim();
+            if (distStr.toLowerCase().includes("km") || distStr.toLowerCase().includes("mi")) {
+                parts.push(distStr);
+            } else {
+                const distNum = parseFloat(distStr);
+                parts.push(!isNaN(distNum) ? `${distNum.toFixed(2)} km` : distStr);
+            }
+        }
         element.innerHTML = parts.length > 0 ? parts.join(" • ") : "-";
     });
 

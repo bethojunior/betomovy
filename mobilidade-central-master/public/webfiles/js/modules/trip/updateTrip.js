@@ -316,8 +316,19 @@ function populateSearchDriverCard(data) {
         const etaEl = document.getElementById("searchTripEta");
         if (etaEl) {
             let parts = [];
-            if (duration) parts.push(duration);
-            if (dist) parts.push(dist);
+            if (duration !== null && duration !== undefined && duration !== "") {
+                const durStr = String(duration).trim();
+                parts.push(durStr.toLowerCase().includes("min") ? durStr : `${Math.round(parseFloat(durStr))} min`);
+            }
+            if (dist !== null && dist !== undefined && dist !== "") {
+                const distStr = String(dist).trim();
+                if (distStr.toLowerCase().includes("km") || distStr.toLowerCase().includes("mi")) {
+                    parts.push(distStr);
+                } else {
+                    const distNum = parseFloat(distStr);
+                    parts.push(!isNaN(distNum) ? `${distNum.toFixed(2)} km` : distStr);
+                }
+            }
             etaEl.innerText = parts.length > 0 ? parts.join(" • ") : "Calculando...";
         }
 
