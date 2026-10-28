@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-28 05:20 UTC - Fix S3/MinIO and Profile photo upload
+# Deploy trigger: 2026-10-28 11:50 UTC - Fix trip background worker path and audit trip dispatch
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

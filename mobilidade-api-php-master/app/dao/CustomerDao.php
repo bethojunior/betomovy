@@ -1077,8 +1077,10 @@ class CustomerDao extends BaseDao
                 ->hydrate($trip)
                 ->createTrip();
 
+            $consolePath = realpath(__DIR__ . '/../../console') ?: '/var/www/html/console';
+            $tripRef = escapeshellarg($this->trip->getTripReference());
             exec(
-                "nohup php ../console/command.php trip-call {$this->trip->getTripReference()} > /dev/null 2>&1 & echo $! "
+                "cd {$consolePath} && nohup /usr/bin/php command.php trip-call {$tripRef} > /dev/null 2>&1 & echo $!"
             );
 
 

@@ -1251,16 +1251,17 @@ class DriverDaoV2 extends BaseDao
             $this->deleteRealtime($trip->tripReference);
             (new RedisUtil)->delete("trip-{$trip->tripReference}");
 
+            $consolePath = realpath(__DIR__ . '/../../console') ?: '/var/www/html/console';
             exec(
-                "nohup php ../console/command.php update-quantity-trips {$trip->userId} {$trip->driverId} > /dev/null 2>&1 & echo $!"
+                "cd {$consolePath} && nohup /usr/bin/php command.php update-quantity-trips {$trip->userId} {$trip->driverId} > /dev/null 2>&1 & echo $!"
             );
 
             exec(
-                "nohup php ../console/command.php save-route-tracing {$tripReference} > /dev/null 2>&1 & echo $!"
+                "cd {$consolePath} && nohup /usr/bin/php command.php save-route-tracing {$tripReference} > /dev/null 2>&1 & echo $!"
             );
 
             exec(
-                "nohup php ../console/command.php queue-finished-trip {$tripReference} > /dev/null 2>&1 & echo $!"
+                "cd {$consolePath} && nohup /usr/bin/php command.php queue-finished-trip {$tripReference} > /dev/null 2>&1 & echo $!"
             );
 
             $this->commit();
