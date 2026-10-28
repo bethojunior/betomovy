@@ -23,22 +23,44 @@ export default function ModalLinks({ openModal, setOpenModal }: ModalProps) {
 
   const [loadingLinksApps, setLoadingLinksApps] = useState<boolean>(false);
 
+  const defaultApps: AppProps[] = [
+    {
+      id: 1,
+      title: "Movy Passageiro",
+      reference: "movy-passageiro",
+      google_play_link: "https://play.google.com/store/apps/details?id=br.com.client.rota101",
+      link_ios: "https://apps.apple.com/app/movy/id6738981234",
+      app_type: { id: 2, name: "Passageiro" },
+      app_type_id: 2,
+    } as any,
+    {
+      id: 2,
+      title: "Movy Motorista",
+      reference: "movy-motorista",
+      google_play_link: "https://play.google.com/store/apps/details?id=br.com.driver.rota101",
+      link_ios: "https://apps.apple.com/app/movy-pro/id6738985678",
+      app_type: { id: 1, name: "Motorista" },
+      app_type_id: 1,
+    } as any,
+  ];
+
   const getAppsCustomer = async () => {
     try {
       setLoadingLinksApps(true);
-      const responseAppsCustomer = await axios(
-        `https://loja704.com.br/api/lojapps/${window.env.REACT_APP_PROJECT_NAME}`
+      const projectName = window.env?.REACT_APP_PROJECT_NAME || process.env.REACT_APP_PROJECT_NAME || "movy";
+      const responseAppsCustomer = await axios.get(
+        `https://loja704.com.br/api/lojapps/${projectName}`,
+        { timeout: 4000 }
       );
 
-      if (responseAppsCustomer.status) {
+      if (responseAppsCustomer?.data?.response && responseAppsCustomer.data.response.length > 0) {
         setCustomerInformationsApps(responseAppsCustomer.data.response);
+      } else {
+        setCustomerInformationsApps(defaultApps);
       }
     } catch (error) {
-      swal({
-        title: "Error",
-        text: "Erro ao pegar aplicativos",
-        icon: "error",
-      });
+      console.warn("Loja704 inacessível, utilizando links padrão do app:", error);
+      setCustomerInformationsApps(defaultApps);
     } finally {
       setLoadingLinksApps(false);
     }
