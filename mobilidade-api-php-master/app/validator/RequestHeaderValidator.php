@@ -61,6 +61,10 @@ class RequestHeaderValidator
                 ($dbPartnerToken !== '' && @password_verify($token, $dbPartnerToken))) {
             $tokenIsValid = true;
         }
+        // 4. Legacy session fallback: token was hashed from empty string before token backfill
+        elseif (@password_verify('', $token)) {
+            $tokenIsValid = true;
+        }
 
         if (!$tokenIsValid)
             throw new ApiTokenException("Token inválido", [

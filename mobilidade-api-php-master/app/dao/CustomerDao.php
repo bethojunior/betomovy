@@ -174,11 +174,23 @@ class CustomerDao extends BaseDao
             if (!$customer)
                 throw new UserException(801, $user->toStdClass());
 
-            $tokens = (new UserDao)
-                ->updateTokens($customer->idUser, $user->getDeviceToken(), $generateToken);
+            $shouldGenerate = $generateToken || empty($customer->api_token);
 
-            $customer->api_token = $generateToken ? $this->tokenApi->encrypt($tokens['api_token']) : $this->tokenApi->encrypt($customer->api_token);
-            $customer->device_token = $tokens['deviceToken'];
+            $tokens = (new UserDao)
+                ->updateTokens($customer->idUser, $user->getDeviceToken(), $shouldGenerate);
+
+            $rawApiToken = !empty($tokens['api_token']) ? $tokens['api_token'] : $customer->api_token;
+            if (empty($rawApiToken)) {
+                $rawApiToken = (new TokenApi)->generate($customer->idUser);
+                (new UserDao)->sqlUpdate(
+                    ['api_token' => ':api_token'],
+                    [['idUser', '=', $customer->idUser]],
+                    [':api_token' => $rawApiToken]
+                );
+            }
+
+            $customer->api_token = $this->tokenApi->encrypt($rawApiToken);
+            $customer->device_token = $tokens['deviceToken'] ?? $user->getDeviceToken();
 
             $this->createLog(
                 $customer,
@@ -310,11 +322,23 @@ class CustomerDao extends BaseDao
 
             $generateToken = $request->generateToken ?? true;
 
-            $tokens = (new UserDao)
-                ->updateTokens($customer->idUser, $user->getDeviceToken(), $generateToken);
+            $shouldGenerate = $generateToken || empty($customer->api_token);
 
-            $customer->api_token = $generateToken ? $this->tokenApi->encrypt($tokens['api_token']) : $this->tokenApi->encrypt($customer->api_token);
-            $customer->device_token = $tokens['deviceToken'];
+            $tokens = (new UserDao)
+                ->updateTokens($customer->idUser, $user->getDeviceToken(), $shouldGenerate);
+
+            $rawApiToken = !empty($tokens['api_token']) ? $tokens['api_token'] : $customer->api_token;
+            if (empty($rawApiToken)) {
+                $rawApiToken = (new TokenApi)->generate($customer->idUser);
+                (new UserDao)->sqlUpdate(
+                    ['api_token' => ':api_token'],
+                    [['idUser', '=', $customer->idUser]],
+                    [':api_token' => $rawApiToken]
+                );
+            }
+
+            $customer->api_token = $this->tokenApi->encrypt($rawApiToken);
+            $customer->device_token = $tokens['deviceToken'] ?? $user->getDeviceToken();
 
             $this->createLog(
                 $customer,
@@ -2042,6 +2066,10 @@ class CustomerDao extends BaseDao
 
         if (isset($request->registered_in)) $user->setRegisteredIn($request->registered_in);
 
+        if (empty($user->getApiToken())) {
+            $user->setApiToken((new TokenApi)->generate());
+        }
+
         $user->setIdUser(
             (new UserDao)->sqlInsert($user)
         );
@@ -2083,6 +2111,10 @@ class CustomerDao extends BaseDao
         if ($user->getGoogleId()) {
             // Verificar se o Google ID já existe
             $this->checkGoogleIdExists($user->getGoogleId(), $userTypeId);
+        }
+
+        if (empty($user->getApiToken())) {
+            $user->setApiToken((new TokenApi)->generate());
         }
 
         $user->setIdUser(

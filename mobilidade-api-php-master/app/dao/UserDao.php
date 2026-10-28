@@ -365,6 +365,15 @@ class UserDao extends BaseDao
      */
     public function updateTokens($idUser, $deviceToken, $generateToken = true)
     {
+        // If generateToken is false, verify whether the user actually has an api_token in the DB
+        $currentUser = null;
+        if (!$generateToken) {
+            $currentUser = $this->find($idUser, ['api_token']);
+            if (empty($currentUser->api_token)) {
+                $generateToken = true;
+            }
+        }
+
         if ($generateToken) {
             $apiToken = (new TokenApi)->generate($idUser);
             $this->sqlUpdate(
@@ -382,7 +391,7 @@ class UserDao extends BaseDao
             [':deviceToken' => $deviceToken]
         );
 
-        return ['deviceToken' => $deviceToken];
+        return ['deviceToken' => $deviceToken, 'api_token' => $currentUser->api_token ?? null];
     }
 
     /**
