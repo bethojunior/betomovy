@@ -102,6 +102,10 @@ final class Connection
             $options = [
                 PDO::MYSQL_ATTR_FOUND_ROWS => true
             ];
+            $caPath = '/etc/pki/tls/certs/ca-bundle.crt';
+            if (defined('PDO::MYSQL_ATTR_SSL_CA')) {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = file_exists($caPath) ? $caPath : true;
+            }
             if (defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT')) {
                 $options[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = false;
             } elseif (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
@@ -127,9 +131,20 @@ final class Connection
                 return $connRO;
             }
 
-            $connRO = new PDO($dsn, $user, $pass, [
+            $optionsRO = [
                 PDO::MYSQL_ATTR_FOUND_ROWS => true
-            ]);
+            ];
+            $caPath = '/etc/pki/tls/certs/ca-bundle.crt';
+            if (defined('PDO::MYSQL_ATTR_SSL_CA')) {
+                $optionsRO[PDO::MYSQL_ATTR_SSL_CA] = file_exists($caPath) ? $caPath : true;
+            }
+            if (defined('Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT')) {
+                $optionsRO[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = false;
+            } elseif (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
+                $optionsRO[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+            }
+
+            $connRO = new PDO($dsn, $user, $pass, $optionsRO);
             $connRO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             try {
                 $connRO->exec("SET NAMES utf8mb4");
