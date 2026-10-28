@@ -41,23 +41,51 @@ class Photo
         $generatedName = $this->generateName($photo['name']);
         $name = $prefixName ? $prefixName . $generatedName : $generatedName;
 
-        $fileType = $photo['type'];
+        $fileType = $photo['type'] ?? 'image/jpeg';
         $fileType = explode('/', $fileType)[0];
 
-        try {
-            $link = $this->s3->uploadSingle($destination . $name, $photo['tmp_name'], $ACL);
+        // 1. Prepare local public destination directories
+        $publicBase = realpath(__DIR__ . '/../../public') ?: (__DIR__ . '/../../public');
+        $localDestDir = rtrim($publicBase, '/\\') . '/' . trim($destination, '/\\') . '/';
+        $localCompressedDir = $localDestDir . self::COMPRESSED_DIR;
 
-            $tempFile = $fileType == 'video' ? $link['ObjectURL'] : $this->resize($photo, $name);
-
-            $this->s3->uploadSingle($destination . self::COMPRESSED_DIR . $name, $tempFile, $ACL);
-
-            $fileType != 'video' && unlink($tempFile);
-
-            return $name;
-        } catch (Exception $e) {
-            throw $e;
+        if (!is_dir($localDestDir)) {
+            @mkdir($localDestDir, 0775, true);
+        }
+        if (!is_dir($localCompressedDir)) {
+            @mkdir($localCompressedDir, 0775, true);
         }
 
+        // Save local copy of original file
+        @copy($photo['tmp_name'], $localDestDir . $name);
+
+        // Generate compressed file
+        $tempFile = null;
+        if ($fileType !== 'video') {
+            $tempFile = $this->resize($photo, $name);
+            // Save local copy of compressed file
+            if ($tempFile && file_exists($tempFile)) {
+                @copy($tempFile, $localCompressedDir . $name);
+            }
+        }
+
+        // 2. Upload to S3 / MinIO with resilience
+        try {
+            $link = $this->s3->uploadSingle($destination . $name, $photo['tmp_name'], $ACL);
+            $uploadFile = $fileType == 'video' ? ($link['ObjectURL'] ?? null) : $tempFile;
+
+            if ($uploadFile && file_exists($uploadFile)) {
+                $this->s3->uploadSingle($destination . self::COMPRESSED_DIR . $name, $uploadFile, $ACL);
+            }
+        } catch (\Throwable $e) {
+            error_log("Photo::save S3 upload error: " . $e->getMessage());
+        } finally {
+            if ($fileType != 'video' && $tempFile && file_exists($tempFile)) {
+                @unlink($tempFile);
+            }
+        }
+
+        return $name;
     }
 
     /**
@@ -106,7 +134,17 @@ class Photo
      */
     public function remove($name, $dir)
     {
-        return $this->s3->removeSingle($dir . $name);
+        $publicBase = realpath(__DIR__ . '/../../public') ?: (__DIR__ . '/../../public');
+        $localFile = rtrim($publicBase, '/\\') . '/' . trim($dir, '/\\') . '/' . $name;
+        $localCompressed = rtrim($publicBase, '/\\') . '/' . trim($dir, '/\\') . '/' . self::COMPRESSED_DIR . $name;
+        if (file_exists($localFile)) @unlink($localFile);
+        if (file_exists($localCompressed)) @unlink($localCompressed);
+
+        try {
+            return $this->s3->removeSingle($dir . $name);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**

@@ -342,10 +342,17 @@ class CustomerController extends ApiController
             $customerId = $_POST['customerId'] ?? null;
             $photo = $_FILES['photo'] ?? null;
 
-            echo $this->returnSuccess("Foto de perfil atualizada",
-                (new CustomerDao)
-                    ->updateProfileImage($customerId, $photo)
-            );
+            $photoName = (new CustomerDao)
+                ->updateProfileImage($customerId, $photo);
+
+            $storageUrl = \app\model\Config::get('link_storage_pictures') ?: 'https://minio.704app.com.br/rota101fb704/';
+            $fullUrl = rtrim($storageUrl, '/') . '/customer/profile/compressed/' . $photoName;
+
+            echo $this->returnSuccess("Foto de perfil atualizada", [
+                'profileImage' => $photoName,
+                'url' => $fullUrl,
+                'filename' => $photoName
+            ]);
         } catch (Exception $e) {
             echo $this->returnError($e, "Erro ao atualizar foto de perfil");
         }

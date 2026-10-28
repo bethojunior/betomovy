@@ -27,13 +27,13 @@ class S3
 
     public function __construct($bucketName = null)
     {
-        $this->bucketName = empty($bucketName) ? (env("S3_BUCKET_NAME") ?: getenv("S3_BUCKET_NAME") ?: 'taxireturnteste') : $bucketName;
+        $this->bucketName = empty($bucketName) ? (env("S3_BUCKET_NAME") ?: getenv("S3_BUCKET_NAME") ?: 'rota101fb704') : $bucketName;
 
         $region = env("S3_REGION") ?: getenv("S3_REGION") ?: 'sa-east-1';
-        $accessKey = env("S3_ACCESS_KEY") ?: getenv("S3_ACCESS_KEY") ?: 'AKIAJGJRVHSXNDWEID3Q';
-        $accessSecret = env("S3_ACCESS_SECRET") ?: getenv("S3_ACCESS_SECRET") ?: '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';
-        $endpoint = env("S3_ENDPOINT") ?: getenv("S3_ENDPOINT") ?: null;
-        $usePathStyle = env("S3_USE_PATH_STYLE_ENDPOINT") ?: getenv("S3_USE_PATH_STYLE_ENDPOINT") ?: false;
+        $accessKey = env("S3_ACCESS_KEY") ?: getenv("S3_ACCESS_KEY") ?: 'suporte';
+        $accessSecret = env("S3_ACCESS_SECRET") ?: getenv("S3_ACCESS_SECRET") ?: 'projeto704';
+        $endpoint = env("S3_ENDPOINT") ?: getenv("S3_ENDPOINT") ?: 'https://minio.704app.com.br';
+        $usePathStyle = env("S3_USE_PATH_STYLE_ENDPOINT") !== false;
 
         $data = [
             'version' => 'latest',

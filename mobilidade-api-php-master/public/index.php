@@ -20,6 +20,18 @@ if (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) 
 }
 
 $uriLowerPath = strtolower(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH));
+if (strpos($uriLowerPath, '/customer/profile/') === 0 || strpos($uriLowerPath, '/customer/doc/') === 0) {
+    $staticFile = __DIR__ . parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    if (file_exists($staticFile) && !is_dir($staticFile)) {
+        $mime = 'image/jpeg';
+        if (substr($staticFile, -4) === '.png') $mime = 'image/png';
+        elseif (substr($staticFile, -5) === '.webp') $mime = 'image/webp';
+        header("Content-Type: " . $mime);
+        header("Cache-Control: public, max-age=86400");
+        readfile($staticFile);
+        exit(0);
+    }
+}
 if (in_array($uriLowerPath, ['/privacy', '/privacidade', '/privacy-policy', '/politica-de-privacidade', '/privacy.html', '/privacidade.html'])) {
     header("Content-Type: text/html; charset=utf-8");
     $privacyFile = __DIR__ . '/privacy.html';
@@ -122,7 +134,7 @@ try {
         echo json_encode([
             'status' => true,
             'message' => 'MOVY API Online',
-            'version' => '1.0.2',
+            'version' => '1.0.3',
             'timestamp' => date('Y-m-d H:i:s'),
             'database' => $dbStatus,
             'db_error' => $dbError
