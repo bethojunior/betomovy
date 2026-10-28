@@ -32,7 +32,8 @@ class DocUserRequest extends FormRequest
                 'integer',
                 Rule::exists('doc', 'id'),
             ],
-            'image' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:10240',
+            'pdf' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:10240',
         ];
     }
 

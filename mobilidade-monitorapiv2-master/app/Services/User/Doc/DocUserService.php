@@ -93,15 +93,16 @@ class DocUserService
     public function insert(array $request)
     {
         $image = $request['image'] ?? null;
-        unset($request['image']);
+        $pdf = $request['pdf'] ?? null;
+        unset($request['image'], $request['pdf']);
 
         $docUser = $this->repository
             ->findActiveByUserAndDoc($request['userId'], $request['docId']);
 
         if ($docUser) {
             $docUser->docStatusId = $request['docStatusId'];
-            $docUser->image = null;
-            $docUser->pdf = null;
+            if ($image) $docUser->image = null;
+            if ($pdf) $docUser->pdf = null;
 
             if (array_key_exists('text', $request)) {
                 $docUser->text = $request['text'];
@@ -114,7 +115,11 @@ class DocUserService
 
         if ($image) {
             $docUser->image = $this->replaceFile($image, "user/{$docUser->userId}/docs/");
+            $this->repository->save($docUser);
+        }
 
+        if ($pdf) {
+            $docUser->pdf = $this->replaceFile($pdf, "user/{$docUser->userId}/docs/");
             $this->repository->save($docUser);
         }
 

@@ -24,7 +24,7 @@ class DocUserImageRequest extends FormRequest
     public function rules()
     {
         return [
-            'image' => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:10240',
         ];
     }
 
