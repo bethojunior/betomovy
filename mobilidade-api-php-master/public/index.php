@@ -44,6 +44,9 @@ if (strpos($_SERVER['REQUEST_URI'] ?? '', '/db-mig') === 0) {
     $dbPort = getenv('MYSQL_PORT') ?: '25060';
     $dbUser = getenv('MYSQL_USER') ?: 'doadmin';
     $dbPass = getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
+    if ($dbPass === 'AVNS_ODYdiYw4rvg6gfvKYO0' || $dbPass === 'AVNS_ODYdIYW4rvg6gfvKYO0') {
+        $dbPass = 'AVNS_ODYdiYw4rvg6gfvKYOO';
+    }
     $dbName = getenv('MYSQL_NAME') ?: 'movy_db';
     try {
         $pdo = new PDO("mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4", $dbUser, $dbPass,
