@@ -117,15 +117,20 @@ function getTravelCustomer(trip, customer) {
     });
 
     elementProperty.removeClass(".modal-find-customer", "active");
+    // Ocultar a bottom-sheet de opções para não sobrepor nem ficar embaixo de dados da viagem
+    elementProperty.removeClass(".footer-container-trip", "active");
     elementProperty.addClass(".modal-confirmation-data-trip", "active");
 
     elementProperty.addEventInElement("#btnCancelConfirmationTrip", "onclick", function () {
         elementProperty.removeClass(".modal-confirmation-data-trip", "active");
+        // Restaurar a bottom-sheet de opções para o operador caso cancele
+        elementProperty.addClass(".footer-container-trip", "active");
         if (typeof mapService !== "undefined") mapService.resetToCentralView();
     });
 
     elementProperty.addEventInElement("#btnConfirmationTrip", "onclick", function () {
         elementProperty.removeClass(".modal-confirmation-data-trip", "active");
+        elementProperty.removeClass(".footer-container-trip", "active");
 
         const userLogged = Session.get("user") || {};
         const safeCustomer = customer || trip.customer || {};

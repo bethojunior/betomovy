@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-28 01:49 UTC - Enforce AVNS_ODYdiYw4rvg6gfvKYOO and movy_db
+# Deploy trigger: 2026-10-28 02:37 UTC - Fix Central button text Avançar & modal Dados da Viagem alignment
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

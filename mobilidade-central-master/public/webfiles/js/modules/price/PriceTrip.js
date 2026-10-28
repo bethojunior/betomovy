@@ -310,7 +310,7 @@ class PriceTrip {
                 managerTrip.typeTaxi.picture = pictureUrl;
                 try {
                     const btnConfirm = document.querySelector(".switch-type-trip .btn-search-trip:last-child");
-                    if (btnConfirm) btnConfirm.innerHTML = `Escolha ${tagText || 'Viagem'}`;
+                    if (btnConfirm) btnConfirm.innerHTML = 'Avançar';
                 } catch(e) {}
             }
 

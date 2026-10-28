@@ -1,4 +1,4 @@
-<!-- Movy Central Deploy: 2026-10-27 23:45 UTC - Uber Layout Alignments Fix -->
+<!-- Movy Central Deploy: 2026-10-28 02:36 UTC - Uber Layout Avançar & Modal Dados Fix -->
 <div class="container-main-map">
     <div class="list-trips-active-partner">
         <div class="container-trips">
@@ -321,9 +321,9 @@
                 <div class="switch-type-trip">
                     <button type="button" class="btn-qrcode-driver-trip" title="Escanear QR Code"><i class="material-icons">qr_code_scanner</i></button>
                     <button type="button" class="btn-search-trip btn-search" style="display: none" id="list-active-drivers">
-                        BUSCA PERSONALIZADA
+                        Personalizada
                     </button>
-                    <button type="button" class="btn-search-trip btn-search">CONFIRMAR</button>
+                    <button type="button" class="btn-search-trip btn-search">AVANÇAR</button>
                 </div>
                 <div class="schedule-trip" id="choiceScheduleTrip" role="button" tabindex="0" title="Agendar viagem">
                     <i class="material-icons">event</i>

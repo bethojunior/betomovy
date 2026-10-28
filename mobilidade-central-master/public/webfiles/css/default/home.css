@@ -3806,32 +3806,69 @@ div.pac-container>.pac-item>span {
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
+    min-width: 0 !important;
 }
 
-.uber-confirm-row .btn-search-trip.btn-search {
+.uber-confirm-row #list-active-drivers {
+    height: 48px !important;
+    background: #F3F4F6 !important;
+    color: #111827 !important;
+    border: 1px solid #D1D5DB !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.2px !important;
+    padding: 0 10px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    flex: 0 1 auto !important;
+    max-width: 125px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    transition: background 0.15s !important;
+}
+
+.uber-confirm-row #list-active-drivers:hover {
+    background: #E5E7EB !important;
+}
+
+.uber-confirm-row .btn-search-trip.btn-search:last-child,
+.uber-confirm-row .btn-search-trip:last-child {
     flex: 1 1 auto !important;
     height: 48px !important;
     background: #000000 !important;
     color: #FFFFFF !important;
     border: none !important;
     border-radius: 12px !important;
-    font-size: 15px !important;
+    font-size: 14px !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.3px !important;
+    letter-spacing: 0.5px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22) !important;
     transition: background 0.15s, transform 0.1s !important;
+    min-width: 0 !important;
+    padding: 0 16px !important;
 }
 
-.uber-confirm-row .btn-search-trip.btn-search:hover {
+.uber-confirm-row .btn-search-trip.btn-search:last-child:hover,
+.uber-confirm-row .btn-search-trip:last-child:hover {
     background: #1F2937 !important;
 }
 
-.uber-confirm-row .btn-search-trip.btn-search:active {
+.uber-confirm-row .btn-search-trip.btn-search:last-child:active,
+.uber-confirm-row .btn-search-trip:last-child:active {
     transform: scale(0.98);
 }
 

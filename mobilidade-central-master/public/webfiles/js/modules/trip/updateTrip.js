@@ -233,9 +233,8 @@ function getTaxiType() {
     this.classList.add("active");
 
     try {
-        const catName = (object.priceName || object.name || "Viagem").trim();
         const btnConfirm = document.querySelector(".switch-type-trip .btn-search-trip:last-child");
-        if (btnConfirm) btnConfirm.innerHTML = `Escolha ${catName}`;
+        if (btnConfirm) btnConfirm.innerHTML = 'Avançar';
     } catch (e) {}
 }
 
