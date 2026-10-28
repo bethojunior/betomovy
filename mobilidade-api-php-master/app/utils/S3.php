@@ -27,22 +27,28 @@ class S3
 
     public function __construct($bucketName = null)
     {
-        $this->bucketName = empty($bucketName) ? env("S3_BUCKET_NAME") : $bucketName;
+        $this->bucketName = empty($bucketName) ? (env("S3_BUCKET_NAME") ?: getenv("S3_BUCKET_NAME") ?: 'taxireturnteste') : $bucketName;
+
+        $region = env("S3_REGION") ?: getenv("S3_REGION") ?: 'sa-east-1';
+        $accessKey = env("S3_ACCESS_KEY") ?: getenv("S3_ACCESS_KEY") ?: 'AKIAJGJRVHSXNDWEID3Q';
+        $accessSecret = env("S3_ACCESS_SECRET") ?: getenv("S3_ACCESS_SECRET") ?: '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';
+        $endpoint = env("S3_ENDPOINT") ?: getenv("S3_ENDPOINT") ?: null;
+        $usePathStyle = env("S3_USE_PATH_STYLE_ENDPOINT") ?: getenv("S3_USE_PATH_STYLE_ENDPOINT") ?: false;
 
         $data = [
             'version' => 'latest',
-            'region' => env("S3_REGION"),
+            'region' => $region,
         ];
 
-        if (env("S3_ACCESS_KEY") && env('S3_ACCESS_SECRET')) {
-            $data['credentials'] = new Credentials(env("S3_ACCESS_KEY"), env('S3_ACCESS_SECRET'));
+        if ($accessKey && $accessSecret) {
+            $data['credentials'] = new Credentials($accessKey, $accessSecret);
         }
 
-        if (env("S3_ENDPOINT")) {
-            $data['endpoint'] = env("S3_ENDPOINT");
+        if ($endpoint) {
+            $data['endpoint'] = $endpoint;
         }
 
-        if (env("S3_USE_PATH_STYLE_ENDPOINT")) {
+        if ($usePathStyle) {
             $data['use_path_style_endpoint'] = true;
         }
 
@@ -89,7 +95,8 @@ class S3
 
     public function getRepoUrl()
     {
-        return env("S3_URL") . $this->bucketName . '/';
+        $baseUrl = env("S3_URL") ?: 'https://s3-sa-east-1.amazonaws.com/';
+        return rtrim($baseUrl, '/') . '/' . $this->bucketName . '/';
     }
 
     /**

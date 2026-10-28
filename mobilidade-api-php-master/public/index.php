@@ -130,6 +130,22 @@ try {
         exit;
     }
 
+    if ($uriPath === '/test-s3') {
+        header('Content-Type: application/json; charset=utf-8');
+        try {
+            $s3 = new \app\utils\S3;
+            $testContent = "MOVY S3 Test " . date('Y-m-d H:i:s');
+            $testFile = tempnam(sys_get_temp_dir(), 's3test');
+            file_put_contents($testFile, $testContent);
+            $res = $s3->uploadSingle('test/ping.txt', $testFile);
+            @unlink($testFile);
+            echo json_encode(['status' => true, 'message' => 'S3 upload successful', 'result' => $res]);
+        } catch (\Throwable $e) {
+            echo json_encode(['status' => false, 'error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
     if (strpos($uriPath, '/test-controller') === 0) {
         ini_set('display_errors', 1);
         error_reporting(E_ALL);
