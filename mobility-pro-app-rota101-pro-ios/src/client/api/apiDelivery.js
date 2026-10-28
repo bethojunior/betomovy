@@ -14,7 +14,7 @@ export const abortRequests = () => {
 
 const apiDelivery = axios.create({
   baseURL: buildApp().HOST_API_DELIVERY,
-  timeout: 55000,
+  timeout: 10000,
 });
 
 apiDelivery.interceptors.request.use(async config => {

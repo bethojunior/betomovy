@@ -295,6 +295,13 @@ export default function Profile({ route }) {
           }}
           icon={<Icon1 size={sizeIcon} name="flag" />}
         />
+        <ButtonOptionCustom
+          title="Política de Privacidade"
+          onPress={() => {
+            Linking.openURL('https://movymob.com/privacy');
+          }}
+          icon={<Ionicons size={sizeIcon} name="shield-checkmark-outline" color={theme.colors.secondary} />}
+        />
         <If condition={verifyOptions(optionsMenu, 'client_share')}>
           <ButtonOptionCustom
             title={translate('myProfile.share_app')}

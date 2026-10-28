@@ -83,11 +83,17 @@ export default function Sections() {
 
   useEffect(() => {
     async function getSections() {
-      const {
-        data: {response},
-      } = await apiDelivery.get('delivery/section');
-      setSections(response);
-      setLoading(true);
+      try {
+        const {
+          data: {response},
+        } = await apiDelivery.get('delivery/section');
+        setSections(response || []);
+      } catch (err) {
+        console.warn('Erro ao carregar seções delivery:', err);
+        setSections([]);
+      } finally {
+        setLoading(true);
+      }
     }
     getSections();
     getPostion();
