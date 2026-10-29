@@ -211,14 +211,40 @@ abstract class TripPaymentService
      */
     protected function voucherPayment(&$customer, Trip $trip)
     {
-        $totalBalance = (float)($customer->tripBalance ?? 0) + (float)($customer->balance ?? 0);
+        $balanceId = $customer->balanceId ?? null;
+        $balanceDao = new BalanceDao();
+
+        // Se o objeto customer na memória estiver desatualizado ou com balanceId ausente, busca direto na tabela balance
+        if ($balanceId) {
+            $freshBalance = $balanceDao->find($balanceId);
+        } else if (!empty($customer->idUser) || !empty($customer->userId)) {
+            $uid = (int)($customer->idUser ?? $customer->userId);
+            $stmt = \app\utils\Connection::open()->prepare("
+                SELECT b.idBalance, b.tripBalance, b.balance
+                FROM customer c
+                INNER JOIN balance b ON c.balanceId = b.idBalance
+                WHERE c.userId = :uid AND c.balanceId IS NOT NULL AND c.balanceId > 0
+                ORDER BY c.idCustomer DESC LIMIT 1
+            ");
+            $stmt->execute([':uid' => $uid]);
+            $freshBalance = $stmt->fetch(\PDO::FETCH_OBJ);
+            if ($freshBalance) {
+                $balanceId = $freshBalance->idBalance;
+                $customer->balanceId = $balanceId;
+            }
+        }
+
+        $tripBal = (float)($freshBalance->tripBalance ?? ($customer->tripBalance ?? 0));
+        $walletBal = (float)($freshBalance->balance ?? ($customer->balance ?? 0));
+        $totalBalance = $tripBal + $walletBal;
+
         if ($totalBalance < (float)$trip->getPrice()) {
             throw new Exception("Cliente não possui saldo suficiente");
         }
 
-        $customer->balance = (new BalanceDao)
+        $customer->balance = $balanceDao
             ->subBalanceForNewTrip(
-                $customer->balanceId, $trip, CustomerBalanceConst::TRIP_BALANCE_LOCKOUT);
+                $balanceId ?: $customer->balanceId, $trip, CustomerBalanceConst::TRIP_BALANCE_LOCKOUT);
     }
 
     /**

@@ -11,7 +11,9 @@ import Mask from "../../../../../services/Mask";
 
 import IconWhatsApp from "../../../../../assets/whatsappIcon.svg";
 import IconGmail from "../../../../../assets/gmailIcon.svg";
+import AvatarDefault from "../../../../../assets/avatar.png";
 import { Constants } from "../../../../../utils/constants";
+import { getCustomerPhotoUrl } from "../../../../../utils/imageUtils";
 
 export const ClientProfile = ({
   profileImage,
@@ -20,18 +22,28 @@ export const ClientProfile = ({
   email,
   message,
 }: ClientProfileProps) => {
-  const imgSrc = profileImage
-    ? (profileImage.startsWith("http") ? profileImage : `${baseImageLink || ""}${profileImage}`)
-    : Constants.defaultImgNotFound;
+  const isDefaultOrEmpty =
+    !profileImage ||
+    profileImage === "user.png" ||
+    profileImage.includes("user.png") ||
+    profileImage === "defaultImgNotFound";
+
+  const resolvedPhoto = isDefaultOrEmpty
+    ? AvatarDefault
+    : getCustomerPhotoUrl(profileImage) ||
+      (profileImage.startsWith("http")
+        ? profileImage
+        : `${baseImageLink || Constants.url_photo_customer}${profileImage}`);
 
   return (
     <ProfileCard>
       <ContentImage>
         <Avatar
-          src={imgSrc}
+          src={resolvedPhoto}
+          fallback={AvatarDefault}
           onError={(e) => {
             e.currentTarget.onerror = null;
-            e.currentTarget.src = Constants.defaultImgNotFound;
+            e.currentTarget.src = AvatarDefault;
           }}
         />
       </ContentImage>

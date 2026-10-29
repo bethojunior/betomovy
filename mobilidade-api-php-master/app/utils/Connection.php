@@ -31,6 +31,22 @@ final class Connection
     }
 
     /**
+     * Compatibility alias for getConnection / open
+     */
+    public function get(string $dbType = self::DB_MYSQL)
+    {
+        return self::open($dbType);
+    }
+
+    /**
+     * Static compatibility alias
+     */
+    public static function getPdo(string $dbType = self::DB_MYSQL)
+    {
+        return self::open($dbType);
+    }
+
+    /**
      * @param string $dbType
      * @return Manager|PDO
      */
