@@ -156,7 +156,23 @@ class ConnectionServer {
             break;
           }
           default: {
-            if (reject) reject("problemas com internet");
+            let errorPayload = null;
+            try {
+              if (this.responseText) {
+                errorPayload = JSON.parse(this.responseText);
+              }
+            } catch (e) {
+              errorPayload = this.responseText;
+            }
+            if (reject) {
+              if (errorPayload) {
+                reject(errorPayload);
+              } else if (request.status === 0) {
+                reject("problemas com internet");
+              } else {
+                reject("Erro no servidor (" + request.status + ")");
+              }
+            }
           }
         }
       }
@@ -320,7 +336,23 @@ class ConnectionServer {
             break;
           }
           default: {
-            reject("problemas com internet");
+            let errorPayload = null;
+            try {
+              if (this.responseText) {
+                errorPayload = JSON.parse(this.responseText);
+              }
+            } catch (e) {
+              errorPayload = this.responseText;
+            }
+            if (reject) {
+              if (errorPayload) {
+                reject(errorPayload);
+              } else if (request.status === 0) {
+                reject("problemas com internet");
+              } else {
+                reject("Erro no servidor (" + request.status + ")");
+              }
+            }
           }
         }
       }
