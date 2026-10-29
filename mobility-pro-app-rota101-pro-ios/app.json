@@ -3,7 +3,7 @@
     "name": "Route 95Pro",
     "scheme": "rota101pro",
     "slug": "expoappv2",
-    "version": "8.1.4",
+    "version": "8.1.5",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "splash": {
@@ -47,7 +47,7 @@
     "android": {
       "package": "br.com.client.rota101",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 3,
+      "versionCode": 80105,
       "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {

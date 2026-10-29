@@ -684,16 +684,24 @@ document.addEventListener('DOMContentLoaded', function () {
         viewController.elementProperty.removeClass('.search-driver-in-trip', 'active')
         updateBtnCallTripVisibility()
         console.error('Erro na criação da viagem:', error)
+        let errMsg = 'Não foi possível confirmar a criação da(s) viagem(ns). Verifique sua conexão e confira em Viagens Ativas antes de tentar novamente.';
+        if (error) {
+          if (typeof error === 'string') {
+            errMsg = error;
+          } else if (error.message) {
+            errMsg = error.message;
+          } else if (error.response && error.response.message) {
+            errMsg = error.response.message;
+          } else if (error.data && error.data.message) {
+            errMsg = error.data.message;
+          }
+        }
         SwalCustom.messageDialog(
-          'Não foi possível confirmar a criação da(s) viagem(ns). Verifique sua conexão e confira em Viagens Ativas antes de tentar novamente.',
+          errMsg,
           'Atenção',
           undefined,
           'warning'
         )
-        /*elementProperty.addClass(".container-connection-internet", "active");
-            setTimeout(function () {
-                newAnotherTripCustomer(newTrip)
-            }, 5000);*/
       })
       .finally(() => {
         viewController.elementProperty.removeClass('.container-preload-main', 'active')
