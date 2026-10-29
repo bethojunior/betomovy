@@ -10,12 +10,23 @@ export const useBank = () => {
   const service = BankService();
   const { getItem } = storage;
 
-
-  const userDriverFind = getItem('userDriverFindLocal', 'json');
+  const getUserDriverFind = () => {
+    try {
+      const data = getItem('userDriverFindLocal', 'json');
+      if (typeof data === 'string') {
+        return JSON.parse(data);
+      }
+      return data || {};
+    } catch {
+      return {};
+    }
+  };
 
   const getLatestTransactions = async () => {
     try {
-      const driverId = userDriverFind.idDriver;
+      const userDriverFind = getUserDriverFind();
+      const driverId = userDriverFind?.idDriver;
+      if (!driverId) return false;
 
       const response = await service.getLatestTransactions(driverId);
 
@@ -48,13 +59,13 @@ export const useBank = () => {
 
   const getAccount = async () => {
     try {
-      const driverId = userDriverFind.idDriver;
+      const userDriverFind = getUserDriverFind();
+      const driverId = userDriverFind?.idDriver;
+      if (!driverId) return false;
 
       const response = await service.getAccount(parseInt(driverId));
 
       if (typeof response === 'string') {
-        customToast(translate('schedule.enougth_bank'), 'warning');
-
         return false;
       }
 
@@ -66,7 +77,9 @@ export const useBank = () => {
 
   const withdraw = async (amount: string) => {
     try {
-      const driverId = userDriverFind.idDriver;
+      const userDriverFind = getUserDriverFind();
+      const driverId = userDriverFind?.idDriver;
+      if (!driverId) return;
 
       await service.withdraw(driverId, amount);
     } catch (err) {
@@ -92,12 +105,13 @@ export const useBank = () => {
 
   const editAccount = async (accountUser: AccountInfo, idBank: string) => {
     try {
-      const driverId = userDriverFind.idDriver;
+      const userDriverFind = getUserDriverFind();
+      const driverId = userDriverFind?.idDriver;
 
       const response = await service.editAccount(
         accountUser,
         driverId,
-        userDriverFind.userId,
+        userDriverFind?.userId,
         idBank,
       );
 
@@ -117,12 +131,13 @@ export const useBank = () => {
 
   const createAccount = async (accountUser: AccountInfo) => {
     try {
-      const driverId = userDriverFind.idDriver;
+      const userDriverFind = getUserDriverFind();
+      const driverId = userDriverFind?.idDriver;
 
       const response = await service.createAccount(
         accountUser,
         driverId,
-        userDriverFind.userId,
+        userDriverFind?.userId,
       );
 
       if (!response.status) {
@@ -141,7 +156,8 @@ export const useBank = () => {
 
   const requestWithdraw = async (amount: number) => {
     try {
-      const driverId = Number(userDriverFind.idDriver);
+      const userDriverFind = getUserDriverFind();
+      const driverId = Number(userDriverFind?.idDriver);
 
       const response = await service.requestWithdraw(driverId, amount);
 

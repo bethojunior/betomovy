@@ -45,13 +45,14 @@ class BankAccountValidator
         if (!$request || count(get_object_vars($request)) < 1)
             throw new InvalidFieldBankAccountException("Nenhum dado de conta bancaria foi enviado");
 
-        if (isset($request->bankId))
+        // bankId/agency/numberAccount são opcionais — só validamos o formato se vierem preenchidos
+        if (!empty($request->bankId))
             $this->bankIdIsValid($request->bankId);
 
-        if (isset($request->agency))
+        if (!empty($request->agency))
             $this->agencyIsValid($request->agency);
 
-        if (isset($request->numberAccount))
+        if (!empty($request->numberAccount))
             $this->numberAccountIsValid($request->numberAccount);
 
         return true;

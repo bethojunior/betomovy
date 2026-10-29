@@ -46,13 +46,25 @@ export default class TripCollection implements ITripRealtime {
 
   getTrip(tripReference: string, callback: TripCallback): string {
     const eventUpdate = TRIP_EVENTS.TRIP_UPDATED;
+    const eventAccepted = TRIP_EVENTS.TRIP_ACCEPTED;
     const eventCanceled = TRIP_EVENTS.TRIP_CANCELED;
 
     const id = `${eventUpdate}:${tripReference}:${callback}`;
 
     if (!this.subs.has(id)) {
+      const handleAccepted = (payload: TripCallbackData) => {
+        if (!payload?.data || (payload.data.tripReference && payload.data.tripReference !== tripReference)) {
+          return;
+        }
+        callback(payload);
+      };
+
       const handleCanceled = (payload: TripCallbackData) => {
+        if (!payload?.data || (payload.data.tripReference && payload.data.tripReference !== tripReference)) {
+          return;
+        }
         this.socket?.off(eventUpdate, callback);
+        this.socket?.off(eventAccepted, handleAccepted);
         this.socket?.off(eventCanceled, handleCanceled);
         this.subs.delete(id);
       };
@@ -65,6 +77,7 @@ export default class TripCollection implements ITripRealtime {
       });
 
       this.socket?.on(eventUpdate, callback);
+      this.socket?.on(eventAccepted, handleAccepted);
       this.socket?.on(eventCanceled, handleCanceled);
     }
 

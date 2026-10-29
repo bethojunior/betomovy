@@ -340,7 +340,6 @@ export const TripStatusProvider = ({ children }: TripStatusContextChildren) => {
           'paymentInfo',
           JSON.stringify(result.data.paymentInfo),
         );
-        return '';
       }
 
       userDriverFind.preAvailable = '0';
