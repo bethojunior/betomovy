@@ -45,6 +45,26 @@ class CustomerTripCallService
 
         (new RedisDriverCalled)->set("trip-{$trip->getTripReference()}-call-drivers", $driversCalled['resultDrivers']);
 
+        // Sincroniza imediatamente os motoristas elegíveis no campo callingDriver do banco de dados
+        // garantindo que o Firestore e o WebSocket distribuam a chamada instantaneamente aos motoristas sem esperar pelo command em background
+        if (!empty($driversCalled['resultDrivers']) && is_array($driversCalled['resultDrivers'])) {
+            try {
+                $driverIds = [];
+                foreach ($driversCalled['resultDrivers'] as $d) {
+                    $dId = $d->driverId ?? $d->idDriver ?? $d->id ?? null;
+                    if ($dId) {
+                        $driverIds[] = $dId;
+                    }
+                }
+                if (!empty($driverIds)) {
+                    (new \app\services\TripDriversService())->updateCallingDriverTrip($trip->getTripReference(), implode(',', array_unique($driverIds)));
+                    $trip->setCallingDriver(implode(',', array_unique($driverIds)));
+                }
+            } catch (\Throwable $e) {
+                // Não interrompe o fluxo caso ocorra falha secundária
+            }
+        }
+
 //        $driversCalled['resultPush'] = $this->sendPushToDriversClose();
 
         return $driversCalled;
