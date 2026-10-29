@@ -134,8 +134,12 @@ export const AuthProvider = ({ children }: any) => {
 
       if (remoteData?.tag && notificationExclude.includes(remoteData?.tag)) return;
 
-      if (remoteData?.action === PushNotificationAction.CUSTOMER_RELEASED) {
-        setNewActionFb(remoteData.action);
+      if (
+        remoteData?.action === PushNotificationAction.CUSTOMER_RELEASED ||
+        remoteData?.action === 'updateBalance' ||
+        remoteData?.type === 'balance_updated'
+      ) {
+        setNewActionFb(remoteData.action || 'updateBalance');
         getScoreUser(user?.idUser);
         return;
       }

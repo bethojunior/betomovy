@@ -522,7 +522,7 @@ class CustomerDao extends BaseDao
               LEFT JOIN {$placesTable} p on c.placeId = p.idPlace
               LEFT JOIN {$cityTable} city on p.cityId = city.id
               LEFT JOIN {$estateTable} est on city.estado = est.id
-              INNER JOIN {$balanceTable} b on c.balanceId = b.idBalance
+              LEFT JOIN {$balanceTable} b on c.balanceId = b.idBalance
             WHERE
                 u.idUser = :idUser
             ORDER BY c.idCustomer DESC
@@ -535,6 +535,29 @@ class CustomerDao extends BaseDao
 
         if (!$customer)
             throw new Exception("Cliente não encontrado");
+
+        if (empty($customer->balanceId) || !isset($customer->tripBalance) || !isset($customer->balance)) {
+            $stmtBal = (new \app\utils\Connection)->get()->prepare("
+                SELECT b.idBalance, b.tripBalance, b.balance, b.withheldBalance
+                FROM customer c2
+                INNER JOIN balance b ON c2.balanceId = b.idBalance
+                WHERE c2.userId = :uid AND c2.balanceId IS NOT NULL AND c2.balanceId > 0
+                ORDER BY c2.idCustomer DESC
+                LIMIT 1
+            ");
+            $stmtBal->execute([':uid' => (int)$userId]);
+            $bRow = $stmtBal->fetch(\PDO::FETCH_OBJ);
+            if ($bRow) {
+                $customer->balanceId = $bRow->idBalance;
+                $customer->tripBalance = $bRow->tripBalance;
+                $customer->balance = $bRow->balance;
+                $customer->withheldBalance = $bRow->withheldBalance;
+            }
+        }
+
+        $customer->tripBalance = (float)($customer->tripBalance ?? 0);
+        $customer->balance = (float)($customer->balance ?? 0);
+        $customer->totalBalance = round($customer->tripBalance + $customer->balance, 2);
 
         return $customer;
     }
@@ -589,7 +612,7 @@ class CustomerDao extends BaseDao
             FROM {$this->table} c
               INNER JOIN {$userTable} u on c.userId = u.idUser
               LEFT JOIN {$levelAccess} la on la.userId = u.idUser
-              INNER JOIN {$balanceTable} b on c.balanceId = b.idBalance
+              LEFT JOIN {$balanceTable} b on c.balanceId = b.idBalance
               LEFT JOIN partner p ON (u.idUser = p.userId AND p.statusId = :statusActive)
               LEFT JOIN partnerRegisterStatus prs ON prs.id = p.partnerRegisterStatusId
               LEFT JOIN militaryUser mu ON mu.userId = u.idUser
@@ -607,6 +630,52 @@ class CustomerDao extends BaseDao
             ':statusActive' => Status::ATIVO
         ])
             ->get(false);
+
+        if ($customer) {
+            // Se o registro não tiver balanceId ou saldo estiver nulo, tenta obter da tabela balance
+            if (empty($customer->balanceId) || !isset($customer->tripBalance) || !isset($customer->balance)) {
+                $stmtBal = (new \app\utils\Connection)->get()->prepare("
+                    SELECT idBalance, tripBalance, balance, withheldBalance
+                    FROM balance
+                    WHERE idBalance = :bid
+                    LIMIT 1
+                ");
+                $stmtBal->execute([':bid' => (int)($customer->balanceId ?? 0)]);
+                $bRow = $stmtBal->fetch(\PDO::FETCH_OBJ);
+
+                if (!$bRow) {
+                    // Tenta achar balance vinculado a outro registro do mesmo cliente/usuário
+                    $stmtBalUser = (new \app\utils\Connection)->get()->prepare("
+                        SELECT b.idBalance, b.tripBalance, b.balance, b.withheldBalance
+                        FROM customer c2
+                        INNER JOIN balance b ON c2.balanceId = b.idBalance
+                        WHERE c2.userId = :uid AND c2.balanceId IS NOT NULL AND c2.balanceId > 0
+                        ORDER BY c2.idCustomer DESC
+                        LIMIT 1
+                    ");
+                    $stmtBalUser->execute([':uid' => (int)$userId]);
+                    $bRow = $stmtBalUser->fetch(\PDO::FETCH_OBJ);
+                    if ($bRow) {
+                        $customer->balanceId = $bRow->idBalance;
+                    }
+                }
+
+                if ($bRow) {
+                    $customer->tripBalance = $bRow->tripBalance;
+                    $customer->balance = $bRow->balance;
+                    $customer->withheldBalance = $bRow->withheldBalance;
+                } else {
+                    $customer->tripBalance = $customer->tripBalance ?? 0;
+                    $customer->balance = $customer->balance ?? 0;
+                    $customer->withheldBalance = $customer->withheldBalance ?? 0;
+                }
+            }
+
+            // Garante que o totalBalance e campos numéricos estejam sempre presentes e formatados
+            $customer->tripBalance = (float)($customer->tripBalance ?? 0);
+            $customer->balance = (float)($customer->balance ?? 0);
+            $customer->totalBalance = round($customer->tripBalance + $customer->balance, 2);
+        }
 
         return $customer;
     }

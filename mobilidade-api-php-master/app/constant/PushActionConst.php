@@ -24,4 +24,6 @@ class PushActionConst
     const SHOW_POSITION = "showPosition";
     const NEW_NOTIFICATION_APP = "newNotificationApp";
     const NOTIFY_CUSTOMER_BEEN_TRIP_ACCEPTED_SCHEDULED = "notifyCustomerBeenTripAcceptedScheduled";
+    const CUSTOMER_RELEASED = "customerReleased";
+    const UPDATE_BALANCE = "updateBalance";
 }

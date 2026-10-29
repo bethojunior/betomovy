@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import { Button } from 'react-native-paper';
 import { Image } from 'react-native';
@@ -521,16 +521,28 @@ export default function Trip({ route }) {
   };
 
   const getCurrentSaldVoucher = useCallback(async () => {
-    await getCurrentBalanceVoucher().then((data: any) => {
-      setValueVoucher(data.tripBalance);
-    });
-  }, []);
+    try {
+      const data: any = await getCurrentBalanceVoucher();
+      if (data) {
+        const total = (Number(data.tripBalance) || 0) + (Number(data.balance) || 0);
+        setValueVoucher(total > 0 ? total : (Number(data.tripBalance) || 0));
+      }
+    } catch (e) {
+      // Ignora erro silencioso
+    }
+  }, [getCurrentBalanceVoucher]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getCurrentSaldVoucher();
+    }, [getCurrentSaldVoucher])
+  );
 
   useEffect(() => {
     getCurrentSaldVoucher();
     listProblems();
     getAdresses();
-  }, []);
+  }, [getCurrentSaldVoucher]);
 
   useEffect(() => {
     if (origin && Object.keys(origin).length > 0) {

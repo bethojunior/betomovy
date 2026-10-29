@@ -10,18 +10,39 @@ namespace app\utils;
  */
 class Headers
 {
+    private static function getHeaderCaseInsensitive(string $key)
+    {
+        $headers = function_exists('getallheaders') ? getallheaders() : [];
+        if (!empty($headers)) {
+            $lowerKey = strtolower($key);
+            foreach ($headers as $k => $v) {
+                if (strtolower((string)$k) === $lowerKey && $v !== null && $v !== '') {
+                    return $v;
+                }
+            }
+        }
+
+        // Fallback para $_SERVER (ex: HTTP_USERID, HTTP_TOKEN, HTTP_PLATFORM)
+        $serverKey = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
+        if (isset($_SERVER[$serverKey]) && $_SERVER[$serverKey] !== '') {
+            return $_SERVER[$serverKey];
+        }
+
+        return null;
+    }
+
     /**
      * Retornar o userid que vem nos headers para autorização
      * @return int|null
      */
     public static function getUserId()
     {
-        return (getallheaders()['userid'] ?? getallheaders()['Userid']) ?? null;
+        return self::getHeaderCaseInsensitive('userid');
     }
 
     public static function getTripReference()
     {
-        return (getallheaders()['tripreference'] ?? getallheaders()['Tripreference']) ?? null;
+        return self::getHeaderCaseInsensitive('tripreference');
     }
 
     /**
@@ -31,11 +52,7 @@ class Headers
      */
     public static function getPlatform()
     {
-        if (!isset(getallheaders()['platform']) && !isset(getallheaders()['Platform'])) {
-            return null;
-        }
-
-        return (getallheaders()['platform'] ?? getallheaders()['Platform']) ?? null;
+        return self::getHeaderCaseInsensitive('platform');
     }
 
     /**
@@ -45,7 +62,7 @@ class Headers
      */
     public static function getAppVersion()
     {
-        return (getallheaders()['version'] ?? getallheaders()['Version']) ?? null;
+        return self::getHeaderCaseInsensitive('version');
     }
 
     /**
@@ -55,26 +72,26 @@ class Headers
      */
     public static function getMpToken()
     {
-        return (getallheaders()['mptoken'] ?? getallheaders()['Mptoken']) ?? null;
+        return self::getHeaderCaseInsensitive('mptoken');
     }
 
     public static function getCentralId()
     {
-        return (getallheaders()['centralId'] ?? getallheaders()['centralid']) ?? null;
+        return self::getHeaderCaseInsensitive('centralId');
     }
 
     public static function getCentralRadius()
     {
-        return (getallheaders()['placesSearchRadius'] ?? getallheaders()['placessearchradius'] ?? getallheaders()['Placessearchradius']) ?? null;
+        return self::getHeaderCaseInsensitive('placesSearchRadius');
     }
 
     public static function getCentralCustomEnabled()
     {
-        return (getallheaders()['enableCustomRadiusCentral'] ?? getallheaders()['enablecustomradiuscentral'] ?? getallheaders()['Enablecustomradiuscentral']) ?? null;
+        return self::getHeaderCaseInsensitive('enableCustomRadiusCentral');
     }
 
     public static function getCityId()
     {
-        return (getallheaders()['cityId'] ?? getallheaders()['CityId']) ?? null;
+        return self::getHeaderCaseInsensitive('cityId');
     }
 }

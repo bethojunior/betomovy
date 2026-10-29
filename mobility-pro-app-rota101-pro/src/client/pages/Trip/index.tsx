@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView from 'react-native-maps';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 
 import { BackHandler } from 'react-native';
@@ -484,10 +484,23 @@ export default function Trip({ route }) {
   }, []);
 
   const getCurrentSaldVoucher = useCallback(async () => {
-    await getCurrentBalanceVoucher().then((data: any) => {
-      setValueVoucher(data.tripBalance);
-    });
-  }, []);
+    try {
+      const data: any = await getCurrentBalanceVoucher();
+      if (data) {
+        // Se houver saldo em carteira e/ou voucher, o saldo total disponível para pagamento é a soma
+        const total = (Number(data.tripBalance) || 0) + (Number(data.balance) || 0);
+        setValueVoucher(total > 0 ? total : (Number(data.tripBalance) || 0));
+      }
+    } catch (e) {
+      // Ignora erro silencioso
+    }
+  }, [getCurrentBalanceVoucher]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getCurrentSaldVoucher();
+    }, [getCurrentSaldVoucher])
+  );
 
   useEffect(() => {
     getCurrentSaldVoucher();

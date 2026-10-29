@@ -297,6 +297,33 @@ class BalanceController extends ApiController
                 // Registro de fluxo opcional não interrompe o sucesso da atualização do saldo
             }
 
+            // Notifica o cliente via push em tempo real para atualizar o saldo no app Android e iOS
+            try {
+                $targetUserId = (int)($customer['userId'] ?? 0);
+                if ($targetUserId > 0) {
+                    $stmtToken = $pdo->prepare("SELECT deviceToken FROM user WHERE idUser = :userId LIMIT 1");
+                    $stmtToken->execute([':userId' => $targetUserId]);
+                    $deviceToken = $stmtToken->fetchColumn();
+
+                    if (!empty($deviceToken)) {
+                        $push = new \app\utils\Push();
+                        $push->setDeviceToken($deviceToken)
+                            ->setTitle(\app\utils\Config::get('app_title') ?: 'MOVY')
+                            ->setBody($successMessage)
+                            ->setAction(\app\constant\PushActionConst::CUSTOMER_RELEASED)
+                            ->setAdditionalData(json_encode([
+                                'action' => 'customerReleased',
+                                'type' => 'balance_updated',
+                                'balance' => $bal['balance'] ?? 0,
+                                'tripBalance' => $bal['tripBalance'] ?? 0
+                            ]));
+                        $push->sendNotification();
+                    }
+                }
+            } catch (\Throwable $tp) {
+                // Notificação silenciosa não impede o retorno de sucesso
+            }
+
             echo $this->returnSuccess($successMessage, $bal);
         } catch (\Throwable $e) {
             echo $this->returnError($e, "Erro ao atualizar voucher");
