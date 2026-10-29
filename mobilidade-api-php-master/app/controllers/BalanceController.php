@@ -126,6 +126,7 @@ class BalanceController extends ApiController
 
             $idCustomer = (int)($_GET['id'] ?? ($payload['idCustomer'] ?? ($payload['id'] ?? 0)));
             $action = strtolower(trim((string)($payload['action'] ?? 'insert')));
+            $target = strtolower(trim((string)($payload['target'] ?? ($payload['type'] ?? 'voucher')))); // 'voucher' ou 'balance' / 'saldo'
             $amount = (float)str_replace(',', '.', (string)($payload['balance'] ?? ($payload['value'] ?? 0)));
 
             if ($idCustomer <= 0) {
@@ -202,6 +203,7 @@ class BalanceController extends ApiController
             }
 
             $currentTripBalance = (float)($bal['tripBalance'] ?? 0);
+            $currentWalletBalance = (float)($bal['balance'] ?? 0);
 
             // Verifica tipo de ação: 'insert' (inserir) ou 'block'/'remove' (retirar)
             $isInsert = in_array($action, ['insert', 'add', 'deposit'], true);
@@ -211,20 +213,43 @@ class BalanceController extends ApiController
                 throw new Exception("Ação inválida. Use 'insert' para inserir ou 'block'/'remove' para retirar.");
             }
 
-            if ($isInsert) {
-                $newTripBalance = round($currentTripBalance + $amount, 2);
-                $flowType = \app\constant\CustomerBalanceConst::VOUCHER_BONUS;
-            } else {
-                $newTripBalance = round(max(0, $currentTripBalance - $amount), 2);
-                $flowType = \app\constant\CustomerBalanceConst::BALANCE_OUT;
-            }
+            $isWalletBalance = in_array($target, ['balance', 'saldo', 'wallet'], true);
 
-            // Atualiza balance
-            $stmtUpd = $pdo->prepare("UPDATE balance SET tripBalance = :tripBalance WHERE idBalance = :idBalance");
-            $stmtUpd->execute([
-                ':tripBalance' => $newTripBalance,
-                ':idBalance' => $balanceId
-            ]);
+            if ($isWalletBalance) {
+                // Movimenta saldo da carteira (coluna balance)
+                if ($isInsert) {
+                    $newWalletBalance = round($currentWalletBalance + $amount, 2);
+                    $flowType = 34; // BALANCE_BONUS
+                } else {
+                    $newWalletBalance = round(max(0, $currentWalletBalance - $amount), 2);
+                    $flowType = 71; // BALANCE_OUT_MANUAL
+                }
+
+                $stmtUpd = $pdo->prepare("UPDATE balance SET balance = :balance WHERE idBalance = :idBalance");
+                $stmtUpd->execute([
+                    ':balance' => $newWalletBalance,
+                    ':idBalance' => $balanceId
+                ]);
+                $bal['balance'] = $newWalletBalance;
+                $successMessage = "Saldo atualizado com sucesso";
+            } else {
+                // Movimenta voucher de corrida (coluna tripBalance)
+                if ($isInsert) {
+                    $newTripBalance = round($currentTripBalance + $amount, 2);
+                    $flowType = \app\constant\CustomerBalanceConst::VOUCHER_BONUS;
+                } else {
+                    $newTripBalance = round(max(0, $currentTripBalance - $amount), 2);
+                    $flowType = \app\constant\CustomerBalanceConst::BALANCE_OUT;
+                }
+
+                $stmtUpd = $pdo->prepare("UPDATE balance SET tripBalance = :tripBalance WHERE idBalance = :idBalance");
+                $stmtUpd->execute([
+                    ':tripBalance' => $newTripBalance,
+                    ':idBalance' => $balanceId
+                ]);
+                $bal['tripBalance'] = $newTripBalance;
+                $successMessage = "Voucher atualizado com sucesso";
+            }
 
             // Registra movimentação no balanceFlow
             try {
@@ -248,8 +273,7 @@ class BalanceController extends ApiController
                 // Registro de fluxo opcional não interrompe o sucesso da atualização do saldo
             }
 
-            $bal['tripBalance'] = $newTripBalance;
-            echo $this->returnSuccess("Voucher atualizado com sucesso", $bal);
+            echo $this->returnSuccess($successMessage, $bal);
         } catch (\Throwable $e) {
             echo $this->returnError($e, "Erro ao atualizar voucher");
         }

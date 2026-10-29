@@ -31,6 +31,7 @@ const Voucher: FC<VoucherProps> = ({
 	setVoucherModalProps,
 }) => {
 	const [statusVoucher, setStatusVoucher] = useState('insert');
+	const [targetType, setTargetType] = useState<'voucher' | 'balance'>('voucher');
 	const [voucherValue, setVoucherValue] = useState('0,00');
 	const [messageAlert, setMessageAlert] = useState('');
 	const [showAlert, setShowAlert] = useState(false);
@@ -54,12 +55,14 @@ const Voucher: FC<VoucherProps> = ({
 		api.put(`balance/${idCustomer}/flow`, {
 			action: statusVoucher,
 			balance: rawAmount,
+			target: targetType,
 			idCustomer,
 		})
 			.then((values) => {
 				setLoadingProps(false);
 				if (values?.data?.status || values?.status === 200) {
-					setMessageAlert('Voucher atualizado com sucesso!');
+					const labelTarget = targetType === 'balance' ? 'Saldo' : 'Voucher';
+					setMessageAlert(`${labelTarget} atualizado com sucesso!`);
 					setVoucherValue('0,00');
 					onSearchProps();
 					setShowAlert(true);
@@ -128,6 +131,16 @@ const Voucher: FC<VoucherProps> = ({
 					</Button>,
 				]}
 			>
+				<VoucherLabel>Destino da Movimentação:</VoucherLabel>
+				<SelectTypeOfVoucher
+					value={targetType}
+					onChange={(value) => {
+						setTargetType(value as 'voucher' | 'balance');
+					}}
+				>
+					<Option value="voucher">Voucher (Saldo Voucher)</Option>
+					<Option value="balance">Saldo (Saldo Atual / Carteira)</Option>
+				</SelectTypeOfVoucher>
 				<VoucherLabel>Valor:</VoucherLabel>
 				<VoucherInput
 					suffix="R$"
