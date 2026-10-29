@@ -16,9 +16,23 @@ class BalanceController extends ApiController
     public function actionLastDriverTransactions()
     {
         try {
+            $req = $this->request();
+            $driverId = null;
+            if (is_object($req) && isset($req->driverId)) {
+                $driverId = $req->driverId;
+            } elseif (is_array($req) && isset($req[0]->driverId)) {
+                $driverId = $req[0]->driverId;
+            }
+            if (!$driverId && isset($_POST['driverId'])) {
+                $driverId = $_POST['driverId'];
+            }
+            if (!$driverId && isset($_GET['driverId'])) {
+                $driverId = $_GET['driverId'];
+            }
+            
             echo $this->returnSuccess("Últimas movimentações do motorista",
                 (new DriverBalanceFlowViewDao)
-                    ->lastDriverTransactions($this->request()->driverId)
+                    ->lastDriverTransactions((int)$driverId)
             );
         } catch (Exception $e) {
             echo $this->returnError($e);

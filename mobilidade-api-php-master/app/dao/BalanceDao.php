@@ -247,16 +247,25 @@ class BalanceDao extends BaseDao
               b.idBalance,
               b.balance,
               b.pendingBalanceWithdraw,
-              b.blockedBalance
+              b.blockedBalance,
+              b.tripBalance
             FROM {$this->table} b
               INNER JOIN {$driverTable} d ON d.balanceId = b.idBalance 
             WHERE d.idDriver = :driverId
+            LIMIT 1
         ";
 
-        return $this->sqlRawSelect($sql, [
-            ':driverId' => $driverId
-        ])
-            ->get(false);
+        try {
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':driverId' => (int)$driverId]);
+            $res = $stmt->fetch(\PDO::FETCH_OBJ);
+            return $res ?: null;
+        } catch (\Throwable $e) {
+            return $this->sqlRawSelect($sql, [
+                ':driverId' => $driverId
+            ])->get(false);
+        }
     }
 
     /**
