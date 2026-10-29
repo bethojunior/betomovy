@@ -48,8 +48,11 @@ class BankAccountDao extends BaseDao
             ->bind([':idUser' => $request->userId])
             ->get(false);
 
-        if ($user->bankAccountId)
-            throw new Exception("Usuario ja possui conta bancária");
+        if ($user && $user->bankAccountId) {
+            // Se já possui conta bancária cadastrada, atualiza a conta existente em vez de estourar erro
+            $request->idBankAccount = (int)$user->bankAccountId;
+            return $this->edit($request);
+        }
 
         /** @var BankAccount $bankAccount */
         $bankAccount = $this->create($request);
@@ -99,7 +102,7 @@ class BankAccountDao extends BaseDao
     }
 
     /**
-     * Dono da conta (userId/driverId) sempre vem do token, nunca do body
+     * Dono da conta (userId/driverId) vem prioritariamente do token, e fallback do request
      * @param $request
      * @throws Exception
      */
@@ -107,8 +110,13 @@ class BankAccountDao extends BaseDao
     {
         $userId = Headers::getUserId();
 
-        if (empty($userId))
+        if (empty($userId) && !empty($request->userId)) {
+            $userId = (int)$request->userId;
+        }
+
+        if (empty($userId)) {
             throw new Exception("Usuário não identificado");
+        }
 
         $request->userId = (int)$userId;
 
@@ -117,7 +125,9 @@ class BankAccountDao extends BaseDao
                 ->bind([':userId' => $request->userId])
                 ->get(false);
 
-            $request->driverId = $driver->idDriver ?? null;
+            if ($driver && !empty($driver->idDriver)) {
+                $request->driverId = (int)$driver->idDriver;
+            }
         }
     }
 
@@ -132,8 +142,26 @@ class BankAccountDao extends BaseDao
             ->bind([':idUser' => $userId])
             ->get(false);
 
-        if (empty($idBankAccount) || !$user || (int)$user->bankAccountId !== (int)$idBankAccount)
-            throw new Exception("Conta bancária não pertence ao usuário");
+        // Se o idUser não tiver bankAccountId ou se for diferente, verifica se idBankAccount pertence diretamente ao usuário na tabela bankAccount
+        if (empty($idBankAccount) || !$user || (int)$user->bankAccountId !== (int)$idBankAccount) {
+            $bankAcc = $this->sqlSelect(['idBankAccount'], [
+                ['idBankAccount', '=', ':idBankAccount'],
+                ['userId', '=', ':userId']
+            ])->bind([':idBankAccount' => (int)$idBankAccount, ':userId' => $userId])->get(false);
+
+            if (!$bankAcc) {
+                // Se o usuário ainda não tiver bankAccountId associado no user, vincula
+                if ($user && empty($user->bankAccountId)) {
+                    (new UserDao)->sqlUpdate(
+                        ['bankAccountId' => ':bankAccountId'],
+                        [['idUser', '=', ':idUser']],
+                        [':idUser' => $userId, ':bankAccountId' => (int)$idBankAccount]
+                    );
+                } else {
+                    throw new Exception("Conta bancária não pertence ao usuário");
+                }
+            }
+        }
     }
 
     public function updateDataDriverAddress($request)
