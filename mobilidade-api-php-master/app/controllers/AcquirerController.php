@@ -229,17 +229,26 @@ class AcquirerController extends ApiController
                         $key = $item['key'] ?? '';
                         $val = $item['value'] ?? '';
                         if (!empty($key)) {
-                            $stmtSave = $pdo->prepare("
-                                INSERT INTO acquirerMetaData (financialIntermediaryId, `key`, `value`) 
-                                VALUES (:fId, :key, :val)
-                                ON DUPLICATE KEY UPDATE `value` = :valUpdate
-                            ");
-                            $stmtSave->execute([
-                                ':fId' => $id,
-                                ':key' => $key,
-                                ':val' => $val,
-                                ':valUpdate' => $val
-                            ]);
+                            // Verifica se já existe para este intermediário
+                            $stmtCheck = $pdo->prepare("SELECT id FROM acquirerMetaData WHERE financialIntermediaryId = :fId AND `key` = :key LIMIT 1");
+                            $stmtCheck->execute([':fId' => $id, ':key' => $key]);
+                            $existingId = $stmtCheck->fetchColumn();
+
+                            if ($existingId) {
+                                $stmtUpdate = $pdo->prepare("UPDATE acquirerMetaData SET `value` = :val WHERE id = :id");
+                                $stmtUpdate->execute([':val' => $val, ':id' => $existingId]);
+                            } else {
+                                $stmtInsert = $pdo->prepare("
+                                    INSERT INTO acquirerMetaData (financialIntermediaryId, `key`, `value`, showable, description) 
+                                    VALUES (:fId, :key, :val, 1, :desc)
+                                ");
+                                $stmtInsert->execute([
+                                    ':fId' => $id,
+                                    ':key' => $key,
+                                    ':val' => $val,
+                                    ':desc' => ucwords(str_replace('_', ' ', $key))
+                                ]);
+                            }
                         }
                     }
                 }
