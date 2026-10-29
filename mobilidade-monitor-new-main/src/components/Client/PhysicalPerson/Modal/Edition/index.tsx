@@ -17,6 +17,7 @@ import Alert from "../../../../Utils/Alert";
 import api from "../../../../../services/api";
 import { ProfilePhotoEditModal } from "../../../../Shared/ProfilePhotoEditModal";
 import { getCustomerPhotoUrl } from "../../../../../utils/imageUtils";
+import AvatarDefault from "../../../../../assets/avatar.png";
 import {
   InputEdit,
   GenderSelect,
@@ -203,7 +204,11 @@ const ModalEditCustomer: FC<ModalProps> = ({
         <ProfileImageSection>
           <ProfileImageWrapper>
             <ProfileImagePreview
-              src={getCustomerPhotoUrl(item?.profileImage) ?? undefined}
+              src={getCustomerPhotoUrl(item?.profileImage) || AvatarDefault}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = AvatarDefault;
+              }}
             />
             <EditPhotoButton
               shape="circle"

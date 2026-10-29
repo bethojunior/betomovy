@@ -439,8 +439,8 @@ class DriverController extends ApiController
     public function actionEditProfileImage()
     {
         try {
-            $driverId = $_POST['driverId'];
-            $photo = $_FILES['photo'];
+            $driverId = $_POST['driverId'] ?? $_GET['id'] ?? null;
+            $photo = $_FILES['photo'] ?? $_FILES['image'] ?? $_FILES['imageCompressed'] ?? null;
 
             echo $this->returnSuccess('Foto de perfil alterada',
                 $this->driverDao->editProfileImage($driverId, $photo)
@@ -448,6 +448,11 @@ class DriverController extends ApiController
         } catch (\Exception $e) {
             echo $this->returnError($e);
         }
+    }
+
+    public function actionProfileImage()
+    {
+        return $this->actionEditProfileImage();
     }
 
     public function actionFindWithAccountInfo()

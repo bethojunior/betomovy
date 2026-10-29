@@ -339,8 +339,8 @@ class CustomerController extends ApiController
     public function actionUpdateProfileImage()
     {
         try {
-            $customerId = $_POST['customerId'] ?? null;
-            $photo = $_FILES['photo'] ?? null;
+            $customerId = $_POST['customerId'] ?? $_GET['id'] ?? null;
+            $photo = $_FILES['photo'] ?? $_FILES['image'] ?? $_FILES['imageCompressed'] ?? null;
 
             $photoName = (new CustomerDao)
                 ->updateProfileImage($customerId, $photo);
@@ -356,6 +356,11 @@ class CustomerController extends ApiController
         } catch (Exception $e) {
             echo $this->returnError($e, "Erro ao atualizar foto de perfil");
         }
+    }
+
+    public function actionProfileImage()
+    {
+        return $this->actionUpdateProfileImage();
     }
 
     public function actionEditProfile()
