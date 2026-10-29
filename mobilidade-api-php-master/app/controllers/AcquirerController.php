@@ -173,7 +173,7 @@ class AcquirerController extends ApiController
                     $acquirers = [];
                     foreach ($dbIntermediaries as $di) {
                         $fId = (int)$di['idFinancialIntermediary'];
-                        $stmtMeta = $pdo->prepare("SELECT * FROM financialIntermediaryMetadata WHERE financialIntermediaryId = :fId");
+                        $stmtMeta = $pdo->prepare("SELECT * FROM acquirerMetaData WHERE financialIntermediaryId = :fId");
                         $stmtMeta->execute([':fId' => $fId]);
                         $metaRows = $stmtMeta->fetchAll(PDO::FETCH_ASSOC);
 
@@ -181,7 +181,7 @@ class AcquirerController extends ApiController
                         foreach ($metaRows as $mr) {
                             $metaData[] = [
                                 'financialIntermediaryId' => $fId,
-                                'key' => $mr['key'] ?? $mr['name'] ?? '',
+                                'key' => $mr['key'] ?? '',
                                 'description' => $mr['description'] ?? $mr['key'] ?? '',
                                 'value' => $mr['value'] ?? ''
                             ];
@@ -230,7 +230,7 @@ class AcquirerController extends ApiController
                         $val = $item['value'] ?? '';
                         if (!empty($key)) {
                             $stmtSave = $pdo->prepare("
-                                INSERT INTO financialIntermediaryMetadata (financialIntermediaryId, `key`, `value`) 
+                                INSERT INTO acquirerMetaData (financialIntermediaryId, `key`, `value`) 
                                 VALUES (:fId, :key, :val)
                                 ON DUPLICATE KEY UPDATE `value` = :valUpdate
                             ");
@@ -288,7 +288,7 @@ class AcquirerController extends ApiController
             if (empty($secretKey)) {
                 try {
                     $pdo = Connection::getConnection(Connection::DB_MYSQL_RO);
-                    $stmt = $pdo->prepare("SELECT `value` FROM financialIntermediaryMetadata WHERE financialIntermediaryId = 6 AND `key` = 'secret_key' LIMIT 1");
+                    $stmt = $pdo->prepare("SELECT `value` FROM acquirerMetaData WHERE financialIntermediaryId IN (6, 17) AND `key` = 'secret_key' LIMIT 1");
                     $stmt->execute();
                     $secretKey = $stmt->fetchColumn() ?: '';
                 } catch (\Throwable $t) {}
