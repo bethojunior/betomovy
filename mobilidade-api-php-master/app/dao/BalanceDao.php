@@ -76,15 +76,36 @@ class BalanceDao extends BaseDao
      */
     public function subBalanceForNewTrip($idBalance, Trip $trip, $balanceType)
     {
+        $currentBalance = $this->find($idBalance);
+        $price = (float)$trip->getPrice();
+        $tripBalance = (float)($currentBalance->tripBalance ?? 0);
+        $walletBalance = (float)($currentBalance->balance ?? 0);
+
+        // Deduz primeiro do voucher/tripBalance; se não cobrir, deduz o restante da carteira
+        if ($tripBalance >= $price) {
+            $deductTripBalance = $price;
+            $deductBalance = 0;
+        } else {
+            $deductTripBalance = max(0, $tripBalance);
+            $deductBalance = $price - $deductTripBalance;
+        }
+
+        $newTripBalance = $tripBalance - $deductTripBalance;
+        $newWalletBalance = $walletBalance - $deductBalance;
+        $withheldBalance = (float)($currentBalance->withheldBalance ?? 0) + $price;
+
         $this->sqlUpdate(
             [
-                'tripBalance' => 'tripBalance - :price',
-                'withheldBalance' => 'withheldBalance + :price'
+                'tripBalance' => ':tripBalance',
+                'balance' => ':balance',
+                'withheldBalance' => ':withheldBalance'
             ],
             [['idBalance', '=', ':idBalance']],
             [
                 ':idBalance' => $idBalance,
-                ':price' => (float)$trip->getPrice()
+                ':tripBalance' => $newTripBalance,
+                ':balance' => $newWalletBalance,
+                ':withheldBalance' => $withheldBalance
             ]
         );
 
