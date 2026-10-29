@@ -277,6 +277,7 @@ class CustomerService
                   INNER JOIN {$userTable} u on c.userId = u.idUser
                   INNER JOIN {$levelAccessTable} la on u.idUser = la.userId
                 WHERE {$whereClause}
+                ORDER BY c.idCustomer DESC
                 LIMIT 1
             ";
 
@@ -332,6 +333,7 @@ class CustomerService
                     {$where['string']} AND
                     u.statusId = :statusId AND
                     la.userTypeId = :customerType
+                ORDER BY c.idCustomer DESC
                 LIMIT 1
             ";
 

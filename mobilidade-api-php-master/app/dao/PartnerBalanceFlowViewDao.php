@@ -92,7 +92,7 @@ class PartnerBalanceFlowViewDao extends BaseDao
                 w.bankAccount AS withdrawDestination
             FROM {$this->table} pbfv
                 LEFT JOIN withdraw w ON w.idWithdraw = pbfv.withdrawId
-            WHERE pbfv.idCustomer = :idCustomer
+            WHERE pbfv.idCustomer = :idCustomer OR pbfv.idCustomer IN (SELECT idCustomer FROM customer WHERE userId = :idCustomer)
             ORDER BY pbfv.date DESC, pbfv.idBalanceFlow ASC
             LIMIT " . self::LIMIT_LAST_TRANSACTIONS;
 

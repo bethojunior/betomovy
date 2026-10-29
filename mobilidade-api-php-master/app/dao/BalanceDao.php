@@ -305,7 +305,9 @@ class BalanceDao extends BaseDao
               b.blockedBalance
             FROM {$this->table} b
               INNER JOIN {$customerTable} c ON c.balanceId = b.idBalance 
-            WHERE c.idCustomer = :customerId
+            WHERE c.idCustomer = :customerId OR c.userId = :customerId
+            ORDER BY c.idCustomer DESC
+            LIMIT 1
         ";
 
         return $this->sqlRawSelect($sql, [

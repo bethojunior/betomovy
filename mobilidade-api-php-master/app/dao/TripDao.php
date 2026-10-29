@@ -1757,8 +1757,9 @@ class TripDao extends BaseDao
      */
     private function voucherPayment(&$establishment)
     {
-        if ($establishment->tripBalance < $this->trip->getPrice()) {
-            throw new Exception("Você não possui saldo suficiente");
+        $totalBalance = (float)($establishment->tripBalance ?? 0) + (float)($establishment->balance ?? 0);
+        if ($totalBalance < (float)$this->trip->getPrice()) {
+            throw new Exception("Cliente não possui saldo suficiente");
         }
 
         $establishment->balance = (new BalanceDao())

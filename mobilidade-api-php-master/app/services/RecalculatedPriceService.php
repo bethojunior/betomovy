@@ -239,8 +239,9 @@ class RecalculatedPriceService
 
             $balance = $balanceDao->find($customer->balanceId);
 
-            if ($balance->tripBalance < $value)
-                throw new Exception("Você não possui saldo suficiente");
+            $totalBalance = (float)($balance->tripBalance ?? 0) + (float)($balance->balance ?? 0);
+            if ($totalBalance < $value)
+                throw new Exception("Cliente não possui saldo suficiente");
 
             $trip->setPrice($value);
 

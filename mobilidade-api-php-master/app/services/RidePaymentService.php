@@ -136,8 +136,10 @@ class RidePaymentService
      */
     private function voucherPayment(stdClass $customer, Rider $rider): void
     {
-        if ($customer->tripBalance < $rider->getValue())
-            throw new Exception("Você não possui saldo suficiente");
+        $totalBalance = (float)($customer->tripBalance ?? 0) + (float)($customer->balance ?? 0);
+        if ($totalBalance < (float)$rider->getValue()) {
+            throw new Exception("Cliente não possui saldo suficiente");
+        }
 
         $ride = $this->rideDao
             ->find($rider->getRideId());

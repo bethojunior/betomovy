@@ -150,14 +150,14 @@ class BalanceController extends ApiController
                 throw new Exception("O valor deve ser maior que zero");
             }
 
-            // Busca o cliente primeiro por idCustomer
-            $stmtCust = $pdo->prepare("SELECT idCustomer, userId, balanceId FROM customer WHERE idCustomer = :id LIMIT 1");
+            // Busca o cliente primeiro por idCustomer (ordenando pelo mais recente)
+            $stmtCust = $pdo->prepare("SELECT idCustomer, userId, balanceId FROM customer WHERE idCustomer = :id ORDER BY idCustomer DESC LIMIT 1");
             $stmtCust->execute([':id' => $idCustomer]);
             $customer = $stmtCust->fetch(\PDO::FETCH_ASSOC);
 
             if (!$customer) {
                 // Tenta buscar por userId caso idCustomer não seja encontrado
-                $stmtCust2 = $pdo->prepare("SELECT idCustomer, userId, balanceId FROM customer WHERE userId = :id LIMIT 1");
+                $stmtCust2 = $pdo->prepare("SELECT idCustomer, userId, balanceId FROM customer WHERE userId = :id ORDER BY idCustomer DESC LIMIT 1");
                 $stmtCust2->execute([':id' => $idCustomer]);
                 $customer = $stmtCust2->fetch(\PDO::FETCH_ASSOC);
             }
@@ -244,6 +244,11 @@ class BalanceController extends ApiController
                     ':balance' => $newWalletBalance,
                     ':idBalance' => $balanceId
                 ]);
+                // Garante sincronização se o mesmo userId tiver múltiplos registros de cliente
+                if (!empty($customer['userId'])) {
+                    $stmtSync = $pdo->prepare("UPDATE customer SET balanceId = :balanceId WHERE userId = :userId");
+                    $stmtSync->execute([':balanceId' => $balanceId, ':userId' => $customer['userId']]);
+                }
                 $bal['balance'] = $newWalletBalance;
                 $successMessage = "Saldo atualizado com sucesso";
             } else {
@@ -261,6 +266,11 @@ class BalanceController extends ApiController
                     ':tripBalance' => $newTripBalance,
                     ':idBalance' => $balanceId
                 ]);
+                // Garante sincronização se o mesmo userId tiver múltiplos registros de cliente
+                if (!empty($customer['userId'])) {
+                    $stmtSync = $pdo->prepare("UPDATE customer SET balanceId = :balanceId WHERE userId = :userId");
+                    $stmtSync->execute([':balanceId' => $balanceId, ':userId' => $customer['userId']]);
+                }
                 $bal['tripBalance'] = $newTripBalance;
                 $successMessage = "Voucher atualizado com sucesso";
             }

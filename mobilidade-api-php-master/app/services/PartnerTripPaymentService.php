@@ -18,8 +18,10 @@ class PartnerTripPaymentService extends TripPaymentService
 {
     protected function voucherPayment(&$customer, Trip $trip)
     {
-        if ($customer->tripBalance < $trip->getPrice())
-            throw new Exception("Você não possui saldo suficiente");
+        $totalBalance = (float)($customer->tripBalance ?? 0) + (float)($customer->balance ?? 0);
+        if ($totalBalance < (float)$trip->getPrice()) {
+            throw new Exception("Cliente não possui saldo suficiente");
+        }
 
         $customer->balance = (new BalanceDao)
             ->subBalanceForNewTrip(

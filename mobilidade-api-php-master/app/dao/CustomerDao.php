@@ -525,6 +525,7 @@ class CustomerDao extends BaseDao
               INNER JOIN {$balanceTable} b on c.balanceId = b.idBalance
             WHERE
                 u.idUser = :idUser
+            ORDER BY c.idCustomer DESC
         ";
 
         $customer = $this->sqlRawSelect($sql, [
@@ -597,6 +598,7 @@ class CustomerDao extends BaseDao
               LEFT JOIN militaryForceGraduation mfg ON mfg.id = mu.militaryGraduationId
             WHERE
                 u.idUser = :idUser
+            ORDER BY c.idCustomer DESC
             LIMIT 1
         ";
 
