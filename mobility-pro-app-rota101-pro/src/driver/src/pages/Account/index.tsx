@@ -129,9 +129,10 @@ export const Account = () => {
     });
   }, []);
 
-  // Refaz a busca da conta ao voltar da tela de conta bancária
+  // Refaz a busca da conta e do saldo ao entrar na tela
   useFocusEffect(
     useCallback(() => {
+      getLatestTransactionsAsync();
       getAccountAsync();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),

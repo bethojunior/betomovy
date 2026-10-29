@@ -37,7 +37,7 @@ import {useLocal} from '../../../contexts/local';
 import theme from '../../../styles/theme';
 import {customToast} from '../../../../utils/FlashMessage';
 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import {Ionicons, FontAwesome} from '@expo/vector-icons';
 
@@ -67,6 +67,7 @@ const PaymentPageSpeedMob = () => {
   const [loading, setLoading] = useState(false);
   const [listCard, setListCard] = useState<any>([]);
   const [currentSald, setCurrentSald] = useState(0);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [coupon, setCoupon] = useState([]);
   const [cardSelected, setCardSelected] = useState('');
   const [listVoucher, setListVoucher] = useState([]);
@@ -85,9 +86,7 @@ const PaymentPageSpeedMob = () => {
   const {getCards, getCoupons, getCurrentBalanceVoucher, removeCard} =
     usePaymentForm();
 
-  useEffect(() => {
-    setLoading(true);
-
+  const loadData = useCallback(() => {
     Promise.all([
       PaymentFormService.listCard(),
       PaymentFormService.listCoupom(),
@@ -96,38 +95,50 @@ const PaymentPageSpeedMob = () => {
     ]).then((values: any) => {
       setLoading(false);
 
-      const {response} = values[0].request;
-      if (!JSON.parse(response).status || !values[0].data.status) {
-        return customToast(
-          translate('paymentPage.text_error_load_info'),
-          'danger',
-        );
+      const responseCard = values[0]?.data;
+      const responseCoupon = values[1]?.data;
+      const responseVoucher = values[2]?.data;
+      const responseCustomer = values[3]?.data;
+
+      if (responseCoupon?.status && responseCoupon?.data) {
+        if (responseCoupon.data.length === 0) {
+          setTextEmptyCoupon(true);
+        } else {
+          setTextEmptyCoupon(false);
+          setCoupon(responseCoupon.data);
+        }
       }
 
-      if (
-        !values[0].data.status ||
-        !values[1].data.status ||
-        !values[2].data.status ||
-        !values[3].data.status
-      ) {
-        return customToast(
-          translate('paymentPage.text_error_load_info'),
-          'danger',
-        );
+      if (responseCard?.status && responseCard?.data) {
+        setListCard(responseCard.data);
       }
-
-      if (values[1].data.data.length === 0) {
-        setTextEmptyCoupon(true);
-      } else {
-        setTextEmptyCoupon(false);
-        setCoupon(values[1].data.data);
+      if (responseVoucher?.status && responseVoucher?.data) {
+        setListVoucher(responseVoucher.data);
       }
-
-      setListCard(values[0].data.data);
-      setListVoucher(values[2].data.data);
-      return setCurrentSald(values[3].data.data.tripBalance);
+      if (responseCustomer?.status && responseCustomer?.data) {
+        setCurrentSald(Number(responseCustomer.data.tripBalance || 0));
+        setWalletBalance(Number(responseCustomer.data.balance || 0));
+      }
+    }).catch(() => {
+      setLoading(false);
     });
-  }, []);
+  }, [position]);
+
+  useEffect(() => {
+    setLoading(true);
+    loadData();
+  }, [loadData]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getCurrentBalanceVoucher().then((data: any) => {
+        if (data) {
+          setCurrentSald(Number(data.tripBalance || 0));
+          setWalletBalance(Number(data.balance || 0));
+        }
+      });
+    }, [getCurrentBalanceVoucher])
+  );
 
   const listCards = useCallback(async () => {
     setLoading(true);
@@ -155,9 +166,12 @@ const PaymentPageSpeedMob = () => {
     setLoading(true);
     await getCurrentBalanceVoucher().then((data: any) => {
       setLoading(false);
-      setCurrentSald(data.tripBalance);
+      if (data) {
+        setCurrentSald(Number(data.tripBalance || 0));
+        setWalletBalance(Number(data.balance || 0));
+      }
     });
-  }, [getCurrentBalanceVoucher, currentSald]);
+  }, [getCurrentBalanceVoucher]);
 
   const deleteCard = () => {
     setLoading(true);
@@ -303,19 +317,35 @@ const PaymentPageSpeedMob = () => {
           >
             {translate('paymentPage.title_voucher')}
           </Title>
-          <CardPaymentForm
-            style={{alignSelf: 'center', flexDirection: 'column'}}
-          >
-            <SimpleText style={{fontSize: 20}}>
-              {translate('paymentPage.text_current_balance')}
-            </SimpleText>
-            <TextPaymentType>
-              {getCoinType()}{' '}
-              {currentSald !== 0
-                ? Helper.maskMoney(Number(currentSald))
-                : '0,00'}
-            </TextPaymentType>
-          </CardPaymentForm>
+          <View style={{flexDirection: 'row', justifyContent: 'center', gap: 15, marginVertical: 10}}>
+            <CardPaymentForm
+              style={{flexDirection: 'column', alignItems: 'center'}}
+            >
+              <SimpleText style={{fontSize: 16}}>
+                Saldo Carteira
+              </SimpleText>
+              <TextPaymentType>
+                {getCoinType()}{' '}
+                {walletBalance !== 0
+                  ? Helper.maskMoney(Number(walletBalance))
+                  : '0,00'}
+              </TextPaymentType>
+            </CardPaymentForm>
+
+            <CardPaymentForm
+              style={{flexDirection: 'column', alignItems: 'center'}}
+            >
+              <SimpleText style={{fontSize: 16}}>
+                Saldo Voucher
+              </SimpleText>
+              <TextPaymentType>
+                {getCoinType()}{' '}
+                {currentSald !== 0
+                  ? Helper.maskMoney(Number(currentSald))
+                  : '0,00'}
+              </TextPaymentType>
+            </CardPaymentForm>
+          </View>
           {listVoucher.map((item: any) => {
             return (
               <CardVoucher

@@ -3,6 +3,7 @@ import {
   NavigationProp,
   ParamListBase,
   useNavigation,
+  useFocusEffect,
 } from '@react-navigation/native';
 
 import { translate } from '../../../../../client/locales';
@@ -23,7 +24,7 @@ import {
 } from '../../../context/bank/types';
 
 import { View, ActivityIndicator } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   Container,
@@ -87,6 +88,13 @@ export default function AccountSpeedMob() {
     getAccountAsync();
     setLoading(false);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getLatestTransactionsAsync();
+      getAccountAsync();
+    }, [])
+  );
 
   return (
     <Container>
