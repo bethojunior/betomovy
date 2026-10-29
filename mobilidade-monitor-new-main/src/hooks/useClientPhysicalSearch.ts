@@ -62,11 +62,21 @@ export function useClientPhysicalSearch(): UseClientPhysicalSearchReturn {
           const raw = values.data?.response?.data ?? values.data?.response ?? values.data?.data;
           const list = Array.isArray(raw) ? raw : [];
 
+          const deduplicateList = (items: ListClient[]) => {
+            const seen = new Set<number>();
+            return items.filter((item) => {
+              const id = item.idCustomer || item.idUser;
+              if (seen.has(id)) return false;
+              seen.add(id);
+              return true;
+            });
+          };
+
           if (page !== 1) {
-            setInfosListClient((prev) => [...(prev ?? []), ...list]);
+            setInfosListClient((prev) => deduplicateList([...(prev ?? []), ...list]));
             return;
           }
-          setInfosListClient(list);
+          setInfosListClient(deduplicateList(list));
           setPagination(values.data?.response?.next_page_url || "");
         })
         .catch(() => {

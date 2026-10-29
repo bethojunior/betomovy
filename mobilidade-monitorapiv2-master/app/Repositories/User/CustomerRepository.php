@@ -44,7 +44,6 @@ class CustomerRepository extends AbstractRepository
     private function findAllCore(User $user, array $data, $cityId = null)
     {
         return $this->getModel()::join('user', 'customer.userId', '=', 'user.idUser')
-            ->join('levelAccess', 'user.idUser', '=', 'levelAccess.userId')
             ->leftJoin('militaryUser', 'user.idUser', '=', 'militaryUser.userId')
             ->leftJoin('militaryStatus', 'militaryUser.militaryStatusId', '=', 'militaryStatus.id')
             ->leftJoin('militaryForceGraduation', 'militaryUser.militaryGraduationId', '=', 'militaryForceGraduation.id')

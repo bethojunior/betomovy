@@ -142,7 +142,11 @@ class BalanceService
         }
         $balanceFlow->save();
 
-        $this->createLog($driverId, $request, $balance, $userId);
+        try {
+            $this->createLog($driverId, $request, $balance, $userId);
+        } catch (\Throwable $e) {
+            \Log::warning("Erro ao salvar log de movimentação de saldo: " . $e->getMessage());
+        }
 
         return $balance;
     }

@@ -4,7 +4,7 @@ import { HiPencil, HiDocument } from "react-icons/hi";
 import { GiTicket } from "react-icons/gi";
 import { AiFillDelete } from "react-icons/ai";
 import { IoMdKeypad } from "react-icons/io";
-import { FaUsers } from "react-icons/fa";
+import { FaUsers, FaMoneyBillWave } from "react-icons/fa";
 import { BiNotepad } from "react-icons/bi";
 import { MdVerifiedUser } from "react-icons/md";
 import { Menu, Select } from "antd";
@@ -120,7 +120,7 @@ const ClientList: FC = () => {
         <IoMdKeypad /> Zerar senha
       </ItemMenuSettings>
       <ItemMenuSettings key="5" onClick={() => showVoucherModal(item)}>
-        <GiTicket /> Voucher
+        <FaMoneyBillWave /> Movimentar Saldo / Voucher
       </ItemMenuSettings>
       {enableZafiraValidationMonitor && hasPermission(ZAFIRA, ZAFIRA_VALIDAR_CADASTRO) && (
         <ItemMenuSettings

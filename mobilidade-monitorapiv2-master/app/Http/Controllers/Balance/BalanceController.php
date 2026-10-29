@@ -20,7 +20,8 @@ class BalanceController extends Controller
     public function manageBalance(int $id, InsertBalanceCustomerRequest $request)
     {
         try {
-            $result = $this->service->manageBalanceAction($id, $request->validated(), $request->header('userid'));
+            $userId = (int) ($request->header('userid') ?? $request->header('userId') ?? optional($request->user())->idUser ?? 0);
+            $result = $this->service->manageBalanceAction($id, $request->validated(), $userId);
         } catch (\Exception $e) {
             return ApiResponse::error($e, 'Erro ao modificar o saldo');
         }
@@ -31,7 +32,8 @@ class BalanceController extends Controller
     public function insertBalanceDriver(int $id, InsertBalanceDriverRequest $request)
     {
         try {
-            $result = $this->service->insertBalanceDriver($id, $request->validated(), $request->header('userid'));
+            $userId = (int) ($request->header('userid') ?? $request->header('userId') ?? optional($request->user())->idUser ?? 0);
+            $result = $this->service->insertBalanceDriver($id, $request->validated(), $userId);
         } catch (\Exception $e) {
             return ApiResponse::error($e, 'Erro ao modificar o saldo do motorista');
         }

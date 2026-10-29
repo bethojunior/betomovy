@@ -100,8 +100,8 @@ const Voucher: FC<VoucherProps> = ({
 				typeAlert={typeAlert}
 			/>
 			<VoucherModal
-				width={300}
-				title="Voucher"
+				width={340}
+				title="Movimentar Saldo / Voucher"
 				visible={voucherModalProps}
 				onCancel={handleCancelProps}
 				footer={[
