@@ -1354,9 +1354,9 @@ class DriverController extends ApiController
         try {
             $id = $_GET['id'] ?? null;
             $pdo = \app\utils\Connection::open();
-            $stmt = $pdo->prepare("SELECT appVersion, platform, last_lat, last_lon FROM driver JOIN user ON driver.userId = user.idUser WHERE driver.idDriver = :id");
+            $stmt = $pdo->prepare("SELECT driver.appVersion, driver.platform, driver.last_lat, driver.last_lon, driver.balanceId, driver.userId, driver.name FROM driver WHERE driver.idDriver = :id");
             $stmt->execute([':id' => $id]);
-            $info = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            $info = $stmt->fetch(\PDO::FETCH_ASSOC) ?: [];
             echo $this->returnSuccess('App info do motorista', $info);
         } catch (\Exception $e) {
             echo $this->returnError($e);
