@@ -305,15 +305,16 @@ class BalanceController extends ApiController
                 throw new Exception("O valor deve ser diferente de zero");
             }
 
-            // 1. Localizar o motorista
-            $stmtDrv = $pdo->prepare("
-                SELECT idDriver, userId, balanceId 
-                FROM driver 
-                WHERE idDriver = :id OR userId = :id 
-                LIMIT 1
-            ");
+            // 1. Localizar o motorista por idDriver primeiro, e somente como fallback por userId
+            $stmtDrv = $pdo->prepare("SELECT idDriver, userId, balanceId FROM driver WHERE idDriver = :id LIMIT 1");
             $stmtDrv->execute([':id' => $driverId]);
             $driver = $stmtDrv->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$driver) {
+                $stmtDrvUser = $pdo->prepare("SELECT idDriver, userId, balanceId FROM driver WHERE userId = :id LIMIT 1");
+                $stmtDrvUser->execute([':id' => $driverId]);
+                $driver = $stmtDrvUser->fetch(\PDO::FETCH_ASSOC);
+            }
 
             if (!$driver) {
                 throw new Exception("Motorista não encontrado");

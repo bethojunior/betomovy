@@ -32,23 +32,43 @@ const MoveBalanceModal: FC<ModalProps> = ({ visibility, handleCloseModal, driver
 
   const handleChangeBalanceDriver = () => {
     setLoading(true)
+    const val =
+      actionSelected === 2
+        ? Utils.BrlToNumber(quantityBalanceDriver, 'negative')
+        : Utils.BrlToNumber(quantityBalanceDriver, 'positive')
+
+    if (!val || val === 0) {
+      setLoading(false)
+      setMessageAlert('Informe uma quantia maior que zero.')
+      setTypeAlert('warning')
+      return setShowAlert(true)
+    }
+
     const payload: BalanceDriverPayload = {
       driverId,
-      value:
-        actionSelected === 2
-          ? Utils.BrlToNumber(quantityBalanceDriver, 'negative')
-          : Utils.BrlToNumber(quantityBalanceDriver, 'positive')
+      value: val
     }
 
     if (observation && observation.trim()) {
       payload.observation = observation.trim()
     }
 
+    // Usar FormData para máxima compatibilidade com processamento de requisição PHP do servidor
+    const formData = new FormData()
+    formData.append('driverId', String(driverId))
+    formData.append('value', String(val))
+    if (observation && observation.trim()) {
+      formData.append('observation', observation.trim())
+    }
+
     api
-      .put(`balance/driver/${driverId}`, payload)
+      .post(`balance/driver/${driverId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
       .then((result) => {
         if (!result.data.status) {
-          setMessageAlert('Não foi possível alterar o saldo do motorista')
+          const errMsg = result.data?.response?.[0] || result.data?.message || 'Não foi possível alterar o saldo do motorista'
+          setMessageAlert(errMsg)
           setTypeAlert('error')
           return setShowAlert(true)
         }
@@ -60,8 +80,9 @@ const MoveBalanceModal: FC<ModalProps> = ({ visibility, handleCloseModal, driver
         handleCloseModal()
         return onSearch()
       })
-      .catch(() => {
-        setMessageAlert('Erro ao alterar o saldo do motorista')
+      .catch((err) => {
+        const errMsg = err?.response?.data?.response?.[0] || err?.response?.data?.message || 'Erro ao alterar o saldo do motorista'
+        setMessageAlert(errMsg)
         setTypeAlert('error')
         setShowAlert(true)
       })
