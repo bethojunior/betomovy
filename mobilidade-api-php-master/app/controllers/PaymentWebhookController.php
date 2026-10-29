@@ -68,14 +68,43 @@ class PaymentWebhookController extends ApiController
     {
         try {
             $this->service->proccessPaymentYume($this->request(false));
-
-            // if (($response['status'] ?? 200) >= 400) {
-            //     return $this->returnError([], $response['message'] ?? 'Erro ao processar webhook da YumePay', $response['status']);
-            // }
-
-            // return $this->returnSuccess($response['message'] ?? 'Webhook da YumePay processado', $response['data'] ?? []);
         } catch (\Exception $e) {
             return $this->returnError($e, $e->getMessage(), 400);
+        }
+    }
+
+    public function actionStripeWebhook()
+    {
+        try {
+            $payload = file_get_contents('php://input');
+            $sigHeader = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
+
+            $event = json_decode($payload, true);
+            if (!$event || !isset($event['type'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid event payload']);
+                return;
+            }
+
+            $eventType = $event['type'];
+            $object = $event['data']['object'] ?? [];
+
+            switch ($eventType) {
+                case 'payment_intent.succeeded':
+                    $paymentIntentId = $object['id'] ?? null;
+                    $saleId = $object['metadata']['sale_id'] ?? null;
+                    // Persistir status se necessário
+                    break;
+                case 'payment_intent.payment_failed':
+                    $paymentIntentId = $object['id'] ?? null;
+                    break;
+            }
+
+            http_response_code(200);
+            echo json_encode(['received' => true]);
+        } catch (\Throwable $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
         }
     }
 }

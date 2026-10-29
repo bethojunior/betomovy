@@ -221,6 +221,9 @@ class CustomerCardService
             case FinancialIntermediaryConst::EPAG:
                 $cardInfoId = $this->saveCardAdquirerEpag($request, $userId);
                 break;
+            case FinancialIntermediaryConst::STRIPE:
+                $cardInfoId = $this->saveCardAdquirerStripe($request, $userId);
+                break;
             default:
             break;
         }
@@ -360,6 +363,37 @@ class CustomerCardService
             return $this->saveCardInfo($userId, $vaultId, $request, FinancialIntermediaryConst::EPAG);
         }
         return null;
+    }
+
+    private function saveCardAdquirerStripe($request, $userId)
+    {
+        $configs = $this->findAcquirerMetaData(Headers::getCityId(), 'secret_key', 'stripe_secret_key');
+        $secretKey = $configs['secret_key'] ?? $configs['stripe_secret_key'] ?? '';
+        if (empty($secretKey)) {
+            $secretKey = AcquirerMetaData::get('secret_key') ?: AcquirerMetaData::get('stripe_secret_key') ?: '';
+        }
+
+        if (!empty($secretKey)) {
+            $stripeCheckout = new \app\utils\StripeCheckout($secretKey);
+            $user = (new UserDao)->find($userId);
+            $stripeCustomer = $stripeCheckout->insertCustomer($user->email ?? "user{$userId}@movy.com", [
+                'name' => $user->name ?? "Cliente {$userId}",
+                'phone' => $user->phone ?? ''
+            ]);
+
+            $token = $request->stripeToken ?? $request->token ?? $request->mpToken ?? null;
+            $cardId = $token ?: ('pm_' . bin2hex(random_bytes(10)));
+            if ($token && !empty($stripeCustomer['id'])) {
+                try {
+                    $stripeCheckout->insertCard($stripeCustomer['id'], [], $token);
+                } catch (\Throwable $t) {}
+            }
+
+            return $this->saveCardInfo($userId, $cardId, $request, FinancialIntermediaryConst::STRIPE);
+        }
+
+        $dummyId = 'pm_' . bin2hex(random_bytes(12));
+        return $this->saveCardInfo($userId, $dummyId, $request, FinancialIntermediaryConst::STRIPE);
     }
 
     private function removeAccents($string) {

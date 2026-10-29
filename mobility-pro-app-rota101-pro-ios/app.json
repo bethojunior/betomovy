@@ -3,7 +3,7 @@
     "name": "Route 95Pro",
     "scheme": "rota101pro",
     "slug": "expoappv2",
-    "version": "8.1.5",
+    "version": "8.2.2",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "splash": {
@@ -20,13 +20,17 @@
       ],
       [
         "./plugins/addServiceToMainApplication",
-        ["com.bubblebutton.BubbleService"]
+        [
+          "com.bubblebutton.BubbleService"
+        ]
       ]
     ],
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "googleServicesFile": "./GoogleService-Info.plist",
@@ -34,7 +38,10 @@
         "NSCameraUsageDescription": "É necessário habilitar a câmera para capturar foto em seu perfil.",
         "NSMicrophoneUsageDescription": "É necessário habilitar o microfone para enviar mensagens de áudio.",
         "NSPhotoLibraryUsageDescription": "Precisa de acesso à biblioteca de fotos para obter imagem do seu perfil.",
-        "UIBackgroundModes": ["location", "fetch"],
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ],
         "NSLocationUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
         "NSLocationAlwaysUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
         "NSLocationWhenInUseUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço."
@@ -42,12 +49,13 @@
       "bundleIdentifier": "br.com.client.rota101",
       "config": {
         "googleMapsApiKey": "AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I"
-      }
+      },
+      "buildNumber": "80202"
     },
     "android": {
       "package": "br.com.client.rota101",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 80105,
+      "versionCode": 80202,
       "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {

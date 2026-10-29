@@ -50,7 +50,46 @@ class CheckoutIntermediaryService
                 return $this->feedByYumePay($intermediaryId, $paymentData, $paymentFormId, $transactionTypeId);
             case FinancialIntermediaryConst::FIREBANKING:
                 return $this->feedByFirebanking($paymentData, $paymentFormId, $transactionTypeId);
+            case FinancialIntermediaryConst::STRIPE:
+                return $this->feedByStripe($intermediaryId, $paymentData, $paymentFormId, $transactionTypeId);
         }
+    }
+
+    private function feedByStripe($intermediaryId, $payment, $paymentFormId, $transactionTypeId = null): Transaction
+    {
+        $transaction = new Transaction();
+        $id = $payment['id'] ?? null;
+        $status = $payment['status'] ?? 'unknown';
+
+        $amount = isset($payment['amount']) ? ((float) $payment['amount']) / 100 : 0.0;
+
+        switch ($status) {
+            case 'succeeded':
+                $transaction->setTransactionStatusId(TransactionConst::COMPLETED);
+                break;
+            case 'requires_capture':
+            case 'processing':
+            case 'requires_action':
+                $transaction->setTransactionStatusId(TransactionConst::PENDENTE);
+                break;
+            case 'canceled':
+                $transaction->setTransactionStatusId(TransactionConst::CANCELADO);
+                break;
+            default:
+                $transaction->setTransactionStatusId(TransactionConst::REJECTED);
+                break;
+        }
+
+        $transaction
+            ->setStatus($status)
+            ->setFinancialIntermediaryId($intermediaryId)
+            ->setGeneratedPaymentId($id)
+            ->setValue($amount)
+            ->setNetValue($amount)
+            ->setPaymentFormId($paymentFormId)
+            ->setTransactionTypeId($transactionTypeId ?? 1);
+
+        return $transaction;
     }
 
     /**

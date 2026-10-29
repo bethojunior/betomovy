@@ -166,6 +166,8 @@ return [
         '/paymentwebhook/fbwebhook',
         '/paymentwebhook/yumepaywebhook',
         '/paymentwebhook/mpwebhook',
+        '/paymentwebhook/stripewebhook',
+        '/acquirer/teststripe',
         '/healthcheck/check',
         '/formstep/getbyusertype',
         '/configapppartner/getconfigapppartner',

@@ -832,6 +832,11 @@ class CheckoutService
                 return new YumePayCheckout($configs['yume_api_token']);
             case FinancialIntermediaryConst::FIREBANKING:
                 return new FBCheckout($configs);
+            case FinancialIntermediaryConst::STRIPE:
+                return new \app\utils\StripeCheckout(
+                    $configs['secret_key'] ?? $configs['stripe_secret_key'] ?? '',
+                    $configs['publishable_key'] ?? $configs['stripe_publishable_key'] ?? null
+                );
             default:
                 throw new CheckoutServiceException(151);
         }

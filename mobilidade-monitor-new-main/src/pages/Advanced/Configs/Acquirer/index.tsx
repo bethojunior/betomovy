@@ -245,6 +245,31 @@ const Acquirer: FC = () => {
 						<Button type="primary" htmlType="submit">
 							Salvar
 						</Button>
+						{list?.idFinancialIntermediary === 6 && (
+							<Button
+								style={{ marginLeft: 12, backgroundColor: '#6772e5', borderColor: '#6772e5', color: '#fff' }}
+								onClick={async () => {
+									try {
+										setLoading(true);
+										const currentVals = form.getFieldsValue();
+										const res = await api.post('acquirer/testStripe', {
+											secret_key: currentVals.secret_key || ''
+										});
+										setLoading(false);
+										if (res.data && res.data.status) {
+											swal('Sucesso!', res.data.message || 'Stripe conectada com sucesso!', 'success');
+										} else {
+											swal('Atenção', res.data?.message || 'Falha na validação com a Stripe', 'error');
+										}
+									} catch (err: any) {
+										setLoading(false);
+										swal('Erro', err.message || 'Erro ao testar Stripe', 'error');
+									}
+								}}
+							>
+								Testar Conexão Stripe
+							</Button>
+						)}
 					</ButtonContainer>
 				</Form>
 			</CardDataContainer>

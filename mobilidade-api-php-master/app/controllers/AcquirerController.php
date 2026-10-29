@@ -137,14 +137,26 @@ class AcquirerController extends ApiController
                         [
                             'financialIntermediaryId' => 6,
                             'key' => 'publishable_key',
-                            'description' => 'Publishable Key',
+                            'description' => 'Publishable Key (Chave Pública)',
                             'value' => ''
                         ],
                         [
                             'financialIntermediaryId' => 6,
                             'key' => 'secret_key',
-                            'description' => 'Secret Key',
+                            'description' => 'Secret Key (Chave Secreta)',
                             'value' => ''
+                        ],
+                        [
+                            'financialIntermediaryId' => 6,
+                            'key' => 'webhook_secret',
+                            'description' => 'Webhook Secret (Chave do Webhook)',
+                            'value' => ''
+                        ],
+                        [
+                            'financialIntermediaryId' => 6,
+                            'key' => 'environment',
+                            'description' => 'Ambiente (test / live)',
+                            'value' => 'test'
                         ]
                     ]
                 ]
@@ -264,6 +276,37 @@ class AcquirerController extends ApiController
             echo $this->returnSuccess('Sucesso ao buscar adquirente ativo', $acquirer->toArray());
         } catch (\Exception $e) {
             echo $this->returnError($e, 'Erro ao buscar adquirente ativo', 400);
+        }
+    }
+
+    public function actionTestStripe()
+    {
+        try {
+            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+            $secretKey = $input['secret_key'] ?? '';
+
+            if (empty($secretKey)) {
+                try {
+                    $pdo = Connection::getConnection(Connection::DB_MYSQL_RO);
+                    $stmt = $pdo->prepare("SELECT `value` FROM financialIntermediaryMetadata WHERE financialIntermediaryId = 6 AND `key` = 'secret_key' LIMIT 1");
+                    $stmt->execute();
+                    $secretKey = $stmt->fetchColumn() ?: '';
+                } catch (\Throwable $t) {}
+            }
+
+            if (empty($secretKey)) {
+                echo json_encode([
+                    'status' => false,
+                    'message' => 'Nenhuma Secret Key informada ou salva para a Stripe.'
+                ]);
+                return;
+            }
+
+            $result = \app\utils\StripeCheckout::testConnection($secretKey);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($result);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao testar Stripe', 400);
         }
     }
 }
