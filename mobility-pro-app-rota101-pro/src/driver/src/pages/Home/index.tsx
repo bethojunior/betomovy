@@ -48,6 +48,7 @@ import theme from '../../../../client/styles/theme';
 
 import { ModalCallTripComponent } from '../../components/ModalCallTripComponent';
 import { ModalInTripComponent } from '../../components/ModalInTripComponent';
+import { TripNotificationListener } from '../../components/TripNotificationListener';
 import { ModalAndButtonPreAcceptedComponent } from '../../components/ModalAndButtonPreAcceptedComponent';
 import { PendingOfflineFinishBanner } from '../../components/PendingOfflineFinishBanner';
 import { IniTripModalComponent } from '../../components/IniTripModalComponent';
@@ -418,6 +419,7 @@ export function Home({ route }) {
               iniTripModal={iniTripModal}
               setPreloadVisible={setPreloadVisible}
             />
+            <TripNotificationListener />
             <TripRealtimeScheduleAccepted />
             <TripRealtimeScheduleCall />
             <TripRealtimeSearchOffer />

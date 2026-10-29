@@ -290,6 +290,10 @@ export const TripProvider = ({ children }: TripContextChildren) => {
         }
 
         await AsyncStorage.removeItem('trip');
+        const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+        if (response.data?.tripReference) {
+          emitTripStatusChange(response.data.tripReference, 'accepted', configCityId);
+        }
         notifyTripAccepted(response.data, isPreAcceptedTrip ? 2 : 1);
         startMapSuggestionTimeout();
       }
