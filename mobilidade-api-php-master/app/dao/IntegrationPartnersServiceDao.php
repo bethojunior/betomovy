@@ -21,7 +21,8 @@ class IntegrationPartnersServiceDao
                 'app' => env("APP_NAME")
             ]);
     
-            $cmd = "curl -X POST -H 'Content-Type: application/json' -d " . escapeshellarg($data) . " " . escapeshellarg($url) . " > /dev/null 2>/dev/null &";
+            // --max-time evita hang; & libera o request do FinishTrip.
+            $cmd = "curl --max-time 5 -X POST -H 'Content-Type: application/json' -d " . escapeshellarg($data) . " " . escapeshellarg($url) . " > /dev/null 2>/dev/null &";
             exec($cmd);
         }
     }

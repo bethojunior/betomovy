@@ -36,6 +36,8 @@ return [
     'update-quantity-trips'             => 'UpdateQuantityTripsCommand',
     'save-route-tracing'                => 'SaveRouteTracingCommand',
     'queue-finished-trip'               => 'QueueFinishedTripCommand',
+    'cleanup-finished-trip-realtime'    => 'CleanupFinishedTripRealtimeCommand',
+    'avg-finished-trip'                 => 'QueueFinishedTripCommand',
     'trip-refund-card-payment'          => 'TripRefundCardPaymentCommand',
     'find-geocoding'                    => 'FindGeocodingCommand',
     'notify-drivers-new-bid'            => 'NotifyDriversNewBidCommand',

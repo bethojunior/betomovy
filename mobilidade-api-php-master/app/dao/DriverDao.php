@@ -1457,20 +1457,6 @@ class DriverDao extends BaseDao
             $userDiscountCouponDao = new UserDiscountCouponDao();
             $trip = $tripDao->find($tripReference);
 
-            $dateStart = $trip->date;
-            $dateEnd = $trip->endDate;
-
-
-            $startTime = $dateStart instanceof DateTime ? $dateStart : new DateTime($dateStart);
-            $endTime = $dateEnd instanceof DateTime ? $dateEnd : new DateTime($dateEnd);
-
-
-            $interval = $startTime->diff($endTime);
-            $totalMinutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i + floor($interval->s / 60);
-
-
-            $this->incrementHoursWorked($trip->driverId, $totalMinutes);
-
             if (!empty($data)) {
                 $trip->driver->location = $data->location ?? null;
                 if (isset($data->location->latitude) && isset($data->location->longitude)) {
@@ -1482,6 +1468,18 @@ class DriverDao extends BaseDao
 
             if ($trip->status != Trip::IN_PROGRESS) {
                 throw new Exception("Corrida indisponível para finalização");
+            }
+
+            // endDate ainda é null em in_progress — calcular horas com o horário de término.
+            try {
+                $dateStart = $trip->date;
+                $startTime = $dateStart instanceof DateTime ? $dateStart : new DateTime((string)$dateStart);
+                $endTime = $date instanceof DateTime ? $date : new DateTime((string)$date);
+                $interval = $startTime->diff($endTime);
+                $totalMinutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i + floor($interval->s / 60);
+                $this->incrementHoursWorked($trip->driverId, $totalMinutes);
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
             }
 
             $trip->status = Trip::FINISHED;
@@ -1540,10 +1538,18 @@ class DriverDao extends BaseDao
              */
             $trip->ecoInfo = null;
 
-            $this->deleteRealtime($trip->tripReference);
-            (new RedisUtil())->delete("trip-{$trip->tripReference}");
+            // Firebase sync bloqueia FinishTrip no app; limpa realtime em processo separado.
+            try {
+                (new RedisUtil())->delete("trip-{$trip->tripReference}");
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
+            }
 
             $consolePath = realpath(__DIR__ . '/../../console') ?: '/var/www/html/console';
+            $tripRefEsc = escapeshellarg((string)$tripReference);
+            exec(
+                "cd {$consolePath} && nohup /usr/bin/php command.php cleanup-finished-trip-realtime {$tripRefEsc} > /dev/null 2>&1 & echo $!"
+            );
             exec(
                 "cd {$consolePath} && nohup /usr/bin/php command.php update-quantity-trips {$tripCustomerUserId} {$trip->driverId} > /dev/null 2>&1 & echo $!"
             );
@@ -1558,7 +1564,11 @@ class DriverDao extends BaseDao
 
             $this->commit();
 
-            (new IntegrationPartnersServiceDao())->sendTripDataToPartners($trip);
+            try {
+                (new IntegrationPartnersServiceDao())->sendTripDataToPartners($trip);
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
+            }
 
             return $trip;
         } catch (Exception $e) {
@@ -1568,6 +1578,11 @@ class DriverDao extends BaseDao
             (new LogDao())->logException($e);
             throw $e;
         }
+    }
+
+    public function cleanupFinishedTripRealtime($tripReference)
+    {
+        $this->deleteRealtime($tripReference);
     }
 
     public function incrementHoursWorked($idDriver, $additionalHours)
@@ -1588,16 +1603,27 @@ class DriverDao extends BaseDao
 
     private function deleteRealtime($tripReference)
     {
-        (new MessagesChatTripRealtime())
-            ->deleteAll($tripReference);
+        try {
+            (new MessagesChatTripRealtime())->deleteAll($tripReference);
+        } catch (\Throwable $e) {
+            (new LogDao())->logException($e);
+        }
 
-        $this->tripRealtime
-            ->setTripReference($tripReference)
-            ->deleteTrip();
+        try {
+            $this->tripRealtime
+                ->setTripReference($tripReference)
+                ->deleteTrip();
+        } catch (\Throwable $e) {
+            (new LogDao())->logException($e);
+        }
 
-        (new TripRouteRealtime())
-            ->setDocumentId($tripReference)
-            ->delete();
+        try {
+            (new TripRouteRealtime())
+                ->setDocumentId($tripReference)
+                ->delete();
+        } catch (\Throwable $e) {
+            (new LogDao())->logException($e);
+        }
     }
 
     /**
