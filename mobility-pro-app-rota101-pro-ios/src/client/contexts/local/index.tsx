@@ -63,6 +63,7 @@ export const LocalProvider: React.FC<LocalProviderProps> = ({ children }) => {
       if (storagePlaceSelected)
         setPlaceSelected(JSON.parse(storagePlaceSelected));
 
+      // loading=true significa bootstrap concluído (Sections usa !loading como spinner)
       setLoading(true);
     }
 
