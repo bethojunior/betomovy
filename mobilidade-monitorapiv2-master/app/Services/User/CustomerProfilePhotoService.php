@@ -46,8 +46,18 @@ class CustomerProfilePhotoService
         $this->putFile($request['imageCompressed'] ?? $request['image'], 'customer/profile/compressed/', $fileName);
 
         $customer->profileImage = $fileName;
-
         $this->repository->save($customer);
+
+        // Sincroniza user.profilePhoto (lista do Monitor usa coalesce entre os dois)
+        try {
+            if ($customer->userId) {
+                \Illuminate\Support\Facades\DB::table('user')
+                    ->where('idUser', $customer->userId)
+                    ->update(['profilePhoto' => $fileName]);
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('CustomerProfilePhotoService sync profilePhoto: ' . $e->getMessage());
+        }
 
         return $customer;
     }

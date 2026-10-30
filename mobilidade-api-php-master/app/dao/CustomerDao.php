@@ -1731,6 +1731,18 @@ class CustomerDao extends BaseDao
             [':profileImage' => $photoName, ':idCustomer' => $resolvedCustomerId]
         );
 
+        // Mantém user.profilePhoto sincronizado (Monitor/lista usam coalesce com esse campo)
+        try {
+            $userId = (int)($customer->userId ?? $customer->idUser ?? 0);
+            if ($userId > 0) {
+                $pdo = (new \app\utils\Connection)->get();
+                $updUser = $pdo->prepare("UPDATE user SET profilePhoto = :photo WHERE idUser = :uid LIMIT 1");
+                $updUser->execute([':photo' => $photoName, ':uid' => $userId]);
+            }
+        } catch (\Throwable $e) {
+            error_log('CustomerDao::updateProfileImage sync profilePhoto: ' . $e->getMessage());
+        }
+
         $customer->profileImage = $photoName;
 
         $log = new Log(LogType::PROCESS);

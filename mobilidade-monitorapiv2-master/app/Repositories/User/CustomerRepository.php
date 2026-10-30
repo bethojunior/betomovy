@@ -151,7 +151,36 @@ class CustomerRepository extends AbstractRepository
                 'customer.balanceId',
                 'balance.balance as comission',
                 'balance.tripBalance as voucherBalance',
-                'customer.profileImage',
+                DB::raw("CASE
+                    WHEN customer.profileImage IS NOT NULL
+                         AND TRIM(customer.profileImage) != ''
+                         AND customer.profileImage != 'user.png'
+                    THEN customer.profileImage
+                    WHEN user.profilePhoto IS NOT NULL
+                         AND TRIM(user.profilePhoto) != ''
+                         AND user.profilePhoto != 'user.png'
+                    THEN user.profilePhoto
+                    ELSE COALESCE(NULLIF(customer.profileImage, ''), NULLIF(user.profilePhoto, ''), 'user.png')
+                END AS profileImage"),
+                DB::raw("CASE
+                    WHEN customer.profileImage IS NOT NULL
+                         AND TRIM(customer.profileImage) != ''
+                         AND customer.profileImage != 'user.png'
+                    THEN CASE
+                        WHEN customer.profileImage LIKE 'http%' THEN customer.profileImage
+                        WHEN customer.profileImage LIKE 'customer/profile/%' THEN CONCAT(config.value, customer.profileImage)
+                        ELSE CONCAT(config.value, 'customer/profile/compressed/', customer.profileImage)
+                    END
+                    WHEN user.profilePhoto IS NOT NULL
+                         AND TRIM(user.profilePhoto) != ''
+                         AND user.profilePhoto != 'user.png'
+                    THEN CASE
+                        WHEN user.profilePhoto LIKE 'http%' THEN user.profilePhoto
+                        WHEN user.profilePhoto LIKE 'customer/profile/%' THEN CONCAT(config.value, user.profilePhoto)
+                        ELSE CONCAT(config.value, 'customer/profile/compressed/', user.profilePhoto)
+                    END
+                    ELSE NULL
+                END AS profileImageLink"),
                 'customer.appVersion',
                 'user.platform',
                 'user.quantityTrips as quantityTripsFinished',
@@ -188,6 +217,8 @@ class CustomerRepository extends AbstractRepository
                 'balance.balance',
                 'balance.tripBalance',
                 'customer.profileImage',
+                'user.profilePhoto',
+                'config.value',
                 'customer.appVersion',
                 'user.platform',
                 'user.quantityTrips',
@@ -233,7 +264,36 @@ class CustomerRepository extends AbstractRepository
                 'customer.balanceId',
                 'balance.balance as comission',
                 'balance.tripBalance as voucherBalance',
-                'customer.profileImage',
+                DB::raw("CASE
+                    WHEN customer.profileImage IS NOT NULL
+                         AND TRIM(customer.profileImage) != ''
+                         AND customer.profileImage != 'user.png'
+                    THEN customer.profileImage
+                    WHEN user.profilePhoto IS NOT NULL
+                         AND TRIM(user.profilePhoto) != ''
+                         AND user.profilePhoto != 'user.png'
+                    THEN user.profilePhoto
+                    ELSE COALESCE(NULLIF(customer.profileImage, ''), NULLIF(user.profilePhoto, ''), 'user.png')
+                END AS profileImage"),
+                DB::raw("CASE
+                    WHEN customer.profileImage IS NOT NULL
+                         AND TRIM(customer.profileImage) != ''
+                         AND customer.profileImage != 'user.png'
+                    THEN CASE
+                        WHEN customer.profileImage LIKE 'http%' THEN customer.profileImage
+                        WHEN customer.profileImage LIKE 'customer/profile/%' THEN CONCAT(config.value, customer.profileImage)
+                        ELSE CONCAT(config.value, 'customer/profile/compressed/', customer.profileImage)
+                    END
+                    WHEN user.profilePhoto IS NOT NULL
+                         AND TRIM(user.profilePhoto) != ''
+                         AND user.profilePhoto != 'user.png'
+                    THEN CASE
+                        WHEN user.profilePhoto LIKE 'http%' THEN user.profilePhoto
+                        WHEN user.profilePhoto LIKE 'customer/profile/%' THEN CONCAT(config.value, user.profilePhoto)
+                        ELSE CONCAT(config.value, 'customer/profile/compressed/', user.profilePhoto)
+                    END
+                    ELSE NULL
+                END AS profileImageLink"),
                 'customer.appVersion',
                 'user.platform',
                 'user.quantityTrips as quantityTripsFinished',

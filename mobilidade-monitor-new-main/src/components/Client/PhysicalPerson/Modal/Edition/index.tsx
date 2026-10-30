@@ -16,7 +16,7 @@ import { useForm } from "../../../../../hooks/form";
 import Alert from "../../../../Utils/Alert";
 import api from "../../../../../services/api";
 import { ProfilePhotoEditModal } from "../../../../Shared/ProfilePhotoEditModal";
-import { getCustomerPhotoUrl } from "../../../../../utils/imageUtils";
+import { getCustomerPhotoCandidates, getCustomerPhotoUrl } from "../../../../../utils/imageUtils";
 import AvatarDefault from "../../../../../assets/avatar.png";
 import {
   InputEdit,
@@ -204,8 +204,23 @@ const ModalEditCustomer: FC<ModalProps> = ({
         <ProfileImageSection>
           <ProfileImageWrapper>
             <ProfileImagePreview
-              src={getCustomerPhotoUrl(item?.profileImage) || AvatarDefault}
+              src={
+                getCustomerPhotoCandidates(item?.profileImage, item?.profileImageLink)[0] ||
+                getCustomerPhotoUrl(item?.profileImage) ||
+                AvatarDefault
+              }
               onError={(e) => {
+                const candidates = getCustomerPhotoCandidates(
+                  item?.profileImage,
+                  item?.profileImageLink
+                );
+                const current = e.currentTarget.src;
+                const idx = candidates.findIndex((u) => u === current);
+                const next = candidates[idx + 1];
+                if (next) {
+                  e.currentTarget.src = next;
+                  return;
+                }
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = AvatarDefault;
               }}
@@ -304,7 +319,10 @@ const ModalEditCustomer: FC<ModalProps> = ({
           onClose={() => setVisibleProfilePhotoEditModal(false)}
           entityType="customer"
           entityId={item.idCustomer}
-          currentImageUrl={getCustomerPhotoUrl(item?.profileImage)}
+          currentImageUrl={
+            getCustomerPhotoCandidates(item?.profileImage, item?.profileImageLink)[0] ||
+            getCustomerPhotoUrl(item?.profileImage)
+          }
           onSuccess={reSearch}
         />
       )}

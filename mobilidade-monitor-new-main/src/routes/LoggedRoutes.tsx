@@ -185,13 +185,8 @@ const LoggedRoutes: FC = () => {
 
   useEffect(() => {
     if (Session.hasCitySelected()) {
-      if (
-        !getKeyLocalStorage(
-          `@MonitorPRO-${appEnv.projectName}:base_url_nodes`
-        )
-      ) {
-        getUrlBaseNodes();
-      }
+      // Sempre atualiza a base de fotos (evita cache com bucket/URL errados)
+      getUrlBaseNodes();
     }
   }, []);
 

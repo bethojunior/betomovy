@@ -693,7 +693,17 @@ class CustomerController extends ApiController
                     customer.balanceId,
                     coalesce(balance.balance, 0) as comission,
                     coalesce(balance.tripBalance, 0) as voucherBalance,
-                    coalesce(customer.profileImage, user.profilePhoto, '') as profileImage,
+                    CASE
+                        WHEN customer.profileImage IS NOT NULL
+                             AND TRIM(customer.profileImage) != ''
+                             AND customer.profileImage != 'user.png'
+                        THEN customer.profileImage
+                        WHEN user.profilePhoto IS NOT NULL
+                             AND TRIM(user.profilePhoto) != ''
+                             AND user.profilePhoto != 'user.png'
+                        THEN user.profilePhoto
+                        ELSE coalesce(nullif(customer.profileImage, ''), nullif(user.profilePhoto, ''), 'user.png')
+                    END as profileImage,
                     customer.appVersion,
                     user.platform,
                     coalesce(user.quantityTrips, 0) as quantityTripsFinished,
@@ -725,7 +735,9 @@ class CustomerController extends ApiController
             $stmt->execute($params);
             $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $formatted = array_map(function ($c) {
+            $storageBase = rtrim((string)(\app\model\Config::get('link_storage_pictures') ?: 'https://minio.704app.com.br/rota101fb704/'), '/') . '/';
+
+            $formatted = array_map(function ($c) use ($storageBase) {
                 $c['idCustomer'] = (int)$c['idCustomer'];
                 $c['idUser'] = (int)$c['idUser'];
                 $c['cityId'] = $c['cityId'] ? (int)$c['cityId'] : null;
@@ -734,6 +746,19 @@ class CustomerController extends ApiController
                 $c['voucherBalance'] = (float)$c['voucherBalance'];
                 $c['quantityTripsFinished'] = (int)$c['quantityTripsFinished'];
                 $c['zafiraValidated'] = (int)$c['zafiraValidated'];
+
+                $photo = trim((string)($c['profileImage'] ?? ''));
+                if ($photo !== '' && $photo !== 'user.png') {
+                    if (stripos($photo, 'http://') === 0 || stripos($photo, 'https://') === 0) {
+                        $c['profileImageLink'] = $photo;
+                    } elseif (stripos($photo, 'customer/profile/') === 0) {
+                        $c['profileImageLink'] = $storageBase . ltrim($photo, '/');
+                    } else {
+                        $c['profileImageLink'] = $storageBase . 'customer/profile/compressed/' . ltrim($photo, '/');
+                    }
+                } else {
+                    $c['profileImageLink'] = null;
+                }
                 return $c;
             }, $customers);
 

@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import {
   ProfileCard,
   ContentImage,
@@ -12,38 +13,38 @@ import Mask from "../../../../../services/Mask";
 import IconWhatsApp from "../../../../../assets/whatsappIcon.svg";
 import IconGmail from "../../../../../assets/gmailIcon.svg";
 import AvatarDefault from "../../../../../assets/avatar.png";
-import { Constants } from "../../../../../utils/constants";
-import { getCustomerPhotoUrl } from "../../../../../utils/imageUtils";
+import { getCustomerPhotoCandidates } from "../../../../../utils/imageUtils";
 
 export const ClientProfile = ({
   profileImage,
-  baseImageLink,
+  profileImageLink,
   phone,
   email,
   message,
 }: ClientProfileProps) => {
-  const isDefaultOrEmpty =
-    !profileImage ||
-    profileImage === "user.png" ||
-    profileImage.includes("user.png") ||
-    profileImage === "defaultImgNotFound";
+  const candidates = useMemo(
+    () => getCustomerPhotoCandidates(profileImage, profileImageLink),
+    [profileImage, profileImageLink]
+  );
+  const [candidateIndex, setCandidateIndex] = useState(0);
 
-  const resolvedPhoto = isDefaultOrEmpty
-    ? AvatarDefault
-    : getCustomerPhotoUrl(profileImage) ||
-      (profileImage.startsWith("http")
-        ? profileImage
-        : `${baseImageLink || Constants.url_photo_customer}${profileImage}`);
+  useEffect(() => {
+    setCandidateIndex(0);
+  }, [profileImage, profileImageLink]);
+
+  const hasCandidate = candidates.length > 0 && candidateIndex < candidates.length;
+  const resolvedPhoto = hasCandidate ? candidates[candidateIndex] : AvatarDefault;
 
   return (
     <ProfileCard>
       <ContentImage>
         <Avatar
+          key={resolvedPhoto}
           src={resolvedPhoto}
+          preview={hasCandidate}
           fallback={AvatarDefault}
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            e.currentTarget.src = AvatarDefault;
+          onError={() => {
+            setCandidateIndex((prev) => prev + 1);
           }}
         />
       </ContentImage>

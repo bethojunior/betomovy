@@ -86,8 +86,7 @@ class CustomerService
         $customer->dependents = $this->userRepository->getDependents($customer->idUser);
         $customer->responsible = $this->userRepository->getResponsible($customer->idUser);
 
-        $customer->profileImage = \Storage::cloud()->url("customer/profile/{$customer->profileImage}");
-
+        // Mantém profileImage como nome do arquivo; profileImageLink já vem do repositório
         return $customer;
     }
 

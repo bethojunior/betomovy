@@ -24,6 +24,7 @@ export interface ListClient {
   phone: string;
   platform: string;
   profileImage: string;
+  profileImageLink?: string | null;
   quantityTripsFinished: number;
   rg: number;
   rgBackPicture: string;

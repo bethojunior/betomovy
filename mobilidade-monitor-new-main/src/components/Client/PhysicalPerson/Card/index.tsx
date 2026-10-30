@@ -38,6 +38,7 @@ interface ListClient {
   phone: string;
   platform: string;
   profileImage: string;
+  profileImageLink?: string | null;
   quantityTripsFinished: number;
   rg: number;
   rgBackPicture: string;
@@ -82,6 +83,7 @@ const ListCLientComponent: FC<ClientListComponents> = ({
       <ClientTopRow>
         <ClientProfile
           profileImage={item.profileImage}
+          profileImageLink={item.profileImageLink}
           baseImageLink={baseImageLink}
           phone={item.phone}
           email={item.email}
