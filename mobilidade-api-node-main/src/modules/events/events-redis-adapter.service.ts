@@ -38,12 +38,17 @@ export class EventRedisAdapterService {
     const socketPrefix = `${basePrefix}:socketio:events`;
 
     try {
+      const socketOpts: any = {
+        host,
+        port,
+      };
+      if (useTls) {
+        socketOpts.tls = true;
+        socketOpts.rejectUnauthorized = false;
+      }
+
       this.pubClient = createClient({
-        socket: {
-          host,
-          port,
-          ...(useTls ? { tls: true, rejectUnauthorized: false } : {}),
-        },
+        socket: socketOpts,
         password: password || undefined,
         disableClientInfo: true,
       });

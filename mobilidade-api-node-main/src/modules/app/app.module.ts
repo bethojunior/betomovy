@@ -75,12 +75,16 @@ import { AppService } from './app.service';
           const useTls =
             String(configService.get<string>('REDIS_TLS', 'false')).toLowerCase() ===
             'true';
+          const socketOpts: any = {
+            host: redisHost,
+            port: Number(configService.get<string>('REDIS_PORT', '6379')),
+          };
+          if (useTls) {
+            socketOpts.tls = true;
+            socketOpts.rejectUnauthorized = false;
+          }
           const store = await redisStore({
-            socket: {
-              host: redisHost,
-              port: Number(configService.get<string>('REDIS_PORT', '6379')),
-              ...(useTls ? { tls: true, rejectUnauthorized: false } : {}),
-            },
+            socket: socketOpts,
             password: configService.get<string>('REDIS_PASSWORD') || undefined,
             database: Number(configService.get<string>('REDIS_DB', '0')),
             keyPrefix: configService.get<string>('REDIS_PREFIX', ''),
