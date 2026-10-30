@@ -26,7 +26,8 @@ class RedisUtil
             'scheme' => 'tcp',
             'host'   => env('REDIS_HOST', '127.0.0.1'),
             'port'   => env('REDIS_PORT', 6379),
-            'read_write_timeout' => 0,
+            'timeout' => 2,
+            'read_write_timeout' => 2,
         ]);
     }
 
@@ -42,7 +43,7 @@ class RedisUtil
             $key = $this->prefix . "-" . $key;
 
             $this->redis->setex($key, $ttl, serialize($value));
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             (new LogDao)->logException($exception);
         }
     }
@@ -65,7 +66,7 @@ class RedisUtil
             }
 
             return unserialize($value);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             (new LogDao)->logException($exception);
             return null;
         }
@@ -83,7 +84,7 @@ class RedisUtil
             $key = $this->prefix . "-" . $key;
 
             $this->redis->del([$key]);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             (new LogDao)->logException($exception);
         }
     }
@@ -106,8 +107,10 @@ class RedisUtil
                 'host'     => $host,
                 'port'     => (int) env('REDIS_PORT', 6379),
                 'password' => env('REDIS_PASSWORD') ?: null,
+                'timeout' => 2,
+                'read_write_timeout' => 2,
             ]);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->redis = null;
             (new LogDao)->logException($exception);
         }

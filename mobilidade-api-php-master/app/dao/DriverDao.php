@@ -1493,82 +1493,75 @@ class DriverDao extends BaseDao
 
             $this->putAvailable($trip->driverId);
 
-            $this->driverRewardTripService->toAwardDriver(
-                new Trip($trip),
-                new Driver($trip->driver)
-            );
+            try {
+                $this->driverRewardTripService->toAwardDriver(
+                    new Trip($trip),
+                    new Driver($trip->driver)
+                );
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
+            }
 
             $balances = $this->splitPayment(new Trip($trip), $trip->tripDiscountCoupon);
 
-            $this->customerTripPaymentService->tripPaymentOnFinish(new Trip($trip));
-
-            (new DriverReferralMonetizationService())
-                ->monetizeSponsors(new Driver($trip->driver), new Trip($trip));
-
-            (new TripCashbackService())
-                ->payCashback(new Trip($trip));
-
-            $trip->driver->balance = $balances['driverBalance'];
-
-            if (!empty($trip->tripDiscountCoupon) && (bool)$userDiscountCouponDao->find($trip->tripDiscountCoupon->userDiscountCouponId)->uniqueUse) {
-                $userDiscountCouponDao->useCoupon($trip->tripDiscountCoupon->userDiscountCouponId);
+            try {
+                $this->customerTripPaymentService->tripPaymentOnFinish(new Trip($trip));
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
             }
 
-            if (!empty($trip->customer->totem) && $trip->customer->totem) {
-                $this->tripReceiptService->sendToCustomer($tripReference);
+            try {
+                (new DriverReferralMonetizationService())
+                    ->monetizeSponsors(new Driver($trip->driver), new Trip($trip));
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
             }
 
-            $logMessage = "MOTORISTA FINALIZOU A VIAGEM ";
+            try {
+                (new TripCashbackService())
+                    ->payCashback(new Trip($trip));
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
+            }
 
-            Queue::dispatch(
-                TripEventJob::class,
-                [
-                    'tripReference' => $tripReference,
-                    'event' => $logMessage,
-                    'data' => $trip
-                ]
-            );
+            $trip->driver->balance = $balances['driverBalance'] ?? null;
 
-            $tripCustomerUserId = (new TripCustomerUserService())->resolveUserId($trip);
+            try {
+                if (!empty($trip->tripDiscountCoupon) && (bool)$userDiscountCouponDao->find($trip->tripDiscountCoupon->userDiscountCouponId)->uniqueUse) {
+                    $userDiscountCouponDao->useCoupon($trip->tripDiscountCoupon->userDiscountCouponId);
+                }
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
+            }
 
-            (new UserService())->updateQuantityTrips($tripCustomerUserId);
+            try {
+                if (!empty($trip->customer->totem) && $trip->customer->totem) {
+                    $this->tripReceiptService->sendToCustomer($tripReference);
+                }
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
+            }
 
             /**
              * Atributo necessário para front-end
              */
             $trip->ecoInfo = null;
 
-            // Firebase sync bloqueia FinishTrip no app; limpa realtime em processo separado.
-            try {
-                (new RedisUtil())->delete("trip-{$trip->tripReference}");
-            } catch (\Throwable $e) {
-                (new LogDao())->logException($e);
-            }
-
-            $consolePath = realpath(__DIR__ . '/../../console') ?: '/var/www/html/console';
-            $tripRefEsc = escapeshellarg((string)$tripReference);
-            exec(
-                "cd {$consolePath} && nohup /usr/bin/php command.php cleanup-finished-trip-realtime {$tripRefEsc} > /dev/null 2>&1 & echo $!"
-            );
-            exec(
-                "cd {$consolePath} && nohup /usr/bin/php command.php update-quantity-trips {$tripCustomerUserId} {$trip->driverId} > /dev/null 2>&1 & echo $!"
-            );
-
-            exec(
-                "cd {$consolePath} && nohup /usr/bin/php command.php save-route-tracing {$tripReference} > /dev/null 2>&1 & echo $!"
-            );
-
-            exec(
-                "cd {$consolePath} && nohup /usr/bin/php command.php queue-finished-trip {$tripReference} > /dev/null 2>&1 & echo $!"
-            );
+            $tripCustomerUserId = (new TripCustomerUserService())->resolveUserId($trip);
 
             $this->commit();
+            $needsRollback = false;
 
-            try {
-                (new IntegrationPartnersServiceDao())->sendTripDataToPartners($trip);
-            } catch (\Throwable $e) {
-                (new LogDao())->logException($e);
-            }
+            // Redis sem timeout + Firebase + Queue travavam FinishTrip ~90s+.
+            // Pós-processamento só em background para o app receber resposta imediata.
+            $consolePath = realpath(__DIR__ . '/../../console') ?: '/var/www/html/console';
+            $tripRefEsc = escapeshellarg((string)$tripReference);
+            $driverIdEsc = escapeshellarg((string)$trip->driverId);
+            $userIdEsc = escapeshellarg((string)$tripCustomerUserId);
+            exec("cd {$consolePath} && nohup /usr/bin/php command.php cleanup-finished-trip-realtime {$tripRefEsc} > /dev/null 2>&1 & echo $!");
+            exec("cd {$consolePath} && nohup /usr/bin/php command.php update-quantity-trips {$userIdEsc} {$driverIdEsc} > /dev/null 2>&1 & echo $!");
+            exec("cd {$consolePath} && nohup /usr/bin/php command.php save-route-tracing {$tripRefEsc} > /dev/null 2>&1 & echo $!");
+            exec("cd {$consolePath} && nohup /usr/bin/php command.php avg-finished-trip {$tripRefEsc} > /dev/null 2>&1 & echo $!");
 
             return $trip;
         } catch (Exception $e) {
