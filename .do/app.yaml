@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-28 11:50 UTC - Fix trip background worker path and audit trip dispatch
+# Deploy trigger: 2026-10-30 14:20 UTC - Restore monitor/central path routing (was falling to site 404)
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
@@ -37,6 +37,10 @@ services:
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xs
+    health_check:
+      http_path: /
+      initial_delay_seconds: 60
+      period_seconds: 15
     routes:
       - path: /central
     envs:
@@ -63,7 +67,11 @@ services:
       repo: developeragencia/movy
     http_port: 8080
     instance_count: 1
-    instance_size_slug: basic-xxs
+    instance_size_slug: basic-xs
+    health_check:
+      http_path: /
+      initial_delay_seconds: 30
+      period_seconds: 10
     routes:
       - path: /monitor
     envs:
