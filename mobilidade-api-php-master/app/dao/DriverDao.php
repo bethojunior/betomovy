@@ -1547,22 +1547,12 @@ class DriverDao extends BaseDao
              */
             $trip->ecoInfo = null;
 
-            $tripCustomerUserId = (new TripCustomerUserService())->resolveUserId($trip);
-
             $this->commit();
             $needsRollback = false;
 
-            // Redis sem timeout + Firebase + Queue travavam FinishTrip ~90s+.
-            // Pós-processamento só em background para o app receber resposta imediata.
-            $consolePath = realpath(__DIR__ . '/../../console') ?: '/var/www/html/console';
-            $tripRefEsc = escapeshellarg((string)$tripReference);
-            $driverIdEsc = escapeshellarg((string)$trip->driverId);
-            $userIdEsc = escapeshellarg((string)$tripCustomerUserId);
-            exec("cd {$consolePath} && nohup /usr/bin/php command.php cleanup-finished-trip-realtime {$tripRefEsc} > /dev/null 2>&1 & echo $!");
-            exec("cd {$consolePath} && nohup /usr/bin/php command.php update-quantity-trips {$userIdEsc} {$driverIdEsc} > /dev/null 2>&1 & echo $!");
-            exec("cd {$consolePath} && nohup /usr/bin/php command.php save-route-tracing {$tripRefEsc} > /dev/null 2>&1 & echo $!");
-            exec("cd {$consolePath} && nohup /usr/bin/php command.php avg-finished-trip {$tripRefEsc} > /dev/null 2>&1 & echo $!");
-
+            // NÃO chamar Redis/Firebase/exec aqui: no App Platform o request
+            // espera filhos e o FinishTrip estoura 504 (~70-90s) mesmo com &.
+            // Limpeza fica a cargo de jobs/cron (avg-finished-trip / sync-trips-realtime).
             return $trip;
         } catch (Exception $e) {
             if ($needsRollback === true) {
