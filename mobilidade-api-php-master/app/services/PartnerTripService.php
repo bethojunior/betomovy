@@ -170,11 +170,16 @@ class PartnerTripService
                 ->hydrate($trip)
                 ->createTrip();
 
-            $consolePath = realpath(__DIR__ . '/../../console') ?: '/var/www/html/console';
-            $tripRef = escapeshellarg($this->trip->getTripReference());
-            exec(
-                "cd {$consolePath} && nohup /usr/bin/php command.php trip-call {$tripRef} > /dev/null 2>&1 & echo $!"
-            );
+            try {
+                $this->tripCallService->notifyFoundDrivers(
+                    $this->trip,
+                    is_array($result['resultDrivers'] ?? null) ? $result['resultDrivers'] : []
+                );
+            } catch (\Throwable $pushError) {
+                (new LogDao())->logException($pushError);
+            }
+
+            backgroundTask('trip-call', escapeshellarg($this->trip->getTripReference()));
 
             if (
                 empty($result['resultDrivers']) &&

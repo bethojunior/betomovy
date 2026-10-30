@@ -170,21 +170,38 @@ class TripCollection implements ITripRealtime {
 
   searchTrip(driverId: string, callback: TripCallback): string {
     const id = IdGenerator.basic();
+    const driverKey = String(driverId);
+    const numericId = Number(driverKey);
+    const ids: Array<string | number> = [driverKey];
+    if (driverKey !== '' && !Number.isNaN(numericId)) {
+      ids.push(numericId);
+    }
 
-    const mountedQuery = query(
-      collection(db, 'trips'),
-      where('callingDriver', 'array-contains', driverId),
-      where('driver', '==', null),
-      limit(1),
-    );
+    const stops = ids.map(candidate => {
+      const mountedQuery = query(
+        collection(db, 'trips'),
+        where('callingDriver', 'array-contains', candidate),
+        limit(1),
+      );
 
-    const unsubscribe = safeOnSnapshot(mountedQuery, snapshot => {
-      snapshot.docChanges().forEach(change => {
-        callback({data: change.doc.data() as Trip, type: change.type});
+      return safeOnSnapshot(mountedQuery, snapshot => {
+        snapshot.docChanges().forEach(change => {
+          const data = change.doc.data() as Trip;
+          const assigned = (data as any)?.driverId || (data as any)?.driver;
+          const status = (data as any)?.status;
+          const searchable =
+            change.type === 'removed' ||
+            (!assigned &&
+              (!status || status === 'searching' || status === 'searching_favorite'));
+          if (!searchable) return;
+          callback({data, type: change.type});
+        });
       });
     });
 
-    this.unsubscribes.set(id, unsubscribe);
+    this.unsubscribes.set(id, () => {
+      stops.forEach(stop => stop());
+    });
     return id;
   }
 

@@ -73,13 +73,13 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "buildNumber": "80202",
+      "buildNumber": "80203",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSCameraUsageDescription": "A câmera é usada durante o cadastro para tirar sua foto de perfil e fotografar os documentos necessários para o cadastro. Ela também é usada quando você troca sua foto de perfil no aplicativo.",
         "NSMicrophoneUsageDescription": "O microfone é usado para gravar e enviar mensagens de áudio no chat entre motoristas e passageiros e para informar endereços por voz ao realizar um chamado.",
         "NSPhotoLibraryUsageDescription": "A biblioteca de fotos é utilizada para selecionar fotos do perfil e enviar imagens ou documentos salvos no aparelho.",
-        "UIBackgroundModes": ["location", "fetch"],
+        "UIBackgroundModes": ["location", "fetch", "remote-notification"],
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
         "NSLocationAlwaysUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
         "NSLocationWhenInUseUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
@@ -97,7 +97,7 @@
     "android": {
       "package": "br.com.client.rota101",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 80202,
+      "versionCode": 80203,
       "edgeToEdgeEnabled": true,
       "config": {
         "googleMaps": {

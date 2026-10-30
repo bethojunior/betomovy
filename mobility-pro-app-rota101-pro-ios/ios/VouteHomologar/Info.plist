@@ -39,7 +39,7 @@
       </dict>
     </array>
     <key>CFBundleVersion</key>
-    <string>80202</string>
+    <string>80203</string>
     <key>GMSApiKey</key>
     <string>AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I</string>
     <key>LSMinimumSystemVersion</key>
@@ -77,6 +77,7 @@
     <array>
       <string>location</string>
       <string>fetch</string>
+      <string>remote-notification</string>
     </array>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>

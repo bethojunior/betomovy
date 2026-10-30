@@ -123,8 +123,9 @@ class NewFreightService
             if (isset($request->tripItems))
                 $this->createTripItems($trip->getTripReference(), $request->tripItems);
 
-            $this->customerTripCallService
+            $calledDrivers = $this->customerTripCallService
                 ->callDrivers($trip, $origin);
+            $tripModelForNotify = $trip;
 
             $this->minPriceRewardTripService
                 ->generate($trip);
@@ -150,8 +151,16 @@ class NewFreightService
 
             $this->conn->commit();
 
-            exec(
-                "nohup php ../console/command.php trip-call {$this->trip->getTripReference()} > /dev/null 2>&1 & echo $! ");
+            try {
+                $this->customerTripCallService->notifyFoundDrivers(
+                    $tripModelForNotify,
+                    is_array($calledDrivers['resultDrivers'] ?? null) ? $calledDrivers['resultDrivers'] : []
+                );
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
+            }
+
+            backgroundTask('trip-call', escapeshellarg($tripModelForNotify->getTripReference()));
 
         } catch (CheckoutCardException $e) {
             $this->updateTripOnPaymentRefused($this->trip);

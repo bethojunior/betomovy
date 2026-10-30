@@ -12,6 +12,7 @@ use app\constant\DriverCalledConst;
 use app\dao\CustomerDao;
 use app\dao\DriverDao;
 use app\dao\LogDao;
+use app\dao\TripDao;
 use app\dao\TripHistoryDao;
 use app\dao\TripTypeDao;
 use app\dtos\TripCallPushDTO;
@@ -153,7 +154,7 @@ class TripCallDriverCommand extends Command
 
                     echo "[Chamado individual] Atualizando status CALLING da viagem e do motorista: {$driver->driverId}" . PHP_EOL;
                     $this->updateStatusOnCallTrip($tripReference, $driver->id, $driver->driverId);
-                    $trip->callingDriver = $driver->driverId;
+                    $trip->callingDriver = (string)$driver->driverId;
 
                     echo "[Chamado individual] Registrando histórico de chamado" . PHP_EOL;
                     $this->tripHistoryDao->insertTripsFound([$trip], $driver->driverId);
@@ -430,15 +431,14 @@ class TripCallDriverCommand extends Command
      */
     private function verifyTripIsSearching($tripReference)
     {
-        $trip = $this->service
-            ->find($tripReference);
+        $trip = (new TripDao())->find($tripReference);
 
-        if (!$trip)
+        if (!$trip) {
             return false;
+        }
 
-        // @TODO as vezes a consulta retorna um array pq cria mais de um registro na tabela tripDrivers.
-        if(is_array($trip) && $trip[0]) {
-            return $trip[0];
+        if (!in_array($trip->status, [Trip::SEARCHING, Trip::SEARCHING_FAVORITE], true)) {
+            return false;
         }
 
         return $trip;

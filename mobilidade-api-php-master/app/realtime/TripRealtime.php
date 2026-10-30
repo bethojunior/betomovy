@@ -157,8 +157,27 @@ class TripRealtime
 
     private function parseCallingDriver()
     {
-        if ($this->callingDriver)
-            $this->callingDriver = explode(',', $this->callingDriver);
+        $raw = $this->callingDriver;
+
+        if (is_int($raw) || is_float($raw)) {
+            $raw = (string)$raw;
+        }
+
+        if (is_array($raw)) {
+            $this->callingDriver = array_values(array_filter(array_map('strval', $raw), function ($id) {
+                return $id !== '';
+            }));
+            return;
+        }
+
+        if (is_string($raw) && $raw !== '') {
+            $this->callingDriver = array_values(array_filter(array_map('trim', explode(',', $raw)), function ($id) {
+                return $id !== '';
+            }));
+            return;
+        }
+
+        $this->callingDriver = [];
     }
 
 

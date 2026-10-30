@@ -190,6 +190,10 @@ export const TripProvider = ({ children }: TripContextChildren) => {
   } = stateTrip;
 
   const isAcceptingTripRef = useRef(false);
+  const callDriverModalRef = useRef(callDriverModal);
+  const tripAcceptedRef = useRef(tripAccepted);
+  callDriverModalRef.current = callDriverModal;
+  tripAcceptedRef.current = tripAccepted;
 
   const { hideBubble } = useBubbleButton();
   const { cityConfig, tokenDriver } = useAuth();
@@ -405,11 +409,11 @@ export const TripProvider = ({ children }: TripContextChildren) => {
     location: { latitude: number; longitude: number },
     userId: number,
     callType?: string | number | null,
-  ): Promise<boolean> => {
-    if (callDriverModal) return false;
-    if (isAcceptingTripRef.current) return false;
-    if (Object.keys(tripAccepted || {}).length > 0) return false;
-    if (isFetchingTripRef.current) return false;
+  ): Promise<'found' | 'empty' | 'skip'> => {
+    if (callDriverModalRef.current) return 'skip';
+    if (isAcceptingTripRef.current) return 'skip';
+    if (Object.keys(tripAcceptedRef.current || {}).length > 0) return 'skip';
+    if (isFetchingTripRef.current) return 'skip';
 
     isFetchingTripRef.current = true;
     try {
@@ -421,9 +425,9 @@ export const TripProvider = ({ children }: TripContextChildren) => {
         userId,
       );
 
-      if (response === null || response === undefined) {
+      if (response === null || response === undefined || typeof response === 'string') {
         dispatchTrip({ type: 'update', field: 'trip', arg: {} });
-        return false;
+        return 'empty';
       }
 
       if (callType && callType === TRIP_CALL_PARTNER) {
@@ -442,14 +446,14 @@ export const TripProvider = ({ children }: TripContextChildren) => {
       await AsyncStorage.setItem('trip', JSON.stringify(response));
       dispatchTrip({ type: 'update', field: 'trip', arg: response });
 
-      return true;
+      return 'found';
     } catch (error) {
       console.log(error);
-      return false;
+      return 'skip';
     } finally {
       isFetchingTripRef.current = false;
     }
-  }, [callDriverModal, song, tripAccepted]);
+  }, []);
 
   useEffect(() => {
     if (tripAccepted && Object.keys(tripAccepted).length > 0) {

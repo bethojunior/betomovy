@@ -22,7 +22,7 @@ export default class SocketConnection {
 
   private readonly logger = new Logger(SocketConnection.name);
   private readonly url = buildApp().HOST_SOCKET;
-  private readonly reconnectionAttempts = 5;
+  private readonly reconnectionAttempts = Infinity;
   private readonly reconnectionDelay = 5000;
 
   private socket: SocketIOClient.Socket | null = null;

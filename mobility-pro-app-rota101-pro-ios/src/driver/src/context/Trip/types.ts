@@ -23,7 +23,7 @@ export interface TripContextType {
     location: {latitude: number; longitude: number},
     userId: number,
     callType?: string | number | null,
-  ) => Promise<boolean>;
+  ) => Promise<'found' | 'empty' | 'skip'>;
   refuseTrip: (driverId: number, tripReference: string) => Promise<void | ''>;
   getTripDenied: any;
   cancelTripSchedule: (

@@ -13,6 +13,7 @@ import { customToast } from '../../../../utils/FlashMessage';
 import { emitDriverStatusChange } from '../../utils/driverStatusChangeEmitter';
 import { emitTripStatusChange } from '../../utils/tripStatusChangeEmitter';
 import { DriverStatusType } from '../../../../interfaces/driver';
+import { readRideCallNotice } from '../../utils/rideCallNotification';
 
 interface NotificationComponentProps {
   onPress?: () => void;
@@ -179,13 +180,13 @@ export const NotificationComponent = ({ onPress }: NotificationComponentProps) =
     }
 
     if (optionChoosed.actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
-      const userId = notificationData?.userId;
-      if (userId == null) return;
+      const notice = readRideCallNotice(notificationData);
+      if (!notice) return;
 
       dispatchTrip({
         type: 'update',
         field: 'notificationTripCallRequest',
-        arg: { userId: parseInt(userId), callType: notificationData?.tripCallTypeId },
+        arg: { userId: notice.userId, callType: notice.callType },
       });
     }
   };
@@ -228,23 +229,12 @@ export const NotificationComponent = ({ onPress }: NotificationComponentProps) =
           }
         } catch {}
 
-        const tag = data?.tag || parsedData?.tag;
-        const action = data?.action || parsedData?.action;
-
-        const isRideCall =
-          tag === 'rideRequest' ||
-          tag === 'notifyDriversClose' ||
-          action === 'rideRequest' ||
-          action === 'tripCall' ||
-          parsedData?.tripReference;
-
-        if (isRideCall && (parsedData?.userId != null || data?.userId != null)) {
-          const userId = parsedData?.userId ?? data?.userId;
-          const callType = parsedData?.tripCallTypeId ?? data?.tripCallTypeId;
+        const notice = readRideCallNotice(parsedData) || readRideCallNotice(data);
+        if (notice) {
           dispatchTrip({
             type: 'update',
             field: 'notificationTripCallRequest',
-            arg: { userId: parseInt(userId), callType },
+            arg: { userId: notice.userId, callType: notice.callType },
           });
         }
       },

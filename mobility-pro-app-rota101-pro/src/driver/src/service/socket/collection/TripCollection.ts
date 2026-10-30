@@ -81,7 +81,7 @@ class TripCollection implements ITripRealtime {
     const eventName = TRIP_EVENTS.TRIP_AVAILABLE;
 
     if (driverId) {
-      this.socket?.emit(TRIP_EVENTS.JOIN_ROOM, { driverId });
+      this.socket?.emit(TRIP_EVENTS.JOIN_ROOM, { driverId: String(driverId) });
     }
 
     this.subs.set(id, {eventName, listener: callback});
@@ -125,8 +125,6 @@ class TripCollection implements ITripRealtime {
   }
 
   disconnect(): void {
-    if (this.socket) return;
-
     this.subs.forEach(entry => {
       this.socket?.off(entry.eventName, entry.listener);
 
@@ -136,7 +134,6 @@ class TripCollection implements ITripRealtime {
     });
 
     this.subs.clear();
-    this.socket?.disconnect();
   }
 }
 

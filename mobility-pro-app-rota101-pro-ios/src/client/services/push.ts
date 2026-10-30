@@ -70,6 +70,15 @@ async function registerForPushNotificationsAsync() {
         enableVibrate: true,
         showBadge: true,
       });
+      await Notifications.setNotificationChannelAsync('tripCall', {
+        name: 'Chamadas de corrida',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 700, 400, 700],
+        sound: 'assobio.mp3',
+        enableVibrate: true,
+        lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+        bypassDnd: false,
+      });
     }
 
     await Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK).catch(() => {});

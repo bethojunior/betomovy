@@ -44,60 +44,12 @@ if (in_array($uriLowerPath, ['/privacy', '/privacidade', '/privacy-policy', '/po
 }
 
 
-// ===== DB MIGRATION ENDPOINT (REMOVE AFTER MIGRATION) =====
 if (strpos($_SERVER['REQUEST_URI'] ?? '', '/db-mig') === 0) {
-    set_time_limit(600);
-    ini_set('memory_limit', '512M');
-    $secret = $_GET['secret'] ?? '';
-    if ($secret !== 'movy-migrate-2026') { http_response_code(403); echo json_encode(['error'=>'Forbidden']); exit; }
+    http_response_code(410);
     header('Content-Type: application/json; charset=utf-8');
-    $action = $_GET['action'] ?? 'status';
-    $dbHost = getenv('MYSQL_HOST') ?: 'movy-mysql-do-user-45837300-0.f.db.ondigitalocean.com';
-    $dbPort = getenv('MYSQL_PORT') ?: '25060';
-    $dbUser = getenv('MYSQL_USER') ?: 'doadmin';
-    $dbPass = getenv('MYSQL_PASS') ?: 'AVNS_ODYdiYw4rvg6gfvKYOO';
-    if ($dbPass === 'AVNS_ODYdiYw4rvg6gfvKYO0' || $dbPass === 'AVNS_ODYdIYW4rvg6gfvKYO0') {
-        $dbPass = 'AVNS_ODYdiYw4rvg6gfvKYOO';
-    }
-    $dbName = getenv('MYSQL_NAME') ?: 'movy_db';
-    try {
-        $pdo = new PDO("mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4", $dbUser, $dbPass,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::MYSQL_ATTR_SSL_CA => true, PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false]);
-        if ($action === 'status') {
-            $tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
-            echo json_encode(['status'=>true,'database'=>$dbName,'tables_count'=>count($tables),'tables'=>$tables]);
-        } elseif ($action === 'run_sql') {
-            $sql = file_get_contents('php://input');
-            if (empty($sql)) { echo json_encode(['error'=>'No SQL']); exit; }
-            $pdo->exec("SET FOREIGN_KEY_CHECKS=0");
-            $pdo->exec("SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO'");
-            $pdo->exec("SET NAMES utf8mb4");
-            try { $pdo->exec("SET SESSION sql_require_primary_key = 0"); } catch (\Throwable $t) {}
-            $queries = preg_split('/;\s*[\r\n]+/', $sql);
-            $ok = 0; $errs = [];
-            foreach ($queries as $q) {
-                $q = trim($q);
-                if (empty($q) || $q[0]==='-' || substr($q,0,2)==='/*') continue;
-                try { $pdo->exec($q); $ok++; } catch(\PDOException $e) { $errs[] = ['q'=>substr($q,0,80),'e'=>$e->getMessage()]; }
-            }
-            $pdo->exec("SET FOREIGN_KEY_CHECKS=1");
-            echo json_encode(['status'=>true,'executed'=>$ok,'errors_count'=>count($errs),'errors'=>array_slice($errs,0,10)]);
-        } elseif ($action === 'query') {
-            $sql = file_get_contents('php://input');
-            if (empty($sql)) { echo json_encode(['error'=>'No SQL']); exit; }
-            $stmt = $pdo->query($sql);
-            echo json_encode(['status'=>true, 'data'=>$stmt->fetchAll(PDO::FETCH_ASSOC)]);
-            exit;
-        } elseif ($action === 'count_rows') {
-            $tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
-            $counts = [];
-            foreach ($tables as $t) { try { $counts[$t]=(int)$pdo->query("SELECT COUNT(*) FROM `$t`")->fetchColumn(); } catch(\Exception $e){ $counts[$t]='err'; } }
-            echo json_encode(['status'=>true,'table_rows'=>$counts]);
-        }
-    } catch(\PDOException $e) { echo json_encode(['status'=>false,'error'=>$e->getMessage()]); }
+    echo json_encode(['status' => false, 'error' => 'disabled']);
     exit;
 }
-// ===== END DB MIGRATION ENDPOINT =====
 
 session_start();
 

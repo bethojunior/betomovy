@@ -177,12 +177,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   };
 
   const dispatchCallDriverModal = (show: boolean) => {
-    if (show && AppState.currentState !== 'active') {
-      return;
-    }
-    requestAnimationFrame(() => {
-      dispatchTrip({ type: 'update', field: 'callDriverModal', arg: show });
-    });
+    dispatchTrip({ type: 'update', field: 'callDriverModal', arg: show });
   };
 
   const getCancelMessage = async (response: any) => {
@@ -201,14 +196,24 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
     }
   };
 
+  const pendingRingRef = useRef(false);
+  const handleTripRef = useRef<(userId: number, callType?: string | number | null) => Promise<void>>(
+    async () => {},
+  );
+  const playSongActiveRef = useRef<() => Promise<void>>(async () => {});
+
   const playSongActive = async () => {
-    if (AppState.currentState !== 'active') return;
+    if (AppState.currentState !== 'active') {
+      pendingRingRef.current = true;
+      return;
+    }
+    pendingRingRef.current = false;
 
     try {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
         staysActiveInBackground: true,
-        playsInSilentModeIOS: true,
+        playsInSilentModeIOS: false,
         shouldDuckAndroid: true,
         playThroughEarpieceAndroid: false,
       });
@@ -260,10 +265,17 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
         callType,
       );
 
-      if (response) {
+      if (response === 'found') {
+        if (AppState.currentState !== 'active') {
+          try {
+            openApp();
+          } catch (error) {
+            console.log(error);
+          }
+        }
         dispatchCallDriverModal(true);
         await playSongActive();
-      } else {
+      } else if (response === 'empty') {
         dispatchCallDriverModal(false);
         await stopSongActive();
       }
@@ -272,6 +284,33 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       await stopSongActive();
     }
   };
+
+  handleTripRef.current = handleTrip;
+  playSongActiveRef.current = playSongActive;
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', next => {
+      if (next !== 'active') return;
+      if (pendingRingRef.current) {
+        pendingRingRef.current = false;
+        void playSongActiveRef.current();
+      }
+      void handleTripRef.current(0, null);
+    });
+
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    if (!userDriverFind?.idDriver || isOffline) return;
+
+    const interval = setInterval(() => {
+      if (Object.keys(tripAcceptedRef.current || {}).length > 0) return;
+      void handleTripRef.current(0, null);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [userDriverFind?.idDriver, isOffline]);
 
   useEffect(() => {
     if (!notificationTripCallRequest) return;
@@ -637,7 +676,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       unsubscribes.forEach((unsubscribe) => tripRealtime.unsubscribe(unsubscribe));
       unsubscribes.clear();
     };
-  }, [userDriverFind.idDriver, isOffline]);
+  }, [userDriverFind.idDriver, isOffline, tripRealtime]);
 
   return <>{tripAccepted && <ProgressBarComponent trip={tripAccepted} />}</>;
 };

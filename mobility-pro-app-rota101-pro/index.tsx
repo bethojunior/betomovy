@@ -62,6 +62,18 @@ TaskManager.defineTask(
   },
 );
 
+if (Platform.OS === 'android') {
+  Notifications.setNotificationChannelAsync('tripCall', {
+    name: 'Chamadas de corrida',
+    importance: Notifications.AndroidImportance.MAX,
+    vibrationPattern: [0, 700, 400, 700],
+    sound: 'assobio.mp3',
+    enableVibrate: true,
+    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    bypassDnd: false,
+  }).catch(() => {});
+}
+
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
     const tag = notification.request.content.data?.tag as PushConstants.PushNotificationTags;

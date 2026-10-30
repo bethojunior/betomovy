@@ -40,7 +40,8 @@
         "NSPhotoLibraryUsageDescription": "Precisa de acesso à biblioteca de fotos para obter imagem do seu perfil.",
         "UIBackgroundModes": [
           "location",
-          "fetch"
+          "fetch",
+          "remote-notification"
         ],
         "NSLocationUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
         "NSLocationAlwaysUsageDescription": "Para otimizar sua experiência de viagem, o ${PRODUCT_NAME} rastreia sua localização desde o instante em que você inicia o aplicativo até o término da sua jornada. Essa informação facilita o processo de embarque, oferece um suporte mais eficaz e aprimora outras funcionalidades do serviço.",
@@ -50,12 +51,12 @@
       "config": {
         "googleMapsApiKey": "AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I"
       },
-      "buildNumber": "80202"
+      "buildNumber": "80203"
     },
     "android": {
       "package": "br.com.client.rota101",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 80202,
+      "versionCode": 80203,
       "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {

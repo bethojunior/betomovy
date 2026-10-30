@@ -292,27 +292,15 @@ class TripDao extends BaseDao
                 }
             }
 
+            $driversCalled = ['resultDrivers' => []];
             if ($origin instanceof Origin && in_array($this->trip->getStatus(), ['searching', 'searching_favorite'])) {
                 try {
-                    (new \app\services\CustomerTripCallService())
+                    $driversCalled = (new \app\services\CustomerTripCallService())
                         ->callDrivers($this->trip, $origin);
                 } catch (\Throwable $t) {
                     (new LogDao())->logException($t);
                 }
             }
-
-            // 8.1 Push to Drivers (Fail-safe)
-            $vehicleCategory = null;
-            try {
-                $vehicleCategory = (new TripTypeDao())->find($this->trip->getTripTypeId())->type ?? null;
-                $this->sendPushDriversClose(
-                    $this->trip->getTripReference(),
-                    $this->trip->getPrice(),
-                    $vehicleCategory,
-                    $this->trip->getUserId(),
-                    $this->trip->getTripCallTypeId()
-                );
-            } catch (\Throwable $t) {}
 
             // 9. Waypoints
             if (!empty($data->waypoints) && (is_array($data->waypoints) || is_object($data->waypoints))) {
@@ -355,11 +343,16 @@ class TripDao extends BaseDao
                 }
 
                 try {
-                    $consolePath = realpath(__DIR__ . '/../../console') ?: '/var/www/html/console';
-                    $tripRef = escapeshellarg($this->trip->getTripReference());
-                    exec(
-                        "cd {$consolePath} && nohup /usr/bin/php command.php trip-call {$tripRef} > /dev/null 2>&1 & echo $!"
+                    (new \app\services\CustomerTripCallService())->notifyFoundDrivers(
+                        $this->trip,
+                        is_array($driversCalled['resultDrivers'] ?? null) ? $driversCalled['resultDrivers'] : []
                     );
+                } catch (\Throwable $t) {
+                    (new LogDao())->logException($t);
+                }
+
+                try {
+                    backgroundTask('trip-call', escapeshellarg($this->trip->getTripReference()));
                 } catch (\Throwable $t) {
                     (new LogDao())->logException($t);
                 }
@@ -1978,8 +1971,15 @@ class TripDao extends BaseDao
      */
     public function sendPushDriversClose($tripReference, ?float $price = null, ?string $vehicleCategory = null, $userId = null, $tripCallTypeId = null)
     {
-        $drivers = (new TripDriversDao())
-            ->getDriversClose($tripReference);
+        $drivers = $this->findCallingDriversForPush($tripReference);
+
+        if (!is_array($drivers) || count($drivers) === 0) {
+            $drivers = (new TripDriversDao())->getDriversClose($tripReference);
+        }
+
+        if (!is_array($drivers)) {
+            $drivers = [];
+        }
 
         $driverModel = new Driver();
         $resultPush = [];
@@ -1996,6 +1996,36 @@ class TripDao extends BaseDao
         }
 
         return ['resultPush' => $resultPush, 'resultDrivers' => $drivers];
+    }
+
+    /**
+     * Motoristas já marcados como calling nesta corrida, com token do aparelho.
+     * A consulta antiga em tripDrivers exige estação e pode devolver lista vazia
+     * mesmo quando driverCalled já tem o motorista elegível.
+     */
+    private function findCallingDriversForPush($tripReference)
+    {
+        $driverTable = (new Driver())->getTableName();
+        $userTable = (new User())->getTableName();
+
+        $sql = "
+            SELECT
+                d.idDriver,
+                u.deviceToken,
+                dC.proximity
+            FROM driverCalled dC
+            INNER JOIN {$driverTable} d ON d.idDriver = dC.driverId
+            INNER JOIN {$userTable} u ON u.idUser = d.userId
+            WHERE dC.tripReference = :tripReference
+              AND dC.status = :status
+              AND u.deviceToken IS NOT NULL
+              AND u.deviceToken <> ''
+        ";
+
+        return $this->sqlRawSelect($sql, [
+            ':tripReference' => $tripReference,
+            ':status' => \app\constant\DriverCalledConst::CALLING,
+        ])->get();
     }
 
     /**

@@ -5,18 +5,29 @@ import {isRealtimeSocketEnabled} from '../../../../utils/realtime/realtimeSocket
 
 export default class TripRealtime {
   private static instance: ITripRealtime;
+  private static useSocket: boolean | null = null;
 
   private constructor() {}
 
+  public static configure(useSocket: boolean): ITripRealtime {
+    if (TripRealtime.instance && TripRealtime.useSocket === useSocket) {
+      return TripRealtime.instance;
+    }
+
+    try {
+      TripRealtime.instance?.disconnect();
+    } catch (error) {
+      console.warn('[TripRealtime] falha ao trocar o canal:', error);
+    }
+
+    TripRealtime.useSocket = useSocket;
+    TripRealtime.instance = useSocket ? new SocketTrip() : new FirebaseTrip();
+    return TripRealtime.instance;
+  }
+
   public static getInstance(): ITripRealtime {
     if (!TripRealtime.instance) {
-      const useSocket = isRealtimeSocketEnabled();
-
-      if (useSocket) {
-        TripRealtime.instance = new SocketTrip();
-      } else {
-        TripRealtime.instance = new FirebaseTrip();
-      }
+      return TripRealtime.configure(isRealtimeSocketEnabled());
     }
 
     return TripRealtime.instance;

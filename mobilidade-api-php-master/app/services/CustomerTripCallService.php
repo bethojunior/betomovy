@@ -5,6 +5,9 @@ namespace app\services;
 use app\constant\DriverCalledConst;
 use app\dao\DriverCalledDao;
 use app\dao\DriversCloseTheTripDao;
+use app\dao\LogDao;
+use app\dao\TripTypeDao;
+use app\dtos\TripCallPushDTO;
 use app\utils\RedisDriverCalled;
 use app\model\Driver;
 use app\model\DriverCalled;
@@ -65,9 +68,61 @@ class CustomerTripCallService
             }
         }
 
-//        $driversCalled['resultPush'] = $this->sendPushToDriversClose();
-
         return $driversCalled;
+    }
+
+    /**
+     * Envia o push da corrida já persistida para os motoristas encontrados.
+     * Não depende do processo em segundo plano trip-call.
+     *
+     * @param Trip|object $trip
+     * @param array $drivers
+     */
+    public function notifyFoundDrivers($trip, array $drivers): void
+    {
+        if (empty($drivers)) {
+            return;
+        }
+
+        $price = method_exists($trip, 'getPrice') ? $trip->getPrice() : ($trip->price ?? null);
+        $tripReference = method_exists($trip, 'getTripReference') ? $trip->getTripReference() : ($trip->tripReference ?? null);
+        $userId = method_exists($trip, 'getUserId') ? $trip->getUserId() : ($trip->userId ?? null);
+        $tripCallTypeId = method_exists($trip, 'getTripCallTypeId') ? $trip->getTripCallTypeId() : ($trip->tripCallTypeId ?? null);
+        $tripTypeId = method_exists($trip, 'getTripTypeId') ? $trip->getTripTypeId() : ($trip->tripTypeId ?? null);
+
+        $vehicleCategory = null;
+        if ($tripTypeId) {
+            try {
+                $vehicleCategory = (new TripTypeDao())->find($tripTypeId)->type ?? null;
+            } catch (\Throwable $e) {
+                $vehicleCategory = null;
+            }
+        }
+
+        $driverModel = new Driver();
+
+        foreach ($drivers as $driver) {
+            $token = $driver->deviceToken ?? null;
+            if (empty($token)) {
+                continue;
+            }
+
+            try {
+                $driverModel->sendTripNotifications(
+                    [$token],
+                    new TripCallPushDTO(
+                        $price !== null ? (float)$price : null,
+                        $vehicleCategory,
+                        isset($driver->proximity) ? (float)$driver->proximity : null,
+                        $tripReference,
+                        $userId !== null ? (int)$userId : null,
+                        $tripCallTypeId !== null ? (int)$tripCallTypeId : null
+                    )
+                );
+            } catch (\Throwable $e) {
+                (new LogDao())->logException($e);
+            }
+        }
     }
 
     /**

@@ -72,11 +72,17 @@ export const TripService = () => {
       ],
     });
 
-    if (!response.status) {
-      return response.data.message;
+    const body = response?.data;
+    if (!body || body.status === false) {
+      return null;
     }
 
-    return response.data.data[0];
+    const payload = body.data;
+    if (Array.isArray(payload)) {
+      return payload[0] ?? null;
+    }
+
+    return payload ?? null;
   };
 
   const get = async (tripReference: string) => {

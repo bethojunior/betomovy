@@ -2,7 +2,9 @@
 
 namespace app\dao;
 
+use app\constant\DriverCalledConst;
 use app\model\Status;
+use app\model\Trip;
 use app\utils\BaseDao;
 use app\model\TripDrivers;
 
@@ -76,6 +78,8 @@ class TripDriversDao extends BaseDao
               LEFT JOIN centralCustomer ON centralCustomer.id = trip.centralCustomerId
             WHERE
               dC.driverId = :driverId
+              AND dC.status = :callingStatus
+              AND trip.status IN (:searchingStatus, :searchingFavoriteStatus)
         ";
 
         $sql .= empty($listTripsDenied) ? " " :
@@ -86,6 +90,9 @@ class TripDriversDao extends BaseDao
             ':driverId' => $driverId,
             ':favoriteDriverId' => $driverId,
             ':favoriteStatus' => Status::ATIVO,
+            ':callingStatus' => DriverCalledConst::CALLING,
+            ':searchingStatus' => Trip::SEARCHING,
+            ':searchingFavoriteStatus' => Trip::SEARCHING_FAVORITE,
         ];
 
         return $this->sqlRawSelect($sql, $bind)

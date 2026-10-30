@@ -60,9 +60,18 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
 
     const newSocket = socketConnection.connect(auth);
 
-    newSocket.on('connect', () => {
-      newSocket.emit('join-room', auth);
-    });
+    const joinRoom = () => {
+      newSocket.emit('join-room', {
+        ...auth,
+        driverId: auth.driverId != null ? String(auth.driverId) : undefined,
+        userId: auth.userId != null ? String(auth.userId) : undefined,
+      });
+    };
+
+    newSocket.on('connect', joinRoom);
+    if (newSocket.connected) {
+      joinRoom();
+    }
 
     setSocket(newSocket);
 

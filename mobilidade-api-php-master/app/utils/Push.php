@@ -9,6 +9,7 @@ use app\utils\Pulse\PulseService;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging;
 use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 /**
  * Class Push
@@ -127,22 +128,11 @@ class Push
 
         $data = $this->buildDataPayload(['notId' => '1']);
 
-        $message = CloudMessage::new()
-            ->withTarget('token', $deviceToken)
-            ->withAndroidConfig(['priority' => 'high'])
-            ->withApnsConfig([
-                'headers' => [
-                    'apns-content-available' => '1',
-                    'apns-priority'          => '10',
-                ],
-                'payload' => [
-                    'aps' => [
-                        'content-available' => 1,
-                        'sound'             => $this->soundname ?: 'default',
-                    ],
-                ],
-            ])
-            ->withData($data);
+        $message = $this->withVisibleAlert(
+            CloudMessage::new()
+                ->withTarget('token', $deviceToken)
+                ->withData($data)
+        );
 
         try {
             $result = $this->triggerSingle($message);
@@ -223,22 +213,11 @@ class Push
 
             $data = $this->buildDataPayload(['notId' => '1']);
 
-            $message = CloudMessage::new()
-                ->withTarget('token', $deviceToken)
-                ->withAndroidConfig(['priority' => 'high'])
-                ->withApnsConfig([
-                    'headers' => [
-                        'apns-content-available' => '1',
-                        'apns-priority'          => '10',
-                    ],
-                    'payload' => [
-                        'aps' => [
-                            'content-available' => 1,
-                            'sound'             => $this->soundname ?: 'default',
-                        ],
-                    ],
-                ])
-                ->withData($data);
+            $message = $this->withVisibleAlert(
+                CloudMessage::new()
+                    ->withTarget('token', $deviceToken)
+                    ->withData($data)
+            );
 
             try {
                 $result = $this->triggerSingle($message);
@@ -267,8 +246,9 @@ class Push
                     $notification = [
                         "title"               => $this->title,
                         "body"                => $this->body,
-                        "sound"               => $this->soundname ?: 'default',
+                        "sound"               => 'default',
                         "priority"            => $this->mapExpoPriority(),
+                        "channelId"           => 'tripCall',
                         "displayInForeground" => $foreground,
                         "data"                => $this->buildDataPayload(),
                     ];
@@ -473,6 +453,45 @@ class Push
         return $this->priority === PushConst::HIGH_PRIORITY ? 'high' : 'default';
     }
 
+    /**
+     * Mensagem só com data não abre banner nem toca no Android/iOS.
+     * Android 8+ toca o som do canal, não o do payload.
+     * O aplicativo cria o canal tripCall com assobio.mp3.
+     * APNs não aceita mp3; som inválido pode derrubar o alerta.
+     */
+    private function withVisibleAlert(CloudMessage $message): CloudMessage
+    {
+        $soundFile = $this->soundname ?: 'default';
+        $androidSound = preg_replace('/\.(mp3|wav|caf)$/i', '', $soundFile) ?: 'default';
+        $apnsSound = preg_match('/\.(caf|wav|aiff|aif)$/i', $soundFile) ? $soundFile : 'default';
+
+        return $message
+            ->withNotification(Notification::create($this->title ?: 'Nova corrida', $this->body ?: 'Há uma corrida disponível'))
+            ->withAndroidConfig([
+                'priority' => 'high',
+                'notification' => [
+                    'channel_id' => 'tripCall',
+                    'sound' => $androidSound,
+                    'default_sound' => false,
+                ],
+            ])
+            ->withApnsConfig([
+                'headers' => [
+                    'apns-priority' => '10',
+                    'apns-push-type' => 'alert',
+                ],
+                'payload' => [
+                    'aps' => [
+                        'alert' => [
+                            'title' => $this->title,
+                            'body' => $this->body,
+                        ],
+                        'sound' => $apnsSound,
+                    ],
+                ],
+            ]);
+    }
+
     private function buildNotification(): array
     {
         return array_filter([
@@ -499,7 +518,7 @@ class Push
             'additionalData' => $this->additionalData
         ] + $extra;
 
-        return array_map('strval', array_filter($data, fn($v) => $v !== null));
+        return PushData::stringify($data);
     }
 
     /**

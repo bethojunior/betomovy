@@ -130,11 +130,13 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnModu
     const { userId, driverId, cityId, callType } = data;
 
     if (userId) {
-      this.eventsRoomService.joinUserRoom(client, userId);
-    } else if (driverId) {
-      this.eventsRoomService.joinDriverRoom(client, driverId);
-    } else if (cityId) {
-      this.eventsRoomService.joinCityRoom(client, cityId, { callType });
+      this.eventsRoomService.joinUserRoom(client, String(userId));
+    }
+    if (driverId) {
+      this.eventsRoomService.joinDriverRoom(client, String(driverId));
+    }
+    if (cityId && !userId && !driverId) {
+      this.eventsRoomService.joinCityRoom(client, String(cityId), { callType });
     }
   }
 
@@ -143,11 +145,13 @@ export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnModu
     const { userId, driverId, cityId, callType } = data;
 
     if (userId) {
-      this.eventsRoomService.leaveUserRoom(client, userId);
-    } else if (driverId) {
-      this.eventsRoomService.leaveDriverRoom(client, driverId);
-    } else if (cityId) {
-      this.eventsRoomService.leaveCityRoom(client, cityId, { callType });
+      this.eventsRoomService.leaveUserRoom(client, String(userId));
+    }
+    if (driverId) {
+      this.eventsRoomService.leaveDriverRoom(client, String(driverId));
+    }
+    if (cityId && !userId && !driverId) {
+      this.eventsRoomService.leaveCityRoom(client, String(cityId), { callType });
     }
   }
 
