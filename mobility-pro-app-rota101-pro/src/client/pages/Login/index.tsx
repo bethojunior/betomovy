@@ -501,7 +501,7 @@ export default function Login() {
                         <IconFacebook height={RFValue(31)} width={RFValue(31)} />
                       </Accessory>
                     </If>
-                    <If condition={verifyIsActive('enable_apple_login')}>
+                    <If condition={false && verifyIsActive('enable_apple_login')}>
                       <Accessory onPress={() => { }}>
                         <IconApple height={RFValue(31)} width={RFValue(31)} />
                       </Accessory>

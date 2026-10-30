@@ -47,23 +47,33 @@ export const useCustomOrderList = (
       const priceIdMap = new Map(
         listPrices.map((price) => [price.tripTypeId, price.id])
       );
-      const orderUpdates = customOrderList.map((item, index) => {
-        const mappedId =
-          item.idTripType != null
-            ? priceIdMap.get(item.idTripType)
-            : undefined;
-        return {
-          id: mappedId,
-          order: index + 1,
-        };
-      });
+      const orderUpdates = customOrderList
+        .map((item, index) => {
+          const mappedId =
+            item.idTripType != null
+              ? priceIdMap.get(item.idTripType)
+              : undefined;
+          return {
+            id: mappedId,
+            order: index + 1,
+          };
+        })
+        .filter((entry) => entry.id != null);
+
+      if (orderUpdates.length === 0) {
+        swal({
+          title: "Nenhum preço encontrado para ordenar",
+          icon: "warning",
+        });
+        return;
+      }
 
       const response = await api.put("price/update-order", {
         cityId: cityId,
         orders: orderUpdates,
       });
 
-      if (response.status) {
+      if (response.data?.status !== false && (response.data?.status || response.status === 200)) {
         swal({
           title: "Ordem personalizada salva com sucesso!",
           icon: "success",
@@ -73,7 +83,7 @@ export const useCustomOrderList = (
         await getTypesTravels();
       } else {
         swal({
-          title: "Erro ao salvar ordem personalizada",
+          title: response.data?.message || "Erro ao salvar ordem personalizada",
           icon: "error",
         });
       }

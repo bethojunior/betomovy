@@ -501,7 +501,7 @@ class PriceTrip {
                 element.classList.add("active");
             }
 
-            const count = priceType.typeDrivers.filter(typeDriver => {
+            const count = (priceType.typeDrivers || []).filter(typeDriver => {
                 if (type === null)
                     return true;
 

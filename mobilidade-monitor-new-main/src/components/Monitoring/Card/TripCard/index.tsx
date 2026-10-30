@@ -27,10 +27,6 @@ const TruncatedValue: FC<{ value?: string | null; as: typeof S.InformationTrip |
 )
 
 const TripCard: FC<TripCardProps> = ({ tripReference, tripData }) => {
-  if (!tripData) {
-    return null
-  }
-
   const [loading, setLoading] = useState(false)
   const [activeDetails, setActiveDetails] = useState('0')
   const [isNotificationModalVisible, setNotificationModalVisible] = useState(false)
@@ -38,6 +34,7 @@ const TripCard: FC<TripCardProps> = ({ tripReference, tripData }) => {
   const { getTripStartTime, setTripStartTime, removeTripStartTime } = useTripTimes()
   
   const tripWithStartTime = useMemo(() => {
+    if (!tripData) return null
     const tripActiveData = { ...(tripData as unknown as TripActive) }
 
     if (tripActiveData.status === TripStatus.STATUS_IN_PROGRESS) {
@@ -717,6 +714,10 @@ const TripCard: FC<TripCardProps> = ({ tripReference, tripData }) => {
         )}
       </>
     )
+  }
+
+  if (!tripData || !tripWithStartTime) {
+    return null
   }
 
   return (

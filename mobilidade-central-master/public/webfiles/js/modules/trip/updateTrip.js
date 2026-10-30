@@ -206,7 +206,10 @@ function closeAddressTrip(event) {
 
 function closePaymentFormKey() {
     viewController.elementProperty.removeClass(".type-cars", "trip-type-selected");
-    document.querySelector(".footer-payment-form").classList.remove("active");
+    const paymentFooter = document.querySelector(".footer-payment-form");
+    if (paymentFooter) {
+        paymentFooter.classList.remove("active");
+    }
 }
 
 

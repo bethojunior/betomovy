@@ -13,8 +13,8 @@ function formatTripEta(durationRaw, distanceRaw) {
       } else {
         let minutes = parseFloat(durStr);
         if (!isNaN(minutes) && minutes > 0) {
-          // API/Maps às vezes devolve segundos
-          if (minutes >= 180) {
+          // Só trata como segundos quando o valor é claramente em segundos (>= 1h)
+          if (minutes >= 3600) {
             minutes = minutes / 60;
           }
           parts.push(`${Math.max(1, Math.round(minutes))} min`);

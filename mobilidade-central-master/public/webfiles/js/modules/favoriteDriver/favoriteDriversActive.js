@@ -141,17 +141,22 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!isDriverOnline(data)) return;
 
             viewController.elementProperty.getElement(`#${data.idDriver}`, card => {
-                const idsList = JSON.parse(Session.get('customTripList'));
+                const rawList = Session.get('customTripList');
+                let idsList = Array.isArray(rawList)
+                  ? rawList
+                  : (typeof rawList === 'string' && rawList
+                      ? (() => { try { const p = JSON.parse(rawList); return Array.isArray(p) ? p : []; } catch (e) { return []; } })()
+                      : []);
                 
                 if(card.classList.contains("active")) {
                     const removeId = idsList.filter((res) => {
                         return res !== card.id 
                     });
-                    Session.set('customTripList', JSON.stringify(removeId))
+                    Session.set('customTripList', removeId)
                     return elementProperty.removeClass(`#${card.id}`, "active");
                 }
                 idsList.push(card.id);
-                Session.set('customTripList', JSON.stringify(idsList));
+                Session.set('customTripList', idsList);
             elementProperty.addClass(`#${card.id}`, "active");
             });
         });

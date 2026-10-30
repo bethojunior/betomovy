@@ -832,11 +832,14 @@ export const ServicesApps = () => {
     setLoading(true);
     try {
       const responseTripPayments = await api.get("tripPaymentForm");
-      setTripPaymentsForms(responseTripPayments.data.response);
+      const paymentsList = Array.isArray(responseTripPayments.data?.response)
+        ? responseTripPayments.data.response
+        : [];
+      setTripPaymentsForms(paymentsList);
 
       let listCommission: CommissionPaymentFormProps[] = [];
 
-      responseTripPayments.data.response.map(
+      paymentsList.map(
         (value: TripPaymentsFormsProps) => {
           const objectCommission = {
             tripPaymentFormId: String(value.idTripPaymentForm),

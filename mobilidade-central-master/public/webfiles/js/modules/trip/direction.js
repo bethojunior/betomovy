@@ -7,20 +7,42 @@ document.addEventListener('DOMContentLoaded', function () {
     const mapService = new MapService();
 
     TripController.getByTripReference(tripReference).then(({ data }) => {
-        document.querySelector('.profile-image').style.backgroundImage = `url('${data.driver.profilePicture}')`;
-        document.querySelector('#nameDriver').innerHTML = data.driver.name;
-        document.querySelector('#plateCar').innerHTML = data.driver.car.plate;
-        document.querySelector('#listAddress').innerHTML = addAddress(data.origin.address);
+        if (!data) return;
 
-        places.push({ lat: parseFloat(data.origin.latitude), lng: parseFloat(data.origin.longitude) });
+        const driver = data.driver || {};
+        const car = driver.car || {};
+        const origin = data.origin || {};
+        const destination = data.destination || {};
+        const wayPoints = Array.isArray(data.tripWayPoints) ? data.tripWayPoints : [];
 
-        document.querySelector('#listAddress').innerHTML += data.tripWayPoints.map(place => {
-            places.push({ lat: parseFloat(place.latitude), lng: parseFloat(place.longitude) });
-            return addAddress(place.address);
-        }).join('');
+        const profileEl = document.querySelector('.profile-image');
+        if (profileEl) {
+            profileEl.style.backgroundImage = `url('${driver.profilePicture || ''}')`;
+        }
+        const nameEl = document.querySelector('#nameDriver');
+        if (nameEl) nameEl.innerHTML = driver.name || '';
+        const plateEl = document.querySelector('#plateCar');
+        if (plateEl) plateEl.innerHTML = car.plate || '';
 
-        places.push({ lat: parseFloat(data.destination.latitude), lng: parseFloat(data.destination.longitude) });
-        document.querySelector('#listAddress').innerHTML += addAddress(data.destination.name);
+        const listEl = document.querySelector('#listAddress');
+        if (listEl) {
+            listEl.innerHTML = addAddress(origin.address || '');
+            if (origin.latitude && origin.longitude) {
+                places.push({ lat: parseFloat(origin.latitude), lng: parseFloat(origin.longitude) });
+            }
+
+            listEl.innerHTML += wayPoints.map(place => {
+                if (place.latitude && place.longitude) {
+                    places.push({ lat: parseFloat(place.latitude), lng: parseFloat(place.longitude) });
+                }
+                return addAddress(place.address || '');
+            }).join('');
+
+            if (destination.latitude && destination.longitude) {
+                places.push({ lat: parseFloat(destination.latitude), lng: parseFloat(destination.longitude) });
+            }
+            listEl.innerHTML += addAddress(destination.name || destination.address || '');
+        }
 
         initMap();
     });

@@ -62,15 +62,16 @@ export default function AccountSpeedMob() {
 
   const getLatestTransactionsAsync = async () => {
     setLoadingTransactions(true);
-    const response = await getLatestTransactions();
-
-    if (!response) {
-      return;
+    try {
+      const response = await getLatestTransactions();
+      if (!response) {
+        return;
+      }
+      setLastTransactions(response.transactions);
+      setBalance(response.balance);
+    } finally {
+      setLoadingTransactions(false);
     }
-
-    setLastTransactions(response.transactions);
-    setBalance(response.balance);
-    setLoadingTransactions(false);
   };
 
   const getAccountAsync = async () => {

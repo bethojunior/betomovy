@@ -519,7 +519,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     Session.setLocal('lastTrip', newTrip)
-    const favoriteDrivers = JSON.parse(Session.get('customTripList'))
+    const favoriteDriversRaw = Session.get('customTripList')
+    const favoriteDrivers = Array.isArray(favoriteDriversRaw)
+      ? favoriteDriversRaw
+      : (typeof favoriteDriversRaw === 'string' && favoriteDriversRaw
+          ? (() => { try { const p = JSON.parse(favoriteDriversRaw); return Array.isArray(p) ? p : []; } catch (e) { return []; } })()
+          : [])
 
     newTrip.favoriteDrivers = SchedulePicker.isActive() && ScheduleDriverPool.isActive()
       ? ScheduleDriverPool.getSelectedDriverIds()

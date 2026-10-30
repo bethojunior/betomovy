@@ -136,12 +136,17 @@ export const useTripRates = (
           .delete(`tax/${id}`)
           .then((response) => {
             setLoading(false);
-            if (response.status) {
+            if (response.data?.status !== false && (response.data?.status || response.status === 200)) {
               swal({
                 title: "Tarifa excluída com sucesso!",
                 icon: "success",
               });
               getRates();
+            } else {
+              swal({
+                title: response.data?.message || "Erro ao deletar tarifa",
+                icon: "error",
+              });
             }
           })
           .catch((error) => {

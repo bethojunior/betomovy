@@ -346,7 +346,7 @@ export const TripProvider = ({ children }: TripContextChildren) => {
   });
 
   const handleTripRouteListener = (result: any) => {
-    if (!result) return;
+    if (!result?.polyline) return;
 
     function getUrlSocket() {
       let url = buildApp().HOST_API_APP.replace('https', 'http');
