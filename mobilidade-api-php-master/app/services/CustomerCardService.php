@@ -407,19 +407,15 @@ class CustomerCardService
                 }
             }
 
-            $cardId = $pmId ?: ('pm_' . bin2hex(random_bytes(10)));
-            $stripeIntermediaryId = defined('\app\constant\FinancialIntermediaryConst::STRIPE') 
-                ? \app\constant\FinancialIntermediaryConst::STRIPE 
-                : 17;
+            if (empty($pmId)) {
+                throw new \Exception('Não foi possível tokenizar o cartão na Stripe. Verifique os dados do cartão.');
+            }
 
-            return $this->saveCardInfo($stripeCustomer['id'] ?? $userId, $cardId, $request, $stripeIntermediaryId);
+            $stripeIntermediaryId = \app\constant\FinancialIntermediaryConst::STRIPE;
+            return $this->saveCardInfo($stripeCustomer['id'] ?? $userId, $pmId, $request, $stripeIntermediaryId);
         }
 
-        $dummyId = 'pm_' . bin2hex(random_bytes(12));
-        $stripeIntermediaryId = defined('\app\constant\FinancialIntermediaryConst::STRIPE') 
-            ? \app\constant\FinancialIntermediaryConst::STRIPE 
-            : 17;
-        return $this->saveCardInfo($userId, $dummyId, $request, $stripeIntermediaryId);
+        throw new \Exception('Stripe não configurada: secret_key ausente no adquirente.');
     }
 
     private function removeAccents($string) {

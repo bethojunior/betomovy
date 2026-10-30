@@ -11,7 +11,7 @@ export const mountSong = async (
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
       staysActiveInBackground: true,
-      playsInSilentModeIOS: false,
+      playsInSilentModeIOS: true,
       shouldDuckAndroid: true,
       playThroughEarpieceAndroid: false,
     });

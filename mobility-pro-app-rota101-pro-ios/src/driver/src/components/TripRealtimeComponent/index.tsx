@@ -203,17 +203,18 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   const playSongActiveRef = useRef<() => Promise<void>>(async () => {});
 
   const playSongActive = async () => {
+    // Sempre tenta tocar (background Android + silent iOS). Se falhar em background, marca pending.
     if (AppState.currentState !== 'active') {
       pendingRingRef.current = true;
-      return;
+    } else {
+      pendingRingRef.current = false;
     }
-    pendingRingRef.current = false;
 
     try {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
         staysActiveInBackground: true,
-        playsInSilentModeIOS: false,
+        playsInSilentModeIOS: true,
         shouldDuckAndroid: true,
         playThroughEarpieceAndroid: false,
       });

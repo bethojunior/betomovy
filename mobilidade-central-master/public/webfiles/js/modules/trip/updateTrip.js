@@ -385,11 +385,7 @@ function initSearchTrip(data) {
 }
 
 function handleSearchTrip(data) {
-    try {
-        const audio = new Audio('/webfiles/songs/songCallTaxi.mp3');
-        audio.play().catch(() => {});
-    } catch (e) {}
-
+    // Som do chamado deve tocar no APP do motorista (Android/iOS), não na Central.
     try {
         populateSearchDriverCard(data);
     } catch (e) {

@@ -83,13 +83,40 @@ try {
             }
         }
 
+        $redisStatus = 'not_tested';
+        $redisError = null;
+        if ($uriPath === '/health') {
+            try {
+                $redisHost = getenv('REDIS_HOST') ?: ($_ENV['REDIS_HOST'] ?? '');
+                if (empty($redisHost)) {
+                    $redisStatus = 'not_configured';
+                } else {
+                    $redis = new \Predis\Client([
+                        'scheme' => 'tcp',
+                        'host' => $redisHost,
+                        'port' => (int)(getenv('REDIS_PORT') ?: ($_ENV['REDIS_PORT'] ?? 6379)),
+                        'password' => (getenv('REDIS_PASSWORD') ?: ($_ENV['REDIS_PASSWORD'] ?? null)) ?: null,
+                        'timeout' => 2,
+                        'read_write_timeout' => 2,
+                    ]);
+                    $pong = $redis->ping();
+                    $redisStatus = ($pong === true || $pong === 'PONG' || (string)$pong === 'PONG') ? 'connected' : ('unexpected:' . (string)$pong);
+                }
+            } catch (\Throwable $e) {
+                $redisStatus = 'failed';
+                $redisError = $e->getMessage();
+            }
+        }
+
         echo json_encode([
             'status' => true,
             'message' => 'MOVY API Online',
             'version' => '1.0.3',
             'timestamp' => date('Y-m-d H:i:s'),
             'database' => $dbStatus,
-            'db_error' => $dbError
+            'db_error' => $dbError,
+            'redis' => $redisStatus,
+            'redis_error' => $redisError,
         ]);
         exit;
     }

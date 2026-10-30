@@ -483,6 +483,49 @@ class PaymentWebhookService
         );
     }
 
+    public function processPaymentStripe(array $event): array
+    {
+        $eventType = $event['type'] ?? '';
+        $object = $event['data']['object'] ?? [];
+        $paymentIntentId = $object['id'] ?? null;
+
+        if (empty($paymentIntentId)) {
+            return $this->response(400, 'payment_intent id ausente');
+        }
+
+        $transaction = $this->findTransactionByGeneratedPaymentId($paymentIntentId);
+        if (!$transaction) {
+            // Evento sem transação local ainda (ex.: intent criado fora do fluxo) — ack sem erro.
+            return $this->response(200, 'Evento Stripe recebido sem transação local', [
+                'payment_intent' => $paymentIntentId,
+                'type' => $eventType,
+            ]);
+        }
+
+        switch ($eventType) {
+            case 'payment_intent.succeeded':
+            case 'charge.succeeded':
+                return $this->handlePixPaidTransaction($transaction);
+
+            case 'payment_intent.payment_failed':
+            case 'charge.failed':
+                return $this->handleDeniedTransaction($transaction);
+
+            case 'payment_intent.canceled':
+                return $this->handleCanceledTransaction($transaction);
+
+            case 'charge.refunded':
+            case 'payment_intent.refunded':
+                return $this->handleRefundedTransaction($transaction);
+
+            default:
+                return $this->response(200, 'Evento Stripe ignorado', [
+                    'type' => $eventType,
+                    'payment_intent' => $paymentIntentId,
+                ]);
+        }
+    }
+
     private function findTransactionByGeneratedPaymentId($paymentId): ?Transaction
     {
         $transactionData = $this->transactionDao

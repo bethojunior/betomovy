@@ -13,7 +13,7 @@ class StripeCheckout implements CheckoutInterface
 
     private string $secretKey;
     private ?string $publishableKey;
-    private $financialIntermediaryId = 6; // Stripe
+    private $financialIntermediaryId = FinancialIntermediaryConst::STRIPE;
 
     private $value;
     private $description;
@@ -54,6 +54,8 @@ class StripeCheckout implements CheckoutInterface
             'description' => $this->description,
             'capture_method' => 'automatic',
             'confirm' => 'true',
+            'off_session' => 'true',
+            'payment_method_types[0]' => 'card',
             'metadata[sale_id]' => (string) ($this->parameters['sale_id'] ?? ''),
             'metadata[trip_reference]' => (string) ($this->parameters['sale_id'] ?? '')
         ];
@@ -88,6 +90,8 @@ class StripeCheckout implements CheckoutInterface
             'description' => $this->description,
             'capture_method' => 'manual',
             'confirm' => 'true',
+            'off_session' => 'true',
+            'payment_method_types[0]' => 'card',
             'metadata[sale_id]' => (string) ($this->parameters['sale_id'] ?? ''),
             'metadata[trip_reference]' => (string) ($this->parameters['sale_id'] ?? '')
         ];

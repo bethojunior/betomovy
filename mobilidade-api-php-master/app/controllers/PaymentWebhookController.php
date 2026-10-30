@@ -79,6 +79,18 @@ class PaymentWebhookController extends ApiController
             $payload = file_get_contents('php://input');
             $sigHeader = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
 
+            $webhookSecret = \app\model\AcquirerMetaData::get('webhook_secret')
+                ?: \app\model\AcquirerMetaData::get('stripe_webhook_secret')
+                ?: (getenv('STRIPE_WEBHOOK_SECRET') ?: '');
+
+            if (!empty($webhookSecret) && !empty($sigHeader)) {
+                if (!$this->verifyStripeSignature($payload, $sigHeader, $webhookSecret)) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Invalid Stripe signature']);
+                    return;
+                }
+            }
+
             $event = json_decode($payload, true);
             if (!$event || !isset($event['type'])) {
                 http_response_code(400);
@@ -86,25 +98,41 @@ class PaymentWebhookController extends ApiController
                 return;
             }
 
-            $eventType = $event['type'];
-            $object = $event['data']['object'] ?? [];
-
-            switch ($eventType) {
-                case 'payment_intent.succeeded':
-                    $paymentIntentId = $object['id'] ?? null;
-                    $saleId = $object['metadata']['sale_id'] ?? null;
-                    // Persistir status se necessário
-                    break;
-                case 'payment_intent.payment_failed':
-                    $paymentIntentId = $object['id'] ?? null;
-                    break;
-            }
-
+            $result = $this->service->processPaymentStripe($event);
             http_response_code(200);
-            echo json_encode(['received' => true]);
+            echo json_encode(['received' => true, 'result' => $result]);
         } catch (\Throwable $e) {
             http_response_code(400);
             echo json_encode(['error' => $e->getMessage()]);
         }
+    }
+
+    private function verifyStripeSignature(string $payload, string $sigHeader, string $secret): bool
+    {
+        $timestamp = null;
+        $signatures = [];
+        foreach (explode(',', $sigHeader) as $part) {
+            [$k, $v] = array_pad(explode('=', trim($part), 2), 2, null);
+            if ($k === 't') {
+                $timestamp = $v;
+            }
+            if ($k === 'v1' && $v) {
+                $signatures[] = $v;
+            }
+        }
+        if (!$timestamp || empty($signatures)) {
+            return false;
+        }
+        if (abs(time() - (int)$timestamp) > 300) {
+            return false;
+        }
+        $signedPayload = $timestamp . '.' . $payload;
+        $expected = hash_hmac('sha256', $signedPayload, $secret);
+        foreach ($signatures as $sig) {
+            if (hash_equals($expected, $sig)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
