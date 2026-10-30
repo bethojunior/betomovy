@@ -145,6 +145,8 @@ class TripCardPaymentService
             case FinancialIntermediaryConst::EPAG:
             case FinancialIntermediaryConst::YUMEPAY:
             case FinancialIntermediaryConst::FIREBANKING:
+            case FinancialIntermediaryConst::STRIPE:
+            case FinancialIntermediaryConst::STRIPE_LEGACY:
                 $captured = TripCardPayment::CAPTURE;
                 break;
             default:
@@ -229,6 +231,13 @@ class TripCardPaymentService
     {
         $card = (new CustomerCardDao)
             ->find($cardId);
+
+        if (!$card && Headers::getUserId()) {
+            $userCards = (new CustomerCardDao)->findByUserId(Headers::getUserId());
+            if (!empty($userCards) && isset($userCards[0]['idCard'])) {
+                $card = (new CustomerCardDao)->find($userCards[0]['idCard']);
+            }
+        }
 
         if (!$card)
             throw new TripPaymentException(251);

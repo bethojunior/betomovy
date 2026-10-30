@@ -14,7 +14,8 @@ class FinancialIntermediaryConst
     const RECEBE_AQUI = 3;
     const IUGU = 4;
     const PAGSEGURO = 5;
-    const STRIPE = 6;
+    const STRIPE = 17;
+    const STRIPE_LEGACY = 6;
     const GETNET = 12;
     const REDE = 7;
     const ZSPAY = 8;

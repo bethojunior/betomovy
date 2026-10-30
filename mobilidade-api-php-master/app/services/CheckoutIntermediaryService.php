@@ -51,6 +51,7 @@ class CheckoutIntermediaryService
             case FinancialIntermediaryConst::FIREBANKING:
                 return $this->feedByFirebanking($paymentData, $paymentFormId, $transactionTypeId);
             case FinancialIntermediaryConst::STRIPE:
+            case FinancialIntermediaryConst::STRIPE_LEGACY:
                 return $this->feedByStripe($intermediaryId, $paymentData, $paymentFormId, $transactionTypeId);
         }
     }

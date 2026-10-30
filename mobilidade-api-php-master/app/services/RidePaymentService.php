@@ -93,6 +93,13 @@ class RidePaymentService
                 $this->voucherAdministrativePayment($rider);
                 break;
             case PaymentFormTypeConst::CREDIT_CARD:
+                if (!$cardId) {
+                    $customerCards = (new \app\dao\CustomerCardDao())->findByUserId($rider->getUserId());
+                    if (!empty($customerCards) && isset($customerCards[0]['idCard'])) {
+                        $cardId = $customerCards[0]['idCard'];
+                    }
+                }
+
                 if (!$cardId)
                     throw new TripPaymentException(251);
 

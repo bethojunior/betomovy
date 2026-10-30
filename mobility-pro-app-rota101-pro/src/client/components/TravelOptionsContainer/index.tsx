@@ -108,39 +108,27 @@ const TravelOptionsContainer = ({
     selectedCoupon,
   } = stateTripCustomer;
 
-  const cardFind = (cardID: number) => {
-    const card = cards.find(item => item.idCard === cardID);
+  const cardFind = (cardID: any) => {
+    if (!cardID) {
+      return cards.length > 0 ? ` ${Helper.maskCardNumber(cards[0].number)}` : ' (Cadastrar cartão)';
+    }
+    const card = cards.find(item => item.idCard === cardID || item.idCard == cardID);
     if (card) {
       return ` ${Helper.maskCardNumber(card.number)}`;
     }
-    return '';
+    if (cards.length > 0) {
+      return ` ${Helper.maskCardNumber(cards[0].number)}`;
+    }
+    return ' (Cadastrar cartão)';
   };
 
-  const handleVerifyLowBattery = async () => {
-    const lowBattery = await hasLowBattery();
-
-    if (lowBattery) {
-      setVisibleModalLowBattery(true);
-    }
-  }
-
-  useEffect(() => {
-    handleVerifyLowBattery();
-  }, []);
-
-  useEffect(() => {
-    if (!expandedTrip?.tripTypeId) return;
-    if (expandedTrip.tripTypeId !== selectedOptionTravel?.tripTypeId) {
-      setExpandedTrip(null);
-      setVisibleTripDetails(false);
-    }
-  }, [expandedTrip, selectedOptionTravel]);
-
   const shouldRequireCreditCardSelection = (): boolean => {
-    return (
-      selectedPaymentMethod?.paymentFormTypeId === '3' &&
-      Object.keys(selectedCard).length === 0
-    );
+    const isCreditCard = String(selectedPaymentMethod?.paymentFormTypeId) === '3' || 
+                         selectedPaymentMethod?.name?.toLowerCase().includes('cart') ||
+                         selectedPaymentMethod?.name?.toLowerCase().includes('crédito');
+    if (!isCreditCard) return false;
+    const hasCardSelected = selectedCard && (typeof selectedCard === 'number' || (typeof selectedCard === 'string' && selectedCard !== '') || (typeof selectedCard === 'object' && Object.keys(selectedCard).length > 0));
+    return !hasCardSelected && cards.length === 0;
   };
 
   const handleOpenCreditCardSelectorAlert = (): void => {

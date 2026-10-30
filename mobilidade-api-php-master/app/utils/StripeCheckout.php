@@ -66,6 +66,8 @@ class StripeCheckout implements CheckoutInterface
             $payload['payment_method'] = $this->stripeToken;
         } elseif (!empty($this->parameters['cardId'])) {
             $payload['payment_method'] = $this->parameters['cardId'];
+        } elseif (!empty($this->parameters['card']['cardId'])) {
+            $payload['payment_method'] = $this->parameters['card']['cardId'];
         }
 
         $res = $this->curlExec('payment_intents', 'POST', $payload);
@@ -87,14 +89,20 @@ class StripeCheckout implements CheckoutInterface
             'capture_method' => 'manual',
             'confirm' => 'true',
             'metadata[sale_id]' => (string) ($this->parameters['sale_id'] ?? ''),
+            'metadata[trip_reference]' => (string) ($this->parameters['sale_id'] ?? '')
         ];
 
         if (!empty($this->customerId)) {
             $payload['customer'] = $this->customerId;
         }
 
-        if (!empty($this->stripeToken)) {
-            $payload['payment_method'] = $this->stripeToken;
+        $paymentMethod = $this->stripeToken 
+            ?? $this->parameters['cardId'] 
+            ?? $this->parameters['card']['cardId'] 
+            ?? null;
+
+        if (!empty($paymentMethod)) {
+            $payload['payment_method'] = $paymentMethod;
         }
 
         return $this->curlExec('payment_intents', 'POST', $payload);
@@ -155,10 +163,49 @@ class StripeCheckout implements CheckoutInterface
     public function insertCard($customerId, $data, $token = null)
     {
         if ($token) {
-            return $this->curlExec("payment_methods/{$token}/attach", 'POST', [
+            $attached = $this->curlExec("payment_methods/{$token}/attach", 'POST', [
                 'customer' => $customerId
             ]);
+
+            // Set as default payment method for the customer
+            try {
+                $this->curlExec("customers/{$customerId}", 'POST', [
+                    'invoice_settings[default_payment_method]' => $token
+                ]);
+            } catch (\Throwable $e) {}
+
+            return $attached;
         }
+
+        // Se dados brutos do cartão foram enviados
+        if (!empty($data['number']) && !empty($data['expirationMonth']) && !empty($data['expirationYear'])) {
+            $cardPayload = [
+                'type' => 'card',
+                'card[number]' => str_replace(' ', '', (string)$data['number']),
+                'card[exp_month]' => (int)$data['expirationMonth'],
+                'card[exp_year]' => (int)$data['expirationYear'],
+            ];
+            if (!empty($data['cvv'])) {
+                $cardPayload['card[cvc]'] = (string)$data['cvv'];
+            }
+            if (!empty($data['cardholderName'])) {
+                $cardPayload['billing_details[name]'] = (string)$data['cardholderName'];
+            }
+
+            $pm = $this->curlExec('payment_methods', 'POST', $cardPayload);
+            if (!empty($pm['id'])) {
+                $this->curlExec("payment_methods/{$pm['id']}/attach", 'POST', [
+                    'customer' => $customerId
+                ]);
+                try {
+                    $this->curlExec("customers/{$customerId}", 'POST', [
+                        'invoice_settings[default_payment_method]' => $pm['id']
+                    ]);
+                } catch (\Throwable $e) {}
+                return $pm;
+            }
+        }
+
         return null;
     }
 

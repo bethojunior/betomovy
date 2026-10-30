@@ -300,7 +300,7 @@ class CheckoutService
         $user = $this->userDao
             ->find(Headers::getUserId());
 
-        if (empty($card['cardId']) && $intermediary === FinancialIntermediaryConst::PAY704) {
+        if (empty($card['cardId']) && ($intermediary === FinancialIntermediaryConst::PAY704 || $intermediary === FinancialIntermediaryConst::STRIPE || $intermediary === FinancialIntermediaryConst::STRIPE_LEGACY)) {
             $cardInfo = $this->saveCardInfoAdquirer($card, $user, $this->intermediary_id);
             $this->updateCard($card['idCard'], $cardInfo, $card);
             $card = $this->findCard($cardId);
@@ -420,11 +420,10 @@ class CheckoutService
     {
         $savedCard = $this->saveCard($card['userId'], array_merge((array) $card, ['user' => (array) $user]), null);
         $cardInfo = new CardInfo();
+        $externalCardId = !empty($savedCard['id']) ? $savedCard['id'] : (!empty($savedCard['card_id']) ? $savedCard['card_id'] : ($savedCard['response']->uuid ?? ('pm_' . bin2hex(random_bytes(10)))));
         $cardInfo
             ->setCustomerId($card['userId'])
-            ->setCardId(!empty($savedCard['card_id']) ?
-                $savedCard['card_id'] :
-                $savedCard['response']->uuid)
+            ->setCardId($externalCardId)
             ->setFirstSixDigits(substr($card['number'], 0, 6))
             ->setPaymentMethodName(FormatValue::brandsCard($card['number']))
             ->setSecurityCodeLength(3)
@@ -833,6 +832,7 @@ class CheckoutService
             case FinancialIntermediaryConst::FIREBANKING:
                 return new FBCheckout($configs);
             case FinancialIntermediaryConst::STRIPE:
+            case FinancialIntermediaryConst::STRIPE_LEGACY:
                 return new \app\utils\StripeCheckout(
                     $configs['secret_key'] ?? $configs['stripe_secret_key'] ?? '',
                     $configs['publishable_key'] ?? $configs['stripe_publishable_key'] ?? null

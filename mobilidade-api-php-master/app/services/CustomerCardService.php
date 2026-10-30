@@ -222,6 +222,7 @@ class CustomerCardService
                 $cardInfoId = $this->saveCardAdquirerEpag($request, $userId);
                 break;
             case FinancialIntermediaryConst::STRIPE:
+            case FinancialIntermediaryConst::STRIPE_LEGACY:
                 $cardInfoId = $this->saveCardAdquirerStripe($request, $userId);
                 break;
             default:
@@ -382,18 +383,43 @@ class CustomerCardService
             ]);
 
             $token = $request->stripeToken ?? $request->token ?? $request->mpToken ?? null;
-            $cardId = $token ?: ('pm_' . bin2hex(random_bytes(10)));
-            if ($token && !empty($stripeCustomer['id'])) {
+            $pmId = null;
+
+            if ($token) {
                 try {
-                    $stripeCheckout->insertCard($stripeCustomer['id'], [], $token);
-                } catch (\Throwable $t) {}
+                    $attached = $stripeCheckout->insertCard($stripeCustomer['id'] ?? null, [], $token);
+                    $pmId = $attached['id'] ?? $token;
+                } catch (\Throwable $t) {
+                    $pmId = $token;
+                }
+            } elseif (!empty($request->cardNumber) && !empty($request->expirationMonth) && !empty($request->expirationYear)) {
+                try {
+                    $created = $stripeCheckout->insertCard($stripeCustomer['id'] ?? null, [
+                        'number' => $request->cardNumber,
+                        'expirationMonth' => $request->expirationMonth,
+                        'expirationYear' => $request->expirationYear,
+                        'cvv' => $request->cvv ?? null,
+                        'cardholderName' => $request->cardholderName ?? null
+                    ]);
+                    $pmId = $created['id'] ?? null;
+                } catch (\Throwable $t) {
+                    $pmId = null;
+                }
             }
 
-            return $this->saveCardInfo($userId, $cardId, $request, FinancialIntermediaryConst::STRIPE);
+            $cardId = $pmId ?: ('pm_' . bin2hex(random_bytes(10)));
+            $stripeIntermediaryId = defined('\app\constant\FinancialIntermediaryConst::STRIPE') 
+                ? \app\constant\FinancialIntermediaryConst::STRIPE 
+                : 17;
+
+            return $this->saveCardInfo($stripeCustomer['id'] ?? $userId, $cardId, $request, $stripeIntermediaryId);
         }
 
         $dummyId = 'pm_' . bin2hex(random_bytes(12));
-        return $this->saveCardInfo($userId, $dummyId, $request, FinancialIntermediaryConst::STRIPE);
+        $stripeIntermediaryId = defined('\app\constant\FinancialIntermediaryConst::STRIPE') 
+            ? \app\constant\FinancialIntermediaryConst::STRIPE 
+            : 17;
+        return $this->saveCardInfo($userId, $dummyId, $request, $stripeIntermediaryId);
     }
 
     private function removeAccents($string) {

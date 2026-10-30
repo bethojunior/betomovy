@@ -190,10 +190,14 @@ export default function TravelOptions({
   };
 
   const listCards = async () => {
-    const response = await getCards();
-    if (response.length > 0) {
-      AsyncStorage.setItem("cardSelected", JSON.stringify(response[0]))
-      setSelectedCard(response[0].idCard);
+    try {
+      const response = await getCards();
+      if (response && response.length > 0) {
+        AsyncStorage.setItem("cardSelected", JSON.stringify(response[0]));
+        setSelectedCard(response[0].idCard);
+      }
+    } catch (e) {
+      console.log('Error listing cards in TravelOptions', e);
     }
   };
 
