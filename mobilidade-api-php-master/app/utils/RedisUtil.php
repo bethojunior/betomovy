@@ -94,8 +94,18 @@ class RedisUtil
         }
 
         try {
+            $redisUrl = trim((string) env('REDIS_URL', ''));
+            if ($redisUrl !== '') {
+                $this->redis = new Client($redisUrl, [
+                    'timeout' => 2,
+                    'read_write_timeout' => 2,
+                    'ssl' => ['verify_peer' => false, 'verify_peer_name' => false],
+                ]);
+                return;
+            }
+
             $host = env('REDIS_HOST');
-            if (empty($host)) {
+            if (empty($host) || in_array(strtolower((string)$host), ['127.0.0.1', 'localhost'], true)) {
                 $this->redis = null;
                 return;
             }

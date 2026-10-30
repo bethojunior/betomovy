@@ -148,6 +148,8 @@ services:
         value: ${movy-redis.PORT}
       - key: REDIS_PASSWORD
         value: ${movy-redis.PASSWORD}
+      - key: REDIS_URL
+        value: ${movy-redis.REDIS_URL}
       - key: REDIS_TLS
         value: "true"
       - key: MONGODB_HOST
@@ -213,6 +215,8 @@ services:
         value: ${movy-redis.PORT}
       - key: REDIS_PASSWORD
         value: ${movy-redis.PASSWORD}
+      - key: REDIS_URL
+        value: ${movy-redis.REDIS_URL}
       - key: REDIS_TLS
         value: "true"
       - key: REDIS_PREFIX
@@ -222,3 +226,4 @@ databases:
   - name: movy-redis
     engine: REDIS
     version: "7"
+    production: false
