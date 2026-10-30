@@ -29,6 +29,9 @@ export class EventRedisAdapterService {
     const host = redisHost;
     const port = Number(this.configService.get<string>('REDIS_PORT', '6379'));
     const password = this.configService.get<string>('REDIS_PASSWORD');
+    const useTls =
+      String(this.configService.get<string>('REDIS_TLS', 'false')).toLowerCase() ===
+      'true';
 
     const rawPrefix = this.configService.get<string>('REDIS_PREFIX', 'mobilidade');
     const basePrefix = EventsHelper.removeTrailingColon(rawPrefix);
@@ -36,7 +39,11 @@ export class EventRedisAdapterService {
 
     try {
       this.pubClient = createClient({
-        socket: { host, port },
+        socket: {
+          host,
+          port,
+          ...(useTls ? { tls: true, rejectUnauthorized: false } : {}),
+        },
         password: password || undefined,
         disableClientInfo: true,
       });

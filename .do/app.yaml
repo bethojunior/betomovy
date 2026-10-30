@@ -142,6 +142,14 @@ services:
         value: movy-secret-token
       - key: REDIS_PREFIX
         value: movy
+      - key: REDIS_HOST
+        value: ${movy-redis.HOSTNAME}
+      - key: REDIS_PORT
+        value: ${movy-redis.PORT}
+      - key: REDIS_PASSWORD
+        value: ${movy-redis.PASSWORD}
+      - key: REDIS_TLS
+        value: "true"
       - key: MONGODB_HOST
         value: movy-mongodb-79fd3aab.mongo.ondigitalocean.com
       - key: MONGODB_PORT
@@ -198,4 +206,19 @@ services:
       - key: MONGO_URL
         value: "mongodb+srv://doadmin:1dQ782TVG36Bc09A@movy-mongodb-79fd3aab.mongo.ondigitalocean.com/admin?tls=true&authSource=admin"
       - key: ENABLE_SOCKET_REDIS_ADAPTER
-        value: "false"
+        value: "true"
+      - key: REDIS_HOST
+        value: ${movy-redis.HOSTNAME}
+      - key: REDIS_PORT
+        value: ${movy-redis.PORT}
+      - key: REDIS_PASSWORD
+        value: ${movy-redis.PASSWORD}
+      - key: REDIS_TLS
+        value: "true"
+      - key: REDIS_PREFIX
+        value: "app:mobilidade:node:"
+
+databases:
+  - name: movy-redis
+    engine: REDIS
+    version: "7"

@@ -72,10 +72,14 @@ import { AppService } from './app.service';
         }
         try {
           const { redisStore } = await import('cache-manager-redis-yet');
+          const useTls =
+            String(configService.get<string>('REDIS_TLS', 'false')).toLowerCase() ===
+            'true';
           const store = await redisStore({
             socket: {
               host: redisHost,
               port: Number(configService.get<string>('REDIS_PORT', '6379')),
+              ...(useTls ? { tls: true, rejectUnauthorized: false } : {}),
             },
             password: configService.get<string>('REDIS_PASSWORD') || undefined,
             database: Number(configService.get<string>('REDIS_DB', '0')),

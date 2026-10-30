@@ -7,6 +7,10 @@ export class RedisService implements IState {
   private readonly redisClient: Redis;
 
   constructor() {
+    const useTls =
+      String(process.env.REDIS_TLS || '').toLowerCase() === 'true' ||
+      String(process.env.REDIS_URL || '').startsWith('rediss://');
+
     this.redisClient = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
       port: Number(process.env.REDIS_PORT) || 6379,
@@ -16,6 +20,7 @@ export class RedisService implements IState {
       lazyConnect: true,
       enableOfflineQueue: false,
       maxRetriesPerRequest: 3,
+      tls: useTls ? { rejectUnauthorized: false } : undefined,
       retryStrategy: (times: number) => {
         if (times > 5) return null; // stop retrying
         return Math.min(times * 1000, 5000);

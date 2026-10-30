@@ -91,14 +91,19 @@ try {
                 if (empty($redisHost)) {
                     $redisStatus = 'not_configured';
                 } else {
-                    $redis = new \Predis\Client([
-                        'scheme' => 'tcp',
+                    $useTls = filter_var(getenv('REDIS_TLS') ?: ($_ENV['REDIS_TLS'] ?? false), FILTER_VALIDATE_BOOLEAN);
+                    $redisOpts = [
+                        'scheme' => $useTls ? 'tls' : 'tcp',
                         'host' => $redisHost,
                         'port' => (int)(getenv('REDIS_PORT') ?: ($_ENV['REDIS_PORT'] ?? 6379)),
                         'password' => (getenv('REDIS_PASSWORD') ?: ($_ENV['REDIS_PASSWORD'] ?? null)) ?: null,
                         'timeout' => 2,
                         'read_write_timeout' => 2,
-                    ]);
+                    ];
+                    if ($useTls) {
+                        $redisOpts['ssl'] = ['verify_peer' => false, 'verify_peer_name' => false];
+                    }
+                    $redis = new \Predis\Client($redisOpts);
                     $pong = $redis->ping();
                     $redisStatus = ($pong === true || $pong === 'PONG' || (string)$pong === 'PONG') ? 'connected' : ('unexpected:' . (string)$pong);
                 }

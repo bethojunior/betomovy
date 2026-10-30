@@ -22,13 +22,11 @@ class RedisUtil
 
     public function returnIstance()
     {
-        return new Client([
-            'scheme' => 'tcp',
-            'host'   => env('REDIS_HOST', '127.0.0.1'),
-            'port'   => env('REDIS_PORT', 6379),
-            'timeout' => 2,
-            'read_write_timeout' => 2,
-        ]);
+        return new Client($this->buildClientOptions(
+            env('REDIS_HOST', '127.0.0.1'),
+            (int) env('REDIS_PORT', 6379),
+            env('REDIS_PASSWORD') ?: null
+        ));
     }
 
     public function set($key, $value, int $ttl = 3600): void
@@ -102,17 +100,39 @@ class RedisUtil
                 return;
             }
 
-            $this->redis = new Client([
-                'scheme'   => 'tcp',
-                'host'     => $host,
-                'port'     => (int) env('REDIS_PORT', 6379),
-                'password' => env('REDIS_PASSWORD') ?: null,
-                'timeout' => 2,
-                'read_write_timeout' => 2,
-            ]);
+            $this->redis = new Client($this->buildClientOptions(
+                $host,
+                (int) env('REDIS_PORT', 6379),
+                env('REDIS_PASSWORD') ?: null
+            ));
         } catch (\Throwable $exception) {
             $this->redis = null;
             (new LogDao)->logException($exception);
         }
+    }
+
+    private function buildClientOptions(string $host, int $port, ?string $password): array
+    {
+        $useTls = filter_var(env('REDIS_TLS', false), FILTER_VALIDATE_BOOLEAN)
+            || stripos((string) env('REDIS_SCHEME', ''), 'tls') !== false
+            || stripos((string) env('REDIS_URL', ''), 'rediss://') === 0;
+
+        $options = [
+            'scheme'   => $useTls ? 'tls' : 'tcp',
+            'host'     => $host,
+            'port'     => $port,
+            'password' => $password,
+            'timeout' => 2,
+            'read_write_timeout' => 2,
+        ];
+
+        if ($useTls) {
+            $options['ssl'] = [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+            ];
+        }
+
+        return $options;
     }
 }
