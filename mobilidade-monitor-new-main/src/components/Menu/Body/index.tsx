@@ -77,11 +77,12 @@ const Menu = ({ children, titlePage }: MenuProps) => {
 
     const translatedSegments = segments
       .map((segment) => {
-        const key = segment.toLowerCase();
+        if (segment == null || segment === "") return "";
+        const key = String(segment).toLowerCase();
         const translated = translations[key];
         return translated !== undefined
           ? translated
-          : segment.charAt(0).toUpperCase() + segment.slice(1);
+          : String(segment).charAt(0).toUpperCase() + String(segment).slice(1);
       })
       .filter(Boolean);
 

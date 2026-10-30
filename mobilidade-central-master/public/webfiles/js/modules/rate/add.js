@@ -43,16 +43,24 @@ document.addEventListener("DOMContentLoaded",function(){
     });
 
     function createTypes() {
-        TripRepository.getTripType().then(({status, response}) => {
-            if (!status)
+        TripRepository.getTripType().then((result) => {
+            const status = result && result.status;
+            const list = Array.isArray(result?.response)
+                ? result.response
+                : (Array.isArray(result?.data) ? result.data : []);
+            if (!status || !list.length)
                 return;
 
             elementProperty.getElement("#tripTypeId", element => {
-                element.innerHTML = `<option value="" disabled selected>Selecione o tipo de tarifa</option>`;
-                element.innerHTML += response.map(tripType => {
-                    return `<option value="${tripType.idTripType}">${tripType.type}</option>`;
-                })
+                element.innerHTML = `<option value="" disabled selected>Selecione o tipo de tarifa...</option>`;
+                element.innerHTML += list.map(tripType => {
+                    const id = tripType.idTripType || tripType.id;
+                    const label = tripType.type || tripType.name || (`Tipo ${id}`);
+                    return `<option value="${id}">${label}</option>`;
+                }).join("");
             });
+        }).catch((err) => {
+            console.error("Erro ao carregar tipos de tarifa:", err);
         });
     }
 

@@ -42,6 +42,11 @@ class CustomerController extends View
         );
     }
 
+    /** Alias: /customer/create → mesma tela de /customer/new */
+    public function actionCreate(){
+        $this->actionNew();
+    }
+
     public function actionGet(){
         $this->addEvents(
             [
