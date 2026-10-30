@@ -22,6 +22,11 @@ Não. Menus, páginas, ícones e botões de Android e iOS **não** foram todos a
 | App motorista Android/iOS | Conta bancária: `setModeEdit` lançava `Function not implemented` | ALTO | Corrigido com estado real |
 | Monitor tarifas (`ServicesApps`) | Sucesso/erro do `price` tratado pelo HTTP genérico, não pelo `status` do body | MÉDIO | Corrigido no código. Sem login de produção para testar a página |
 | Central / Monitor sites | Login abre | — | Páginas de login carregam. Sem credenciais: menus internos não clicados |
+| API PHP `Connection.php` | Senha MySQL hardcoded no código | CRÍTICO | Removido fallback com senha. Exige `MYSQL_*` no ambiente (já existe no App Platform) |
+| API PHP `Job.php` | `backgroundTaskDev` usava `/usr/bin/php` fixo | ALTO | Usa `PHP_BINARY` |
+| App cliente Android/iOS | Categorias do cadastro parceiro com `onPress` vazio | MÉDIO | Seleção grava categoria e marca visualmente |
+| App cliente Android/iOS | `ItemCategory` só respondia no ícone/chevron | MÉDIO | Linha inteira clicável |
+| App cliente Android/iOS | `HelpMethodModal` engolia erro | BAIXO | Limpa lista e registra aviso |
 
 ## Não corrigido / bloqueado
 

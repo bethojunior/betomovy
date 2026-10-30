@@ -32,11 +32,12 @@ export default function HelpMethodModal({
     try {
       const {data} = await apiMain.get('/cancellationReasons/getReports');
       if (!data?.status) {
-        throw new Error('error');
+        throw new Error(data?.message || 'Não foi possível carregar as opções de ajuda');
       }
       setHelpers(data?.data || []);
-    } catch {
-      console.log('error');
+    } catch (error: any) {
+      setHelpers([]);
+      console.warn('HelpMethodModal:', error?.message || error);
     }
     setLoading(false);
   };
