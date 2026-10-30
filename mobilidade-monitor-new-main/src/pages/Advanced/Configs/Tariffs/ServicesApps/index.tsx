@@ -373,17 +373,13 @@ export const ServicesApps = () => {
 
         Promise.all([responseDriverComission, responseUpdatePrices])
           .then((response) => {
-            setLoading(false);
-            if (!response[1]?.data?.status && !response[1]?.status) {
-              let errorMsg = "Não foi possível atualizar o preço.";
-              try {
-                if (response[1]?.data?.message) {
-                  errorMsg = response[1].data.message;
-                } else if (response[1]?.request?.response) {
-                  const parsed = JSON.parse(response[1].request.response);
-                  if (parsed?.response) errorMsg = parsed.response;
-                }
-              } catch {}
+            const priceBody = response[1]?.data;
+            if (priceBody && priceBody.status === false) {
+              const errorMsg =
+                priceBody.message ||
+                (typeof priceBody.response === "string"
+                  ? priceBody.response
+                  : "Não foi possível atualizar o preço.");
               swal({
                 title: errorMsg,
                 icon: "warning",
@@ -401,7 +397,10 @@ export const ServicesApps = () => {
           })
           .catch((error: AxiosError) => {
             swal({
-              title: error.response?.data.response,
+              title:
+                (error.response?.data as any)?.message ||
+                (error.response?.data as any)?.response ||
+                "Erro ao atualizar preço",
               icon: "error",
             });
           })

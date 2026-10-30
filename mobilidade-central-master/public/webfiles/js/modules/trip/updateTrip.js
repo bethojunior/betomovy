@@ -315,30 +315,23 @@ function populateSearchDriverCard(data) {
         const duration = Session.getLocal("estimatedTripTime");
         const etaEl = document.getElementById("searchTripEta");
         if (etaEl) {
-            let parts = [];
-            if (duration !== null && duration !== undefined && duration !== "") {
-                const durStr = String(duration).trim();
-                const durNum = parseFloat(durStr);
-                if (!isNaN(durNum)) {
-                    parts.push(`${Math.round(durNum)} min`);
-                } else if (!durStr.toLowerCase().includes("nan")) {
-                    parts.push(durStr.toLowerCase().includes("min") ? durStr : `${durStr} min`);
-                }
-            }
-            if (dist !== null && dist !== undefined && dist !== "") {
-                const distStr = String(dist).trim();
-                if (distStr.toLowerCase().includes("km") || distStr.toLowerCase().includes("mi")) {
-                    parts.push(distStr);
-                } else {
-                    const distNum = parseFloat(distStr);
-                    if (!isNaN(distNum)) {
-                        parts.push(`${distNum.toFixed(2)} km`);
-                    } else if (!distStr.toLowerCase().includes("nan")) {
-                        parts.push(distStr);
+            const formatted = typeof formatTripEta === "function"
+                ? formatTripEta(duration, dist)
+                : (function () {
+                    let parts = [];
+                    let minutes = parseFloat(String(duration || "").replace(",", "."));
+                    if (!isNaN(minutes) && minutes > 0) {
+                        if (minutes >= 180) minutes = minutes / 60;
+                        parts.push(`${Math.max(1, Math.round(minutes))} min`);
                     }
-                }
-            }
-            etaEl.innerText = parts.length > 0 ? parts.join(" • ") : "Calculando...";
+                    let km = parseFloat(String(dist || "").replace(",", "."));
+                    if (!isNaN(km) && km >= 0) {
+                        if (km >= 100) km = km / 1000;
+                        parts.push(`${km.toFixed(2)} km`);
+                    }
+                    return parts.join(" • ");
+                })();
+            etaEl.innerText = formatted || "Calculando...";
         }
 
         const paymentFormEl = document.getElementById("namePaymentForm");

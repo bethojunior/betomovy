@@ -127,6 +127,7 @@ class DefaultController extends View
                 "modules/dynamicfields/infoFieldsCentral",
                 "modules/driver/checkFavorites",
                 "modules/driver/anotherTypeDriver",
+                "utils/formatTripEta",
                 "modules/trip/updateTrip",
                 "modules/paymentform/TripPaymentForm",
                 "modules/init/initEvents",

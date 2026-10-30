@@ -93,21 +93,23 @@ function getTravelCustomer(trip, customer) {
     const dist = trip.distance || Session.getLocal("distanceTrip");
     const duration = trip.estimatedTripTime || Session.getLocal("estimatedTripTime");
     elementProperty.getElement("#etaTripConfirmation", element => {
-        let parts = [];
-        if (duration !== null && duration !== undefined && duration !== "") {
-            const durStr = String(duration).trim();
-            parts.push(durStr.toLowerCase().includes("min") ? durStr : `${Math.round(parseFloat(durStr))} min`);
-        }
-        if (dist !== null && dist !== undefined && dist !== "") {
-            const distStr = String(dist).trim();
-            if (distStr.toLowerCase().includes("km") || distStr.toLowerCase().includes("mi")) {
-                parts.push(distStr);
-            } else {
-                const distNum = parseFloat(distStr);
-                parts.push(!isNaN(distNum) ? `${distNum.toFixed(2)} km` : distStr);
-            }
-        }
-        element.innerHTML = parts.length > 0 ? parts.join(" • ") : "-";
+        const formatted = typeof formatTripEta === "function"
+            ? formatTripEta(duration, dist)
+            : (function () {
+                let parts = [];
+                let minutes = parseFloat(String(duration || "").replace(",", "."));
+                if (!isNaN(minutes) && minutes > 0) {
+                    if (minutes >= 180) minutes = minutes / 60;
+                    parts.push(`${Math.max(1, Math.round(minutes))} min`);
+                }
+                let km = parseFloat(String(dist || "").replace(",", "."));
+                if (!isNaN(km) && km >= 0) {
+                    if (km >= 100) km = km / 1000;
+                    parts.push(`${km.toFixed(2)} km`);
+                }
+                return parts.join(" • ");
+            })();
+        element.innerHTML = formatted || "-";
     });
 
     const paymentFormEl = document.getElementById("namePaymentForm");

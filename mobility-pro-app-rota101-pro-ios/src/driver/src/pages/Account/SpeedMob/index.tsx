@@ -58,6 +58,7 @@ export default function AccountSpeedMob() {
   const [loading, setLoading] = useState(true);
   const [loadingTransactions, setLoadingTransactions] = useState<boolean>(true);
   const [modalInfoAccount, setModalInfoAccount] = useState(false);
+  const [modeEditAccount, setModeEditAccount] = useState(false);
 
   const getLatestTransactionsAsync = async () => {
     setLoadingTransactions(true);
@@ -192,9 +193,10 @@ export default function AccountSpeedMob() {
         visible={modalInfoAccount}
         setVisible={setModalInfoAccount}
         accountInfo={accountInfo}
-        getInfoAccount={getAccountAsync} modeEdit={false} setModeEdit={function (value: boolean): void {
-          throw new Error('Function not implemented.');
-        } }      />
+        getInfoAccount={getAccountAsync}
+        modeEdit={modeEditAccount}
+        setModeEdit={setModeEditAccount}
+      />
 
       <ModalTransference
         visible={transferenceOn}
