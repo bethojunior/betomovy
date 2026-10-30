@@ -399,6 +399,13 @@ class CheckoutService
         $card = $this->customerCardDao
             ->find($id);
 
+        if (!$card && Headers::getUserId()) {
+            $userCards = $this->customerCardDao->findByUserId(Headers::getUserId());
+            if (!empty($userCards) && isset($userCards[0]['idCard'])) {
+                $card = $this->customerCardDao->find($userCards[0]['idCard']);
+            }
+        }
+
         if (!$card) {
             throw new CheckoutServiceException(153, compact('card'));
         }

@@ -87,16 +87,23 @@ try {
         $redisError = null;
         if ($uriPath === '/health') {
             try {
-                $redisHost = getenv('REDIS_HOST') ?: ($_ENV['REDIS_HOST'] ?? '');
-                if (empty($redisHost)) {
+                // Preferir getenv (vars do App Platform). Ignorar localhost do .env bakeado.
+                $redisHost = trim((string)(getenv('REDIS_HOST') ?: ''));
+                $isLocalFallback = $redisHost === '' || in_array(strtolower($redisHost), ['127.0.0.1', 'localhost'], true);
+                $redisTlsEnv = getenv('REDIS_TLS');
+                $hasDoBinding = $redisTlsEnv !== false || (getenv('REDIS_PASSWORD') !== false && getenv('REDIS_PASSWORD') !== '');
+                if ($isLocalFallback && !$hasDoBinding) {
                     $redisStatus = 'not_configured';
+                } elseif ($isLocalFallback) {
+                    $redisStatus = 'waiting_binding';
+                    $redisError = 'REDIS_HOST ainda não resolvido pelo App Platform (localhost)';
                 } else {
-                    $useTls = filter_var(getenv('REDIS_TLS') ?: ($_ENV['REDIS_TLS'] ?? false), FILTER_VALIDATE_BOOLEAN);
+                    $useTls = filter_var($redisTlsEnv !== false ? $redisTlsEnv : false, FILTER_VALIDATE_BOOLEAN);
                     $redisOpts = [
                         'scheme' => $useTls ? 'tls' : 'tcp',
                         'host' => $redisHost,
-                        'port' => (int)(getenv('REDIS_PORT') ?: ($_ENV['REDIS_PORT'] ?? 6379)),
-                        'password' => (getenv('REDIS_PASSWORD') ?: ($_ENV['REDIS_PASSWORD'] ?? null)) ?: null,
+                        'port' => (int)(getenv('REDIS_PORT') ?: 6379),
+                        'password' => getenv('REDIS_PASSWORD') ?: null,
                         'timeout' => 2,
                         'read_write_timeout' => 2,
                     ];
