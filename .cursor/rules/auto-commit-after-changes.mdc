@@ -1,0 +1,16 @@
+---
+description: Sempre fazer commit e push automático após corrigir, melhorar ou criar código
+alwaysApply: true
+---
+
+# Commit automático após alterações
+
+Sempre que você **corrigir**, **melhorar** ou **criar** código neste projeto:
+
+1. Ao concluir a alteração (mesmo sem o usuário pedir), faça **commit** das mudanças relacionadas.
+2. Em seguida faça **push** para a branch atual (`git push -u origin HEAD` se necessário).
+3. Inclua **somente** os arquivos da alteração feita — nunca misture arquivos não relacionados, secrets (`.env`, credentials) nem pastas de logs/prints/vídeos.
+4. Mensagem de commit curta e objetiva (1 linha), em português ou estilo do repo (`fix:`, `feat:`, etc.).
+5. Não peça confirmação para commit/push dessas atualizações de trabalho; o usuário pediu commit automático.
+6. Se não houver mudanças staged/pendentes relevantes, não crie commit vazio.
+7. Continue seguindo o protocolo seguro de git (sem `--force` em main, sem alterar git config, sem `--no-verify`).

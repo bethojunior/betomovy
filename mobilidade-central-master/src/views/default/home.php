@@ -1,4 +1,4 @@
-<!-- Movy Central Deploy: 2026-10-28 02:36 UTC - Uber Layout Avançar & Modal Dados Fix -->
+<!-- Movy Central Deploy: 2026-10-31 - Mobile address bottom-sheet + layout fix -->
 <div class="container-main-map">
     <div class="list-trips-active-partner">
         <div class="container-trips">
@@ -238,17 +238,16 @@
                 </button>
                 <h2 class="trip-panel-title">Endereços da viagem</h2>
             </header>
-            <div class="row form-trip" id="formPassenger">
+            <div class="form-trip" id="formPassenger">
                 <div class="form-data-passenger">
                     <div class="address-fields">
                         <div>
-                            <input type="text" id="originSelected" class="col s12 input-custom select-type-place origin-place" readonly place="origin" placeholder="Insira o local de partida" autocomplete="off">
+                            <input type="text" id="originSelected" class="input-custom select-type-place origin-place" readonly place="origin" placeholder="Insira o local de partida" autocomplete="off">
                             <i class="material-icons clear-input" for="origin">close</i>
                         </div>
                         <div id="containerInputDestination">
-                            <input type="text" id="destinationSelected" class="col s12 input-custom select-type-place destination-place" readonly place="destination" autocomplete="off" placeholder="Para onde ?">
+                            <input type="text" id="destinationSelected" class="input-custom select-type-place destination-place" readonly place="destination" autocomplete="off" placeholder="Para onde?">
                             <i class="material-icons clear-input" for="destination">close</i>
-                            <!--                        <i class="material-icons ">add</i>-->
                         </div>
                     </div>
                     <button type="button" id="swapAddressBtn" class="swap-address-btn" aria-label="Inverter origem e destino">
@@ -259,8 +258,8 @@
             </div>
             <div class="container-footer-local">
                 <a href="#" class="small add-place-stop">Adicionar parada</a>
-                <button type="button" id="optimized" class="btn btn-primary w-100 mt-2">Sugestão de melhor rota</button>
-                <button type="button" id="btnCalculatePriceByPlaces" class="btn btn-primary w-100 mt-2">Avançar</button>
+                <button type="button" id="optimized" class="btn-route-suggest">Sugestão de melhor rota</button>
+                <button type="button" id="btnCalculatePriceByPlaces" class="btn-route-advance">Avançar</button>
             </div>
             <div class="container-search-local">
                 <i class="material-icons back-address">arrow_back</i>

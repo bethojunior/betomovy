@@ -86,17 +86,21 @@ body {
 .container-menu .container-logo.active > .form-trip {
     opacity: 1;
     transition: 0.5s;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-height: 0;
     position: relative;
     max-height: none;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 @media screen and (max-width: 990px) {
     .container-menu .container-logo.active > .form-trip {
         max-height: none;
+        flex: 0 1 auto;
     }
 }
 
@@ -145,6 +149,7 @@ ul li.block-local p {
     pointer-events: none;
 }
 
+.input-custom,
 .col.s12.input-custom {
     color: var(--color-text-primary);
     margin-bottom: 0;
@@ -158,26 +163,26 @@ ul li.block-local p {
     line-height: 1.35;
     pointer-events: unset;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 10px;
     box-sizing: border-box;
     transition: border-color 0.15s, background 0.15s;
 }
 
+.input-custom.origin-place,
+.input-custom.destination-place,
 .col.s12.input-custom.origin-place,
 .col.s12.input-custom.destination-place {
     background-color: var(--color-bg-muted);
     border: 1px solid var(--color-border);
 }
 
-
-.col.s12.input-custom.origin-place:before{
-}
-
+.input-custom.error,
 .col.s12.input-custom.error {
     border: 1px solid #ff9696;
     background-color: #ffd9d9;
 }
 
+.input-custom:focus,
 .col.s12.input-custom:focus {
     background-color: var(--color-border-subtle);
     border-bottom: none !important;
@@ -695,15 +700,16 @@ ul li.block-local p {
     max-width: 100%;
     display: flex;
     flex-direction: row;
-    align-items: stretch;
-    align-self: flex-start;
+    align-items: flex-start;
+    align-self: stretch;
     flex-grow: 0;
     gap: 8px;
-    margin: clamp(0.35rem, 2vw, 1rem) auto 0;
+    margin: 0;
     padding: 0 clamp(0.5rem, 3vw, 1.25rem);
-    position: absolute;
-    left: 0;
-    right: 0;
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
     box-sizing: border-box;
 }
 
@@ -736,6 +742,15 @@ ul li.block-local p {
 }
 
 @media (min-width: 992px) {
+    .container-menu .container-logo.active > .form-trip {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .container-footer-local {
+        margin-top: auto;
+    }
+
     .notification-item{
         font-size:30pt;
         right:2vw;
@@ -874,15 +889,66 @@ ul li.block-local p {
 
 .container-footer-local {
     flex-shrink: 0;
+    margin-top: auto;
     width: 100%;
     max-width: 100%;
     padding: clamp(0.75rem, 2.5vw, 1rem) clamp(0.75rem, 3vw, 1.1rem);
+    padding-bottom: max(clamp(0.75rem, 2.5vw, 1rem), env(safe-area-inset-bottom, 0px));
     border-top: 1px solid var(--color-border);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 8px;
     background: var(--color-bg-surface);
+}
+
+.container-footer-local .add-place-stop {
+    align-self: flex-start;
+}
+
+.container-footer-local #optimized,
+.container-footer-local #btnCalculatePriceByPlaces,
+.container-footer-local .btn-route-suggest,
+.container-footer-local .btn-route-advance {
+    width: 100% !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.container-footer-local .btn-route-suggest {
+    height: 42px;
+    background: var(--color-bg-surface);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-input);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.container-footer-local .btn-route-advance {
+    height: 46px;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.container-footer-local .btn-route-suggest:hover {
+    background: var(--color-bg-hover);
+}
+
+.container-footer-local .btn-route-advance:hover {
+    background: var(--color-primary-hover);
 }
 
 .container-search-local {
@@ -960,13 +1026,16 @@ ul li.block-local p {
 }
 
 /* Input: cresce para preencher a linha e reserva espaço para o ícone */
+.address-fields > div .input-custom,
 .address-fields > div .col.s12.input-custom,
+.container-waypoint-search .input-custom,
 .container-waypoint-search .col.s12.input-custom {
     flex: 1 1 0%;
     min-width: 0;
-    width: auto;            /* cancela o width:100% da regra base */
-    max-width: none;        /* cancela o max-width:100% da regra base */
+    width: 100%;
+    max-width: none;
     padding-right: 2.5rem;
+    box-sizing: border-box;
 }
 
 /* Ícone "→" dos inputs de origem/destino */
@@ -1233,5 +1302,145 @@ ul li.block-local p {
     font-size: 5px;
     margin-left: 10px;
     color: #181818;
+}
+
+/* ── Mobile: painel de endereços em bottom sheet (mapa visível) ── */
+@media screen and (max-width: 991px) {
+    .container-main-map {
+        position: relative;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .container-main-map > .map-client {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100% !important;
+        z-index: 1;
+        float: none;
+    }
+
+    .container-main-map > .map-client #mapClient {
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
+    }
+
+    .container-menu {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: min(68vh, 560px) !important;
+        transform: translateY(110%) !important;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -10px 36px rgba(15, 23, 42, 0.18);
+        overflow: hidden;
+        background: var(--color-bg-surface);
+        z-index: 1010;
+    }
+
+    .container-menu.active {
+        transform: translateY(0) !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        border-left: none;
+    }
+
+    .container-menu .container-logo,
+    .container-menu .container-logo.active {
+        position: relative !important;
+        height: auto !important;
+        max-height: min(68vh, 560px);
+        min-height: 0;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden;
+        box-shadow: none;
+        border-bottom: none;
+        transform: none !important;
+    }
+
+    .container-menu .container-logo.active > .form-trip {
+        flex: 0 1 auto !important;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        max-height: 42vh;
+        margin: 0;
+        padding: 10px 0 6px;
+    }
+
+    .form-data-passenger {
+        position: relative !important;
+        margin: 0 !important;
+        width: 100%;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .address-fields {
+        gap: 8px;
+    }
+
+    .swap-address-btn {
+        margin-top: 2px;
+        width: 42px;
+        height: 42px;
+    }
+
+    .col.s12.input-custom {
+        min-height: 44px;
+        border-radius: 10px;
+        font-size: 15px;
+        line-height: 1.3;
+    }
+
+    .container-footer-local {
+        margin-top: 0;
+        padding: 10px 14px max(12px, env(safe-area-inset-bottom, 0px));
+        gap: 8px;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .container-footer-local #optimized {
+        height: 42px !important;
+        font-size: 13px !important;
+        border-radius: 10px !important;
+    }
+
+    .container-footer-local #btnCalculatePriceByPlaces {
+        height: 46px !important;
+        font-size: 15px !important;
+        border-radius: 10px !important;
+    }
+
+    .container-search-local {
+        border-radius: 20px 20px 0 0;
+    }
+
+    .trip-panel-header {
+        min-height: 44px;
+        padding-top: 10px;
+        padding-bottom: 8px;
+    }
+
+    .trip-panel-header::before {
+        content: "";
+        position: absolute;
+        top: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 36px;
+        height: 4px;
+        border-radius: 999px;
+        background: #d1d5db;
+    }
 }
 
