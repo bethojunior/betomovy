@@ -51,7 +51,6 @@ class CheckoutIntermediaryService
             case FinancialIntermediaryConst::FIREBANKING:
                 return $this->feedByFirebanking($paymentData, $paymentFormId, $transactionTypeId);
             case FinancialIntermediaryConst::STRIPE:
-            case FinancialIntermediaryConst::STRIPE_LEGACY:
                 return $this->feedByStripe($intermediaryId, $paymentData, $paymentFormId, $transactionTypeId);
         }
     }
@@ -59,10 +58,14 @@ class CheckoutIntermediaryService
     private function feedByStripe($intermediaryId, $payment, $paymentFormId, $transactionTypeId = null): Transaction
     {
         $transaction = new Transaction();
-        $id = $payment['id'] ?? null;
+        $id = $payment['id'] ?? ($payment['payment_intent'] ?? null);
         $status = $payment['status'] ?? 'unknown';
 
-        $amount = isset($payment['amount']) ? ((float) $payment['amount']) / 100 : 0.0;
+        // Stripe devolve amount em centavos; refunds usam amount ou payment_intent aninhado
+        $amountRaw = $payment['amount']
+            ?? ($payment['amount_received'] ?? null)
+            ?? ($payment['amount_to_capture'] ?? null);
+        $amount = is_numeric($amountRaw) ? ((float) $amountRaw) / 100 : 0.0;
 
         switch ($status) {
             case 'succeeded':
@@ -71,24 +74,37 @@ class CheckoutIntermediaryService
             case 'requires_capture':
             case 'processing':
             case 'requires_action':
+            case 'requires_confirmation':
                 $transaction->setTransactionStatusId(TransactionConst::PENDENTE);
                 break;
             case 'canceled':
-                $transaction->setTransactionStatusId(TransactionConst::CANCELADO);
+                $transaction->setTransactionStatusId(TransactionConst::REJECTED);
                 break;
             default:
-                $transaction->setTransactionStatusId(TransactionConst::REJECTED);
+                // Erro Stripe costuma vir em error.message sem status de PI
+                if (!empty($payment['error'])) {
+                    $transaction->setTransactionStatusId(TransactionConst::REJECTED);
+                    $status = $payment['error']['message'] ?? $status;
+                } else {
+                    $transaction->setTransactionStatusId(TransactionConst::REJECTED);
+                }
                 break;
         }
 
         $transaction
             ->setStatus($status)
-            ->setFinancialIntermediaryId($intermediaryId)
+            ->setStatusDetailed($status)
+            ->setIntermediaryId($intermediaryId)
             ->setGeneratedPaymentId($id)
             ->setValue($amount)
-            ->setNetValue($amount)
+            ->setIntermediaryFee(0)
             ->setPaymentFormId($paymentFormId)
-            ->setTransactionTypeId($transactionTypeId ?? 1);
+            ->setTypeId($transactionTypeId)
+            ->setUserId(Headers::getUserId());
+
+        if ($this->transactionId) {
+            $transaction->setIdTransaction($this->transactionId);
+        }
 
         return $transaction;
     }

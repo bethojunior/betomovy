@@ -245,7 +245,7 @@ const Acquirer: FC = () => {
 						<Button type="primary" htmlType="submit">
 							Salvar
 						</Button>
-						{((list as any)?.idFinancialIntermediary === 17 || (list as any)?.idFinancialIntermediary === 6 || (list as any)?.name?.toUpperCase().includes('STRIPE')) && (
+						{((list as any)?.idFinancialIntermediary === 17 || (list as any)?.name?.toUpperCase().includes('STRIPE')) && (
 							<Button
 								style={{ marginLeft: 12, backgroundColor: '#6772e5', borderColor: '#6772e5', color: '#fff' }}
 								onClick={async () => {

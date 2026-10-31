@@ -130,30 +130,30 @@ class AcquirerController extends ApiController
                     ]
                 ],
                 [
-                    'idFinancialIntermediary' => 6,
+                    'idFinancialIntermediary' => 17,
                     'name' => 'Stripe',
                     'active' => 0,
                     'acquirer_meta_data' => [
                         [
-                            'financialIntermediaryId' => 6,
+                            'financialIntermediaryId' => 17,
                             'key' => 'publishable_key',
-                            'description' => 'Publishable Key (Chave Pública)',
+                            'description' => 'Publishable Key (Chave Pública pk_...)',
                             'value' => ''
                         ],
                         [
-                            'financialIntermediaryId' => 6,
+                            'financialIntermediaryId' => 17,
                             'key' => 'secret_key',
-                            'description' => 'Secret Key (Chave Secreta)',
+                            'description' => 'Secret Key (use sk_live_/sk_test_ — rk_ restringida pode falhar)',
                             'value' => ''
                         ],
                         [
-                            'financialIntermediaryId' => 6,
+                            'financialIntermediaryId' => 17,
                             'key' => 'webhook_secret',
                             'description' => 'Webhook Secret (Chave do Webhook)',
                             'value' => ''
                         ],
                         [
-                            'financialIntermediaryId' => 6,
+                            'financialIntermediaryId' => 17,
                             'key' => 'environment',
                             'description' => 'Ambiente (test / live)',
                             'value' => 'test'
@@ -297,7 +297,13 @@ class AcquirerController extends ApiController
             if (empty($secretKey)) {
                 try {
                     $pdo = Connection::getConnection(Connection::DB_MYSQL_RO);
-                    $stmt = $pdo->prepare("SELECT `value` FROM acquirerMetaData WHERE financialIntermediaryId IN (6, 17) AND `key` = 'secret_key' LIMIT 1");
+                    $stmt = $pdo->prepare(
+                        "SELECT `value` FROM acquirerMetaData
+                         WHERE financialIntermediaryId = 17
+                           AND `key` IN ('secret_key', 'stripe_secret_key')
+                           AND `value` IS NOT NULL AND `value` <> ''
+                         LIMIT 1"
+                    );
                     $stmt->execute();
                     $secretKey = $stmt->fetchColumn() ?: '';
                 } catch (\Throwable $t) {}

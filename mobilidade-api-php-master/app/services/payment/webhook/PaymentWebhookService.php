@@ -12,6 +12,7 @@ use app\dao\DriverBalanceDao;
 use app\dao\DriverDao;
 use app\dao\TransactionDao;
 use app\dao\TripPixPaymentsDao;
+use app\model\PaymentForm;
 use app\model\Transaction;
 use app\model\VoucherPurchase;
 use app\services\CheckoutService;
@@ -505,7 +506,21 @@ class PaymentWebhookService
         switch ($eventType) {
             case 'payment_intent.succeeded':
             case 'charge.succeeded':
-                return $this->handlePixPaidTransaction($transaction);
+                // PIX Stripe reutiliza o fluxo PIX; cartão só marca COMPLETED
+                if ((int) $transaction->getPaymentFormId() === PaymentForm::PIX) {
+                    return $this->handlePixPaidTransaction($transaction);
+                }
+                $this->updateTransactionStatusAndDispatch($transaction, TransactionConst::COMPLETED);
+                return $this->response(200, 'Pagamento Stripe (cartão) confirmado', [
+                    'id' => $transaction->getIdTransaction(),
+                    'payment_intent' => $paymentIntentId,
+                ]);
+
+            case 'payment_intent.amount_capturable_updated':
+                $this->updateTransactionStatusAndDispatch($transaction, TransactionConst::PENDENTE);
+                return $this->response(200, 'Pagamento Stripe autorizado (aguarda captura)', [
+                    'id' => $transaction->getIdTransaction(),
+                ]);
 
             case 'payment_intent.payment_failed':
             case 'charge.failed':

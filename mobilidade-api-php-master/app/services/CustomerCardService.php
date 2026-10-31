@@ -222,7 +222,6 @@ class CustomerCardService
                 $cardInfoId = $this->saveCardAdquirerEpag($request, $userId);
                 break;
             case FinancialIntermediaryConst::STRIPE:
-            case FinancialIntermediaryConst::STRIPE_LEGACY:
                 $cardInfoId = $this->saveCardAdquirerStripe($request, $userId);
                 break;
             default:
@@ -374,48 +373,77 @@ class CustomerCardService
             $secretKey = AcquirerMetaData::get('secret_key') ?: AcquirerMetaData::get('stripe_secret_key') ?: '';
         }
 
-        if (!empty($secretKey)) {
-            $stripeCheckout = new \app\utils\StripeCheckout($secretKey);
-            $user = (new UserDao)->find($userId);
-            $stripeCustomer = $stripeCheckout->insertCustomer($user->email ?? "user{$userId}@movy.com", [
-                'name' => $user->name ?? "Cliente {$userId}",
-                'phone' => $user->phone ?? ''
-            ]);
-
-            $token = $request->stripeToken ?? $request->token ?? $request->mpToken ?? null;
-            $pmId = null;
-
-            if ($token) {
-                try {
-                    $attached = $stripeCheckout->insertCard($stripeCustomer['id'] ?? null, [], $token);
-                    $pmId = $attached['id'] ?? $token;
-                } catch (\Throwable $t) {
-                    $pmId = $token;
-                }
-            } elseif (!empty($request->cardNumber) && !empty($request->expirationMonth) && !empty($request->expirationYear)) {
-                try {
-                    $created = $stripeCheckout->insertCard($stripeCustomer['id'] ?? null, [
-                        'number' => $request->cardNumber,
-                        'expirationMonth' => $request->expirationMonth,
-                        'expirationYear' => $request->expirationYear,
-                        'cvv' => $request->cvv ?? null,
-                        'cardholderName' => $request->cardholderName ?? null
-                    ]);
-                    $pmId = $created['id'] ?? null;
-                } catch (\Throwable $t) {
-                    $pmId = null;
-                }
-            }
-
-            if (empty($pmId)) {
-                throw new \Exception('Não foi possível tokenizar o cartão na Stripe. Verifique os dados do cartão.');
-            }
-
-            $stripeIntermediaryId = \app\constant\FinancialIntermediaryConst::STRIPE;
-            return $this->saveCardInfo($stripeCustomer['id'] ?? $userId, $pmId, $request, $stripeIntermediaryId);
+        if (empty($secretKey)) {
+            throw new \Exception('Stripe não configurada: secret_key ausente no adquirente.');
         }
 
-        throw new \Exception('Stripe não configurada: secret_key ausente no adquirente.');
+        $stripeCheckout = new \app\utils\StripeCheckout($secretKey);
+        $user = (new UserDao)->find($userId);
+        $stripeCustomer = $stripeCheckout->insertCustomer($user->email ?? "user{$userId}@movy.com", [
+            'name' => $user->name ?? "Cliente {$userId}",
+            'phone' => $user->phone ?? ''
+        ]);
+
+        if (empty($stripeCustomer['id'])) {
+            throw new \Exception('Não foi possível criar/obter o Customer na Stripe.');
+        }
+
+        // Aceita só tokens Stripe reais (pm_/tok_/card_). Timestamp/mpToken fake do app NÃO deve ser usado.
+        $rawToken = $request->stripeToken ?? $request->token ?? $request->mpToken ?? null;
+        $token = (is_string($rawToken) && preg_match('/^(pm_|tok_|card_)/', $rawToken))
+            ? $rawToken
+            : null;
+
+        $pmId = null;
+        $lastError = null;
+
+        if ($token) {
+            try {
+                $attached = $stripeCheckout->insertCard($stripeCustomer['id'], [], $token);
+                $pmId = $attached['id'] ?? null;
+            } catch (\Throwable $t) {
+                $lastError = $t->getMessage();
+            }
+        }
+
+        $cardNumber = preg_replace('/\D+/', '', (string) ($request->cardNumber ?? ''));
+        $expMonth = (int) ($request->expirationMonth ?? 0);
+        $expYear = (int) ($request->expirationYear ?? 0);
+        if ($expYear > 0 && $expYear < 100) {
+            $expYear += 2000;
+        }
+
+        if (empty($pmId) && $cardNumber !== '' && $expMonth > 0 && $expYear > 0) {
+            try {
+                $created = $stripeCheckout->insertCard($stripeCustomer['id'], [
+                    'number' => $cardNumber,
+                    'expirationMonth' => $expMonth,
+                    'expirationYear' => $expYear,
+                    'cvv' => $request->cvv ?? null,
+                    'cardholderName' => $request->cardholderName ?? null
+                ]);
+                $pmId = $created['id'] ?? null;
+            } catch (\Throwable $t) {
+                $lastError = $t->getMessage();
+            }
+        }
+
+        if (empty($pmId)) {
+            $hint = $lastError ? " Detalhe: {$lastError}" : '';
+            throw new \Exception('Não foi possível tokenizar o cartão na Stripe. Verifique os dados do cartão.' . $hint);
+        }
+
+        // Normaliza dígitos no request para gravação local
+        $request->cardNumber = $cardNumber ?: ($request->cardNumber ?? '');
+        if (empty($request->firstSixDigits) && strlen($cardNumber) >= 6) {
+            $request->firstSixDigits = substr($cardNumber, 0, 6);
+        }
+        if (empty($request->lastFourDigits) && strlen($cardNumber) >= 4) {
+            $request->lastFourDigits = substr($cardNumber, -4);
+        }
+
+        $stripeIntermediaryId = \app\constant\FinancialIntermediaryConst::STRIPE;
+        return $this->saveCardInfo($stripeCustomer['id'], $pmId, $request, $stripeIntermediaryId);
     }
 
     private function removeAccents($string) {

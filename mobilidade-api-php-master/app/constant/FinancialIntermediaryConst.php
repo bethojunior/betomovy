@@ -14,9 +14,13 @@ class FinancialIntermediaryConst
     const RECEBE_AQUI = 3;
     const IUGU = 4;
     const PAGSEGURO = 5;
+    /** Stripe oficial neste projeto (api.movymob.com) */
     const STRIPE = 17;
-    const STRIPE_LEGACY = 6;
+    /** Alias de STRIPE (id 17). NÃO usar 6 — no banco MOVY id 6 é GETNET. */
+    const STRIPE_LEGACY = 17;
+    /** Em alguns seeds antigos GETNET=12; no banco MOVY produção o id é 6. */
     const GETNET = 12;
+    const GETNET_MOVY = 6;
     const REDE = 7;
     const ZSPAY = 8;
     const PAYSOON = 9;

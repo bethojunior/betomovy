@@ -146,7 +146,6 @@ class TripCardPaymentService
             case FinancialIntermediaryConst::YUMEPAY:
             case FinancialIntermediaryConst::FIREBANKING:
             case FinancialIntermediaryConst::STRIPE:
-            case FinancialIntermediaryConst::STRIPE_LEGACY:
                 $captured = TripCardPayment::CAPTURE;
                 break;
             default:

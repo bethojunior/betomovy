@@ -25,6 +25,9 @@ class StripeCheckout implements CheckoutInterface
     {
         $this->secretKey = trim($secretKey);
         $this->publishableKey = $publishableKey ? trim($publishableKey) : null;
+        if ($this->secretKey === '') {
+            throw new Exception('Stripe: secret_key vazia. Configure a chave no adquirente (Monitor/Central).');
+        }
     }
 
     public function __get($name)
@@ -149,6 +152,20 @@ class StripeCheckout implements CheckoutInterface
 
     public function refundCreditPayment($paymentId, $amount = null)
     {
+        // PI só autorizado (requires_capture): cancelar em vez de refund
+        try {
+            $current = $this->findPayment($paymentId);
+            $status = $current['status'] ?? '';
+            if (in_array($status, ['requires_capture', 'requires_confirmation', 'requires_action', 'requires_payment_method'], true)) {
+                return $this->curlExec("payment_intents/{$paymentId}/cancel", 'POST', []);
+            }
+            if ($status === 'canceled') {
+                return $current;
+            }
+        } catch (\Throwable $e) {
+            // segue para tentar refund
+        }
+
         $payload = [
             'payment_intent' => $paymentId
         ];
@@ -281,18 +298,28 @@ class StripeCheckout implements CheckoutInterface
         curl_close($ch);
 
         $json = json_decode($raw, true);
+        $key = trim($secretKey);
+        $isRestricted = strpos($key, 'rk_') === 0;
+        $isSecret = strpos($key, 'sk_') === 0;
+
         if ($code >= 200 && $code < 300) {
+            $msg = 'Conexão com a Stripe realizada com sucesso!';
+            if ($isRestricted) {
+                $msg .= ' Atenção: chave rk_ (restricted) detectada. Para criar cartões e PaymentIntents use sk_live_/sk_test_ com permissões completas, ou libere PaymentMethods + PaymentIntents na chave restrita.';
+            }
             return [
                 'status' => true,
-                'message' => 'Conexão com a Stripe realizada com sucesso!',
-                'data' => $json
+                'message' => $msg,
+                'data' => $json,
+                'key_type' => $isRestricted ? 'restricted' : ($isSecret ? 'secret' : 'unknown'),
             ];
         }
 
         return [
             'status' => false,
             'message' => $json['error']['message'] ?? 'Falha ao autenticar com as credenciais da Stripe.',
-            'error' => $json
+            'error' => $json,
+            'key_type' => $isRestricted ? 'restricted' : ($isSecret ? 'secret' : 'unknown'),
         ];
     }
 

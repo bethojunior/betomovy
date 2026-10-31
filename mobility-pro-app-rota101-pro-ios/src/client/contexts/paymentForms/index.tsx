@@ -70,19 +70,24 @@ export const PaymentFormProvider = ({ children }: any) => {
 
         const date = dueDate?.split('/');
         const organizedBithDay = birthday?.split('/');
+        const cleanNumber = String(cardNumber || '').split(' ').join('');
+        const yearPrefix = String(parseInt(String(new Date().getFullYear() / 100), 10));
+        const expYearRaw = String(date?.[1] || '');
+        const expirationYear =
+          expYearRaw.length === 2 ? yearPrefix + expYearRaw : expYearRaw;
 
         const card = {
-          cardNumber,
+          cardNumber: cleanNumber,
           cvv,
           expirationMonth: date[0],
-          expirationYear: date[1],
+          expirationYear,
           cardholderName: cardHolder,
           docNumber: Helper.unMask(document),
           mpToken: null,
-          firstSixDigits: cardNumber?.split(' ').join('').substr(0, 6),
-          paymentMethodName: await Helper.detectCardType(cardNumber),
+          firstSixDigits: cleanNumber.substr(0, 6),
+          paymentMethodName: await Helper.detectCardType(cleanNumber),
           securityCodeLength: String(cvv).length,
-          lastFourDigits: cardNumber.substr(-4),
+          lastFourDigits: cleanNumber.substr(-4),
           dateOfBirth: `${organizedBithDay[2] +
             '-' +
             organizedBithDay[1] +

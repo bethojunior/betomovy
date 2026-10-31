@@ -4,7 +4,8 @@ class PaymentCard {
         const acquirer = Session.getLocal("ACQUIRER") || Session.get("ACQUIRER") || {};
         const name = String(acquirer.name || acquirer.Name || "").toUpperCase();
         const id = parseInt(acquirer.idFinancialIntermediary || acquirer.id || 0, 10);
-        return id === 17 || id === 6 || name.includes("STRIPE");
+        // No banco MOVY o id 6 é GETNET; Stripe é somente id 17
+        return id === 17 || name.includes("STRIPE");
     }
 
     static isMercadoPagoAcquirer() {

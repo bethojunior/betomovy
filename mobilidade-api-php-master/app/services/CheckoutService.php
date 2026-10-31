@@ -209,7 +209,14 @@ class CheckoutService
 
         $this->checkout = $this->getCheckout($transaction->getIntermediaryId(), null, $transaction->getPaymentFormId());
 
-        if ($this->acquirer && !$this->acquirer->getCapture()) {
+        $intermediaryId = (int) $transaction->getIntermediaryId();
+        $isStripe = $intermediaryId === FinancialIntermediaryConst::STRIPE;
+
+        // Stripe sempre autoriza (manual) e captura no fim da corrida.
+        // Demais adquirentes: captura só se a flag do adquirente estiver desligada (pré-auth).
+        $shouldCapture = $isStripe || ($this->acquirer && !$this->acquirer->getCapture());
+
+        if ($shouldCapture) {
             $payment = $this->checkout->captureAmount($transaction->getGeneratedPaymentId(), $transaction->getValue());
             $this->updateTransaction($payment);
 
@@ -300,7 +307,7 @@ class CheckoutService
         $user = $this->userDao
             ->find(Headers::getUserId());
 
-        if (empty($card['cardId']) && ($intermediary === FinancialIntermediaryConst::PAY704 || $intermediary === FinancialIntermediaryConst::STRIPE || $intermediary === FinancialIntermediaryConst::STRIPE_LEGACY)) {
+        if (empty($card['cardId']) && ($intermediary === FinancialIntermediaryConst::PAY704 || $intermediary === FinancialIntermediaryConst::STRIPE)) {
             $cardInfo = $this->saveCardInfoAdquirer($card, $user, $this->intermediary_id);
             $this->updateCard($card['idCard'], $cardInfo, $card);
             $card = $this->findCard($cardId);
@@ -339,7 +346,17 @@ class CheckoutService
         $name = $user->name ?? null;
         $phone = $user->phone ?? null;
         $document = $user->document ?? null;
-        $capture = !(empty($capture) && empty($captureFinancial));
+
+        $isStripe = ((int) $this->intermediary_id) === FinancialIntermediaryConst::STRIPE;
+
+        // Stripe: respeita o parâmetro da corrida (false = authorize/manual).
+        // Outros: OR com flag do adquirente (legado).
+        if ($isStripe) {
+            $capture = (bool) $capture;
+        } else {
+            $capture = !(empty($capture) && empty($captureFinancial));
+        }
+
         $mpCustomerId = $card['mpCustomerId'];
         $customerId = $card['CustomerId'];
         $userId = $user->idUser;
@@ -811,6 +828,7 @@ class CheckoutService
                     $configs['704_pay_api_secret']
                 );
             case FinancialIntermediaryConst::GETNET:
+            case FinancialIntermediaryConst::GETNET_MOVY: // id 6 no banco MOVY
                 return new GetnetCheckout(
                     $configs['getnet_seller_id'],
                     $configs['client_id'],
@@ -839,7 +857,6 @@ class CheckoutService
             case FinancialIntermediaryConst::FIREBANKING:
                 return new FBCheckout($configs);
             case FinancialIntermediaryConst::STRIPE:
-            case FinancialIntermediaryConst::STRIPE_LEGACY:
                 return new \app\utils\StripeCheckout(
                     $configs['secret_key'] ?? $configs['stripe_secret_key'] ?? '',
                     $configs['publishable_key'] ?? $configs['stripe_publishable_key'] ?? null
