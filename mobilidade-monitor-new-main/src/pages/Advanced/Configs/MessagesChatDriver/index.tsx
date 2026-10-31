@@ -31,7 +31,7 @@ export const MessagesChatDriver = () => {
   const [messageSelected, setMessageSelected] =
     useState<ChatBotTripProps | null>(null);
 
-  const [typesTrips, setTypesTrips] = useState<number>(1);
+  const [typesTrips, setTypesTrips] = useState<number | undefined>(undefined);
   const [message, setMessage] = useState<string>("");
 
   const getChatBotTripAndType = () => {
@@ -42,16 +42,16 @@ export const MessagesChatDriver = () => {
 
     Promise.all([responseChatBotTrip, responseChabotBotTripType])
       .then((response) => {
-        if (response[0].status) {
-          setChatBotTrip(response[0].data.response);
-        }
+        const trips = response[0]?.data?.response ?? response[0]?.data?.data;
+        const types = response[1]?.data?.response ?? response[1]?.data?.data;
 
-        if (response[1].status) {
-          setChatBotTripType(response[1].data.response);
-        }
+        setChatBotTrip(Array.isArray(trips) ? trips : []);
+        setChatBotTripType(Array.isArray(types) ? types : []);
       })
       .catch((error) => {
         console.error(error);
+        setChatBotTrip([]);
+        setChatBotTripType([]);
       })
       .finally(() => {
         setLoadingTable(false);
@@ -62,8 +62,22 @@ export const MessagesChatDriver = () => {
     getChatBotTripAndType();
   }, []);
 
+  useEffect(() => {
+    if (typesTrips == null && chatBotTripType.length > 0) {
+      setTypesTrips(chatBotTripType[0].id);
+    }
+  }, [chatBotTripType, typesTrips]);
+
   const handleAddNewMessage = async () => {
     try {
+      if (!typesTrips) {
+        swal({
+          title: "Selecione o tipo de viagem",
+          icon: "warning",
+        });
+        return;
+      }
+
       if (message.length <= 0) {
         swal({
           title: "Preencha o campo mensagem",
@@ -132,11 +146,19 @@ export const MessagesChatDriver = () => {
     });
   };
 
+  const resolveTripTypeName = (item: ChatBotTripProps) => {
+    const type =
+      item.chatBotTripType ||
+      item.chat_bot_trip_type ||
+      chatBotTripType.find((t) => t.id === item.chatBotTripTypeId);
+    return type?.name || "—";
+  };
+
   const columns: ColumnsType<ChatBotTripProps> = [
     {
       title: "Tipo de viagem",
       key: "idUserPenaltyType",
-      render: (_, item) => <p>{item.chat_bot_trip_type.name}</p>,
+      render: (_, item) => <p>{resolveTripTypeName(item)}</p>,
       width: 200,
       ellipsis: true,
     },

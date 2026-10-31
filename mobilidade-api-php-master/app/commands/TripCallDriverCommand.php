@@ -179,9 +179,8 @@ class TripCallDriverCommand extends Command
                         continue;
                     }
 
-
-                    echo "[Chamado individual] Atualizando status de chamado do motorista para não atendido" . PHP_EOL;
-                    $this->updateStatusOnNotAnsweredTrip($tripReference, new DriverCalled($driver));
+                    // Mantém CALLING: a corrida só some da tela se Aceitar, Recusar ou outro motorista aceitar.
+                    echo "[Chamado individual] Tempo parcial esgotado — mantendo CALLING e chamando próximo motorista" . PHP_EOL;
                 }
             }
 
@@ -321,10 +320,11 @@ class TripCallDriverCommand extends Command
             }, $drivers);
 
             if ($checkTrip) {
-                echo "[Dedo rápido] Atualizando viagens e motoristas para não atendida" . PHP_EOL;
-                $this->updateAllDriversStatusOnNotAnsweredTrip($driverCalledIds, $trip->getTripReference());
+                // Mantém CALLING enquanto a viagem busca motorista (estilo Uber/99).
+                echo "[Dedo rápido] Tempo parcial esgotado — mantendo CALLING e renovando lista" . PHP_EOL;
             } else {
                 echo "[Dedo rápido] Viagem não está mais ativa após waitAllDriversAnswer. Encerrando." . PHP_EOL;
+                $this->updateAllDriversStatusOnNotAnsweredTrip($driverCalledIds, $trip->getTripReference());
             }
 
             echo "[Dedo rápido] Renovando a lista de motoristas" . PHP_EOL;
@@ -486,6 +486,11 @@ class TripCallDriverCommand extends Command
 
         while ($timeActual < $this->timeToExpireDriverCall) {
 
+            if (!$this->verifyTripIsSearching($tripReference)) {
+                echo "[Chamado individual] Viagem não está mais em busca. Encerrando espera." . PHP_EOL;
+                break;
+            }
+
             echo "[Chamado individual] Consultando status de atendimento do motorista.. ";
             $driver = $this->driverCalledService
                 ->getStatusDriver($tripReference, $driverCalledId);
@@ -507,6 +512,11 @@ class TripCallDriverCommand extends Command
         $timeActual = 1;
 
         while ($timeActual < $this->timeToExpireDriverCall) {
+
+            if (!$this->verifyTripIsSearching($tripReference)) {
+                echo "[Dedo rápido] Viagem não está mais em busca (aceita/cancelada). Encerrando espera." . PHP_EOL;
+                break;
+            }
 
             echo "[Dedo rápido] Consultando status de atendimento dos motoristas.. ";
             $drivers = $this->driverCalledService

@@ -32,35 +32,44 @@ const SUPPRESSED_FOREGROUND_TAGS_IOS = new Set([
   PushConstants.PushNotificationTags.CUSTOMERS_CLOSE,
 ]);
 
-TaskManager.defineTask(
-  PushConstants.BACKGROUND_NOTIFICATION_TASK,
-  async ({ data, error }: any) => {
-    if (error) {
-      console.log('[PUSH][BG] erro na task:', error);
-      return;
-    }
+try {
+  const taskName = PushConstants.BACKGROUND_NOTIFICATION_TASK;
+  const alreadyDefined =
+    typeof (TaskManager as any).isTaskDefined === 'function'
+      ? (TaskManager as any).isTaskDefined(taskName)
+      : false;
 
-    const rawData = data?.data ?? {};
-    let notifData: any = data?.notification?.request?.content?.data ?? null;
-
-    if (!notifData) {
-      try {
-        notifData = JSON.parse(rawData?.body || rawData?.dataString || '');
-      } catch {
-        if (rawData) notifData = rawData;
+  if (!alreadyDefined) {
+    TaskManager.defineTask(taskName, async ({ data, error }: any) => {
+      if (error) {
+        console.log('[PUSH][BG] erro na task:', error);
+        return;
       }
-    }
 
-    if (!notifData) return;
+      const rawData = data?.data ?? {};
+      let notifData: any = data?.notification?.request?.content?.data ?? null;
 
-    const shouldOpenApp =
-      OPEN_APP_TAGS.has(notifData?.tag) && OPEN_APP_ACTIONS.has(notifData?.action);
+      if (!notifData) {
+        try {
+          notifData = JSON.parse(rawData?.body || rawData?.dataString || '');
+        } catch {
+          if (rawData) notifData = rawData;
+        }
+      }
 
-    if (shouldOpenApp && Platform.OS === 'android') {
-      NativeModules.BubbleButton?.openApp();
-    }
-  },
-);
+      if (!notifData) return;
+
+      const shouldOpenApp =
+        OPEN_APP_TAGS.has(notifData?.tag) && OPEN_APP_ACTIONS.has(notifData?.action);
+
+      if (shouldOpenApp && Platform.OS === 'android') {
+        NativeModules.BubbleButton?.openApp();
+      }
+    });
+  }
+} catch (e) {
+  console.warn('[PUSH] defineTask falhou (não crítico):', e);
+}
 
 if (Platform.OS === 'android') {
   Notifications.setNotificationChannelAsync('tripCall', {

@@ -75,6 +75,13 @@ class DriverSplitPaymentService
 
         $this->loadCheckoutService($oldTransaction->intermediaryId);
 
+        // Stripe Connect / split marketplace ainda não implementado no StripeCheckout
+        $intermediaryId = (int) ($oldTransaction->intermediaryId ?? 0);
+        if ($intermediaryId === \app\constant\FinancialIntermediaryConst::STRIPE
+            || $intermediaryId === \app\constant\FinancialIntermediaryConst::STRIPE_LEGACY) {
+            return null;
+        }
+
         $this->cancelOldPayment(new Transaction($oldTransaction));
 
         $splitPaymentDTO = $this->getSplitPaymentDTO($driverSplitValue->amount);

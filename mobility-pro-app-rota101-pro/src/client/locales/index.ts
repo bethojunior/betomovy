@@ -61,15 +61,23 @@ const iosSetLanguage = async () => {
     const locale = await AsyncStorage.getItem('@language');
     if (locale) return locale;
 
-    const appleLocale = NativeModules.SettingsManager.settings.AppleLocale;
+    const settings = NativeModules?.SettingsManager?.settings;
+    const appleLocale =
+      settings?.AppleLocale ||
+      (Array.isArray(settings?.AppleLanguages)
+        ? settings.AppleLanguages[0]
+        : null) ||
+      'pt_BR';
 
-    const normalizedLocale = switchIosLanguage(appleLocale);
+    const normalizedLocale = switchIosLanguage(String(appleLocale));
     await AsyncStorage.setItem('@language', normalizedLocale);
 
     return normalizedLocale;
   } catch (error) {
-    const fallback = 'en_US';
-    await AsyncStorage.setItem('@language', fallback);
+    const fallback = 'pt_BR';
+    try {
+      await AsyncStorage.setItem('@language', fallback);
+    } catch {}
     return fallback;
   }
 };

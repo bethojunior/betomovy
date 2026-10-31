@@ -16,9 +16,6 @@ import { ConfigGlobalProvider } from '../src/context/ConfigGlobal';
 import { ConfigAppPartnerProvider } from '../src/context/ConfigAppPartner';
 import { AuthProvider } from '../src/context/auth';
 import Routes from '../src/routes';
-
-import 'intl';
-import 'intl/locale-data/jsonp/pt-BR';
 import { IfoodModalProvider } from '../src/driver/contexts/IfoodModal';
 import { TermsProvider } from '../src/context/terms';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,11 +24,35 @@ import { SocketProvider } from './context/SocketIO';
 import { PermissionsProvider } from './utils/permissions/PermissionsProvider';
 import { PermissionModal } from './utils/permissions/PermissionModal';
 import { translate } from './client/locales';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { setupGlobalErrorHandling } from '../lib/middleware/GlobalErrorHandler';
 
-SplashScreen.preventAutoHideAsync();
+// Hermes (RN 0.81+) já tem Intl. O polyfill antigo pode crashar o iOS no boot.
+try {
+  const needsIntlPolyfill =
+    typeof Intl === 'undefined' ||
+    typeof (Intl as any).NumberFormat === 'undefined' ||
+    typeof (Intl as any).DateTimeFormat === 'undefined';
+  if (needsIntlPolyfill) {
+    require('intl');
+    require('intl/locale-data/jsonp/pt-BR');
+  }
+} catch (e) {
+  console.warn('[App] intl polyfill ignorado:', e);
+}
+
+setupGlobalErrorHandling();
+
+try {
+  SplashScreen.preventAutoHideAsync();
+} catch (e) {
+  console.warn('[App] SplashScreen.preventAutoHideAsync:', e);
+}
 
 if (__DEV__) {
-  require('../config/reactotron');
+  try {
+    require('../config/reactotron');
+  } catch {}
 
   LogBox.ignoreLogs([
     'VirtualizedLists should never be nested inside plain ScrollViews',
@@ -39,6 +60,17 @@ if (__DEV__) {
     'SafeAreaView has been deprecated',
   ]);
 }
+
+try {
+  (Text as any).defaultProps = {
+    ...(Text as any).defaultProps,
+    allowFontScaling: false,
+  };
+  (TextInput as any).defaultProps = {
+    ...(TextInput as any).defaultProps,
+    allowFontScaling: false,
+  };
+} catch {}
 
 const styles = StyleSheet.create({
   container: {
@@ -56,51 +88,43 @@ export default function App() {
     return onThemeReady(() => setSafeAreaBgColor(themeClient.colors.background_global));
   }, []);
 
-  (Text as any).defaultProps = {
-    ...(Text as any).defaultProps,
-    allowFontScaling: false,
-  };
-
-  (TextInput as any).defaultProps = {
-    ...(TextInput as any).defaultProps,
-    allowFontScaling: false,
-  };
-
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <ThemeProvider theme={themeClient}>
-        <SafeAreaView style={[styles.container, { backgroundColor: safeAreaBgColor }]}>
-          <Provider>
-            <FlashMessage MessageComponent={CustomFlashMessage} position="top" style={styles.flash} floating />
-            <StatusBar style="dark" backgroundColor="#000" translucent={false} />
-            <ConfigGlobalProvider>
-              <NavigationContainer>
-                <AuthProvider>
-                  <SocketProvider>
-                    <ModulesProvider>
-                      <KeyboardAvoidingView
-                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                        style={styles.container}
-                      >
-                        <PermissionsProvider>
-                          <IfoodModalProvider>
-                            <TermsProvider>
-                              <ConfigAppPartnerProvider>
-                                <Routes />
-                              </ConfigAppPartnerProvider>
-                            </TermsProvider>
-                          </IfoodModalProvider>
-                          <PermissionModal translate={translate} />
-                        </PermissionsProvider>
-                      </KeyboardAvoidingView>
-                    </ModulesProvider>
-                  </SocketProvider>
-                </AuthProvider>
-              </NavigationContainer>
-            </ConfigGlobalProvider>
-          </Provider>
-        </SafeAreaView>
-      </ThemeProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={styles.container}>
+        <ThemeProvider theme={themeClient}>
+          <SafeAreaView style={[styles.container, { backgroundColor: safeAreaBgColor }]}>
+            <Provider>
+              <FlashMessage MessageComponent={CustomFlashMessage} position="top" style={styles.flash} floating />
+              <StatusBar style="dark" backgroundColor="#000" translucent={false} />
+              <ConfigGlobalProvider>
+                <NavigationContainer>
+                  <AuthProvider>
+                    <SocketProvider>
+                      <ModulesProvider>
+                        <KeyboardAvoidingView
+                          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                          style={styles.container}
+                        >
+                          <PermissionsProvider>
+                            <IfoodModalProvider>
+                              <TermsProvider>
+                                <ConfigAppPartnerProvider>
+                                  <Routes />
+                                </ConfigAppPartnerProvider>
+                              </TermsProvider>
+                            </IfoodModalProvider>
+                            <PermissionModal translate={translate} />
+                          </PermissionsProvider>
+                        </KeyboardAvoidingView>
+                      </ModulesProvider>
+                    </SocketProvider>
+                  </AuthProvider>
+                </NavigationContainer>
+              </ConfigGlobalProvider>
+            </Provider>
+          </SafeAreaView>
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }

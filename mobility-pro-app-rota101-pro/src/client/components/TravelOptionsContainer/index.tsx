@@ -457,7 +457,7 @@ const TravelOptionsContainer = ({
                   color={theme.colors.secondary}
                 />
               </ButtonOpenPaymentMethodModal>
-              <If condition={selectedPaymentMethod?.paymentFormTypeId === '3'}>
+              <If condition={Number(selectedPaymentMethod?.paymentFormTypeId) === 3}>
                 <ButtonOpenPaymentMethodRight onPress={() => setModalCard(true)}>
                   <PaymentMethodSelected>
                     <AntDesign name="credit-card" size={20} />

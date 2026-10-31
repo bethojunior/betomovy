@@ -19,4 +19,10 @@ class CustomerCardController{
                 {cardId},resolve,reject,false);
         });
     }
+
+    verifyAcquirer(){
+        return new Promise((resolve,reject)=>{
+            ConnectionServer.sendRequest("CustomerCard/Acquirer", "GET", null, resolve, reject, false);
+        });
+    }
 }

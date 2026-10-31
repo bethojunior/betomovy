@@ -70,42 +70,48 @@ export const PaymentFormProvider = ({ children }: any) => {
 
         const date = dueDate?.split('/');
         const organizedBithDay = birthday?.split('/');
+        const cleanNumber = String(cardNumber || '').split(' ').join('');
+        let expirationYear = String(date?.[1] || '');
+        if (expirationYear.length === 2) {
+          expirationYear = `20${expirationYear}`;
+        }
 
         const card = {
-          cardNumber,
+          cardNumber: cleanNumber,
           cvv,
-          expirationMonth: date[0],
-          expirationYear: date[1],
+          expirationMonth: date?.[0],
+          expirationYear,
           cardholderName: cardHolder,
           docNumber: Helper.unMask(document),
           mpToken: null,
-          firstSixDigits: cardNumber?.split(' ').join('').substr(0, 6),
-          paymentMethodName: await Helper.detectCardType(cardNumber),
+          firstSixDigits: cleanNumber.substr(0, 6),
+          paymentMethodName: await Helper.detectCardType(cleanNumber),
           securityCodeLength: String(cvv).length,
-          lastFourDigits: cardNumber.substr(-4),
-          dateOfBirth: `${organizedBithDay[2] +
-            '-' +
-            organizedBithDay[1] +
-            '-' +
-            organizedBithDay[0]
-            }`,
+          lastFourDigits: cleanNumber.substr(-4),
+          dateOfBirth: organizedBithDay?.length === 3
+            ? `${organizedBithDay[2]}-${organizedBithDay[1]}-${organizedBithDay[0]}`
+            : null,
         };
 
         const { data } = await PaymentFormService.addCard(card);
 
-        if (!data.status) {
-          return customToast(translate('paymentPage.error_add_card'), 'danger');
+        if (!data?.status) {
+          customToast(translate('paymentPage.error_add_card'), 'danger');
+          return false;
         }
 
-        return customToast(
+        await getCards();
+        customToast(
           translate('paymentPage.text_success_to_add_card'),
           'success',
         );
+        return true;
       } catch (error) {
-        return customToast(translate('paymentPage.error_add_card'), 'danger');
+        customToast(translate('paymentPage.error_add_card'), 'danger');
+        return false;
       }
     },
-    [],
+    [getCards],
   );
 
   const removeCard = useCallback(async (cardSelected: string) => {

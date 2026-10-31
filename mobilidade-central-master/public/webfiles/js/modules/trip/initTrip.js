@@ -174,6 +174,15 @@ function getPlaceCustomer() {
 
         updateBtnCallTripVisibility();
 
+        // Recalcula o mapa após o painel de endereços (bottom sheet / sidebar)
+        setTimeout(() => {
+            try {
+                if (typeof mapService !== "undefined" && mapService?.resizeMap) {
+                    mapService.resizeMap();
+                }
+            } catch (e) {}
+        }, 350);
+
         viewController.elementProperty.getElement(".pac-container", element => {
             element.style.display = "none";
         });

@@ -63,7 +63,13 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
     dispatchTrip,
     verifyExistTrip,
     clearDataTrip,
-    stateTrip: { tripAccepted, tripPreAccepted, cancelTrip, notificationTripCallRequest },
+    stateTrip: {
+      tripAccepted,
+      tripPreAccepted,
+      cancelTrip,
+      notificationTripCallRequest,
+      callDriverModal,
+    },
   } = useTripProvider((context) => context);
 
   const { setStatusTrip, restoreRecalculation } = useTripStatusProvider(
@@ -197,13 +203,28 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   };
 
   const pendingRingRef = useRef(false);
+  const isRingingRef = useRef(false);
+  const ringingTripRef = useRef<string | null>(null);
+  const fallbackRingRef = useRef<Audio.Sound | null>(null);
+  const callDriverModalRef = useRef(false);
   const handleTripRef = useRef<(userId: number, callType?: string | number | null) => Promise<void>>(
     async () => {},
   );
   const playSongActiveRef = useRef<() => Promise<void>>(async () => {});
+  const stopSongActiveRef = useRef<() => Promise<void>>(async () => {});
+
+  useLayoutEffect(() => {
+    callDriverModalRef.current = !!callDriverModal;
+  }, [callDriverModal]);
 
   const playSongActive = async () => {
-    // Sempre tenta tocar (background Android + silent iOS). Se falhar em background, marca pending.
+    if (isRingingRef.current) {
+      if (AppState.currentState !== 'active') {
+        pendingRingRef.current = true;
+      }
+      return;
+    }
+
     if (AppState.currentState !== 'active') {
       pendingRingRef.current = true;
     } else {
@@ -222,13 +243,22 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       if (song) {
         await song.setIsLoopingAsync(true);
         await song.playAsync();
+        isRingingRef.current = true;
       } else {
-        await playSong('whistle', true);
+        const sound = await playSong('whistle', true);
+        if (sound) {
+          fallbackRingRef.current = sound;
+          isRingingRef.current = true;
+        }
       }
     } catch (e) {
       console.warn('[TripRealtime] Erro ao tocar som de chamada:', e);
       try {
-        await playSong('whistle', true);
+        const sound = await playSong('whistle', true);
+        if (sound) {
+          fallbackRingRef.current = sound;
+          isRingingRef.current = true;
+        }
       } catch (err) {
         console.error('[TripRealtime] Fallback playSong whistle falhou:', err);
       }
@@ -236,9 +266,17 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   };
 
   const stopSongActive = async () => {
+    pendingRingRef.current = false;
+    isRingingRef.current = false;
+    ringingTripRef.current = null;
     try {
       if (song) {
         await song.stopAsync();
+      }
+      if (fallbackRingRef.current) {
+        await fallbackRingRef.current.stopAsync();
+        await fallbackRingRef.current.unloadAsync().catch(() => {});
+        fallbackRingRef.current = null;
       }
       await stopSong('whistle');
     } catch (e) {
@@ -274,8 +312,20 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
             console.log(error);
           }
         }
+        const tripRaw = await AsyncStorage.getItem('trip');
+        const tripData = tripRaw ? JSON.parse(tripRaw) : null;
+        const tripReference = tripData?.tripReference || null;
+        const alreadyRingingSameTrip =
+          isRingingRef.current &&
+          ringingTripRef.current &&
+          tripReference &&
+          ringingTripRef.current === tripReference;
+
         dispatchCallDriverModal(true);
-        await playSongActive();
+        if (!alreadyRingingSameTrip) {
+          ringingTripRef.current = tripReference;
+          await playSongActive();
+        }
       } else if (response === 'empty') {
         dispatchCallDriverModal(false);
         await stopSongActive();
@@ -288,13 +338,17 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
 
   handleTripRef.current = handleTrip;
   playSongActiveRef.current = playSongActive;
+  stopSongActiveRef.current = stopSongActive;
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', next => {
       if (next !== 'active') return;
-      if (pendingRingRef.current) {
+      // Só retoma o toque se ainda houver chamado aberto na tela
+      if (pendingRingRef.current && callDriverModalRef.current) {
         pendingRingRef.current = false;
         void playSongActiveRef.current();
+      } else {
+        pendingRingRef.current = false;
       }
       void handleTripRef.current(0, null);
     });
@@ -303,12 +357,24 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!userDriverFind?.idDriver || isOffline) return;
+    if (!userDriverFind?.idDriver) return;
+
+    if (isOffline) {
+      pendingRingRef.current = false;
+      void stopSongActiveRef.current();
+      return;
+    }
+
+    // Ao ficar online: limpa toque residual e só toca se achar corrida de verdade
+    pendingRingRef.current = false;
+    void stopSongActiveRef.current().then(() => {
+      void handleTripRef.current(0, null);
+    });
 
     const interval = setInterval(() => {
       if (Object.keys(tripAcceptedRef.current || {}).length > 0) return;
       void handleTripRef.current(0, null);
-    }, 5000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [userDriverFind?.idDriver, isOffline]);
@@ -335,12 +401,27 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
     }
 
     if (type === 'removed') {
+      try {
+        const currentTripRaw = await AsyncStorage.getItem('trip');
+        const currentTrip = currentTripRaw ? JSON.parse(currentTripRaw) : null;
+        const removedRef = trip?.tripReference;
+        // Só limpa se a corrida removida for a que está na tela do motorista
+        if (
+          removedRef &&
+          currentTrip?.tripReference &&
+          removedRef !== currentTrip.tripReference
+        ) {
+          return;
+        }
+      } catch {}
+
       AsyncStorage.removeItem('trip');
       try {
         await stopSongActive();
       } catch (error) {
         console.log('Erro ao buscar viagens disponiveis', error);
       }
+      dispatchCallDriverModal(false);
       dispatchTrip({ type: 'update', field: 'trip', arg: {} });
     }
   };
