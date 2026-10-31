@@ -14,13 +14,26 @@ export const TravelProvider = ({ children }: TravelContextProps) => {
   const [travels, setTravels] = useState<TravelProps[]>([]);
 
   const getTravel = useCallback(
-    async (status: boolean | string, page: number, setDataPage: any) => {
+    async (status: boolean | string | null, page: number, setDataPage: any) => {
       try {
+        const customerId =
+          user?.idCustomer || (user as any)?.customerId || user?.idUser;
+
+        if (!customerId) {
+          setTravels([]);
+          return;
+        }
+
+        // true/"all" => sem filtro de status (API lista searching, andamento e finalizadas)
+        const statusFilter =
+          status === true || status === 'true' || status === 'all' || status === null
+            ? null
+            : status;
+
         const response = await service.getTravels(
-          status,
+          statusFilter,
           page,
-          // @ts-ignore
-          user.idCustomer,
+          Number(customerId),
         );
 
         if (!response.status) {
@@ -28,10 +41,14 @@ export const TravelProvider = ({ children }: TravelContextProps) => {
           return customToast(response.message, 'danger');
         }
 
-        setDataPage(response.data.paginate);
-        setTravels(response.data.trips);
+        const trips = Array.isArray(response?.data?.trips)
+          ? response.data.trips
+          : [];
 
-        reactotron.log?.('TravelPagination', response.data.trips);
+        setDataPage(response.data?.paginate || {});
+        setTravels(trips);
+
+        reactotron.log?.('TravelPagination', trips);
 
         return response;
       } catch (error) {
@@ -39,7 +56,7 @@ export const TravelProvider = ({ children }: TravelContextProps) => {
         return customToast(translate('toast.text_fetch_trips_error'), 'danger');
       }
     },
-    [service],
+    [service, user?.idCustomer, user?.idUser],
   );
 
   const value = useMemo(

@@ -524,32 +524,35 @@ class CustomerService
     public function getWhereForGetTrips($request)
     {
         $where = [
-            ['c.idCustomer', '=', ':customerId', 'AND'],
-            ['t.centralId', 'IS', 'NULL'],
+            ['c.idCustomer', '=', ':customerId'],
         ];
 
-        // status ausente ou `true` (filtro "Todos") também deve excluir viagens sem motorista
-        $hasStatusFilter = isset($request->status) && $request->status !== true;
+        $rawStatus = $request->status ?? null;
+        // "Todos": true / "true" / 1 / null / "" — inclui searching (sem motorista), em andamento e finalizadas
+        $isAllFilter = $rawStatus === null
+            || $rawStatus === ''
+            || $rawStatus === true
+            || $rawStatus === 1
+            || $rawStatus === '1'
+            || $rawStatus === 'true'
+            || $rawStatus === 'all';
 
-        if (!$hasStatusFilter) {
-            $where[count($where) - 1][] = 'AND';
-            $where[] = ['t.driverId', 'IS', 'NOT NULL'];
-        }
+        $hasStatusFilter = !$isAllFilter;
 
         $bind = [':customerId' => $request->customerId];
 
         if ($hasStatusFilter) {
-            if (is_string($request->status)) {
+            if (is_string($rawStatus)) {
                 $where[count($where) - 1][] = 'AND';
                 $where[] = ['t.status', '=', ':status'];
-                $bind[':status'] = $request->status;
+                $bind[':status'] = $rawStatus;
             }
 
-            if (is_array($request->status)) {
+            if (is_array($rawStatus)) {
                 $where[count($where) - 1][] = 'AND';
-                foreach ($request->status as $key => $status) {
-                    $or = end($request->status) == $status ? ')' : 'OR';
-                    $start = $request->status[0] == $status ? '(' : '';
+                foreach ($rawStatus as $key => $status) {
+                    $or = end($rawStatus) == $status ? ')' : 'OR';
+                    $start = $rawStatus[0] == $status ? '(' : '';
 
                     $where[] = [$start . 't.status', '=', ':status' . $key, $or];
                     $bind[':status' . $key] = $status;
@@ -559,8 +562,8 @@ class CustomerService
 
         if (isset($request->date)) {
             $where[count($where) - 1][] = 'AND';
-            $where[] = ['DATE_FORMAT(date, \'%Y-%m-%d\')', '<=', ':start_day', 'AND'];
-            $where[] = ['DATE_FORMAT(date, \'%Y-%m-%d\')', '>=', ':end_day'];
+            $where[] = ['DATE_FORMAT(t.date, \'%Y-%m-%d\')', '<=', ':start_day', 'AND'];
+            $where[] = ['DATE_FORMAT(t.date, \'%Y-%m-%d\')', '>=', ':end_day'];
             $bind[':start_day'] = today();
             $bind[':end_day'] = subDays(today(), $request->date);
         }
@@ -609,11 +612,11 @@ class CustomerService
               tt.type
             FROM {$tripTable} t
               INNER JOIN {$userTable} u on t.userId = u.idUser
-              INNER JOIN {$originTable} o on t.originId = o.idOrigin
-              INNER JOIN {$destinationTable} dest on t.destinationId = dest.idDestination
+              LEFT JOIN {$originTable} o on t.originId = o.idOrigin
+              LEFT JOIN {$destinationTable} dest on t.destinationId = dest.idDestination
               INNER JOIN {$this->table} c on u.idUser = c.userId
-              INNER JOIN {$tripPaymentTable} tPF on t.tripPaymentFormId = tPF.idTripPaymentForm
-              INNER JOIN {$tripTypeTable} tt on t.tripTypeId = tt.idTripType
+              LEFT JOIN {$tripPaymentTable} tPF on t.tripPaymentFormId = tPF.idTripPaymentForm
+              LEFT JOIN {$tripTypeTable} tt on t.tripTypeId = tt.idTripType
               LEFT JOIN {$driverTable} d ON t.driverId = d.idDriver
               LEFT JOIN {$userTable} ud on d.userId = ud.idUser
             WHERE {$whereString} ORDER BY t.date DESC LIMIT {$pagination->getLimit()}

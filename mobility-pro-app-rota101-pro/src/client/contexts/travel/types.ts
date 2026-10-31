@@ -1,6 +1,6 @@
 export interface TravelContextData {
   getTravel: (
-    status: boolean | string,
+    status: boolean | string | null,
     page: number,
     setDataPage: (data: PageProps) => void,
   ) => Promise<any>;

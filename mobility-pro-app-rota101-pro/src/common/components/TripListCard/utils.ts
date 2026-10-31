@@ -33,6 +33,10 @@ export const switchTripStatusLabel = (status: string) => {
     case 'BOARDING':
       return translate('service.boarding');
     case 'SEARCHING':
+    case 'SEARCHING_FAVORITE':
+      return translate('service.searching');
+    case 'WAITING':
+    case 'GET_BID_BY_DRIVERS':
       return translate('service.searching');
     case 'IN_PROGRESS':
       return translate('request.text_in_progress');
