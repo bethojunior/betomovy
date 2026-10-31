@@ -30,7 +30,9 @@ export const ModalEditChatbotDriver = ({
   selectTypeMessage,
 }: ModalEditChatbotDriverProps) => {
   const [idMessage, setIdMessage] = useState<number | undefined>(
-    messageSelected?.chat_bot_trip_type.id
+    messageSelected?.chatBotTripTypeId ??
+      messageSelected?.chatBotTripType?.id ??
+      messageSelected?.chat_bot_trip_type?.id
   );
   const [message, setMessage] = useState<string>("");
 
