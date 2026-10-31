@@ -69,16 +69,19 @@ class Photo
             }
         }
 
-        // 2. Upload to S3 / MinIO with resilience
+        // 2. Upload to S3 / MinIO — falha deve propagar (senão o app "acha" que salvou)
         try {
-            $link = $this->s3->uploadSingle($destination . $name, $photo['tmp_name'], $ACL);
-            $uploadFile = $fileType == 'video' ? ($link['ObjectURL'] ?? null) : $tempFile;
+            $this->s3->uploadSingle($destination . $name, $photo['tmp_name'], $ACL);
+            $uploadFile = $fileType == 'video' ? $photo['tmp_name'] : $tempFile;
 
             if ($uploadFile && file_exists($uploadFile)) {
                 $this->s3->uploadSingle($destination . self::COMPRESSED_DIR . $name, $uploadFile, $ACL);
+            } elseif ($fileType !== 'video') {
+                throw new Exception('Falha ao gerar/enviar foto comprimida de perfil');
             }
         } catch (\Throwable $e) {
             error_log("Photo::save S3 upload error: " . $e->getMessage());
+            throw new Exception('Erro ao enviar foto para o armazenamento: ' . $e->getMessage());
         } finally {
             if ($fileType != 'video' && $tempFile && file_exists($tempFile)) {
                 @unlink($tempFile);

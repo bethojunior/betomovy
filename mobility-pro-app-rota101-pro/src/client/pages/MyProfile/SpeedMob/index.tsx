@@ -91,14 +91,20 @@ export default function MyProfileSpeedMob() {
         console.warn('Falha ao redimensionar foto:', resizeErr);
       }
 
+      const previousUri = uriProfile;
       setUriProfile(imageToUpload);
-      await uploadProfileImage(imageToUpload, {
-        onSuccess: serverUrl => {
-          setUriProfile(serverUrl);
-          setImageKey(Date.now());
-          customToast(translate('toast.text_photo_updated_success'), 'success');
-        },
-      });
+      try {
+        await uploadProfileImage(imageToUpload, {
+          onSuccess: serverUrl => {
+            setUriProfile(serverUrl);
+            setImageKey(Date.now());
+            customToast(translate('toast.text_photo_updated_success'), 'success');
+          },
+        });
+      } catch (uploadError) {
+        setUriProfile(previousUri || user?.profileImageLink || null);
+        throw uploadError;
+      }
     } catch (error: any) {
       console.error('Erro ao atualizar foto:', error);
       if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
@@ -123,14 +129,20 @@ export default function MyProfileSpeedMob() {
         console.warn('Falha ao redimensionar foto:', resizeErr);
       }
 
+      const previousUri = uriProfile;
       setUriProfile(imageToUpload);
-      await uploadProfileImage(imageToUpload, {
-        onSuccess: serverUrl => {
-          setUriProfile(serverUrl);
-          setImageKey(Date.now());
-          customToast(translate('toast.text_photo_updated_success'), 'success');
-        },
-      });
+      try {
+        await uploadProfileImage(imageToUpload, {
+          onSuccess: serverUrl => {
+            setUriProfile(serverUrl);
+            setImageKey(Date.now());
+            customToast(translate('toast.text_photo_updated_success'), 'success');
+          },
+        });
+      } catch (uploadError) {
+        setUriProfile(previousUri || user?.profileImageLink || null);
+        throw uploadError;
+      }
     } catch (error: any) {
       console.error('Erro ao atualizar foto:', error);
       if (error?.message === 'Network Error' || error?.code === 'ECONNABORTED') {
