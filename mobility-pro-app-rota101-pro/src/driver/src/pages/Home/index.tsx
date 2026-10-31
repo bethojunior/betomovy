@@ -208,6 +208,9 @@ export function Home({ route }) {
 
   const getPermissionsActions = async () => {
     // Aqui apenas verifica bateria (Android only — no-op no iOS).
+    if (Platform.OS !== 'android') {
+      return;
+    }
     BatteryOptEnabled().then(isEnabled => {
       if (isEnabled) {
         RequestDisableOptimization();
