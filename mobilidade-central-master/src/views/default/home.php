@@ -258,7 +258,6 @@
             </div>
             <div class="container-footer-local">
                 <a href="#" class="small add-place-stop">Adicionar parada</a>
-                <button type="button" id="optimized" class="btn-route-suggest">Sugestão de melhor rota</button>
                 <button type="button" id="btnCalculatePriceByPlaces" class="btn-route-advance">Avançar</button>
             </div>
             <div class="container-search-local">

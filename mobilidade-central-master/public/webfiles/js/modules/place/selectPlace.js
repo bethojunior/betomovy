@@ -159,32 +159,12 @@ function readjustRoute(routes) {
 }
 
 function bestRoute() {
-  document.querySelector('#optimized').innerHTML = 'Sugestão de melhor rota'
+  const optimizedBtn = document.querySelector('#optimized')
+  if (optimizedBtn) optimizedBtn.innerHTML = 'Sugestão de melhor rota'
   readjustRoute(notOptimized)
   isOptimized = false
   optimized = []
 }
-
-viewController.elementProperty.addEventInElement('#optimized', 'onclick', function () {
-  if (notOptimized.length > 2) {
-    if (isOptimized) {
-      bestRoute()
-    } else {
-      notOptimized.map((res) => locals.push(res))
-      document.querySelector('#optimized').innerHTML = 'Rota padrão'
-      getDistanceFromLatLonInKm(locals)
-      readjustRoute(optimized)
-      isOptimized = true
-    }
-  } else {
-    bestRoute()
-    SwalCustom.messageDialog(
-      'Necessário no mínimo 3 endereços para realizar essa ação.',
-      'Ops...',
-      'info'
-    )
-  }
-})
 
 function swapOriginDestination() {
   const originInput = document.querySelector("*[place='origin']")
@@ -304,7 +284,8 @@ function clearOptimized() {
   optimized = []
   trip.waypoints = []
   trip.customer = null
-  document.querySelector('#optimized').innerHTML = 'Sugestão de melhor rota'
+  const optimizedBtn = document.querySelector('#optimized')
+  if (optimizedBtn) optimizedBtn.innerHTML = 'Sugestão de melhor rota'
   isOptimized = false
 }
 

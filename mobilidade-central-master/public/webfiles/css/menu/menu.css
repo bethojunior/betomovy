@@ -907,9 +907,7 @@ ul li.block-local p {
     align-self: flex-start;
 }
 
-.container-footer-local #optimized,
 .container-footer-local #btnCalculatePriceByPlaces,
-.container-footer-local .btn-route-suggest,
 .container-footer-local .btn-route-advance {
     width: 100% !important;
     margin: 0 !important;
@@ -917,18 +915,6 @@ ul li.block-local p {
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-}
-
-.container-footer-local .btn-route-suggest {
-    height: 42px;
-    background: var(--color-bg-surface);
-    color: var(--color-text-secondary);
-    border: 1px solid var(--color-border-input);
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
 }
 
 .container-footer-local .btn-route-advance {
@@ -941,10 +927,6 @@ ul li.block-local p {
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-}
-
-.container-footer-local .btn-route-suggest:hover {
-    background: var(--color-bg-hover);
 }
 
 .container-footer-local .btn-route-advance:hover {
@@ -1153,25 +1135,6 @@ ul li.block-local p {
 
 #btnCalculatePriceByPlaces:hover {
     background: var(--color-primary-hover) !important;
-}
-
-#optimized {
-    width: 100% !important;
-    height: 40px;
-    background: var(--color-bg-surface) !important;
-    color: var(--color-text-secondary) !important;
-    border: 1px solid var(--color-border-input) !important;
-    border-radius: 8px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    cursor: pointer;
-    font-family: 'Open Sans', sans-serif;
-    transition: background 0.15s;
-    margin-top: 0 !important;
-}
-
-#optimized:hover {
-    background: var(--color-bg-hover) !important;
 }
 
 /* ── History / saved places ── */
@@ -1407,12 +1370,6 @@ ul li.block-local p {
         padding: 10px 14px max(12px, env(safe-area-inset-bottom, 0px));
         gap: 8px;
         border-top: 1px solid var(--color-border);
-    }
-
-    .container-footer-local #optimized {
-        height: 42px !important;
-        font-size: 13px !important;
-        border-radius: 10px !important;
     }
 
     .container-footer-local #btnCalculatePriceByPlaces {
