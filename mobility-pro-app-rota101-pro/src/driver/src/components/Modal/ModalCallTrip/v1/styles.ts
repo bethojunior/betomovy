@@ -171,24 +171,38 @@ export const ButtonContent = styled.View`
   margin-top: 20px;
   width: 100%;
   align-self: center;
-  align-items: center;
-  align-content: flex-end;
+  align-items: stretch;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 4px;
 `;
 
 export const ButtonRefuse = styled.TouchableOpacity`
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   align-self: flex-end;
   padding: 8px;
 `;
 
+export const ButtonReject = styled.TouchableOpacity`
+  flex: 1;
+  height: 52px;
+  border-color: #c62828;
+  background-color: transparent;
+  border-width: 1.5px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+`;
+
 export const ButtonAccept = styled.TouchableOpacity`
-  width: 97%;
-  height: 50px;
+  flex: 1.4;
+  height: 52px;
   border-color: ${({theme}) => theme.colors.primary};
   background-color: ${({theme}) => theme.colors.primary};
   border-width: 0.5px;
-  border-radius: 5px;
+  border-radius: 8px;
   align-items: center;
   justify-content: center;
   position: relative;

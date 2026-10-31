@@ -341,6 +341,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       } catch (error) {
         console.log('Erro ao buscar viagens disponiveis', error);
       }
+      dispatchCallDriverModal(false);
       dispatchTrip({ type: 'update', field: 'trip', arg: {} });
     }
   };

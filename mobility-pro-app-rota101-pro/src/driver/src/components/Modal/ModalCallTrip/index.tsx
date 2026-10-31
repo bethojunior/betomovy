@@ -120,22 +120,15 @@ export default function ModalCallTrip({
       return 0;
     }
 
-    const timeElapsed = (second * 100) / timeLimit;
+    // Corrida fica na tela até Aceitar, Recusar ou outro motorista pegar.
+    // Progresso visual só até 100% — não fecha o modal por timer.
+    const safeLimit = Math.max(Number(timeLimit) || 1, 1);
+    const timeElapsed = Math.min((second * 100) / safeLimit, 100);
 
     setTimeToAccept(timeElapsed);
 
-    if (timeElapsed > 100) {
-      dispatchTrip({ type: 'update', field: 'callDriverModal', arg: false });
-      setRewardTrip(true);
-      setTotalBonus(0);
-      receivedNotification = true;
-      try {
-        await song?.stopAsync();
-      } catch (error) {
-        console.log('erro', error);
-      }
-      await AsyncStorage.removeItem('trip');
-      return dispatchTrip({ type: 'update', field: 'trip', arg: {} });
+    if (timeElapsed >= 100) {
+      return '';
     }
 
     second += 1;

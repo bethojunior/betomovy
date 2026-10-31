@@ -11,6 +11,7 @@ import {
   ButtonAccept,
   ButtonContent,
   ButtonRefuse,
+  ButtonReject,
   ClienSection,
   ClientInfo,
   ClientInfoContent,
@@ -408,6 +409,14 @@ export const V1ModalCallTrip = ({
             </View>
           </AddressContent>
           <ButtonContent>
+            <ButtonReject
+              onPress={handleRefuse}
+              disabled={loading}
+            >
+              <TextButton style={{ color: '#c62828' }}>
+                {translate('callTrip.text_refuse')}
+              </TextButton>
+            </ButtonReject>
             <ButtonAccept
               onPress={() => {
                 confirm();
