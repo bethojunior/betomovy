@@ -7,19 +7,29 @@ import { AppsId } from '../context/ConfigGlobal/constants';
 import useAppTheme from './useAppTheme';
 
 export function useClientRoutes() {
-  const { signed, isGuest, loading: authLoading, loadingGeneralSettings } = useAuth();
+  const {
+    signed,
+    isGuest,
+    loadingSession,
+    loadingGeneralSettings,
+  } = useAuth();
   const { init, loading: loadingModules } = useModules();
   const { loading: loadingTheme } = useAppTheme(AppsId['CLIENTE FINAL']);
   const { checkPermission: checkOverlayPermission } = useBubbleButton();
 
   const isUserSigned = useMemo(() => signed && init !== '', [signed, init]);
 
-  const [checkingOverlayPermission, setCheckingOverlayPermission] = useState(true);
+  const [checkingOverlayPermission, setCheckingOverlayPermission] = useState(
+    Platform.OS === 'android',
+  );
   const [initialAppRoute, setInitialAppRoute] = useState<string | undefined>(undefined);
   const isMountedRef = useRef(true);
 
   useEffect(() => {
-    if (!isUserSigned) return;
+    if (!isUserSigned) {
+      setCheckingOverlayPermission(false);
+      return;
+    }
 
     isMountedRef.current = true;
 
@@ -29,11 +39,18 @@ export function useClientRoutes() {
         return;
       }
 
-      const overlayGranted = await checkOverlayPermission();
-      if (!isMountedRef.current) return;
-
-      setInitialAppRoute(overlayGranted ? undefined : 'AppPermissions');
-      setCheckingOverlayPermission(false);
+      try {
+        const overlayGranted = await checkOverlayPermission();
+        if (!isMountedRef.current) return;
+        setInitialAppRoute(overlayGranted ? undefined : 'AppPermissions');
+      } catch {
+        if (!isMountedRef.current) return;
+        setInitialAppRoute(undefined);
+      } finally {
+        if (isMountedRef.current) {
+          setCheckingOverlayPermission(false);
+        }
+      }
     }
 
     resolveInitialRoute();
@@ -41,15 +58,29 @@ export function useClientRoutes() {
     return () => {
       isMountedRef.current = false;
     };
-  }, [isUserSigned]);
+  }, [isUserSigned, checkOverlayPermission]);
 
-  // prettier-ignore
   const isLoadingResources = useMemo(() => {
-    const isInitialAuthLoading = authLoading && init === '';
-    const isCheckingOverlayPermission = isUserSigned && checkingOverlayPermission;
+    const isInitialAuthLoading = loadingSession && init === '';
+    const isCheckingOverlayPermission =
+      isUserSigned && checkingOverlayPermission && Platform.OS === 'android';
 
-    return (isInitialAuthLoading || loadingTheme || loadingModules || loadingGeneralSettings || isCheckingOverlayPermission);
-  }, [authLoading, init, loadingTheme, loadingModules, loadingGeneralSettings, isUserSigned, checkingOverlayPermission]);
+    return (
+      isInitialAuthLoading ||
+      loadingTheme ||
+      loadingModules ||
+      loadingGeneralSettings ||
+      isCheckingOverlayPermission
+    );
+  }, [
+    loadingSession,
+    init,
+    loadingTheme,
+    loadingModules,
+    loadingGeneralSettings,
+    isUserSigned,
+    checkingOverlayPermission,
+  ]);
 
   return { isGuest, isUserSigned, isLoadingResources, initialAppRoute };
 }
