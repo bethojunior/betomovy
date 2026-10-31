@@ -100,35 +100,46 @@ export default function AddPlaymentForm() {
     // eslint-disable-next-line radix
     const year = parseInt(new Date().getFullYear() / 100);
 
+    const cleanNumber = String(cardNumber || '').split(' ').join('');
     const data = {
-      cardNumber,
+      cardNumber: cleanNumber,
       cvv: securityCode,
       expirationMonth: expirationDate?.split('/')[0],
-      expirationYear: year + expirationDate?.split('/')[1],
+      expirationYear: String(year) + String(expirationDate?.split('/')[1] || ''),
       cardholderName: name,
-      docNumber: document,
-      mpToken: new Date().getTime(),
-      firstSixDigits: cardNumber?.split(' ').join('').substr(0, 6),
-      paymentMethodName: Helper.detectCardType(cardNumber),
+      docNumber: Helper.unMask ? Helper.unMask(document) : String(document).replace(/\D/g, ''),
+      mpToken: null,
+      firstSixDigits: cleanNumber.substr(0, 6),
+      paymentMethodName: Helper.detectCardType(cleanNumber),
       securityCodeLength: securityCode.length,
-      lastFourDigits: cardNumber.substr(-4),
+      lastFourDigits: cleanNumber.substr(-4),
       cardFlagId: selectedCardFlag,
     };
 
     setLoading(true);
+    try {
+      const response = await apiMain.post('CustomerCard/Insert', data);
 
-    const response = await apiMain.post('CustomerCard/Insert', data);
-
-    if (response.data.status) {
-      navigation.navigate('ListCreditCard');
-    } else {
+      if (response.data.status) {
+        Alert.alert(
+          translate('addPlaymentForm.title_alert_attention'),
+          translate('paymentPage.text_success_to_add_card') || 'Cartão adicionado com sucesso',
+        );
+        navigation.navigate('ListCreditCard');
+      } else {
+        Alert.alert(
+          translate('addPlaymentForm.title_alert_attention'),
+          response.data?.message || translate('addPlaymentForm.message_alert_occurred_registering_card'),
+        );
+      }
+    } catch (e) {
       Alert.alert(
         translate('addPlaymentForm.title_alert_attention'),
         translate('addPlaymentForm.message_alert_occurred_registering_card'),
       );
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }, [name, document, securityCode, expirationDate, cardNumber]);
 
   return (

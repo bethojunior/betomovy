@@ -1300,7 +1300,7 @@ ul li.block-local p {
         width: 100% !important;
         max-width: 100% !important;
         height: auto !important;
-        max-height: min(68vh, 560px) !important;
+        max-height: min(52vh, 420px) !important;
         transform: translateY(110%) !important;
         border-radius: 20px 20px 0 0;
         box-shadow: 0 -10px 36px rgba(15, 23, 42, 0.18);
@@ -1320,7 +1320,7 @@ ul li.block-local p {
     .container-menu .container-logo.active {
         position: relative !important;
         height: auto !important;
-        max-height: min(68vh, 560px);
+        max-height: min(52vh, 420px);
         min-height: 0;
         width: 100% !important;
         display: flex !important;
@@ -1335,9 +1335,9 @@ ul li.block-local p {
         flex: 0 1 auto !important;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        max-height: 42vh;
+        max-height: 28vh;
         margin: 0;
-        padding: 10px 0 6px;
+        padding: 8px 0 4px;
     }
 
     .form-data-passenger {

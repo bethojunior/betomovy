@@ -741,6 +741,17 @@ export const TripProvider = ({ children }: TripContextChildren) => {
       const finalWaypoints = cacheData?.waypoints || waypoints;
       const finalTolls = cacheData?.tolls ?? stateTripCustomer.calculateAllData?.tolls;
 
+      let resolvedCardId = cardSelected || '';
+      if (!resolvedCardId) {
+        try {
+          const stored = await AsyncStorage.getItem('cardSelected');
+          const parsed = stored ? JSON.parse(stored) : null;
+          resolvedCardId = parsed?.idCard ? String(parsed.idCard) : '';
+        } catch (_) {
+          resolvedCardId = '';
+        }
+      }
+
       const payload = {
         stdObject: [
           {
@@ -754,9 +765,9 @@ export const TripProvider = ({ children }: TripContextChildren) => {
             pixId: null,
             tolls: Helper.getTollIds(finalTolls),
             cardId:
-              finalSelectedPaymentMethod?.paymentFormTypeId === '3' &&
-                cardSelected !== ''
-                ? cardSelected
+              Number(finalSelectedPaymentMethod?.paymentFormTypeId) === CREDIT_CARD_APP &&
+                resolvedCardId !== ''
+                ? resolvedCardId
                 : null,
             schedule: null,
             scheduleISO: null,
@@ -938,7 +949,7 @@ export const TripProvider = ({ children }: TripContextChildren) => {
       waypoints,
       tolls: Helper.getTollIds(stateTripCustomer.calculateAllData?.tolls),
       cardId:
-        selectedPaymentMethod?.paymentFormTypeId === '3' && cardSelected !== ''
+        Number(selectedPaymentMethod?.paymentFormTypeId) === CREDIT_CARD_APP && cardSelected !== ''
           ? cardSelected
           : null,
       schedule: null,
@@ -1029,7 +1040,7 @@ export const TripProvider = ({ children }: TripContextChildren) => {
           waypoints,
           tolls: Helper.getTollIds(stateTripCustomer.calculateAllData?.tolls),
           cardId:
-            selectedPaymentMethod?.paymentFormTypeId === '3' &&
+            Number(selectedPaymentMethod?.paymentFormTypeId) === CREDIT_CARD_APP &&
               cardSelected !== ''
               ? cardSelected
               : null,
@@ -1146,7 +1157,7 @@ export const TripProvider = ({ children }: TripContextChildren) => {
       waypoints,
       tolls: Helper.getTollIds(stateTripCustomer.calculateAllData?.tolls),
       cardId:
-        selectedPaymentMethod?.paymentFormTypeId === '3' && cardSelected !== ''
+        Number(selectedPaymentMethod?.paymentFormTypeId) === CREDIT_CARD_APP && cardSelected !== ''
           ? cardSelected
           : null,
       schedule: null,
@@ -1299,7 +1310,7 @@ export const TripProvider = ({ children }: TripContextChildren) => {
           waypoints,
           tolls: Helper.getTollIds(stateTripCustomer.calculateAllData?.tolls),
           cardId:
-            selectedPaymentMethod?.paymentFormTypeId === '3' &&
+            Number(selectedPaymentMethod?.paymentFormTypeId) === CREDIT_CARD_APP &&
               cardSelected !== ''
               ? cardSelected
               : null,

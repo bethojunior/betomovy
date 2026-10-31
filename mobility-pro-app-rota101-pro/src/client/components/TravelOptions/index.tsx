@@ -213,6 +213,12 @@ export default function TravelOptions({
     setHasInDriver(modulesActives.find(data => data.moduleName === 'InDriver'));
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      listCards();
+    }, []),
+  );
+
   useEffect(() => {
     setTurbined(false);
     setTypeTrip('');

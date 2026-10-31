@@ -24,7 +24,6 @@ import IconAmex from '../../../../../assets/icon-amex.svg';
 import IconDiners from '../../../../../assets/icon-diners.svg';
 import IconHipercard from '../../../../../assets/icon-hipercard.svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AntDesign } from '@expo/vector-icons';
 
 const cardIcons = {
   elo: <IconElo width={40} height={40} />,
@@ -92,36 +91,51 @@ const AddCard: FC<Props> = ({ visible, setVisible, listCard, updateList }) => {
 
   const insertCard = useCallback(
     async (form: FormData) => {
-      if (Platform.OS === 'ios') {
-        setVisible(false);
-      } else {
-        setLoading(true);
-      }
-      const { cardHolder, document, cardNumber, cvv, birthday } = form;
-      let { dueDate } = form;
+      if (loading) return;
 
-      if (dueDate && dueDate.length === 5 && dueDate.indexOf('/') === 2) {
-        const [month, year] = dueDate?.split('/');
-        const currentYear = new Date().getFullYear().toString().slice(-2);
-        if (year.length === 2) {
-          dueDate = `${month}/${'20' + year}`;
+      setLoading(true);
+      try {
+        const { cardHolder, document, cardNumber, cvv, birthday } = form;
+        let { dueDate } = form;
+
+        if (dueDate && dueDate.length === 5 && dueDate.indexOf('/') === 2) {
+          const [month, year] = dueDate.split('/');
+          if (year.length === 2) {
+            dueDate = `${month}/20${year}`;
+          }
         }
-      }
 
-      await addCard(listCard, cardHolder, document, cardNumber, dueDate, cvv, birthday);
-      setLoading(false);
-      setVisible(false);
-      reset();
-      return updateList();
+        const ok = await addCard(
+          listCard,
+          cardHolder,
+          document,
+          cardNumber,
+          dueDate,
+          cvv,
+          birthday,
+        );
+
+        if (!ok) {
+          return;
+        }
+
+        reset();
+        setVisible(false);
+        if (typeof updateList === 'function') {
+          await updateList();
+        }
+      } finally {
+        setLoading(false);
+      }
     },
-    [addCard]
+    [addCard, listCard, loading, reset, setVisible, updateList],
   );
 
-
   const closeModal = useCallback(() => {
+    if (loading) return;
     setVisible(false);
     reset();
-  }, [setVisible, reset]);
+  }, [loading, setVisible, reset]);
 
   return (
     <>

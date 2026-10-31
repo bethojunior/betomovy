@@ -308,7 +308,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
     const interval = setInterval(() => {
       if (Object.keys(tripAcceptedRef.current || {}).length > 0) return;
       void handleTripRef.current(0, null);
-    }, 5000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [userDriverFind?.idDriver, isOffline]);
