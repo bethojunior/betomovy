@@ -43,19 +43,22 @@ class CustomerCardDao extends BaseDao
                 c.expirationMonth,
                 c.expirationYear,
                 c.holderDocument,
-                mp.mpCustomerId,
-                mp.mpCardId AS mpCardId,
-                mp.mpFirstSixDigits,
-                mp.mpSecurityCodeLength,
-                mp.mpPaymentMethodName,
-                mp.mpLastFourDigits,
+                COALESCE(ci.CustomerId, mp.mpCustomerId) AS mpCustomerId,
+                COALESCE(ci.cardId, mp.mpCardId) AS mpCardId,
+                COALESCE(ci.cardId, mp.mpCardId) AS cardId,
+                COALESCE(ci.firstSixDigits, mp.mpFirstSixDigits) AS mpFirstSixDigits,
+                COALESCE(ci.securityCodeLength, mp.mpSecurityCodeLength) AS mpSecurityCodeLength,
+                COALESCE(ci.paymentMethodName, mp.mpPaymentMethodName) AS mpPaymentMethodName,
+                COALESCE(ci.lastFourDigits, mp.mpLastFourDigits) AS mpLastFourDigits,
+                ci.financialIntermediaryId,
                 c.statusId,
                 c.userId,
                 c.created_at,
                 c.birthDate
             FROM {$this->table} c
               LEFT JOIN mpCardInfo mp ON c.mpCardInfoId = mp.idMpCardInfo
-            WHERE userId = :userId AND statusId = :statusId {$whereCardId}
+              LEFT JOIN cardInfo ci ON c.cardInfoId = ci.id
+            WHERE c.userId = :userId AND c.statusId = :statusId {$whereCardId}
         ";
 
         return $this->sqlRawSelect($sql, $bind)

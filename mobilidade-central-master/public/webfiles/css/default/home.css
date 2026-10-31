@@ -500,18 +500,19 @@ body {
 }
 
 .footer-payment-form {
-    background: var(--color-bg-surface);
+    background: #FFFFFF;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 500;
+    z-index: 2500 !important;
     transform: translateY(110%);
     transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .footer-payment-form.active {
@@ -523,94 +524,109 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    background: var(--color-primary);
-    color: var(--color-text-inverse);
+    padding: 16px 20px;
+    background: #000000;
+    color: #FFFFFF;
     flex-shrink: 0;
 }
 
 .footer-payment-form > .title-footer > p {
     margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--color-text-inverse);
+    font-size: 16px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 0.2px;
 }
 
 .footer-payment-form > .title-footer > i {
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
-    color: rgba(255,255,255,0.7);
-    transition: color 0.12s;
+    color: rgba(255, 255, 255, 0.85);
+    transition: color 0.15s, transform 0.1s;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .footer-payment-form > .title-footer > i:hover {
-    color: var(--color-text-inverse);
+    color: #FFFFFF;
+    transform: scale(1.1);
 }
 
 /* "Forma de pagamento" sub-label */
 .footer-payment-form > p {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-text-disabled);
-    padding: 14px 16px 6px;
+    letter-spacing: 0.05em;
+    color: #6B7280;
+    padding: 16px 20px 8px;
     margin: 0;
 }
 
 /* ── Payment list ── */
 .footer-payment-form > .list-payment-forms {
     list-style: none;
-    padding: 0 0 16px;
+    padding: 0 16px 24px;
     margin: 0;
     overflow-y: auto;
     flex: 1;
     -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .footer-payment-form > .list-payment-forms > li {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 13px 16px;
-    border-bottom: 1px solid var(--color-bg-muted);
+    gap: 14px;
+    padding: 14px 18px;
+    background: #F9FAFB;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background 0.1s;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-}
-
-.footer-payment-form > .list-payment-forms > li:last-child {
-    border-bottom: none;
+    transition: all 0.15s ease;
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+    position: relative;
 }
 
 .footer-payment-form > .list-payment-forms > li:hover {
-    background: var(--color-bg-hover);
+    background: #F3F4F6;
+    border-color: #D1D5DB;
 }
 
 .footer-payment-form > .list-payment-forms > li.payment-form-trip.active {
-    background: var(--color-success-bg);
-    color: #15803d;
+    background: #F0FDF4;
+    border: 2px solid #16A34A;
+    color: #15803D;
+    box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
 }
 
 .footer-payment-form > .list-payment-forms > li.payment-form-trip.active::after {
-    content: "check";
+    content: "check_circle";
     font-family: 'Material Icons';
-    font-size: 18px;
-    color: var(--color-success-text);
+    font-size: 22px;
+    color: #16A34A;
     margin-left: auto;
 }
 
 .footer-payment-form > .list-payment-forms > li > i {
-    font-size: 20px;
-    color: var(--color-text-disabled);
+    font-size: 22px;
+    color: #4B5563;
     flex-shrink: 0;
+}
+
+.footer-payment-form > .list-payment-forms > li.payment-form-trip.active > i {
+    color: #16A34A;
 }
 
 .footer-payment-form > .list-payment-forms > li > p {
     margin: 0;
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    flex: 1;
 }
 
 .footer-payment-form > .add-payment-form {
@@ -1478,7 +1494,16 @@ div.pac-container>.pac-item>span {
     }
 
     .footer-payment-form {
-        width: 30%;
+        width: 390px !important;
+        max-width: 390px !important;
+        height: calc(100vh - 64px) !important;
+        top: 64px !important;
+        left: 0 !important;
+        right: auto !important;
+        bottom: 0 !important;
+        border-right: 1px solid #E5E7EB !important;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15) !important;
+        z-index: 2500 !important;
     }
 
     .footer-payment-form > .list-payment-forms {
@@ -1487,8 +1512,8 @@ div.pac-container>.pac-item>span {
     }
 
     .footer-payment-form > .list-payment-forms > li {
-        font-size: 13px;
-        padding: 11px 16px;
+        font-size: 14px;
+        padding: 13px 16px;
     }
 
     .footer-payment-form > .list-payment-forms > li > i {

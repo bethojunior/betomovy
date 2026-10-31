@@ -38,6 +38,23 @@ document.addEventListener("deviceready", function () {
 
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    try {
+        const customerCardController = new CustomerCardController();
+        if (typeof customerCardController.verifyAcquirer === "function") {
+            customerCardController.verifyAcquirer().then(({ status, data, response }) => {
+                const acquirer = data || response;
+                if (status && acquirer) {
+                    Session.setLocal("ACQUIRER", acquirer);
+                }
+            }).catch(() => {});
+        }
+        customerCardController.get().then(({ status, data }) => {
+            if (status) Session.setLocal("cards", data || []);
+        }).catch(() => {});
+    } catch (e) {}
+});
+
 function showOptionsReturn() {
     Route.startClassesInComponent([
         {component: "#modalInfoReturn",class:"active"}],()=>{

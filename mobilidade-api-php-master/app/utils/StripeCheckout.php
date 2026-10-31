@@ -40,19 +40,35 @@ class StripeCheckout implements CheckoutInterface
         $this->parameters = $data;
         $this->value = $data['value'] ?? 0;
         $this->description = $data['description'] ?? 'MOVY Viagem';
-        $this->customerId = $data['customerId'] ?? null;
-        $this->stripeToken = $data['stripeToken'] ?? $data['mpToken'] ?? null;
+        $this->customerId = $data['customerId']
+            ?? ($data['card']['CustomerId'] ?? null)
+            ?? ($data['card']['mpCustomerId'] ?? null);
+
+        $token = $data['stripeToken'] ?? $data['mpToken'] ?? null;
+        // Aceita apenas tokens/PM Stripe válidos; evita token MP quebrando o PaymentIntent
+        if (is_string($token) && preg_match('/^(pm_|tok_|card_)/', $token)) {
+            $this->stripeToken = $token;
+        } else {
+            $this->stripeToken = $data['card']['cardId']
+                ?? $data['cardId']
+                ?? (is_string($token) ? $token : null);
+            if (is_string($this->stripeToken) && !preg_match('/^(pm_|tok_|card_)/', $this->stripeToken)) {
+                $this->stripeToken = $data['card']['cardId'] ?? null;
+            }
+        }
         return $this;
     }
 
     public function creditPayment()
     {
         $amountInCents = (int) round(((float) $this->value) * 100);
+        // Reserva (manual) na criação da viagem; captura real em finishPayment/captureAmount
+        $captureMethod = !empty($this->parameters['capture']) ? 'automatic' : 'manual';
         $payload = [
             'amount' => $amountInCents,
             'currency' => 'brl',
             'description' => $this->description,
-            'capture_method' => 'automatic',
+            'capture_method' => $captureMethod,
             'confirm' => 'true',
             'off_session' => 'true',
             'payment_method_types[0]' => 'card',
@@ -114,6 +130,16 @@ class StripeCheckout implements CheckoutInterface
 
     public function captureAmount($paymentId, $amount = null)
     {
+        try {
+            $current = $this->findPayment($paymentId);
+            $status = $current['status'] ?? '';
+            if (in_array($status, ['succeeded', 'canceled'], true)) {
+                return $current;
+            }
+        } catch (\Throwable $e) {
+            // segue para tentar capturar
+        }
+
         $payload = [];
         if (!empty($amount)) {
             $payload['amount_to_capture'] = (int) round(((float) $amount) * 100);

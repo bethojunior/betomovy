@@ -375,7 +375,64 @@
         </div>
         <p>Forma de pagamento</p>
         <ul class="list-payment-forms"></ul>
-        <!--<a id="addPaymentForm" class="add-payment-form">Adicionar cartão de credito</a>-->
+        <a id="addPaymentForm" class="add-payment-form" href="javascript:void(0)">Adicionar cartão de crédito</a>
+    </div>
+
+    <div class="container-cards" id="containerCardsModal">
+        <div>
+            <span>
+                Selecione um cartão
+                <i class="material-icons close-cards-modal">close</i>
+            </span>
+            <ul id="listCardPaymentModal"></ul>
+            <a id="addCardModal" href="javascript:void(0)">Adicionar cartão</a>
+        </div>
+    </div>
+
+    <div class="container-add-card" id="containerAddCard">
+        <div>
+            <nav>
+                <i class="material-icons" id="backPaymentForm">arrow_back</i>
+                <p>Adicionar cartão</p>
+            </nav>
+            <form method="post" id="addCard" name="addCard" autocomplete="off">
+                <div>
+                    <label for="cardholderName">Nome no cartão</label>
+                    <input type="text" id="cardholderName" data-checkout="cardholderName" placeholder="NOME COMPLETO"/>
+                </div>
+                <div class="divider-container">
+                    <div>
+                        <label for="documentCard">CPF</label>
+                        <input type="tel" id="documentCard" placeholder="###.###.###-##"/>
+                    </div>
+                </div>
+                <div>
+                    <label for="cardNumber">Número do cartão</label>
+                    <div>
+                        <i class="material-icons">credit_card</i>
+                        <input type="tel" id="cardNumber" data-checkout="cardNumber" placeholder="•••• •••• •••• ••••"
+                               autocomplete="off"/>
+                    </div>
+                </div>
+                <div class="divider-container">
+                    <div>
+                        <label for="dateMonthYear">Validade</label>
+                        <input type="tel" id="dateMonthYear" placeholder="MM/AA"/>
+                    </div>
+                    <div>
+                        <label for="securityCode">CVV</label>
+                        <input type="tel" id="securityCode" data-checkout="securityCode" placeholder="CVV" autocomplete="off"/>
+                    </div>
+                </div>
+                <div hidden>
+                    <input type="text" id="cardExpirationMonth" data-checkout="cardExpirationMonth"/>
+                    <input type="text" id="cardExpirationYear" data-checkout="cardExpirationYear"/>
+                    <input type="text" id="docNumber" data-checkout="docNumber"/>
+                    <select id="docType" data-checkout="docType"><option value="CPF" selected>CPF</option></select>
+                </div>
+                <button type="submit">Salvar cartão</button>
+            </form>
+        </div>
     </div>
     <div class="footer-schedule-form" id="footerScheduleForm">
         <div class="title-footer">

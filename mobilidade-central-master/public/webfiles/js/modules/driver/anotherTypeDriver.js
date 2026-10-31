@@ -59,7 +59,7 @@ function showAnotherPrice() {
         //Session.set("managerTrip",managerTrip);
 
         if (parseInt(trip.tripPaymentFormId) === PAYMENT_CARD_CREDIT) {
-            getCardSelectedPayTrip(Session.get("cardSelected")).then(() => {
+            getCardSelectedPayTrip(Session.get("cardSelected") || Session.getLocal("cardSelected")).then(() => {
                 initNewTrip(trip);
             }).catch((message) => {
                 SwalCustom.messageDialog("", message, undefined, "warning");
@@ -76,7 +76,7 @@ function callAgainTrip() {
     const trip = Session.get("lastTrip");
 
     if (parseInt(trip.tripPaymentFormId) === PAYMENT_CARD_CREDIT) {
-        getCardSelectedPayTrip(Session.get("cardSelected")).then(() => {
+        getCardSelectedPayTrip(Session.get("cardSelected") || Session.getLocal("cardSelected")).then(() => {
             initNewTrip(trip);
         }).catch((message) => {
             SwalCustom.messageDialog("", message, undefined, "warning");

@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Carregar e configurar botões de tipos de chamada
   loadCentralCallTypes()
 
-  //updateCards();
+  updateCards();
 
   setCetralSessionNotifierInLocalStorage()
   setAppNameInLocalStorage()
@@ -514,8 +514,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (parseInt(newTrip.tripPaymentFormId) === PAYMENT_CARD_CREDIT) {
-      newTrip['mpToken'] = Session.getValueInSession('tokenCard', 'token')
-      newTrip['cardId'] = Session.getValueInSession('tokenCard', 'cardId')
+      const tokenCard = Session.get('tokenCard') || Session.getLocal('tokenCard')
+      const mpToken = tokenCard?.token || Session.getValueInSession('tokenCard', 'token')
+      const cardId = tokenCard?.cardId || Session.getValueInSession('tokenCard', 'cardId')
+      if (!cardId) {
+        SwalCustom.messageDialog('', 'Selecione ou adicione um cartão para pagar com Stripe.', undefined, 'warning')
+        if (typeof choiceCard === 'function') choiceCard()
+        return
+      }
+      newTrip['mpToken'] = mpToken
+      newTrip['cardId'] = cardId
     }
 
     Session.setLocal('lastTrip', newTrip)
