@@ -202,6 +202,7 @@ export const Config = () => {
   }, []);
 
   const updateFee = async () => {
+    setLoading(true);
     api
       .post("central/fee", {
         isByKm: fee.isByKm,
@@ -212,9 +213,10 @@ export const Config = () => {
             : Number(Mask.setRemoveMaskMoney(fee.returnFee)),
       })
       .then(({ data }) => {
+        setLoading(false);
         if (!data.status) {
           setMessageAlert(
-            "Ocorreu um erro ao atualizar a taxa, tente novamente"
+            data?.message || "Ocorreu um erro ao atualizar a taxa, tente novamente"
           );
           setTypeAlert("error");
           setShowAlert(true);
@@ -223,6 +225,12 @@ export const Config = () => {
 
         setMessageAlert("Taxa atualizada com sucesso!");
         setTypeAlert("success");
+        setShowAlert(true);
+      })
+      .catch(() => {
+        setLoading(false);
+        setMessageAlert("Falha de rede ao atualizar a taxa");
+        setTypeAlert("error");
         setShowAlert(true);
       });
   };
@@ -237,7 +245,8 @@ export const Config = () => {
         setLoading(false);
         if (!data.status) {
           setMessageAlert(
-            "Ocorreu um erro ao atualizar a configuração, tente novamente"
+            data?.message ||
+              "Ocorreu um erro ao atualizar a configuração, tente novamente"
           );
           setTypeAlert("error");
           setShowAlert(true);
@@ -246,6 +255,12 @@ export const Config = () => {
 
         setMessageAlert("Configuração atualizada com sucesso!");
         setTypeAlert("success");
+        setShowAlert(true);
+      })
+      .catch(() => {
+        setLoading(false);
+        setMessageAlert("Falha de rede ao atualizar a configuração");
+        setTypeAlert("error");
         setShowAlert(true);
       });
   };
@@ -259,7 +274,7 @@ export const Config = () => {
           paymentFormId: 1,
         },
         {
-          isActive: 0,
+          isActive: pix,
           paymentFormId: 4,
         },
       ])
@@ -267,7 +282,8 @@ export const Config = () => {
         setLoading(false);
         if (!data.status) {
           setMessageAlert(
-            "Ocorreu um erro ao atualizar a configuração, tente novamente"
+            data?.message ||
+              "Ocorreu um erro ao atualizar a configuração, tente novamente"
           );
           setTypeAlert("error");
           setShowAlert(true);
@@ -277,16 +293,27 @@ export const Config = () => {
         setMessageAlert("Configuração atualizada com sucesso!");
         setTypeAlert("success");
         setShowAlert(true);
+      })
+      .catch(() => {
+        setLoading(false);
+        setMessageAlert("Falha de rede ao atualizar a forma de pagamento");
+        setTypeAlert("error");
+        setShowAlert(true);
       });
   };
 
   const changeValue = async (index: number, value: boolean) => {
     setMonitoring(!monitoring);
-    callTypes[index].isActive = value === true ? 1 : 0;
-    setCallTypes(callTypes);
+    const nextActive = value ? 1 : 0;
+    const nextCallTypes = callTypes.map((item, i) =>
+      i === index ? { ...item, isActive: nextActive } : item
+    );
+    setCallTypes(nextCallTypes);
 
-    changeCallType[index].isActive = value;
-    setChangeCallType(changeCallType);
+    const nextChange = changeCallType.map((item: any, i: number) =>
+      i === index ? { ...item, isActive: nextActive } : item
+    );
+    setChangeCallType(nextChange);
   };
 
   const updateCallType = async () => {
@@ -297,7 +324,8 @@ export const Config = () => {
         setLoading(false);
         if (!data.status) {
           setMessageAlert(
-            "Ocorreu um erro ao atualizar a configuração, tente novamente"
+            data?.message ||
+              "Ocorreu um erro ao atualizar a configuração, tente novamente"
           );
           setTypeAlert("error");
           setShowAlert(true);
@@ -306,6 +334,12 @@ export const Config = () => {
 
         setMessageAlert("Configuração atualizada com sucesso!");
         setTypeAlert("success");
+        setShowAlert(true);
+      })
+      .catch(() => {
+        setLoading(false);
+        setMessageAlert("Falha de rede ao atualizar tipos de chamado");
+        setTypeAlert("error");
         setShowAlert(true);
       });
   };
@@ -499,11 +533,14 @@ export const Config = () => {
           >
             <div style={{ display: "block" }}>
               <div style={{ marginBottom: 15 }}>
-                <Radio.Group defaultValue={configFinish === "1" ? "1" : "0"}>
-                  <Radio key="1" value="1" onClick={() => setConfigFinish("1")}>
+                <Radio.Group
+                  value={configFinish === "1" ? "1" : "0"}
+                  onChange={(e) => setConfigFinish(String(e.target.value))}
+                >
+                  <Radio key="1" value="1">
                     Ativar
                   </Radio>
-                  <Radio key="0" value="0" onClick={() => setConfigFinish("0")}>
+                  <Radio key="0" value="0">
                     Desativar
                   </Radio>
                 </Radio.Group>
@@ -551,7 +588,7 @@ export const Config = () => {
                   return (
                     <Checkbox
                       key={item.id}
-                      checked={item.isActive === 1}
+                      checked={Number(item.isActive) === 1}
                       onChange={(e) => {
                         changeValue(index, e.target.checked);
                       }}

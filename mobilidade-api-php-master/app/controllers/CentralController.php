@@ -1854,59 +1854,271 @@ class CentralController extends ApiController
         echo json_encode(['status' => true, 'response' => [], 'data' => []]);
     }
 
+    public function actionPriceRange()
+    {
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $cityId = isset($_GET['cityId']) ? (int)$_GET['cityId'] : 0;
+
+            if ($method === 'DELETE') {
+                $id = (int)($_GET['id'] ?? 0);
+                if ($id <= 0) {
+                    $parts = explode('/', trim(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/'));
+                    $id = (int)end($parts);
+                }
+                $pdo->prepare("UPDATE priceRange SET statusId = 2, updated_at = NOW() WHERE id = :id")
+                    ->execute([':id' => $id]);
+                echo $this->returnSuccess('Faixa removida', true);
+                return;
+            }
+
+            if ($method === 'POST' || $method === 'PUT') {
+                $raw = file_get_contents('php://input');
+                $data = json_decode($raw, true) ?: $_POST;
+                $ins = $pdo->prepare("
+                    INSERT INTO priceRange (cityId, tripTypeId, description, min_value, max_value, new_value, statusId, created_at, updated_at)
+                    VALUES (:cityId, :tripTypeId, :description, :min_value, :max_value, :new_value, 1, NOW(), NOW())
+                ");
+                $ins->execute([
+                    ':cityId' => (int)($data['cityId'] ?? $cityId),
+                    ':tripTypeId' => (int)($data['tripTypeId'] ?? 0),
+                    ':description' => (string)($data['description'] ?? ''),
+                    ':min_value' => (float)($data['min_value'] ?? 0),
+                    ':max_value' => (float)($data['max_value'] ?? 0),
+                    ':new_value' => (float)($data['new_value'] ?? 0),
+                ]);
+                echo $this->returnSuccess('Faixa criada', ['id' => (int)$pdo->lastInsertId()]);
+                return;
+            }
+
+            $sql = "
+                SELECT pr.id, pr.cityId, pr.tripTypeId, pr.description, pr.min_value, pr.max_value, pr.new_value, pr.statusId
+                FROM priceRange pr
+                WHERE pr.statusId = 1
+            ";
+            $params = [];
+            if ($cityId > 0) {
+                $sql .= " AND pr.cityId = :cityId";
+                $params[':cityId'] = $cityId;
+            }
+            $sql .= " ORDER BY pr.id DESC";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            echo $this->returnSuccess('Faixas encontradas', $rows);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao processar faixa de preço');
+        }
+    }
+
+    public function actionFee()
+    {
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        try {
+            if ($method === 'POST' || $method === 'PUT') {
+                $raw = file_get_contents('php://input');
+                $data = json_decode($raw, true);
+                if (!is_array($data) || empty($data)) {
+                    $data = $_POST;
+                }
+
+                $pdo = Connection::open(Connection::DB_MYSQL);
+                $pdo->prepare("UPDATE centralFee SET statusId = 2 WHERE statusId = 1")->execute();
+
+                $returnFee = isset($data['returnFee']) ? (float)$data['returnFee'] : 0;
+                $isByKm = !empty($data['isByKm']) ? 1 : 0;
+                $paidByCentral = !empty($data['paidByCentral']) ? 1 : 0;
+
+                $ins = $pdo->prepare("
+                    INSERT INTO centralFee (returnFee, isByKm, paidByCentral, statusId, created_at, updated_at)
+                    VALUES (:returnFee, :isByKm, :paidByCentral, 1, NOW(), NOW())
+                ");
+                $ins->execute([
+                    ':returnFee' => $returnFee,
+                    ':isByKm' => $isByKm,
+                    ':paidByCentral' => $paidByCentral,
+                ]);
+
+                echo $this->returnSuccess('Taxa atualizada', [
+                    'id' => (int)$pdo->lastInsertId(),
+                    'returnFee' => $returnFee,
+                    'isByKm' => (bool)$isByKm,
+                    'paidByCentral' => (bool)$paidByCentral,
+                    'statusId' => 1,
+                ]);
+                return;
+            }
+
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $stmt = $pdo->query("SELECT id, returnFee, isByKm, paidByCentral, statusId FROM centralFee WHERE statusId = 1 ORDER BY id DESC LIMIT 1");
+            $fee = $stmt ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
+            if (!$fee) {
+                $fee = [
+                    'id' => 0,
+                    'returnFee' => 0.0,
+                    'isByKm' => false,
+                    'paidByCentral' => false,
+                    'statusId' => 1,
+                ];
+            } else {
+                $fee['id'] = (int)$fee['id'];
+                $fee['returnFee'] = (float)$fee['returnFee'];
+                $fee['isByKm'] = (bool)(int)$fee['isByKm'];
+                $fee['paidByCentral'] = (bool)(int)$fee['paidByCentral'];
+                $fee['statusId'] = (int)$fee['statusId'];
+            }
+            echo $this->returnSuccess('Taxa da central recuperada', $fee);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao processar taxa da central');
+        }
+    }
+
+    public function actionVoucherPurchasePaymentFindAll()
+    {
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL_RO);
+            $stmt = $pdo->query("
+                SELECT
+                    cvp.id,
+                    cvp.paymentFormId,
+                    cvp.isActive,
+                    pf.name AS name
+                FROM centralVoucherPurchasePayment cvp
+                JOIN paymentForm pf ON pf.idPaymentForm = cvp.paymentFormId
+                WHERE cvp.statusId = 1
+            ");
+            $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            foreach ($rows as &$row) {
+                $row['id'] = (int)$row['id'];
+                $row['paymentFormId'] = (int)$row['paymentFormId'];
+                $row['isActive'] = (int)$row['isActive'];
+            }
+            echo $this->returnSuccess('Formas de pagamento encontradas', $rows);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao listar formas de pagamento');
+        }
+    }
+
+    public function actionVoucherPurchasePaymentUpdatePaymentForm()
+    {
+        try {
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true);
+            if (!is_array($data)) {
+                $data = $_POST;
+            }
+            // Axios pode enviar array raiz; Laravel/PHP às vezes embrulha
+            if (isset($data[0]) && is_array($data[0])) {
+                $items = $data;
+            } elseif (isset($data['data']) && is_array($data['data'])) {
+                $items = $data['data'];
+            } else {
+                $items = array_values(array_filter($data, 'is_array'));
+            }
+
+            if (empty($items)) {
+                echo $this->returnError(new Exception('Payload inválido'), 'Nenhum pagamento enviado');
+                return;
+            }
+
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $upd = $pdo->prepare("
+                UPDATE centralVoucherPurchasePayment
+                SET isActive = :isActive, updated_at = NOW()
+                WHERE paymentFormId = :paymentFormId AND statusId = 1
+            ");
+            foreach ($items as $item) {
+                if (!isset($item['paymentFormId'])) {
+                    continue;
+                }
+                $upd->execute([
+                    ':isActive' => !empty($item['isActive']) ? 1 : 0,
+                    ':paymentFormId' => (int)$item['paymentFormId'],
+                ]);
+            }
+
+            echo $this->returnSuccess('Formas de pagamento atualizadas', true);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao atualizar formas de pagamento');
+        }
+    }
+
     public function actionCentralCallTypesFindAll()
     {
         $this->actionCentralCallTypes();
+    }
+
+    public function actionCentralCallTypesUpdate()
+    {
+        try {
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true);
+            if (!is_array($data)) {
+                $data = $_POST;
+            }
+            $items = isset($data[0]) ? $data : array_values(array_filter($data, 'is_array'));
+
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $upd = $pdo->prepare("
+                UPDATE centralCallTypeConfig
+                SET isActive = :isActive, updated_at = NOW()
+                WHERE centralCallTypeId = :centralCallTypeId
+            ");
+            foreach ($items as $item) {
+                if (!isset($item['centralCallTypeId'])) {
+                    continue;
+                }
+                $upd->execute([
+                    ':isActive' => !empty($item['isActive']) ? 1 : 0,
+                    ':centralCallTypeId' => (int)$item['centralCallTypeId'],
+                ]);
+            }
+            echo $this->returnSuccess('Tipos de chamado atualizados', true);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao atualizar tipos de chamado');
+        }
     }
 
     public function actionCentralCallTypes()
     {
         try {
             $pdo = Connection::open(Connection::DB_MYSQL_RO);
-            $stmt = $pdo->query("SELECT id, name, active FROM centralCallType WHERE active = 1");
-            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $pdo->query("
+                SELECT
+                    ctc.id,
+                    ctc.centralCallTypeId,
+                    ctc.isActive,
+                    ct.name AS name
+                FROM centralCallTypeConfig ctc
+                JOIN centralCallType ct ON ct.id = ctc.centralCallTypeId
+            ");
+            $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
             $callTypes = [];
             if (!empty($rows)) {
                 foreach ($rows as $r) {
                     $callTypes[] = [
-                        'centralCallTypeId' => (int)$r['id'],
                         'id' => (int)$r['id'],
+                        'centralCallTypeId' => (int)$r['centralCallTypeId'],
                         'name' => $r['name'],
-                        'isActive' => (bool)$r['active']
+                        'isActive' => (int)$r['isActive'],
                     ];
                 }
             } else {
                 $callTypes = [
-                    ['centralCallTypeId' => 1, 'id' => 1, 'name' => 'Procurar Cliente', 'isActive' => true],
-                    ['centralCallTypeId' => 2, 'id' => 2, 'name' => 'Chamar para Central', 'isActive' => true],
-                    ['centralCallTypeId' => 3, 'id' => 3, 'name' => 'Procurar Motorista', 'isActive' => true]
+                    ['centralCallTypeId' => 1, 'id' => 1, 'name' => 'Procurar Cliente', 'isActive' => 1],
+                    ['centralCallTypeId' => 2, 'id' => 2, 'name' => 'Chamar para Central', 'isActive' => 1],
+                    ['centralCallTypeId' => 3, 'id' => 3, 'name' => 'Procurar Motorista', 'isActive' => 1],
                 ];
             }
 
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode([
-                'status' => true,
-                'message' => 'Tipos de chamada encontrados',
-                'response' => $callTypes,
-                'data' => $callTypes,
-                'errors' => null
-            ]);
+            echo $this->returnSuccess('Tipos de chamada encontrados', $callTypes);
         } catch (\Throwable $e) {
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode([
-                'status' => true,
-                'response' => [
-                    ['centralCallTypeId' => 1, 'id' => 1, 'name' => 'Procurar Cliente', 'isActive' => true],
-                    ['centralCallTypeId' => 2, 'id' => 2, 'name' => 'Chamar para Central', 'isActive' => true],
-                    ['centralCallTypeId' => 3, 'id' => 3, 'name' => 'Procurar Motorista', 'isActive' => true]
-                ],
-                'data' => [
-                    ['centralCallTypeId' => 1, 'id' => 1, 'name' => 'Procurar Cliente', 'isActive' => true],
-                    ['centralCallTypeId' => 2, 'id' => 2, 'name' => 'Chamar para Central', 'isActive' => true],
-                    ['centralCallTypeId' => 3, 'id' => 3, 'name' => 'Procurar Motorista', 'isActive' => true]
-                ],
-                'errors' => null
+            echo $this->returnSuccess('Tipos de chamada padrão', [
+                ['centralCallTypeId' => 1, 'id' => 1, 'name' => 'Procurar Cliente', 'isActive' => 1],
+                ['centralCallTypeId' => 2, 'id' => 2, 'name' => 'Chamar para Central', 'isActive' => 1],
+                ['centralCallTypeId' => 3, 'id' => 3, 'name' => 'Procurar Motorista', 'isActive' => 1],
             ]);
         }
     }

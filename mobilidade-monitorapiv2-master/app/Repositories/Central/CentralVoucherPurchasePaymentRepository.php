@@ -29,11 +29,21 @@ class CentralVoucherPurchasePaymentRepository extends AbstractRepository
 
     public function updateVoucherPurchasePaymentForm(array $data)
     {
+        // Aceita array raiz [{...}] ou payload embrulhado
+        if (isset($data['paymentFormId'])) {
+            $data = [$data];
+        } elseif (!isset($data[0]) && isset($data['data']) && is_array($data['data'])) {
+            $data = $data['data'];
+        }
+
         foreach ($data as $item) {
+            if (!is_array($item) || !isset($item['paymentFormId'])) {
+                continue;
+            }
             $this->getModel()
                 ::where('paymentFormId', $item['paymentFormId'])
                 ->update([
-                    'isActive' => $item['isActive']
+                    'isActive' => !empty($item['isActive']) ? 1 : 0
                 ]);
         }
 
