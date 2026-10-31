@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import * as Notifications from 'expo-notifications';
 import { useTripProvider } from '../../context/Trip';
 import { useAuth } from '../../../../context/auth';
@@ -17,6 +17,23 @@ export const TripNotificationListener = () => {
 
   const { userDriverFind, setUserDriverFind } = useUserDriver();
   const { cityConfig } = useAuth();
+  const hasFetchedLaunchResponse = useRef(false);
+  const processedNoticesRef = useRef<Set<string>>(new Set());
+  const tripRef = useRef(trip);
+  const userDriverRef = useRef(userDriverFind);
+  const cityConfigRef = useRef(cityConfig);
+
+  useEffect(() => {
+    tripRef.current = trip;
+  }, [trip]);
+
+  useEffect(() => {
+    userDriverRef.current = userDriverFind;
+  }, [userDriverFind]);
+
+  useEffect(() => {
+    cityConfigRef.current = cityConfig;
+  }, [cityConfig]);
 
   const handleNotificationResponse = async (response: Notifications.NotificationResponse) => {
     const rawData = response?.notification?.request?.content?.data ?? {};
@@ -31,10 +48,13 @@ export const TripNotificationListener = () => {
     } catch {}
 
     const actionIdentifier = response.actionIdentifier;
+    const currentTripState = tripRef.current;
+    const currentUser = userDriverRef.current;
+    const currentCityConfig = cityConfigRef.current;
 
     if (actionIdentifier === 'accept') {
-      const currentTrip = trip?.tripReference ? trip : notificationData;
-      const currentDriverId = userDriverFind?.idDriver;
+      const currentTrip = currentTripState?.tripReference ? currentTripState : notificationData;
+      const currentDriverId = currentUser?.idDriver;
 
       if (!currentTrip?.tripReference || !currentDriverId) {
         return;
@@ -57,25 +77,29 @@ export const TripNotificationListener = () => {
       );
 
       const updatedUser = {
-        ...userDriverFind,
+        ...currentUser,
         status: 'corrida' as DriverStatusType,
       };
       setUserDriverFind(updatedUser);
 
       const currentLocation =
-        userDriverFind?.latitude && userDriverFind?.longitude
-          ? { latitude: userDriverFind.latitude, longitude: userDriverFind.longitude }
+        currentUser?.latitude && currentUser?.longitude
+          ? { latitude: currentUser.latitude, longitude: currentUser.longitude }
           : undefined;
 
-      emitDriverStatusChange(updatedUser, 'corrida', cityConfig, currentLocation);
+      emitDriverStatusChange(updatedUser, 'corrida', currentCityConfig, currentLocation);
 
-      const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
+      const configCityId = currentCityConfig?.cityId ? String(currentCityConfig.cityId) : undefined;
       emitTripStatusChange(currentTrip.tripReference, 'accepted', configCityId);
     }
 
     if (actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
       const notice = readRideCallNotice(notificationData) || readRideCallNotice(rawData);
       if (!notice) return;
+
+      const dedupeKey = `tap:${notice.userId}:${notice.callType || ''}`;
+      if (processedNoticesRef.current.has(dedupeKey)) return;
+      processedNoticesRef.current.add(dedupeKey);
 
       dispatchTrip({
         type: 'update',
@@ -86,12 +110,14 @@ export const TripNotificationListener = () => {
   };
 
   useEffect(() => {
-    // Verificar se app foi aberto por toque em notificação
-    Notifications.getLastNotificationResponseAsync().then((lastResponse) => {
-      if (lastResponse) {
-        handleNotificationResponse(lastResponse);
-      }
-    });
+    if (!hasFetchedLaunchResponse.current) {
+      hasFetchedLaunchResponse.current = true;
+      Notifications.getLastNotificationResponseAsync().then((lastResponse) => {
+        if (lastResponse) {
+          handleNotificationResponse(lastResponse);
+        }
+      });
+    }
 
     const responseSubscription = Notifications.addNotificationResponseReceivedListener(
       handleNotificationResponse,
@@ -111,13 +137,17 @@ export const TripNotificationListener = () => {
         } catch {}
 
         const notice = readRideCallNotice(parsedData) || readRideCallNotice(data);
-        if (notice) {
-          dispatchTrip({
-            type: 'update',
-            field: 'notificationTripCallRequest',
-            arg: { userId: notice.userId, callType: notice.callType },
-          });
-        }
+        if (!notice) return;
+
+        const dedupeKey = `recv:${notice.userId}:${notice.callType || ''}:${notification?.request?.identifier || ''}`;
+        if (processedNoticesRef.current.has(dedupeKey)) return;
+        processedNoticesRef.current.add(dedupeKey);
+
+        dispatchTrip({
+          type: 'update',
+          field: 'notificationTripCallRequest',
+          arg: { userId: notice.userId, callType: notice.callType },
+        });
       },
     );
 
@@ -125,7 +155,7 @@ export const TripNotificationListener = () => {
       responseSubscription.remove();
       receivedSubscription.remove();
     };
-  }, [userDriverFind?.idDriver, trip?.tripReference, cityConfig]);
+  }, []);
 
   return null;
 };

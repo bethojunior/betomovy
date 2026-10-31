@@ -81,8 +81,14 @@ export const V1 = ({
     }
 
     try {
-      mountSong(null, true, 'soundCallOnline').then((sound) => {
-        sound?.playAsync();
+      // Som curto de "ficou online" — nunca em loop e nunca o assobio de chamada
+      mountSong(null, true, 'soundCallOnline').then(async (sound) => {
+        if (!sound) return;
+        await sound.setIsLoopingAsync(false);
+        const status = await sound.getStatusAsync();
+        if (status?.isLoaded) {
+          await sound.playAsync();
+        }
       });
     } catch (e) {}
 
