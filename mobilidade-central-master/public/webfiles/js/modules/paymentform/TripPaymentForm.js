@@ -78,6 +78,9 @@ function openPaymentForm() {
         Route.backPage();
     }
 
+    // Atualizar a lista de formas de pagamento para garantir itens frescos e eventos vinculados
+    getPaymentForm();
+
     Route.startClassesInComponent([{component:".footer-payment-form",class:"active"}],
         ()=>{
             viewController.elementProperty.removeClass(".footer-payment-form","active");
@@ -85,7 +88,10 @@ function openPaymentForm() {
 }
 
 function closePaymentForm() {
-    Route.backPage();
+    viewController.elementProperty.removeClass(".footer-payment-form", "active");
+    if (typeof Route !== "undefined" && typeof Route.backPage === "function") {
+        Route.backPage();
+    }
 }
 
 function showPaymentForm() {
@@ -215,8 +221,12 @@ function getPaymentForm(callback) {
                 if (name.includes('pix') || desc.includes('pix')) return false;
                 if (payment.paymentFormTypeId === 12) return false;
 
-                // Permitir apenas Dinheiro (2), Pagamento no Local (4) e Voucher Central (11)
-                return payment.paymentFormTypeId === 2 || payment.paymentFormTypeId === 4 || payment.paymentFormTypeId === 11;
+                // Permitir Voucher (1), Dinheiro/Cash (2), Cartão/Stripe (3), Pagamento no Local (4), Central Cash/Voucher Central (11)
+                return payment.paymentFormTypeId === 1 ||
+                       payment.paymentFormTypeId === 2 || 
+                       payment.paymentFormTypeId === 3 || 
+                       payment.paymentFormTypeId === 4 || 
+                       payment.paymentFormTypeId === 11;
             }).map(payment => {
                 let cleanName = (payment.name || '').replace(/\s*(ou|\/|\+)?\s*pix\b/gi, '').trim();
                 return {
@@ -225,16 +235,32 @@ function getPaymentForm(callback) {
                 };
             });
 
+            const currentSelected = Session.getLocal("paymentForm");
+            const currentId = currentSelected ? currentSelected.idTripPaymentForm : null;
+
             element.innerHTML = filteredPayments.map(payment => {
-                return `<li class="payment-form-trip" 
+                const isActive = (currentId && payment.idTripPaymentForm === currentId) ? 'active' : '';
+                const iconClass = payment.paymentFormTypeId === 3 
+                    ? 'fa fa-credit-card' 
+                    : (payment.paymentFormTypeId === 1 || payment.paymentFormTypeId === 11 ? 'fa fa-ticket' : 'fa fa-money');
+
+                return `<li class="payment-form-trip ${isActive}" 
                             value="${payment.idTripPaymentForm}" 
-                            payment='${JSON.stringify(payment)}'>
-                        <i class="fa fa-money"></i>
+                            payment='${JSON.stringify(payment).replace(/'/g, "&apos;")}'>
+                        <i class="${iconClass}"></i>
                         <p>${payment.name}</p>
                      </li>`;
             }).join("");
 
-            callback();
+            // Associar evento click a cada item da lista diretamente
+            const items = element.querySelectorAll('.payment-form-trip');
+            items.forEach(item => {
+                item.onclick = function() {
+                    managerTrip.paymentFormIdSelected = getPaymentFormSelect(this);
+                };
+            });
+
+            if (callback) callback();
         });
     }).catch((e) => {
         //console.log(e)
