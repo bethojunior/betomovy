@@ -958,13 +958,39 @@ function searchByPlace(placeType) {
 }
 
 function initEventSearchPlace() {
-  viewController.elementProperty.addEventInElement('.select-type-place', 'onclick', function () {
+  function handleSelectPlace(element) {
+    const placeType = element.getAttribute('place') || 'origin'
     viewController.elementProperty.addClass('.container-search-local', 'active')
     updateBtnCallTripVisibility()
-    Session.setLocal('getPositionPlaceSelected', this.getAttribute('place'))
-    searchByPlace(this.getAttribute('place'))
-    viewController.elementProperty.getElement('.search-address-location', (element) => {
-      setTimeout(() => element.focus(), 300)
+    Session.setLocal('getPositionPlaceSelected', placeType)
+    searchByPlace(placeType)
+    const searchInput = document.querySelector('.search-address-location')
+    if (searchInput) {
+      if (placeType === 'origin') {
+        searchInput.setAttribute('placeholder', 'Digite o local de partida...')
+      } else if (placeType === 'destination') {
+        searchInput.setAttribute('placeholder', 'Digite para onde você vai...')
+      } else {
+        searchInput.setAttribute('placeholder', 'Digite o endereço...')
+      }
+      setTimeout(() => {
+        searchInput.focus()
+        if (searchInput.value) {
+          searchInput.select()
+        }
+      }, 150)
+    }
+  }
+
+  viewController.elementProperty.addEventInElement('.select-type-place', 'onclick', function (e) {
+    if (e && e.stopPropagation) e.stopPropagation()
+    handleSelectPlace(this)
+  })
+
+  // Fallback direto via addEventListener para garantir resposta imediata a cliques e toques
+  document.querySelectorAll('.select-type-place').forEach((el) => {
+    el.addEventListener('click', function (e) {
+      handleSelectPlace(this)
     })
   })
 
