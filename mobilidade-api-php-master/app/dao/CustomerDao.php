@@ -1143,6 +1143,18 @@ class CustomerDao extends BaseDao
             );
 
 
+            $callingIds = [];
+            foreach (($result['resultDrivers'] ?? []) as $foundDriver) {
+                $foundId = $foundDriver->driverId ?? $foundDriver->idDriver ?? $foundDriver->id ?? null;
+                if ($foundId) {
+                    $callingIds[] = (string)$foundId;
+                }
+            }
+            $callingIds = array_values(array_unique($callingIds));
+            if (!empty($callingIds)) {
+                $trip->callingDriver = implode(',', $callingIds);
+            }
+
             $this->tripRealtime
                 ->setBlockedDrivers($blockedDrivers)
                 ->hydrate($trip)

@@ -336,6 +336,28 @@ class TripDao extends BaseDao
                     if (!isset($tripObj->date)) {
                         $tripObj->date = now();
                     }
+
+                    // O app do motorista só toca se callingDriver contiver o id dele.
+                    // Grava de novo depois do commit e manda no realtime na hora, sem esperar o trip-call.
+                    $callingIds = [];
+                    foreach (($driversCalled['resultDrivers'] ?? []) as $foundDriver) {
+                        $foundId = $foundDriver->driverId ?? $foundDriver->idDriver ?? $foundDriver->id ?? null;
+                        if ($foundId) {
+                            $callingIds[] = (string)$foundId;
+                        }
+                    }
+                    $callingIds = array_values(array_unique($callingIds));
+                    if (!empty($callingIds)) {
+                        $callingCsv = implode(',', $callingIds);
+                        $tripObj->callingDriver = $callingCsv;
+                        try {
+                            (new \app\services\TripDriversService())
+                                ->updateCallingDriverTrip($this->trip->getTripReference(), $callingCsv);
+                        } catch (\Throwable $t) {
+                            (new LogDao())->logException($t);
+                        }
+                    }
+
                     (new \app\realtime\TripRealtime())
                         ->hydrate($tripObj)
                         ->createTrip();
