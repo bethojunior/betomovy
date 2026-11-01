@@ -11,7 +11,7 @@ import IconGoogle from '../../../assets/images/google.svg';
 import IconFacebook from '../../../assets/images/facebook.svg';
 import IconApple from '../../../assets/images/apple-logo.svg';
 import apiMain from '../../../api/apiMain';
-import logo from '../../../../../assets/logo.png';
+import logo from '../../../../../assets/logo-on-dark.png';
 import Preload from '../../../components/Preload';
 import { translate } from '../../../locales';
 import {

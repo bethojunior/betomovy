@@ -165,7 +165,7 @@
   },
   "private": true,
   "name": "client-app-v2",
-  "version": "8.2.2",
+  "version": "8.3.4",
   "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {

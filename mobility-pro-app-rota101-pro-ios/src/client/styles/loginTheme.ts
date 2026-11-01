@@ -1,5 +1,4 @@
 import {RFValue} from 'react-native-responsive-fontsize';
-import {buildApp} from '../../constantBuild/config';
 
 export default {
   colors: {
@@ -129,6 +128,7 @@ export default {
     xlarge: '0px 8px 16px rgba(0,0,0,0.4)',
   },
   images: {
-    logo: buildApp().HOST_IMAGE_LOGO,
+    // Logo local do app (splash/login). Não usar URL remota aqui.
+    logo: null as string | null,
   },
 };

@@ -365,11 +365,7 @@ export default function Login() {
               <Content>
                 <ContentImage>
                   <Logo
-                    source={
-                      loginTheme.images.logo
-                        ? { uri: loginTheme.images.logo }
-                        : logo
-                    }
+                    source={logo}
                     resizeMode="contain"
                   />
                 </ContentImage>

@@ -97,7 +97,7 @@
     "android": {
       "package": "br.com.client.rota101",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 80304,
+      "versionCode": 80305,
       "edgeToEdgeEnabled": true,
       "config": {
         "googleMaps": {
