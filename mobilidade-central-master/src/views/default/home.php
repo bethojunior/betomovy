@@ -185,49 +185,55 @@
         </div><!-- /search-driver-in-trip -->
 
         <div class="trip-client">
-            <div class="info-trip">
-                <div class="info-option-trip">
-                    <p>Alguma informação sobre o ponto seu embarque ou compartilhar sua viagem?</p>
-                    <a><i class="material-icons" id="optionTrip">
-                            arrow_drop_down
-                        </i></a>
-                </div>
-                <ul class="options-trip">
-                    <li>
-                        <i class="material-icons">
-                            place
-                        </i>
-                        <p>Mudar local</p>
-                    </li>
-                    <li id="shareTripApp">
-                        <i class="material-icons">
-                            share
-                        </i>
-                        <p>Compartilhar viagem</p>
-                    </li>
-                </ul>
-            </div>
-            <footer>
-                <div id="zoomInRoute" class="option-gps-route">
-                    <i class="material-icons">
-                        gps_fixed
-                    </i>
-                </div>
-                <div class="data-trip">
-                    <div id="dataTripInfo">
-                        <div class="image-profile-driver">
-                            <div id="nameDriver" class="name-driver-trip"></div>
+            <div class="trip-client-card" id="tripClientCard">
+                <header class="trip-client-card-header">
+                    <span class="trip-client-badge">
+                        <i class="material-icons">directions_car</i> Motorista a caminho
+                    </span>
+                    <button type="button" class="trip-client-btn-close" id="btnMinimizeTripClient" aria-label="Fechar ou recolher">
+                        <i class="material-icons">expand_more</i>
+                    </button>
+                </header>
+
+                <div class="trip-client-driver-row">
+                    <div class="trip-client-avatar-wrapper">
+                        <div class="image-profile-driver"></div>
+                    </div>
+                    <div class="trip-client-driver-details">
+                        <h3 id="nameDriver" class="name-driver-trip">Motorista</h3>
+                        <div class="trip-client-car-plate-badge">
+                            <span id="carPlateDriver" class="car-plate-driver">---</span>
                         </div>
-                        <div class="info-data-driver">
-                            <div>
-                                <b id="carPlateDriver" class="car-plate-driver"></b>
-                                <p id="carBrandDriver" class="car-brand-driver"></p>
-                            </div>
-                            <div class="description-title">MOVY &bull; Central de Mobilidade Inteligente</div>
+                        <p id="carBrandDriver" class="car-brand-driver"></p>
+                    </div>
+                </div>
+
+                <div class="trip-client-route-preview">
+                    <div class="trip-client-route-item origin">
+                        <span class="route-dot origin"></span>
+                        <div class="route-text">
+                            <label>Embarque</label>
+                            <p id="tripClientOriginText">Local de partida</p>
+                        </div>
+                    </div>
+                    <div class="trip-client-route-item destination">
+                        <span class="route-dot destination"></span>
+                        <div class="route-text">
+                            <label>Destino</label>
+                            <p id="tripClientDestText">Destino da viagem</p>
                         </div>
                     </div>
                 </div>
-            </footer>
+
+                <div class="trip-client-actions">
+                    <button type="button" class="trip-client-action-btn btn-share" id="shareTripApp">
+                        <i class="material-icons">share</i> Compartilhar
+                    </button>
+                    <button type="button" class="trip-client-action-btn btn-cancel-trip" id="cancelTrip">
+                        <i class="material-icons">close</i> Cancelar
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
     <div class="container-menu" id="containerMenu">

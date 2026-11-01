@@ -629,153 +629,285 @@ body {
     display: block;
 }
 
-.trip-client > footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background-color: var(--main-color);;
-    box-shadow: 0 -1px 10px #a4a4a4;
-    z-index: 10;
-}
-
-.trip-client > footer > div.description-title {
-    float: left;
-    width: calc(100% - 4vw);
-    color: var(--color-text-inverse);
-    background-color: var(--main-color);;
-    padding: 1vw 2vw;
-    font-weight: 600;
-    font-size: 4vw;
-    border-radius: 2vw 2vw 0 0;
-}
-
-.trip-client > footer > div.data-trip {
-    display: flex;
-    width: 100%;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.trip-client > footer > div.data-trip > div {
-    display: flex;
-    align-items: center;
-    margin: 1vw;
-    font-size: 3.5vw;
-    width: 100%;
-    overflow: hidden;
-    flex-direction: column;
-}
-
-.trip-client > footer > div.data-trip > div:last-child {
-    width: 100%;
-}
-
-.trip-client > footer > div.data-trip > div.contact-with-driver{
-    position:absolute;
-    right:0;
-    top: -7.5vw;
-    z-index:10;
-    background-color: var(--color-bg-surface);
-    width: 60%;
-    display: flex;
-    justify-content: space-around;
-    margin: 0;
-    border-radius: 4vw 0 0 4vw;
-    box-shadow: 0 0 10px #c1c1c1;
-    height: 15vw;
-}
-
-.trip-client > footer > div.data-trip > div > div {
-    margin: 0 1vw;
-}
-
-.trip-client > footer > div.data-trip > div > div.info-data-driver{
-    width:100%;
-    display:flex;
-    position:relative;
-    z-index: 10;
-    margin-top: 3vw;
-    border-top: 1px solid #fff;
-    padding-top: 2vw;
-    align-items: center;
-    justify-content: center;
-}
-
-.trip-client > footer > div.data-trip > div > div.info-data-driver > div:first-child{
-    width:40%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    color: var(--color-text-inverse);
-}
-
-.trip-client > footer > div.data-trip > div > div.info-data-driver > div > .car-plate-driver{
-    /* width: 50%; */
-    background-color: var(--color-bg-surface);
-    padding: 2vw;
-    display: block;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 4vw;
-    color: var(--color-primary-hover);
-    border: 1px solid #7d7d7d;
-}
-.trip-client > footer > div.data-trip > div > div.info-data-driver > div > p > span{
-    display:block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: center;
-    font-weight: bold;
-    font-family: sans-serif;
-}
-
-
-.trip-client > footer > div.data-trip > div > div.info-data-driver > div:last-child{
-    width:60%;
-    font-size: 5vw;
-    color: var(--color-text-inverse);
-    font-weight: 600;
+/* ── MODERNO CARD TRIP CLIENT (MOTORISTA A CAMINHO) ── */
+.trip-client {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 2100 !important;
     display: none;
+    pointer-events: none;
 }
 
-
-.trip-client > footer > div.data-trip > div > div > p,
-.trip-client > footer > div.data-trip > div > div > b {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.trip-client.active {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: flex-end;
+    pointer-events: auto;
 }
 
-.trip-client > footer > div.data-trip > div > .image-profile-driver {
-    width: 20vw;
-    height: 20vw;
-    border: 1px solid #fff;
-    border-radius: 100%;
-    margin: 1vw;
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    position: relative;
-    z-index: 10;
+.trip-client-card {
+    background: #ffffff;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.22);
+    padding: 20px 20px 28px;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    pointer-events: auto;
+    animation: slideUpTripClient 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpTripClient {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.trip-client-card-header {
     display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    box-shadow: 0 -1px 10px #a4a4a4;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.trip-client > footer > div.data-trip > div > .image-profile-driver > div{
-    background-color: var(--color-primary-hover);
-    color: var(--color-text-inverse);
-    width: 200px;
-    text-align:center;
-    border-radius:5px;
+.trip-client-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 9999px;
+}
+
+.trip-client-badge i {
+    font-size: 16px;
+}
+
+.trip-client-btn-close {
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #475569;
+    transition: 0.2s;
+}
+
+.trip-client-btn-close:hover {
+    background: #e2e8f0;
+}
+
+.trip-client-driver-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.trip-client-avatar-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.trip-client .image-profile-driver {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 50% !important;
+    border: 3px solid #2563eb !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+    background-color: #f1f5f9;
+}
+
+.trip-client-driver-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.trip-client-driver-details .name-driver-trip {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 0 4px !important;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.trip-client-car-plate-badge {
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+.trip-client-car-plate-badge .car-plate-driver {
+    display: inline-block !important;
+    background: #0f172a !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    padding: 3px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid #334155 !important;
+}
+
+.trip-client-driver-details .car-brand-driver {
+    font-size: 13px !important;
+    color: #64748b !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
+    font-weight: 500 !important;
+}
+
+.trip-client-driver-details .car-brand-driver span {
+    display: inline-block !important;
+    margin-right: 6px !important;
+}
+
+.trip-client-route-preview {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.trip-client-route-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.trip-client-route-item .route-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+}
+
+.trip-client-route-item .route-dot.origin {
+    background: #10b981;
+}
+
+.trip-client-route-item .route-dot.destination {
+    background: #2563eb;
+    border-radius: 2px;
+}
+
+.trip-client-route-item .route-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.trip-client-route-item .route-text label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.trip-client-route-item .route-text p {
+    font-size: 13px;
+    color: #1e293b;
+    font-weight: 600;
+    margin: 0;
     white-space: nowrap;
-    position: absolute;
-    bottom: -10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trip-client-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.trip-client-action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.trip-client-action-btn i {
+    font-size: 18px;
+}
+
+.trip-client-action-btn.btn-share {
+    background: #f1f5f9;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+}
+
+.trip-client-action-btn.btn-share:hover {
+    background: #e2e8f0;
+}
+
+.trip-client-action-btn.btn-cancel-trip {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.trip-client-action-btn.btn-cancel-trip:hover {
+    background: #fca5a5;
+    color: #991b1b;
+}
+
+@media (min-width: 992px) {
+    .trip-client {
+        position: fixed !important;
+        top: 64px !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        right: auto !important;
+        width: 390px !important;
+        display: none !important;
+    }
+
+    .trip-client.active {
+        display: block !important;
+    }
+
+    .trip-client-card {
+        border-radius: 0 !important;
+        height: 100% !important;
+        max-width: none !important;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12) !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
 }
 
 
@@ -1040,100 +1172,8 @@ body {
         cursor:pointer;
     }
 
-    .trip-client > footer{
-        width:30%;
-        height: unset;
-        bottom: unset;
-        left: 10px;
-        border-radius: 9px;
-        background-color: #123;
-        top: 10px;
-        right: 0;
-        left: 0;
-        margin: auto;
-    }
-
-    .trip-client > footer > div.data-trip > div > .image-profile-driver{
-        width: 50px;
-        top: 0;
-        position: relative;
-        box-shadow: 0 0 10px #3d3d3d;
-        height: 50px;
-    }
-
-    .trip-client > footer > div.data-trip > div > .image-profile-driver > div{
-        font-size: 10pt;
-        bottom: -31px;
-        background-color: var(--color-bg-surface);
-        border-radius: 5px;
-        color: var(--color-primary-hover);
-        padding: 1px 4px;
-    }
-    .trip-client > footer > div.data-trip > div > div.info-data-driver > div:last-child{
-        font-size:10pt;
-    }
-
-    .trip-client > footer > div.data-trip > div > div.info-data-driver > div > .car-plate-driver{
-        font-size:10pt;
-        padding: 10px 20px;
-        display: block;
-        margin: 12px auto;
-    }
-
-    .trip-client > footer > div.data-trip > div > div.info-data-driver{
-        flex: 1;
-        font-size:10pt;
-        margin-top: 0;
-        border: none;
-        width: 100%;
-        padding: 0;
-        margin: 10px 0 0;
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .trip-client > footer > div.data-trip > div.contact-with-driver > div, .trip-client > footer > div.data-trip > div.contact-with-driver > i{
-        font-size:20pt;
-        cursor: pointer;
-        height: 15px;
-    }
-
-    .trip-client > footer > div.data-trip > div.contact-with-driver{
-        height:unset;
-        border-radius: 10px;
-        top: unset;
-        position: relative;
-        width: 100%;
-        border-radius: 0 0 5px 5px;
-        box-shadow: none;
-        padding: 0;
-    }
-    .trip-client > footer > .option-gps-route{
-        padding: 13px;
-        top: -60px;
-        bottom: 0;
-        left: 10px;
-        cursor: pointer;
+    .trip-client > footer {
         display: none !important;
-    }
-    .trip-client > footer > div.data-trip > div > div.info-data-driver > div:first-child{
-        width:100%;
-    }
-
-    .trip-client > footer > div.data-trip > div > div.info-data-driver > div:last-child{
-        width:100%;
-        margin-top: 20px;
-        font-size: 12pt;
-        display: none;
-    }
-
-    .trip-client > footer > div.data-trip > div > div > img{
-        width:45%
-    }
-
-    .trip-client > footer > div.data-trip > div{
-        margin: 0;
-        padding: 1vw;
     }
 
     .form-data-passenger > div > i {

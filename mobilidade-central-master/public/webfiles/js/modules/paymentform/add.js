@@ -102,16 +102,19 @@
         }
 
         function saveCardStripe() {
-            customerCardController.insert(buildCardPayload()).then(({ status }) => {
+            customerCardController.insert(buildCardPayload()).then((res) => {
                 preload(false);
-                if (!status) {
-                    SwalCustom.messageDialog("", "Não foi possível adicionar o cartão !", undefined, "warning");
+                const ok = res && (res.status === true || res.status === 200 || res.status === 201);
+                if (!ok) {
+                    const msg = res?.message || (res?.response && (typeof res.response === 'string' ? res.response : Object.values(res.response).flat().join('\n'))) || "Não foi possível adicionar o cartão !";
+                    SwalCustom.messageDialog("", msg, undefined, "warning");
                     return;
                 }
                 onCardSaved();
-            }).catch(() => {
+            }).catch((err) => {
                 preload(false);
-                SwalCustom.messageDialog("", "Não foi possível adicionar o cartão !", undefined, "warning");
+                const msg = (typeof err === "string" ? err : err?.message) || "Não foi possível adicionar o cartão !";
+                SwalCustom.messageDialog("", msg, undefined, "warning");
             });
         }
 

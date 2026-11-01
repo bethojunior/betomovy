@@ -88,6 +88,13 @@ function initRace(trip) {
     viewController.elementProperty.getElement(".trip-client", element => {
         element.classList.add("active");
     });
+
+    viewController.elementProperty.addEventInElement("#btnMinimizeTripClient", "onclick", function () {
+        const card = document.querySelector(".trip-client-card");
+        if (card) {
+            card.classList.toggle("minimized");
+        }
+    });
     // viewController.elementProperty.getElement(".footer-container-trip", element => {
     //     element.classList.remove("active");
     // });
@@ -117,11 +124,27 @@ function initRace(trip) {
         element.innerHTML = `${brand} ${model} ${color}`.trim();
     });
     viewController.elementProperty.getElement(".image-profile-driver", element => {
-        if (driver.profileImage) {
-            element.style.backgroundImage = `url('${environment.hosts.hostImageDriver + driver.profileImage}')`;
+        let photoUrl = "";
+        const rawPhoto = driver.profileImage || driver.profileImageUrl || driver.driverImage || "";
+        if (rawPhoto) {
+            if (rawPhoto.startsWith("http://") || rawPhoto.startsWith("https://")) {
+                photoUrl = rawPhoto;
+            } else {
+                photoUrl = `https://minio.704app.com.br/rota101fb704/driver/profile/compressed/${rawPhoto}`;
+            }
+        }
+        if (photoUrl) {
+            element.style.backgroundImage = `url('${photoUrl}')`;
         } else {
             element.style.backgroundImage = `url('/webfiles/img/icon/default.png')`;
         }
+    });
+
+    viewController.elementProperty.getElement("#tripClientOriginText", element => {
+        element.innerHTML = trip.origin?.address || trip.originAddress || "Local de partida";
+    });
+    viewController.elementProperty.getElement("#tripClientDestText", element => {
+        element.innerHTML = trip.destination?.address || trip.destAddress || "Destino";
     });
     mapService.removeRoute();
 

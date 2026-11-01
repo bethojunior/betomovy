@@ -266,11 +266,11 @@ export const V1ModalCallTrip = ({
                     />
                     <ClientRating>
                       {/* @ts-ignore */}
-                      {parseFloat(trip?.ratingCustomer).toPrecision(2)} -{' '}
-                      {IsToShowField('quantityTripsCustomer', cityConfig)
-                        ? `${trip?.quantityTripsCustomer} ${translate(
-                          'callTrip.text_trip',
-                        )}`
+                      {Number.isFinite(parseFloat(trip?.ratingCustomer))
+                        ? parseFloat(trip?.ratingCustomer).toPrecision(2)
+                        : '5.0'}
+                      {IsToShowField('quantityTripsCustomer', cityConfig) && trip?.quantityTripsCustomer != null
+                        ? ` - ${trip?.quantityTripsCustomer} ${translate('callTrip.text_trip')}`
                         : ''}
                     </ClientRating>
                   </If>

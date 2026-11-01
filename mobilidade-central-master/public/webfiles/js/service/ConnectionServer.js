@@ -8,7 +8,20 @@ class ConnectionServer {
 
     const token = Session.getValueInSession("user", "api_token");
     const userId = Session.getValueInSession("user", "idUser");
-    const cityId = Session.getValueInSessionLocal("citySelected", "cityId");
+    let cityId = Session.getValueInSessionLocal("citySelected", "cityId")
+      || Session.getLocal("city-origin")
+      || Session.get("city-origin")
+      || Session.getLocal("city-destination")
+      || Session.get("city-destination")
+      || Session.getValueInSessionLocal("cityConfig", "cityId")
+      || Session.getValueInSessionLocal("cityConfig", "id");
+
+    if (!cityId) {
+      try {
+        const stored = JSON.parse(localStorage.getItem("cityConfig"));
+        if (stored?.cityId || stored?.id) cityId = stored.cityId || stored.id;
+      } catch (e) {}
+    }
 
     if (token && token !== "undefined" && token !== "null") {
       request.setRequestHeader("token", token);
