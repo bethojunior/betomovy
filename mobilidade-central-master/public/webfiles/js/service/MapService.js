@@ -92,16 +92,28 @@ class MapService {
     // ─── Criação e inicialização do mapa ─────────────────────────────────────
 
     initMap(id, position, callback = undefined) {
-        if (!position || isNaN(parseFloat(position.lat)) || isNaN(parseFloat(position.lng)) || (parseFloat(position.lat) === -3.7319 && parseFloat(position.lng) === -38.5267)) {
-            const centralSelected = Session.get('centralSelected');
-            if (centralSelected && !isNaN(parseFloat(centralSelected.latitude)) && parseFloat(centralSelected.latitude) !== 0 && parseFloat(centralSelected.latitude) !== -3.7319) {
-                position = { lat: parseFloat(centralSelected.latitude), lng: parseFloat(centralSelected.longitude) };
+        const bad = (lat, lng) =>
+            isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0) ||
+            (Math.abs(lat - -3.7319) < 0.0002 && Math.abs(lng - -38.5267) < 0.0002) ||
+            (Math.abs(lat - 42.40843) < 0.002 && Math.abs(lng - -71.0536625) < 0.002);
+
+        let lat = position ? parseFloat(position.lat) : NaN;
+        let lng = position ? parseFloat(position.lng) : NaN;
+        if (bad(lat, lng)) {
+            const saved = (typeof Session !== 'undefined') ? Session.getLocal('location') : null;
+            const centralSelected = (typeof Session !== 'undefined') ? Session.get('centralSelected') : null;
+            if (saved && !bad(parseFloat(saved.lat), parseFloat(saved.lng))) {
+                lat = parseFloat(saved.lat);
+                lng = parseFloat(saved.lng);
+            } else if (centralSelected && !bad(parseFloat(centralSelected.latitude), parseFloat(centralSelected.longitude))) {
+                lat = parseFloat(centralSelected.latitude);
+                lng = parseFloat(centralSelected.longitude);
             } else {
-                position = { lat: 42.40843, lng: -71.0536625 };
+                lat = -9.389;
+                lng = -40.503;
             }
-        } else {
-            position = { lat: parseFloat(position.lat), lng: parseFloat(position.lng) };
         }
+        position = { lat, lng };
 
         if (this.map !== null) {
             this.map.setCenter([position.lng, position.lat]);

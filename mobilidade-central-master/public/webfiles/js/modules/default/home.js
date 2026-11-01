@@ -121,6 +121,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  function isBadMapCoord(lat, lng) {
+    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) return true
+    // Fortaleza legado e Everett/MA (fallback antigo que gravava endereço errado)
+    if (Math.abs(lat - -3.7319) < 0.0002 && Math.abs(lng - -38.5267) < 0.0002) return true
+    if (Math.abs(lat - 42.40843) < 0.002 && Math.abs(lng - -71.0536625) < 0.002) return true
+    return false
+  }
+
   function initLoadMap() {
     let centralSelected = Session.get('centralSelected')
 
@@ -134,22 +142,48 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!centralSelected) return setTimeout(initLoadMap, 1500)
 
-    let lat = parseFloat(centralSelected.latitude)
-    let lng = parseFloat(centralSelected.longitude)
+    const browserLoc = Session.getLocal('location')
+    const centralLat = parseFloat(centralSelected.latitude)
+    const centralLng = parseFloat(centralSelected.longitude)
 
-    // Coordenadas padrão da central (Everett, MA) quando não configurada ou se mantinha fallback antigo
-    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0) || (lat === -3.7319 && lng === -38.5267)) {
-      lat = 42.40843
-      lng = -71.0536625
-      centralSelected.latitude = lat
-      centralSelected.longitude = lng
-      Session.set('centralSelected', centralSelected)
-      try {
-        localStorage.setItem('centralSelected', JSON.stringify(centralSelected))
-      } catch (e) {}
+    const openAt = (lat, lng) => initMap({ lat, lng })
+
+    if (browserLoc && !isBadMapCoord(parseFloat(browserLoc.lat), parseFloat(browserLoc.lng))) {
+      openAt(parseFloat(browserLoc.lat), parseFloat(browserLoc.lng))
+      return
     }
 
-    initMap({ lat, lng })
+    if (!isBadMapCoord(centralLat, centralLng)) {
+      openAt(centralLat, centralLng)
+    }
+
+    // Sempre pede a localização atual e recentraliza (não usa Everett)
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          const lat = pos.coords.latitude
+          const lng = pos.coords.longitude
+          Session.setLocal('location', { lat, lng })
+          if (mapService && mapService.map) {
+            mapService.map.setCenter([lng, lat])
+            if (mapService.pointCenter) mapService.pointCenter.setLngLat([lng, lat])
+          } else {
+            openAt(lat, lng)
+          }
+        },
+        function () {
+          if (isBadMapCoord(centralLat, centralLng) && !(mapService && mapService.map)) {
+            openAt(-9.389, -40.503)
+          }
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 5000 }
+      )
+      return
+    }
+
+    if (!(mapService && mapService.map)) {
+      openAt(isBadMapCoord(centralLat, centralLng) ? -9.389 : centralLat, isBadMapCoord(centralLat, centralLng) ? -40.503 : centralLng)
+    }
   }
 
   function initMap(position) {

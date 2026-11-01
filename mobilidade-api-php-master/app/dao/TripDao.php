@@ -268,36 +268,13 @@ class TripDao extends BaseDao
             // 6. Create Trip Record
             $this->trip = $this->createTrip($data);
 
-            // 7. Payment for Establishment only if establishmentId is provided
+            // 7. Pagamento de cartão/voucher roda DEPOIS do chamado (não segura o toque do motorista).
+            $deferredPayment = !empty($data->tripPaymentFormId) && empty($data->establishmentId);
             $establishment = null;
             if (!empty($data->establishmentId)) {
                 try {
                     $this->tripPayment($establishment);
                 } catch (\Throwable $t) {}
-            } elseif (!empty($data->tripPaymentFormId)) {
-                // Se a forma de pagamento for Cartão / Stripe ou Voucher, processa o pagamento/pré-autorização
-                try {
-                    $tpf = (new TripPaymentFormDao())->find($data->tripPaymentFormId);
-                    if ($tpf) {
-                        $isCard = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::CREDIT_CARD || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::DEBIT_CARD);
-                        $isVoucher = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER_ADMINISTRATIVE);
-
-                        if ($isCard || $isVoucher) {
-                            $custObj = $customer ?? (new CustomerDao())->findByUser($this->trip->getUserId());
-                            (new \app\services\CustomerTripPaymentService())->tripPayment(
-                                $custObj,
-                                $this->trip,
-                                $data->cardId ?? null,
-                                $data->mpToken ?? null,
-                                !empty($data->isOpenPriceTrip),
-                                $data->idTransaction ?? null
-                            );
-                        }
-                    }
-                } catch (\Throwable $t) {
-                    (new LogDao())->logException($t);
-                    throw $t;
-                }
             }
 
             // 8. Queue drivers in driverCalled table so drivers are found by searchTrip
@@ -379,6 +356,37 @@ class TripDao extends BaseDao
                     backgroundTask('trip-call', escapeshellarg($this->trip->getTripReference()));
                 } catch (\Throwable $t) {
                     (new LogDao())->logException($t);
+                }
+            }
+
+            if (!empty($deferredPayment)) {
+                try {
+                    $tpf = (new TripPaymentFormDao())->find($data->tripPaymentFormId);
+                    if ($tpf) {
+                        $isCard = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::CREDIT_CARD || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::DEBIT_CARD);
+                        $isVoucher = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER_ADMINISTRATIVE);
+
+                        if ($isCard || $isVoucher) {
+                            $custObj = $customer ?? (new CustomerDao())->findByUser($this->trip->getUserId());
+                            (new \app\services\CustomerTripPaymentService())->tripPayment(
+                                $custObj,
+                                $this->trip,
+                                $data->cardId ?? null,
+                                $data->mpToken ?? null,
+                                !empty($data->isOpenPriceTrip),
+                                $data->idTransaction ?? null
+                            );
+                        }
+                    }
+                } catch (\Throwable $t) {
+                    (new LogDao())->logException($t);
+                    try {
+                        \app\dao\GenericDao::execute(
+                            "UPDATE trip SET status = 'payment_refused' WHERE tripReference = :ref",
+                            [':ref' => $this->trip->getTripReference()]
+                        );
+                    } catch (\Throwable $e) {}
+                    throw $t;
                 }
             }
 

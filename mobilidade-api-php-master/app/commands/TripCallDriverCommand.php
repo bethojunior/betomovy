@@ -193,7 +193,7 @@ class TripCallDriverCommand extends Command
             if ($trip && $countRenews > $this->maxRenewList) {
                 echo "[Chamado individual] A viagem continua disponível e a quantidade de renovações da lista individual chegou ao limite" . PHP_EOL;
                 echo "[Chamado individual] Aguardando intervalo antes de iniciar o dedo rápido" . PHP_EOL;
-                sleep(5);
+                sleep(1);
                 echo "[Chamado individual] Iniciando chamado de dedo rápido" . PHP_EOL;
                 $this->callAllDriversClose(new Trip($trip));
             }
@@ -209,7 +209,7 @@ class TripCallDriverCommand extends Command
                 echo "[Chamado individual] Lista renovada" . PHP_EOL;
         }
 
-        sleep(5);
+        sleep(1);
 
         echo "Finalizando processo de chamado" . PHP_EOL;
 
@@ -334,7 +334,7 @@ class TripCallDriverCommand extends Command
 
             if (!empty($drivers)) {
                 echo "[Dedo rápido] Aguardando intervalo antes do próximo lote de dedo rápido" . PHP_EOL;
-                sleep(5);
+                sleep(1);
             }
 
             /**
@@ -366,8 +366,8 @@ class TripCallDriverCommand extends Command
      */
     private function waitForAvailableDrivers(Trip $trip, int $currentRenewCount): array
     {
-        echo "[Dedo rápido] Nenhum motorista encontrado nesta rodada (Renovação {$currentRenewCount}). Aguardando 5 segundos..." . PHP_EOL;
-        sleep(5);
+        echo "[Dedo rápido] Nenhum motorista encontrado nesta rodada (Renovação {$currentRenewCount}). Aguardando 1 segundo..." . PHP_EOL;
+        sleep(1);
 
         echo "[Dedo rápido] (Loop Vazio) Verificando se a viagem ainda está ativa" . PHP_EOL;
         $checkTrip = $this->verifyTripIsSearching($trip->getTripReference());

@@ -6,6 +6,7 @@ import { mapLight } from '../../styles/mapLight';
 import { useAuth } from '../../../../context/auth';
 import { useFocusEffect } from '@react-navigation/native';
 import { useInitialCoordsByLocale } from '~/hooks/useInitialCoordsByLocale';
+import * as Location from 'expo-location';
 
 interface Props extends MapViewProps {
   setCountVisible: (value: boolean) => void;
@@ -26,6 +27,35 @@ export const Map = forwardRef<MapView, Props>(
     const isMountedRef = useRef(true);
 
     const { initialCoords: region } = useInitialCoordsByLocale();
+
+    useEffect(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const perm = await Location.getForegroundPermissionsAsync();
+          if (perm.status !== 'granted') return;
+          const loc =
+            (await Location.getLastKnownPositionAsync()) ||
+            (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }));
+          if (cancelled || !loc) return;
+          const map = typeof ref === 'object' && ref ? ref.current : null;
+          map?.animateToRegion(
+            {
+              latitude: loc.coords.latitude,
+              longitude: loc.coords.longitude,
+              latitudeDelta: 0.04,
+              longitudeDelta: 0.04,
+            },
+            350,
+          );
+        } catch {
+          // segue no recorte inicial até o GPS responder
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, [ref]);
 
     const darkMapEnabled = useMemo(() =>
       generalSettings?.find(item => item.key === "enable_map_dark_driver")

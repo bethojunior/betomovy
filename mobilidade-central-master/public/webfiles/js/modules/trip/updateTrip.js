@@ -15,7 +15,7 @@ function startSearchStatusPoll(tripReference) {
 
             checkStatusTrip(response, tripRealtime.typeModified);
         });
-    }, 8000);
+    }, 1500);
 }
 
 function stopSearchStatusPoll() {
