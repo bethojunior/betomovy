@@ -119,7 +119,7 @@ class DriverRepository extends AbstractRepository
         return $this->getModel()::join('user', 'driver.userId', '=', 'user.idUser')
             ->leftJoin('driverRegisterStatus', 'driver.driverRegisterStatusId', '=', 'driverRegisterStatus.idDriverRegisterStatus')
             ->leftJoin('balance', 'driver.balanceId', '=', 'balance.idBalance')
-            ->join('levelAccess', 'user.idUser', '=', 'levelAccess.userId')
+            ->leftJoin('levelAccess', 'user.idUser', '=', 'levelAccess.userId')
             ->leftJoin('userType', 'levelAccess.userTypeId', '=', 'userType.idUserType')
             ->leftJoin('car', function (JoinClause $join) {
                 $join->on('driver.idDriver', '=', 'car.driverId')
