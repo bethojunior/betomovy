@@ -32,10 +32,25 @@ export function useDriverList(): UseDriverListReturn {
       const formattedSearch =
         searchBy === "document"
           ? searchValue.replace(/[.\-/]/g, "")
-          : searchValue;
-      const statusParam = idStatusSearch > 0 ? idStatusSearch : "";
-      const typeParam = driverType > 0 ? driverType : "";
-      return `driver/getAll?page=${page}&allCities=0&driverRegisterStatusId=${statusParam}&driverType=${typeParam}&${searchBy}=${encodeURIComponent(formattedSearch)}`;
+          : searchValue.trim();
+
+      const params = new URLSearchParams();
+      params.set("page", String(page));
+      params.set("per_page", "20");
+
+      // Só envia filtros preenchidos (evita empty→null quebrando no Laravel)
+      if (idStatusSearch > 0) {
+        params.set("driverRegisterStatusId", String(idStatusSearch));
+      }
+      if (driverType > 0) {
+        params.set("driverType", String(driverType));
+      }
+      if (formattedSearch) {
+        params.set(searchBy, formattedSearch);
+      }
+
+      // Endpoint paginado correto (findAll). getAll era legado e escondia motoristas sem balance/carro.
+      return `driver?${params.toString()}`;
     },
     [searchBy, idStatusSearch, driverType]
   );

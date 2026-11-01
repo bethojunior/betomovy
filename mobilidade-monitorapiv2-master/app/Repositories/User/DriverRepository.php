@@ -57,7 +57,7 @@ class DriverRepository extends AbstractRepository
     private function findAllCore($user, array $data, $cityId = null)
     {
         return $this->getModel()::join('user', 'driver.userId', '=', 'user.idUser')
-            ->join('levelAccess', 'user.idUser', '=', 'levelAccess.userId')
+            ->leftJoin('levelAccess', 'user.idUser', '=', 'levelAccess.userId')
             ->leftJoin('car', function (JoinClause $join) {
                 $join->on('driver.idDriver', '=', 'car.driverId')
                     ->where(function ($query) {
@@ -67,42 +67,49 @@ class DriverRepository extends AbstractRepository
                     ->whereNull('car.deleted_at');
             })
             ->where('user.statusId', StatusConst::ACTIVE)
-            ->when(isset($data['email']), function (Builder $query) use ($data) {
-                $term = FullTextSearchHelper::prepareBooleanQuery($data['email']);
-                $query->when($term !== '', function (Builder $query) use ($term) {
-                    $query->whereRaw('MATCH(user.email) AGAINST(? IN BOOLEAN MODE)', [$term]);
+            ->when(isset($data['email']) && $data['email'] !== '', function (Builder $query) use ($data) {
+                $term = FullTextSearchHelper::prepareBooleanQuery((string) $data['email']);
+                $query->when($term !== '', function (Builder $query) use ($term, $data) {
+                    $query->where(function (Builder $q) use ($term, $data) {
+                        $q->whereRaw('MATCH(user.email) AGAINST(? IN BOOLEAN MODE)', [$term])
+                            ->orWhere('user.email', 'like', '%' . $data['email'] . '%');
+                    });
                 });
             })
-            ->when(isset($data['name']), function (Builder $query) use ($data) {
-                $term = FullTextSearchHelper::prepareBooleanQuery($data['name']);
-                $query->when($term !== '', function (Builder $query) use ($term) {
-                    $query->whereRaw('MATCH(user.name) AGAINST(? IN BOOLEAN MODE)', [$term]);
+            ->when(isset($data['name']) && $data['name'] !== '', function (Builder $query) use ($data) {
+                $term = FullTextSearchHelper::prepareBooleanQuery((string) $data['name']);
+                $query->when($term !== '', function (Builder $query) use ($term, $data) {
+                    $query->where(function (Builder $q) use ($term, $data) {
+                        $q->whereRaw('MATCH(user.name) AGAINST(? IN BOOLEAN MODE)', [$term])
+                            ->orWhere('user.name', 'like', '%' . $data['name'] . '%');
+                    });
                 });
             })
-            ->when(isset($data['document']), function (Builder $query) use ($data) {
+            ->when(isset($data['document']) && $data['document'] !== '', function (Builder $query) use ($data) {
                 $digits = preg_replace('/\D/', '', $data['document']);
                 $query->where('user.document_digits', 'like', $digits . '%');
             })
-            ->when(isset($data['phone']), function (Builder $query) use ($data) {
+            ->when(isset($data['phone']) && $data['phone'] !== '', function (Builder $query) use ($data) {
                 $normalizedPhone = PhoneHelper::normalizePhone($data['phone']);
                 $query->where('user.phone_digits', 'like', $normalizedPhone . '%');
             })
-            ->when(isset($data['driverType']), function (Builder $query) use ($data) {
+            ->when(isset($data['driverType']) && $data['driverType'] !== '' && (int) $data['driverType'] > 0, function (Builder $query) use ($data) {
                 $query->where('levelAccess.userTypeId', $data['driverType']);
             })
-            ->when(isset($data['carPlate']), function (Builder $query) use ($data) {
+            ->when(isset($data['carPlate']) && $data['carPlate'] !== '', function (Builder $query) use ($data) {
                 $normalizedPlate = PlateHelper::normalizePlate($data['carPlate']);
                 $query->where('car.plate_normalized', 'like', $normalizedPlate . '%');
             })
-            ->when(isset($data['driverRegisterStatusId']), function (Builder $query) use ($data) {
+            ->when(isset($data['driverRegisterStatusId']) && $data['driverRegisterStatusId'] !== '' && (int) $data['driverRegisterStatusId'] > 0, function (Builder $query) use ($data) {
                 $query->where('driver.driverRegisterStatusId', $data['driverRegisterStatusId']);
             })
             ->when(!$user->role->support, function (Builder $query) use ($cityId) {
                 CityAuthorizationHelper::restrictToCity($query, $cityId, 'driver.cityId');
             })
             ->select('driver.idDriver')
+            ->distinct()
             ->orderByDesc('driver.idDriver')
-            ->paginate($data['per_page'] ?? 10);
+            ->paginate($data['per_page'] ?? 20);
     }
 
     // Traz os campos de exibição só pros IDs já decididos pelo findAllCore — join pesado, mas em cima de poucas linhas (a página atual).
@@ -616,97 +623,8 @@ class DriverRepository extends AbstractRepository
 
     public function getAll($user, array $data, $cityId = null)
     {
-        return $this->getModel()::join('user as uadm', 'uadm.idUser', '=', DB::raw($user->idUser))
-            ->join('role', 'role.id', 'uadm.roleId')
-            ->join('user', 'driver.userId', '=', 'user.idUser')
-            ->join('driverRegisterStatus', 'driver.driverRegisterStatusId', '=', 'driverRegisterStatus.idDriverRegisterStatus')
-            ->join('balance', 'driver.balanceId', '=', 'balance.idBalance')
-            ->join('levelAccess', 'user.idUser', '=', 'levelAccess.userId')
-            ->join('userType', 'levelAccess.userTypeId', '=', 'userType.idUserType')
-            ->leftJoin('car', 'driver.idDriver', '=', 'car.driverId')
-            ->leftJoin('station', 'driver.stationId', '=', 'station.idStation')
-            ->leftJoin('militaryUser', 'user.idUser', '=', 'militaryUser.userId')
-            ->leftJoin('militaryStatus', 'militaryUser.militaryStatusId', '=', 'militaryStatus.id')
-            ->leftJoin('militaryForceGraduation', 'militaryUser.militaryGraduationId', '=', 'militaryForceGraduation.id')
-            ->leftJoin('militaryForce', 'militaryUser.militaryForceId', '=', 'militaryForce.id')
-            ->where('user.statusId', StatusConst::ACTIVE)
-            ->where(function (Builder $query) {
-                $query->whereNull('car.pending')
-                    ->orWhere('car.pending', 0);
-            })
-            ->whereNull('car.deleted_at')
-            ->when(isset($data['email']), function (Builder $query) use ($data) {
-                $query->where('user.email', 'like', '%' . $data['email'] . '%');
-            })
-            ->when(isset($data['name']), function (Builder $query) use ($data) {
-                $query->where('user.name', 'like', '%' . $data['name'] . '%');
-            })
-            ->when(isset($data['document']), function (Builder $query) use ($data) {
-                $query->where('user.document', 'like', '%' . $data['document'] . '%');
-            })
-            ->when(isset($data['phone']), function (Builder $query) use ($data) {
-                $normalizedPhone = PhoneHelper::normalizePhone($data['phone']);
-                $query->whereRaw(
-                    "REPLACE(REPLACE(REPLACE(REPLACE(user.phone, '(', ''), ')', ''), '-', ''), ' ', '') LIKE ?",
-                    ['%' . $normalizedPhone . '%']
-                );
-            })
-            ->when(isset($data['driverType']), function (Builder $query) use ($data) {
-                $query->where('levelAccess.userTypeId', $data['driverType']);
-            })
-            ->when(isset($data['carPlate']), function (Builder $query) use ($data) {
-                $normalizedPlate = PlateHelper::normalizePlate($data['carPlate']);
-                $query->whereRaw(
-                    "REPLACE(REPLACE(UPPER(car.plate), '-', ''), ' ', '') LIKE ?",
-                    ['%' . $normalizedPlate . '%']
-                );
-            })
-            ->where(function (Builder $query) use ($cityId) {
-                $query->where('role.support', '=', 1);
-                $query->when(isset($cityId), function (Builder $query) use ($cityId) {
-                    $query->orWhere('driver.cityId', $cityId);
-                });
-            })
-            ->select(
-                'driver.idDriver',
-                'user.name',
-                'user.nickname',
-                'user.phone',
-                'user.document',
-                'driverRegisterStatus.name as registerStatus',
-                'driver.driverRegisterStatusId',
-                'user.email',
-                'user.idUser',
-                'balance.balance',
-                'balance.blockedBalance',
-                'levelAccess.userTypeId',
-                'userType.name as userType',
-                'user.rating',
-                'user.gender',
-                'user.created_at',
-                'station.name as station',
-                'driver.profileImage',
-                'driver.proofOfResidence',
-                'driver.alvara',
-                'user.rg',
-                'user.rgFrontPicture',
-                'user.rgBackPicture',
-                'car.plate as carPlate',
-                'car.brand as carBrand',
-                'car.model as carModel',
-                'driver.cityId',
-                'driver.prepaid',
-                'driver.appVersion',
-                'user.platform',
-                'militaryUser.om',
-                'militaryStatus.name as militaryStatus',
-                'militaryForce.name as militaryForce',
-                'militaryForceGraduation.patent as militaryPatent',
-                'militaryForceGraduation.picture as militaryPatentPicture',
-                'user.zafiraValidated'
-            )
-            ->orderBy('balance.balance')
-            ->get();
+        // Mantido por compatibilidade de rota; mesma query do findAll (não esconde sem balance/carro).
+        return $this->findAll($user, $data, $cityId);
     }
 
     public function allWithPositions(array $status, ?int $cityId = null): Collection

@@ -273,7 +273,9 @@ class DriverService
 
     public function getAll(array $data, $cityId = null)
     {
-        return $this->repository->getAll(Auth::user(), $data, $cityId);
+        // getAll legado escondia motoristas (INNER JOIN balance/userType + filtro de carro).
+        // Reutiliza findAll (paginado, JOINs corretos) para a listagem do Monitor.
+        return $this->repository->findAll(Auth::user(), $data, $cityId);
     }
 
     public function getAllDriversWithPositions(array $request, ?int $cityId = null): \Illuminate\Database\Eloquent\Collection
