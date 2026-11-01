@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import {useAuth} from '../context/auth';
 import {useTerms} from '../context/terms';
@@ -11,15 +11,15 @@ export default function useSplashScreenInitialization() {
   const {loading: isTermsLoading} = useTerms();
   const {loadingSession} = useAuth();
 
-  useEffect(() => {
-    async function handleSplashState() {
-      if (!loadingSession && !isTermsLoading && isResourcesLoaded) {
-        await SplashScreen.hideAsync();
-        setSplashReady(true);
-      }
-    }
+  const held = useRef(false);
 
-    handleSplashState();
+  useEffect(() => {
+    if (held.current) return;
+    if (!loadingSession && !isTermsLoading && isResourcesLoaded) {
+      held.current = true;
+      SplashScreen.hideAsync();
+      setTimeout(() => setSplashReady(true), 1200);
+    }
   }, [loadingSession, isTermsLoading, isResourcesLoaded]);
 
   return isSplashReady;

@@ -5,16 +5,19 @@ import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex: 1;
-  background: ${({theme}) => theme.colors.background_global};
+  background: #0b1220;
 `;
 
 export const Content = styled.ScrollView.attrs({
   showsVerticalScrollIndicator: false,
 })`
+  margin: ${RFValue(16)}px;
   padding-left: ${({theme}) => theme.spacing.xlarge}px;
   padding-right: ${({theme}) => theme.spacing.xlarge}px;
   padding-top: ${({theme}) => theme.spacing.medium}px;
   padding-bottom: ${({theme}) => theme.spacing.medium}px;
+  background-color: #ffffff;
+  border-radius: ${RFValue(22)}px;
 `;
 
 export const ContentButton = styled.View`

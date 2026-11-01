@@ -5,10 +5,11 @@ interface LoginColor {
   color?: string;
 }
 
-export const BackgroundImage = styled.ImageBackground`
+export const BackgroundImage = styled.View`
   flex: 1;
   width: 100%;
   height: 100%;
+  background-color: #0b1220;
 `;
 
 export const Overlay = styled.View`
@@ -17,7 +18,7 @@ export const Overlay = styled.View`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(10, 16, 32, 0.65);
+  background-color: transparent;
 `;
 
 export const Container = styled.ScrollView.attrs(props => ({
@@ -43,10 +44,9 @@ export const ContentImage = styled.View`
 `;
 
 export const Logo = styled.Image`
-  height: ${RFValue(115)}px;
-  width: ${RFValue(115)}px;
-  margin-bottom: ${RFValue(20)}px;
-  border-radius: ${RFValue(16)}px;
+  height: ${RFValue(78)}px;
+  width: ${RFValue(220)}px;
+  margin-bottom: ${RFValue(18)}px;
 `;
 
 export const LoginCard = styled.View`
@@ -146,7 +146,7 @@ export const ButtonRegisterText = styled.Text`
 export const ButtonRegisterTextGrif = styled.Text<LoginColor>`
   font-family: ${({ theme }) => theme.fonts.bold};
   font-size: ${RFValue(13)}px;
-  color: #ff3388;
+  color: #1aa89c;
   text-decoration-line: underline;
   margin-left: ${RFValue(5)}px;
 `;

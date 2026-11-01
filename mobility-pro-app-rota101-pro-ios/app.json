@@ -7,9 +7,9 @@
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "splash": {
-      "image": "./assets/logo.png",
+      "image": "./assets/logo-on-dark.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0B1220"
     },
     "plugins": [
       [

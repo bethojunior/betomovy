@@ -10,8 +10,7 @@ import { Modal } from 'react-native';
 import IconGoogle from '../../assets/images/google.svg';
 import IconFacebook from '../../assets/images/facebook.svg';
 import IconApple from '../../assets/images/apple-logo.svg';
-import logo from '../../../../assets/logo.png';
-import loginBg from '../../../../assets/login-bg.png';
+import logo from '../../../../assets/logo-on-dark.png';
 import Preload from '../../components/Preload';
 import { translate } from '../../locales';
 import { SwalAlert } from '../../components/SwalAlert';
@@ -343,7 +342,7 @@ export default function Login() {
             visible={showAlertBeta}
             setVisible={setShowAlertBeta}
           />
-          <BackgroundImage source={loginBg} resizeMode="cover">
+          <BackgroundImage>
             <Overlay />
             <Container>
               <If condition={APP_PARTNER}>
