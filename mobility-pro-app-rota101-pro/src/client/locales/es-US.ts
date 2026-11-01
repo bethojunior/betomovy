@@ -2452,6 +2452,7 @@ export default {
     description:
       'Para que puedas recibir y aceptar o rechazar viajes disponibles incluso con la app minimizada, necesitamos que permitas que la app se muestre sobre otras aplicaciones.',
     confirm: 'Continuar',
+    skip: 'Ahora no',
     loading: 'Espera...',
   },
   toast: {

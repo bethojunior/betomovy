@@ -1,11 +1,9 @@
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
 import { useEffect, useRef, useState } from 'react';
 import { Container, VersionText } from './styles';
-import { Platform, Text } from 'react-native';
 import Constants from 'expo-constants';
 
 import AnimatedLottieView from 'lottie-react-native';
-import { useBubbleButton } from '@704apps/react-native-bubble-button';
 import { useUserDriver } from '../../context/userDriver';
 import { If } from '../../components/If';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -14,7 +12,6 @@ import { useLocalProvider } from '../../context/local';
 import { AlertLocationRefused } from '../../components/AlertLocationRefused';
 import { useNetwork } from '~/context/ConfigGlobal';
 import { useBackgroundLocationPermission } from '../../hooks/useBackgroundLocationPermission';
-import { useDriverStatus } from '../../hooks/useDriverStatus';
 
 const SPLASH_MAX_WAIT_MS = 12000;
 
@@ -29,22 +26,12 @@ const AnimatedSplashScreen = () => {
   const { itsNetwork: network } = useNetwork();
   const prevNetworkRef = useRef<boolean | null>(null);
   const { checkBackgroundLocationPermission } = useBackgroundLocationPermission();
-  const { checkPermission: checkOverlayPermission } = useBubbleButton();
-  const { isOnline } = useDriverStatus();
 
   const handleNavigation = async () => {
     const hasLocationPermission = await checkBackgroundLocationPermission();
     if (!hasLocationPermission) {
       navigation.reset({ index: 0, routes: [{ name: 'BackgroundLocationPermission' }] });
       return;
-    }
-
-    if (Platform.OS === 'android' && isOnline) {
-      const hasOverlayPermission = await checkOverlayPermission();
-      if (!hasOverlayPermission) {
-        navigation.reset({ index: 0, routes: [{ name: 'OverlayPermission' }] });
-        return;
-      }
     }
 
     navigation.reset({ index: 0, routes: [{ name: 'Home' }] });

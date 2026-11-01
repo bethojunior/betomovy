@@ -2472,6 +2472,7 @@ export default {
     description:
       "Pour que vous puissiez recevoir et accepter ou refuser des courses disponibles même avec l'application réduite, nous avons besoin que vous autorisiez l'application à s'afficher par-dessus les autres applications.",
     confirm: 'Continuer',
+    skip: 'Plus tard',
     loading: 'Veuillez patienter...',
   },
   toast: {

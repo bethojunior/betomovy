@@ -53,3 +53,16 @@ export const ContentButtons = styled.View`
 `;
 
 export const PermissionButton = styled(Button)``;
+
+export const SkipButton = styled.TouchableOpacity`
+  margin-top: ${RFValue(16)}px;
+  align-self: center;
+  padding: ${RFValue(8)}px;
+`;
+
+export const SkipText = styled.Text`
+  font-size: ${RFValue(14)}px;
+  font-family: ${({ theme }) => theme.fonts.medium};
+  color: ${({ theme }) => theme.colors.primary};
+  text-decoration-line: underline;
+`;

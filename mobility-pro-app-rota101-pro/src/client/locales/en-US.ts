@@ -2418,6 +2418,7 @@ export default {
     description:
       'So you can receive and accept or decline available rides even with the app minimized, we need you to allow the app to display over other apps.',
     confirm: 'Continue',
+    skip: 'Not now',
     loading: 'Please wait...',
   },
   toast: {

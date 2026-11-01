@@ -2448,6 +2448,7 @@ export default {
     description:
       'Para você receber e conseguir aceitar ou recusar corridas disponíveis mesmo com o aplicativo minimizado, precisamos que você permita a exibição do app sobre outros aplicativos.',
     confirm: 'Continuar',
+    skip: 'Agora não',
     loading: 'Aguarde...',
   },
   toast: {

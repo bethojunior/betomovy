@@ -6,6 +6,8 @@ import {
   ContentPermission,
   Description,
   PermissionButton,
+  SkipButton,
+  SkipText,
   Title,
 } from '../styles';
 
@@ -17,6 +19,8 @@ interface PermissionStepProps {
   buttonTitle: string;
   onPress: () => void;
   loading?: boolean;
+  secondaryTitle?: string;
+  onSecondaryPress?: () => void;
 }
 
 export function PermissionStep({
@@ -27,6 +31,8 @@ export function PermissionStep({
   buttonTitle,
   onPress,
   loading,
+  secondaryTitle,
+  onSecondaryPress,
 }: PermissionStepProps) {
   return (
     <ContentPage style={{ width }}>
@@ -45,6 +51,11 @@ export function PermissionStep({
               enabled={!loading}
             />
           </ContentButtons>
+          {secondaryTitle && onSecondaryPress ? (
+            <SkipButton onPress={onSecondaryPress} disabled={loading}>
+              <SkipText>{secondaryTitle}</SkipText>
+            </SkipButton>
+          ) : null}
         </ContentPermission>
       </ContentPageScroll>
     </ContentPage>
