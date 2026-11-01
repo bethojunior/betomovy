@@ -3,7 +3,7 @@
     "name": "Movy",
     "scheme": "rota101pro",
     "slug": "expoappv2",
-    "version": "8.3.3",
+    "version": "8.3.4",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "splash": {
@@ -97,7 +97,7 @@
     "android": {
       "package": "br.com.client.rota101",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 80303,
+      "versionCode": 80304,
       "edgeToEdgeEnabled": true,
       "config": {
         "googleMaps": {
