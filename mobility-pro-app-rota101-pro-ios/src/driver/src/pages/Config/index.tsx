@@ -23,7 +23,7 @@ import { useAuth } from '../../../../context/auth';
 import { useDriverAppReport } from '../../hooks/useDriverAppReport';
 import { useDevicePermissions } from '../../hooks/useDevicePermissions';
 
-let addNew = [];
+const samePaymentId = (a: unknown, b: unknown) => Number(a) === Number(b);
 
 export const Config = () => {
   const [appSettings, setAppSettings] = useState(null);
@@ -33,6 +33,7 @@ export const Config = () => {
   const [loading, setLoading] = useState(true);
   const [modalNavigationExternal, setModalNavigationExternal] = useState(false);
   const [lastNavigationExternal, setLastNavigationExternal] = useState('');
+  const [savingPayment, setSavingPayment] = useState(false);
 
   const {
     listPaymentForm,
@@ -42,6 +43,7 @@ export const Config = () => {
     getChooseDriverPaymentForm,
     getImpositionPaymentForm,
     updateChooseDriver,
+    setListChooseDriver,
   } = useConfig();
 
   const { colors } = useTheme();
@@ -71,35 +73,70 @@ export const Config = () => {
   }, []);
 
   useEffect(() => {
-    if (listChooseDriver?.length > 0) {
-      listChooseDriver?.map(item => {
-        return addNew.push(item.tripPaymentFormId);
-      });
-    }
-  }, [listChooseDriver?.length > 0]);
-
-  useEffect(() => {
     if (appSettings === null) {
       getAppSettings();
     }
   }, [appSettings]);
 
+  const selectedPaymentIds = (listChooseDriver || [])
+    .map(item => Number(item.tripPaymentFormId))
+    .filter(id => Number.isFinite(id) && id > 0);
+
+  const isPaymentImposed = (id: number) =>
+    (listImposition || []).some(el => samePaymentId(el.tripPaymentFormId, id));
+
+  const isPaymentSelected = (id: number) =>
+    selectedPaymentIds.some(el => samePaymentId(el, id)) || isPaymentImposed(id);
+
   const changePaymentForm = async (state: boolean, id: number) => {
-    if (listImposition.some(el => el.tripPaymentFormId === id)) {
+    if (savingPayment) {
+      return;
+    }
+
+    if (isPaymentImposed(id)) {
       return customToast(
         translate('configPage.text_payment_form_imposition'),
         'warning',
       );
     }
 
-    if (state) {
-      addNew.push(id);
-    } else {
-      addNew = addNew.filter(el => el !== id);
+    const paymentId = Number(id);
+    const nextIds = state
+      ? Array.from(new Set([...selectedPaymentIds, paymentId]))
+      : selectedPaymentIds.filter(el => el !== paymentId);
+
+    // Atualização otimista para o Switch refletir na hora (API pode devolver id como string)
+    setListChooseDriver(
+      nextIds.map(tripPaymentFormId => ({ tripPaymentFormId } as any)),
+    );
+
+    setSavingPayment(true);
+    try {
+      await updateChooseDriver(nextIds);
+      await getChooseDriverPaymentForm();
+    } finally {
+      setSavingPayment(false);
+    }
+  };
+
+  const changeAllPaymentForms = async (enableAll: boolean) => {
+    if (savingPayment) {
+      return;
     }
 
-    await updateChooseDriver(addNew);
-    return getChooseDriverPaymentForm();
+    // Lista vazia = aceita todas as formas (comportamento da API / "Todos")
+    const nextIds = enableAll ? [] : selectedPaymentIds;
+    if (enableAll) {
+      setListChooseDriver([]);
+    }
+
+    setSavingPayment(true);
+    try {
+      await updateChooseDriver(nextIds);
+      await getChooseDriverPaymentForm();
+    } finally {
+      setSavingPayment(false);
+    }
   };
 
   const changeAcceptMode = async (
@@ -295,25 +332,22 @@ export const Config = () => {
               <Title>{translate('configPage.title_payment_form')}</Title>
             </Header>
             <View>
-              {listPaymentForm?.map((item, index) => {
+              {(listPaymentForm || []).map((item, index) => {
+                const paymentId = Number(item.idTripPaymentForm);
+                const selected = isPaymentSelected(paymentId);
+                const imposed = isPaymentImposed(paymentId);
                 return (
                   <Section
-                    removeBorder={index === listPaymentForm.length - 1}
-                    key={index}
+                    removeBorder={index === (listPaymentForm || []).length - 1}
+                    key={`payment-${paymentId || index}`}
                   >
                     <SubTitle>{item.name}</SubTitle>
                     <Switch
-                      value={
-                        listChooseDriver?.some(
-                          el => el.tripPaymentFormId === item.idTripPaymentForm,
-                        ) ||
-                        listImposition?.some(
-                          el => el.tripPaymentFormId === item.idTripPaymentForm,
-                        )
-                      }
+                      value={!!selected}
+                      disabled={imposed || savingPayment}
                       color={colors.primary}
                       onValueChange={e => {
-                        changePaymentForm(e, item.idTripPaymentForm);
+                        changePaymentForm(e, paymentId);
                       }}
                     />
                   </Section>
@@ -328,12 +362,13 @@ export const Config = () => {
               >
                 <SubTitle>Todos</SubTitle>
                 <Switch
-                  value={
-                    listChooseDriver?.length === 0
-                  }
-                  pointerEvents='none'
+                  value={(listChooseDriver || []).length === 0}
+                  disabled={savingPayment}
                   ios_backgroundColor={colors.primary}
                   color={colors.primary}
+                  onValueChange={enableAll => {
+                    changeAllPaymentForms(enableAll);
+                  }}
                 />
               </Section>
             </View>

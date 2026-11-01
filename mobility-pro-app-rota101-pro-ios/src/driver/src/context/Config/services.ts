@@ -8,7 +8,8 @@ export const ConfigService = () => {
       const result = await apiMainDriver('TripPaymentForm/GetAll');
       return result.data;
     } catch (error) {
-      return customToast(translate('configPage.text_payment_forms_load_error'), 'danger');
+      customToast(translate('configPage.text_payment_forms_load_error'), 'danger');
+      return { status: false, message: translate('configPage.text_payment_forms_load_error'), data: [] };
     }
   };
 
@@ -17,7 +18,8 @@ export const ConfigService = () => {
       const result = await apiMainDriver('DriverFormOfPayment/GetAll');
       return result.data;
     } catch (error) {
-      return customToast(error, 'danger');
+      customToast(error, 'danger');
+      return { status: false, message: 'Erro ao carregar formas escolhidas', data: [] };
     }
   };
 
@@ -28,7 +30,8 @@ export const ConfigService = () => {
       );
       return result.data;
     } catch (error) {
-      return customToast(error, 'danger');
+      customToast(error, 'danger');
+      return { status: false, message: 'Erro ao carregar imposições', data: [] };
     }
   };
 
@@ -39,7 +42,8 @@ export const ConfigService = () => {
       });
       return result.data;
     } catch (error) {
-      return customToast(error, 'danger');
+      customToast(error, 'danger');
+      return { status: false, message: 'Erro ao salvar formas de pagamento', data: [] };
     }
   };
   return {

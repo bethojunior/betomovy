@@ -98,41 +98,46 @@ interface List {
 //   return context;
 // };
 
+const asList = (payload: any): List[] => {
+  const raw = payload?.data ?? payload?.response ?? payload;
+  return Array.isArray(raw) ? raw : [];
+};
+
 export const useConfig = () => {
-  const [listPaymentForm, setPaymentForm] = useState<List[]>();
-  const [listChooseDriver, setListChooseDriver] = useState<List[]>();
-  const [listImposition, setListImposition] = useState<List[]>();
+  const [listPaymentForm, setPaymentForm] = useState<List[]>([]);
+  const [listChooseDriver, setListChooseDriver] = useState<List[]>([]);
+  const [listImposition, setListImposition] = useState<List[]>([]);
 
   const service = ConfigService();
 
   const getPaymentForm = async () => {
     const response = await service.get();
-    if (!response.status) {
-      return customToast(response.message, 'danger');
+    if (!response?.status) {
+      return customToast(response?.message || 'Erro', 'danger');
     }
-    return setPaymentForm(response.data);
+    return setPaymentForm(asList(response));
   };
 
   const getChooseDriverPaymentForm = async () => {
     const response = await service.getChooseDriver();
-    if (!response.status) {
-      return customToast(response.message, 'danger');
+    if (!response?.status) {
+      return customToast(response?.message || 'Erro', 'danger');
     }
-    return setListChooseDriver(response.data);
+    return setListChooseDriver(asList(response));
   };
 
   const getImpositionPaymentForm = async () => {
     const response = await service.getImposition();
-    if (!response.status) {
-      return customToast(response.message, 'danger');
+    if (!response?.status) {
+      return customToast(response?.message || 'Erro', 'danger');
     }
-    return setListImposition(response.data);
+    return setListImposition(asList(response));
   };
 
   const updateChooseDriver = async (id: number[]) => {
     const response = await service.chooseFormPayment(id);
-    if (!response.status) {
-      return customToast(response.message, 'danger');
+    if (!response?.status) {
+      return customToast(response?.message || 'Erro', 'danger');
     }
     return customToast(
       translate('configPage.title_payment_form_updated'),
