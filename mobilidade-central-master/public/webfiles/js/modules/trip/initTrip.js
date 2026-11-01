@@ -44,6 +44,24 @@ function validateTrip(trip) {
         }
     }
 
+    const isCard = typeof isPaymentFormCard === "function"
+        ? isPaymentFormCard(trip.tripPaymentFormId)
+        : (parseInt(trip.tripPaymentFormId, 10) === 3 || parseInt(trip.tripPaymentFormId, 10) === 18);
+
+    if (isCard) {
+        const tokenCard = Session.get("tokenCard") || Session.getLocal("tokenCard");
+        const cardId = trip.cardId || tokenCard?.cardId || Session.getValueInSession("tokenCard", "cardId");
+        const mpToken = trip.mpToken || tokenCard?.token || Session.getValueInSession("tokenCard", "token");
+
+        if (!cardId) {
+            SwalCustom.messageDialog("", "Selecione ou adicione um cartão para pagar com Stripe.", undefined, "warning");
+            if (typeof choiceCard === "function") choiceCard();
+            return false;
+        }
+        trip.cardId = cardId;
+        trip.mpToken = mpToken;
+    }
+
     return true;
 }
 

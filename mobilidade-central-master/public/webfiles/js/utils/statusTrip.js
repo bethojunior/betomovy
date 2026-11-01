@@ -17,6 +17,41 @@ const PAYMENT_CARD_CREDIT = 3;
 const PAYMENT_VOUCHER_CENTRAL = 11;
 const STATUS_SCHEDULED = 'scheduled';
 
+function isPaymentFormCard(paymentFormOrId) {
+    if (!paymentFormOrId) {
+        const stored = Session?.getLocal("paymentForm") || Session?.get("paymentForm");
+        if (stored) return isPaymentFormCard(stored);
+        return false;
+    }
+
+    if (typeof paymentFormOrId === "object") {
+        const id = parseInt(paymentFormOrId.idTripPaymentForm || paymentFormOrId.id || 0, 10);
+        const typeId = parseInt(paymentFormOrId.paymentFormTypeId || 0, 10);
+        const name = (paymentFormOrId.name || "").toUpperCase();
+
+        if (typeId === 3 || id === 3 || id === 18) return true;
+        if (name.includes("STRIPE") || name.includes("CARTAO") || name.includes("CARTÃO") || name.includes("CARD")) return true;
+        return false;
+    }
+
+    const numericId = parseInt(paymentFormOrId, 10);
+    if (numericId === 3 || numericId === 18) return true;
+
+    const stored = Session?.getLocal("paymentForm") || Session?.get("paymentForm");
+    if (stored) {
+        const sId = parseInt(stored.idTripPaymentForm || stored.id || 0, 10);
+        const sTypeId = parseInt(stored.paymentFormTypeId || 0, 10);
+        const sName = (stored.name || "").toUpperCase();
+        if (sId === numericId) {
+            if (sTypeId === 3 || sName.includes("STRIPE") || sName.includes("CARTAO") || sName.includes("CARTÃO") || sName.includes("CARD")) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 function showStatusTrip(status) {
     switch (status) {
         case STATUS_SEARCHING:

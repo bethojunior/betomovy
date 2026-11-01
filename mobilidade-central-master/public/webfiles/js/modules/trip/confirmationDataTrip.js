@@ -155,6 +155,25 @@ function getTravelCustomer(trip, customer) {
         trip.tripTypeId = parseInt(trip.tripTypeId || managerTrip?.typeTaxi?.tripTypeId || 1);
         trip.tripPaymentFormId = parseInt(trip.tripPaymentFormId || managerTrip?.paymentFormIdSelected || 1);
 
+        // Validar cartão de crédito / Stripe antes de disparar a busca
+        const isCard = typeof isPaymentFormCard === "function"
+            ? isPaymentFormCard(trip.tripPaymentFormId)
+            : (trip.tripPaymentFormId === 3 || trip.tripPaymentFormId === 18);
+
+        if (isCard) {
+            const tokenCard = Session.get("tokenCard") || Session.getLocal("tokenCard");
+            const cardId = tokenCard?.cardId || Session.getValueInSession("tokenCard", "cardId");
+            const mpToken = tokenCard?.token || Session.getValueInSession("tokenCard", "token");
+
+            if (!cardId) {
+                SwalCustom.messageDialog("", "Selecione ou adicione um cartão para pagar com Stripe.", undefined, "warning");
+                if (typeof choiceCard === "function") choiceCard();
+                return;
+            }
+            trip.cardId = cardId;
+            trip.mpToken = mpToken;
+        }
+
         trip.tripCustomer = {
             id: safeCustomer.id ?? null,
             userId: custUserId,

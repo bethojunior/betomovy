@@ -274,6 +274,30 @@ class TripDao extends BaseDao
                 try {
                     $this->tripPayment($establishment);
                 } catch (\Throwable $t) {}
+            } elseif (!empty($data->tripPaymentFormId)) {
+                // Se a forma de pagamento for Cartão / Stripe ou Voucher, processa o pagamento/pré-autorização
+                try {
+                    $tpf = (new TripPaymentFormDao())->find($data->tripPaymentFormId);
+                    if ($tpf) {
+                        $isCard = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::CREDIT_CARD || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::DEBIT_CARD);
+                        $isVoucher = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER_ADMINISTRATIVE);
+
+                        if ($isCard || $isVoucher) {
+                            $custObj = $customer ?? (new CustomerDao())->findByUser($this->trip->getUserId());
+                            (new \app\services\CustomerTripPaymentService())->tripPayment(
+                                $custObj,
+                                $this->trip,
+                                $data->cardId ?? null,
+                                $data->mpToken ?? null,
+                                !empty($data->isOpenPriceTrip),
+                                $data->idTransaction ?? null
+                            );
+                        }
+                    }
+                } catch (\Throwable $t) {
+                    (new LogDao())->logException($t);
+                    throw $t;
+                }
             }
 
             // 8. Queue drivers in driverCalled table so drivers are found by searchTrip

@@ -227,8 +227,11 @@ function showPaymentForm() {
         } else {
             document.querySelector(".btn-search-trip")?.removeAttribute("balanceTrip");
 
-            const isCard = parseInt(paymentForm.paymentFormTypeId, 10) === PAYMENT_CARD_CREDIT
-                || parseInt(paymentForm.idTripPaymentForm, 10) === 3;
+            const isCard = typeof isPaymentFormCard === "function"
+                ? isPaymentFormCard(paymentForm)
+                : (parseInt(paymentForm.paymentFormTypeId, 10) === PAYMENT_CARD_CREDIT
+                   || parseInt(paymentForm.idTripPaymentForm, 10) === 3
+                   || parseInt(paymentForm.idTripPaymentForm, 10) === 18);
 
             viewController.elementProperty.getElement("#cardSelectedPayTrip", element => {
                 element.style.display = isCard ? "flex" : "none";
@@ -270,11 +273,17 @@ function updateCardSelected() {
 }
 
 function showDataPaymentForm(idTripPaymentForm) {
+    if (typeof isPaymentFormCard === "function" && isPaymentFormCard(idTripPaymentForm)) {
+        getCardSelectedPayTrip(Session.getLocal("cardSelected"));
+        return;
+    }
+
     switch (parseInt(idTripPaymentForm, 10)) {
         case 1:
             showBalanceVoucherClient();
             break;
         case 3:
+        case 18:
             getCardSelectedPayTrip(Session.getLocal("cardSelected"));
             break;
     }

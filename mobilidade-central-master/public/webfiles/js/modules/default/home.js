@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
       newTrip['centralNeighborhoodId'] = managerTrip.typeTaxi.centralNeighborhoodId
     }
 
-    if (parseInt(newTrip.tripPaymentFormId) === PAYMENT_CARD_CREDIT) {
+    if (typeof isPaymentFormCard === 'function' ? isPaymentFormCard(newTrip.tripPaymentFormId) : (parseInt(newTrip.tripPaymentFormId) === PAYMENT_CARD_CREDIT || parseInt(newTrip.tripPaymentFormId) === 18)) {
       const tokenCard = Session.get('tokenCard') || Session.getLocal('tokenCard')
       const mpToken = tokenCard?.token || Session.getValueInSession('tokenCard', 'token')
       const cardId = tokenCard?.cardId || Session.getValueInSession('tokenCard', 'cardId')

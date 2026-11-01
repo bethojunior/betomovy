@@ -58,7 +58,7 @@ function showAnotherPrice() {
 
         //Session.set("managerTrip",managerTrip);
 
-        if (parseInt(trip.tripPaymentFormId) === PAYMENT_CARD_CREDIT) {
+        if (typeof isPaymentFormCard === "function" ? isPaymentFormCard(trip.tripPaymentFormId) : (parseInt(trip.tripPaymentFormId) === PAYMENT_CARD_CREDIT || parseInt(trip.tripPaymentFormId) === 18)) {
             getCardSelectedPayTrip(Session.get("cardSelected") || Session.getLocal("cardSelected")).then(() => {
                 initNewTrip(trip);
             }).catch((message) => {
@@ -75,7 +75,7 @@ function callAgainTrip() {
 
     const trip = Session.get("lastTrip");
 
-    if (parseInt(trip.tripPaymentFormId) === PAYMENT_CARD_CREDIT) {
+    if (typeof isPaymentFormCard === "function" ? isPaymentFormCard(trip.tripPaymentFormId) : (parseInt(trip.tripPaymentFormId) === PAYMENT_CARD_CREDIT || parseInt(trip.tripPaymentFormId) === 18)) {
         getCardSelectedPayTrip(Session.get("cardSelected") || Session.getLocal("cardSelected")).then(() => {
             initNewTrip(trip);
         }).catch((message) => {
