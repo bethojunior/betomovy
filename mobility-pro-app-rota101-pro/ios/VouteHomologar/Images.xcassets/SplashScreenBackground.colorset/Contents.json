@@ -4,9 +4,9 @@
       "color": {
         "components": {
           "alpha": "1.000",
-          "blue": "1.00000000000000",
-          "green": "1.00000000000000",
-          "red": "1.00000000000000"
+          "blue": "0.474510",
+          "green": "0.137255",
+          "red": "0.803922"
         },
         "color-space": "srgb"
       },
@@ -14,7 +14,7 @@
     }
   ],
   "info": {
-    "version": 1,
-    "author": "expo"
+    "author": "expo",
+    "version": 1
   }
 }

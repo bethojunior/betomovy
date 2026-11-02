@@ -1,12 +1,14 @@
 import styled from "styled-components/native";
-import { RFValue } from "react-native-responsive-fontsize";
 
 export const Container = styled.View`
     flex: 1;
     justify-content: center;
     align-items: center;
-`
+    background-color: #CD2379;
+`;
 
 export const Logo = styled.Image`
-
-`
+    width: 280px;
+    height: 72px;
+    resize-mode: contain;
+`;

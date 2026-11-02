@@ -1,14 +1,20 @@
 import { useEffect, useRef } from 'react';
-import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
 import {
-  Container,
-  Splash,
-  SplashImage,
-  SpinnerContainer,
-} from './styles';
+  ActivityIndicator,
+  Animated,
+  Dimensions,
+  Easing,
+  ImageBackground,
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
+import { Container, Splash, SplashImage, SpinnerContainer } from './styles';
 
 import { Portal } from 'react-native-paper';
-import logo from '~/../assets/logo-on-dark.png';
+import splashRingsBg from '~/../assets/splash_rings_bg.png';
+import splashIconMovy from '~/../assets/splash_icon_movy.png';
+import splashTextMovyWhite from '~/../assets/splash_text_movy_white.png';
 import splash from '~/../assets/splash.png';
 
 interface PreloadProps {
@@ -17,63 +23,137 @@ interface PreloadProps {
   transparent?: boolean;
 }
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 const BrandDefault = () => {
-  const fade = useRef(new Animated.Value(0)).current;
-  const line = useRef(new Animated.Value(0)).current;
+  // Animação sincronizada idêntica ao vídeo
+  const iconFade = useRef(new Animated.Value(0)).current;
+  const iconScale = useRef(new Animated.Value(0.7)).current;
+  const iconTranslateX = useRef(new Animated.Value(0)).current;
+
+  const textFade = useRef(new Animated.Value(0)).current;
+  const textTranslateX = useRef(new Animated.Value(24)).current;
+
+  const pulseScale = useRef(new Animated.Value(0.85)).current;
+  const pulseOpacity = useRef(new Animated.Value(0.7)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fade, {
-        toValue: 1,
-        duration: 700,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(line, {
-        toValue: 1,
-        duration: 1000,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: false,
-      }),
+    // 1. Pulso das ondas concêntricas
+    Animated.loop(
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(pulseScale, {
+            toValue: 1.35,
+            duration: 1800,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseOpacity, {
+            toValue: 0,
+            duration: 1800,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.parallel([
+          Animated.timing(pulseScale, { toValue: 0.85, duration: 0, useNativeDriver: true }),
+          Animated.timing(pulseOpacity, { toValue: 0.7, duration: 0, useNativeDriver: true }),
+        ]),
+      ])
+    ).start();
+
+    // 2. Animação Sequencial do Logo:
+    // Fase 1: Ícone aparece no centro com zoom e fade
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(iconFade, {
+          toValue: 1,
+          duration: 600,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(iconScale, {
+          toValue: 1,
+          duration: 650,
+          easing: Easing.out(Easing.back(1.4)),
+          useNativeDriver: true,
+        }),
+      ]),
+      // Pequena pausa no centro como no vídeo
+      Animated.delay(200),
+      // Fase 2: Ícone desliza para a esquerda e o texto Movy branco surge à direita
+      Animated.parallel([
+        Animated.timing(iconTranslateX, {
+          toValue: -52,
+          duration: 750,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(textFade, {
+          toValue: 1,
+          duration: 700,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(textTranslateX, {
+          toValue: 0,
+          duration: 750,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]),
     ]).start();
-  }, [fade, line]);
+  }, []);
 
   return (
-    <View style={brand.screen}>
-      <Animated.Image
-        source={logo}
-        resizeMode="contain"
+    <ImageBackground
+      source={splashRingsBg}
+      style={brand.screen}
+      resizeMode="cover"
+    >
+      {/* Onda circular de pulso concêntrico */}
+      <Animated.View
         style={[
-          brand.logo,
+          brand.pulseRing,
           {
-            opacity: fade,
-            transform: [
-              {
-                translateY: fade.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [12, 0],
-                }),
-              },
-            ],
+            opacity: pulseOpacity,
+            transform: [{ scale: pulseScale }],
           },
         ]}
       />
-      <View style={brand.track}>
-        <Animated.View
+
+      {/* Container Central com Ícone + Texto Movy em Branco */}
+      <View style={brand.logoContainer}>
+        {/* Ícone Movy colorido */}
+        <Animated.Image
+          source={splashIconMovy}
+          resizeMode="contain"
           style={[
-            brand.route,
+            brand.icon,
             {
-              width: line.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 168],
-              }),
+              opacity: iconFade,
+              transform: [
+                { scale: iconScale },
+                { translateX: iconTranslateX },
+              ],
             },
           ]}
         />
-        <Animated.View style={[brand.pin, { opacity: line }]} />
+
+        {/* Texto Movy Branco idêntico ao vídeo */}
+        <Animated.Image
+          source={splashTextMovyWhite}
+          resizeMode="contain"
+          style={[
+            brand.textWhite,
+            {
+              opacity: textFade,
+              transform: [{ translateX: textTranslateX }],
+            },
+          ]}
+        />
       </View>
-      <Text style={brand.tag}>Mobilidade urbana</Text>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -84,44 +164,39 @@ const brand = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#0B1220',
+    backgroundColor: '#CD2379',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logo: {
-    width: 240,
-    height: 92,
+  pulseRing: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    borderWidth: 3,
+    borderColor: 'rgba(255, 255, 255, 0.45)',
   },
-  track: {
-    marginTop: 28,
-    width: 180,
-    height: 8,
+  logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    width: SCREEN_WIDTH,
+    height: 140,
   },
-  route: {
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#2EE6D6',
+  icon: {
+    width: 88,
+    height: 70,
   },
-  pin: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginLeft: -4,
-    backgroundColor: '#F5C542',
-  },
-  tag: {
-    marginTop: 18,
-    color: 'rgba(255,255,255,0.72)',
-    fontSize: 13,
-    letterSpacing: 1.4,
+  textWhite: {
+    width: 160,
+    height: 56,
+    marginLeft: 8,
   },
 });
 
 const FullSplashImage = () => (
-  <Splash>
-    <SplashImage source={splash} />
+  <Splash style={{ backgroundColor: '#CD2379' }}>
+    <SplashImage source={splash} resizeMode="cover" />
   </Splash>
 );
 
@@ -142,7 +217,7 @@ export default function Preload({
     <Portal>
       <Container
         transparent={transparent}
-        style={!transparent && type === 'brand' ? { backgroundColor: '#0B1220' } : undefined}
+        style={!transparent && type === 'brand' ? { backgroundColor: '#CD2379' } : undefined}
       >
         {type === 'brand' && <BrandDefault />}
         {type === 'splash' && <FullSplashImage />}
