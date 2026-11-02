@@ -704,7 +704,7 @@ class CustomerController extends ApiController
                         THEN customer.profileImage
                         ELSE 'user.png'
                     END as profileImage,
-                    coalesce(nullif(customer.appVersion, ''), nullif(user.appVersion, ''), '') as appVersion,
+                    coalesce(customer.appVersion, '') as appVersion,
                     coalesce(nullif(user.platform, ''), 'android') as platform,
                     coalesce(nullif(user.quantityTrips, 0), (
                         SELECT count(1) FROM trip WHERE (trip.userId = user.idUser OR trip.customerId = customer.idCustomer) AND trip.status = 'finished'
