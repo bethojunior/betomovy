@@ -707,6 +707,7 @@ class CustomerController extends ApiController
                     customer.appVersion,
                     user.platform,
                     coalesce(user.quantityTrips, 0) as quantityTripsFinished,
+                    (SELECT COUNT(*) FROM trip WHERE trip.customerId = customer.idCustomer AND trip.status = 'canceled') as quantityTripsCancelled,
                     coalesce(user.created_at, '') as created_at,
                     coalesce(user.observation, '') as observation,
                     user.last_lat as latitude,
@@ -745,6 +746,7 @@ class CustomerController extends ApiController
                 $c['comission'] = (float)$c['comission'];
                 $c['voucherBalance'] = (float)$c['voucherBalance'];
                 $c['quantityTripsFinished'] = (int)$c['quantityTripsFinished'];
+                $c['quantityTripsCancelled'] = (int)$c['quantityTripsCancelled'];
                 $c['zafiraValidated'] = (int)$c['zafiraValidated'];
 
                 $photo = trim((string)($c['profileImage'] ?? ''));

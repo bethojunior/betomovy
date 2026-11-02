@@ -36,7 +36,10 @@ class CustomerRepository extends AbstractRepository
         $enriched = $this->enrichCustomers($core->getCollection()->pluck('idCustomer'))->keyBy('idCustomer');
 
         return $core->setCollection(
-            $core->getCollection()->map(fn ($row) => $enriched->get($row->idCustomer))
+            $core->getCollection()
+                ->map(fn ($row) => $enriched->get($row->idCustomer))
+                ->filter()
+                ->values()
         );
     }
 
@@ -121,7 +124,8 @@ class CustomerRepository extends AbstractRepository
         return $this->getModel()::join('user', 'customer.userId', '=', 'user.idUser')
             // leftJoin: findAllCore() não exige balance, inner join aqui sumia com o cliente no map().
             ->leftJoin('balance', 'customer.balanceId', '=', 'balance.idBalance')
-            ->join('config', 'config.key', DB::raw("'link_storage_pictures'"))
+            // leftJoin: sem a config 'link_storage_pictures' o inner join zerava a listagem inteira.
+            ->leftJoin('config', 'config.key', DB::raw("'link_storage_pictures'"))
             ->leftJoin('city', 'user.cityId', 'city.id')
             ->leftJoin('customerRegisterStatus', 'customer.customerRegisterStatusId', '=', 'customerRegisterStatus.idCustomerRegisterStatus')
             ->leftJoin('militaryUser', 'user.idUser', '=', 'militaryUser.userId')
@@ -184,6 +188,7 @@ class CustomerRepository extends AbstractRepository
                 'customer.appVersion',
                 'user.platform',
                 'user.quantityTrips as quantityTripsFinished',
+                DB::raw("(SELECT COUNT(*) FROM trip WHERE trip.customerId = customer.idCustomer AND trip.status = 'canceled') AS quantityTripsCancelled"),
                 'user.created_at',
                 'user.observation',
                 'user.last_lat as latitude',

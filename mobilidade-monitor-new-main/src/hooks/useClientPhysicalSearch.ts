@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { SelectValue } from "antd/lib/select";
 import swal from "sweetalert";
 import api from "../services/api";
@@ -24,6 +24,7 @@ export function useClientPhysicalSearch(): UseClientPhysicalSearchReturn {
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState("");
   const [thisPage, setThisPage] = useState(1);
+  const lastRequestId = useRef(0);
 
   const [searchRaw, setSearchRaw] = useState("");
   const [search, setSearchDebounced] = useState("");
@@ -44,7 +45,7 @@ export function useClientPhysicalSearch(): UseClientPhysicalSearchReturn {
 
   const buildUrl = useCallback(
     (page: number) => {
-      const searchParam = search ? `&${SEARCH_PARAM_BY_RADIO[radio]}=${search}` : "";
+      const searchParam = search ? `&${SEARCH_PARAM_BY_RADIO[radio]}=${encodeURIComponent(search)}` : "";
       return `customer?page=${page}&customerRegisterStatusId=${status}&militaryForceId=${forceSelected}&militaryGraduationId=${patentSelected}${searchParam}`;
     },
     [radio, search, status, forceSelected, patentSelected]
@@ -52,12 +53,17 @@ export function useClientPhysicalSearch(): UseClientPhysicalSearchReturn {
 
   const onSearch = useCallback(
     (page = 1) => {
+      const requestId = ++lastRequestId.current;
       setLoading(true);
       api
         .get(buildUrl(page))
         .then((values) => {
+          if (requestId !== lastRequestId.current) return;
           setThisPage(page);
-          if (!values.data.status) return;
+          if (!values.data.status) {
+            swal({ title: values.data?.message || "Erro ao pesquisar clientes", icon: "error" });
+            return;
+          }
 
           const raw = values.data?.response?.data ?? values.data?.response ?? values.data?.data;
           const list = Array.isArray(raw) ? raw : [];
@@ -72,17 +78,20 @@ export function useClientPhysicalSearch(): UseClientPhysicalSearchReturn {
             });
           };
 
+          setPagination(values.data?.response?.next_page_url || "");
           if (page !== 1) {
             setInfosListClient((prev) => deduplicateList([...(prev ?? []), ...list]));
             return;
           }
           setInfosListClient(deduplicateList(list));
-          setPagination(values.data?.response?.next_page_url || "");
         })
         .catch(() => {
+          if (requestId !== lastRequestId.current) return;
           swal({ title: "Erro ao pesquisar clientes", icon: "error" });
         })
-        .finally(() => setLoading(false));
+        .finally(() => {
+          if (requestId === lastRequestId.current) setLoading(false);
+        });
     },
     [buildUrl]
   );
