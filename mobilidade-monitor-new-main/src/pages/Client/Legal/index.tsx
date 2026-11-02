@@ -54,7 +54,8 @@ const LegalPerson: FC = () => {
   const [customerEdit, setCustomerEdit] = useState<Data | null>(null);
   const [registerOrEdit, setRegisterOrEdit] = useState(false);
 
-  const { cityId } = Session.getLocal("citySelected");
+  const sessionCity = Session.getLocal("citySelected");
+  const cityId = Number(sessionCity?.cityId || sessionCity?.id || 0);
 
   const {
     listLegalPerson,
@@ -251,10 +252,10 @@ const LegalPerson: FC = () => {
       </ItemMenuSettings>
       <ItemMenuSettings
         key="2"
-        onClick={() => blockClient(item.id, item.company_register_status.name)}
+        onClick={() => blockClient(item.id, item.company_register_status?.name ?? "ATIVO")}
       >
         <BsLockFill />{" "}
-        {item.company_register_status.name === "ATIVO"
+        {(item.company_register_status?.name ?? "ATIVO") === "ATIVO"
           ? "Bloquear"
           : "Desbloquear"}
       </ItemMenuSettings>

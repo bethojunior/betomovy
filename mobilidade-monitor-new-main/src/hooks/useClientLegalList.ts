@@ -39,9 +39,15 @@ export function useClientLegalList(cityId: number): UseClientLegalListReturn {
     api.get(buildUrl(1, valueSearch))
       .then((response) => {
         if (response.data?.status) {
-          const { data, last_page, current_page } = response.data.response;
-          setListLegalPerson(data);
-          setHasMore(current_page < last_page);
+          const resp = response.data?.response ?? response.data?.data;
+          const items = Array.isArray(resp) ? resp : (resp?.data ?? []);
+          const lastPage = typeof resp?.last_page === "number" ? resp.last_page : 1;
+          const currentPage = typeof resp?.current_page === "number" ? resp.current_page : 1;
+          setListLegalPerson(items);
+          setHasMore(currentPage < lastPage);
+        } else {
+          setListLegalPerson([]);
+          setHasMore(false);
         }
       })
       .catch(() => {
@@ -56,9 +62,12 @@ export function useClientLegalList(cityId: number): UseClientLegalListReturn {
     api.get(buildUrl(pageRef.current, valueSearch))
       .then((response) => {
         if (response.data?.status) {
-          const { data, last_page, current_page } = response.data.response;
-          setListLegalPerson((prev) => [...prev, ...data]);
-          setHasMore(current_page < last_page);
+          const resp = response.data?.response ?? response.data?.data;
+          const items = Array.isArray(resp) ? resp : (resp?.data ?? []);
+          const lastPage = typeof resp?.last_page === "number" ? resp.last_page : 1;
+          const currentPage = typeof resp?.current_page === "number" ? resp.current_page : pageRef.current;
+          setListLegalPerson((prev) => [...prev, ...items]);
+          setHasMore(currentPage < lastPage);
         }
       })
       .catch(() => {
