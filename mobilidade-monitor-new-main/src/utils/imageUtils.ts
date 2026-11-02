@@ -9,8 +9,10 @@ const isPlaceholderPhoto = (photo?: string | null) => {
   return (
     normalized === '' ||
     normalized === 'user.png' ||
+    normalized === 'default.png' ||
     normalized === 'defaultimgnotfound' ||
     normalized.endsWith('/user.png') ||
+    normalized.endsWith('/default.png') ||
     normalized.includes('defaultimgnotfound')
   )
 }

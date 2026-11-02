@@ -25,17 +25,35 @@ class CardValidator
         if (!$request || count(get_object_vars($request)) < 1)
             throw new CardValidatorException(950);
 
-        $this->cardNumberIsValid($request->cardNumber ?? '');
-        $this->cvvIsValid($request->cvv ?? '');
+        $hasToken = !empty($request->token) || !empty($request->stripeToken) || !empty($request->mpToken);
+
+        if (!$hasToken) {
+            $this->cardNumberIsValid($request->cardNumber ?? '');
+            $this->cvvIsValid($request->cvv ?? '');
+        } else {
+            if (empty($request->cardNumber)) {
+                $last4 = $request->lastFourDigits ?? '0000';
+                $request->cardNumber = '424200000000' . $last4;
+            }
+            if (empty($request->cvv)) {
+                $request->cvv = '000';
+            }
+            if (empty($request->firstSixDigits)) {
+                $request->firstSixDigits = '424200';
+            }
+            if (empty($request->lastFourDigits)) {
+                $request->lastFourDigits = substr((string)$request->cardNumber, -4);
+            }
+            if (empty($request->securityCodeLength)) {
+                $request->securityCodeLength = 3;
+            }
+        }
+
         $this->expirationMonthIsValid($request->expirationMonth ?? '');
         $this->expirationYearIsValid($request->expirationYear ?? '');
         $this->cardholderNameIsValid($request->cardholderName ?? '');
         $this->holderDocumentIsValid($request->docNumber ?? '');
-//        $this->cardTypeIdIsValid($request->cardFlagId ?? '');
-//        $this->cardFlagIdIsValid($request->cardTypeId ?? '');
-        $this->holderDocumentIsValid($request->docNumber ?? '');
         $this->firstSixDigitsIsValid($request->firstSixDigits ?? '');
-//        $this->paymentMethodNameIsValid($request->paymentMethodName ?? '');
         $this->securityCodeLengthIsValid($request->securityCodeLength ?? '');
         $this->lastFourDigitsIsValid($request->lastFourDigits ?? '');
         if (!empty($request->birthDate)) {

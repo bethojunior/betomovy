@@ -82,6 +82,7 @@ const ListCLientComponent: FC<ClientListComponents> = ({
 
       <ClientTopRow>
         <ClientProfile
+          name={item.name}
           profileImage={item.profileImage}
           profileImageLink={item.profileImageLink}
           baseImageLink={baseImageLink}

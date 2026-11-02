@@ -46,7 +46,7 @@ export function useClientPhysicalSearch(): UseClientPhysicalSearchReturn {
   const buildUrl = useCallback(
     (page: number) => {
       const searchParam = search ? `&${SEARCH_PARAM_BY_RADIO[radio]}=${encodeURIComponent(search)}` : "";
-      return `customer?page=${page}&customerRegisterStatusId=${status}&militaryForceId=${forceSelected}&militaryGraduationId=${patentSelected}${searchParam}`;
+      return `customer/index?page=${page}&customerRegisterStatusId=${status}&militaryForceId=${forceSelected}&militaryGraduationId=${patentSelected}${searchParam}`;
     },
     [radio, search, status, forceSelected, patentSelected]
   );
@@ -71,7 +71,7 @@ export function useClientPhysicalSearch(): UseClientPhysicalSearchReturn {
           const deduplicateList = (items: ListClient[]) => {
             const seen = new Set<number>();
             return items.filter((item) => {
-              const id = item.idCustomer || item.idUser;
+              const id = item.idUser || item.idCustomer;
               if (seen.has(id)) return false;
               seen.add(id);
               return true;

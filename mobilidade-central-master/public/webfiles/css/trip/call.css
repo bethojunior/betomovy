@@ -566,10 +566,16 @@ body {
 }
 
 .trip-client {
-    position: absolute;
-    height: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
+    height: auto;
+    max-height: 85vh;
     display: none;
+    pointer-events: none;
+    z-index: 1250;
 }
 
 .trip-client > .option-trip {
@@ -640,22 +646,21 @@ body {
 
 .trip-client.active {
     display: flex !important;
-    flex-direction: column;
-    justify-content: flex-end;
-    pointer-events: auto;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
 }
 
 .trip-client-card {
-    background: #ffffff;
-    border-radius: 24px 24px 0 0;
-    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.22);
-    padding: 20px 20px 28px;
-    width: 100%;
-    max-width: 480px;
-    margin: 0 auto;
-    box-sizing: border-box;
-    pointer-events: auto;
-    animation: slideUpTripClient 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    background: #ffffff !important;
+    border-radius: 24px 24px 0 0 !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.22) !important;
+    padding: 20px 20px 28px !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    pointer-events: auto !important;
+    animation: slideUpTripClient 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
 @keyframes slideUpTripClient {

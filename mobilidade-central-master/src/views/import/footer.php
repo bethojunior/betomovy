@@ -42,6 +42,8 @@ if ($mapboxToken): ?>
 <script src="https://cdn.jsdelivr.net/npm/@mapbox/polyline@1.2.1/src/polyline.js"></script>
 <!-- Mapbox GL Draw — DrawingManager equivalent -->
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
+<!-- Stripe.js v3 Oficial -->
+<script src="https://js.stripe.com/v3/"></script>
 
 <?php
 $host = Host::getLocal();

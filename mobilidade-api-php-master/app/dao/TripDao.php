@@ -268,8 +268,28 @@ class TripDao extends BaseDao
             // 6. Create Trip Record
             $this->trip = $this->createTrip($data);
 
-            // 7. Pagamento de cartão/voucher roda DEPOIS do chamado (não segura o toque do motorista).
-            $deferredPayment = !empty($data->tripPaymentFormId) && empty($data->establishmentId);
+            // 7. Pagamento eletrônico (Cartão/Stripe/Voucher) deve autorizar ANTES de chamar motoristas!
+            // Se o cartão for recusado ou não tiver saldo, aborta aqui e NÃO chama nenhum motorista.
+            if (!empty($data->tripPaymentFormId) && empty($data->establishmentId)) {
+                $tpf = (new TripPaymentFormDao())->find($data->tripPaymentFormId);
+                if ($tpf) {
+                    $isCard = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::CREDIT_CARD || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::DEBIT_CARD);
+                    $isVoucher = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER_ADMINISTRATIVE);
+
+                    if ($isCard || $isVoucher) {
+                        $custObj = $customer ?? (new CustomerDao())->findByUser($this->trip->getUserId());
+                        (new \app\services\CustomerTripPaymentService())->tripPayment(
+                            $custObj,
+                            $this->trip,
+                            $data->cardId ?? null,
+                            $data->mpToken ?? null,
+                            !empty($data->isOpenPriceTrip),
+                            $data->idTransaction ?? null
+                        );
+                    }
+                }
+            }
+
             $establishment = null;
             if (!empty($data->establishmentId)) {
                 try {
@@ -378,37 +398,6 @@ class TripDao extends BaseDao
                     backgroundTask('trip-call', escapeshellarg($this->trip->getTripReference()));
                 } catch (\Throwable $t) {
                     (new LogDao())->logException($t);
-                }
-            }
-
-            if (!empty($deferredPayment)) {
-                try {
-                    $tpf = (new TripPaymentFormDao())->find($data->tripPaymentFormId);
-                    if ($tpf) {
-                        $isCard = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::CREDIT_CARD || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::DEBIT_CARD);
-                        $isVoucher = ((int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER || (int)$tpf->paymentFormTypeId === \app\constant\PaymentFormTypeConst::VOUCHER_ADMINISTRATIVE);
-
-                        if ($isCard || $isVoucher) {
-                            $custObj = $customer ?? (new CustomerDao())->findByUser($this->trip->getUserId());
-                            (new \app\services\CustomerTripPaymentService())->tripPayment(
-                                $custObj,
-                                $this->trip,
-                                $data->cardId ?? null,
-                                $data->mpToken ?? null,
-                                !empty($data->isOpenPriceTrip),
-                                $data->idTransaction ?? null
-                            );
-                        }
-                    }
-                } catch (\Throwable $t) {
-                    (new LogDao())->logException($t);
-                    try {
-                        \app\dao\GenericDao::execute(
-                            "UPDATE trip SET status = 'payment_refused' WHERE tripReference = :ref",
-                            [':ref' => $this->trip->getTripReference()]
-                        );
-                    } catch (\Throwable $e) {}
-                    throw $t;
                 }
             }
 

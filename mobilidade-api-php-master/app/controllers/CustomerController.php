@@ -660,9 +660,9 @@ class CustomerController extends ApiController
 
             $whereSql = implode(' AND ', $where);
 
-            // Count total
+            // Count total de clientes únicos (por usuário)
             $countSql = "
-                SELECT count(DISTINCT customer.idCustomer)
+                SELECT count(DISTINCT customer.userId)
                 FROM customer
                 JOIN user ON customer.userId = user.idUser
                 WHERE {$whereSql}
@@ -671,7 +671,7 @@ class CustomerController extends ApiController
             $countStmt->execute($params);
             $total = (int)$countStmt->fetchColumn();
 
-            // Query items
+            // Query items agrupados por cliente único (pegando o registro customer mais recente de cada um)
             $sql = "
                 SELECT
                     customer.idCustomer,
@@ -694,20 +694,24 @@ class CustomerController extends ApiController
                     coalesce(balance.balance, 0) as comission,
                     coalesce(balance.tripBalance, 0) as voucherBalance,
                     CASE
-                        WHEN customer.profileImage IS NOT NULL
-                             AND TRIM(customer.profileImage) != ''
-                             AND customer.profileImage != 'user.png'
-                        THEN customer.profileImage
                         WHEN user.profilePhoto IS NOT NULL
                              AND TRIM(user.profilePhoto) != ''
                              AND user.profilePhoto != 'user.png'
                         THEN user.profilePhoto
-                        ELSE coalesce(nullif(customer.profileImage, ''), nullif(user.profilePhoto, ''), 'user.png')
+                        WHEN customer.profileImage IS NOT NULL
+                             AND TRIM(customer.profileImage) != ''
+                             AND customer.profileImage != 'user.png'
+                        THEN customer.profileImage
+                        ELSE 'user.png'
                     END as profileImage,
-                    customer.appVersion,
-                    user.platform,
-                    coalesce(user.quantityTrips, 0) as quantityTripsFinished,
-                    (SELECT COUNT(*) FROM trip WHERE trip.customerId = customer.idCustomer AND trip.status = 'canceled') as quantityTripsCancelled,
+                    coalesce(nullif(customer.appVersion, ''), nullif(user.appVersion, ''), '') as appVersion,
+                    coalesce(nullif(user.platform, ''), 'android') as platform,
+                    coalesce(nullif(user.quantityTrips, 0), (
+                        SELECT count(1) FROM trip WHERE (trip.userId = user.idUser OR trip.customerId = customer.idCustomer) AND trip.status = 'finished'
+                    ), 0) as quantityTripsFinished,
+                    (
+                        SELECT count(1) FROM trip WHERE (trip.userId = user.idUser OR trip.customerId = customer.idCustomer) AND trip.status = 'canceled'
+                    ) as quantityTripsCancelled,
                     coalesce(user.created_at, '') as created_at,
                     coalesce(user.observation, '') as observation,
                     user.last_lat as latitude,
@@ -721,15 +725,21 @@ class CustomerController extends ApiController
                     null as docLabels,
                     null as docTexts,
                     null as docStatuses
-                FROM customer
+                FROM (
+                    SELECT customer.userId, MAX(customer.idCustomer) as maxIdCustomer
+                    FROM customer
+                    JOIN user ON customer.userId = user.idUser
+                    WHERE {$whereSql}
+                    GROUP BY customer.userId
+                    ORDER BY maxIdCustomer DESC
+                    LIMIT {$limit} OFFSET {$offset}
+                ) latest_customer
+                JOIN customer ON customer.idCustomer = latest_customer.maxIdCustomer
                 JOIN user ON customer.userId = user.idUser
                 LEFT JOIN customerRegisterStatus crs ON customer.customerRegisterStatusId = crs.idCustomerRegisterStatus
                 LEFT JOIN city ON user.cityId = city.id
                 LEFT JOIN balance ON customer.balanceId = balance.idBalance
-                WHERE {$whereSql}
-                GROUP BY customer.idCustomer
                 ORDER BY customer.idCustomer DESC
-                LIMIT {$limit} OFFSET {$offset}
             ";
 
             $stmt = $pdo->prepare($sql);

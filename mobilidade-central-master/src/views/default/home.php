@@ -410,22 +410,31 @@
                         <input type="tel" id="documentCard" placeholder="###.###.###-##"/>
                     </div>
                 </div>
-                <div>
-                    <label for="cardNumber">Número do cartão</label>
-                    <div>
-                        <i class="material-icons">credit_card</i>
-                        <input type="tel" id="cardNumber" data-checkout="cardNumber" placeholder="•••• •••• •••• ••••"
-                               autocomplete="off"/>
-                    </div>
+                <!-- Container oficial Stripe Elements -->
+                <div id="stripeCardContainer" style="display: none; margin-bottom: 16px;">
+                    <label style="display:block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155;">Dados do Cartão (Stripe Seguro)</label>
+                    <div id="stripeCardElement" style="padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; background: #ffffff; min-height: 44px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);"></div>
+                    <div id="stripeCardErrors" style="color: #dc2626; font-size: 13px; margin-top: 6px; font-weight: 500;"></div>
                 </div>
-                <div class="divider-container">
+                <!-- Campos legados para MercadoPago e outros -->
+                <div id="legacyCardFields">
                     <div>
-                        <label for="dateMonthYear">Validade</label>
-                        <input type="tel" id="dateMonthYear" placeholder="MM/AA"/>
+                        <label for="cardNumber">Número do cartão</label>
+                        <div>
+                            <i class="material-icons">credit_card</i>
+                            <input type="tel" id="cardNumber" data-checkout="cardNumber" placeholder="•••• •••• •••• ••••"
+                                   autocomplete="off"/>
+                        </div>
                     </div>
-                    <div>
-                        <label for="securityCode">CVV</label>
-                        <input type="tel" id="securityCode" data-checkout="securityCode" placeholder="CVV" autocomplete="off"/>
+                    <div class="divider-container">
+                        <div>
+                            <label for="dateMonthYear">Validade</label>
+                            <input type="tel" id="dateMonthYear" placeholder="MM/AA"/>
+                        </div>
+                        <div>
+                            <label for="securityCode">CVV</label>
+                            <input type="tel" id="securityCode" data-checkout="securityCode" placeholder="CVV" autocomplete="off"/>
+                        </div>
                     </div>
                 </div>
                 <div hidden>
@@ -434,7 +443,7 @@
                     <input type="text" id="docNumber" data-checkout="docNumber"/>
                     <select id="docType" data-checkout="docType"><option value="CPF" selected>CPF</option></select>
                 </div>
-                <button type="submit">Salvar cartão</button>
+                <button type="submit" id="btnSubmitAddCard">Salvar cartão</button>
             </form>
         </div>
     </div>
