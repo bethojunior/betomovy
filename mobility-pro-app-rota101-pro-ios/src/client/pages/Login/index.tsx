@@ -1,76 +1,94 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import * as WebBrowser from 'expo-web-browser';
-import { TextInputMask } from 'react-native-masked-text';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ActivityIndicator, Modal, Platform, StatusBar, TouchableOpacity, View } from 'react-native';
+import { Feather, FontAwesome5, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { Modal } from 'react-native';
+
 import IconGoogle from '../../assets/images/google.svg';
 import IconFacebook from '../../assets/images/facebook.svg';
 import IconApple from '../../assets/images/apple-logo.svg';
-import logo from '../../../../assets/logo-on-dark.png';
+import logoMovyWhite from '../../../../assets/logo_movy_white_text.png';
+import loginBg from '../../../../assets/login-bg.png';
+
 import Preload from '../../components/Preload';
 import { translate } from '../../locales';
-import { SwalAlert } from '../../components/SwalAlert';
 import { AppsId } from '../../../context/ConfigGlobal/constants';
 import getAppColors from '../../../utils/GetAppColors';
 import {
-  BackgroundImage,
-  ButtonRedefinePassword,
-  ButtonRedefinePasswordText,
-  BtnBackAppPartners,
-  ButtonRegister,
-  ButtonRegisterText,
-  ButtonRegisterTextGrif,
-  Container,
-  ContainerBiometry,
-  Content,
-  ContentActions,
-  ContentButton,
-  ContentImage,
-  ContentOrSocial,
-  ContentSocial,
-  ContentTermsOfUse,
-  LoginCard,
-  Logo,
-  OrSocialText,
-  OrSocialTrace,
-  Overlay,
-  TextBackAppPartners,
-  TermsOfUseButton,
-  TermsOfUseText,
+  BackgroundContainer,
+  DarkOverlay,
+  ScrollContainer,
+  ContentWrapper,
+  LogoContainer,
+  LogoImage,
+  TaglineText,
+  ProfileGridContainer,
+  ProfileGridItem,
+  ProfileIconBadge,
+  ProfileGridTitle,
+  ProfileGridSubtitle,
+  GlassLoginCard,
+  CardHeaderRow,
+  CardHeaderPill,
+  CardHeaderPillText,
+  InputGroup,
+  ModernInputLabel,
+  ModernInputBox,
+  ModernTextInput,
+  InputErrorText,
+  CardActionsRow,
+  ForgotPasswordBtn,
+  ForgotPasswordText,
+  BiometryRow,
+  BiometryText,
+  PrimaryLoginButton,
+  PrimaryLoginButtonText,
+  RegisterPillButton,
+  RegisterPillTextNormal,
+  RegisterPillTextHighlight,
+  SocialDividerRow,
+  SocialDividerLine,
+  SocialDividerText,
+  SocialButtonsRow,
+  SocialIconButton,
+  TermsContainer,
+  TermsLinkText,
+  PartnerBackBtn,
+  PartnerBackBtnText,
+  ModalBackdrop,
+  ModalCard,
+  ModalTitle,
+  ModalSubtitle,
+  ModalChoiceCard,
+  ModalChoiceIconBox,
+  ModalChoiceContent,
+  ModalChoiceTitle,
+  ModalChoiceDescription,
+  ModalCloseButton,
+  ModalCloseButtonText,
 } from './styles';
-import { Input } from '../../components/Input';
+
 import { schema } from './schema';
-import { InputPassword } from '../../components/InputPassword';
-import { InputContainer } from '../../components/InputContainer';
-import { Accessory } from '../../components/Accessory';
 import { customToast } from '../../../utils/FlashMessage';
 import { If } from '../../components/If';
 import TermsOfUseModal from '../../components/TermsOfUseModal';
 import { useAuth } from '../../../context/auth';
 import { useModules } from '../../contexts/modules';
-import { BackPage } from '../../components/BackPage';
-import loginTheme from '../../styles/loginTheme';
-import { CheckBox } from '../../components/CheckBox';
-import { Fingerprint } from '../../components/Fingerprint';
 import { Switch } from '../../components/Switch';
-import { TextEdit } from '../../components/TextEdit';
 import { LoginFacebookModal } from '../../components/LoginFacebookModal';
 import { getDeviceId } from '../../../driver/src/utils/device';
 import { ModalSwitch } from '../../../driver/src/components/ModalSwitch';
 import LoginSpeedmob from './SpeedMob';
 import { useNetwork } from '../../../context/ConfigGlobal';
 import { buildApp, isBeta } from '../../../constantBuild/config';
-import { Button } from '../../components/Button';
 import apiMain from '../../api/apiMain';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import theme from '../../styles/theme';
 import { useConfigAppPartner } from '../../../context/ConfigAppPartner/useConfigAppPartner';
 
-interface FormData extends TextInputMask {
+interface FormData {
   email: string;
   password: string;
 }
@@ -90,9 +108,13 @@ export default function Login() {
     setLoading,
   } = useAuth();
 
-
   const [modalForgotPassword, setModalForgotPassword] = useState(false);
-  const [enabled, setEnabled] = useState(false);
+  const [modalChoiceRegister, setModalChoiceRegister] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+
+  const [enabledBiometry, setEnabledBiometry] = useState(false);
   const [modalFacebook, setModalFacebook] = useState(false);
   const [switchEnabled, setSwitchEnabled] = useState(false);
   const [modalTerms, setModalTerms] = useState(false);
@@ -106,17 +128,20 @@ export default function Login() {
     control,
     handleSubmit,
     setValue,
-    reset: handleResetFieldsInputs,
     formState: { errors },
-  } = useForm<any>({
+  } = useForm<FormData>({
     resolver: yupResolver(schema(translate)),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
 
-  const isDriver = () => {
-    const nextDriverState = !driverSelected;
-    AsyncStorage.setItem('driver-box', String(nextDriverState));
-    setDriverSelected(nextDriverState);
-    if (nextDriverState) {
+  // Alterna o perfil entre passageiro (false) e motorista (true)
+  const selectProfile = (driverMode: boolean) => {
+    AsyncStorage.setItem('driver-box', String(driverMode));
+    setDriverSelected(driverMode);
+    if (driverMode) {
       getAppColors(Number(AppsId.DRIVER));
     } else {
       getAppColors(Number(AppsId['CLIENTE FINAL']));
@@ -129,6 +154,7 @@ export default function Login() {
       setDriverSelected(true);
       getAppColors(Number(AppsId.DRIVER));
     } else {
+      setDriverSelected(false);
       getAppColors(Number(AppsId['CLIENTE FINAL']));
     }
   };
@@ -159,9 +185,15 @@ export default function Login() {
     [betaEnd, isBeta, authenticateLogin, appPartnerSelected],
   );
 
-  const handleSignUp = useCallback(() => {
-    navigation.navigate('Register');
-  }, [navigation]);
+  const handleOpenRegisterModal = () => {
+    setModalChoiceRegister(true);
+  };
+
+  const handleSelectRegisterChoice = (isDriverChoice: boolean) => {
+    selectProfile(isDriverChoice);
+    setModalChoiceRegister(false);
+    navigation.navigate('Register', { isDriver: isDriverChoice });
+  };
 
   const handleRecoveryPassword = useCallback(() => {
     setModalForgotPassword(true);
@@ -169,18 +201,12 @@ export default function Login() {
 
   const getBiometryEnabled = async () => {
     const biometry = await AsyncStorage.getItem('biometry_enabled');
-    if (biometry) {
-      return setEnabled(true);
-    }
-    return setEnabled(false);
+    setEnabledBiometry(!!biometry);
   };
 
   const handleBiometry = async () => {
     const biometrySwitch = await AsyncStorage.getItem('biometry_switch');
-    if (biometrySwitch) {
-      return setSwitchEnabled(true);
-    }
-    return setSwitchEnabled(false);
+    setSwitchEnabled(!!biometrySwitch);
   };
 
   const verifyLastLogin = async () => {
@@ -198,19 +224,6 @@ export default function Login() {
       return isActive?.value === '1';
     }
     return false;
-  };
-
-  const loginOnBiometry = async () => {
-    if (isBeta && betaEnd) {
-      setShowAlertBeta(true);
-      return;
-    }
-    const account = await AsyncStorage.getItem('account');
-    if (account) {
-      const user = JSON.parse(account);
-      // @ts-ignore
-      signIn(user);
-    }
   };
 
   const handleRedirectSelectAppPartner = () => {
@@ -240,293 +253,378 @@ export default function Login() {
     if (!data.status) {
       return customToast(data?.message, 'danger');
     }
-
     return data;
   };
 
   const handlePressButtonFacebook = async () => {
-    const dataId: any = await createId();
-    const browser = await WebBrowser.openAuthSessionAsync(
-      `https://login-social.prod.704apps.com.br?id=${dataId.id}&deviceToken=${dataId.deviceToken}`,
-      null,
-      {
-        toolbarColor: loginTheme.colors.primary,
-      },
-    );
-
-    if (browser.type === 'cancel' || browser.type === 'dismiss') {
-      const response: any = await getIdApi(dataId.id);
-      if (!response.status) {
-        return customToast(response?.message, 'danger');
+    try {
+      const dataId: any = await createId();
+      const browser = await WebBrowser.openAuthSessionAsync(
+        `https://login-social.prod.704apps.com.br?id=${dataId.id}&deviceToken=${dataId.deviceToken}`,
+      );
+      if (browser.type === 'dismiss') {
+        const dataUser = await getIdApi(dataId.id);
+        if (dataUser?.status) {
+          const { user } = dataUser.data;
+          setSocialLogin(user);
+        }
       }
-      if (!response?.data) {
-        return customToast(translate('toast.text_request_canceled'), 'danger');
-      }
-      const deviceId = await getDeviceId();
-      const payloadParse = JSON.parse(response?.data?.content);
-      setSocialLogin({
-        email: payloadParse?.email,
-        name: payloadParse?.name,
-        deviceToken: deviceId,
-        nickname: payloadParse?.nickname,
-        phone: payloadParse?.phone || '',
-      });
+    } catch (e) {
+      console.error(e);
     }
   };
 
   const handlePressButtonGoogle = async () => {
-    const dataId: any = await createId();
-    const browser = await WebBrowser.openAuthSessionAsync(
-      `https://login-social.prod.704apps.com.br/google?id=${dataId.id}&deviceToken=${dataId.deviceToken}`,
-      null,
-      {
-        toolbarColor: loginTheme.colors.primary,
-      },
-    );
-
-    if (browser.type === 'cancel' || browser.type === 'dismiss') {
-      setLoading(true);
-      const response: any = await getIdApi(dataId.id);
-      if (!response.status) {
-        setLoading(false);
-
-        return customToast(response?.message, 'danger');
+    try {
+      const dataId: any = await createId();
+      const browser = await WebBrowser.openAuthSessionAsync(
+        `https://login-social.prod.704apps.com.br/google?id=${dataId.id}&deviceToken=${dataId.deviceToken}`,
+      );
+      if (browser.type === 'dismiss') {
+        const dataUser = await getIdApi(dataId.id);
+        if (dataUser?.status) {
+          const { user } = dataUser.data;
+          setSocialLogin(user);
+        }
       }
-      if (!response?.data?.content) {
-        setLoading(false);
-
-        return customToast(translate('toast.text_request_canceled'), 'danger');
-      }
-      const deviceId = await getDeviceId();
-      const payloadParse = JSON.parse(response?.data?.content);
-      setLoading(false);
-      setSocialLogin({
-        email: payloadParse?.email,
-        name: payloadParse?.name,
-        deviceToken: deviceId,
-        nickname: payloadParse?.nickname,
-        phone: payloadParse?.phone || '',
-      });
+    } catch (e) {
+      console.error(e);
     }
   };
 
   useEffect(() => {
-    handleResetFieldsInputs();
-  }, [appPartnerSelected]);
-
-  useEffect(() => {
-    loadingIsDriverSelected();
     verifyLastLogin();
-  }, []);
-
-  useEffect(() => {
+    loadingIsDriverSelected();
     getBiometryEnabled();
     handleBiometry();
-  }, [enabled, switchEnabled]);
+  }, []);
 
   return (
     <>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+
       {init !== 'Speedmob' && init !== 'SpeedMob' && (
-        <>
-          <Modal visible={switchEnabled} transparent>
-            <Fingerprint
-              setEnabledBiometry={setEnabled}
-              setEnabled={setSwitchEnabled}
-              onPress={loginOnBiometry}
-            />
-          </Modal>
+        <BackgroundContainer source={loginBg} resizeMode="cover">
+          <DarkOverlay />
 
-          <SwalAlert
-            title={translate('trip.title_change_route')}
-            description={translate('configPage.beta_version_body')}
-            visible={showAlertBeta}
-            setVisible={setShowAlertBeta}
-          />
-          <BackgroundImage>
-            <Overlay />
-            <Container>
-              <If condition={APP_PARTNER}>
-                <BtnBackAppPartners onPress={handleRedirectSelectAppPartner}>
-                  <AntDesign
-                    name="arrow-left"
-                    size={24}
-                    color="#ffffff"
-                  />
-                  <TextBackAppPartners>
+          <ScrollContainer>
+            <ContentWrapper>
+              {/* Botão Voltar para seleção de Parceiros quando aplicável */}
+              <If condition={!!APP_PARTNER}>
+                <PartnerBackBtn onPress={handleRedirectSelectAppPartner}>
+                  <AntDesign name="arrowleft" size={18} color="#ffffff" />
+                  <PartnerBackBtnText>
                     {translate('login.text_button_redirect_app_partner')}
-                  </TextBackAppPartners>
-                </BtnBackAppPartners>
+                  </PartnerBackBtnText>
+                </PartnerBackBtn>
               </If>
 
-              <If condition={verifyDelivery}>
-                <BackPage onPress={() => navigation.goBack()} text={''} />
-              </If>
+              {/* Logo MOVY em Destaque */}
+              <LogoContainer>
+                <LogoImage source={logoMovyWhite} resizeMode="contain" />
+                <TaglineText>Mobilidade urbana inteligente</TaglineText>
+              </LogoContainer>
 
-              <Content>
-                <ContentImage>
-                  <Logo
-                    source={
-                      loginTheme.images.logo
-                        ? { uri: loginTheme.images.logo }
-                        : logo
-                    }
-                    resizeMode="contain"
+              {/* ===== GRIDS COM AS CORES ROSA COM FUNDO TRANSPARENTE ===== */}
+              <ProfileGridContainer>
+                {/* GRID PASSAGEIRO */}
+                <ProfileGridItem
+                  active={!driverSelected}
+                  activeOpacity={0.8}
+                  onPress={() => selectProfile(false)}
+                >
+                  <ProfileIconBadge active={!driverSelected}>
+                    <FontAwesome5
+                      name="user-friends"
+                      size={RFValue(18)}
+                      color={!driverSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'}
+                    />
+                  </ProfileIconBadge>
+                  <ProfileGridTitle active={!driverSelected}>
+                    PASSAGEIRO
+                  </ProfileGridTitle>
+                  <ProfileGridSubtitle active={!driverSelected}>
+                    Quero viajar
+                  </ProfileGridSubtitle>
+                </ProfileGridItem>
+
+                {/* GRID MOTORISTA */}
+                <ProfileGridItem
+                  active={driverSelected}
+                  activeOpacity={0.8}
+                  onPress={() => selectProfile(true)}
+                >
+                  <ProfileIconBadge active={driverSelected}>
+                    <MaterialCommunityIcons
+                      name="steering"
+                      size={RFValue(22)}
+                      color={driverSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'}
+                    />
+                  </ProfileIconBadge>
+                  <ProfileGridTitle active={driverSelected}>
+                    MOTORISTA
+                  </ProfileGridTitle>
+                  <ProfileGridSubtitle active={driverSelected}>
+                    Quero dirigir
+                  </ProfileGridSubtitle>
+                </ProfileGridItem>
+              </ProfileGridContainer>
+
+              {/* ===== CARD DE LOGIN GLASSMORPHISM ESCURO ===== */}
+              <GlassLoginCard>
+                <CardHeaderRow>
+                  <CardHeaderPill>
+                    <Feather
+                      name={driverSelected ? 'navigation' : 'user'}
+                      size={13}
+                      color="#ff80ab"
+                    />
+                    <CardHeaderPillText>
+                      {driverSelected ? 'Acesso do Motorista' : 'Acesso do Passageiro'}
+                    </CardHeaderPillText>
+                  </CardHeaderPill>
+                </CardHeaderRow>
+
+                {/* Input de E-mail */}
+                <InputGroup>
+                  <ModernInputLabel>{translate('login.label_email')}</ModernInputLabel>
+                  <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, value } }) => (
+                      <ModernInputBox
+                        hasError={!!errors.email}
+                        isFocused={emailFocused}
+                      >
+                        <Feather
+                          name="mail"
+                          size={18}
+                          color={emailFocused ? '#CD2379' : 'rgba(255, 255, 255, 0.55)'}
+                        />
+                        <ModernTextInput
+                          value={value}
+                          onChangeText={onChange}
+                          onFocus={() => setEmailFocused(true)}
+                          onBlur={() => setEmailFocused(false)}
+                          placeholder={translate('login.text_placeholder_email')}
+                          placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                          keyboardType="email-address"
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          autoComplete="email"
+                        />
+                      </ModernInputBox>
+                    )}
                   />
-                </ContentImage>
+                  {errors.email && (
+                    <InputErrorText>{errors.email.message as string}</InputErrorText>
+                  )}
+                </InputGroup>
 
-                <LoginCard>
-                  <InputContainer
-                    color={loginTheme.colors.primary}
-                    label={translate('login.label_email')}
-                  >
-                    <Input
-                      name="email"
-                      color={loginTheme.colors.primary}
-                      control={control}
-                      error={errors.email && (errors.email.message as string)}
-                      placeholder={translate('login.text_placeholder_email')}
-                      keyboardType="email-address"
-                      icon
-                      autoComplete="email"
-                    />
-                  </InputContainer>
-
-                  <InputContainer
-                    color={loginTheme.colors.primary}
-                    label={translate('login.label_password')}
-                  >
-                    <InputPassword
-                      name="password"
-                      color={loginTheme.colors.primary}
-                      control={control}
-                      placeholder={translate('login.text_placeholder_password')}
-                      error={errors.password && (errors.password.message as string)}
-                      icon
-                      onSubmitEditing={handleSubmit(handleAuth)}
-                    />
-                  </InputContainer>
-
-                  <ContentActions>
-                    <If condition={!verifyIsActive('enable_im_partner')}>
-                      <CheckBox
-                        colorText={loginTheme.colors.primary}
-                        title={translate('register.im_partner')}
-                        checked={driverSelected}
-                        onCheck={isDriver}
-                      />
-                    </If>
-
-                    <ButtonRedefinePassword
-                      activeOpacity={0.8}
-                      onPress={handleRecoveryPassword}
-                    >
-                      <ButtonRedefinePasswordText color={loginTheme.colors.primary}>
-                        {translate('recoveryPassword.title')}
-                      </ButtonRedefinePasswordText>
-                    </ButtonRedefinePassword>
-                  </ContentActions>
-
-                  <If condition={enabled && !driverSelected}>
-                    <ContentActions>
-                      <ContainerBiometry>
-                        <ContentActions>
-                          <TextEdit color={loginTheme.colors.primary}>
-                            {translate('myProfile.biometry')}
-                          </TextEdit>
-                          <Switch
-                            enabled={switchEnabled}
-                            value={switchEnabled}
-                            onValueChange={async check => {
-                              if (check) {
-                                await AsyncStorage.setItem(
-                                  'biometry_switch',
-                                  String(switchEnabled),
-                                );
-                              }
-
-                              setSwitchEnabled(!switchEnabled);
-                            }}
+                {/* Input de Senha */}
+                <InputGroup>
+                  <ModernInputLabel>{translate('login.label_password')}</ModernInputLabel>
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, value } }) => (
+                      <ModernInputBox
+                        hasError={!!errors.password}
+                        isFocused={passwordFocused}
+                      >
+                        <Feather
+                          name="lock"
+                          size={18}
+                          color={passwordFocused ? '#CD2379' : 'rgba(255, 255, 255, 0.55)'}
+                        />
+                        <ModernTextInput
+                          value={value}
+                          onChangeText={onChange}
+                          onFocus={() => setPasswordFocused(true)}
+                          onBlur={() => setPasswordFocused(false)}
+                          placeholder={translate('login.text_placeholder_password')}
+                          placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                          secureTextEntry={!showPassword}
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          onSubmitEditing={handleSubmit(handleAuth)}
+                        />
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={() => setShowPassword(!showPassword)}
+                          style={{ padding: 4 }}
+                        >
+                          <Feather
+                            name={showPassword ? 'eye' : 'eye-off'}
+                            size={18}
+                            color="rgba(255, 255, 255, 0.65)"
                           />
-                        </ContentActions>
-                      </ContainerBiometry>
-                    </ContentActions>
-                  </If>
+                        </TouchableOpacity>
+                      </ModernInputBox>
+                    )}
+                  />
+                  {errors.password && (
+                    <InputErrorText>{errors.password.message as string}</InputErrorText>
+                  )}
+                </InputGroup>
 
-                  <ContentButton>
-                    <Button
-                      colorText={loginTheme.colors.primaryText}
-                      color={loginTheme.colors.primary}
-                      title={translate('login.text_login')}
-                      onPress={handleSubmit(handleAuth)}
+                {/* Esqueceu a Senha */}
+                <CardActionsRow>
+                  <ForgotPasswordBtn
+                    activeOpacity={0.8}
+                    onPress={handleRecoveryPassword}
+                  >
+                    <ForgotPasswordText>
+                      {translate('recoveryPassword.title')}
+                    </ForgotPasswordText>
+                  </ForgotPasswordBtn>
+                </CardActionsRow>
+
+                {/* Biometria (se disponível) */}
+                <If condition={enabledBiometry && !driverSelected}>
+                  <BiometryRow>
+                    <BiometryText>{translate('myProfile.biometry')}</BiometryText>
+                    <Switch
+                      enabled={switchEnabled}
+                      value={switchEnabled}
+                      onValueChange={async check => {
+                        if (check) {
+                          await AsyncStorage.setItem('biometry_switch', String(switchEnabled));
+                        }
+                        setSwitchEnabled(!switchEnabled);
+                      }}
                     />
-                  </ContentButton>
-                </LoginCard>
-
-                <ButtonRegister
-                  activeOpacity={0.7}
-                  onPress={() => handleSignUp()}
-                >
-                  <ButtonRegisterText>
-                    {translate('login.not_account')}
-                  </ButtonRegisterText>
-                  <ButtonRegisterTextGrif color="#ff2d75">
-                    {translate('login.text_register')}
-                  </ButtonRegisterTextGrif>
-                </ButtonRegister>
-
-                <If
-                  condition={
-                    verifyIsActive('enable_google_login') ||
-                    verifyIsActive('enable_facebook_login') ||
-                    verifyIsActive('enable_apple_login')
-                  }
-                >
-                  <ContentOrSocial>
-                    <OrSocialTrace />
-                    <OrSocialText>
-                      {''} {translate('login.init_ssesion_social')} {''}
-                    </OrSocialText>
-                    <OrSocialTrace />
-                  </ContentOrSocial>
-
-                  <ContentSocial>
-                    <If condition={verifyIsActive('enable_google_login')}>
-                      <Accessory onPress={() => handlePressButtonGoogle()}>
-                        <IconGoogle height={RFValue(31)} width={RFValue(31)} />
-                      </Accessory>
-                    </If>
-                    <If condition={verifyIsActive('enable_facebook_login')}>
-                      <Accessory onPress={() => handlePressButtonFacebook()}>
-                        <IconFacebook height={RFValue(31)} width={RFValue(31)} />
-                      </Accessory>
-                    </If>
-                    <If condition={false && verifyIsActive('enable_apple_login')}>
-                      <Accessory onPress={() => { }}>
-                        <IconApple height={RFValue(31)} width={RFValue(31)} />
-                      </Accessory>
-                    </If>
-                  </ContentSocial>
+                  </BiometryRow>
                 </If>
 
-                <ContentTermsOfUse>
-                  <TermsOfUseButton
-                    activeOpacity={0.7}
-                    onPress={() => setModalTerms(true)}
-                  >
-                    <TermsOfUseText>
-                      {translate('myProfile.text_terms_of_use')}
-                    </TermsOfUseText>
-                  </TermsOfUseButton>
-                </ContentTermsOfUse>
-              </Content>
+                {/* Botão de Entrar */}
+                <PrimaryLoginButton
+                  activeOpacity={0.85}
+                  onPress={handleSubmit(handleAuth)}
+                >
+                  <PrimaryLoginButtonText>
+                    {driverSelected ? 'ENTRAR COMO MOTORISTA' : 'ENTRAR COMO PASSAGEIRO'}
+                  </PrimaryLoginButtonText>
+                </PrimaryLoginButton>
+              </GlassLoginCard>
 
-              <Preload visible={loading} />
-            </Container>
-          </BackgroundImage>
+              {/* Botão Cadastre-se com Grid de escolha */}
+              <RegisterPillButton
+                activeOpacity={0.8}
+                onPress={handleOpenRegisterModal}
+              >
+                <RegisterPillTextNormal>
+                  {translate('login.not_account')}
+                </RegisterPillTextNormal>
+                <RegisterPillTextHighlight>
+                  {translate('login.text_register')}
+                </RegisterPillTextHighlight>
+              </RegisterPillButton>
 
+              {/* Social Login */}
+              <If
+                condition={
+                  verifyIsActive('enable_google_login') ||
+                  verifyIsActive('enable_facebook_login')
+                }
+              >
+                <SocialDividerRow>
+                  <SocialDividerLine />
+                  <SocialDividerText>
+                    {translate('login.init_ssesion_social')}
+                  </SocialDividerText>
+                  <SocialDividerLine />
+                </SocialDividerRow>
+
+                <SocialButtonsRow>
+                  <If condition={verifyIsActive('enable_google_login')}>
+                    <SocialIconButton activeOpacity={0.8} onPress={handlePressButtonGoogle}>
+                      <IconGoogle height={RFValue(24)} width={RFValue(24)} />
+                    </SocialIconButton>
+                  </If>
+                  <If condition={verifyIsActive('enable_facebook_login')}>
+                    <SocialIconButton activeOpacity={0.8} onPress={handlePressButtonFacebook}>
+                      <IconFacebook height={RFValue(24)} width={RFValue(24)} />
+                    </SocialIconButton>
+                  </If>
+                </SocialButtonsRow>
+              </If>
+
+              {/* Termos de Uso */}
+              <TermsContainer>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => setModalTerms(true)}>
+                  <TermsLinkText>
+                    {translate('myProfile.text_terms_of_use')}
+                  </TermsLinkText>
+                </TouchableOpacity>
+              </TermsContainer>
+            </ContentWrapper>
+
+            <Preload visible={loading} />
+          </ScrollContainer>
+
+          {/* ===== MODAL DE ESCOLHA DE CADASTRO (PASSAGEIRO OU MOTORISTA) ===== */}
+          <Modal
+            visible={modalChoiceRegister}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setModalChoiceRegister(false)}
+          >
+            <ModalBackdrop>
+              <ModalCard>
+                <ModalTitle>Como deseja se cadastrar?</ModalTitle>
+                <ModalSubtitle>
+                  Escolha o seu perfil para iniciar o cadastro na Movy
+                </ModalSubtitle>
+
+                {/* Opção Passageiro */}
+                <ModalChoiceCard
+                  activeOpacity={0.8}
+                  onPress={() => handleSelectRegisterChoice(false)}
+                >
+                  <ModalChoiceIconBox>
+                    <FontAwesome5 name="user" size={RFValue(20)} color="#ffffff" />
+                  </ModalChoiceIconBox>
+                  <ModalChoiceContent>
+                    <ModalChoiceTitle>Sou passageiro</ModalChoiceTitle>
+                    <ModalChoiceDescription>
+                      Viaje com conforto, segurança e economia para qualquer destino.
+                    </ModalChoiceDescription>
+                  </ModalChoiceContent>
+                  <Feather name="chevron-right" size={22} color="#CD2379" />
+                </ModalChoiceCard>
+
+                {/* Opção Motorista */}
+                <ModalChoiceCard
+                  activeOpacity={0.8}
+                  onPress={() => handleSelectRegisterChoice(true)}
+                >
+                  <ModalChoiceIconBox color="#00F0FF">
+                    <MaterialCommunityIcons name="car" size={RFValue(24)} color="#070b14" />
+                  </ModalChoiceIconBox>
+                  <ModalChoiceContent>
+                    <ModalChoiceTitle>Sou motorista</ModalChoiceTitle>
+                    <ModalChoiceDescription>
+                      Dirija no seu horário, seja seu próprio chefe e aumente seus ganhos.
+                    </ModalChoiceDescription>
+                  </ModalChoiceContent>
+                  <Feather name="chevron-right" size={22} color="#00F0FF" />
+                </ModalChoiceCard>
+
+                <ModalCloseButton
+                  activeOpacity={0.7}
+                  onPress={() => setModalChoiceRegister(false)}
+                >
+                  <ModalCloseButtonText>Cancelar</ModalCloseButtonText>
+                </ModalCloseButton>
+              </ModalCard>
+            </ModalBackdrop>
+          </Modal>
+
+          {/* Modais de Termos e Recuperação de Senha */}
           <TermsOfUseModal
             visible={modalTerms}
-            colorText={loginTheme.colors.primary}
+            colorText="#ffffff"
             setVisible={setModalTerms}
           />
 
@@ -557,7 +655,7 @@ export default function Login() {
               }}
             />
           </If>
-        </>
+        </BackgroundContainer>
       )}
 
       {(init === 'Speedmob' || init === 'SpeedMob') && <LoginSpeedmob />}
