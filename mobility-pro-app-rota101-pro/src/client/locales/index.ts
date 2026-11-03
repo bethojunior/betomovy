@@ -21,18 +21,19 @@ const normalizeTranslate = {
 
 const androidLanguage = async () => {
   const language = await AsyncStorage.getItem('@language');
-  if (language) {
+  if (language && language !== 'en_US') {
     return language;
   }
 
   let locale = await NativeModules.I18nManager.localeIdentifier;
   locale = switchIosLanguage(locale);
+  const finalLocale = (locale && locale !== 'en_US') ? locale : 'pt_BR';
   await AsyncStorage.setItem(
     '@language',
-    locale || 'en_US',
+    finalLocale,
   );
 
-  return locale || 'en_US';
+  return finalLocale;
 };
 
 const switchIosLanguage = (locale: string) => {
@@ -52,7 +53,7 @@ const switchIosLanguage = (locale: string) => {
     case 'fr':
       return 'fr_FR';
     default:
-      return 'en_US';
+      return 'pt_BR';
   }
 };
 

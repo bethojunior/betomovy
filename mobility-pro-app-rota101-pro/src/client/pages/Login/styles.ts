@@ -64,20 +64,15 @@ export const ProfileGridContainer = styled.View`
 export const ProfileGridItem = styled.TouchableOpacity<{ active: boolean }>`
   flex: 1;
   background-color: ${({ active }) =>
-    active ? 'rgba(205, 35, 121, 0.28)' : 'rgba(255, 255, 255, 0.05)'};
+    active ? 'rgba(205, 35, 121, 0.22)' : 'transparent'};
   border-width: ${({ active }) => (active ? '2px' : '1px')};
   border-color: ${({ active }) =>
-    active ? '#CD2379' : 'rgba(255, 255, 255, 0.12)'};
+    active ? '#CD2379' : 'rgba(255, 255, 255, 0.20)'};
   border-radius: ${RFValue(16)}px;
   padding-vertical: ${RFValue(14)}px;
   padding-horizontal: ${RFValue(10)}px;
   align-items: center;
   justify-content: center;
-  shadow-color: ${({ active }) => (active ? '#CD2379' : 'transparent')};
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.45;
-  shadow-radius: 12px;
-  elevation: ${({ active }) => (active ? 6 : 0)};
 `;
 
 export const ProfileIconBadge = styled.View<{ active: boolean }>`
