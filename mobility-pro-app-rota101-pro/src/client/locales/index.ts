@@ -21,19 +21,18 @@ const normalizeTranslate = {
 
 const androidLanguage = async () => {
   const language = await AsyncStorage.getItem('@language');
-  if (language && language !== 'en_US') {
+  if (language) {
     return language;
   }
 
   let locale = await NativeModules.I18nManager.localeIdentifier;
   locale = switchIosLanguage(locale);
-  const finalLocale = (locale && locale !== 'en_US') ? locale : 'pt_BR';
   await AsyncStorage.setItem(
     '@language',
-    finalLocale,
+    locale || 'en_US',
   );
 
-  return finalLocale;
+  return locale || 'en_US';
 };
 
 const switchIosLanguage = (locale: string) => {
@@ -53,7 +52,7 @@ const switchIosLanguage = (locale: string) => {
     case 'fr':
       return 'fr_FR';
     default:
-      return 'pt_BR';
+      return 'en_US';
   }
 };
 
@@ -98,21 +97,21 @@ I18n.translations = {
   pt_PT: ptPT,
 };
 
-I18n.defaultLocale = 'pt_BR';
-I18n.locale = 'pt_BR';
+I18n.defaultLocale = 'en_US';
+I18n.locale = 'en_US';
 I18n.fallbacks = true;
 
 export const setLanguageToI18n = async () => {
   const language = await getLanguageByDevice();
   // @ts-ignore
-  const translateNormalize = normalizeTranslate[language] || 'pt_BR';
+  const translateNormalize = normalizeTranslate[language] || 'en_US';
   const iHaveThisLanguage =
     // eslint-disable-next-line no-prototype-builtins
     I18n.translations.hasOwnProperty(translateNormalize);
   // eslint-disable-next-line no-unused-expressions
   iHaveThisLanguage
     ? (I18n.locale = translateNormalize)
-    : (I18n.locale = 'pt_BR');
+    : (I18n.locale = 'en_US');
 };
 
 setLanguageToI18n();

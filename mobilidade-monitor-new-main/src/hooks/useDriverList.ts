@@ -49,8 +49,8 @@ export function useDriverList(): UseDriverListReturn {
         params.set(searchBy, formattedSearch);
       }
 
-      // Endpoint paginado correto (driver/index evita redirecionamento 301 de diretório do Nginx)
-      return `driver/index?${params.toString()}`;
+      // Endpoint paginado correto (findAll). getAll era legado e escondia motoristas sem balance/carro.
+      return `driver?${params.toString()}`;
     },
     [searchBy, idStatusSearch, driverType]
   );

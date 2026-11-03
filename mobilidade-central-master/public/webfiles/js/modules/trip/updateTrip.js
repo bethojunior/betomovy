@@ -125,7 +125,7 @@ function initRace(trip) {
     });
     viewController.elementProperty.getElement(".image-profile-driver", element => {
         let photoUrl = "";
-        const rawPhoto = driver.profilePicture || driver.profileImage || driver.profileImageUrl || driver.driverImage || "";
+        const rawPhoto = driver.profileImage || driver.profileImageUrl || driver.driverImage || "";
         if (rawPhoto) {
             if (rawPhoto.startsWith("http://") || rawPhoto.startsWith("https://")) {
                 photoUrl = rawPhoto;
@@ -135,20 +135,8 @@ function initRace(trip) {
         }
         if (photoUrl) {
             element.style.backgroundImage = `url('${photoUrl}')`;
-            element.style.backgroundSize = "cover";
-            element.style.backgroundPosition = "center";
-            element.innerHTML = "";
         } else {
-            const initial = (driverName || "M").charAt(0).toUpperCase();
-            element.style.backgroundImage = "none";
-            element.style.backgroundColor = "#2563eb";
-            element.style.color = "#ffffff";
-            element.style.display = "flex";
-            element.style.alignItems = "center";
-            element.style.justifyContent = "center";
-            element.style.fontSize = "28px";
-            element.style.fontWeight = "800";
-            element.innerHTML = `<span>${initial}</span>`;
+            element.style.backgroundImage = `url('/webfiles/img/icon/default.png')`;
         }
     });
 

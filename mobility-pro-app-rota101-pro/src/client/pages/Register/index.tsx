@@ -391,8 +391,6 @@ export function Register() {
 
     if (passengerStep === 1) {
       if (!pName.trim()) newErrors.pName = 'Informe seu nome completo';
-      const cleanCpf = pCpf.replace(/\D/g, '');
-      if (cleanCpf && cleanCpf.length !== 11) newErrors.pCpf = 'CPF deve ter 11 dígitos';
       const cleanBirth = pBirthDate.replace(/\D/g, '');
       if (cleanBirth && cleanBirth.length !== 8) newErrors.pBirthDate = 'Data de nascimento incompleta';
 
@@ -445,7 +443,7 @@ export function Register() {
       const payload = {
         name: pName.trim(),
         email: pEmail.trim().toLowerCase(),
-        document: pCpf.replace(/\D/g, ''),
+        document: '',
         dateOfBirth: formattedDate,
         nickname: pName.trim().split(' ')[0] || 'Cliente',
         registered_in: 'mobilidade',
@@ -515,8 +513,6 @@ export function Register() {
       setDriverStep(2);
     } else if (driverStep === 2) {
       if (!dName.trim()) newErrors.dName = 'Informe seu nome completo';
-      const cleanCpf = dCpf.replace(/\D/g, '');
-      if (!cleanCpf || cleanCpf.length !== 11) newErrors.dCpf = 'CPF é obrigatório para motoristas';
       const cleanPhone = dPhone.replace(/\D/g, '');
       if (!cleanPhone || cleanPhone.length < 10) newErrors.dPhone = 'Informe um celular válido com DDD';
       if (!dEmail.trim() || !dEmail.includes('@') || !dEmail.includes('.')) {
@@ -571,7 +567,7 @@ export function Register() {
         user: {
           name: dName.trim(),
           email: dEmail.trim().toLowerCase(),
-          document: dCpf.replace(/\D/g, ''),
+          document: '',
           dateOfBirth: formattedDate,
           phone: dPhone.replace(/\D/g, ''),
           password: dPassword,
@@ -824,23 +820,6 @@ export function Register() {
                           />
                         </ModernInputBox>
                         {errors.pName && <InputErrorText>{errors.pName}</InputErrorText>}
-                      </InputGroup>
-
-                      <InputGroup>
-                        <ModernInputLabel>CPF</ModernInputLabel>
-                        <ModernInputBox hasError={!!errors.pCpf}>
-                          <Feather name="file-text" size={18} color="#8A99AD" />
-                          <ModernTextInput
-                            placeholder="000.000.000-00"
-                            placeholderTextColor="rgba(255, 255, 255, 0.35)"
-                            value={pCpf}
-                            onChangeText={txt => setPCpf(maskCpf(txt))}
-                            keyboardType="numeric"
-                            maxLength={14}
-                            autoCorrect={false}
-                          />
-                        </ModernInputBox>
-                        {errors.pCpf && <InputErrorText>{errors.pCpf}</InputErrorText>}
                       </InputGroup>
 
                       <InputGroup>
@@ -1232,23 +1211,6 @@ export function Register() {
                           />
                         </ModernInputBox>
                         {errors.dName && <InputErrorText>{errors.dName}</InputErrorText>}
-                      </InputGroup>
-
-                      <InputGroup>
-                        <ModernInputLabel>CPF *</ModernInputLabel>
-                        <ModernInputBox hasError={!!errors.dCpf}>
-                          <Feather name="file-text" size={18} color="#8A99AD" />
-                          <ModernTextInput
-                            placeholder="000.000.000-00"
-                            placeholderTextColor="rgba(255, 255, 255, 0.35)"
-                            value={dCpf}
-                            onChangeText={txt => setDCpf(maskCpf(txt))}
-                            keyboardType="numeric"
-                            maxLength={14}
-                            autoCorrect={false}
-                          />
-                        </ModernInputBox>
-                        {errors.dCpf && <InputErrorText>{errors.dCpf}</InputErrorText>}
                       </InputGroup>
 
                       <InputGroup>

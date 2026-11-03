@@ -255,7 +255,7 @@ export const V1ModalCallTrip = ({
             <CallTripAvatar trip={trip} style={{ marginRight: 10 }} />
             <ClientInfo>
               <View style={{ width: '60%' }}>
-                <SimpleText>{trip?.nameCustomer || 'Passageiro'}</SimpleText>
+                <SimpleText>{trip?.nameCustomer}</SimpleText>
                 <ClienSection>
                   <If condition={IsToShowField('ratingCustomer', cityConfig)}>
                     <AntDesign
@@ -265,16 +265,13 @@ export const V1ModalCallTrip = ({
                       color={colors.primary}
                     />
                     <ClientRating>
-                      {(() => {
-                        const r = parseFloat(trip?.ratingCustomer);
-                        const ratingStr = Number.isFinite(r) ? r.toFixed(1) : '5.0';
-                        const q = trip?.quantityTripsCustomer;
-                        const hasQty = q !== null && q !== undefined && q !== '' && q !== 'null' && q !== 'undefined' && !isNaN(Number(q));
-                        const qtyStr = IsToShowField('quantityTripsCustomer', cityConfig) && hasQty
-                          ? ` - ${q} ${translate('callTrip.text_trip')}`
-                          : '';
-                        return `${ratingStr}${qtyStr}`;
-                      })()}
+                      {/* @ts-ignore */}
+                      {Number.isFinite(parseFloat(trip?.ratingCustomer))
+                        ? parseFloat(trip?.ratingCustomer).toPrecision(2)
+                        : '5.0'}
+                      {IsToShowField('quantityTripsCustomer', cityConfig) && trip?.quantityTripsCustomer != null
+                        ? ` - ${trip?.quantityTripsCustomer} ${translate('callTrip.text_trip')}`
+                        : ''}
                     </ClientRating>
                   </If>
                 </ClienSection>

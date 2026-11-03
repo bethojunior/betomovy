@@ -74,6 +74,7 @@ class StripeCheckout implements CheckoutInterface
             'capture_method' => $captureMethod,
             'confirm' => 'true',
             'off_session' => 'true',
+            'payment_method_types[0]' => 'card',
             'metadata[sale_id]' => (string) ($this->parameters['sale_id'] ?? ''),
             'metadata[trip_reference]' => (string) ($this->parameters['sale_id'] ?? '')
         ];
@@ -109,6 +110,7 @@ class StripeCheckout implements CheckoutInterface
             'capture_method' => 'manual',
             'confirm' => 'true',
             'off_session' => 'true',
+            'payment_method_types[0]' => 'card',
             'metadata[sale_id]' => (string) ($this->parameters['sale_id'] ?? ''),
             'metadata[trip_reference]' => (string) ($this->parameters['sale_id'] ?? '')
         ];
@@ -270,6 +272,7 @@ class StripeCheckout implements CheckoutInterface
         $payload = [
             'amount' => $amountInCents,
             'currency' => 'brl',
+            'payment_method_types[0]' => 'pix',
             'description' => $data['description'] ?? 'MOVY Viagem PIX'
         ];
         return $this->curlExec('payment_intents', 'POST', $payload);
@@ -356,12 +359,7 @@ class StripeCheckout implements CheckoutInterface
 
         $res = json_decode($raw, true) ?? [];
         if ($code >= 400) {
-            $rawMsg = $res['error']['message'] ?? "Erro HTTP {$code} retornado pela Stripe";
-            if (stripos($rawMsg, 'Sending credit card numbers directly') !== false) {
-                $msg = "Para pagamento com cartão no app, ative 'Tratar dados de cartão diretamente' no painel Stripe (dashboard.stripe.com/account/integration/settings) ou escolha Dinheiro, PIX ou Maquininha.";
-            } else {
-                $msg = $rawMsg;
-            }
+            $msg = $res['error']['message'] ?? "Erro HTTP {$code} retornado pela Stripe";
             throw new Exception("Stripe: {$msg}");
         }
 
