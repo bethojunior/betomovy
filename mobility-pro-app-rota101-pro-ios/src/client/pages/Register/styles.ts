@@ -91,6 +91,70 @@ export const WebviewToggleText = styled.Text`
 `;
 
 /* ===== SELEÇÃO DE PERFIL (PASSAGEIRO / MOTORISTA) ===== */
+export const SelectedProfileBanner = styled.View<{ isDriver: boolean }>`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: ${({ isDriver }) =>
+    isDriver ? 'rgba(0, 240, 255, 0.12)' : 'rgba(205, 35, 121, 0.15)'};
+  border-width: 1.5px;
+  border-color: ${({ isDriver }) => (isDriver ? '#00F0FF' : '#CD2379')};
+  border-radius: ${RFValue(16)}px;
+  padding: ${RFValue(12)}px ${RFValue(14)}px;
+  margin-bottom: ${RFValue(16)}px;
+`;
+
+export const SelectedProfileLeft = styled.View`
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+`;
+
+export const SelectedProfileIconBox = styled.View<{ isDriver: boolean }>`
+  width: ${RFValue(42)}px;
+  height: ${RFValue(42)}px;
+  border-radius: ${RFValue(21)}px;
+  background-color: ${({ isDriver }) => (isDriver ? '#00F0FF' : '#CD2379')};
+  align-items: center;
+  justify-content: center;
+  margin-right: ${RFValue(10)}px;
+`;
+
+export const SelectedProfileTextBox = styled.View`
+  flex: 1;
+`;
+
+export const SelectedProfileTitle = styled.Text<{ isDriver: boolean }>`
+  font-size: ${RFValue(13)}px;
+  font-weight: bold;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+`;
+
+export const SelectedProfileSubtitle = styled.Text<{ isDriver: boolean }>`
+  font-size: ${RFValue(10)}px;
+  color: ${({ isDriver }) => (isDriver ? '#00F0FF' : '#ff80ab')};
+  margin-top: 1px;
+`;
+
+export const ChangeProfileButton = styled.TouchableOpacity<{ isDriver: boolean }>`
+  padding-horizontal: ${RFValue(10)}px;
+  padding-vertical: ${RFValue(7)}px;
+  border-radius: ${RFValue(10)}px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.18);
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const ChangeProfileButtonText = styled.Text`
+  font-size: ${RFValue(10.5)}px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-left: 5px;
+`;
+
 export const ProfileGridContainer = styled.View`
   flex-direction: row;
   gap: 12px;
@@ -434,4 +498,97 @@ export const DropdownButton = styled.TouchableOpacity`
 export const DropdownButtonText = styled.Text<{ hasValue: boolean }>`
   font-size: ${RFValue(13.5)}px;
   color: ${({ hasValue }) => (hasValue ? '#ffffff' : 'rgba(255, 255, 255, 0.35)')};
+`;
+
+/* ===== COMPONENTES DE FOTO DE PERFIL ===== */
+export const PhotoUploadSection = styled.View`
+  align-items: center;
+  margin-bottom: ${RFValue(18)}px;
+  padding-vertical: ${RFValue(6)}px;
+`;
+
+export const PhotoAvatarWrapper = styled.TouchableOpacity`
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${RFValue(12)}px;
+`;
+
+export const PhotoAvatarImage = styled.Image`
+  width: ${RFValue(100)}px;
+  height: ${RFValue(100)}px;
+  border-radius: ${RFValue(50)}px;
+  border-width: 3px;
+  border-color: #CD2379;
+`;
+
+export const PhotoAvatarPlaceholder = styled.View`
+  width: ${RFValue(100)}px;
+  height: ${RFValue(100)}px;
+  border-radius: ${RFValue(50)}px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-width: 2px;
+  border-color: rgba(255, 255, 255, 0.25);
+  border-style: dashed;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const PhotoCameraBadge = styled.View`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: ${RFValue(32)}px;
+  height: ${RFValue(32)}px;
+  border-radius: ${RFValue(16)}px;
+  background-color: #CD2379;
+  border-width: 2px;
+  border-color: #0d1322;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const PhotoActionsRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+`;
+
+export const PhotoChoiceButton = styled.TouchableOpacity<{ variant?: 'camera' | 'gallery' }>`
+  flex-direction: row;
+  align-items: center;
+  background-color: ${({ variant }) =>
+    variant === 'camera' ? 'rgba(205, 35, 121, 0.25)' : 'rgba(255, 255, 255, 0.08)'};
+  border-width: 1px;
+  border-color: ${({ variant }) =>
+    variant === 'camera' ? '#CD2379' : 'rgba(255, 255, 255, 0.20)'};
+  border-radius: ${RFValue(10)}px;
+  padding-horizontal: ${RFValue(14)}px;
+  padding-vertical: ${RFValue(8)}px;
+`;
+
+export const PhotoChoiceButtonText = styled.Text`
+  font-size: ${RFValue(11.5)}px;
+  color: #ffffff;
+  font-weight: 600;
+  margin-left: 6px;
+`;
+
+export const PhotoRemoveBtn = styled.TouchableOpacity`
+  margin-top: ${RFValue(8)}px;
+  padding-vertical: 4px;
+`;
+
+export const PhotoRemoveBtnText = styled.Text`
+  font-size: ${RFValue(10.5)}px;
+  color: #ef4444;
+  font-weight: 500;
+`;
+
+export const PhotoTipText = styled.Text`
+  font-size: ${RFValue(11)}px;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  margin-top: 4px;
 `;
