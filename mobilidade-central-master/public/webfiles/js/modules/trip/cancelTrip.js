@@ -65,8 +65,21 @@ function cancelTripByCustomer(status){
         try {
             stopProgressTrip();
         } catch (e) {}
+        try {
+            clearDataCar();
+        } catch (e) {}
+        try {
+            viewController.elementProperty.removeClass(".trip-client", "active");
+            viewController.elementProperty.removeClass("#mapWrapper", "in-trip");
+        } catch (e) {}
+        if (typeof initProcessingCallTrip === "function") {
+            try {
+                initProcessingCallTrip(true, true);
+            } catch (e) {}
+        }
         if (typeof managerTrip !== "undefined") {
             managerTrip.isSearch = false;
+            managerTrip.inTrip = false;
             managerTrip.tripCurrent = null;
         }
         Session.deleteLocal("tripReference");

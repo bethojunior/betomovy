@@ -15,7 +15,7 @@ function startSearchStatusPoll(tripReference) {
 
             checkStatusTrip(response, tripRealtime.typeModified);
         });
-    }, 1500);
+    }, 700);
 }
 
 function stopSearchStatusPoll() {
@@ -69,13 +69,21 @@ function initRace(trip) {
 
     if (trip.status === STATUS_IN_PROGRESS) {
         viewController.elementProperty.getElement("#cancelTrip", element => {
-            element.style.display = "none"
-        })
+            element.style.display = "none";
+        });
     } else {
         viewController.elementProperty.getElement("#cancelTrip", element => {
-            element.style.display = "flex"
-        })
+            element.style.display = "flex";
+        });
     }
+
+    viewController.elementProperty.addEventInElement("#cancelTrip", "onclick", function (e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        viewController.elementProperty.getElement("#messageCancelTrip", element => {
+            element.innerHTML = "Deseja realmente cancelar esta corrida com o motorista?";
+        });
+        cancelSearchTrip(STATUS_CANCELED);
+    });
 
 
     viewController.elementProperty.addEventInElement("#dataTripInfo", "onclick", function () {

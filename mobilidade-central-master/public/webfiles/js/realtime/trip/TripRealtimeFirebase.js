@@ -40,19 +40,58 @@ class TripRealtimeFirebase {
 
     getTrip(tripReference, callback) {
         const id = `${tripReference}:${callback}`;
+        const db = getDBFirestore();
+        if (!db) return id;
 
-        this.reference = getDBFirestore()
-            .collection(this.collection)
-            .where("tripReference", "==", tripReference)
-            .limit(1);
+        let docUnsubscribe = null;
+        let queryUnsubscribe = null;
 
-        const unsubscribe = this.reference.onSnapshot((snapshot) => {
-            snapshot.docChanges().map((change) => {
-                callback(change.doc.data(), change.type);
+        // 1. Escuta direta pontual ao documento trips/{tripReference} (Instantânea < 100ms via WebSocket Firestore)
+        try {
+            const docRef = db.collection(this.collection).doc(tripReference);
+            docUnsubscribe = docRef.onSnapshot((docSnapshot) => {
+                if (docSnapshot && docSnapshot.exists) {
+                    const data = docSnapshot.data();
+                    if (data) {
+                        callback(data, "modified");
+                    }
+                }
+            }, (error) => {
+                console.warn("[Firestore] Doc listener warning:", error);
             });
-        });
+        } catch (e) {
+            console.warn("[Firestore] Error attaching doc listener:", e);
+        }
 
-        this.subs.set(id, unsubscribe);
+        // 2. Escuta secundária de redundância via query
+        try {
+            const queryRef = db.collection(this.collection).where("tripReference", "==", tripReference).limit(1);
+            queryUnsubscribe = queryRef.onSnapshot((snapshot) => {
+                if (snapshot && !snapshot.empty) {
+                    snapshot.docChanges().forEach((change) => {
+                        const data = change.doc.data();
+                        if (data) {
+                            callback(data, change.type);
+                        }
+                    });
+                }
+            }, (error) => {
+                console.warn("[Firestore] Query listener warning:", error);
+            });
+        } catch (e) {
+            console.warn("[Firestore] Error attaching query listener:", e);
+        }
+
+        const compositeUnsubscribe = () => {
+            if (typeof docUnsubscribe === "function") {
+                try { docUnsubscribe(); } catch (e) {}
+            }
+            if (typeof queryUnsubscribe === "function") {
+                try { queryUnsubscribe(); } catch (e) {}
+            }
+        };
+
+        this.subs.set(id, compositeUnsubscribe);
         return id;
     }
 }
