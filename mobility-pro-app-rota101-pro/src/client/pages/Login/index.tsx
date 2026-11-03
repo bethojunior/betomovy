@@ -192,7 +192,7 @@ export default function Login() {
   const handleSelectRegisterChoice = (isDriverChoice: boolean) => {
     selectProfile(isDriverChoice);
     setModalChoiceRegister(false);
-    navigation.navigate('Register');
+    navigation.navigate('Register', { isDriver: isDriverChoice });
   };
 
   const handleRecoveryPassword = useCallback(() => {
