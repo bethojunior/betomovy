@@ -22,6 +22,8 @@ import { useAuth } from '../../../context/auth';
 import { useConfigAppPartner } from '../../../context/ConfigAppPartner/useConfigAppPartner';
 import { translate } from '../../locales';
 import { injectDynamic } from './webViewInject';
+import loginBg from '../../../../assets/login-bg.png';
+import logoMovyWhite from '../../../../assets/logo_movy_white_text.png';
 
 import {
   BackgroundContainer,
@@ -471,7 +473,7 @@ export function Register() {
   /* ===== TELA DE SUCESSO ===== */
   if (registrationSuccess) {
     return (
-      <BackgroundContainer source={require('../../assets/images/wallpaper.png')} resizeMode="cover">
+      <BackgroundContainer source={loginBg} resizeMode="cover">
         <DarkOverlay />
         <ScrollContainer>
           <ContentWrapper>
@@ -480,7 +482,7 @@ export function Register() {
                 <Feather name="arrow-left" size={22} color="#ffffff" />
               </BackButton>
               <HeaderTitleContainer>
-                <HeaderLogo source={require('../../assets/images/logo.png')} />
+                <HeaderLogo source={logoMovyWhite} />
                 <HeaderSubtitle>Cadastro Realizado</HeaderSubtitle>
               </HeaderTitleContainer>
               <View style={{ width: 42 }} />
@@ -534,7 +536,7 @@ export function Register() {
 
   /* ===== FORMULÁRIO NATIVO PASSO A PASSO ===== */
   return (
-    <BackgroundContainer source={require('../../assets/images/wallpaper.png')} resizeMode="cover">
+    <BackgroundContainer source={loginBg} resizeMode="cover">
       <DarkOverlay />
 
       <ScrollContainer>
@@ -545,7 +547,7 @@ export function Register() {
               <Feather name="arrow-left" size={22} color="#ffffff" />
             </BackButton>
             <HeaderTitleContainer>
-              <HeaderLogo source={require('../../assets/images/logo.png')} />
+              <HeaderLogo source={logoMovyWhite} />
               <HeaderSubtitle>
                 {!isDriver ? 'Passo a passo Passageiro' : 'Passo a passo Motorista'}
               </HeaderSubtitle>
