@@ -25,32 +25,42 @@ interface PreloadProps {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+// Proporções exatas da composição central da Logo Movy
+const ICON_WIDTH = 68;
+const ICON_HEIGHT = 54;
+const GAP = 10;
+const TEXT_WIDTH = 148;
+const TEXT_HEIGHT = 46;
+const TOTAL_WIDTH = ICON_WIDTH + GAP + TEXT_WIDTH; // 226
+// Distância do centro do ícone (34) até o centro do container (113) = 79
+const CENTER_OFFSET_X = (TOTAL_WIDTH / 2) - (ICON_WIDTH / 2);
+
 const BrandDefault = () => {
-  // Animação sincronizada idêntica ao vídeo
+  // Animação sincronizada 100% idêntica ao vídeo
   const iconFade = useRef(new Animated.Value(0)).current;
-  const iconScale = useRef(new Animated.Value(0.7)).current;
-  const iconTranslateX = useRef(new Animated.Value(0)).current;
+  const iconScale = useRef(new Animated.Value(0.75)).current;
+  const iconTranslateX = useRef(new Animated.Value(CENTER_OFFSET_X)).current;
 
   const textFade = useRef(new Animated.Value(0)).current;
-  const textTranslateX = useRef(new Animated.Value(24)).current;
+  const textTranslateX = useRef(new Animated.Value(18)).current;
 
   const pulseScale = useRef(new Animated.Value(0.85)).current;
   const pulseOpacity = useRef(new Animated.Value(0.7)).current;
 
   useEffect(() => {
-    // 1. Pulso das ondas concêntricas
+    // 1. Pulso suave e contínuo das ondas concêntricas
     Animated.loop(
       Animated.sequence([
         Animated.parallel([
           Animated.timing(pulseScale, {
-            toValue: 1.35,
-            duration: 1800,
+            toValue: 1.4,
+            duration: 1900,
             easing: Easing.out(Easing.quad),
             useNativeDriver: true,
           }),
           Animated.timing(pulseOpacity, {
             toValue: 0,
-            duration: 1800,
+            duration: 1900,
             easing: Easing.out(Easing.quad),
             useNativeDriver: true,
           }),
@@ -62,42 +72,48 @@ const BrandDefault = () => {
       ])
     ).start();
 
-    // 2. Animação Sequencial do Logo:
-    // Fase 1: Ícone aparece no centro com zoom e fade
+    // 2. Animação do Logo:
+    // Fase 1: Ícone surge no centro exato da tela com zoom e fade
     Animated.sequence([
       Animated.parallel([
         Animated.timing(iconFade, {
           toValue: 1,
-          duration: 600,
+          duration: 500,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.timing(iconScale, {
-          toValue: 1,
-          duration: 650,
-          easing: Easing.out(Easing.back(1.4)),
+          toValue: 1.05,
+          duration: 550,
+          easing: Easing.out(Easing.back(1.3)),
           useNativeDriver: true,
         }),
       ]),
-      // Pequena pausa no centro como no vídeo
-      Animated.delay(200),
-      // Fase 2: Ícone desliza para a esquerda e o texto Movy branco surge à direita
+      Animated.timing(iconScale, {
+        toValue: 1,
+        duration: 200,
+        easing: Easing.inOut(Easing.quad),
+        useNativeDriver: true,
+      }),
+      // Pausa idêntica ao vídeo
+      Animated.delay(180),
+      // Fase 2: Ícone desliza suavemente para a sua posição esquerda e o texto Movy branco surge ao lado
       Animated.parallel([
         Animated.timing(iconTranslateX, {
-          toValue: -52,
-          duration: 750,
+          toValue: 0,
+          duration: 700,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.timing(textFade, {
           toValue: 1,
-          duration: 700,
+          duration: 650,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.timing(textTranslateX, {
           toValue: 0,
-          duration: 750,
+          duration: 700,
           easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
@@ -122,9 +138,9 @@ const BrandDefault = () => {
         ]}
       />
 
-      {/* Container Central com Ícone + Texto Movy em Branco */}
+      {/* Composição Central Perfeitamente Alinhada (Ícone + Texto Movy em Branco) */}
       <View style={brand.logoContainer}>
-        {/* Ícone Movy colorido */}
+        {/* Ícone Movy colorido com deslocamento milimétrico */}
         <Animated.Image
           source={splashIconMovy}
           resizeMode="contain"
@@ -140,7 +156,7 @@ const BrandDefault = () => {
           ]}
         />
 
-        {/* Texto Movy Branco idêntico ao vídeo */}
+        {/* Texto Movy Branco idêntico ao vídeo, sem qualquer corte */}
         <Animated.Image
           source={splashTextMovyWhite}
           resizeMode="contain"
@@ -170,27 +186,27 @@ const brand = StyleSheet.create({
   },
   pulseRing: {
     position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    borderWidth: 3,
-    borderColor: 'rgba(255, 255, 255, 0.45)',
+    width: 290,
+    height: 290,
+    borderRadius: 145,
+    borderWidth: 2.5,
+    borderColor: 'rgba(255, 255, 255, 0.40)',
   },
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    width: SCREEN_WIDTH,
-    height: 140,
-  },
-  icon: {
-    width: 88,
+    justifyContent: 'flex-start',
+    width: TOTAL_WIDTH,
     height: 70,
   },
+  icon: {
+    width: ICON_WIDTH,
+    height: ICON_HEIGHT,
+  },
   textWhite: {
-    width: 160,
-    height: 56,
-    marginLeft: 8,
+    width: TEXT_WIDTH,
+    height: TEXT_HEIGHT,
+    marginLeft: GAP,
   },
 });
 

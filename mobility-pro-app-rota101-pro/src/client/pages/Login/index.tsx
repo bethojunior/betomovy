@@ -325,7 +325,7 @@ export default function Login() {
                 <TaglineText>Mobilidade urbana inteligente</TaglineText>
               </LogoContainer>
 
-              {/* ===== GRIDS COM CORES ROSA COM FUNDO TRANSPARENTE ROSA ESCURO ===== */}
+              {/* ===== GRIDS COM AS CORES ROSA COM FUNDO TRANSPARENTE ===== */}
               <ProfileGridContainer>
                 {/* GRID PASSAGEIRO */}
                 <ProfileGridItem
@@ -586,7 +586,7 @@ export default function Login() {
                     <FontAwesome5 name="user" size={RFValue(20)} color="#ffffff" />
                   </ModalChoiceIconBox>
                   <ModalChoiceContent>
-                    <ModalChoiceTitle>Quero ser Passageiro</ModalChoiceTitle>
+                    <ModalChoiceTitle>Sou passageiro</ModalChoiceTitle>
                     <ModalChoiceDescription>
                       Viaje com conforto, segurança e economia para qualquer destino.
                     </ModalChoiceDescription>
@@ -603,7 +603,7 @@ export default function Login() {
                     <MaterialCommunityIcons name="car" size={RFValue(24)} color="#070b14" />
                   </ModalChoiceIconBox>
                   <ModalChoiceContent>
-                    <ModalChoiceTitle>Quero ser Motorista</ModalChoiceTitle>
+                    <ModalChoiceTitle>Sou motorista</ModalChoiceTitle>
                     <ModalChoiceDescription>
                       Dirija no seu horário, seja seu próprio chefe e aumente seus ganhos.
                     </ModalChoiceDescription>

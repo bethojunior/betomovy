@@ -61,11 +61,7 @@ export const ProfileGridContainer = styled.View`
   margin-bottom: ${RFValue(16)}px;
 `;
 
-interface ProfileGridItemProps {
-  active: boolean;
-}
-
-export const ProfileGridItem = styled.TouchableOpacity<ProfileGridItemProps>`
+export const ProfileGridItem = styled.TouchableOpacity<{ active: boolean }>`
   flex: 1;
   background-color: ${({ active }) =>
     active ? 'rgba(205, 35, 121, 0.28)' : 'rgba(255, 255, 255, 0.05)'};
@@ -79,8 +75,8 @@ export const ProfileGridItem = styled.TouchableOpacity<ProfileGridItemProps>`
   justify-content: center;
   shadow-color: ${({ active }) => (active ? '#CD2379' : 'transparent')};
   shadow-offset: 0px 4px;
-  shadow-opacity: 0.35;
-  shadow-radius: 8px;
+  shadow-opacity: 0.45;
+  shadow-radius: 12px;
   elevation: ${({ active }) => (active ? 6 : 0)};
 `;
 
@@ -98,21 +94,21 @@ export const ProfileIconBadge = styled.View<{ active: boolean }>`
 export const ProfileGridTitle = styled.Text<{ active: boolean }>`
   font-size: ${RFValue(13)}px;
   font-weight: bold;
-  color: ${({ active }) => (active ? '#ffffff' : 'rgba(255, 255, 255, 0.75)')};
+  color: ${({ active }) => (active ? '#ffffff' : 'rgba(255, 255, 255, 0.65)')};
   letter-spacing: 0.6px;
 `;
 
 export const ProfileGridSubtitle = styled.Text<{ active: boolean }>`
   font-size: ${RFValue(10)}px;
-  color: ${({ active }) => (active ? '#ff80ab' : 'rgba(255, 255, 255, 0.45)')};
+  color: ${({ active }) => (active ? '#ff80ab' : 'rgba(255, 255, 255, 0.40)')};
   margin-top: 2px;
 `;
 
 /* ===== CARD PRINCIPAL DE LOGIN (GLASSMORPHISM ESCURO) ===== */
 export const GlassLoginCard = styled.View`
-  background-color: rgba(14, 22, 38, 0.86);
+  background-color: rgba(13, 19, 34, 0.88);
   border-width: 1px;
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.10);
   border-radius: ${RFValue(22)}px;
   padding: ${RFValue(22)}px ${RFValue(18)}px;
   shadow-color: #000;
@@ -145,6 +141,7 @@ export const CardHeaderPillText = styled.Text`
   font-weight: 600;
   color: #ff80ab;
   margin-left: 6px;
+  letter-spacing: 0.3px;
 `;
 
 /* ===== INPUTS MODERNOS ESCUROS ===== */
@@ -233,7 +230,7 @@ export const PrimaryLoginButton = styled.TouchableOpacity`
   justify-content: center;
   shadow-color: #CD2379;
   shadow-offset: 0px 4px;
-  shadow-opacity: 0.4;
+  shadow-opacity: 0.45;
   shadow-radius: 12px;
   elevation: 6;
 `;
@@ -250,9 +247,9 @@ export const RegisterPillButton = styled.TouchableOpacity`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.06);
   border-width: 1px;
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
   padding-vertical: ${RFValue(12)}px;
   padding-horizontal: ${RFValue(20)}px;
@@ -343,7 +340,7 @@ export const PartnerBackBtnText = styled.Text`
 /* ===== MODAL DE CADASTRO (ESCOLHA PASSAGEIRO / MOTORISTA) ===== */
 export const ModalBackdrop = styled.View`
   flex: 1;
-  background-color: rgba(0, 0, 0, 0.82);
+  background-color: rgba(3, 6, 14, 0.88);
   justify-content: center;
   align-items: center;
   padding-horizontal: 20px;
@@ -359,8 +356,8 @@ export const ModalCard = styled.View`
   max-width: 420px;
   shadow-color: #CD2379;
   shadow-offset: 0px 8px;
-  shadow-opacity: 0.35;
-  shadow-radius: 16px;
+  shadow-opacity: 0.45;
+  shadow-radius: 20px;
   elevation: 12;
 `;
 
@@ -379,10 +376,10 @@ export const ModalSubtitle = styled.Text`
   margin-bottom: ${RFValue(20)}px;
 `;
 
-export const ModalChoiceCard = styled.TouchableOpacity<{ color?: string }>`
+export const ModalChoiceCard = styled.TouchableOpacity<{ color?: string; bgColor?: string }>`
   flex-direction: row;
   align-items: center;
-  background-color: rgba(205, 35, 121, 0.18);
+  background-color: ${({ bgColor }) => (bgColor ? bgColor : 'rgba(205, 35, 121, 0.16)')};
   border-width: 1.5px;
   border-color: ${({ color }) => (color ? color : '#CD2379')};
   border-radius: ${RFValue(16)}px;
@@ -405,15 +402,15 @@ export const ModalChoiceContent = styled.View`
 `;
 
 export const ModalChoiceTitle = styled.Text`
-  font-size: ${RFValue(14)}px;
+  font-size: ${RFValue(15)}px;
   font-weight: bold;
   color: #ffffff;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 `;
 
 export const ModalChoiceDescription = styled.Text`
   font-size: ${RFValue(11)}px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.72);
   line-height: 16px;
 `;
 

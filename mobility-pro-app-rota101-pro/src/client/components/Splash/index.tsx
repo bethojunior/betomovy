@@ -1,48 +1,23 @@
 import { useEffect } from 'react';
-import { Container, Logo } from './styles';
-
-import { Animated } from 'react-native';
-
 import { useNavigation } from '@react-navigation/native';
+import Preload from '../../../components/Preload';
 
-interface SplashProps{
-    route?: any;
-    type: 'client' | 'driver'
+interface SplashProps {
+  route?: any;
+  type: 'client' | 'driver';
 }
 
-const Splash = ({ route, type }: SplashProps) => {
-    
-    const opacity = new Animated.Value(0);
+const Splash = ({ type }: SplashProps) => {
+  const navigate = useNavigation();
 
-    const navigate = useNavigation();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate.navigate(type === 'client' ? 'SignIn' : 'Home');
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, [navigate, type]);
 
-
-    {/* EFEITO FADE NA IMAGEM */}
-
-    const fadeIn = () => {
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }).start();
-    };  
-
-    useEffect(() => {
-        fadeIn();
-        
-        {/* QUANDO SE PASSAR 1 SEGUNDO REDIRECIONA PARA SIGN IN */}
-        setTimeout(() => {
-            navigate.navigate(type === 'client' ? 'SignIn' : 'Home');
-        }, 1000);
-    }, []);
-
-    return (
-        <Container>
-            <Animated.View style={[{ opacity }]}>
-                <Logo source={route} />
-            </Animated.View>
-        </Container>
-    );
+  return <Preload visible={true} type="brand" transparent={false} />;
 };
 
 export default Splash;

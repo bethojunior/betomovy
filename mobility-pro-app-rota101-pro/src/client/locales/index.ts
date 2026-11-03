@@ -97,21 +97,21 @@ I18n.translations = {
   pt_PT: ptPT,
 };
 
-I18n.defaultLocale = 'en_US';
-I18n.locale = 'en_US';
+I18n.defaultLocale = 'pt_BR';
+I18n.locale = 'pt_BR';
 I18n.fallbacks = true;
 
 export const setLanguageToI18n = async () => {
   const language = await getLanguageByDevice();
   // @ts-ignore
-  const translateNormalize = normalizeTranslate[language] || 'en_US';
+  const translateNormalize = normalizeTranslate[language] || 'pt_BR';
   const iHaveThisLanguage =
     // eslint-disable-next-line no-prototype-builtins
     I18n.translations.hasOwnProperty(translateNormalize);
   // eslint-disable-next-line no-unused-expressions
   iHaveThisLanguage
     ? (I18n.locale = translateNormalize)
-    : (I18n.locale = 'en_US');
+    : (I18n.locale = 'pt_BR');
 };
 
 setLanguageToI18n();
