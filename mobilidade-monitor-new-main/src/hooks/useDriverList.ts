@@ -37,6 +37,7 @@ export function useDriverList(): UseDriverListReturn {
       const params = new URLSearchParams();
       params.set("page", String(page));
       params.set("per_page", "20");
+      params.set("allCities", "1"); // Exibe todos os motoristas globalmente sem restringir por cidade
 
       // Só envia filtros preenchidos (evita empty→null quebrando no Laravel)
       if (idStatusSearch > 0) {
@@ -49,7 +50,7 @@ export function useDriverList(): UseDriverListReturn {
         params.set(searchBy, formattedSearch);
       }
 
-      // Endpoint paginado correto (findAll). getAll era legado e escondia motoristas sem balance/carro.
+      // Endpoint paginado correto (findAll). allCities=1 garante todos os motoristas cadastrados
       return `driver?${params.toString()}`;
     },
     [searchBy, idStatusSearch, driverType]
@@ -58,7 +59,7 @@ export function useDriverList(): UseDriverListReturn {
   const getDrivers = useCallback(() => {
     setFilterLoading(true);
     pageRef.current = 1;
-    api.get(buildUrl(1, debouncedValueSearch))
+    api.get(buildUrl(1, debouncedValueSearch), { headers: { cityid: "0", cityId: "0" } })
       .then((response) => {
         if (response.data?.status && (response.data?.response || response.data?.data)) {
           const resp = response.data.response ?? response.data.data;
@@ -82,7 +83,7 @@ export function useDriverList(): UseDriverListReturn {
   const fetchMore = useCallback(() => {
     setFilterLoading(true);
     pageRef.current += 1;
-    api.get(buildUrl(pageRef.current, debouncedValueSearch))
+    api.get(buildUrl(pageRef.current, debouncedValueSearch), { headers: { cityid: "0", cityId: "0" } })
       .then((response) => {
         if (response.data?.status && (response.data?.response || response.data?.data)) {
           const resp = response.data.response ?? response.data.data;

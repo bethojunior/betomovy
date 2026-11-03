@@ -49,7 +49,7 @@ class DriverRepository extends AbstractRepository
         $enriched = $this->enrichDrivers($core->getCollection()->pluck('idDriver'))->keyBy('idDriver');
 
         return $core->setCollection(
-            $core->getCollection()->map(fn ($row) => $enriched->get($row->idDriver))
+            $core->getCollection()->map(fn ($row) => $enriched->get($row->idDriver))->filter()->values()
         );
     }
 
@@ -66,7 +66,10 @@ class DriverRepository extends AbstractRepository
                     })
                     ->whereNull('car.deleted_at');
             })
-            ->where('user.statusId', StatusConst::ACTIVE)
+            ->where(function (Builder $query) {
+                $query->whereNull('user.statusId')
+                    ->orWhere('user.statusId', '!=', StatusConst::REMOVED);
+            })
             ->when(isset($data['email']) && $data['email'] !== '', function (Builder $query) use ($data) {
                 $term = FullTextSearchHelper::prepareBooleanQuery((string) $data['email']);
                 $query->when($term !== '', function (Builder $query) use ($term, $data) {
@@ -103,8 +106,8 @@ class DriverRepository extends AbstractRepository
             ->when(isset($data['driverRegisterStatusId']) && $data['driverRegisterStatusId'] !== '' && (int) $data['driverRegisterStatusId'] > 0, function (Builder $query) use ($data) {
                 $query->where('driver.driverRegisterStatusId', $data['driverRegisterStatusId']);
             })
-            ->when(!$user->role->support, function (Builder $query) use ($cityId) {
-                CityAuthorizationHelper::restrictToCity($query, $cityId, 'driver.cityId');
+            ->when(!$user->role->support && !empty($cityId) && $cityId !== 'all' && $cityId !== '0' && empty($data['allCities']), function (Builder $query) use ($cityId) {
+                $query->where('driver.cityId', $cityId);
             })
             ->select('driver.idDriver')
             ->distinct()

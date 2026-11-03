@@ -721,22 +721,22 @@ class DriverController extends ApiController
             $limit = max(1, min(100, (int)($_GET['per_page'] ?? $_GET['limit'] ?? 10)));
             $offset = ($page - 1) * $limit;
 
-            $headers = function_exists('getallheaders') ? getallheaders() : [];
-            $cityId = $headers['cityid'] ?? $headers['cityId'] ?? $_SERVER['HTTP_CITYID'] ?? $_GET['cityId'] ?? null;
-
+            // Motoristas são exibidos de forma global no monitor, a menos que haja filtro explícito via query param (?cityId=...)
+            $explicitCityId = null;
+            if (!empty($_GET['cityId']) && $_GET['cityId'] !== 'all' && $_GET['cityId'] !== '0') {
+                $explicitCityId = (int)$_GET['cityId'];
+            }
             if (isset($_GET['allCities']) && ($_GET['allCities'] === '1' || $_GET['allCities'] === 'true')) {
-                $cityId = null;
-            }
-            if ($cityId === 'all' || $cityId === '0' || $cityId === 0 || $cityId === '') {
-                $cityId = null;
+                $explicitCityId = null;
             }
 
-            $where = ["user.statusId = 1"];
+            // Exibe todos os motoristas existentes (ativos, pendentes, bloqueados, etc.), ignorando apenas deletados (statusId = 2)
+            $where = ["(user.statusId IS NULL OR user.statusId != 2)"];
             $params = [];
 
-            if ($cityId) {
+            if ($explicitCityId) {
                 $where[] = "driver.cityId = :cityId";
-                $params[':cityId'] = (int)$cityId;
+                $params[':cityId'] = $explicitCityId;
             }
 
             if (!empty($_GET['driverRegisterStatusId'])) {
