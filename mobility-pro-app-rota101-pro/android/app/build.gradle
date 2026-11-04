@@ -92,8 +92,8 @@ android {
         applicationId 'br.com.client.rota101'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 80304
-        versionName "8.3.4"
+        versionCode 80305
+        versionName "8.3.5"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
@@ -194,6 +194,11 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+}
+
+// Force React Native bundle creation tasks to never use cached/stale outputs in Android Studio / Gradle
+tasks.matching { it.name.startsWith("createBundle") }.configureEach {
+    outputs.upToDateWhen { false }
 }
 
 apply plugin: 'com.google.gms.google-services'

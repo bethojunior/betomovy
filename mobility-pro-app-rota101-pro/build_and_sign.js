@@ -14,6 +14,7 @@ const gradleAab = path.join(appDir, 'android\\app\\build\\outputs\\bundle\\relea
 const targetAab = path.join(releaseDir, 'app-release.aab');
 const outputApks = path.join(releaseDir, 'app-release.apks');
 const universalApk = path.join(releaseDir, 'app-movy-universal.apk');
+const movyUniversalApk = path.join(releaseDir, 'movy-app-universal.apk');
 
 if (!fs.existsSync(releaseDir)) {
     fs.mkdirSync(releaseDir, { recursive: true });
@@ -48,11 +49,13 @@ execSync(extractCmd, { cwd: releaseDir, stdio: 'inherit' });
 const extractedApk = path.join(releaseDir, 'universal.apk');
 if (fs.existsSync(extractedApk)) {
     fs.copyFileSync(extractedApk, universalApk);
+    fs.copyFileSync(extractedApk, movyUniversalApk);
     console.log('Universal APK created successfully at:', universalApk);
+    console.log('Universal APK created successfully at:', movyUniversalApk);
 }
 
 const statsAab = fs.statSync(targetAab);
-const statsApk = fs.statSync(universalApk);
+const statsApk = fs.statSync(movyUniversalApk);
 console.log('\n================ ALL DONE ================');
 console.log(`Signed AAB: ${targetAab} (${(statsAab.size / (1024*1024)).toFixed(2)} MB)`);
 console.log(`Signed APK: ${universalApk} (${(statsApk.size / (1024*1024)).toFixed(2)} MB)`);
