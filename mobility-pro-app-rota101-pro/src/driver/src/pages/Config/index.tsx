@@ -1,4 +1,8 @@
 import { ActivityIndicator, View, Linking } from 'react-native';
+import { Audio } from 'expo-av';
+import { Camera } from 'expo-camera';
+import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 import { Switch } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons';
@@ -49,7 +53,46 @@ export const Config = () => {
   const { colors } = useTheme();
   const { userDriver } = useAuth();
   const { sendReport: sendAppReport } = useDriverAppReport();
-  const { permissions } = useDevicePermissions();
+  const { permissions, refresh: refreshPermissions } = useDevicePermissions();
+
+  const handleRequestPermission = async (type?: 'foreground' | 'background' | 'camera' | 'audio' | 'notifications' | 'media') => {
+    try {
+      if (type === 'audio') {
+        const res = await Audio.requestPermissionsAsync();
+        if (res.granted) {
+          await refreshPermissions();
+          return;
+        }
+      } else if (type === 'camera') {
+        const res = await Camera.requestCameraPermissionsAsync();
+        if (res.granted) {
+          await refreshPermissions();
+          return;
+        }
+      } else if (type === 'foreground') {
+        const res = await Location.requestForegroundPermissionsAsync();
+        if (res.granted) {
+          await refreshPermissions();
+          return;
+        }
+      } else if (type === 'background') {
+        const res = await Location.requestBackgroundPermissionsAsync();
+        if (res.granted) {
+          await refreshPermissions();
+          return;
+        }
+      } else if (type === 'notifications') {
+        const res = await Notifications.requestPermissionsAsync();
+        if (res.granted) {
+          await refreshPermissions();
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('[handleRequestPermission] erro ao solicitar permissao:', e);
+    }
+    Linking.openSettings();
+  };
 
   const getAppSettings = async () => {
     const settings = JSON.parse(await AsyncStorage.getItem('appSetting'));
@@ -175,8 +218,8 @@ export const Config = () => {
     }
   };
 
-  const ButtonPermission = ({ status }: { status: boolean }) => (
-    <Button disabled={status} onPress={() => Linking.openSettings()}>
+  const ButtonPermission = ({ status, type }: { status: boolean; type?: 'foreground' | 'background' | 'camera' | 'audio' | 'notifications' | 'media' }) => (
+    <Button disabled={status} onPress={() => handleRequestPermission(type)}>
       <ButtonText disabled={status}>
         {translate(`configPage.text_${status}`)}
       </ButtonText>
@@ -295,31 +338,31 @@ export const Config = () => {
               <SubTitle>
                 {translate('configPage.text_acess_localization')}
               </SubTitle>
-              <ButtonPermission status={permissions.foreground} />
+              <ButtonPermission status={permissions.foreground} type="foreground" />
             </Section>
             <Section>
               <SubTitle>
                 {translate('configPage.text_acess_localization_background')}
               </SubTitle>
-              <ButtonPermission status={permissions.background} />
+              <ButtonPermission status={permissions.background} type="background" />
             </Section>
             <Section>
               <SubTitle>{translate('configPage.text_acess_galery')} (Xiaomi)</SubTitle>
-              <ButtonPermission status={permissions.media} />
+              <ButtonPermission status={permissions.media} type="media" />
             </Section>
             <Section>
               <SubTitle>{translate('configPage.text_acess_camera')}</SubTitle>
-              <ButtonPermission status={permissions.camera} />
+              <ButtonPermission status={permissions.camera} type="camera" />
             </Section>
             <Section>
               <SubTitle>{translate('configPage.text_acess_audio')}</SubTitle>
-              <ButtonPermission status={permissions.audio} />
+              <ButtonPermission status={permissions.audio} type="audio" />
             </Section>
             <Section removeBorder>
               <SubTitle>
                 {translate('configPage.text_acess_notification')}
               </SubTitle>
-              <ButtonPermission status={permissions.notifications} />
+              <ButtonPermission status={permissions.notifications} type="notifications" />
             </Section>
           </Content>
           <Content>
