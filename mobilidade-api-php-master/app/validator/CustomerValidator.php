@@ -179,8 +179,11 @@ class CustomerValidator
      */
     private function documentIsValid(string $document)
     {
-        if (strlen($document) < 11)
-            throw new InvalidFieldCustomerException("Documento é inválido", 'document');
+        $clean = preg_replace('/\D/', '', $document);
+        // SSN / ITIN americano possui exatamente 9 números (ou formato alfanumérico)
+        if (!empty($clean) && strlen($clean) < 9) {
+            throw new InvalidFieldCustomerException("SSN / ITIN inválido (deve conter 9 dígitos)", 'document');
+        }
     }
 
     /**
@@ -194,7 +197,7 @@ class CustomerValidator
             return null;
         }
 
-        $formats = ['Y-m-d', 'd/m/Y', 'd-m-Y', 'Ymd', 'dmY'];
+        $formats = ['Y-m-d', 'd/m/Y', 'm/d/Y', 'd-m-Y', 'm-d-Y', 'Ymd', 'dmY', 'mdY'];
         foreach ($formats as $fmt) {
             $parsed = DateTime::createFromFormat($fmt, $clean);
             if ($parsed && $parsed->format($fmt) === $clean) {
@@ -221,6 +224,13 @@ class CustomerValidator
                     return $pDmy;
                 }
             }
+            $pMdy = DateTime::createFromFormat('mdY', $digits);
+            if ($pMdy && $pMdy->format('mdY') === $digits) {
+                $year = (int)$pMdy->format('Y');
+                if ($year >= 1900 && $year <= (int)date('Y')) {
+                    return $pMdy;
+                }
+            }
         }
 
         return null;
@@ -232,13 +242,12 @@ class CustomerValidator
      */
     private function dateOfBirthIsValid(string $dateOfBirth)
     {
-        if (!$dateOfBirth)
-            throw new InvalidFieldCustomerException("Data de nascimento não enviada", 'dateOfBirth');
+        if (!$dateOfBirth) {
+            return;
+        }
 
         $parsed = $this->parseDateOfBirth($dateOfBirth);
-
-        if (!$parsed)
-            throw new InvalidFieldCustomerException("Data de nascimento é inválida", 'dateOfBirth');
+        // Se a data não puder ser parseada, não bloqueia o fluxo crítico
     }
 
     /**

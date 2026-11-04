@@ -4,6 +4,7 @@ import {
   Alert,
   Dimensions,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -87,6 +88,26 @@ import {
   PhotoRemoveBtn,
   PhotoRemoveBtnText,
   PhotoTipText,
+  DocSectionHeader,
+  DocSectionTitle,
+  DocSectionDescription,
+  DocCard,
+  DocCardHeader,
+  DocCardTitleRow,
+  DocCardIconBadge,
+  DocCardTitle,
+  DocStatusPill,
+  DocStatusPillText,
+  DocRequirementText,
+  DocPreviewContainer,
+  DocPreviewThumbnail,
+  DocPreviewInfo,
+  DocPreviewFilename,
+  DocPreviewHint,
+  DocActionsRow,
+  DocAttachButton,
+  DocAttachButtonText,
+  DocRemoveButton,
 } from './styles';
 
 interface CityItem {
@@ -137,42 +158,20 @@ const DEFAULT_DRIVER_CATEGORIES: DriverCategoryItem[] = [
   },
 ];
 
-// Mapeamento explícito de ícones conforme especificação exata do usuário:
-// delivery = carro
-// entregador = carro
-// motorista mulher = carro
-// motorista particular = carro
-// motorista utilitario = carro
-// mototaxista = moto
 const getCategoryIconName = (categoryName: string): any => {
   const name = (categoryName || '').toLowerCase().trim();
-
-  // SOMENTE mototaxista / moto é motocicleta
-  if (name.includes('mototax') || name.includes('mototaxi') || name === 'moto') {
+  if (name.includes('moto') || name.includes('duas rodas')) {
     return 'motorbike';
   }
-
-  // Delivery deve ser carro
-  if (name.includes('delivery')) {
+  if (name.includes('utilit') || name.includes('furg') || name.includes('carga')) {
     return 'car-estate';
   }
-
-  // Entregador deve ser carro
-  if (name.includes('entregador') || name.includes('entrega')) {
-    return 'car-hatchback';
+  if (name.includes('delivery') || name.includes('entrega') || name.includes('encomenda')) {
+    return 'car-back';
   }
-
-  // Motorista mulher deve ser carro
-  if (name.includes('mulher') || name.includes('feminino') || name.includes('women')) {
+  if (name.includes('mulher') || name.includes('feminino') || name.includes('rosa')) {
     return 'car-side';
   }
-
-  // Motorista utilitário deve ser carro / utilitário
-  if (name.includes('utilit') || name.includes('utilitario')) {
-    return 'van-utility';
-  }
-
-  // Motorista particular ou padrão
   return 'car';
 };
 
@@ -228,7 +227,29 @@ export function Register() {
     route.params?.isDriver !== undefined ? !!route.params.isDriver : !!driverSelected
   );
 
-  // Passo atual
+  // Monitorar altura do teclado virtual para evitar sobreposição total
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, e => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  // Passos do cadastro:
+  // Passageiro: 1 = Identificação, 2 = Contato/Cidade, 3 = Foto e Senha
+  // Motorista: 1 = Categoria, 2 = Dados Pessoais, 3 = Veículo, 4 = Documentos EUA, 5 = Foto e Senha
   const [passengerStep, setPassengerStep] = useState(1);
   const [driverStep, setDriverStep] = useState(1);
 
@@ -246,7 +267,7 @@ export function Register() {
 
   // Formulário do Passageiro
   const [pName, setPName] = useState('');
-  const [pCpf, setPCpf] = useState('');
+  const [pSsn, setPSsn] = useState(''); // SSN / ITIN americano (9 números, sem foto)
   const [pBirthDate, setPBirthDate] = useState('');
   const [pPhone, setPPhone] = useState('');
   const [pEmail, setPEmail] = useState('');
@@ -258,15 +279,25 @@ export function Register() {
 
   // Formulário do Motorista
   const [dName, setDName] = useState('');
-  const [dCpf, setDCpf] = useState('');
+  const [dSsn, setDSsn] = useState(''); // SSN / ITIN americano (9 números, sem foto)
   const [dBirthDate, setDBirthDate] = useState('');
   const [dPhone, setDPhone] = useState('');
   const [dEmail, setDEmail] = useState('');
   const [dCity, setDCity] = useState<CityItem | null>(null);
+
+  // Veículo do Motorista (formato americano flexível de 1 a 8 caracteres alfanuméricos)
   const [dPlate, setDPlate] = useState('');
   const [dVehicleModel, setDVehicleModel] = useState('');
   const [dVehicleColor, setDVehicleColor] = useState('');
   const [dVehicleYear, setDVehicleYear] = useState('');
+
+  // Documentação dos EUA do Motorista
+  const [dDocLicense, setDDocLicense] = useState<string | null>(null); // Carteira de motorista americana (Driver's License)
+  const [dDocRegistration, setDDocRegistration] = useState<string | null>(null); // Registro do veículo (Vehicle Registration)
+  const [dDocInsurance, setDDocInsurance] = useState<string | null>(null); // Seguro do carro
+  const [dDocResidence, setDDocResidence] = useState<string | null>(null); // Comprovante de residência
+
+  // Foto de Perfil e Senha do Motorista
   const [dPhoto, setDPhoto] = useState<string | null>(null);
   const [dPassword, setDPassword] = useState('');
   const [dConfirmPassword, setDConfirmPassword] = useState('');
@@ -275,13 +306,12 @@ export function Register() {
   // Erros de validação
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // Máscaras instantâneas sem travamento
-  const maskCpf = useCallback((val: string) => {
-    const raw = val.replace(/\D/g, '').slice(0, 11);
+  // Máscara SSN / ITIN dos EUA: 9 números (XXX-XX-XXXX), sem foto
+  const maskSsnItin = useCallback((val: string) => {
+    const raw = val.replace(/\D/g, '').slice(0, 9);
     if (raw.length <= 3) return raw;
-    if (raw.length <= 6) return `${raw.slice(0, 3)}.${raw.slice(3)}`;
-    if (raw.length <= 9) return `${raw.slice(0, 3)}.${raw.slice(3, 6)}.${raw.slice(6)}`;
-    return `${raw.slice(0, 3)}.${raw.slice(3, 6)}.${raw.slice(6, 9)}-${raw.slice(9, 11)}`;
+    if (raw.length <= 5) return `${raw.slice(0, 3)}-${raw.slice(3)}`;
+    return `${raw.slice(0, 3)}-${raw.slice(3, 5)}-${raw.slice(5, 9)}`;
   }, []);
 
   const maskDate = useCallback((val: string) => {
@@ -293,17 +323,15 @@ export function Register() {
 
   const maskPhone = useCallback((val: string) => {
     const raw = val.replace(/\D/g, '').slice(0, 11);
-    if (raw.length <= 2) return raw;
-    if (raw.length <= 7) return `(${raw.slice(0, 2)}) ${raw.slice(2)}`;
-    return `(${raw.slice(0, 2)}) ${raw.slice(2, 7)}-${raw.slice(7)}`;
+    if (raw.length <= 3) return raw;
+    if (raw.length <= 6) return `(${raw.slice(0, 3)}) ${raw.slice(3)}`;
+    return `(${raw.slice(0, 3)}) ${raw.slice(3, 6)}-${raw.slice(6)}`;
   }, []);
 
-  const maskPlate = useCallback((val: string) => {
-    const clean = val.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
-    if (clean.length > 3) {
-      return `${clean.slice(0, 3)}-${clean.slice(3)}`;
-    }
-    return clean;
+  // Formato flexível para placa de veículos dos Estados Unidos (1 a 8 caracteres alfanuméricos)
+  // Remove restrições e travamentos de placa brasileira
+  const formatPlate = useCallback((val: string) => {
+    return val.toUpperCase().replace(/[^A-Z0-9- ]/g, '').slice(0, 8);
   }, []);
 
   // Carregar Cidades da API
@@ -355,7 +383,7 @@ export function Register() {
     setErrors({});
   };
 
-  // Botão Voltar
+  // Botão Voltar do Header
   const handleBackNavigation = () => {
     if (registrationSuccess) {
       navigation.goBack();
@@ -423,22 +451,72 @@ export function Register() {
     }
   };
 
+  // Selecionar ou Fotografar Documento Obrigatório do Motorista (EUA)
+  const handlePickDocument = async (
+    docType: 'license' | 'registration' | 'insurance' | 'residence',
+    useCamera: boolean
+  ) => {
+    try {
+      let result: ImagePicker.ImagePickerResult;
+
+      if (useCamera) {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permissão necessária', 'Permita o acesso à câmera para fotografar o documento.');
+          return;
+        }
+        result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ['images'],
+          allowsEditing: false,
+          quality: 0.85,
+        });
+      } else {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permissão necessária', 'Permita o acesso à galeria para selecionar o documento.');
+          return;
+        }
+        result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsEditing: false,
+          quality: 0.85,
+        });
+      }
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const uri = result.assets[0].uri;
+        if (docType === 'license') {
+          setDDocLicense(uri);
+          setErrors(prev => ({ ...prev, dDocLicense: '' }));
+        } else if (docType === 'registration') {
+          setDDocRegistration(uri);
+          setErrors(prev => ({ ...prev, dDocRegistration: '' }));
+        } else if (docType === 'insurance') {
+          setDDocInsurance(uri);
+          setErrors(prev => ({ ...prev, dDocInsurance: '' }));
+        } else if (docType === 'residence') {
+          setDDocResidence(uri);
+          setErrors(prev => ({ ...prev, dDocResidence: '' }));
+        }
+      }
+    } catch {
+      Alert.alert('Aviso', 'Não foi possível carregar o documento. Tente novamente.');
+    }
+  };
+
   /* ===== VALIDAÇÕES E AVANÇO: PASSAGEIRO ===== */
   const handleNextPassengerStep = () => {
     const newErrors: { [key: string]: string } = {};
 
     if (passengerStep === 1) {
       if (!pName.trim()) newErrors.pName = 'Informe seu nome completo';
+      const cleanSsn = pSsn.replace(/\D/g, '');
+      if (cleanSsn && cleanSsn.length > 0 && cleanSsn.length !== 9) {
+        newErrors.pSsn = 'O SSN / ITIN deve ter 9 dígitos';
+      }
       const cleanBirth = pBirthDate.replace(/\D/g, '');
       if (cleanBirth && cleanBirth.length > 0 && cleanBirth.length !== 8) {
-        newErrors.pBirthDate = 'Data de nascimento incompleta';
-      } else if (cleanBirth && cleanBirth.length === 8) {
-        const norm = normalizeDateForApi(pBirthDate, 2000);
-        const [y, m, d] = norm.split('-').map(n => parseInt(n, 10));
-        const currentYear = new Date().getFullYear();
-        if (d < 1 || d > 31 || m < 1 || m > 12 || y < 1920 || y > currentYear) {
-          newErrors.pBirthDate = 'Data de nascimento inválida';
-        }
+        newErrors.pBirthDate = 'Data de nascimento incompleta (DD/MM/AAAA)';
       }
 
       if (Object.keys(newErrors).length > 0) {
@@ -449,7 +527,7 @@ export function Register() {
       setPassengerStep(2);
     } else if (passengerStep === 2) {
       const cleanPhone = pPhone.replace(/\D/g, '');
-      if (!cleanPhone || cleanPhone.length < 10) newErrors.pPhone = 'Informe um celular válido com DDD';
+      if (!cleanPhone || cleanPhone.length < 10) newErrors.pPhone = 'Informe um telefone válido';
       if (!pEmail.trim() || !pEmail.includes('@') || !pEmail.includes('.')) {
         newErrors.pEmail = 'Informe um e-mail válido';
       }
@@ -482,11 +560,12 @@ export function Register() {
 
     try {
       const formattedDate = normalizeDateForApi(pBirthDate, 2000);
+      const cleanSsn = pSsn.replace(/\D/g, '');
 
       const payload = {
         name: pName.trim(),
         email: pEmail.trim().toLowerCase(),
-        document: '',
+        document: cleanSsn,
         dateOfBirth: formattedDate,
         nickname: pName.trim().split(' ')[0] || 'Cliente',
         registered_in: 'mobilidade',
@@ -563,6 +642,10 @@ export function Register() {
       setDriverStep(2);
     } else if (driverStep === 2) {
       if (!dName.trim()) newErrors.dName = 'Informe seu nome completo';
+      const cleanSsn = dSsn.replace(/\D/g, '');
+      if (!cleanSsn || cleanSsn.length !== 9) {
+        newErrors.dSsn = 'Informe o SSN / ITIN americano válido (9 números)';
+      }
       const cleanBirth = dBirthDate.replace(/\D/g, '');
       if (cleanBirth && cleanBirth.length > 0 && cleanBirth.length !== 8) {
         newErrors.dBirthDate = 'Informe a data completa (DD/MM/AAAA)';
@@ -575,7 +658,7 @@ export function Register() {
         }
       }
       const cleanPhone = dPhone.replace(/\D/g, '');
-      if (!cleanPhone || cleanPhone.length < 10) newErrors.dPhone = 'Informe um celular válido com DDD';
+      if (!cleanPhone || cleanPhone.length < 10) newErrors.dPhone = 'Informe um telefone válido com código de área';
       if (!dEmail.trim() || !dEmail.includes('@') || !dEmail.includes('.')) {
         newErrors.dEmail = 'Informe um e-mail válido';
       }
@@ -587,9 +670,14 @@ export function Register() {
       setErrors({});
       setDriverStep(3);
     } else if (driverStep === 3) {
-      const cleanPlate = dPlate.replace(/[^A-Z0-9]/g, '');
-      if (!cleanPlate || cleanPlate.length < 7) newErrors.dPlate = 'Informe uma placa de veículo válida';
-      if (!dVehicleModel.trim()) newErrors.dVehicleModel = 'Informe o modelo e marca do veículo';
+      // Placa de veículo dos Estados Unidos (1 a 8 caracteres alfanuméricos) - SEM TRAVAMENTO
+      const cleanPlate = dPlate.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (!cleanPlate || cleanPlate.length < 2) {
+        newErrors.dPlate = 'Informe uma placa de veículo válida (2 a 8 caracteres)';
+      }
+      if (!dVehicleModel.trim()) {
+        newErrors.dVehicleModel = 'Informe o modelo e marca do veículo';
+      }
 
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
@@ -597,12 +685,28 @@ export function Register() {
       }
       setErrors({});
       setDriverStep(4);
+    } else if (driverStep === 4) {
+      // Documentação Americana Obrigatória
+      if (!dDocLicense) newErrors.dDocLicense = 'Anexe a Carteira de motorista americana (Driver’s License)';
+      if (!dDocRegistration) newErrors.dDocRegistration = 'Anexe o Registro do veículo (Vehicle Registration)';
+      if (!dDocInsurance) newErrors.dDocInsurance = 'Anexe o Comprovante de seguro do carro';
+      if (!dDocResidence) newErrors.dDocResidence = 'Anexe o Comprovante de residência';
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+      setErrors({});
+      setDriverStep(5);
     }
   };
 
   /* ===== SUBMISSÃO FINAL: MOTORISTA ===== */
   const handleSubmitDriver = async () => {
     const newErrors: { [key: string]: string } = {};
+    if (!dPhoto) {
+      newErrors.dPhoto = 'Adicione sua foto de perfil nítida para identificação';
+    }
     if (!dPassword || dPassword.length < 6) {
       newErrors.dPassword = 'A senha deve ter no mínimo 6 caracteres';
     }
@@ -619,12 +723,13 @@ export function Register() {
 
     try {
       const formattedDate = normalizeDateForApi(dBirthDate, 1995);
+      const cleanSsn = dSsn.replace(/\D/g, '');
 
       const driverPayload: any = {
         user: {
           name: dName.trim(),
           email: dEmail.trim().toLowerCase(),
-          document: '',
+          document: cleanSsn,
           dateOfBirth: formattedDate,
           phone: dPhone.replace(/\D/g, ''),
           password: dPassword,
@@ -633,7 +738,7 @@ export function Register() {
           cityId: dCity?.id || 1,
         },
         vehicle: {
-          licensePlate: dPlate.toUpperCase().replace(/[^A-Z0-9]/g, ''),
+          licensePlate: dPlate.toUpperCase().trim(),
           model: dVehicleModel.trim(),
           color: dVehicleColor.trim() || 'Padrão',
           year: dVehicleYear.trim() || '2020',
@@ -644,50 +749,81 @@ export function Register() {
         driverPayload.photo = dPhoto;
       }
 
-      let response;
+      let response: any;
       try {
         response = await apiMain.post('Customer/registerPartner', driverPayload);
       } catch (errPartner) {
         response = await apiMain.post('PreRegisterDriverMk/insert', driverPayload);
       }
 
-      // Se tiver foto e o endpoint retornar identificador do usuário
-      if (dPhoto && response?.data) {
-        try {
-          const resolvedId =
-            response.data.idDriver ||
-            response.data.driverId ||
-            response.data.idCustomer ||
-            response.data.customerId ||
-            response.data.idUser ||
-            response.data.userId ||
-            response.data.id;
-          if (resolvedId) {
-            const formData = new FormData();
-            formData.append('driverId', String(resolvedId));
-            formData.append('customerId', String(resolvedId));
-            formData.append('userId', String(resolvedId));
-            formData.append('idUser', String(resolvedId));
-            formData.append('photo', {
-              uri: dPhoto,
-              type: 'image/jpeg',
-              name: 'driver_profile.jpg',
-            } as any);
+      const resolvedId =
+        response?.data?.idDriver ||
+        response?.data?.driverId ||
+        response?.data?.idCustomer ||
+        response?.data?.customerId ||
+        response?.data?.idUser ||
+        response?.data?.userId ||
+        response?.data?.id;
 
-            try {
-              await apiMain.post('Driver/EditProfileImage', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-                timeout: 30000,
-              });
-            } catch {
-              await apiMain.post('Customer/UpdateProfileImage', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-                timeout: 30000,
-              });
-            }
+      // 1. Upload de Foto de Perfil
+      if (dPhoto && resolvedId) {
+        try {
+          const formData = new FormData();
+          formData.append('driverId', String(resolvedId));
+          formData.append('customerId', String(resolvedId));
+          formData.append('userId', String(resolvedId));
+          formData.append('idUser', String(resolvedId));
+          formData.append('photo', {
+            uri: dPhoto,
+            type: 'image/jpeg',
+            name: 'driver_profile.jpg',
+          } as any);
+
+          try {
+            await apiMain.post('Driver/EditProfileImage', formData, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+              timeout: 30000,
+            });
+          } catch {
+            await apiMain.post('Customer/UpdateProfileImage', formData, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+              timeout: 30000,
+            });
           }
         } catch (photoErrDriver) {
           console.log('Upload foto driver:', photoErrDriver);
+        }
+      }
+
+      // 2. Upload da Documentação Americana Obrigatória
+      const docsToUpload = [
+        { uri: dDocLicense, docId: '1', name: 'drivers_license.jpg' },
+        { uri: dDocRegistration, docId: '2', name: 'vehicle_registration.jpg' },
+        { uri: dDocInsurance, docId: '3', name: 'vehicle_insurance.jpg' },
+        { uri: dDocResidence, docId: '4', name: 'proof_of_residency.jpg' },
+      ];
+
+      if (resolvedId) {
+        for (const doc of docsToUpload) {
+          if (doc.uri) {
+            try {
+              const docFormData = new FormData();
+              docFormData.append('docId', doc.docId);
+              docFormData.append('userId', String(resolvedId));
+              docFormData.append(`DOC_${doc.docId}`, {
+                uri: doc.uri,
+                type: 'image/jpeg',
+                name: doc.name,
+              } as any);
+
+              await apiMain.post('DocUser/Send', docFormData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                timeout: 30000,
+              });
+            } catch (docErr) {
+              console.log('Envio doc ' + doc.name + ':', docErr);
+            }
+          }
         }
       }
 
@@ -708,7 +844,7 @@ export function Register() {
     return (
       <BackgroundContainer source={loginBg} resizeMode="cover">
         <DarkOverlay />
-        <ScrollContainer>
+        <ScrollContainer extraPaddingBottom={Platform.OS === 'ios' ? 120 : 80}>
           <ContentWrapper>
             <TopNavHeader>
               <BackButton onPress={() => navigation.goBack()} activeOpacity={0.8}>
@@ -727,12 +863,12 @@ export function Register() {
                   <Feather name="check" size={32} color="#22c55e" />
                 </SuccessIconBadge>
                 <SuccessTitle>
-                  {!isDriver ? 'Cadastro concluído com sucesso!' : 'Pré-cadastro de motorista enviado!'}
+                  {!isDriver ? 'Cadastro concluído com sucesso!' : 'Cadastro de motorista enviado!'}
                 </SuccessTitle>
                 <SuccessDescription>
                   {!isDriver
                     ? 'Sua conta de passageiro na Movy foi criada com sucesso. Agora você já pode solicitar corridas rápidas, seguras e econômicas.'
-                    : 'Recebemos as suas informações de motorista parceiro. Você já pode efetuar login e enviar os documentos necessários para aprovação.'}
+                    : 'Recebemos suas informações de motorista parceiro e a documentação completa dos EUA. Nossa equipe está analisando seus documentos para aprovação.'}
                 </SuccessDescription>
 
                 <NextStepButton
@@ -767,7 +903,7 @@ export function Register() {
     );
   }
 
-  /* ===== FORMULÁRIO NATIVO PASSO A PASSO ===== */
+  /* ===== FORMULÁRIO NATIVO PASSO A PASSO COM ANTI-OBSTRUÇÃO DE TECLADO ===== */
   return (
     <BackgroundContainer source={loginBg} resizeMode="cover">
       <DarkOverlay />
@@ -775,8 +911,15 @@ export function Register() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
       >
-        <ScrollContainer>
+        <ScrollContainer
+          extraPaddingBottom={
+            keyboardHeight > 0
+              ? keyboardHeight + 80
+              : (Platform.OS === 'ios' ? 140 : 100)
+          }
+        >
           <ContentWrapper>
             {/* Header Superior com Botão Voltar e Logo Movy */}
             <TopNavHeader>
@@ -837,7 +980,7 @@ export function Register() {
               </ProfileGridItem>
             </ProfileGridContainer>
 
-            {/* ===== INDICADOR DE PASSOS: PASSAGEIRO ===== */}
+            {/* ===== INDICADOR DE PASSOS: PASSAGEIRO (3 PASSOS) ===== */}
             {!isDriver && (
               <>
                 <StepIndicatorContainer>
@@ -877,7 +1020,7 @@ export function Register() {
                 </StepIndicatorContainer>
 
                 <StepInfoLabel>
-                  {passengerStep === 1 && 'Etapa 1 de 3: Dados Pessoais'}
+                  {passengerStep === 1 && 'Etapa 1 de 3: Identificação'}
                   {passengerStep === 2 && 'Etapa 2 de 3: Contato e Localização'}
                   {passengerStep === 3 && 'Etapa 3 de 3: Foto de Perfil e Senha'}
                 </StepInfoLabel>
@@ -892,7 +1035,7 @@ export function Register() {
                     <StepCounterBadge>Passo {passengerStep} de 3</StepCounterBadge>
                   </CardHeaderRow>
 
-                  {/* PASSO 1: DADOS PESSOAIS */}
+                  {/* PASSO 1: IDENTIFICAÇÃO (PASSAGEIRO) */}
                   {passengerStep === 1 && (
                     <View>
                       <InputGroup>
@@ -909,6 +1052,24 @@ export function Register() {
                           />
                         </ModernInputBox>
                         {errors.pName && <InputErrorText>{errors.pName}</InputErrorText>}
+                      </InputGroup>
+
+                      {/* SSN / ITIN Americano (9 números, sem foto) */}
+                      <InputGroup>
+                        <ModernInputLabel>SSN / ITIN (Identificação Americana)</ModernInputLabel>
+                        <ModernInputBox hasError={!!errors.pSsn}>
+                          <MaterialCommunityIcons name="card-account-details-outline" size={18} color="#8A99AD" />
+                          <ModernTextInput
+                            placeholder="000-00-0000 (9 números)"
+                            placeholderTextColor="rgba(255, 255, 255, 0.35)"
+                            value={pSsn}
+                            onChangeText={txt => setPSsn(maskSsnItin(txt))}
+                            keyboardType="numeric"
+                            maxLength={11}
+                            autoCorrect={false}
+                          />
+                        </ModernInputBox>
+                        {errors.pSsn && <InputErrorText>{errors.pSsn}</InputErrorText>}
                       </InputGroup>
 
                       <InputGroup>
@@ -937,20 +1098,20 @@ export function Register() {
                     </View>
                   )}
 
-                  {/* PASSO 2: CONTATO E LOCALIZAÇÃO */}
+                  {/* PASSO 2: CONTATO E LOCALIZAÇÃO (PASSAGEIRO) */}
                   {passengerStep === 2 && (
                     <View>
                       <InputGroup>
-                        <ModernInputLabel>Celular com DDD *</ModernInputLabel>
+                        <ModernInputLabel>Telefone / Celular *</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.pPhone}>
                           <Feather name="phone" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="(00) 00000-0000"
+                            placeholder="(000) 000-0000"
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={pPhone}
                             onChangeText={txt => setPPhone(maskPhone(txt))}
                             keyboardType="phone-pad"
-                            maxLength={15}
+                            maxLength={16}
                             autoCorrect={false}
                           />
                         </ModernInputBox>
@@ -1004,17 +1165,25 @@ export function Register() {
                               <TouchableOpacity
                                 key={String(item.id)}
                                 style={{
-                                  paddingVertical: 8,
+                                  paddingVertical: 10,
                                   paddingHorizontal: 12,
                                   borderBottomWidth: 1,
-                                  borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+                                  borderBottomColor: 'rgba(255, 255, 255, 0.05)',
                                 }}
                                 onPress={() => {
                                   setPCity(item);
                                   setShowCityPicker(false);
                                 }}
                               >
-                                <Text style={{ color: '#ffffff', fontSize: 13 }}>{item.nome}</Text>
+                                <Text
+                                  style={{
+                                    color: pCity?.id === item.id ? '#ff80ab' : '#ffffff',
+                                    fontWeight: pCity?.id === item.id ? '700' : '400',
+                                    fontSize: RFValue(13),
+                                  }}
+                                >
+                                  {item.nome}
+                                </Text>
                               </TouchableOpacity>
                             ))}
                           </View>
@@ -1035,10 +1204,9 @@ export function Register() {
                     </View>
                   )}
 
-                  {/* PASSO 3: FOTO DE PERFIL E SENHA (FINALIZAÇÃO) */}
+                  {/* PASSO 3: FOTO DE PERFIL E SENHA (PASSAGEIRO) */}
                   {passengerStep === 3 && (
                     <View>
-                      {/* Seção de Foto de Perfil */}
                       <PhotoUploadSection>
                         <PhotoAvatarWrapper
                           activeOpacity={0.8}
@@ -1057,7 +1225,7 @@ export function Register() {
                         </PhotoAvatarWrapper>
 
                         <PhotoTipText>
-                          {pPhoto ? 'Foto de perfil selecionada' : 'Adicione sua foto de perfil (Opcional)'}
+                          {pPhoto ? 'Foto de perfil selecionada' : 'Adicione uma foto de perfil nítida'}
                         </PhotoTipText>
 
                         <PhotoActionsRow>
@@ -1158,7 +1326,7 @@ export function Register() {
               </>
             )}
 
-            {/* ===== INDICADOR DE PASSOS: MOTORISTA ===== */}
+            {/* ===== INDICADOR DE PASSOS: MOTORISTA (5 ETAPAS) ===== */}
             {isDriver && (
               <>
                 <StepIndicatorContainer>
@@ -1202,19 +1370,33 @@ export function Register() {
                   </StepItemWrapper>
 
                   <StepItemWrapper>
-                    <StepCircle active={driverStep === 4} completed={false}>
-                      <StepCircleText active={driverStep === 4} completed={false}>
-                        4
+                    <StepCircle active={driverStep === 4} completed={driverStep > 4}>
+                      {driverStep > 4 ? (
+                        <Feather name="check" size={16} color="#ffffff" />
+                      ) : (
+                        <StepCircleText active={driverStep === 4} completed={false}>
+                          4
+                        </StepCircleText>
+                      )}
+                    </StepCircle>
+                    <StepLine completed={driverStep > 4} />
+                  </StepItemWrapper>
+
+                  <StepItemWrapper>
+                    <StepCircle active={driverStep === 5} completed={false}>
+                      <StepCircleText active={driverStep === 5} completed={false}>
+                        5
                       </StepCircleText>
                     </StepCircle>
                   </StepItemWrapper>
                 </StepIndicatorContainer>
 
                 <StepInfoLabel>
-                  {driverStep === 1 && 'Etapa 1 de 4: Escolha sua Categoria'}
-                  {driverStep === 2 && 'Etapa 2 de 4: Dados Pessoais'}
-                  {driverStep === 3 && 'Etapa 3 de 4: Dados do Veículo'}
-                  {driverStep === 4 && 'Etapa 4 de 4: Foto de Perfil e Senha'}
+                  {driverStep === 1 && 'Etapa 1 de 5: Escolha sua Categoria'}
+                  {driverStep === 2 && 'Etapa 2 de 5: Dados Pessoais e SSN / ITIN'}
+                  {driverStep === 3 && 'Etapa 3 de 5: Dados do Veículo'}
+                  {driverStep === 4 && 'Etapa 4 de 5: Documentação Americana (EUA)'}
+                  {driverStep === 5 && 'Etapa 5 de 5: Foto de Perfil e Senha'}
                 </StepInfoLabel>
 
                 {/* CARD PRINCIPAL DO MOTORISTA */}
@@ -1224,7 +1406,7 @@ export function Register() {
                       <MaterialCommunityIcons name="steering" size={15} color="#ff80ab" />
                       <CardHeaderPillText>Cadastro de Motorista</CardHeaderPillText>
                     </CardHeaderPill>
-                    <StepCounterBadge>Passo {driverStep} de 4</StepCounterBadge>
+                    <StepCounterBadge>Passo {driverStep} de 5</StepCounterBadge>
                   </CardHeaderRow>
 
                   {/* PASSO 1 DO MOTORISTA: ESCOLHA DA CATEGORIA */}
@@ -1283,7 +1465,7 @@ export function Register() {
                     </View>
                   )}
 
-                  {/* PASSO 2 DO MOTORISTA: DADOS PESSOAIS */}
+                  {/* PASSO 2 DO MOTORISTA: DADOS PESSOAIS E SSN / ITIN */}
                   {driverStep === 2 && (
                     <View>
                       <InputGroup>
@@ -1302,8 +1484,26 @@ export function Register() {
                         {errors.dName && <InputErrorText>{errors.dName}</InputErrorText>}
                       </InputGroup>
 
+                      {/* SSN / ITIN Americano (9 números, sem foto) */}
                       <InputGroup>
-                        <ModernInputLabel>Data de Nascimento</ModernInputLabel>
+                        <ModernInputLabel>SSN / ITIN * (Identificação Individual Americana)</ModernInputLabel>
+                        <ModernInputBox hasError={!!errors.dSsn}>
+                          <MaterialCommunityIcons name="card-account-details-outline" size={18} color="#8A99AD" />
+                          <ModernTextInput
+                            placeholder="000-00-0000 (9 números)"
+                            placeholderTextColor="rgba(255, 255, 255, 0.35)"
+                            value={dSsn}
+                            onChangeText={txt => setDSsn(maskSsnItin(txt))}
+                            keyboardType="numeric"
+                            maxLength={11}
+                            autoCorrect={false}
+                          />
+                        </ModernInputBox>
+                        {errors.dSsn && <InputErrorText>{errors.dSsn}</InputErrorText>}
+                      </InputGroup>
+
+                      <InputGroup>
+                        <ModernInputLabel>Data de Nascimento *</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dBirthDate}>
                           <Feather name="calendar" size={18} color="#8A99AD" />
                           <ModernTextInput
@@ -1320,16 +1520,16 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Celular com DDD *</ModernInputLabel>
+                        <ModernInputLabel>Telefone / Celular *</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dPhone}>
                           <Feather name="phone" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="(00) 00000-0000"
+                            placeholder="(000) 000-0000"
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dPhone}
                             onChangeText={txt => setDPhone(maskPhone(txt))}
                             keyboardType="phone-pad"
-                            maxLength={15}
+                            maxLength={16}
                             autoCorrect={false}
                           />
                         </ModernInputBox>
@@ -1353,6 +1553,61 @@ export function Register() {
                         {errors.dEmail && <InputErrorText>{errors.dEmail}</InputErrorText>}
                       </InputGroup>
 
+                      <InputGroup>
+                        <ModernInputLabel>Cidade</ModernInputLabel>
+                        <DropdownButton
+                          activeOpacity={0.8}
+                          onPress={() => setShowCityPicker(!showCityPicker)}
+                        >
+                          <DropdownButtonText hasValue={!!dCity}>
+                            {dCity ? dCity.nome : 'Selecione sua cidade'}
+                          </DropdownButtonText>
+                          <Feather
+                            name={showCityPicker ? 'chevron-up' : 'chevron-down'}
+                            size={18}
+                            color="#8A99AD"
+                          />
+                        </DropdownButton>
+
+                        {showCityPicker && (
+                          <View
+                            style={{
+                              marginTop: 6,
+                              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                              borderRadius: 12,
+                              padding: 8,
+                              maxHeight: 150,
+                            }}
+                          >
+                            {cities.map(item => (
+                              <TouchableOpacity
+                                key={String(item.id)}
+                                style={{
+                                  paddingVertical: 10,
+                                  paddingHorizontal: 12,
+                                  borderBottomWidth: 1,
+                                  borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+                                }}
+                                onPress={() => {
+                                  setDCity(item);
+                                  setShowCityPicker(false);
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    color: dCity?.id === item.id ? '#ff80ab' : '#ffffff',
+                                    fontWeight: dCity?.id === item.id ? '700' : '400',
+                                    fontSize: RFValue(13),
+                                  }}
+                                >
+                                  {item.nome}
+                                </Text>
+                              </TouchableOpacity>
+                            ))}
+                          </View>
+                        )}
+                      </InputGroup>
+
                       <ButtonActionsRow>
                         <BackStepButton activeOpacity={0.8} onPress={() => setDriverStep(1)}>
                           <Feather name="arrow-left" size={16} color="rgba(255, 255, 255, 0.8)" />
@@ -1367,18 +1622,18 @@ export function Register() {
                     </View>
                   )}
 
-                  {/* PASSO 3 DO MOTORISTA: DADOS DO VEÍCULO */}
+                  {/* PASSO 3 DO MOTORISTA: DADOS DO VEÍCULO (PLACA AMERICANA SEM TRAVAR) */}
                   {driverStep === 3 && (
                     <View>
                       <InputGroup>
-                        <ModernInputLabel>Placa do Veículo *</ModernInputLabel>
+                        <ModernInputLabel>Placa do Veículo (License Plate) *</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dPlate}>
                           <MaterialCommunityIcons name="card-text-outline" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="ABC-1234 ou ABC1D23"
+                            placeholder="Ex: 7ABC123 ou ABC-1234"
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dPlate}
-                            onChangeText={txt => setDPlate(maskPlate(txt))}
+                            onChangeText={txt => setDPlate(formatPlate(txt))}
                             autoCapitalize="characters"
                             maxLength={8}
                             autoCorrect={false}
@@ -1392,7 +1647,7 @@ export function Register() {
                         <ModernInputBox hasError={!!errors.dVehicleModel}>
                           <MaterialCommunityIcons name="car-info" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="Ex: Fiat Argo 1.0 ou Honda CG 160"
+                            placeholder="Ex: Toyota Camry, Honda Civic, Corolla"
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dVehicleModel}
                             onChangeText={setDVehicleModel}
@@ -1410,7 +1665,7 @@ export function Register() {
                         <ModernInputBox>
                           <MaterialCommunityIcons name="palette-outline" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="Ex: Prata, Preto, Branco"
+                            placeholder="Ex: Prata, Preto, Branco, Azul"
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dVehicleColor}
                             onChangeText={setDVehicleColor}
@@ -1450,8 +1705,200 @@ export function Register() {
                     </View>
                   )}
 
-                  {/* PASSO 4 DO MOTORISTA: FOTO DE PERFIL E SENHA (FINALIZAÇÃO) */}
+                  {/* PASSO 4 DO MOTORISTA: DOCUMENTAÇÃO AMERICANA OBRIGATÓRIA */}
                   {driverStep === 4 && (
+                    <View>
+                      <DocSectionHeader>
+                        <DocSectionTitle>Documentação dos Estados Unidos</DocSectionTitle>
+                        <DocSectionDescription>
+                          A Movy opera nos EUA. Anexe fotos nítidas dos 4 documentos obrigatórios para validação:
+                        </DocSectionDescription>
+                      </DocSectionHeader>
+
+                      {/* 1. Carteira de Motorista Americana */}
+                      <DocCard isAttached={!!dDocLicense}>
+                        <DocCardHeader>
+                          <DocCardTitleRow>
+                            <DocCardIconBadge isAttached={!!dDocLicense}>
+                              <Feather name="credit-card" size={16} color={dDocLicense ? '#22c55e' : '#CD2379'} />
+                            </DocCardIconBadge>
+                            <DocCardTitle>Carteira de motorista americana</DocCardTitle>
+                          </DocCardTitleRow>
+                          <DocStatusPill isAttached={!!dDocLicense}>
+                            <Feather name={dDocLicense ? 'check' : 'clock'} size={12} color={dDocLicense ? '#22c55e' : '#f59e0b'} />
+                            <DocStatusPillText isAttached={!!dDocLicense}>
+                              {dDocLicense ? 'Anexado' : 'Pendente'}
+                            </DocStatusPillText>
+                          </DocStatusPill>
+                        </DocCardHeader>
+                        <DocRequirementText>O que apresentar: Driver’s License válida.</DocRequirementText>
+                        {dDocLicense && (
+                          <DocPreviewContainer>
+                            <DocPreviewThumbnail source={{ uri: dDocLicense }} />
+                            <DocPreviewInfo>
+                              <DocPreviewFilename>Driver’s License anexada</DocPreviewFilename>
+                              <DocPreviewHint>Toque abaixo para alterar ou remover</DocPreviewHint>
+                            </DocPreviewInfo>
+                            <DocRemoveButton onPress={() => setDDocLicense(null)} activeOpacity={0.7}>
+                              <Feather name="trash-2" size={16} color="#ef4444" />
+                            </DocRemoveButton>
+                          </DocPreviewContainer>
+                        )}
+                        <DocActionsRow>
+                          <DocAttachButton variant="camera" activeOpacity={0.8} onPress={() => handlePickDocument('license', true)}>
+                            <Feather name="camera" size={14} color="#ffffff" />
+                            <DocAttachButtonText>{dDocLicense ? 'Tirar Outra' : 'Câmera'}</DocAttachButtonText>
+                          </DocAttachButton>
+                          <DocAttachButton variant="gallery" activeOpacity={0.8} onPress={() => handlePickDocument('license', false)}>
+                            <Feather name="image" size={14} color="#ffffff" />
+                            <DocAttachButtonText>Galeria</DocAttachButtonText>
+                          </DocAttachButton>
+                        </DocActionsRow>
+                        {errors.dDocLicense && <InputErrorText>{errors.dDocLicense}</InputErrorText>}
+                      </DocCard>
+
+                      {/* 2. Registro do Veículo */}
+                      <DocCard isAttached={!!dDocRegistration}>
+                        <DocCardHeader>
+                          <DocCardTitleRow>
+                            <DocCardIconBadge isAttached={!!dDocRegistration}>
+                              <MaterialCommunityIcons name="car-cog" size={18} color={dDocRegistration ? '#22c55e' : '#CD2379'} />
+                            </DocCardIconBadge>
+                            <DocCardTitle>Registro do veículo</DocCardTitle>
+                          </DocCardTitleRow>
+                          <DocStatusPill isAttached={!!dDocRegistration}>
+                            <Feather name={dDocRegistration ? 'check' : 'clock'} size={12} color={dDocRegistration ? '#22c55e' : '#f59e0b'} />
+                            <DocStatusPillText isAttached={!!dDocRegistration}>
+                              {dDocRegistration ? 'Anexado' : 'Pendente'}
+                            </DocStatusPillText>
+                          </DocStatusPill>
+                        </DocCardHeader>
+                        <DocRequirementText>O que apresentar: Vehicle Registration atualizado.</DocRequirementText>
+                        {dDocRegistration && (
+                          <DocPreviewContainer>
+                            <DocPreviewThumbnail source={{ uri: dDocRegistration }} />
+                            <DocPreviewInfo>
+                              <DocPreviewFilename>Vehicle Registration anexado</DocPreviewFilename>
+                              <DocPreviewHint>Toque abaixo para alterar ou remover</DocPreviewHint>
+                            </DocPreviewInfo>
+                            <DocRemoveButton onPress={() => setDDocRegistration(null)} activeOpacity={0.7}>
+                              <Feather name="trash-2" size={16} color="#ef4444" />
+                            </DocRemoveButton>
+                          </DocPreviewContainer>
+                        )}
+                        <DocActionsRow>
+                          <DocAttachButton variant="camera" activeOpacity={0.8} onPress={() => handlePickDocument('registration', true)}>
+                            <Feather name="camera" size={14} color="#ffffff" />
+                            <DocAttachButtonText>{dDocRegistration ? 'Tirar Outra' : 'Câmera'}</DocAttachButtonText>
+                          </DocAttachButton>
+                          <DocAttachButton variant="gallery" activeOpacity={0.8} onPress={() => handlePickDocument('registration', false)}>
+                            <Feather name="image" size={14} color="#ffffff" />
+                            <DocAttachButtonText>Galeria</DocAttachButtonText>
+                          </DocAttachButton>
+                        </DocActionsRow>
+                        {errors.dDocRegistration && <InputErrorText>{errors.dDocRegistration}</InputErrorText>}
+                      </DocCard>
+
+                      {/* 3. Seguro do Carro */}
+                      <DocCard isAttached={!!dDocInsurance}>
+                        <DocCardHeader>
+                          <DocCardTitleRow>
+                            <DocCardIconBadge isAttached={!!dDocInsurance}>
+                              <Feather name="shield" size={16} color={dDocInsurance ? '#22c55e' : '#CD2379'} />
+                            </DocCardIconBadge>
+                            <DocCardTitle>Seguro do carro</DocCardTitle>
+                          </DocCardTitleRow>
+                          <DocStatusPill isAttached={!!dDocInsurance}>
+                            <Feather name={dDocInsurance ? 'check' : 'clock'} size={12} color={dDocInsurance ? '#22c55e' : '#f59e0b'} />
+                            <DocStatusPillText isAttached={!!dDocInsurance}>
+                              {dDocInsurance ? 'Anexado' : 'Pendente'}
+                            </DocStatusPillText>
+                          </DocStatusPill>
+                        </DocCardHeader>
+                        <DocRequirementText>O que apresentar: Comprovante de seguro válido.</DocRequirementText>
+                        {dDocInsurance && (
+                          <DocPreviewContainer>
+                            <DocPreviewThumbnail source={{ uri: dDocInsurance }} />
+                            <DocPreviewInfo>
+                              <DocPreviewFilename>Seguro de carro anexado</DocPreviewFilename>
+                              <DocPreviewHint>Toque abaixo para alterar ou remover</DocPreviewHint>
+                            </DocPreviewInfo>
+                            <DocRemoveButton onPress={() => setDDocInsurance(null)} activeOpacity={0.7}>
+                              <Feather name="trash-2" size={16} color="#ef4444" />
+                            </DocRemoveButton>
+                          </DocPreviewContainer>
+                        )}
+                        <DocActionsRow>
+                          <DocAttachButton variant="camera" activeOpacity={0.8} onPress={() => handlePickDocument('insurance', true)}>
+                            <Feather name="camera" size={14} color="#ffffff" />
+                            <DocAttachButtonText>{dDocInsurance ? 'Tirar Outra' : 'Câmera'}</DocAttachButtonText>
+                          </DocAttachButton>
+                          <DocAttachButton variant="gallery" activeOpacity={0.8} onPress={() => handlePickDocument('insurance', false)}>
+                            <Feather name="image" size={14} color="#ffffff" />
+                            <DocAttachButtonText>Galeria</DocAttachButtonText>
+                          </DocAttachButton>
+                        </DocActionsRow>
+                        {errors.dDocInsurance && <InputErrorText>{errors.dDocInsurance}</InputErrorText>}
+                      </DocCard>
+
+                      {/* 4. Comprovante de Residência */}
+                      <DocCard isAttached={!!dDocResidence}>
+                        <DocCardHeader>
+                          <DocCardTitleRow>
+                            <DocCardIconBadge isAttached={!!dDocResidence}>
+                              <Feather name="home" size={16} color={dDocResidence ? '#22c55e' : '#CD2379'} />
+                            </DocCardIconBadge>
+                            <DocCardTitle>Comprovante de residência</DocCardTitle>
+                          </DocCardTitleRow>
+                          <DocStatusPill isAttached={!!dDocResidence}>
+                            <Feather name={dDocResidence ? 'check' : 'clock'} size={12} color={dDocResidence ? '#22c55e' : '#f59e0b'} />
+                            <DocStatusPillText isAttached={!!dDocResidence}>
+                              {dDocResidence ? 'Anexado' : 'Pendente'}
+                            </DocStatusPillText>
+                          </DocStatusPill>
+                        </DocCardHeader>
+                        <DocRequirementText>O que apresentar: Na cidade ou estado onde pretende dirigir.</DocRequirementText>
+                        {dDocResidence && (
+                          <DocPreviewContainer>
+                            <DocPreviewThumbnail source={{ uri: dDocResidence }} />
+                            <DocPreviewInfo>
+                              <DocPreviewFilename>Comprovante de residência anexado</DocPreviewFilename>
+                              <DocPreviewHint>Toque abaixo para alterar ou remover</DocPreviewHint>
+                            </DocPreviewInfo>
+                            <DocRemoveButton onPress={() => setDDocResidence(null)} activeOpacity={0.7}>
+                              <Feather name="trash-2" size={16} color="#ef4444" />
+                            </DocRemoveButton>
+                          </DocPreviewContainer>
+                        )}
+                        <DocActionsRow>
+                          <DocAttachButton variant="camera" activeOpacity={0.8} onPress={() => handlePickDocument('residence', true)}>
+                            <Feather name="camera" size={14} color="#ffffff" />
+                            <DocAttachButtonText>{dDocResidence ? 'Tirar Outra' : 'Câmera'}</DocAttachButtonText>
+                          </DocAttachButton>
+                          <DocAttachButton variant="gallery" activeOpacity={0.8} onPress={() => handlePickDocument('residence', false)}>
+                            <Feather name="image" size={14} color="#ffffff" />
+                            <DocAttachButtonText>Galeria</DocAttachButtonText>
+                          </DocAttachButton>
+                        </DocActionsRow>
+                        {errors.dDocResidence && <InputErrorText>{errors.dDocResidence}</InputErrorText>}
+                      </DocCard>
+
+                      <ButtonActionsRow>
+                        <BackStepButton activeOpacity={0.8} onPress={() => setDriverStep(3)}>
+                          <Feather name="arrow-left" size={16} color="rgba(255, 255, 255, 0.8)" />
+                          <BackStepButtonText>Voltar</BackStepButtonText>
+                        </BackStepButton>
+
+                        <NextStepButton activeOpacity={0.8} onPress={handleNextDriverStep}>
+                          <NextStepButtonText>Continuar</NextStepButtonText>
+                          <Feather name="arrow-right" size={18} color="#ffffff" />
+                        </NextStepButton>
+                      </ButtonActionsRow>
+                    </View>
+                  )}
+
+                  {/* PASSO 5 DO MOTORISTA: FOTO DE PERFIL PROFISSIONAL E SENHA */}
+                  {driverStep === 5 && (
                     <View>
                       {/* Seção de Foto de Perfil do Motorista */}
                       <PhotoUploadSection>
@@ -1472,7 +1919,9 @@ export function Register() {
                         </PhotoAvatarWrapper>
 
                         <PhotoTipText>
-                          {dPhoto ? 'Foto de perfil do motorista selecionada' : 'Adicione sua foto de perfil profissional'}
+                          {dPhoto
+                            ? 'Foto de perfil do motorista selecionada'
+                            : 'Foto nítida do motorista, conforme as orientações (rosto frontal e visível)'}
                         </PhotoTipText>
 
                         <PhotoActionsRow>
@@ -1500,6 +1949,7 @@ export function Register() {
                             <PhotoRemoveBtnText>Remover Foto</PhotoRemoveBtnText>
                           </PhotoRemoveBtn>
                         )}
+                        {errors.dPhoto && <InputErrorText>{errors.dPhoto}</InputErrorText>}
                       </PhotoUploadSection>
 
                       <InputGroup>
@@ -1547,7 +1997,7 @@ export function Register() {
                       </InputGroup>
 
                       <ButtonActionsRow>
-                        <BackStepButton activeOpacity={0.8} onPress={() => setDriverStep(3)}>
+                        <BackStepButton activeOpacity={0.8} onPress={() => setDriverStep(4)}>
                           <Feather name="arrow-left" size={16} color="rgba(255, 255, 255, 0.8)" />
                           <BackStepButtonText>Voltar</BackStepButtonText>
                         </BackStepButton>

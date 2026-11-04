@@ -20,15 +20,17 @@ export const DarkOverlay = styled.View`
   background-color: rgba(6, 10, 20, 0.88);
 `;
 
-export const ScrollContainer = styled.ScrollView.attrs(() => ({
+export const ScrollContainer = styled.ScrollView.attrs((props: any) => ({
   contentContainerStyle: {
     flexGrow: 1,
     paddingVertical: RFValue(18),
-    paddingBottom: RFValue(36),
+    paddingBottom: props.extraPaddingBottom || RFValue(80),
+    ...(props.contentContainerStyle || {}),
   },
   keyboardShouldPersistTaps: 'handled',
+  keyboardDismissMode: 'on-drag',
   showsVerticalScrollIndicator: false,
-}))`
+}))<{ extraPaddingBottom?: number }>`
   flex: 1;
 `;
 
@@ -599,4 +601,163 @@ export const PhotoTipText = styled.Text`
   color: rgba(255, 255, 255, 0.55);
   text-align: center;
   margin-top: 4px;
+`;
+
+/* ===== DOCUMENTAÇÃO AMERICANA DO MOTORISTA ===== */
+export const DocSectionHeader = styled.View`
+  margin-bottom: ${RFValue(12)}px;
+`;
+
+export const DocSectionTitle = styled.Text`
+  font-size: ${RFValue(14)}px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+`;
+
+export const DocSectionDescription = styled.Text`
+  font-size: ${RFValue(11.5)}px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: ${RFValue(16)}px;
+`;
+
+export const DocCard = styled.View<{ isAttached: boolean }>`
+  background-color: ${({ isAttached }) =>
+    isAttached ? 'rgba(34, 197, 94, 0.08)' : 'rgba(255, 255, 255, 0.04)'};
+  border-width: 1px;
+  border-color: ${({ isAttached }) =>
+    isAttached ? 'rgba(34, 197, 94, 0.45)' : 'rgba(255, 255, 255, 0.10)'};
+  border-radius: ${RFValue(14)}px;
+  padding: ${RFValue(14)}px;
+  margin-bottom: ${RFValue(12)}px;
+`;
+
+export const DocCardHeader = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: ${RFValue(6)}px;
+`;
+
+export const DocCardTitleRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+  margin-right: 8px;
+`;
+
+export const DocCardIconBadge = styled.View<{ isAttached: boolean }>`
+  width: ${RFValue(32)}px;
+  height: ${RFValue(32)}px;
+  border-radius: ${RFValue(16)}px;
+  background-color: ${({ isAttached }) =>
+    isAttached ? 'rgba(34, 197, 94, 0.20)' : 'rgba(205, 35, 121, 0.15)'};
+  align-items: center;
+  justify-content: center;
+  margin-right: ${RFValue(10)}px;
+`;
+
+export const DocCardTitle = styled.Text`
+  font-size: ${RFValue(12.5)}px;
+  font-weight: 700;
+  color: #ffffff;
+  flex: 1;
+`;
+
+export const DocStatusPill = styled.View<{ isAttached: boolean }>`
+  flex-direction: row;
+  align-items: center;
+  padding-horizontal: 8px;
+  padding-vertical: 3px;
+  border-radius: 20px;
+  background-color: ${({ isAttached }) =>
+    isAttached ? 'rgba(34, 197, 94, 0.20)' : 'rgba(245, 158, 11, 0.15)'};
+  border-width: 1px;
+  border-color: ${({ isAttached }) =>
+    isAttached ? '#22c55e' : 'rgba(245, 158, 11, 0.40)'};
+`;
+
+export const DocStatusPillText = styled.Text<{ isAttached: boolean }>`
+  font-size: ${RFValue(10)}px;
+  font-weight: 600;
+  color: ${({ isAttached }) => (isAttached ? '#22c55e' : '#f59e0b')};
+  margin-left: 4px;
+`;
+
+export const DocRequirementText = styled.Text`
+  font-size: ${RFValue(11)}px;
+  color: rgba(255, 255, 255, 0.60);
+  margin-bottom: ${RFValue(10)}px;
+  line-height: ${RFValue(15)}px;
+`;
+
+export const DocPreviewContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: ${RFValue(10)}px;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-radius: ${RFValue(10)}px;
+  padding: ${RFValue(8)}px;
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.12);
+`;
+
+export const DocPreviewThumbnail = styled.Image`
+  width: ${RFValue(60)}px;
+  height: ${RFValue(45)}px;
+  border-radius: ${RFValue(6)}px;
+  resize-mode: cover;
+  background-color: rgba(255, 255, 255, 0.05);
+`;
+
+export const DocPreviewInfo = styled.View`
+  flex: 1;
+  margin-left: ${RFValue(10)}px;
+`;
+
+export const DocPreviewFilename = styled.Text`
+  font-size: ${RFValue(11)}px;
+  font-weight: 600;
+  color: #22c55e;
+`;
+
+export const DocPreviewHint = styled.Text`
+  font-size: ${RFValue(10)}px;
+  color: rgba(255, 255, 255, 0.50);
+  margin-top: 2px;
+`;
+
+export const DocActionsRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const DocAttachButton = styled.TouchableOpacity<{ variant?: 'camera' | 'gallery' }>`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ variant }) =>
+    variant === 'camera' ? 'rgba(205, 35, 121, 0.22)' : 'rgba(255, 255, 255, 0.08)'};
+  border-width: 1px;
+  border-color: ${({ variant }) =>
+    variant === 'camera' ? '#CD2379' : 'rgba(255, 255, 255, 0.20)'};
+  border-radius: ${RFValue(10)}px;
+  padding-vertical: ${RFValue(8)}px;
+`;
+
+export const DocAttachButtonText = styled.Text`
+  font-size: ${RFValue(11)}px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-left: 6px;
+`;
+
+export const DocRemoveButton = styled.TouchableOpacity`
+  padding: ${RFValue(8)}px;
+  border-radius: ${RFValue(8)}px;
+  background-color: rgba(239, 68, 68, 0.15);
+  align-items: center;
+  justify-content: center;
 `;

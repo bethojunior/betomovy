@@ -2437,7 +2437,7 @@ class CustomerDao extends BaseDao
         $duplicateCheck = new UserDuplicateCheckService;
 
         if ($duplicateCheck->documentExistsForUserTypes($document, [$userTypeId], $ignore)) {
-            throw new InvalidFieldCustomerException("CPF já existe", 'document');
+            throw new InvalidFieldCustomerException("SSN / ITIN já cadastrado", 'document');
         }
 
         return true;
