@@ -176,6 +176,49 @@ class CustomerValidator
 
     /**
      * @param string $dateOfBirth
+     * @return DateTime|null
+     */
+    private function parseDateOfBirth(string $dateOfBirth): ?DateTime
+    {
+        $clean = trim($dateOfBirth);
+        if (empty($clean)) {
+            return null;
+        }
+
+        $formats = ['Y-m-d', 'd/m/Y', 'd-m-Y', 'Ymd', 'dmY'];
+        foreach ($formats as $fmt) {
+            $parsed = DateTime::createFromFormat($fmt, $clean);
+            if ($parsed && $parsed->format($fmt) === $clean) {
+                $year = (int)$parsed->format('Y');
+                if ($year >= 1900 && $year <= (int)date('Y')) {
+                    return $parsed;
+                }
+            }
+        }
+
+        $digits = preg_replace('/\D/', '', $clean);
+        if (strlen($digits) === 8) {
+            $pYmd = DateTime::createFromFormat('Ymd', $digits);
+            if ($pYmd && $pYmd->format('Ymd') === $digits) {
+                $year = (int)$pYmd->format('Y');
+                if ($year >= 1900 && $year <= (int)date('Y')) {
+                    return $pYmd;
+                }
+            }
+            $pDmy = DateTime::createFromFormat('dmY', $digits);
+            if ($pDmy && $pDmy->format('dmY') === $digits) {
+                $year = (int)$pDmy->format('Y');
+                if ($year >= 1900 && $year <= (int)date('Y')) {
+                    return $pDmy;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $dateOfBirth
      * @throws InvalidFieldCustomerException
      */
     private function dateOfBirthIsValid(string $dateOfBirth)
@@ -183,9 +226,9 @@ class CustomerValidator
         if (!$dateOfBirth)
             throw new InvalidFieldCustomerException("Data de nascimento não enviada", 'dateOfBirth');
 
-        $parsed = DateTime::createFromFormat('Y-m-d', $dateOfBirth);
+        $parsed = $this->parseDateOfBirth($dateOfBirth);
 
-        if (!$parsed || $parsed->format('Y-m-d') !== $dateOfBirth)
+        if (!$parsed)
             throw new InvalidFieldCustomerException("Data de nascimento é inválida", 'dateOfBirth');
     }
 

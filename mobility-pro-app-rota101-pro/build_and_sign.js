@@ -48,9 +48,10 @@ execSync(extractCmd, { cwd: releaseDir, stdio: 'inherit' });
 
 const extractedApk = path.join(releaseDir, 'universal.apk');
 if (fs.existsSync(extractedApk)) {
-    fs.copyFileSync(extractedApk, universalApk);
     fs.copyFileSync(extractedApk, movyUniversalApk);
-    console.log('Universal APK created successfully at:', universalApk);
+    fs.unlinkSync(extractedApk);
+    if (fs.existsSync(universalApk)) fs.unlinkSync(universalApk);
+    if (fs.existsSync(outputApks)) fs.unlinkSync(outputApks);
     console.log('Universal APK created successfully at:', movyUniversalApk);
 }
 

@@ -38,14 +38,11 @@ import {
   HeaderSubtitle,
   WebviewToggleBtn,
   WebviewToggleText,
-  SelectedProfileBanner,
-  SelectedProfileLeft,
-  SelectedProfileIconBox,
-  SelectedProfileTextBox,
-  SelectedProfileTitle,
-  SelectedProfileSubtitle,
-  ChangeProfileButton,
-  ChangeProfileButtonText,
+  ProfileGridContainer,
+  ProfileGridItem,
+  ProfileIconBadge,
+  ProfileGridTitle,
+  ProfileGridSubtitle,
   StepIndicatorContainer,
   StepItemWrapper,
   StepCircle,
@@ -392,7 +389,17 @@ export function Register() {
     if (passengerStep === 1) {
       if (!pName.trim()) newErrors.pName = 'Informe seu nome completo';
       const cleanBirth = pBirthDate.replace(/\D/g, '');
-      if (cleanBirth && cleanBirth.length !== 8) newErrors.pBirthDate = 'Data de nascimento incompleta';
+      if (cleanBirth && cleanBirth.length !== 8) {
+        newErrors.pBirthDate = 'Data de nascimento incompleta';
+      } else if (cleanBirth && cleanBirth.length === 8) {
+        const day = parseInt(cleanBirth.substring(0, 2), 10);
+        const month = parseInt(cleanBirth.substring(2, 4), 10);
+        const year = parseInt(cleanBirth.substring(4, 8), 10);
+        const currentYear = new Date().getFullYear();
+        if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1920 || year > currentYear - 10) {
+          newErrors.pBirthDate = 'Data de nascimento inválida';
+        }
+      }
 
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
@@ -437,8 +444,8 @@ export function Register() {
       const cleanBirth = pBirthDate.replace(/\D/g, '');
       const formattedDate =
         cleanBirth.length === 8
-          ? cleanBirth.substring(4, 8) + cleanBirth.substring(2, 4) + cleanBirth.substring(0, 2)
-          : '20000101';
+          ? `${cleanBirth.substring(4, 8)}-${cleanBirth.substring(2, 4)}-${cleanBirth.substring(0, 2)}`
+          : '2000-01-01';
 
       const payload = {
         name: pName.trim(),
@@ -513,6 +520,18 @@ export function Register() {
       setDriverStep(2);
     } else if (driverStep === 2) {
       if (!dName.trim()) newErrors.dName = 'Informe seu nome completo';
+      const cleanBirth = dBirthDate.replace(/\D/g, '');
+      if (cleanBirth && cleanBirth.length !== 8) {
+        newErrors.dBirthDate = 'Informe a data completa (DD/MM/AAAA)';
+      } else if (cleanBirth && cleanBirth.length === 8) {
+        const day = parseInt(cleanBirth.substring(0, 2), 10);
+        const month = parseInt(cleanBirth.substring(2, 4), 10);
+        const year = parseInt(cleanBirth.substring(4, 8), 10);
+        const currentYear = new Date().getFullYear();
+        if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1920 || year > currentYear - 18) {
+          newErrors.dBirthDate = 'Data de nascimento inválida (mínimo 18 anos)';
+        }
+      }
       const cleanPhone = dPhone.replace(/\D/g, '');
       if (!cleanPhone || cleanPhone.length < 10) newErrors.dPhone = 'Informe um celular válido com DDD';
       if (!dEmail.trim() || !dEmail.includes('@') || !dEmail.includes('.')) {
@@ -560,8 +579,8 @@ export function Register() {
       const cleanBirth = dBirthDate.replace(/\D/g, '');
       const formattedDate =
         cleanBirth.length === 8
-          ? cleanBirth.substring(4, 8) + cleanBirth.substring(2, 4) + cleanBirth.substring(0, 2)
-          : '19950101';
+          ? `${cleanBirth.substring(4, 8)}-${cleanBirth.substring(2, 4)}-${cleanBirth.substring(0, 2)}`
+          : '1995-01-01';
 
       const driverPayload: any = {
         user: {
@@ -716,37 +735,50 @@ export function Register() {
               <View style={{ width: 42 }} />
             </TopNavHeader>
 
-            {/* Banner Único do Perfil Escolhido com Ação de Troca Direta */}
-            <SelectedProfileBanner isDriver={isDriver}>
-              <SelectedProfileLeft>
-                <SelectedProfileIconBox isDriver={isDriver}>
-                  {isDriver ? (
-                    <MaterialCommunityIcons name="steering" size={RFValue(22)} color="#ffffff" />
-                  ) : (
-                    <FontAwesome5 name="user" size={RFValue(18)} color="#ffffff" />
-                  )}
-                </SelectedProfileIconBox>
-                <SelectedProfileTextBox>
-                  <SelectedProfileTitle isDriver={isDriver}>
-                    {isDriver ? 'SOU MOTORISTA' : 'SOU PASSAGEIRO'}
-                  </SelectedProfileTitle>
-                  <SelectedProfileSubtitle isDriver={isDriver}>
-                    {isDriver ? 'Cadastro para Dirigir' : 'Cadastro para Viajar'}
-                  </SelectedProfileSubtitle>
-                </SelectedProfileTextBox>
-              </SelectedProfileLeft>
-
-              <ChangeProfileButton
-                isDriver={isDriver}
+            {/* ===== GRID DE SELEÇÃO DE PERFIL: PASSAGEIRO / MOTORISTA ===== */}
+            <ProfileGridContainer>
+              {/* GRID PASSAGEIRO */}
+              <ProfileGridItem
+                active={!isDriver}
                 activeOpacity={0.8}
-                onPress={() => handleToggleProfile(!isDriver)}
+                onPress={() => handleToggleProfile(false)}
               >
-                <Feather name="refresh-cw" size={12} color="#ffffff" />
-                <ChangeProfileButtonText>
-                  {isDriver ? 'Sou Passageiro' : 'Sou Motorista'}
-                </ChangeProfileButtonText>
-              </ChangeProfileButton>
-            </SelectedProfileBanner>
+                <ProfileIconBadge active={!isDriver}>
+                  <FontAwesome5
+                    name="user-friends"
+                    size={RFValue(18)}
+                    color={!isDriver ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'}
+                  />
+                </ProfileIconBadge>
+                <ProfileGridTitle active={!isDriver}>
+                  PASSAGEIRO
+                </ProfileGridTitle>
+                <ProfileGridSubtitle active={!isDriver}>
+                  Quero viajar
+                </ProfileGridSubtitle>
+              </ProfileGridItem>
+
+              {/* GRID MOTORISTA */}
+              <ProfileGridItem
+                active={isDriver}
+                activeOpacity={0.8}
+                onPress={() => handleToggleProfile(true)}
+              >
+                <ProfileIconBadge active={isDriver}>
+                  <MaterialCommunityIcons
+                    name="steering"
+                    size={RFValue(22)}
+                    color={isDriver ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'}
+                  />
+                </ProfileIconBadge>
+                <ProfileGridTitle active={isDriver}>
+                  MOTORISTA
+                </ProfileGridTitle>
+                <ProfileGridSubtitle active={isDriver}>
+                  Quero dirigir
+                </ProfileGridSubtitle>
+              </ProfileGridItem>
+            </ProfileGridContainer>
 
             {/* ===== INDICADOR DE PASSOS: PASSAGEIRO ===== */}
             {!isDriver && (
@@ -1215,7 +1247,7 @@ export function Register() {
 
                       <InputGroup>
                         <ModernInputLabel>Data de Nascimento</ModernInputLabel>
-                        <ModernInputBox>
+                        <ModernInputBox hasError={!!errors.dBirthDate}>
                           <Feather name="calendar" size={18} color="#8A99AD" />
                           <ModernTextInput
                             placeholder="DD/MM/AAAA"
@@ -1227,6 +1259,7 @@ export function Register() {
                             autoCorrect={false}
                           />
                         </ModernInputBox>
+                        {errors.dBirthDate && <InputErrorText>{errors.dBirthDate}</InputErrorText>}
                       </InputGroup>
 
                       <InputGroup>

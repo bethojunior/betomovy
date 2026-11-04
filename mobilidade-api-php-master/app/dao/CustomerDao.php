@@ -1942,12 +1942,42 @@ class CustomerDao extends BaseDao
      * @param $dateOfBirth
      * @throws CustomerException
      */
-    private function validDateOfBirthFormat($dateOfBirth)
+    private function validDateOfBirthFormat(&$dateOfBirth)
     {
-        $parsed = DateTime::createFromFormat('Y-m-d', $dateOfBirth);
+        $clean = trim((string)$dateOfBirth);
+        $formats = ['Y-m-d', 'd/m/Y', 'd-m-Y', 'Ymd', 'dmY'];
+        foreach ($formats as $fmt) {
+            $parsed = DateTime::createFromFormat($fmt, $clean);
+            if ($parsed && $parsed->format($fmt) === $clean) {
+                $year = (int)$parsed->format('Y');
+                if ($year >= 1900 && $year <= (int)date('Y')) {
+                    $dateOfBirth = $parsed->format('Y-m-d');
+                    return;
+                }
+            }
+        }
 
-        if (!$parsed || $parsed->format('Y-m-d') !== $dateOfBirth)
-            throw new CustomerException(709, ['sended' => $dateOfBirth]);
+        $digits = preg_replace('/\D/', '', $clean);
+        if (strlen($digits) === 8) {
+            $pYmd = DateTime::createFromFormat('Ymd', $digits);
+            if ($pYmd && $pYmd->format('Ymd') === $digits) {
+                $year = (int)$pYmd->format('Y');
+                if ($year >= 1900 && $year <= (int)date('Y')) {
+                    $dateOfBirth = $pYmd->format('Y-m-d');
+                    return;
+                }
+            }
+            $pDmy = DateTime::createFromFormat('dmY', $digits);
+            if ($pDmy && $pDmy->format('dmY') === $digits) {
+                $year = (int)$pDmy->format('Y');
+                if ($year >= 1900 && $year <= (int)date('Y')) {
+                    $dateOfBirth = $pDmy->format('Y-m-d');
+                    return;
+                }
+            }
+        }
+
+        throw new CustomerException(709, ['sended' => $dateOfBirth]);
     }
 
     /**

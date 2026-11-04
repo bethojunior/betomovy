@@ -155,30 +155,34 @@ export const ChangeProfileButtonText = styled.Text`
   margin-left: 5px;
 `;
 
+/* ===== GRID DE SELEÇÃO DE PERFIL (PASSAGEIRO / MOTORISTA) ===== */
 export const ProfileGridContainer = styled.View`
   flex-direction: row;
-  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: ${RFValue(16)}px;
+  width: 100%;
 `;
 
 export const ProfileGridItem = styled.TouchableOpacity<{ active: boolean }>`
   flex: 1;
   background-color: ${({ active }) =>
-    active ? 'rgba(205, 35, 121, 0.22)' : 'transparent'};
+    active ? 'rgba(205, 35, 121, 0.16)' : 'rgba(255, 255, 255, 0.04)'};
   border-width: ${({ active }) => (active ? '2px' : '1px')};
   border-color: ${({ active }) =>
-    active ? '#CD2379' : 'rgba(255, 255, 255, 0.20)'};
+    active ? '#CD2379' : 'rgba(255, 255, 255, 0.18)'};
   border-radius: ${RFValue(16)}px;
-  padding-vertical: ${RFValue(12)}px;
-  padding-horizontal: ${RFValue(10)}px;
+  padding-vertical: ${RFValue(14)}px;
+  padding-horizontal: ${RFValue(8)}px;
   align-items: center;
   justify-content: center;
+  margin-horizontal: 5px;
 `;
 
 export const ProfileIconBadge = styled.View<{ active: boolean }>`
-  width: ${RFValue(40)}px;
-  height: ${RFValue(40)}px;
-  border-radius: ${RFValue(20)}px;
+  width: ${RFValue(42)}px;
+  height: ${RFValue(42)}px;
+  border-radius: ${RFValue(21)}px;
   background-color: ${({ active }) =>
     active ? '#CD2379' : 'rgba(255, 255, 255, 0.08)'};
   align-items: center;
@@ -187,16 +191,18 @@ export const ProfileIconBadge = styled.View<{ active: boolean }>`
 `;
 
 export const ProfileGridTitle = styled.Text<{ active: boolean }>`
-  font-size: ${RFValue(12)}px;
+  font-size: ${RFValue(12.5)}px;
   font-weight: bold;
-  color: ${({ active }) => (active ? '#ffffff' : 'rgba(255, 255, 255, 0.65)')};
+  color: ${({ active }) => (active ? '#ffffff' : 'rgba(255, 255, 255, 0.70)')};
   letter-spacing: 0.6px;
+  text-align: center;
 `;
 
 export const ProfileGridSubtitle = styled.Text<{ active: boolean }>`
-  font-size: ${RFValue(9.5)}px;
-  color: ${({ active }) => (active ? '#ff80ab' : 'rgba(255, 255, 255, 0.40)')};
-  margin-top: 1px;
+  font-size: ${RFValue(10)}px;
+  color: ${({ active }) => (active ? '#ff80ab' : 'rgba(255, 255, 255, 0.45)')};
+  margin-top: 2px;
+  text-align: center;
 `;
 
 /* ===== INDICADOR DE PASSO A PASSO (STEP INDICATOR) ===== */
