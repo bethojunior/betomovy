@@ -8,14 +8,20 @@ let searchStatusPollIntervalId = null;
 function startSearchStatusPoll(tripReference) {
     stopSearchStatusPoll();
 
-    searchStatusPollIntervalId = setInterval(() => {
+    const pollTrip = () => {
         TripRepository.get(tripReference).then(({ status, response }) => {
             if (!status || !response) return;
             if (response.status === STATUS_SEARCHING || response.status === STATUS_SEARCHING_FAVORITE) return;
 
             checkStatusTrip(response, tripRealtime.typeModified);
-        });
-    }, 700);
+        }).catch(() => {});
+    };
+
+    // Executa imediatamente na inicialização
+    pollTrip();
+
+    // Polling contínuo de alta frequência (400ms) para resposta instantânea
+    searchStatusPollIntervalId = setInterval(pollTrip, 400);
 }
 
 function stopSearchStatusPoll() {
@@ -60,7 +66,7 @@ function initRace(trip) {
     managerTrip.tripCurrent = trip;
 
     viewController.elementProperty.getElement(".info-trip", element => {
-        if (trip.status !== STATUS_ACCEPTED || trip.status !== STATUS_PRE_ACCEPTED) {
+        if (trip.status !== STATUS_ACCEPTED && trip.status !== STATUS_PRE_ACCEPTED) {
             element.style.display = "none";
             return;
         }
@@ -137,8 +143,10 @@ function initRace(trip) {
         if (rawPhoto) {
             if (rawPhoto.startsWith("http://") || rawPhoto.startsWith("https://")) {
                 photoUrl = rawPhoto;
+            } else if (rawPhoto.startsWith("driver/profile/")) {
+                photoUrl = `https://api.movymob.com/${rawPhoto}`;
             } else {
-                photoUrl = `https://minio.704app.com.br/rota101fb704/driver/profile/compressed/${rawPhoto}`;
+                photoUrl = `https://api.movymob.com/driver/profile/compressed/${rawPhoto}`;
             }
         }
         if (photoUrl) {
@@ -192,7 +200,11 @@ function updateMapTripDriver(trip, latitude, longitude) {
 
 function stopProgressTrip() {
     stopSearchStatusPoll();
-    searchTripProgress.stopProgress();
+    try {
+        if (typeof searchTripProgress !== "undefined" && searchTripProgress?.stopProgress) {
+            searchTripProgress.stopProgress();
+        }
+    } catch (e) {}
 
     viewController.elementProperty.getElement(".preloader-search-trip", element => {
         element.classList.remove("active");
@@ -201,13 +213,23 @@ function stopProgressTrip() {
     viewController.elementProperty.removeClass(".search-driver-in-trip", "active");
     updateBtnCallTripVisibility();
 
-    if (mapService.pointCustomer != null)
-        mapService.pointCustomer.setMap(mapService.map)
+    try {
+        if (mapService.pointCustomer != null && typeof mapService.pointCustomer.setMap === 'function') {
+            mapService.pointCustomer.setMap(mapService.map);
+        }
+    } catch (e) {}
 
-    mapService.map.setOptions({styles: mapService.getStyleMapDefault()});
+    try {
+        if (mapService.map && typeof mapService.map.setOptions === 'function') {
+            mapService.map.setOptions({styles: mapService.getStyleMapDefault()});
+        }
+    } catch (e) {}
 
-    if (mapService.infoSearch !== null)
-        mapService.infoSearch.setMap(null);
+    try {
+        if (mapService.infoSearch !== null && typeof mapService.infoSearch.setMap === 'function') {
+            mapService.infoSearch.setMap(null);
+        }
+    } catch (e) {}
 }
 
 function clearDataCar() {

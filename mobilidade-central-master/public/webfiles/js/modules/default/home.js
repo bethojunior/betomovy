@@ -391,23 +391,34 @@ document.addEventListener('DOMContentLoaded', function () {
       getFee()
     })
 
-    elementProperty.addEventInElement('#cancelTrip', 'onclick', function () {
-      const response = Session.get('timeArrivalDriver')
+    elementProperty.addEventInElement('#cancelTrip', 'onclick', function (e) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      const response = Session.get('timeArrivalDriver') || { text: 'alguns minutos' }
 
-      CustomerController.checkCancellationFee(managerTrip.tripCurrent.tripReference).then(
-        ({ status, data }) => {
-          if (data == null) {
-            elementProperty.getElement('#messageCancelTrip', (element) => {
-              element.innerHTML = `O motorista está a ${response.text} de você !`
-            })
-          } else {
-            elementProperty.getElement('#messageCancelTrip', (element) => {
-              element.innerHTML = data.type.description
-            })
-          }
-          cancelSearchTrip()
-        }
-      )
+      const doCancel = (msg) => {
+        elementProperty.getElement('#messageCancelTrip', (element) => {
+          element.innerHTML = msg || 'Deseja realmente cancelar esta corrida com o motorista?'
+        })
+        cancelSearchTrip()
+      }
+
+      const tripRef = managerTrip?.tripCurrent?.tripReference || Session.getLocal('tripReference')
+      if (tripRef && typeof CustomerController !== 'undefined' && CustomerController.checkCancellationFee) {
+        CustomerController.checkCancellationFee(tripRef)
+          .then(({ status, data }) => {
+            if (data == null) {
+              doCancel(`O motorista está a ${response.text || 'alguns minutos'} de você !`)
+            } else {
+              doCancel(data?.type?.description || 'Deseja realmente cancelar esta corrida?')
+            }
+          })
+          .catch((err) => {
+            console.warn('[cancelTrip] checkCancellationFee failed, opening cancel confirmation:', err)
+            doCancel()
+          })
+      } else {
+        doCancel()
+      }
     })
 
     elementProperty.addEventInElement('#zoomInRoute', 'onclick', function () {

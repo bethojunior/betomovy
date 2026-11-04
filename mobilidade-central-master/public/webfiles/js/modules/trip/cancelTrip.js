@@ -21,19 +21,49 @@ function cancelTripDriverArrival(response){
 }
 
 function cancelSearchTrip(status = STATUS_CANCELED) {
-
     viewController.elementProperty.addClass(".container-cancel-request-trip", "active");
 
-    viewController.elementProperty.addEventInElement("#btnCancelModalTripRequest", "onclick", function () {
-        viewController.elementProperty.removeClass(".container-cancel-request-trip", "active");
-    });
+    const btnCancelModal = document.querySelector("#btnCancelModalTripRequest");
+    if (btnCancelModal) {
+        btnCancelModal.onclick = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            viewController.elementProperty.removeClass(".container-cancel-request-trip", "active");
+        };
+    }
 
-    viewController.elementProperty.addEventInElement("#btnCancelTripRequest", "onclick", function () {
-        viewController.elementProperty.removeClass(".container-cancel-request-trip", "active");
-        cancelTripByCustomer(status)
-
-    });
+    const btnCancelTrip = document.querySelector("#btnCancelTripRequest");
+    if (btnCancelTrip) {
+        btnCancelTrip.onclick = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            viewController.elementProperty.removeClass(".container-cancel-request-trip", "active");
+            cancelTripByCustomer(status);
+        };
+    }
 }
+
+// Delegação global de cliques para botões de cancelamento (garante funcionamento mesmo após recriação de DOM)
+document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("click", (e) => {
+        const cancelSearchBtn = e.target.closest(".cancel-search-trip, .sdit-cancel-btn");
+        if (cancelSearchBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            cancelSearchTrip(STATUS_CANCELED);
+            return;
+        }
+
+        const cancelTripBtn = e.target.closest("#cancelTrip");
+        if (cancelTripBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            viewController.elementProperty.getElement("#messageCancelTrip", element => {
+                element.innerHTML = "Deseja realmente cancelar esta corrida com o motorista?";
+            });
+            cancelSearchTrip(STATUS_CANCELED);
+            return;
+        }
+    });
+});
 
 function getActiveTripReference() {
     let ref = null;

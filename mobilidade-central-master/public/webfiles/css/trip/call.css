@@ -651,10 +651,13 @@ body {
 }
 
 .trip-client-card {
-    background: #ffffff !important;
+    background: rgba(13, 19, 34, 0.94) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
     border-radius: 24px 24px 0 0 !important;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.22) !important;
-    padding: 20px 20px 28px !important;
+    box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.60) !important;
+    padding: 22px 20px 28px !important;
     width: 100% !important;
     max-width: 480px !important;
     margin: 0 auto !important;
@@ -680,19 +683,21 @@ body {
     align-items: center;
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .trip-client-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(16, 185, 129, 0.12);
-    color: #059669;
+    background: rgba(16, 185, 129, 0.16);
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.35);
     font-size: 13px;
     font-weight: 700;
     padding: 6px 14px;
     border-radius: 9999px;
+    letter-spacing: 0.3px;
 }
 
 .trip-client-badge i {
@@ -700,8 +705,8 @@ body {
 }
 
 .trip-client-btn-close {
-    background: #f1f5f9;
-    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.10);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -709,12 +714,13 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #475569;
+    color: rgba(255, 255, 255, 0.80);
     transition: 0.2s;
 }
 
 .trip-client-btn-close:hover {
-    background: #e2e8f0;
+    background: rgba(255, 255, 255, 0.16);
+    color: #FFFFFF;
 }
 
 .trip-client-driver-row {
@@ -733,12 +739,12 @@ body {
     width: 72px !important;
     height: 72px !important;
     border-radius: 50% !important;
-    border: 3px solid #2563eb !important;
+    border: 2.5px solid #CD2379 !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
-    background-color: #f1f5f9;
+    box-shadow: 0 0 18px rgba(205, 35, 121, 0.45) !important;
+    background-color: #070B14;
 }
 
 .trip-client-driver-details {
@@ -747,9 +753,9 @@ body {
 }
 
 .trip-client-driver-details .name-driver-trip {
-    font-size: 18px !important;
+    font-size: 19px !important;
     font-weight: 800 !important;
-    color: #0f172a !important;
+    color: #FFFFFF !important;
     margin: 0 0 4px !important;
     white-space: nowrap;
     overflow: hidden;
@@ -763,19 +769,19 @@ body {
 
 .trip-client-car-plate-badge .car-plate-driver {
     display: inline-block !important;
-    background: #0f172a !important;
-    color: #ffffff !important;
+    background: #070B14 !important;
+    color: #FFFFFF !important;
     font-size: 13px !important;
     font-weight: 800 !important;
-    letter-spacing: 1px !important;
-    padding: 3px 10px !important;
+    letter-spacing: 1.2px !important;
+    padding: 3px 12px !important;
     border-radius: 6px !important;
-    border: 1px solid #334155 !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
 }
 
 .trip-client-driver-details .car-brand-driver {
     font-size: 13px !important;
-    color: #64748b !important;
+    color: rgba(255, 255, 255, 0.70) !important;
     margin: 0 !important;
     line-height: 1.4 !important;
     font-weight: 500 !important;
@@ -787,9 +793,9 @@ body {
 }
 
 .trip-client-route-preview {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
     padding: 12px 14px;
     margin-bottom: 18px;
     display: flex;
@@ -812,12 +818,14 @@ body {
 }
 
 .trip-client-route-item .route-dot.origin {
-    background: #10b981;
+    background: #10B981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
 }
 
 .trip-client-route-item .route-dot.destination {
-    background: #2563eb;
-    border-radius: 2px;
+    background: #CD2379;
+    border-radius: 3px;
+    box-shadow: 0 0 8px rgba(205, 35, 121, 0.6);
 }
 
 .trip-client-route-item .route-text {
@@ -827,16 +835,16 @@ body {
 
 .trip-client-route-item .route-text label {
     display: block;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.45);
     margin-bottom: 2px;
 }
 
 .trip-client-route-item .route-text p {
     font-size: 13px;
-    color: #1e293b;
+    color: #FFFFFF;
     font-weight: 600;
     margin: 0;
     white-space: nowrap;
@@ -846,7 +854,7 @@ body {
 
 .trip-client-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 .trip-client-action-btn {
@@ -854,11 +862,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     padding: 12px 14px;
     font-size: 14px;
     font-weight: 700;
-    border-radius: 12px;
+    border-radius: 14px;
     border: none;
     cursor: pointer;
     transition: 0.2s;
@@ -869,24 +877,27 @@ body {
 }
 
 .trip-client-action-btn.btn-share {
-    background: #f1f5f9;
-    color: #1e293b;
-    border: 1px solid #cbd5e1;
+    background: rgba(255, 255, 255, 0.08);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .trip-client-action-btn.btn-share:hover {
-    background: #e2e8f0;
+    background: rgba(255, 255, 255, 0.16);
+    border-color: #00D2FF;
+    color: #00D2FF;
 }
 
 .trip-client-action-btn.btn-cancel-trip {
-    background: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
+    background: rgba(239, 68, 68, 0.15);
+    color: #FF6B6B;
+    border: 1px solid rgba(239, 68, 68, 0.40);
 }
 
 .trip-client-action-btn.btn-cancel-trip:hover {
-    background: #fca5a5;
-    color: #991b1b;
+    background: rgba(239, 68, 68, 0.30);
+    color: #FFFFFF;
+    box-shadow: 0 4px 18px rgba(239, 68, 68, 0.35);
 }
 
 @media (min-width: 992px) {
@@ -905,13 +916,16 @@ body {
     }
 
     .trip-client-card {
-        border-radius: 0 !important;
-        height: 100% !important;
+        border-radius: 0 24px 24px 0 !important;
+        height: calc(100vh - 64px) !important;
         max-width: none !important;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12) !important;
+        box-shadow: 8px 0 36px rgba(0, 0, 0, 0.50) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.10) !important;
+        border-top: none !important;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
+        overflow-y: auto;
     }
 }
 
@@ -1021,54 +1035,90 @@ body {
 }
 
 .container-cancel-request-trip {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 20;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(7, 11, 20, 0.78);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 9999;
     display: none;
+    align-items: center;
+    justify-content: center;
 }
 
 .container-cancel-request-trip.active {
-    display: block;
+    display: flex !important;
 }
 
 .container-cancel-request-trip > div {
-    position: absolute;
-    bottom: 0;
-    background-color: var(--color-bg-surface);
-    width: 100%;
-    padding: 2vw 5vw;
+    position: relative;
+    background: rgba(13, 19, 34, 0.96) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7) !important;
+    width: 90%;
+    max-width: 420px;
+    padding: 28px 24px !important;
+    text-align: center;
+    box-sizing: border-box;
+    animation: slideUpTripClient 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .container-cancel-request-trip > div > h4 {
-    font-size: 5vw;
-    font-family: sans-serif;
-    font-weight: 500;
-    margin: 1vw 0;
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    color: #FFFFFF !important;
+    margin: 0 0 10px !important;
 }
 
 .container-cancel-request-trip > div > p {
-    margin: 2vw 0 5vw;
+    font-size: 14px !important;
+    color: rgba(255, 255, 255, 0.72) !important;
+    margin: 0 0 22px !important;
+    line-height: 1.4 !important;
 }
 
 .container-cancel-request-trip > div > div {
     display: flex;
-    justify-content: space-between;
+    gap: 12px;
     width: 100%;
 }
 
 .container-cancel-request-trip > div > div > button {
-    width: 45%;
-    padding: 3vw;
-    font-size: 4.25vw;
-    border: 1px solid var(--color-border);
-    border-radius: 1vw;
+    flex: 1;
+    padding: 13px 16px !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    border-radius: 14px !important;
+    cursor: pointer;
+    transition: 0.2s;
+    outline: none;
+    border: none;
 }
 
-.container-cancel-request-trip > div > div > button {
-    background-color: var(--color-bg-surface);
+.container-cancel-request-trip > div > div > button#btnCancelTripRequest {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border: 1px solid rgba(239, 68, 68, 0.45) !important;
+    color: #FF6B6B !important;
+}
+
+.container-cancel-request-trip > div > div > button#btnCancelTripRequest:hover {
+    background: rgba(239, 68, 68, 0.35) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4) !important;
+}
+
+.container-cancel-request-trip > div > div > button#btnCancelModalTripRequest {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.container-cancel-request-trip > div > div > button#btnCancelModalTripRequest:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #FFFFFF !important;
 }
 
 /*.container-cancel-request-trip > div > div > button:last-child {
@@ -1143,36 +1193,16 @@ body {
     }
 
     .container-cancel-request-trip > div {
-        border-radius: 5px;
-        width:25%;
-        display:block;
-        margin:auto;
-        right: 0;
-        left: 0;
-        padding:0.5vw;
-        bottom: unset;
+        width: 90%;
+        max-width: 440px;
+        margin: auto;
     }
-
 
     .container-cancel-request-trip.active {
-        display:flex;
-        justify-content:center;
-        align-items:center;
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
     }
-
-    .container-cancel-request-trip > div > h4{
-        font-size:15pt;
-        text-align:center;
-    }
-
-    .container-cancel-request-trip > div > p{
-        margin:1vw;
-        text-align:center;
-    }
-
-    .container-cancel-request-trip > div > div > button{
-        font-size:12pt;
-        padding:1vw;
         border-radius:5px;
         cursor:pointer;
     }
