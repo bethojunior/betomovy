@@ -1,50 +1,49 @@
 :root {
-    /* ── Tipografia Global (SF Pro / Inter Modern Sans) ── */
+    /* ── Tipografia Global (Uber/99 Modern Sans) ── */
     --font-family-base: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-family-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-    /* ── Marca MOVY / Identidade Oficial Mobile Android (Dark Luxury Glass) ── */
-    --color-primary: #CD2379;
-    --color-primary-hover: #E82A8C;
-    --color-primary-dark: #8C104E;
-    --color-accent: #00D2FF;
-    --color-accent-hover: #26DBFF;
-    --color-brand-cyan: #00D2FF;
-    --color-brand-magenta: #CD2379;
+    /* ── Marca MOVY / Estilo Uber / 99 ── */
+    --color-primary: #000000;
+    --color-primary-hover: #1e293b;
+    --color-primary-dark: #090d16;
+    --color-accent: #2563eb;
+    --color-accent-hover: #1d4ed8;
+    --color-brand-cyan: #04F3FA;
 
     /* Aliases legados */
-    --color-dark: #070B14;
-    --color-dark-hover: #0D1322;
+    --color-dark: #0f172a;
+    --color-dark-hover: #1e293b;
 
-    /* Dark UI (Header executivo, drawers, modais) */
-    --color-header-gradient: #070B14;
-    --color-drawer-bg: #0D1322;
+    /* Dark UI (Header executivo, drawers) */
+    --color-header-gradient: #000000;
+    --color-drawer-bg: #0b0f19;
 
     /* Links */
-    --color-link: #00D2FF;
-    --color-link-hover: #26DBFF;
+    --color-link: #2563eb;
+    --color-link-hover: #1d4ed8;
 
     /* ── Texto ── */
-    --color-text-primary: #FFFFFF;
-    --color-text-secondary: rgba(255, 255, 255, 0.78);
-    --color-text-muted: rgba(255, 255, 255, 0.48);
-    --color-text-disabled: rgba(255, 255, 255, 0.28);
-    --color-text-inverse: #070B14;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #334155;
+    --color-text-muted: #64748b;
+    --color-text-disabled: #94a3b8;
+    --color-text-inverse: #ffffff;
 
-    /* ── Superfície / fundo Dark Glass ── */
-    --color-bg-page: #070B14;
-    --color-bg-surface: #0D1322;
-    --color-bg-subtle: #121A2D;
-    --color-bg-muted: #1A243B;
-    --color-bg-hover: #202D49;
+    /* ── Superfície / fundo ── */
+    --color-bg-page: #f8fafc;
+    --color-bg-surface: #ffffff;
+    --color-bg-subtle: #f8fafc;
+    --color-bg-muted: #f1f5f9;
+    --color-bg-hover: #f1f5f9;
 
     /* ── Borda ── */
-    --color-border: rgba(255, 255, 255, 0.10);
-    --color-border-light: rgba(255, 255, 255, 0.08);
-    --color-border-input: rgba(255, 255, 255, 0.14);
-    --color-border-focus: #CD2379;
-    --color-border-subtle: rgba(255, 255, 255, 0.05);
-    --color-border-strong: rgba(255, 255, 255, 0.22);
+    --color-border: #e2e8f0;
+    --color-border-light: rgba(255, 255, 255, 0.10);
+    --color-border-input: #cbd5e1;
+    --color-border-focus: #0f172a;
+    --color-border-subtle: #f1f5f9;
+    --color-border-strong: #cbd5e1;
 
     /* ── Raios e Curvaturas Modernas ── */
     --radius-sm: 8px;
@@ -53,53 +52,53 @@
     --radius-xl: 22px;
     --radius-full: 9999px;
 
-    /* ── Sombras e Glassmorphism ── */
+    /* ── Sombras de Alta Precisão (Uber Style) ── */
     --color-white: #ffffff;
-    --color-surface: rgba(255, 255, 255, 0.05);
-    --color-overlay: rgba(7, 11, 20, 0.75);
-    --color-shadow: rgba(0, 0, 0, 0.40);
-    --color-shadow-md: rgba(0, 0, 0, 0.55);
-    --color-shadow-lg: rgba(0, 0, 0, 0.70);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    --shadow-floating: 0 14px 40px -4px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
-    --shadow-modal: 0 24px 60px -12px rgba(0, 0, 0, 0.7);
+    --color-surface: rgba(255, 255, 255, 0.08);
+    --color-overlay: rgba(15, 23, 42, 0.55);
+    --color-shadow: rgba(15, 23, 42, 0.05);
+    --color-shadow-md: rgba(15, 23, 42, 0.10);
+    --color-shadow-lg: rgba(15, 23, 42, 0.18);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+    --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    --shadow-floating: 0 14px 38px -4px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+    --shadow-modal: 0 24px 60px -12px rgba(15, 23, 42, 0.28);
 
     /* ── Status — Elegantes e Modernos ── */
     --color-success: #10b981;
-    --color-success-bg: rgba(16, 185, 129, 0.15);
-    --color-success-text: #10b981;
-    --color-success-border: rgba(16, 185, 129, 0.35);
-    --color-success-dark: #059669;
+    --color-success-bg: #ecfdf5;
+    --color-success-text: #059669;
+    --color-success-border: #a7f3d0;
+    --color-success-dark: #047857;
 
     --color-warning: #f59e0b;
-    --color-warning-bg: rgba(245, 158, 11, 0.15);
-    --color-warning-text: #fbbf24;
-    --color-warning-border: rgba(245, 158, 11, 0.35);
+    --color-warning-bg: #fffbeb;
+    --color-warning-text: #b45309;
+    --color-warning-border: #fde68a;
 
     --color-danger: #ef4444;
-    --color-danger-text: #ff6b6b;
-    --color-danger-bg: rgba(239, 68, 68, 0.15);
-    --color-danger-strong: #dc2626;
+    --color-danger-text: #dc2626;
+    --color-danger-bg: #fef2f2;
+    --color-danger-strong: #b91c1c;
 
-    --color-info: #00D2FF;
-    --color-info-bg: rgba(0, 210, 255, 0.15);
-    --color-info-text: #00D2FF;
+    --color-info: #0284c7;
+    --color-info-bg: #f0f9ff;
+    --color-info-text: #0369a1;
 
-    --color-scheduled: #818cf8;
-    --color-scheduled-bg: rgba(129, 140, 248, 0.15);
-    --color-scheduled-text: #a5b4fc;
+    --color-scheduled: #6366f1;
+    --color-scheduled-bg: #eef2ff;
+    --color-scheduled-text: #4f46e5;
 
     /* ── WhatsApp ── */
     --color-whatsapp: #25d366;
     --color-whatsapp-hover: #1ebe5d;
 
     /* ── Scrollbar ── */
-    --color-scrollbar-track: #070B14;
-    --color-scrollbar-thumb: #1A243B;
-    --color-scrollbar-thumb-hover: #263554;
+    --color-scrollbar-track: #0f172a;
+    --color-scrollbar-thumb: #334155;
+    --color-scrollbar-thumb-hover: #475569;
 
     /* ── Ícones / utilitários ── */
-    --color-icon-muted: rgba(255, 255, 255, 0.45);
-    --color-icon-subtle: rgba(255, 255, 255, 0.25);
+    --color-icon-muted: #94a3b8;
+    --color-icon-subtle: #cbd5e1;
 }

@@ -185,15 +185,14 @@ ul li.block-local p {
 
 .input-custom:focus,
 .col.s12.input-custom:focus {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid #CD2379 !important;
-    border-bottom: 1px solid #CD2379 !important;
-    -webkit-box-shadow: 0 0 12px rgba(205, 35, 121, 0.35) !important;
-    box-shadow: 0 0 12px rgba(205, 35, 121, 0.35) !important;
+    background-color: var(--color-border-subtle);
+    border-bottom: none !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
 }
 
 .input-custom::placeholder {
-    color: rgba(255, 255, 255, 0.40);
+    color: #969393;
 }
 
 .button-confirm-run {

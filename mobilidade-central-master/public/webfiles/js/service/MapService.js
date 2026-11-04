@@ -465,7 +465,7 @@ class MapService {
                     type: 'line',
                     source: sourceId,
                     layout: { 'line-join': 'round', 'line-cap': 'round' },
-                    paint: { 'line-color': '#CD2379', 'line-width': 4.5, 'line-opacity': 0.95 },
+                    paint: { 'line-color': '#000000', 'line-width': 4, 'line-opacity': 0.95 },
                 });
             }
         });
@@ -855,8 +855,8 @@ class MapService {
                     source: sourceId,
                     layout: { 'line-join': 'round', 'line-cap': 'round' },
                     paint: {
-                        'line-color': '#CD2379',
-                        'line-width': 4.5,
+                        'line-color': '#000000',
+                        'line-width': 4,
                         'line-opacity': 0.95,
                     },
                 });
