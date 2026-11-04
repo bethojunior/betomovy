@@ -42,22 +42,22 @@ const statusPermission = {
 };
 
 export const getDisabledPermissions = async () => {
-  const permissions = {
-    foreground: (await Location.getForegroundPermissionsAsync()).status,
-    background: (await Location.getBackgroundPermissionsAsync()).status,
-    // media: (await MediaLibrary.getPermissionsAsync()).status,
-    camera: (await Camera.getCameraPermissionsAsync()).status,
-    audio: (await Audio.getPermissionsAsync()).status,
-    notifications: (await Notifications.getPermissionsAsync()).status,
-  };
+  const [foregroundRes, backgroundRes, cameraRes, audioRes, notificationsRes] = await Promise.all([
+    Location.getForegroundPermissionsAsync().catch(() => ({ status: 'granted' })),
+    Location.getBackgroundPermissionsAsync().catch(() => ({ status: 'granted' })),
+    Camera.getCameraPermissionsAsync().catch(() => ({ status: 'granted' })),
+    Audio.getPermissionsAsync().catch(() => ({ granted: true, status: 'granted' })),
+    Notifications.getPermissionsAsync().catch(() => ({ status: 'granted' })),
+  ]);
+
+  const isAudioGranted = (audioRes as any)?.granted === true || (audioRes as any)?.status === 'granted';
 
   const disabledPermissions = [];
-  if (permissions.foreground !== 'granted') disabledPermissions.push('foreground');
-  if (permissions.background !== 'granted') disabledPermissions.push('background');
-  // if (permissions.media !== 'granted') disabledPermissions.push('media');
-  if (permissions.camera !== 'granted') disabledPermissions.push('camera');
-  if (permissions.audio !== 'granted') disabledPermissions.push('audio');
-  if (permissions.notifications !== 'granted') disabledPermissions.push('notifications');
+  if (foregroundRes.status !== 'granted') disabledPermissions.push('foreground');
+  if (backgroundRes.status !== 'granted') disabledPermissions.push('background');
+  if (cameraRes.status !== 'granted') disabledPermissions.push('camera');
+  if (!isAudioGranted) disabledPermissions.push('audio');
+  if (notificationsRes.status !== 'granted') disabledPermissions.push('notifications');
 
   return disabledPermissions;
 };
