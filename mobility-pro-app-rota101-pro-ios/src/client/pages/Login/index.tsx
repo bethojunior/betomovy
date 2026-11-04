@@ -335,7 +335,7 @@ export default function Login() {
                 >
                   <ProfileIconBadge active={!driverSelected}>
                     <FontAwesome5
-                      name="user-friends"
+                      name="user"
                       size={RFValue(18)}
                       color={!driverSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'}
                     />
@@ -357,7 +357,7 @@ export default function Login() {
                   <ProfileIconBadge active={driverSelected}>
                     <MaterialCommunityIcons
                       name="steering"
-                      size={RFValue(22)}
+                      size={RFValue(20)}
                       color={driverSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'}
                     />
                   </ProfileIconBadge>

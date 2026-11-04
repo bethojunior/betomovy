@@ -167,7 +167,7 @@ export default function Profile({ route }) {
       <ScrollView contentContainerStyle={styles.content}>
         <If condition={verifyOptions(optionsMenu, 'client_profile')}>
           <ButtonOptionCustom
-            icon={<AvatarProfile uri={user?.profileImageLink} />}
+            icon={<AvatarProfile uri={user?.profileImageLink || user?.profileImage} />}
             title={user != null && Helper.maskNames(user?.nameUser?.trim())}
             subtitle={translate('profile.text_subtitle_edit_profile')}
             onPress={() => {

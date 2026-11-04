@@ -265,14 +265,27 @@ class CustomerService
                     WHEN '{$dbFemale}' THEN {$femaleId}
                     ELSE NULL
                   END AS genderId,
-                  CONCAT(
-                    (
-                        SELECT
-                            config.value
-                        FROM config
-                            WHERE config.`key` = 'link_storage_pictures'
-                    ), 'customer/profile/compressed/', c.profileImage
-                  ) AS profileImageLink
+                  CASE
+                    WHEN c.profileImage IS NOT NULL AND c.profileImage != '' AND c.profileImage != 'user.png' AND c.profileImage LIKE 'http%'
+                    THEN c.profileImage
+                    WHEN c.profileImage IS NOT NULL AND c.profileImage != '' AND c.profileImage != 'user.png'
+                    THEN CONCAT(
+                        COALESCE(
+                            NULLIF((SELECT config.value FROM config WHERE config.`key` = 'link_storage_pictures'), ''),
+                            'https://api.movymob.com/'
+                        ), 'customer/profile/compressed/', c.profileImage
+                    )
+                    WHEN u.profilePhoto IS NOT NULL AND u.profilePhoto != '' AND u.profilePhoto != 'user.png' AND u.profilePhoto LIKE 'http%'
+                    THEN u.profilePhoto
+                    WHEN u.profilePhoto IS NOT NULL AND u.profilePhoto != '' AND u.profilePhoto != 'user.png'
+                    THEN CONCAT(
+                        COALESCE(
+                            NULLIF((SELECT config.value FROM config WHERE config.`key` = 'link_storage_pictures'), ''),
+                            'https://api.movymob.com/'
+                        ), 'customer/profile/compressed/', u.profilePhoto
+                    )
+                    ELSE NULL
+                  END AS profileImageLink
                 FROM {$this->table} c
                   INNER JOIN {$userTable} u on c.userId = u.idUser
                   INNER JOIN {$levelAccessTable} la on u.idUser = la.userId
@@ -318,14 +331,27 @@ class CustomerService
                     WHEN '{$dbFemale}' THEN {$femaleId}
                     ELSE NULL
                   END AS genderId,
-                  CONCAT(
-                    (
-                        SELECT
-                            config.value
-                        FROM config
-                            WHERE config.`key` = 'link_storage_pictures'
-                    ), 'customer/profile/compressed/', c.profileImage
-                  ) AS profileImageLink
+                  CASE
+                    WHEN c.profileImage IS NOT NULL AND c.profileImage != '' AND c.profileImage != 'user.png' AND c.profileImage LIKE 'http%'
+                    THEN c.profileImage
+                    WHEN c.profileImage IS NOT NULL AND c.profileImage != '' AND c.profileImage != 'user.png'
+                    THEN CONCAT(
+                        COALESCE(
+                            NULLIF((SELECT config.value FROM config WHERE config.`key` = 'link_storage_pictures'), ''),
+                            'https://api.movymob.com/'
+                        ), 'customer/profile/compressed/', c.profileImage
+                    )
+                    WHEN u.profilePhoto IS NOT NULL AND u.profilePhoto != '' AND u.profilePhoto != 'user.png' AND u.profilePhoto LIKE 'http%'
+                    THEN u.profilePhoto
+                    WHEN u.profilePhoto IS NOT NULL AND u.profilePhoto != '' AND u.profilePhoto != 'user.png'
+                    THEN CONCAT(
+                        COALESCE(
+                            NULLIF((SELECT config.value FROM config WHERE config.`key` = 'link_storage_pictures'), ''),
+                            'https://api.movymob.com/'
+                        ), 'customer/profile/compressed/', u.profilePhoto
+                    )
+                    ELSE NULL
+                  END AS profileImageLink
                 FROM {$this->table} c
                   INNER JOIN {$userTable} u on c.userId = u.idUser
                   INNER JOIN {$levelAccessTable} la on u.idUser = la.userId

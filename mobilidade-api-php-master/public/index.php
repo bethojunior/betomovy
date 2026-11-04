@@ -20,7 +20,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) 
 }
 
 $uriLowerPath = strtolower(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH));
-if (strpos($uriLowerPath, '/customer/profile/') === 0 || strpos($uriLowerPath, '/customer/doc/') === 0) {
+if (strpos($uriLowerPath, '/customer/profile/') === 0 || strpos($uriLowerPath, '/customer/doc/') === 0 || strpos($uriLowerPath, '/driver/profile/') === 0 || strpos($uriLowerPath, '/driver/docs/') === 0 || strpos($uriLowerPath, '/driver/doc/') === 0) {
     $staticFile = __DIR__ . parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
     if (file_exists($staticFile) && !is_dir($staticFile)) {
         $mime = 'image/jpeg';

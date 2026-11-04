@@ -57,31 +57,32 @@ export const TaglineText = styled.Text`
 /* ===== GRID DE SELEÇÃO DE PERFIL (PASSAGEIRO / MOTORISTA) ===== */
 export const ProfileGridContainer = styled.View`
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
-  margin-bottom: ${RFValue(16)}px;
+  margin-bottom: ${RFValue(18)}px;
   width: 100%;
 `;
 
 export const ProfileGridItem = styled.TouchableOpacity<{ active: boolean }>`
   flex: 1;
+  min-height: ${RFValue(92)}px;
   background-color: ${({ active }) =>
-    active ? 'rgba(205, 35, 121, 0.16)' : 'rgba(255, 255, 255, 0.04)'};
-  border-width: ${({ active }) => (active ? '2px' : '1px')};
+    active ? 'rgba(205, 35, 121, 0.18)' : 'rgba(255, 255, 255, 0.05)'};
+  border-width: 1.5px;
   border-color: ${({ active }) =>
-    active ? '#CD2379' : 'rgba(255, 255, 255, 0.18)'};
-  border-radius: ${RFValue(16)}px;
-  padding-vertical: ${RFValue(14)}px;
+    active ? '#CD2379' : 'rgba(255, 255, 255, 0.14)'};
+  border-radius: ${RFValue(18)}px;
+  padding-vertical: ${RFValue(12)}px;
   padding-horizontal: ${RFValue(8)}px;
   align-items: center;
   justify-content: center;
-  margin-horizontal: 5px;
+  margin-horizontal: 4px;
 `;
 
 export const ProfileIconBadge = styled.View<{ active: boolean }>`
-  width: ${RFValue(42)}px;
-  height: ${RFValue(42)}px;
-  border-radius: ${RFValue(21)}px;
+  width: ${RFValue(40)}px;
+  height: ${RFValue(40)}px;
+  border-radius: ${RFValue(20)}px;
   background-color: ${({ active }) =>
     active ? '#CD2379' : 'rgba(255, 255, 255, 0.08)'};
   align-items: center;
@@ -91,7 +92,7 @@ export const ProfileIconBadge = styled.View<{ active: boolean }>`
 
 export const ProfileGridTitle = styled.Text<{ active: boolean }>`
   font-size: ${RFValue(12.5)}px;
-  font-weight: bold;
+  font-weight: 700;
   color: ${({ active }) => (active ? '#ffffff' : 'rgba(255, 255, 255, 0.70)')};
   letter-spacing: 0.6px;
   text-align: center;
@@ -99,6 +100,7 @@ export const ProfileGridTitle = styled.Text<{ active: boolean }>`
 
 export const ProfileGridSubtitle = styled.Text<{ active: boolean }>`
   font-size: ${RFValue(10)}px;
+  font-weight: 500;
   color: ${({ active }) => (active ? '#ff80ab' : 'rgba(255, 255, 255, 0.45)')};
   margin-top: 2px;
   text-align: center;

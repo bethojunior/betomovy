@@ -810,13 +810,16 @@ class CustomerDao extends BaseDao
             );
 
             $this->commit();
+
+            $result = $user->toStdClass();
+            $result->idCustomer = $customer->getIdCustomer();
+            $result->customerId = $customer->getIdCustomer();
+            return $result;
         } catch (Exception $e) {
             $this->rollback();
             (new LogDao)->logException($e);
             throw $e;
         }
-
-        return true;
     }
 
     /**
@@ -836,6 +839,30 @@ class CustomerDao extends BaseDao
             }
             $requireDoc = !empty($request->document);
             $this->validator->validateInsertCustomer($request, $requireDoc);
+
+            if (isset($request->dateOfBirth)) {
+                $rawDob = trim((string)$request->dateOfBirth);
+                if (empty($rawDob)) {
+                    $request->dateOfBirth = null;
+                } else {
+                    $parsed = DateTime::createFromFormat('Y-m-d', $rawDob);
+                    if (!$parsed || $parsed->format('Y-m-d') !== $rawDob) {
+                        $formats = ['d/m/Y', 'd-m-Y', 'Ymd', 'dmY'];
+                        $found = false;
+                        foreach ($formats as $fmt) {
+                            $p = DateTime::createFromFormat($fmt, $rawDob);
+                            if ($p) {
+                                $request->dateOfBirth = $p->format('Y-m-d');
+                                $found = true;
+                                break;
+                            }
+                        }
+                        if (!$found) {
+                            $request->dateOfBirth = '2000-01-01';
+                        }
+                    }
+                }
+            }
 
             $this->beginTransaction();
 

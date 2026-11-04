@@ -7,8 +7,27 @@ import { useTheme } from 'styled-components/native';
 import userImage from '../../client/assets/images/user.png';
 import { AvatarImage, Container, LoadingOverlay, MenuIconBadge } from './styles';
 
+function resolveAvatarUri(rawUri?: string | null): string | null {
+  if (!rawUri || typeof rawUri !== 'string') return null;
+  const trimmed = rawUri.trim();
+  if (!trimmed || trimmed === 'user.png' || trimmed.endsWith('/user.png') || trimmed === 'null' || trimmed === 'undefined') return null;
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('file://')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('/')) {
+    return `https://api.movymob.com${trimmed}`;
+  }
+  if (trimmed.includes('customer/profile/') || trimmed.includes('driver/profile/') || trimmed.includes('driver/docs/')) {
+    return `https://api.movymob.com/${trimmed.replace(/^\/+/, '')}`;
+  }
+  if (trimmed.startsWith('driver_') || trimmed.includes('driver')) {
+    return `https://api.movymob.com/driver/profile/${trimmed}`;
+  }
+  return `https://api.movymob.com/customer/profile/compressed/${trimmed}`;
+}
+
 function isValidUri(uri?: string | null) {
-  return !!uri && uri.trim() !== '' && !uri.includes('user.png');
+  return !!resolveAvatarUri(uri);
 }
 
 interface AvatarProfileProps {
@@ -32,25 +51,28 @@ export function AvatarProfile({
 }: AvatarProfileProps) {
   const theme = useTheme();
 
+  const resolved = resolveAvatarUri(uri);
+
   const [displaySource, setDisplaySource] = useState<ImageSourcePropType>(
-    !showPreloadOverlay && isValidUri(uri) ? { uri } : userImage,
+    !showPreloadOverlay && resolved ? { uri: resolved } : userImage,
   );
 
   const [pendingUri, setPendingUri] = useState<string | null>(
-    isValidUri(uri) ? uri : null,
+    resolved ? resolved : null,
   );
 
   useEffect(() => {
-    if (!isValidUri(uri)) {
+    const freshResolved = resolveAvatarUri(uri);
+    if (!freshResolved) {
       setDisplaySource(userImage);
       setPendingUri(null);
       return;
     }
 
     if (showPreloadOverlay) {
-      setPendingUri(uri);
+      setPendingUri(freshResolved);
     } else {
-      setDisplaySource({ uri });
+      setDisplaySource({ uri: freshResolved });
       setPendingUri(null);
     }
   }, [uri, showPreloadOverlay]);
@@ -77,6 +99,7 @@ export function AvatarProfile({
         borderColor={borderColor}
         borderWidth={borderWidth}
         resizeMode="cover"
+        onError={() => setDisplaySource(userImage)}
       />
 
       {isPreloading && (

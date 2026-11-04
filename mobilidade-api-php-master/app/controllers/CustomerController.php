@@ -143,9 +143,14 @@ class CustomerController extends ApiController
     public function actionRegister()
     {
         try {
-            echo $this->returnSuccess("Cadastrado com sucesso",
-                (new CustomerDao)->register($this->request())
-            );
+            $user = (new CustomerDao)->register($this->request());
+            $customer = (new CustomerDao)->findByUser($user->getIdUser());
+            $result = $user->toStdClass();
+            if ($customer) {
+                $result->idCustomer = $customer->getIdCustomer();
+                $result->customerId = $customer->getIdCustomer();
+            }
+            echo $this->returnSuccess("Cadastrado com sucesso", $result);
         } catch (Exception $e) {
             echo $this->returnError($e);
         }
@@ -168,8 +173,8 @@ class CustomerController extends ApiController
     public function actionRegisterPartner()
     {
         try {
-            (new CustomerDao)->registerPartner($this->request());
-            echo $this->returnSuccess("Cadastrado com sucesso", true);
+            $result = (new CustomerDao)->registerPartner($this->request());
+            echo $this->returnSuccess("Cadastrado com sucesso", $result);
         } catch (Exception $e) {
             echo $this->returnError($e);
         }
@@ -339,17 +344,18 @@ class CustomerController extends ApiController
     public function actionUpdateProfileImage()
     {
         try {
-            $customerId = $_POST['customerId'] ?? $_GET['id'] ?? null;
+            $customerId = $_POST['customerId'] ?? $_POST['idCustomer'] ?? $_POST['userId'] ?? $_POST['idUser'] ?? $_GET['id'] ?? null;
             $photo = $_FILES['photo'] ?? $_FILES['image'] ?? $_FILES['imageCompressed'] ?? null;
 
             $photoName = (new CustomerDao)
                 ->updateProfileImage($customerId, $photo);
 
-            $storageUrl = \app\model\Config::get('link_storage_pictures') ?: 'https://minio.704app.com.br/rota101fb704/';
+            $storageUrl = \app\model\Config::get('link_storage_pictures') ?: 'https://api.movymob.com/';
             $fullUrl = rtrim($storageUrl, '/') . '/customer/profile/compressed/' . $photoName;
 
             echo $this->returnSuccess("Foto de perfil atualizada", [
                 'profileImage' => $photoName,
+                'profileImageLink' => $fullUrl,
                 'url' => $fullUrl,
                 'filename' => $photoName
             ]);

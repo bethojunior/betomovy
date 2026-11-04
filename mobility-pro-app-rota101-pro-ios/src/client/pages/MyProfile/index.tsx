@@ -300,7 +300,7 @@ export default function MyProfile() {
               <ButtonPhoto onPress={() => setShowModalSelectPhoto(true)}>
                 <AvatarWrapper>
                   <AvatarProfile
-                    uri={user?.profileImageLink}
+                    uri={user?.profileImageLink || user?.profileImage}
                     loading={uploadingPhoto}
                     showPreloadOverlay
                     size={RFValue(88)}

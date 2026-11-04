@@ -2359,17 +2359,34 @@ class DriverDao extends BaseDao
      */
     public function editProfileImage($driverId, $photo, bool $notifyAdmin = true)
     {
-        $driver = $this->find($driverId, false);
+        $driver = null;
+        if (!empty($driverId)) {
+            $driver = $this->find($driverId, false);
+            if (!$driver) {
+                $driver = $this->findByUser($driverId);
+            }
+        }
+        if (!$driver) {
+            $userId = Headers::getUserId();
+            if ($userId) {
+                $driver = $this->findByUser($userId);
+            }
+        }
+        if (!$driver) {
+            throw new Exception("Motorista não encontrado para atualização de foto");
+        }
 
         $photoName = $this->service
-            ->updateProfileImage($photo, $driver->profileImageTemp);
+            ->updateProfileImage($photo, $driver->profileImageTemp ?? $driver->profileImage, false);
 
-        $key = 'profileImageTemp';
-
-        $set = [$key => ':profileImage'];
+        $set = [
+            'profileImage' => ':profileImage',
+            'profileImageTemp' => ':profileImageTemp'
+        ];
         $bind = [
             ':profileImage' => $photoName,
-            ':idDriver' => $driverId
+            ':profileImageTemp' => $photoName,
+            ':idDriver' => $driver->getIdDriver()
         ];
 
         if ((bool)Config::get('driver_profile_image_init_pending')) {
@@ -2379,7 +2396,20 @@ class DriverDao extends BaseDao
 
         $this->sqlUpdate($set, [['idDriver', '=', ':idDriver']], $bind);
 
-        $driver->$key = $photoName;
+        $driver->profileImage = $photoName;
+        $driver->profileImageTemp = $photoName;
+
+        // Mantém user.profilePhoto sincronizado para o motorista
+        try {
+            $uid = (int)($driver->userId ?? $driver->getUserId());
+            if ($uid > 0) {
+                $pdo = (new \app\utils\Connection)->get();
+                $updUser = $pdo->prepare("UPDATE user SET profilePhoto = :photo WHERE idUser = :uid LIMIT 1");
+                $updUser->execute([':photo' => $photoName, ':uid' => $uid]);
+            }
+        } catch (\Throwable $e) {
+            error_log('DriverDao::editProfileImage sync profilePhoto error: ' . $e->getMessage());
+        }
 
         if ($notifyAdmin) {
             $adminNotificationType =

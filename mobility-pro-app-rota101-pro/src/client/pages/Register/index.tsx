@@ -176,6 +176,47 @@ const getCategoryIconName = (categoryName: string): any => {
   return 'car';
 };
 
+function normalizeDateForApi(raw?: string | null, defaultYear = 2000): string {
+  if (!raw || typeof raw !== 'string') return `${defaultYear}-01-01`;
+  const clean = raw.trim();
+  if (!clean) return `${defaultYear}-01-01`;
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clean)) {
+    return clean;
+  }
+
+  const digits = clean.replace(/\D/g, '');
+  if (digits.length === 8) {
+    const first4 = parseInt(digits.substring(0, 4), 10);
+    const last4 = parseInt(digits.substring(4, 8), 10);
+
+    let year = defaultYear;
+    let month = 1;
+    let day = 1;
+
+    if (first4 >= 1920 && first4 <= 2030) {
+      year = first4;
+      month = parseInt(digits.substring(4, 6), 10);
+      day = parseInt(digits.substring(6, 8), 10);
+    } else if (last4 >= 1920 && last4 <= 2030) {
+      day = parseInt(digits.substring(0, 2), 10);
+      month = parseInt(digits.substring(2, 4), 10);
+      year = last4;
+    } else {
+      return `${defaultYear}-01-01`;
+    }
+
+    if (month < 1 || month > 12) month = 1;
+    if (day < 1 || day > 31) day = 1;
+
+    const mm = String(month).padStart(2, '0');
+    const dd = String(day).padStart(2, '0');
+    return `${year}-${mm}-${dd}`;
+  }
+
+  return `${defaultYear}-01-01`;
+}
+
 export function Register() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
@@ -389,14 +430,13 @@ export function Register() {
     if (passengerStep === 1) {
       if (!pName.trim()) newErrors.pName = 'Informe seu nome completo';
       const cleanBirth = pBirthDate.replace(/\D/g, '');
-      if (cleanBirth && cleanBirth.length !== 8) {
+      if (cleanBirth && cleanBirth.length > 0 && cleanBirth.length !== 8) {
         newErrors.pBirthDate = 'Data de nascimento incompleta';
       } else if (cleanBirth && cleanBirth.length === 8) {
-        const day = parseInt(cleanBirth.substring(0, 2), 10);
-        const month = parseInt(cleanBirth.substring(2, 4), 10);
-        const year = parseInt(cleanBirth.substring(4, 8), 10);
+        const norm = normalizeDateForApi(pBirthDate, 2000);
+        const [y, m, d] = norm.split('-').map(n => parseInt(n, 10));
         const currentYear = new Date().getFullYear();
-        if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1920 || year > currentYear - 10) {
+        if (d < 1 || d > 31 || m < 1 || m > 12 || y < 1920 || y > currentYear) {
           newErrors.pBirthDate = 'Data de nascimento inválida';
         }
       }
@@ -441,11 +481,7 @@ export function Register() {
     setSubmitting(true);
 
     try {
-      const cleanBirth = pBirthDate.replace(/\D/g, '');
-      const formattedDate =
-        cleanBirth.length === 8
-          ? `${cleanBirth.substring(4, 8)}-${cleanBirth.substring(2, 4)}-${cleanBirth.substring(0, 2)}`
-          : '2000-01-01';
+      const formattedDate = normalizeDateForApi(pBirthDate, 2000);
 
       const payload = {
         name: pName.trim(),
@@ -476,12 +512,19 @@ export function Register() {
         try {
           const customerId =
             data?.data?.idCustomer ||
+            data?.data?.customerId ||
+            data?.data?.idUser ||
+            data?.data?.userId ||
             data?.data?.[0]?.idCustomer ||
+            data?.data?.[0]?.idUser ||
             data?.data?.id ||
-            data?.idCustomer;
+            data?.idCustomer ||
+            data?.idUser;
           if (customerId) {
             const formData = new FormData();
             formData.append('customerId', String(customerId));
+            formData.append('userId', String(customerId));
+            formData.append('idUser', String(customerId));
             formData.append('photo', {
               uri: pPhoto,
               type: 'image/jpeg',
@@ -521,14 +564,13 @@ export function Register() {
     } else if (driverStep === 2) {
       if (!dName.trim()) newErrors.dName = 'Informe seu nome completo';
       const cleanBirth = dBirthDate.replace(/\D/g, '');
-      if (cleanBirth && cleanBirth.length !== 8) {
+      if (cleanBirth && cleanBirth.length > 0 && cleanBirth.length !== 8) {
         newErrors.dBirthDate = 'Informe a data completa (DD/MM/AAAA)';
       } else if (cleanBirth && cleanBirth.length === 8) {
-        const day = parseInt(cleanBirth.substring(0, 2), 10);
-        const month = parseInt(cleanBirth.substring(2, 4), 10);
-        const year = parseInt(cleanBirth.substring(4, 8), 10);
+        const norm = normalizeDateForApi(dBirthDate, 1995);
+        const [y, m, d] = norm.split('-').map(n => parseInt(n, 10));
         const currentYear = new Date().getFullYear();
-        if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1920 || year > currentYear - 18) {
+        if (d < 1 || d > 31 || m < 1 || m > 12 || y < 1920 || y > currentYear - 18) {
           newErrors.dBirthDate = 'Data de nascimento inválida (mínimo 18 anos)';
         }
       }
@@ -576,11 +618,7 @@ export function Register() {
     setSubmitting(true);
 
     try {
-      const cleanBirth = dBirthDate.replace(/\D/g, '');
-      const formattedDate =
-        cleanBirth.length === 8
-          ? `${cleanBirth.substring(4, 8)}-${cleanBirth.substring(2, 4)}-${cleanBirth.substring(0, 2)}`
-          : '1995-01-01';
+      const formattedDate = normalizeDateForApi(dBirthDate, 1995);
 
       const driverPayload: any = {
         user: {
@@ -616,18 +654,37 @@ export function Register() {
       // Se tiver foto e o endpoint retornar identificador do usuário
       if (dPhoto && response?.data) {
         try {
-          const driverId = response.data.id || response.data.idCustomer || response.data.driverId;
-          if (driverId) {
+          const resolvedId =
+            response.data.idDriver ||
+            response.data.driverId ||
+            response.data.idCustomer ||
+            response.data.customerId ||
+            response.data.idUser ||
+            response.data.userId ||
+            response.data.id;
+          if (resolvedId) {
             const formData = new FormData();
-            formData.append('customerId', String(driverId));
+            formData.append('driverId', String(resolvedId));
+            formData.append('customerId', String(resolvedId));
+            formData.append('userId', String(resolvedId));
+            formData.append('idUser', String(resolvedId));
             formData.append('photo', {
               uri: dPhoto,
               type: 'image/jpeg',
               name: 'driver_profile.jpg',
             } as any);
-            await apiMain.post('Customer/UpdateProfileImage', formData, {
-              headers: { 'Content-Type': 'multipart/form-data' },
-            });
+
+            try {
+              await apiMain.post('Driver/EditProfileImage', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                timeout: 30000,
+              });
+            } catch {
+              await apiMain.post('Customer/UpdateProfileImage', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                timeout: 30000,
+              });
+            }
           }
         } catch (photoErrDriver) {
           console.log('Upload foto driver:', photoErrDriver);
@@ -745,7 +802,7 @@ export function Register() {
               >
                 <ProfileIconBadge active={!isDriver}>
                   <FontAwesome5
-                    name="user-friends"
+                    name="user"
                     size={RFValue(18)}
                     color={!isDriver ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'}
                   />
@@ -767,7 +824,7 @@ export function Register() {
                 <ProfileIconBadge active={isDriver}>
                   <MaterialCommunityIcons
                     name="steering"
-                    size={RFValue(22)}
+                    size={RFValue(20)}
                     color={isDriver ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'}
                   />
                 </ProfileIconBadge>

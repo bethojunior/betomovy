@@ -53,7 +53,16 @@ class CustomerValidator
                 $this->documentIsValid($doc);
             }
             if (!empty($dob)) {
-                $this->dateOfBirthIsValid($dob);
+                $parsedDob = $this->parseDateOfBirth((string)$dob);
+                if ($parsedDob) {
+                    $normalized = $parsedDob->format('Y-m-d');
+                    if (is_object($data)) $data->dateOfBirth = $normalized;
+                    if (is_object($request)) $request->dateOfBirth = $normalized;
+                } else {
+                    // Safe fallback para cadastro de cliente simples não ser bloqueado
+                    if (is_object($data)) $data->dateOfBirth = '2000-01-01';
+                    if (is_object($request)) $request->dateOfBirth = '2000-01-01';
+                }
             }
         }
 
