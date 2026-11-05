@@ -25,14 +25,10 @@ const androidLanguage = async () => {
     return language;
   }
 
-  let locale = await NativeModules.I18nManager.localeIdentifier;
-  locale = switchIosLanguage(locale);
-  await AsyncStorage.setItem(
-    '@language',
-    locale || 'en_US',
-  );
-
-  return locale || 'en_US';
+  // Idioma padrão do aplicativo deve ser SEMPRE Inglês (Estados Unidos)
+  const defaultLocale = 'en_US';
+  await AsyncStorage.setItem('@language', defaultLocale);
+  return defaultLocale;
 };
 
 const switchIosLanguage = (locale: string) => {
