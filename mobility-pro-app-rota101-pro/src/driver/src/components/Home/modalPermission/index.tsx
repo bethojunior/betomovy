@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, ActivityIndicator } from 'react-native';
+import { Modal, ActivityIndicator, PermissionsAndroid, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { Camera } from 'expo-camera';
@@ -50,7 +50,12 @@ export const getDisabledPermissions = async () => {
     Notifications.getPermissionsAsync().catch(() => ({ status: 'granted' })),
   ]);
 
-  const isAudioGranted = (audioRes as any)?.granted === true || (audioRes as any)?.status === 'granted';
+  let isAudioGranted = (audioRes as any)?.granted === true || (audioRes as any)?.status === 'granted';
+  if (!isAudioGranted && Platform.OS === 'android') {
+    try {
+      isAudioGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+    } catch {}
+  }
 
   const disabledPermissions = [];
   if (foregroundRes.status !== 'granted') disabledPermissions.push('foreground');

@@ -92,8 +92,8 @@ android {
         applicationId 'br.com.client.rota101'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 80306
-        versionName "8.3.6"
+        versionCode 80307
+        versionName "8.3.7"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
@@ -202,3 +202,42 @@ tasks.matching { it.name.startsWith("createBundle") }.configureEach {
 }
 
 apply plugin: 'com.google.gms.google-services'
+
+// Automatizacao: Sempre que bundleRelease rodar (no Android Studio ou linha de comando),
+// gera o movy-app-universal.apk assinado e copia para a pasta release e raiz do projeto.
+tasks.matching { it.name == "bundleRelease" }.configureEach {
+    doLast {
+        println(">>> [MOVY HOOK] bundleRelease finalizado! Gerando movy-app-universal.apk atualizado...")
+        def rootDirApp = projectDir.parentFile.absolutePath
+        def nodeScript = new File(rootDirApp, "build_and_sign.js")
+        if (nodeScript.exists()) {
+            exec {
+                workingDir rootDirApp
+                commandLine 'node', 'build_and_sign.js'
+            }
+            println(">>> [MOVY HOOK] movy-app-universal.apk sincronizado com sucesso!")
+        }
+    }
+}
+
+// Tambem para assembleRelease, se for gerado APK pelo Android Studio
+tasks.matching { it.name == "assembleRelease" }.configureEach {
+    doLast {
+        def releaseApk = file("${buildDir}/outputs/apk/release/app-release.apk")
+        def targetUniversal = file("${projectDir}/release/movy-app-universal.apk")
+        def rootUniversal = file("${rootDir.parentFile.absolutePath}/movy-app-universal.apk")
+        if (releaseApk.exists()) {
+            copy {
+                from releaseApk
+                into targetUniversal.parentFile
+                rename { "movy-app-universal.apk" }
+            }
+            copy {
+                from releaseApk
+                into rootUniversal.parentFile
+                rename { "movy-app-universal.apk" }
+            }
+            println(">>> [MOVY HOOK] assembleRelease copiou APK para movy-app-universal.apk!")
+        }
+    }
+}

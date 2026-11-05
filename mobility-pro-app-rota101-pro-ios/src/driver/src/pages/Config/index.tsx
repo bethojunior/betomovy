@@ -1,4 +1,4 @@
-import { ActivityIndicator, View, Linking } from 'react-native';
+import { ActivityIndicator, View, Linking, PermissionsAndroid, Platform } from 'react-native';
 import { Audio } from 'expo-av';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
@@ -58,6 +58,15 @@ export const Config = () => {
   const handleRequestPermission = async (type?: 'foreground' | 'background' | 'camera' | 'audio' | 'notifications' | 'media') => {
     try {
       if (type === 'audio') {
+        if (Platform.OS === 'android') {
+          try {
+            const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+              await refreshPermissions();
+              return;
+            }
+          } catch {}
+        }
         const res = await Audio.requestPermissionsAsync();
         if (res.granted) {
           await refreshPermissions();

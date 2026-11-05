@@ -374,6 +374,7 @@ export default function Trip({ route }) {
     }
 
     getSelectedPaymentMethod();
+    getTripPaymentMethods();
   }, [trip?.tripReference, trip?.status]);
 
   const handleSelectAddress = (datas: DestinationFree) => {

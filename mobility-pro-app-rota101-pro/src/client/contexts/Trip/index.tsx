@@ -533,13 +533,36 @@ export const TripProvider = ({ children }: TripContextChildren) => {
   }
 
   async function getTripPaymentMethods() {
-    const { data } = await apiMain.post('TripPaymentForm/GetAll', {});
+    try {
+      const { data } = await apiMain.post('TripPaymentForm/GetAll', {});
+      const methods = data?.data || [];
 
-    dispatchTripCustomer({
-      type: 'update',
-      field: 'tripPaymentMethods',
-      arg: data.data,
-    });
+      dispatchTripCustomer({
+        type: 'update',
+        field: 'tripPaymentMethods',
+        arg: methods,
+      });
+
+      if ((!selectedPaymentMethod || !selectedPaymentMethod?.name) && methods.length > 0) {
+        const stored = await AsyncStorage.getItem('lastSelectedPaymentMethod');
+        let initial = null;
+        if (stored) {
+          try {
+            initial = JSON.parse(stored);
+          } catch {}
+        }
+        if (!initial || !initial.name) {
+          initial = methods[0];
+        }
+        dispatchTripCustomer({
+          type: 'update',
+          field: 'selectedPaymentMethod',
+          arg: initial,
+        });
+      }
+    } catch (e) {
+      console.warn('Erro ao carregar formas de pagamento:', e);
+    }
   }
 
   async function calculateAll(

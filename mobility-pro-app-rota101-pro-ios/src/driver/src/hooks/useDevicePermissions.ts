@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AppState } from 'react-native';
+import { AppState, PermissionsAndroid, Platform } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
@@ -31,7 +31,12 @@ export function useDevicePermissions() {
         Notifications.getPermissionsAsync().catch(() => ({ granted: true, status: 'granted' })),
       ]);
 
-    const isAudioGranted = (audio as any)?.granted === true || (audio as any)?.status === 'granted';
+    let isAudioGranted = (audio as any)?.granted === true || (audio as any)?.status === 'granted';
+    if (!isAudioGranted && Platform.OS === 'android') {
+      try {
+        isAudioGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+      } catch {}
+    }
 
     setPermissions({
       foreground: foreground.granted,
