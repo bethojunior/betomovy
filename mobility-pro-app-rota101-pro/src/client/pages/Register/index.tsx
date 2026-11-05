@@ -6,7 +6,9 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Platform,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -1139,55 +1141,127 @@ export function Register() {
                         <ModernInputLabel>Cidade</ModernInputLabel>
                         <DropdownButton
                           activeOpacity={0.8}
-                          onPress={() => setShowCityPicker(!showCityPicker)}
+                          onPress={() => setShowCityPicker(true)}
                         >
                           <DropdownButtonText hasValue={!!pCity}>
                             {pCity ? pCity.nome : 'Selecione sua cidade'}
                           </DropdownButtonText>
                           <Feather
-                            name={showCityPicker ? 'chevron-up' : 'chevron-down'}
+                            name="chevron-down"
                             size={18}
                             color="#8A99AD"
                           />
                         </DropdownButton>
 
-                        {showCityPicker && (
-                          <View
+                        <Modal
+                          visible={showCityPicker}
+                          transparent
+                          animationType="fade"
+                          onRequestClose={() => setShowCityPicker(false)}
+                        >
+                          <TouchableOpacity
+                            activeOpacity={1}
+                            onPress={() => setShowCityPicker(false)}
                             style={{
-                              marginTop: 6,
-                              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                              borderRadius: 12,
-                              padding: 8,
-                              maxHeight: 150,
+                              flex: 1,
+                              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              paddingHorizontal: 20,
                             }}
                           >
-                            {cities.map(item => (
-                              <TouchableOpacity
-                                key={String(item.id)}
+                            <TouchableOpacity
+                              activeOpacity={1}
+                              style={{
+                                width: '100%',
+                                maxWidth: 400,
+                                maxHeight: '70%',
+                                backgroundColor: '#131A26',
+                                borderRadius: 16,
+                                borderWidth: 1,
+                                borderColor: 'rgba(255, 255, 255, 0.15)',
+                                overflow: 'hidden',
+                                elevation: 20,
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 10 },
+                                shadowOpacity: 0.5,
+                                shadowRadius: 20,
+                              }}
+                            >
+                              <View
                                 style={{
-                                  paddingVertical: 10,
-                                  paddingHorizontal: 12,
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 16,
                                   borderBottomWidth: 1,
-                                  borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-                                }}
-                                onPress={() => {
-                                  setPCity(item);
-                                  setShowCityPicker(false);
+                                  borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+                                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
                                 }}
                               >
-                                <Text
-                                  style={{
-                                    color: pCity?.id === item.id ? '#ff80ab' : '#ffffff',
-                                    fontWeight: pCity?.id === item.id ? '700' : '400',
-                                    fontSize: RFValue(13),
-                                  }}
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                  <Feather name="map-pin" size={18} color="#ff80ab" style={{ marginRight: 8 }} />
+                                  <Text style={{ color: '#ffffff', fontSize: RFValue(15), fontWeight: '700' }}>
+                                    Selecione sua Cidade
+                                  </Text>
+                                </View>
+                                <TouchableOpacity
+                                  activeOpacity={0.7}
+                                  onPress={() => setShowCityPicker(false)}
+                                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                                 >
-                                  {item.nome}
-                                </Text>
-                              </TouchableOpacity>
-                            ))}
-                          </View>
-                        )}
+                                  <Feather name="x" size={20} color="#8A99AD" />
+                                </TouchableOpacity>
+                              </View>
+
+                              <ScrollView
+                                style={{ maxHeight: 360 }}
+                                contentContainerStyle={{ paddingVertical: 6 }}
+                                showsVerticalScrollIndicator={true}
+                                bounces={false}
+                              >
+                                {cities.map(item => {
+                                  const isSelected = pCity?.id === item.id;
+                                  return (
+                                    <TouchableOpacity
+                                      key={String(item.id)}
+                                      style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        paddingVertical: 14,
+                                        paddingHorizontal: 20,
+                                        borderBottomWidth: 1,
+                                        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+                                        backgroundColor: isSelected ? 'rgba(255, 128, 171, 0.12)' : 'transparent',
+                                      }}
+                                      activeOpacity={0.7}
+                                      onPress={() => {
+                                        setPCity(item);
+                                        setShowCityPicker(false);
+                                      }}
+                                    >
+                                      <Text
+                                        style={{
+                                          color: isSelected ? '#ff80ab' : '#ffffff',
+                                          fontWeight: isSelected ? '700' : '400',
+                                          fontSize: RFValue(14),
+                                          flex: 1,
+                                        }}
+                                      >
+                                        {item.nome}
+                                      </Text>
+                                      {isSelected && (
+                                        <Feather name="check" size={18} color="#ff80ab" />
+                                      )}
+                                    </TouchableOpacity>
+                                  );
+                                })}
+                              </ScrollView>
+                            </TouchableOpacity>
+                          </TouchableOpacity>
+                        </Modal>
                       </InputGroup>
 
                       <ButtonActionsRow>
@@ -1557,55 +1631,127 @@ export function Register() {
                         <ModernInputLabel>Cidade</ModernInputLabel>
                         <DropdownButton
                           activeOpacity={0.8}
-                          onPress={() => setShowCityPicker(!showCityPicker)}
+                          onPress={() => setShowCityPicker(true)}
                         >
                           <DropdownButtonText hasValue={!!dCity}>
                             {dCity ? dCity.nome : 'Selecione sua cidade'}
                           </DropdownButtonText>
                           <Feather
-                            name={showCityPicker ? 'chevron-up' : 'chevron-down'}
+                            name="chevron-down"
                             size={18}
                             color="#8A99AD"
                           />
                         </DropdownButton>
 
-                        {showCityPicker && (
-                          <View
+                        <Modal
+                          visible={showCityPicker}
+                          transparent
+                          animationType="fade"
+                          onRequestClose={() => setShowCityPicker(false)}
+                        >
+                          <TouchableOpacity
+                            activeOpacity={1}
+                            onPress={() => setShowCityPicker(false)}
                             style={{
-                              marginTop: 6,
-                              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                              borderRadius: 12,
-                              padding: 8,
-                              maxHeight: 150,
+                              flex: 1,
+                              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              paddingHorizontal: 20,
                             }}
                           >
-                            {cities.map(item => (
-                              <TouchableOpacity
-                                key={String(item.id)}
+                            <TouchableOpacity
+                              activeOpacity={1}
+                              style={{
+                                width: '100%',
+                                maxWidth: 400,
+                                maxHeight: '70%',
+                                backgroundColor: '#131A26',
+                                borderRadius: 16,
+                                borderWidth: 1,
+                                borderColor: 'rgba(255, 255, 255, 0.15)',
+                                overflow: 'hidden',
+                                elevation: 20,
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 10 },
+                                shadowOpacity: 0.5,
+                                shadowRadius: 20,
+                              }}
+                            >
+                              <View
                                 style={{
-                                  paddingVertical: 10,
-                                  paddingHorizontal: 12,
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 16,
                                   borderBottomWidth: 1,
-                                  borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-                                }}
-                                onPress={() => {
-                                  setDCity(item);
-                                  setShowCityPicker(false);
+                                  borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+                                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
                                 }}
                               >
-                                <Text
-                                  style={{
-                                    color: dCity?.id === item.id ? '#ff80ab' : '#ffffff',
-                                    fontWeight: dCity?.id === item.id ? '700' : '400',
-                                    fontSize: RFValue(13),
-                                  }}
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                  <Feather name="map-pin" size={18} color="#ff80ab" style={{ marginRight: 8 }} />
+                                  <Text style={{ color: '#ffffff', fontSize: RFValue(15), fontWeight: '700' }}>
+                                    Selecione sua Cidade
+                                  </Text>
+                                </View>
+                                <TouchableOpacity
+                                  activeOpacity={0.7}
+                                  onPress={() => setShowCityPicker(false)}
+                                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                                 >
-                                  {item.nome}
-                                </Text>
-                              </TouchableOpacity>
-                            ))}
-                          </View>
-                        )}
+                                  <Feather name="x" size={20} color="#8A99AD" />
+                                </TouchableOpacity>
+                              </View>
+
+                              <ScrollView
+                                style={{ maxHeight: 360 }}
+                                contentContainerStyle={{ paddingVertical: 6 }}
+                                showsVerticalScrollIndicator={true}
+                                bounces={false}
+                              >
+                                {cities.map(item => {
+                                  const isSelected = dCity?.id === item.id;
+                                  return (
+                                    <TouchableOpacity
+                                      key={String(item.id)}
+                                      style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        paddingVertical: 14,
+                                        paddingHorizontal: 20,
+                                        borderBottomWidth: 1,
+                                        borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+                                        backgroundColor: isSelected ? 'rgba(255, 128, 171, 0.12)' : 'transparent',
+                                      }}
+                                      activeOpacity={0.7}
+                                      onPress={() => {
+                                        setDCity(item);
+                                        setShowCityPicker(false);
+                                      }}
+                                    >
+                                      <Text
+                                        style={{
+                                          color: isSelected ? '#ff80ab' : '#ffffff',
+                                          fontWeight: isSelected ? '700' : '400',
+                                          fontSize: RFValue(14),
+                                          flex: 1,
+                                        }}
+                                      >
+                                        {item.nome}
+                                      </Text>
+                                      {isSelected && (
+                                        <Feather name="check" size={18} color="#ff80ab" />
+                                      )}
+                                    </TouchableOpacity>
+                                  );
+                                })}
+                              </ScrollView>
+                            </TouchableOpacity>
+                          </TouchableOpacity>
+                        </Modal>
                       </InputGroup>
 
                       <ButtonActionsRow>
