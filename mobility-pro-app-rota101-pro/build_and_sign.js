@@ -49,6 +49,14 @@ execSync(extractCmd, { cwd: releaseDir, stdio: 'inherit' });
 const extractedApk = path.join(releaseDir, 'universal.apk');
 if (fs.existsSync(extractedApk)) {
     fs.copyFileSync(extractedApk, movyUniversalApk);
+    // Também copia para a raiz do workspace para acesso imediato
+    const rootApk = path.join('D:\\APLICATIVO MOVY', 'movy-app-universal.apk');
+    try {
+        fs.copyFileSync(extractedApk, rootApk);
+        console.log('Universal APK also copied to root:', rootApk);
+    } catch (e) {
+        console.warn('Failed to copy to root:', e.message);
+    }
     fs.unlinkSync(extractedApk);
     if (fs.existsSync(universalApk)) fs.unlinkSync(universalApk);
     if (fs.existsSync(outputApks)) fs.unlinkSync(outputApks);
