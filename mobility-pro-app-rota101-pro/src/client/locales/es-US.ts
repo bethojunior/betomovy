@@ -1468,7 +1468,7 @@ export default {
     plate: 'Placa',
     year: 'Año',
     color: 'Color',
-    renavam: 'Renavam',
+    renavam: 'Registro del Vehículo / VIN',
     under_analysis: 'En análisis',
     request_vehicle_change: 'Solicitar cambio de vehículo',
     send: 'Enviar',

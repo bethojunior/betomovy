@@ -94,8 +94,7 @@ class MapService {
     initMap(id, position, callback = undefined) {
         const bad = (lat, lng) =>
             isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0) ||
-            (Math.abs(lat - -3.7319) < 0.0002 && Math.abs(lng - -38.5267) < 0.0002) ||
-            (Math.abs(lat - 42.40843) < 0.002 && Math.abs(lng - -71.0536625) < 0.002);
+            (Math.abs(lat - -3.7319) < 0.0002 && Math.abs(lng - -38.5267) < 0.0002);
 
         let lat = position ? parseFloat(position.lat) : NaN;
         let lng = position ? parseFloat(position.lng) : NaN;
@@ -109,8 +108,9 @@ class MapService {
                 lat = parseFloat(centralSelected.latitude);
                 lng = parseFloat(centralSelected.longitude);
             } else {
-                lat = -9.389;
-                lng = -40.503;
+                // Fallback padrão MOVY USA (Saugus / Boston Area, Massachusetts)
+                lat = 42.4334;
+                lng = -71.0119;
             }
         }
         position = { lat, lng };

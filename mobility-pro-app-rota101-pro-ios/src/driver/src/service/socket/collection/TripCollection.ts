@@ -100,11 +100,30 @@ class TripCollection implements ITripRealtime {
 
   getTrip(tripReference: string, callback: TripCallback): string {
     const eventUpdate = TRIP_EVENTS.TRIP_UPDATED;
+    const eventCancel = TRIP_EVENTS.TRIP_CANCELED;
+    const eventCancelRef = `trip-canceled-${tripReference}`;
     const id = `${eventUpdate}:${tripReference}:${callback}`;
 
+    const cancelListener = (payload: any) => {
+      const ref = payload?.tripReference || payload?.data?.tripReference || tripReference;
+      if (ref === tripReference || !payload?.tripReference) {
+        callback({
+          data: { ...(payload?.data || payload || {}), tripReference, status: 'canceled' },
+          type: 'removed',
+        });
+      }
+    };
+
     if (!this.subs.has(id)) {
-      this.subs.set(id, { eventName: eventUpdate, listener: callback});
+      this.subs.set(id, {
+        eventName: eventUpdate,
+        listener: callback,
+        cleanupEventName: eventCancelRef,
+        cleanupListener: cancelListener,
+      });
       this.socket?.on(eventUpdate, callback);
+      this.socket?.on(eventCancel, cancelListener);
+      this.socket?.on(eventCancelRef, cancelListener);
     }
 
     return id;

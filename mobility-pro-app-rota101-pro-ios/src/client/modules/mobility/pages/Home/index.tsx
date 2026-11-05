@@ -395,18 +395,21 @@ export default function Home() {
 
   const fetchLocation = useCallback(async () => {
     try {
-      const location = await Location.getLastKnownPositionAsync();
-
-      if (location?.coords) {
+      // 1. Posição rápida em cache se disponível
+      const cachedLocation = await Location.getLastKnownPositionAsync();
+      if (cachedLocation?.coords) {
         setPosition({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
+          latitude: cachedLocation.coords.latitude,
+          longitude: cachedLocation.coords.longitude,
         });
-      } else {
-        const { coords } = await Location.getCurrentPositionAsync({ accuracy: 1 });
+      }
+
+      // 2. Busca SEMPRE a localização GPS em tempo real (padrão Uber)
+      const freshLocation = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+      if (freshLocation?.coords) {
         setPosition({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
+          latitude: freshLocation.coords.latitude,
+          longitude: freshLocation.coords.longitude,
         });
       }
     } catch (error) {

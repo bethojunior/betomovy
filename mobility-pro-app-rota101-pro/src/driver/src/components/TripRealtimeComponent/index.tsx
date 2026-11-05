@@ -356,6 +356,31 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
     return () => subscription.remove();
   }, []);
 
+  // Sincronização periódica com a central para detectar cancelamentos durante corrida ativa
+  useEffect(() => {
+    const activeRef = tripAccepted?.tripReference;
+    if (!activeRef || tripAccepted?.status === STATUS_FINISHED || tripAccepted?.status === STATUS_CANCELED) {
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      try {
+        const check = await verifyExistTrip(activeRef);
+        if (
+          check?.status === STATUS_CANCELED ||
+          check?.status === 'canceled' ||
+          check?.status === STATUS_BACK_OFF ||
+          check?.status === 'back_off' ||
+          check?.status === STATUS_FINISHED
+        ) {
+          verify(activeRef);
+        }
+      } catch (err) {}
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [tripAccepted?.tripReference, tripAccepted?.status]);
+
   useEffect(() => {
     if (!userDriverFind?.idDriver) return;
 
@@ -580,7 +605,14 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       initializeDriverTrip(trip);
     }
 
-    if (type === 'removed' && Object.keys(cancelTripRef.current || {}).length === 0) {
+    const isTripCancelled =
+      type === 'removed' ||
+      trip?.status === 'canceled' ||
+      trip?.status === STATUS_CANCELED ||
+      trip?.status === 'back_off' ||
+      trip?.status === STATUS_BACK_OFF;
+
+    if (isTripCancelled && Object.keys(cancelTripRef.current || {}).length === 0) {
       if (tripUpdateEvent) {
         tripRealtime.unsubscribe(tripUpdateEvent);
         tripUpdateEvent = null;
@@ -588,11 +620,13 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
 
       openApp();
 
-      if (trip?.tripReference) {
-        verify(trip.tripReference);
+      const tripRef = trip?.tripReference || tripAcceptedRef.current?.tripReference;
+      if (tripRef) {
+        verify(tripRef);
       }
 
       canModifyRoute = true;
+      return;
     }
   };
 

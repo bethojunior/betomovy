@@ -231,6 +231,17 @@ export function Register() {
 
   // Monitorar altura do teclado virtual para evitar sobreposição total
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const scrollToInput = (yOffset?: number) => {
+    setTimeout(() => {
+      if (typeof yOffset === 'number') {
+        scrollViewRef.current?.scrollTo({ y: yOffset, animated: true });
+      } else {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }
+    }, 100);
+  };
 
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -238,6 +249,9 @@ export function Register() {
 
     const showSub = Keyboard.addListener(showEvent, e => {
       setKeyboardHeight(e.endCoordinates.height);
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
     });
     const hideSub = Keyboard.addListener(hideEvent, () => {
       setKeyboardHeight(0);
@@ -913,12 +927,19 @@ export function Register() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
       >
         <ScrollContainer
+          ref={scrollViewRef}
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingVertical: 18,
+            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 160 : (Platform.OS === 'ios' ? 140 : 100),
+          }}
+          keyboardShouldPersistTaps="handled"
           extraPaddingBottom={
             keyboardHeight > 0
-              ? keyboardHeight + 80
+              ? keyboardHeight + 160
               : (Platform.OS === 'ios' ? 140 : 100)
           }
         >
@@ -1815,6 +1836,7 @@ export function Register() {
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dVehicleColor}
                             onChangeText={setDVehicleColor}
+                            onFocus={() => scrollToInput(300)}
                             autoCapitalize="words"
                             autoCorrect={false}
                           />
@@ -1830,6 +1852,7 @@ export function Register() {
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dVehicleYear}
                             onChangeText={setDVehicleYear}
+                            onFocus={() => scrollToInput(500)}
                             keyboardType="numeric"
                             maxLength={4}
                             autoCorrect={false}

@@ -3,7 +3,7 @@
     "name": "Route 95Pro",
     "scheme": "rota101pro",
     "slug": "expoappv2",
-    "version": "8.3.6",
+    "version": "8.3.7",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "splash": {
@@ -51,12 +51,12 @@
       "config": {
         "googleMapsApiKey": "AIzaSyDWAMSuOr80f8wW7y6vFglqRKz4dKq6Y4I"
       },
-      "buildNumber": "80306"
+      "buildNumber": "80307"
     },
     "android": {
       "package": "br.com.client.rota101",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 80306,
+      "versionCode": 80307,
       "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {

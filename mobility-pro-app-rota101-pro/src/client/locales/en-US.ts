@@ -1445,7 +1445,7 @@ export default {
     plate: 'Plate',
     year: 'Year',
     color: 'Color',
-    renavam: 'Renavam',
+    renavam: 'Vehicle Registration / VIN',
     under_analysis: 'Under analysis',
     request_vehicle_change: 'Request vehicle change',
     send: 'Send',

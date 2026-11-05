@@ -73,6 +73,7 @@ export default function Local({ navigation }) {
     if (!getPermissionLocal) return;
     getPermissionLocal()
       .then(() => {
+        // 1. Posição rápida
         Location.getLastKnownPositionAsync()
           .then(location => {
             if (location) {
@@ -80,21 +81,20 @@ export default function Local({ navigation }) {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
               });
-            } else {
-              Location.getCurrentPositionAsync({ accuracy: 1 })
-                .then(({ coords }) => {
-                  setPosition({
-                    latitude: coords.latitude,
-                    longitude: coords.longitude,
-                  });
-                })
-                .catch(error => {
-                  console.error('Erro ao obter a localização atual:', error?.message || error);
-                });
             }
           })
+          .catch(() => {});
+
+        // 2. Localização GPS em tempo real (sempre atualizada)
+        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High })
+          .then(({ coords }) => {
+            setPosition({
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+            });
+          })
           .catch(error => {
-            console.error('Erro ao obter a última localização conhecida:', error?.message || error);
+            console.error('Erro ao obter a localização atual:', error?.message || error);
           });
       })
       .catch(error => {

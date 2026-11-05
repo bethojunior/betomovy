@@ -1,4 +1,4 @@
-/* ── Modal Dados da Viagem ── */
+/* ── Modal Dados da Viagem (Design Dark Moderno Movy) ── */
 
 .modal-confirmation-data-trip {
     position: fixed !important;
@@ -8,7 +8,8 @@
     bottom: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
-    background: rgba(0, 0, 0, 0.65) !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(4px) !important;
     display: none;
     justify-content: center !important;
     align-items: center !important;
@@ -21,19 +22,21 @@
     display: flex !important;
 }
 
-/* ── Card ── */
+/* ── Card Container Dark ── */
 .modal-confirmation-data-trip > div {
-    background: #FFFFFF !important;
+    background: #181920 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 16px !important;
     width: min(94vw, 480px) !important;
     max-width: 480px !important;
     max-height: 88vh !important;
     overflow-y: auto !important;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
     display: flex !important;
     flex-direction: column !important;
     box-sizing: border-box !important;
-    animation: modalConfirmFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    color: #FFFFFF !important;
+    animation: modalConfirmFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 @keyframes modalConfirmFadeIn {
@@ -47,220 +50,234 @@
     }
 }
 
-/* ── Header ── */
+/* ── Header Rosa Movy ── */
 .modal-confirmation-data-trip > div > .data-customer {
-    background: var(--color-primary);
-    color: var(--color-text-inverse);
-    padding: 14px 18px;
-    border-radius: 14px 14px 0 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    background: linear-gradient(135deg, #E91E63 0%, #D81B60 100%) !important;
+    color: #FFFFFF !important;
+    padding: 16px 20px !important;
+    border-radius: 15px 15px 0 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
 }
 
 .modal-confirmation-data-trip > div > .data-customer h6 {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.2px;
-    color: var(--color-text-inverse);
+    margin: 0 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.3px !important;
+    color: #FFFFFF !important;
 }
 
 .modal-confirmation-data-trip > div > .data-customer .data-customer-icon {
-    font-size: 18px;
-    font-family: 'Material Icons';
-    opacity: 0.8;
+    font-size: 20px !important;
+    color: #FFFFFF !important;
+    font-family: 'Material Icons' !important;
+    opacity: 0.9 !important;
 }
 
 /* ── Vehicle Illustration Header ── */
 .confirmation-vehicle-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 14px 18px 6px;
-    border-bottom: 1px solid var(--color-border);
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 14px 20px 10px !important;
+    background: #1E222D !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .confirmation-vehicle-img-wrap {
-    width: 70px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    width: 64px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
 }
 
 .confirmation-vehicle-img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
 }
 
 .confirmation-vehicle-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
 }
 
 .confirmation-category-badge {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--color-text-primary);
-    letter-spacing: -0.01em;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: #FFFFFF !important;
+    letter-spacing: -0.01em !important;
 }
 
 .confirmation-category-eta {
-    font-size: 12px;
-    color: var(--color-text-secondary);
-    font-weight: 500;
+    font-size: 12px !important;
+    color: #94A3B8 !important;
+    font-weight: 500 !important;
 }
 
 /* ── Body ── */
 .modal-confirmation-data-trip > div > .data-trip {
-    padding: 16px 18px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    padding: 16px 20px 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    background: #181920 !important;
 }
 
 .modal-confirmation-data-trip > div > .data-trip > p {
-    margin: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-size: 13px;
-    color: var(--color-text-secondary);
-    padding: 4px 0;
-    border-bottom: 1px solid var(--color-bg-muted);
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: baseline !important;
+    font-size: 13.5px !important;
+    color: #E2E8F0 !important;
+    padding: 8px 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
 }
 
 .modal-confirmation-data-trip > div > .data-trip > p:last-of-type {
-    border-bottom: none;
+    border-bottom: none !important;
 }
 
 .modal-confirmation-data-trip > div > .data-trip > p > span:first-child {
-    font-weight: 600;
-    color: var(--color-text-muted);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    flex-shrink: 0;
-    margin-right: 8px;
+    font-weight: 600 !important;
+    color: #94A3B8 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    flex-shrink: 0 !important;
+    margin-right: 12px !important;
 }
 
 .modal-confirmation-data-trip > div > .data-trip > p > span:last-child {
-    text-align: right;
-    font-weight: 500;
-    color: var(--color-text-primary);
+    text-align: right !important;
+    font-weight: 600 !important;
+    color: #FFFFFF !important;
+}
+
+.modal-confirmation-data-trip #valueTripConfirmation {
+    color: #10B981 !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
 }
 
 /* ── Rota com linha vertical ── */
 .modal-confirmation-data-trip #routeTrip {
-    list-style: none;
-    margin: 10px 0 0;
-    padding: 0;
-    position: relative;
+    list-style: none !important;
+    margin: 12px 0 0 !important;
+    padding: 0 !important;
+    position: relative !important;
 }
 
 .modal-confirmation-data-trip #routeTrip li {
-    position: relative;
-    padding: 0 0 14px 28px;
-    font-size: 12.5px;
-    color: var(--color-text-secondary);
-    line-height: 1.4;
+    position: relative !important;
+    padding: 0 0 14px 28px !important;
+    font-size: 13px !important;
+    color: #E2E8F0 !important;
+    line-height: 1.4 !important;
 }
 
 .modal-confirmation-data-trip #routeTrip li:last-child {
-    padding-bottom: 4px;
+    padding-bottom: 4px !important;
 }
 
 /* Linha vertical conectando as paradas */
 .modal-confirmation-data-trip #routeTrip li:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    left: 6px;
-    top: 16px;
-    bottom: 0;
-    width: 2px;
-    background: var(--color-border);
-    z-index: 0;
+    content: '' !important;
+    position: absolute !important;
+    left: 6px !important;
+    top: 16px !important;
+    bottom: 0 !important;
+    width: 2px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    z-index: 0 !important;
 }
 
 /* Origem — círculo verde */
 .modal-confirmation-data-trip #routeTrip li.route-origin::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 3px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--color-success);
-    box-shadow: 0 0 0 2px rgba(16,185,129,0.25);
-    z-index: 1;
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 3px !important;
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 50% !important;
+    background: #10B981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.28) !important;
+    z-index: 1 !important;
 }
 
 /* Paradas intermediárias — ponto cinza menor */
 .modal-confirmation-data-trip #routeTrip li.route-waypoint::before {
-    content: '';
-    position: absolute;
-    left: 3px;
-    top: 5px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--color-text-disabled);
-    z-index: 1;
+    content: '' !important;
+    position: absolute !important;
+    left: 3px !important;
+    top: 5px !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: #64748B !important;
+    z-index: 1 !important;
 }
 
-/* Destino — quadrado vermelho */
+/* Destino — quadrado vermelho/rosa */
 .modal-confirmation-data-trip #routeTrip li.route-destination::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 3px;
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    background: var(--color-danger);
-    box-shadow: 0 0 0 2px rgba(239,68,68,0.25);
-    z-index: 1;
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 3px !important;
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 3px !important;
+    background: #EF4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.28) !important;
+    z-index: 1 !important;
 }
 
 /* ── Checkbox retorno ── */
 .modal-confirmation-data-trip .form-check {
-    padding: 8px 18px;
-    font-size: 13px;
-    color: var(--color-text-secondary);
+    padding: 10px 20px !important;
+    font-size: 13px !important;
+    color: #CBD5E1 !important;
+    background: #181920 !important;
+}
+
+.modal-confirmation-data-trip .form-check-input {
+    accent-color: #E91E63 !important;
 }
 
 /* ── Divisor ── */
 .modal-confirmation-data-trip hr {
-    margin: 0;
-    border: none;
-    border-top: 1px solid var(--color-border-subtle);
+    margin: 0 !important;
+    border: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 /* ── Footer / botões ── */
 .modal-confirmation-data-trip .data-footer {
     display: flex !important;
     flex-direction: row !important;
-    gap: 10px !important;
-    padding: 14px 18px 16px !important;
-    background: #FFFFFF !important;
-    border-top: 1px solid #F3F4F6 !important;
+    gap: 12px !important;
+    padding: 16px 20px 18px !important;
+    background: #181920 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .modal-confirmation-data-trip .data-footer > button {
     flex: 1 !important;
-    height: 44px !important;
-    border-radius: 10px !important;
-    font-size: 13px !important;
+    height: 46px !important;
+    border-radius: 12px !important;
+    font-size: 13.5px !important;
     font-weight: 700 !important;
     cursor: pointer !important;
-    font-family: 'Open Sans', sans-serif !important;
-    transition: background 0.15s, transform 0.1s !important;
-    letter-spacing: 0.3px !important;
+    font-family: 'Open Sans', -apple-system, sans-serif !important;
+    transition: transform 0.12s ease, filter 0.15s ease !important;
+    letter-spacing: 0.4px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -268,30 +285,31 @@
 }
 
 .modal-confirmation-data-trip #btnConfirmationTrip {
-    background: #000000 !important;
+    background: linear-gradient(135deg, #E91E63 0%, #D81B60 100%) !important;
     color: #FFFFFF !important;
     border: none !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 4px 14px rgba(233, 30, 99, 0.4) !important;
 }
 
 .modal-confirmation-data-trip #btnConfirmationTrip:hover {
-    background: #1F2937 !important;
+    filter: brightness(1.1) !important;
 }
 
 .modal-confirmation-data-trip #btnConfirmationTrip:active {
-    transform: scale(0.98);
+    transform: scale(0.98) !important;
 }
 
 .modal-confirmation-data-trip #btnCancelConfirmationTrip {
-    background: #F3F4F6 !important;
-    color: #111827 !important;
-    border: 1px solid #D1D5DB !important;
+    background: #232733 !important;
+    color: #CBD5E1 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 .modal-confirmation-data-trip #btnCancelConfirmationTrip:hover {
-    background: #E5E7EB !important;
+    background: #2D3242 !important;
+    color: #FFFFFF !important;
 }
 
 .modal-confirmation-data-trip #btnCancelConfirmationTrip:active {
-    transform: scale(0.98);
+    transform: scale(0.98) !important;
 }

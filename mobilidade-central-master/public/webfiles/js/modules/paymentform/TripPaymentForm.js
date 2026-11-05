@@ -29,16 +29,39 @@ function initCardsModal() {
 
     window.showModalCards = function (callback) {
         if (callback !== undefined) callbackSelectCard = callback;
-        refreshCardsModalList().then(bindCardSelectEvents);
         elementProperty.addClass(".container-cards", "active");
+
+        // Busca cartões atualizados do servidor antes de renderizar
+        const fetchCards = (typeof CustomerCardController !== "undefined")
+            ? new CustomerCardController().get()
+            : Promise.resolve({ status: false });
+
+        fetchCards.then(res => {
+            if (res && res.status && Array.isArray(res.data)) {
+                Session.setLocal("cards", res.data);
+            }
+            refreshCardsModalList().then(bindCardSelectEvents);
+        }).catch(() => {
+            refreshCardsModalList().then(bindCardSelectEvents);
+        });
     };
 
     function bindCardSelectEvents() {
-        elementProperty.addEventInElement(".cards-list-select", "onclick", function () {
-            elementProperty.removeClass(".container-cards", "active");
-            if (callbackSelectCard !== null) {
-                callbackSelectCard(JSON.parse(this.getAttribute("value")));
-            }
+        const listItems = document.querySelectorAll("#listCardPaymentModal .cards-list-select");
+        listItems.forEach(item => {
+            item.onclick = function (e) {
+                e.stopPropagation();
+                elementProperty.removeClass(".container-cards", "active");
+                try {
+                    const rawVal = this.getAttribute("value");
+                    const parsedCard = JSON.parse(rawVal);
+                    if (callbackSelectCard !== null) {
+                        callbackSelectCard(parsedCard);
+                    }
+                } catch (err) {
+                    console.error("Erro ao selecionar cartão:", err);
+                }
+            };
         });
     }
 
@@ -47,17 +70,23 @@ function initCardsModal() {
             const cards = Session.getLocal("cards") || [];
             elementProperty.getElement("#listCardPaymentModal", element => {
                 if (!cards.length) {
-                    element.innerHTML = `<li><i class="material-icons">credit_card</i><p></p></li>`;
+                    element.innerHTML = `<li class="no-cards-msg" style="padding: 16px; text-align: center; color: #64748b; font-size: 14px; cursor: default; list-style: none;">
+                        <i class="material-icons" style="font-size: 32px; color: #94a3b8; display: block; margin: 0 auto 6px;">credit_card_off</i>
+                        Nenhum cartão cadastrado. Clique em Adicionar cartão abaixo.
+                    </li>`;
                     resolve();
                     return;
                 }
 
                 element.innerHTML = cards.map(card => {
-                    const last4 = card.mpLastFourDigits || (card.number ? String(card.number).substr(-4) : "----");
+                    const last4 = card.last4 || card.last_four || card.lastFourDigits || card.mpLastFourDigits || (card.number ? String(card.number).slice(-4) : "••••");
+                    const brand = (card.brand || card.paymentMethodName || card.mpPaymentMethodName || card.mpPaymentMethodId || "Cartão").toUpperCase();
                     const safe = JSON.stringify(card).replace(/'/g, "&apos;");
-                    return `<li class="cards-list-select" value='${safe}'>
-                        <i class="material-icons">credit_card</i>
-                        <p>${last4}</p>
+                    return `<li class="cards-list-select" value='${safe}' style="display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid #eee; cursor: pointer;">
+                        <i class="material-icons" style="margin-right: 14px; font-size: 26px; color: #2563eb;">credit_card</i>
+                        <p style="margin: 0; font-size: 15px; font-weight: 600; color: #1e293b;">
+                            <span style="color: #2563eb; margin-right: 6px;">${brand}</span> •••• ${last4}
+                        </p>
                     </li>`;
                 }).join("");
                 resolve();
@@ -111,8 +140,10 @@ function getCardSelectedPayTrip(card) {
         if (!card || Array.isArray(card)) {
             viewController.elementProperty.getElement("#cardSelectedPayTrip", element => {
                 element.style.display = "flex";
-                element.innerHTML = `<div onclick="choiceCard()"><i class="material-icons">credit_card</i>
-            <p>Selecionar cartão</p></div>`;
+                element.innerHTML = `<div onclick="choiceCard()" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <i class="material-icons">credit_card</i>
+                    <p style="margin: 0; font-weight: 500;">Selecionar cartão</p>
+                </div>`;
             });
             return;
         }
@@ -120,32 +151,30 @@ function getCardSelectedPayTrip(card) {
         Session.setLocal("cardSelected", card);
         Session.set("cardSelected", card);
 
-        const last4 = card.mpLastFourDigits || (card.number ? String(card.number).substr(-4) : "----");
+        const last4 = card.last4 || card.last_four || card.lastFourDigits || card.mpLastFourDigits || (card.number ? String(card.number).slice(-4) : "••••");
+        const brand = (card.brand || card.paymentMethodName || card.mpPaymentMethodName || "Cartão").toUpperCase();
 
         viewController.elementProperty.getElement("#cardSelectedPayTrip", element => {
             element.style.display = "flex";
-            element.innerHTML = `<div onclick="choiceCard()"><i class="material-icons">credit_card</i>
-            <p>${last4}</p></div>`;
+            element.innerHTML = `<div onclick="choiceCard()" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <i class="material-icons" style="color: #2563eb;">credit_card</i>
+                <p style="margin: 0; font-weight: 600; color: #1e293b;">${brand} •••• ${last4}</p>
+            </div>`;
         });
 
         const paymentCard = new PaymentCard();
 
         paymentCard.createToken(card, function (status, response) {
-            if (status !== 200 && status !== 201) {
-                SwalCustom.messageDialog("", "Ocorreu um error", undefined, "warning");
-                reject("Ocorreu um na solicitação do pagamento com cartão");
-                return;
-            }
-
-            const token = (response && response.id) || card.cardId || card.mpCardId || null;
+            const token = (response && response.id) || card.cardId || card.mpCardId || card.idCard || card.id || null;
+            const finalCardId = card.idCard || card.cardId || card.id || card.mpCardId || token;
 
             Session.set("tokenCard", {
                 token: token,
-                cardId: card.idCard
+                cardId: finalCardId
             });
             Session.setLocal("tokenCard", {
                 token: token,
-                cardId: card.idCard
+                cardId: finalCardId
             });
 
             resolve(Session.get("tokenCard") || Session.getLocal("tokenCard"));
@@ -257,19 +286,23 @@ function updateCardSelected() {
     const card = Session.getLocal("cardSelected");
     const cards = Session.getLocal("cards") || [];
 
-    if (!card || !card.idCard) {
+    if (!card) {
         Session.delete("cardSelected");
         return;
     }
 
-    if (cards.filter(cardActive => cardActive.idCard === card.idCard).length === 0) {
+    const cardId = card.idCard || card.cardId || card.id || card.mpCardId;
+    if (!cardId) {
+        Session.delete("cardSelected");
+        return;
+    }
+
+    if (cards.length > 0 && cards.filter(cardActive => (cardActive.idCard || cardActive.cardId || cardActive.id || cardActive.mpCardId) === cardId).length === 0) {
         Session.delete("cardSelected");
         viewController.elementProperty.getElement("#cardSelectedClient", element => {
             element.innerHTML = "----";
         });
     }
-
-    if (cards.length === 0) Session.delete("cardSelected");
 }
 
 function showDataPaymentForm(idTripPaymentForm) {

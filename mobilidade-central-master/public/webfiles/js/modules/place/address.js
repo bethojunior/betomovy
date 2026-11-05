@@ -11,7 +11,7 @@ function getAddressCurrent(address) {
                     return;
 
                 if (!response.typeMoney) {
-                    response.typeMoney = 'R$';
+                    response.typeMoney = '$';
                 }
 
                 Session.setLocal("cityConfig", response);
@@ -43,7 +43,7 @@ function getConfigCentral(central) {
                 return;
 
             if (!response.typeMoney) {
-                response.typeMoney = 'R$';
+                response.typeMoney = '$';
             }
 
             Session.setLocal("cityConfig", response);

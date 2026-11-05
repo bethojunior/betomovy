@@ -50,7 +50,7 @@ interface GroupKeysProps {
 }
 
 const Menu = ({ children, titlePage }: MenuProps) => {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, isBrazilActive, setIsBrazilActive, t } = useLanguage();
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -304,32 +304,34 @@ const Menu = ({ children, titlePage }: MenuProps) => {
                 boxSizing: "border-box",
               }}
             >
-              <button
-                type="button"
-                onClick={() => setLanguage("pt")}
-                style={{
-                  border: "none",
-                  background: language === "pt" ? "#0284c7" : "transparent",
-                  color: language === "pt" ? "#FFFFFF" : "#94a3b8",
-                  borderRadius: 16,
-                  padding: "0 10px",
-                  height: 26,
-                  lineHeight: "26px",
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 5,
-                  fontWeight: 700,
-                  fontSize: 11,
-                  letterSpacing: "0.5px",
-                  transition: "all 0.2s ease",
-                  boxShadow: language === "pt" ? "0 2px 6px rgba(2, 132, 199, 0.4)" : "none",
-                }}
-                title="Português (Brasil)"
-              >
-                <span>🇧🇷</span>
-                <span>PT</span>
-              </button>
+              {isBrazilActive && (
+                <button
+                  type="button"
+                  onClick={() => setLanguage("pt")}
+                  style={{
+                    border: "none",
+                    background: language === "pt" ? "#0284c7" : "transparent",
+                    color: language === "pt" ? "#FFFFFF" : "#94a3b8",
+                    borderRadius: 16,
+                    padding: "0 10px",
+                    height: 26,
+                    lineHeight: "26px",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    fontWeight: 700,
+                    fontSize: 11,
+                    letterSpacing: "0.5px",
+                    transition: "all 0.2s ease",
+                    boxShadow: language === "pt" ? "0 2px 6px rgba(2, 132, 199, 0.4)" : "none",
+                  }}
+                  title="Português (Brasil)"
+                >
+                  <span>🇧🇷</span>
+                  <span>PT</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setLanguage("en")}
@@ -355,6 +357,35 @@ const Menu = ({ children, titlePage }: MenuProps) => {
               >
                 <span>🇺🇸</span>
                 <span>EN</span>
+              </button>
+
+              {/* Botão admin para ativar/desativar Brasil */}
+              <button
+                type="button"
+                onClick={() => {
+                  const newState = !isBrazilActive;
+                  setIsBrazilActive(newState);
+                }}
+                style={{
+                  border: "none",
+                  background: isBrazilActive ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)",
+                  color: isBrazilActive ? "#4ade80" : "#f87171",
+                  borderRadius: 16,
+                  padding: "0 8px",
+                  height: 26,
+                  lineHeight: "26px",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 3,
+                  fontWeight: 600,
+                  fontSize: 10,
+                  transition: "all 0.2s ease",
+                }}
+                title={isBrazilActive ? "Admin: Desativar idioma Brasil" : "Admin: Ativar idioma Brasil"}
+              >
+                <span>🇧🇷</span>
+                <span>{isBrazilActive ? "ON" : "OFF"}</span>
               </button>
             </div>
             <SelectAndButtonNotification />

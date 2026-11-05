@@ -67,14 +67,14 @@ const iosSetLanguage = async () => {
       (Array.isArray(settings?.AppleLanguages)
         ? settings.AppleLanguages[0]
         : null) ||
-      'pt_BR';
+      'en_US';
 
     const normalizedLocale = switchIosLanguage(String(appleLocale));
     await AsyncStorage.setItem('@language', normalizedLocale);
 
     return normalizedLocale;
   } catch (error) {
-    const fallback = 'pt_BR';
+    const fallback = 'en_US';
     try {
       await AsyncStorage.setItem('@language', fallback);
     } catch {}

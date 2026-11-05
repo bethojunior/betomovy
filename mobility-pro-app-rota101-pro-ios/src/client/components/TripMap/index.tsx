@@ -133,7 +133,7 @@ const TripMap = ({
             syncMarkers();
           }}
           style={{ flex: 1 }}
-          showsUserLocation={false}
+          showsUserLocation={true}
           showsMyLocationButton={false}
           userInterfaceStyle="light"
           rotateEnabled={false}

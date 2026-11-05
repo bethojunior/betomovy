@@ -150,10 +150,14 @@ function initRace(trip) {
             }
         }
         if (photoUrl) {
-            element.style.backgroundImage = `url('${photoUrl}')`;
+            element.style.backgroundImage = `url('${photoUrl}'), url('/webfiles/img/icon/avatar.png')`;
         } else {
-            element.style.backgroundImage = `url('/webfiles/img/icon/default.png')`;
+            element.style.backgroundImage = `url('/webfiles/img/icon/avatar.png')`;
         }
+        element.style.backgroundColor = '#e2e8f0';
+        element.style.backgroundPosition = 'center';
+        element.style.backgroundSize = 'cover';
+        element.style.backgroundRepeat = 'no-repeat';
     });
 
     viewController.elementProperty.getElement("#tripClientOriginText", element => {

@@ -19,7 +19,19 @@ import { useNavigation } from '@react-navigation/native';
 export function Languages() {
   const [languageSelected, setLanguageSelected] = useState('');
   const [dialogVisible, setDialogVisible] = useState(false);
-  const navigation = useNavigation()
+  const [isBrazilEnabled, setIsBrazilEnabled] = useState(true);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    AsyncStorage.getItem('@App:brazil_active').then(val => {
+      if (val === 'false') {
+        setIsBrazilEnabled(false);
+        if (I18n.locale === 'pt_BR') {
+          handleLanguage('en_US');
+        }
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleLanguage = async (locale: string) => {
     try {
@@ -60,13 +72,15 @@ export function Languages() {
   return (
     <Container>
       <Content>
-        <LanguageItem
-          name="Português - BR"
-          onPress={() => setLanguage('pt_BR')}
-          selected={languageSelected === 'pt_BR'}
-        >
-          <Brazil height={RFValue(50)} width={RFValue(50)} />
-        </LanguageItem>
+        {isBrazilEnabled && (
+          <LanguageItem
+            name="Português - BR"
+            onPress={() => setLanguage('pt_BR')}
+            selected={languageSelected === 'pt_BR'}
+          >
+            <Brazil height={RFValue(50)} width={RFValue(50)} />
+          </LanguageItem>
+        )}
 
         <LanguageItem
           name="Inglês"

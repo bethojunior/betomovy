@@ -28,7 +28,7 @@ function getTravelCustomer(trip, customer) {
     });
 
     const isBatchSchedule = Array.isArray(trip?.schedules) && trip.schedules.length > 1;
-    const typeMoney = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || 'R$';
+    const typeMoney = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || Session.getLocal('cityConfig')?.typeMoney || '$';
 
     elementProperty.getElement("#valueTripConfirmationLabel", element => {
         element.innerHTML = isBatchSchedule ? "Valor por viagem" : "Valor";
@@ -162,8 +162,9 @@ function getTravelCustomer(trip, customer) {
 
         if (isCard) {
             const tokenCard = Session.get("tokenCard") || Session.getLocal("tokenCard");
-            const cardId = tokenCard?.cardId || Session.getValueInSession("tokenCard", "cardId");
-            const mpToken = tokenCard?.token || Session.getValueInSession("tokenCard", "token");
+            const cardSelected = Session.get("cardSelected") || Session.getLocal("cardSelected");
+            const cardId = tokenCard?.cardId || cardSelected?.idCard || cardSelected?.cardId || cardSelected?.id || Session.getValueInSession("tokenCard", "cardId");
+            const mpToken = tokenCard?.token || cardSelected?.token || cardSelected?.stripePaymentMethodId || cardId || Session.getValueInSession("tokenCard", "token");
 
             if (!cardId) {
                 SwalCustom.messageDialog("", "Selecione ou adicione um cartão para pagar com Stripe.", undefined, "warning");

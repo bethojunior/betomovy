@@ -13,6 +13,7 @@ import { translate } from '../../locales';
 import { calculateDistance } from '../../../utils/geolocation';
 import { TIMEOUT_SHORT } from '~/common/constants/timeouts';
 import { loadSession } from '../../../utils/Storage/sessionStorage';
+import * as Location from 'expo-location';
 
 interface IPlace {
   [key: string]: any;
@@ -69,6 +70,62 @@ export const LocalProvider: React.FC<LocalProviderProps> = ({ children }) => {
 
     loadStorageData();
     getLocals();
+
+    let watchSub: Location.LocationSubscription | null = null;
+
+    async function initGpsLocation() {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          // 1. Posição rápida do cache para não deixar mapa em branco
+          const lastLoc = await Location.getLastKnownPositionAsync().catch(() => null);
+          if (lastLoc?.coords) {
+            setPosition({
+              latitude: lastLoc.coords.latitude,
+              longitude: lastLoc.coords.longitude,
+            });
+            getLocalByPosition(lastLoc.coords.latitude, lastLoc.coords.longitude);
+          }
+
+          // 2. Alta precisão GPS atual (como na Uber)
+          const currentLoc = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.High,
+          }).catch(() => null);
+          if (currentLoc?.coords) {
+            setPosition({
+              latitude: currentLoc.coords.latitude,
+              longitude: currentLoc.coords.longitude,
+            });
+            getLocalByPosition(currentLoc.coords.latitude, currentLoc.coords.longitude);
+          }
+
+          // 3. Monitoramento contínuo em tempo real conforme usuário se desloca
+          watchSub = await Location.watchPositionAsync(
+            {
+              accuracy: Location.Accuracy.Balanced,
+              distanceInterval: 15,
+              timeInterval: 10000,
+            },
+            loc => {
+              if (loc?.coords) {
+                setPosition({
+                  latitude: loc.coords.latitude,
+                  longitude: loc.coords.longitude,
+                });
+              }
+            }
+          ).catch(() => null);
+        }
+      } catch (err) {
+        console.warn('Erro ao inicializar GPS LocalContext:', err);
+      }
+    }
+
+    initGpsLocation();
+
+    return () => {
+      watchSub?.remove();
+    };
   }, []);
 
   useEffect(() => {

@@ -123,9 +123,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function isBadMapCoord(lat, lng) {
     if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) return true
-    // Fortaleza legado e Everett/MA (fallback antigo que gravava endereço errado)
+    // Apenas coordenadas inválidas ou resquício legado de Fortaleza
     if (Math.abs(lat - -3.7319) < 0.0002 && Math.abs(lng - -38.5267) < 0.0002) return true
-    if (Math.abs(lat - 42.40843) < 0.002 && Math.abs(lng - -71.0536625) < 0.002) return true
     return false
   }
 
@@ -157,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
       openAt(centralLat, centralLng)
     }
 
-    // Sempre pede a localização atual e recentraliza (não usa Everett)
+    // Pede localização GPS do navegador em alta precisão e recentraliza
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         function (pos) {
@@ -173,7 +172,8 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         function () {
           if (isBadMapCoord(centralLat, centralLng) && !(mapService && mapService.map)) {
-            openAt(-9.389, -40.503)
+            // Fallback padrão MOVY USA (Saugus / Boston, MA)
+            openAt(42.4334, -71.0119)
           }
         },
         { enableHighAccuracy: true, timeout: 8000, maximumAge: 5000 }
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (!(mapService && mapService.map)) {
-      openAt(isBadMapCoord(centralLat, centralLng) ? -9.389 : centralLat, isBadMapCoord(centralLat, centralLng) ? -40.503 : centralLng)
+      openAt(isBadMapCoord(centralLat, centralLng) ? 42.4334 : centralLat, isBadMapCoord(centralLat, centralLng) ? -71.0119 : centralLng)
     }
   }
 
@@ -532,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
     Session.setLocal('managerTrip', managerTrip)
 
     if (fee) {
-      let typeMoney = 'R$'
+      let typeMoney = '$'
       try {
         const config = JSON.parse(localStorage.getItem('cityConfig')) || Session.getLocal('cityConfig')
         if (config && config.typeMoney) typeMoney = config.typeMoney
@@ -2167,7 +2167,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const priceLabel = activeTrip.querySelector('.label-prices-trip')
     if (!priceLabel) return
 
-    const moeda = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || 'R$'
+    const moeda = JSON?.parse(localStorage?.getItem('cityConfig'))?.typeMoney || '$'
 
     if (!priceLabel.getAttribute('valueDefault')) {
       priceLabel.setAttribute('valueDefault', priceLabel.innerHTML)

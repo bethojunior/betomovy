@@ -3979,6 +3979,19 @@ div.pac-container>.pac-item>span {
     transition: background 0.15s !important;
 }
 
+/* Esconder botões de zoom quando qualquer bottom sheet, card de motorista ou busca estiver ativo */
+.footer-container-trip.active ~ .map-zoom-controls,
+.search-driver-in-trip.active ~ .map-zoom-controls,
+body:has(.footer-container-trip.active) .map-zoom-controls,
+body:has(.search-driver-in-trip.active) .map-zoom-controls,
+body:has(.trip-client.active) .map-zoom-controls,
+body:has(.trip-client-card.active) .map-zoom-controls,
+body:has(#containerTripActive.active) .map-zoom-controls,
+body:has(.container-cards.active) .map-zoom-controls,
+body:has(.container-add-card.active) .map-zoom-controls {
+    display: none !important;
+}
+
 @media (max-width: 991px) {
     .footer-container-trip.active ~ .map-zoom-controls,
     .search-driver-in-trip.active ~ .map-zoom-controls {

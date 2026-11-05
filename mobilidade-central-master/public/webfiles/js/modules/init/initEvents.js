@@ -39,6 +39,19 @@ document.addEventListener("deviceready", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+    // Geolocation automática no navegador da Central
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                if (pos && pos.coords) {
+                    Session.setLocal("location", { lat: pos.coords.latitude, lng: pos.coords.longitude });
+                }
+            },
+            function () {},
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
+        );
+    }
+
     try {
         const customerCardController = new CustomerCardController();
         if (typeof customerCardController.verifyAcquirer === "function") {

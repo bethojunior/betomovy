@@ -34,15 +34,29 @@ export const Map = forwardRef<MapView, Props>(
         try {
           const perm = await Location.getForegroundPermissionsAsync();
           if (perm.status !== 'granted') return;
-          const loc =
-            (await Location.getLastKnownPositionAsync()) ||
-            (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }));
-          if (cancelled || !loc) return;
           const map = typeof ref === 'object' && ref ? ref.current : null;
-          map?.animateToRegion(
+
+          // 1. Animação rápida com a última posição conhecida se houver
+          const cached = await Location.getLastKnownPositionAsync().catch(() => null);
+          if (!cancelled && cached && map) {
+            map.animateToRegion(
+              {
+                latitude: cached.coords.latitude,
+                longitude: cached.coords.longitude,
+                latitudeDelta: 0.04,
+                longitudeDelta: 0.04,
+              },
+              200,
+            );
+          }
+
+          // 2. Busca GPS em tempo real de alta precisão
+          const fresh = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+          if (cancelled || !fresh || !map) return;
+          map.animateToRegion(
             {
-              latitude: loc.coords.latitude,
-              longitude: loc.coords.longitude,
+              latitude: fresh.coords.latitude,
+              longitude: fresh.coords.longitude,
               latitudeDelta: 0.04,
               longitudeDelta: 0.04,
             },

@@ -2,9 +2,11 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 export type LanguageType = "pt" | "en";
 
-interface LanguageContextData {
+export interface LanguageContextData {
   language: LanguageType;
   setLanguage: (lang: LanguageType) => void;
+  isBrazilActive: boolean;
+  setIsBrazilActive: (active: boolean) => void;
   t: (text: string, fallback?: string) => string;
 }
 
@@ -380,24 +382,46 @@ const translations: Record<LanguageType, Record<string, string>> = {
 const LanguageContext = createContext<LanguageContextData>({} as LanguageContextData);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [isBrazilActive, setIsBrazilActiveState] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem("@App:brazil_active");
+      if (saved !== null) return saved === "true";
+    } catch {}
+    return true;
+  });
+
   const [language, setLanguageState] = useState<LanguageType>(() => {
     try {
+      const brazilActive = localStorage.getItem("@App:brazil_active") !== "false";
+      if (!brazilActive) return "en";
       const saved = localStorage.getItem("@App:language");
       if (saved === "en" || saved === "pt") return saved;
     } catch {}
-    return "pt";
+    return "en"; // Padrão: Inglês (Estados Unidos)
   });
 
   const setLanguage = (lang: LanguageType) => {
+    const activeLang = (!isBrazilActive && lang === "pt") ? "en" : lang;
     try {
-      localStorage.setItem("@App:language", lang);
+      localStorage.setItem("@App:language", activeLang);
     } catch {}
-    setLanguageState(lang);
+    setLanguageState(activeLang);
+  };
+
+  const setIsBrazilActive = (active: boolean) => {
+    try {
+      localStorage.setItem("@App:brazil_active", String(active));
+    } catch {}
+    setIsBrazilActiveState(active);
+    if (!active) {
+      setLanguage("en");
+    }
   };
 
   const t = (text: string, fallback?: string): string => {
     if (!text) return fallback || "";
-    const langDict = translations[language];
+    const activeLang = (!isBrazilActive && language === "pt") ? "en" : language;
+    const langDict = translations[activeLang];
     if (langDict && langDict[text] !== undefined) {
       return langDict[text];
     }
@@ -409,7 +433,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, isBrazilActive, setIsBrazilActive, t }}>
       {children}
     </LanguageContext.Provider>
   );

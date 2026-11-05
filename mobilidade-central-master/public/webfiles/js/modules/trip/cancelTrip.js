@@ -124,6 +124,14 @@ function cancelTripByCustomer(status){
         return;
     }
 
+    // Notificação imediata via socket para motoristas conectados
+    try {
+        if (typeof socketConnection !== "undefined" && socketConnection && typeof socketConnection.emit === "function") {
+            socketConnection.emit("trip-canceled", { tripReference: tripRef, status: "canceled", canceledBy: "central" });
+            socketConnection.emit(`trip-canceled-${tripRef}`, { tripReference: tripRef, status: "canceled", canceledBy: "central" });
+        }
+    } catch (e) {}
+
     TripRepository.cancel(tripRef)
         .then(function (res) {
             cleanupLocalSearch();
