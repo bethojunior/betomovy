@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -24,7 +24,7 @@ import apiMain from '../../api/apiMain';
 import { buildApp } from '../../../constantBuild/config';
 import { useAuth } from '../../../context/auth';
 import { useConfigAppPartner } from '../../../context/ConfigAppPartner/useConfigAppPartner';
-import { translate } from '../../locales';
+import I18n, { translate } from '../../locales';
 import { injectDynamic } from './webViewInject';
 import loginBg from '../../../../assets/login-bg.png';
 import logoMovyWhite from '../../../../assets/logo_movy_white_text.png';
@@ -225,6 +225,32 @@ export function Register() {
   const { appPartnerSelected } = useConfigAppPartner();
 
   // Perfil selecionado (false = Passageiro, true = Motorista)
+  const isPt = (I18n.locale || '').startsWith('pt');
+  const t = (enText: string, ptText: string) => (isPt ? ptText : enText);
+
+  const formatCategoryName = (rawName: string) => {
+    if (isPt) return rawName;
+    const lower = (rawName || '').toLowerCase();
+    if (lower.includes('mulher')) return 'Women Driver';
+    if (lower.includes('particular')) return 'Private Driver';
+    if (lower.includes('mototaxi')) return 'Motorcycle Taxi';
+    if (lower.includes('delivery')) return 'Delivery';
+    if (lower.includes('entregador')) return 'Courier';
+    if (lower.includes('utilit')) return 'Utility Vehicle';
+    return rawName;
+  };
+
+  const formatCategoryDesc = (rawDesc: string) => {
+    if (isPt) return rawDesc;
+    const lower = (rawDesc || '').toLowerCase();
+    if (lower.includes('mulher')) return 'Exclusive rides for women passengers by women drivers';
+    if (lower.includes('particular')) return 'Passenger transportation in private car with comfort';
+    if (lower.includes('moto')) return 'Fast rides and motorcycle passenger transport';
+    if (lower.includes('delivery') || lower.includes('pacote')) return 'Express deliveries for packages and orders';
+    if (lower.includes('mercadoria')) return 'Urban merchandise and package delivery';
+    if (lower.includes('utilit')) return 'Cargo and medium haul transport in utility vehicles';
+    return rawDesc || 'Professional driving with Movy';
+  };
   const [isDriver, setIsDriver] = useState<boolean>(
     route.params?.isDriver !== undefined ? !!route.params.isDriver : !!driverSelected
   );
@@ -525,14 +551,14 @@ export function Register() {
     const newErrors: { [key: string]: string } = {};
 
     if (passengerStep === 1) {
-      if (!pName.trim()) newErrors.pName = 'Informe seu nome completo';
+      if (!pName.trim()) newErrors.pName = t('Enter your full name', 'Informe seu nome completo');
       const cleanSsn = pSsn.replace(/\D/g, '');
       if (cleanSsn && cleanSsn.length > 0 && cleanSsn.length !== 9) {
-        newErrors.pSsn = 'O SSN / ITIN deve ter 9 dígitos';
+        newErrors.pSsn = t('SSN / ITIN must have 9 digits', 'O SSN / ITIN deve ter 9 dígitos');
       }
       const cleanBirth = pBirthDate.replace(/\D/g, '');
       if (cleanBirth && cleanBirth.length > 0 && cleanBirth.length !== 8) {
-        newErrors.pBirthDate = 'Data de nascimento incompleta (DD/MM/AAAA)';
+        newErrors.pBirthDate = t('Incomplete date of birth', 'Data de nascimento incompleta (DD/MM/AAAA)');
       }
 
       if (Object.keys(newErrors).length > 0) {
@@ -543,9 +569,9 @@ export function Register() {
       setPassengerStep(2);
     } else if (passengerStep === 2) {
       const cleanPhone = pPhone.replace(/\D/g, '');
-      if (!cleanPhone || cleanPhone.length < 10) newErrors.pPhone = 'Informe um telefone válido';
+      if (!cleanPhone || cleanPhone.length < 10) newErrors.pPhone = t('Enter a valid phone number', 'Informe um telefone válido');
       if (!pEmail.trim() || !pEmail.includes('@') || !pEmail.includes('.')) {
-        newErrors.pEmail = 'Informe um e-mail válido';
+        newErrors.pEmail = t('Enter a valid email address', 'Informe um e-mail válido');
       }
 
       if (Object.keys(newErrors).length > 0) {
@@ -561,10 +587,10 @@ export function Register() {
   const handleSubmitPassenger = async () => {
     const newErrors: { [key: string]: string } = {};
     if (!pPassword || pPassword.length < 6) {
-      newErrors.pPassword = 'A senha deve ter no mínimo 6 caracteres';
+      newErrors.pPassword = t('Password must have at least 6 characters', 'A senha deve ter no mínimo 6 caracteres');
     }
     if (pPassword !== pConfirmPassword) {
-      newErrors.pConfirmPassword = 'As senhas não coincidem';
+      newErrors.pConfirmPassword = t('Passwords do not match', 'As senhas não coincidem');
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -650,33 +676,33 @@ export function Register() {
 
     if (driverStep === 1) {
       if (!selectedCategoryId) {
-        newErrors.category = 'Selecione uma categoria para continuar';
+        newErrors.category = t('Select a category to continue', 'Selecione uma categoria para continuar');
         setErrors(newErrors);
         return;
       }
       setErrors({});
       setDriverStep(2);
     } else if (driverStep === 2) {
-      if (!dName.trim()) newErrors.dName = 'Informe seu nome completo';
+      if (!dName.trim()) newErrors.dName = t('Enter your full name', 'Informe seu nome completo');
       const cleanSsn = dSsn.replace(/\D/g, '');
       if (!cleanSsn || cleanSsn.length !== 9) {
-        newErrors.dSsn = 'Informe o SSN / ITIN americano válido (9 números)';
+        newErrors.dSsn = t('Enter a valid 9-digit US SSN / ITIN', 'Informe o SSN / ITIN americano válido (9 números)');
       }
       const cleanBirth = dBirthDate.replace(/\D/g, '');
       if (cleanBirth && cleanBirth.length > 0 && cleanBirth.length !== 8) {
-        newErrors.dBirthDate = 'Informe a data completa (DD/MM/AAAA)';
+        newErrors.dBirthDate = t('Enter complete date of birth', 'Informe a data completa (DD/MM/AAAA)');
       } else if (cleanBirth && cleanBirth.length === 8) {
         const norm = normalizeDateForApi(dBirthDate, 1995);
         const [y, m, d] = norm.split('-').map(n => parseInt(n, 10));
         const currentYear = new Date().getFullYear();
         if (d < 1 || d > 31 || m < 1 || m > 12 || y < 1920 || y > currentYear - 18) {
-          newErrors.dBirthDate = 'Data de nascimento inválida (mínimo 18 anos)';
+          newErrors.dBirthDate = t('Invalid date of birth (minimum 18 years old)', 'Data de nascimento inválida (mínimo 18 anos)');
         }
       }
       const cleanPhone = dPhone.replace(/\D/g, '');
-      if (!cleanPhone || cleanPhone.length < 10) newErrors.dPhone = 'Informe um telefone válido com código de área';
+      if (!cleanPhone || cleanPhone.length < 10) newErrors.dPhone = t('Enter a valid phone number with area code', 'Informe um telefone válido com código de área');
       if (!dEmail.trim() || !dEmail.includes('@') || !dEmail.includes('.')) {
-        newErrors.dEmail = 'Informe um e-mail válido';
+        newErrors.dEmail = t('Enter a valid email address', 'Informe um e-mail válido');
       }
 
       if (Object.keys(newErrors).length > 0) {
@@ -689,10 +715,10 @@ export function Register() {
       // Placa de veículo dos Estados Unidos (1 a 8 caracteres alfanuméricos) - SEM TRAVAMENTO
       const cleanPlate = dPlate.toUpperCase().replace(/[^A-Z0-9]/g, '');
       if (!cleanPlate || cleanPlate.length < 2) {
-        newErrors.dPlate = 'Informe uma placa de veículo válida (2 a 8 caracteres)';
+        newErrors.dPlate = t('Enter a valid license plate (2 to 8 characters)', 'Informe uma placa de veículo válida (2 a 8 caracteres)');
       }
       if (!dVehicleModel.trim()) {
-        newErrors.dVehicleModel = 'Informe o modelo e marca do veículo';
+        newErrors.dVehicleModel = t('Enter vehicle make and model', 'Informe o modelo e marca do veículo');
       }
 
       if (Object.keys(newErrors).length > 0) {
@@ -703,10 +729,10 @@ export function Register() {
       setDriverStep(4);
     } else if (driverStep === 4) {
       // Documentação Americana Obrigatória
-      if (!dDocLicense) newErrors.dDocLicense = 'Anexe a Carteira de motorista americana (Driver’s License)';
-      if (!dDocRegistration) newErrors.dDocRegistration = 'Anexe o Registro do veículo (Vehicle Registration)';
-      if (!dDocInsurance) newErrors.dDocInsurance = 'Anexe o Comprovante de seguro do carro';
-      if (!dDocResidence) newErrors.dDocResidence = 'Anexe o Comprovante de residência';
+      if (!dDocLicense) newErrors.dDocLicense = t('Attach US Driver’s License', 'Anexe a Carteira de motorista americana (Driver’s License)');
+      if (!dDocRegistration) newErrors.dDocRegistration = t('Attach Vehicle Registration', 'Anexe o Registro do veículo (Vehicle Registration)');
+      if (!dDocInsurance) newErrors.dDocInsurance = t('Attach Proof of Vehicle Insurance', 'Anexe o Comprovante de seguro do carro');
+      if (!dDocResidence) newErrors.dDocResidence = t('Attach Proof of Residence', 'Anexe o Comprovante de residência');
 
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
@@ -721,13 +747,13 @@ export function Register() {
   const handleSubmitDriver = async () => {
     const newErrors: { [key: string]: string } = {};
     if (!dPhoto) {
-      newErrors.dPhoto = 'Adicione sua foto de perfil nítida para identificação';
+      newErrors.dPhoto = t('Add a clear profile photo for identification', 'Adicione sua foto de perfil nítida para identificação');
     }
     if (!dPassword || dPassword.length < 6) {
-      newErrors.dPassword = 'A senha deve ter no mínimo 6 caracteres';
+      newErrors.dPassword = t('Password must have at least 6 characters', 'A senha deve ter no mínimo 6 caracteres');
     }
     if (dPassword !== dConfirmPassword) {
-      newErrors.dConfirmPassword = 'As senhas não coincidem';
+      newErrors.dConfirmPassword = t('Passwords do not match', 'As senhas não coincidem');
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -868,7 +894,7 @@ export function Register() {
               </BackButton>
               <HeaderTitleContainer>
                 <HeaderLogo source={logoMovyWhite} />
-                <HeaderSubtitle>Cadastro Realizado</HeaderSubtitle>
+                <HeaderSubtitle>{t('Registration Complete', 'Cadastro Realizado')}</HeaderSubtitle>
               </HeaderTitleContainer>
               <View style={{ width: 42 }} />
             </TopNavHeader>
@@ -879,7 +905,7 @@ export function Register() {
                   <Feather name="check" size={32} color="#22c55e" />
                 </SuccessIconBadge>
                 <SuccessTitle>
-                  {!isDriver ? 'Cadastro concluído com sucesso!' : 'Cadastro de motorista enviado!'}
+                  {!isDriver ? t('Registration completed successfully!', 'Cadastro concluído com sucesso!') : t('Driver registration submitted!', 'Cadastro de motorista enviado!')}
                 </SuccessTitle>
                 <SuccessDescription>
                   {!isDriver
@@ -907,7 +933,7 @@ export function Register() {
                   }}
                 >
                   <NextStepButtonText>
-                    {!isDriver ? 'Entrar na Movy Agora' : 'Ir para Login de Motorista'}
+                    {!isDriver ? t('Sign in to Movy Now', 'Entrar na Movy Agora') : t('Go to Driver Login', 'Ir para Login de Motorista')}
                   </NextStepButtonText>
                   <Feather name="arrow-right" size={18} color="#ffffff" />
                 </NextStepButton>
@@ -952,7 +978,7 @@ export function Register() {
               <HeaderTitleContainer>
                 <HeaderLogo source={logoMovyWhite} />
                 <HeaderSubtitle>
-                  {!isDriver ? 'Passo a passo Passageiro' : 'Passo a passo Motorista'}
+                  {!isDriver ? t('Rider Registration', 'Passo a passo Passageiro') : t('Driver Registration', 'Passo a passo Motorista')}
                 </HeaderSubtitle>
               </HeaderTitleContainer>
               <View style={{ width: 42 }} />
@@ -974,10 +1000,10 @@ export function Register() {
                   />
                 </ProfileIconBadge>
                 <ProfileGridTitle active={!isDriver}>
-                  PASSAGEIRO
+                  {t('RIDER', 'PASSAGEIRO')}
                 </ProfileGridTitle>
                 <ProfileGridSubtitle active={!isDriver}>
-                  Quero viajar
+                  {t('I want to ride', 'Quero viajar')}
                 </ProfileGridSubtitle>
               </ProfileGridItem>
 
@@ -995,10 +1021,10 @@ export function Register() {
                   />
                 </ProfileIconBadge>
                 <ProfileGridTitle active={isDriver}>
-                  MOTORISTA
+                  {t('DRIVER', 'MOTORISTA')}
                 </ProfileGridTitle>
                 <ProfileGridSubtitle active={isDriver}>
-                  Quero dirigir
+                  {t('I want to drive', 'Quero dirigir')}
                 </ProfileGridSubtitle>
               </ProfileGridItem>
             </ProfileGridContainer>
@@ -1043,9 +1069,9 @@ export function Register() {
                 </StepIndicatorContainer>
 
                 <StepInfoLabel>
-                  {passengerStep === 1 && 'Etapa 1 de 3: Identificação'}
-                  {passengerStep === 2 && 'Etapa 2 de 3: Contato e Localização'}
-                  {passengerStep === 3 && 'Etapa 3 de 3: Foto de Perfil e Senha'}
+                  {passengerStep === 1 && t('Step 1 of 3: Identification', 'Etapa 1 de 3: Identificação')}
+                  {passengerStep === 2 && t('Step 2 of 3: Contact & Location', 'Etapa 2 de 3: Contato e Localização')}
+                  {passengerStep === 3 && t('Step 3 of 3: Profile Photo & Password', 'Etapa 3 de 3: Foto de Perfil e Senha')}
                 </StepInfoLabel>
 
                 {/* CARD PRINCIPAL DO PASSAGEIRO */}
@@ -1053,20 +1079,20 @@ export function Register() {
                   <CardHeaderRow>
                     <CardHeaderPill>
                       <Feather name="user-check" size={14} color="#ff80ab" />
-                      <CardHeaderPillText>Cadastro de Passageiro</CardHeaderPillText>
+                      <CardHeaderPillText>{t('Rider Registration', 'Cadastro de Passageiro')}</CardHeaderPillText>
                     </CardHeaderPill>
-                    <StepCounterBadge>Passo {passengerStep} de 3</StepCounterBadge>
+                    <StepCounterBadge>{t(`Step ${passengerStep} of 3`, `Passo ${passengerStep} de 3`)}</StepCounterBadge>
                   </CardHeaderRow>
 
                   {/* PASSO 1: IDENTIFICAÇÃO (PASSAGEIRO) */}
                   {passengerStep === 1 && (
                     <View>
                       <InputGroup>
-                        <ModernInputLabel>Nome Completo *</ModernInputLabel>
+                        <ModernInputLabel>{t('Full Name *', 'Nome Completo *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.pName}>
                           <Feather name="user" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="Digite seu nome completo"
+                            placeholder={t('Enter your full name', 'Digite seu nome completo')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={pName}
                             onChangeText={setPName}
@@ -1079,11 +1105,11 @@ export function Register() {
 
                       {/* SSN / ITIN Americano (9 números, sem foto) */}
                       <InputGroup>
-                        <ModernInputLabel>SSN / ITIN (Identificação Americana)</ModernInputLabel>
+                        <ModernInputLabel>{t('SSN / ITIN (US Identification)', 'SSN / ITIN (Identificação Americana)')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.pSsn}>
                           <MaterialCommunityIcons name="card-account-details-outline" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="000-00-0000 (9 números)"
+                            placeholder={t('000-00-0000 (9 digits)', '000-00-0000 (9 números)')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={pSsn}
                             onChangeText={txt => setPSsn(maskSsnItin(txt))}
@@ -1096,11 +1122,11 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Data de Nascimento</ModernInputLabel>
+                        <ModernInputLabel>{t('Date of Birth', 'Data de Nascimento')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.pBirthDate}>
                           <Feather name="calendar" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="DD/MM/AAAA"
+                            placeholder={t('MM/DD/YYYY', 'DD/MM/AAAA')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={pBirthDate}
                             onChangeText={txt => setPBirthDate(maskDate(txt))}
@@ -1114,7 +1140,7 @@ export function Register() {
 
                       <ButtonActionsRow>
                         <NextStepButton activeOpacity={0.8} onPress={handleNextPassengerStep}>
-                          <NextStepButtonText>Continuar</NextStepButtonText>
+                          <NextStepButtonText>{t('Continue', 'Continuar')}</NextStepButtonText>
                           <Feather name="arrow-right" size={18} color="#ffffff" />
                         </NextStepButton>
                       </ButtonActionsRow>
@@ -1125,7 +1151,7 @@ export function Register() {
                   {passengerStep === 2 && (
                     <View>
                       <InputGroup>
-                        <ModernInputLabel>Telefone / Celular *</ModernInputLabel>
+                        <ModernInputLabel>{t('Phone Number *', 'Telefone / Celular *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.pPhone}>
                           <Feather name="phone" size={18} color="#8A99AD" />
                           <ModernTextInput
@@ -1142,7 +1168,7 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>E-mail *</ModernInputLabel>
+                        <ModernInputLabel>{t('Email Address *', 'E-mail *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.pEmail}>
                           <Feather name="mail" size={18} color="#8A99AD" />
                           <ModernTextInput
@@ -1159,13 +1185,13 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Cidade</ModernInputLabel>
+                        <ModernInputLabel>{t('City / Area', 'Cidade')}</ModernInputLabel>
                         <DropdownButton
                           activeOpacity={0.8}
                           onPress={() => setShowCityPicker(true)}
                         >
                           <DropdownButtonText hasValue={!!pCity}>
-                            {pCity ? pCity.nome : 'Selecione sua cidade'}
+                            {pCity ? pCity.nome : t('Select your city', 'Selecione sua cidade')}
                           </DropdownButtonText>
                           <Feather
                             name="chevron-down"
@@ -1224,7 +1250,7 @@ export function Register() {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                   <Feather name="map-pin" size={18} color="#ff80ab" style={{ marginRight: 8 }} />
                                   <Text style={{ color: '#ffffff', fontSize: RFValue(15), fontWeight: '700' }}>
-                                    Selecione sua Cidade
+                                    {t('Select your City', 'Selecione sua Cidade')}
                                   </Text>
                                 </View>
                                 <TouchableOpacity
@@ -1288,11 +1314,11 @@ export function Register() {
                       <ButtonActionsRow>
                         <BackStepButton activeOpacity={0.8} onPress={() => setPassengerStep(1)}>
                           <Feather name="arrow-left" size={16} color="rgba(255, 255, 255, 0.8)" />
-                          <BackStepButtonText>Voltar</BackStepButtonText>
+                          <BackStepButtonText>{t('Back', 'Voltar')}</BackStepButtonText>
                         </BackStepButton>
 
                         <NextStepButton activeOpacity={0.8} onPress={handleNextPassengerStep}>
-                          <NextStepButtonText>Continuar</NextStepButtonText>
+                          <NextStepButtonText>{t('Continue', 'Continuar')}</NextStepButtonText>
                           <Feather name="arrow-right" size={18} color="#ffffff" />
                         </NextStepButton>
                       </ButtonActionsRow>
@@ -1320,7 +1346,7 @@ export function Register() {
                         </PhotoAvatarWrapper>
 
                         <PhotoTipText>
-                          {pPhoto ? 'Foto de perfil selecionada' : 'Adicione uma foto de perfil nítida'}
+                          {pPhoto ? t('Profile photo selected', 'Foto de perfil selecionada') : t('Add a clear profile photo', 'Adicione uma foto de perfil nítida')}
                         </PhotoTipText>
 
                         <PhotoActionsRow>
@@ -1330,7 +1356,7 @@ export function Register() {
                             onPress={() => handlePickPhoto(false, true)}
                           >
                             <Feather name="camera" size={14} color="#ffffff" />
-                            <PhotoChoiceButtonText>Tirar Foto</PhotoChoiceButtonText>
+                            <PhotoChoiceButtonText>{t('Take Photo', 'Tirar Foto')}</PhotoChoiceButtonText>
                           </PhotoChoiceButton>
 
                           <PhotoChoiceButton
@@ -1339,23 +1365,23 @@ export function Register() {
                             onPress={() => handlePickPhoto(false, false)}
                           >
                             <Feather name="image" size={14} color="#ffffff" />
-                            <PhotoChoiceButtonText>Galeria</PhotoChoiceButtonText>
+                            <PhotoChoiceButtonText>{t('Gallery', 'Galeria')}</PhotoChoiceButtonText>
                           </PhotoChoiceButton>
                         </PhotoActionsRow>
 
                         {pPhoto && (
                           <PhotoRemoveBtn activeOpacity={0.7} onPress={() => setPPhoto(null)}>
-                            <PhotoRemoveBtnText>Remover Foto</PhotoRemoveBtnText>
+                            <PhotoRemoveBtnText>{t('Remove Photo', 'Remover Foto')}</PhotoRemoveBtnText>
                           </PhotoRemoveBtn>
                         )}
                       </PhotoUploadSection>
 
                       <InputGroup>
-                        <ModernInputLabel>Senha de Acesso *</ModernInputLabel>
+                        <ModernInputLabel>{t('Password *', 'Senha de Acesso *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.pPassword}>
                           <Feather name="lock" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="Mínimo de 6 caracteres"
+                            placeholder={t('Minimum 6 characters', 'Mínimo de 6 caracteres')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             secureTextEntry={!pShowPassword}
                             value={pPassword}
@@ -1377,11 +1403,11 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Confirmar Senha *</ModernInputLabel>
+                        <ModernInputLabel>{t('Confirm Password *', 'Confirmar Senha *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.pConfirmPassword}>
                           <Feather name="lock" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="Repita a senha"
+                            placeholder={t('Repeat your password', 'Repita a senha')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             secureTextEntry={!pShowPassword}
                             value={pConfirmPassword}
@@ -1397,7 +1423,7 @@ export function Register() {
                       <ButtonActionsRow>
                         <BackStepButton activeOpacity={0.8} onPress={() => setPassengerStep(2)}>
                           <Feather name="arrow-left" size={16} color="rgba(255, 255, 255, 0.8)" />
-                          <BackStepButtonText>Voltar</BackStepButtonText>
+                          <BackStepButtonText>{t('Back', 'Voltar')}</BackStepButtonText>
                         </BackStepButton>
 
                         <NextStepButton
@@ -1409,7 +1435,7 @@ export function Register() {
                             <ActivityIndicator size="small" color="#ffffff" />
                           ) : (
                             <>
-                              <NextStepButtonText>Finalizar Cadastro</NextStepButtonText>
+                              <NextStepButtonText>{t('Submit Registration', 'Finalizar Cadastro')}</NextStepButtonText>
                               <Feather name="check" size={18} color="#ffffff" />
                             </>
                           )}
@@ -1487,11 +1513,11 @@ export function Register() {
                 </StepIndicatorContainer>
 
                 <StepInfoLabel>
-                  {driverStep === 1 && 'Etapa 1 de 5: Escolha sua Categoria'}
-                  {driverStep === 2 && 'Etapa 2 de 5: Dados Pessoais e SSN / ITIN'}
-                  {driverStep === 3 && 'Etapa 3 de 5: Dados do Veículo'}
-                  {driverStep === 4 && 'Etapa 4 de 5: Documentação Americana (EUA)'}
-                  {driverStep === 5 && 'Etapa 5 de 5: Foto de Perfil e Senha'}
+                  {driverStep === 1 && t('Step 1 of 5: Choose your Category', 'Etapa 1 de 5: Escolha sua Categoria')}
+                  {driverStep === 2 && t('Step 2 of 5: Personal Details & SSN / ITIN', 'Etapa 2 de 5: Dados Pessoais e SSN / ITIN')}
+                  {driverStep === 3 && t('Step 3 of 5: Vehicle Details', 'Etapa 3 de 5: Dados do Veículo')}
+                  {driverStep === 4 && t('Step 4 of 5: US Documentation (USA)', 'Etapa 4 de 5: Documentação Americana (EUA)')}
+                  {driverStep === 5 && t('Step 5 of 5: Profile Photo & Password', 'Etapa 5 de 5: Foto de Perfil e Senha')}
                 </StepInfoLabel>
 
                 {/* CARD PRINCIPAL DO MOTORISTA */}
@@ -1499,9 +1525,9 @@ export function Register() {
                   <CardHeaderRow>
                     <CardHeaderPill>
                       <MaterialCommunityIcons name="steering" size={15} color="#ff80ab" />
-                      <CardHeaderPillText>Cadastro de Motorista</CardHeaderPillText>
+                      <CardHeaderPillText>{t('Driver Registration', 'Cadastro de Motorista')}</CardHeaderPillText>
                     </CardHeaderPill>
-                    <StepCounterBadge>Passo {driverStep} de 5</StepCounterBadge>
+                    <StepCounterBadge>{t(`Step ${driverStep} of 5`, `Passo ${driverStep} de 5`)}</StepCounterBadge>
                   </CardHeaderRow>
 
                   {/* PASSO 1 DO MOTORISTA: ESCOLHA DA CATEGORIA */}
@@ -1515,7 +1541,7 @@ export function Register() {
                           lineHeight: 18,
                         }}
                       >
-                        Selecione a categoria em que você deseja atuar na Movy para iniciar suas corridas:
+                        {t('Select the category you wish to drive with Movy to start earning:', 'Selecione a categoria em que você deseja atuar na Movy para iniciar suas corridas:')}
                       </Text>
 
                       {driverCategories.map(cat => {
@@ -1538,9 +1564,9 @@ export function Register() {
                             </CategoryIconContainer>
 
                             <CategoryInfoCol>
-                              <CategoryTitle isSelected={isSelected}>{cat.name}</CategoryTitle>
+                              <CategoryTitle isSelected={isSelected}>{formatCategoryName(cat.name)}</CategoryTitle>
                               <CategoryDescription>
-                                {cat.description || 'Atuação profissional com a Movy'}
+                                {formatCategoryDesc(cat.description)}
                               </CategoryDescription>
                             </CategoryInfoCol>
 
@@ -1553,7 +1579,7 @@ export function Register() {
 
                       <ButtonActionsRow>
                         <NextStepButton activeOpacity={0.8} onPress={handleNextDriverStep}>
-                          <NextStepButtonText>Continuar</NextStepButtonText>
+                          <NextStepButtonText>{t('Continue', 'Continuar')}</NextStepButtonText>
                           <Feather name="arrow-right" size={18} color="#ffffff" />
                         </NextStepButton>
                       </ButtonActionsRow>
@@ -1564,11 +1590,11 @@ export function Register() {
                   {driverStep === 2 && (
                     <View>
                       <InputGroup>
-                        <ModernInputLabel>Nome Completo *</ModernInputLabel>
+                        <ModernInputLabel>{t('Full Name *', 'Nome Completo *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dName}>
                           <Feather name="user" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="Digite seu nome completo"
+                            placeholder={t('Enter your full name', 'Digite seu nome completo')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dName}
                             onChangeText={setDName}
@@ -1581,11 +1607,11 @@ export function Register() {
 
                       {/* SSN / ITIN Americano (9 números, sem foto) */}
                       <InputGroup>
-                        <ModernInputLabel>SSN / ITIN * (Identificação Individual Americana)</ModernInputLabel>
+                        <ModernInputLabel>{t('SSN / ITIN * (US Individual Identification)', 'SSN / ITIN * (Identificação Individual Americana)')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dSsn}>
                           <MaterialCommunityIcons name="card-account-details-outline" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="000-00-0000 (9 números)"
+                            placeholder={t('000-00-0000 (9 digits)', '000-00-0000 (9 números)')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dSsn}
                             onChangeText={txt => setDSsn(maskSsnItin(txt))}
@@ -1598,11 +1624,11 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Data de Nascimento *</ModernInputLabel>
+                        <ModernInputLabel>{t('Date of Birth *', 'Data de Nascimento *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dBirthDate}>
                           <Feather name="calendar" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="DD/MM/AAAA"
+                            placeholder={t('MM/DD/YYYY', 'DD/MM/AAAA')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dBirthDate}
                             onChangeText={txt => setDBirthDate(maskDate(txt))}
@@ -1615,7 +1641,7 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Telefone / Celular *</ModernInputLabel>
+                        <ModernInputLabel>{t('Phone Number *', 'Telefone / Celular *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dPhone}>
                           <Feather name="phone" size={18} color="#8A99AD" />
                           <ModernTextInput
@@ -1632,7 +1658,7 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>E-mail *</ModernInputLabel>
+                        <ModernInputLabel>{t('Email Address *', 'E-mail *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dEmail}>
                           <Feather name="mail" size={18} color="#8A99AD" />
                           <ModernTextInput
@@ -1649,13 +1675,13 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Cidade</ModernInputLabel>
+                        <ModernInputLabel>{t('City / Area', 'Cidade')}</ModernInputLabel>
                         <DropdownButton
                           activeOpacity={0.8}
                           onPress={() => setShowCityPicker(true)}
                         >
                           <DropdownButtonText hasValue={!!dCity}>
-                            {dCity ? dCity.nome : 'Selecione sua cidade'}
+                            {dCity ? dCity.nome : t('Select your city', 'Selecione sua cidade')}
                           </DropdownButtonText>
                           <Feather
                             name="chevron-down"
@@ -1714,7 +1740,7 @@ export function Register() {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                   <Feather name="map-pin" size={18} color="#ff80ab" style={{ marginRight: 8 }} />
                                   <Text style={{ color: '#ffffff', fontSize: RFValue(15), fontWeight: '700' }}>
-                                    Selecione sua Cidade
+                                    {t('Select your City', 'Selecione sua Cidade')}
                                   </Text>
                                 </View>
                                 <TouchableOpacity
@@ -1778,11 +1804,11 @@ export function Register() {
                       <ButtonActionsRow>
                         <BackStepButton activeOpacity={0.8} onPress={() => setDriverStep(1)}>
                           <Feather name="arrow-left" size={16} color="rgba(255, 255, 255, 0.8)" />
-                          <BackStepButtonText>Voltar</BackStepButtonText>
+                          <BackStepButtonText>{t('Back', 'Voltar')}</BackStepButtonText>
                         </BackStepButton>
 
                         <NextStepButton activeOpacity={0.8} onPress={handleNextDriverStep}>
-                          <NextStepButtonText>Continuar</NextStepButtonText>
+                          <NextStepButtonText>{t('Continue', 'Continuar')}</NextStepButtonText>
                           <Feather name="arrow-right" size={18} color="#ffffff" />
                         </NextStepButton>
                       </ButtonActionsRow>
@@ -1793,7 +1819,7 @@ export function Register() {
                   {driverStep === 3 && (
                     <View>
                       <InputGroup>
-                        <ModernInputLabel>Placa do Veículo (License Plate) *</ModernInputLabel>
+                        <ModernInputLabel>{t('Vehicle License Plate *', 'Placa do Veículo (License Plate) *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dPlate}>
                           <MaterialCommunityIcons name="card-text-outline" size={18} color="#8A99AD" />
                           <ModernTextInput
@@ -1810,7 +1836,7 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Marca e Modelo do Veículo *</ModernInputLabel>
+                        <ModernInputLabel>{t('Vehicle Make and Model *', 'Marca e Modelo do Veículo *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dVehicleModel}>
                           <MaterialCommunityIcons name="car-info" size={18} color="#8A99AD" />
                           <ModernTextInput
@@ -1828,11 +1854,11 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Cor do Veículo</ModernInputLabel>
+                        <ModernInputLabel>{t('Vehicle Color', 'Cor do Veículo')}</ModernInputLabel>
                         <ModernInputBox>
                           <MaterialCommunityIcons name="palette-outline" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="Ex: Prata, Preto, Branco, Azul"
+                            placeholder={t('Ex: Silver, Black, White, Blue', 'Ex: Prata, Preto, Branco, Azul')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dVehicleColor}
                             onChangeText={setDVehicleColor}
@@ -1844,7 +1870,7 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Ano de Fabricação</ModernInputLabel>
+                        <ModernInputLabel>{t('Year of Manufacture', 'Ano de Fabricação')}</ModernInputLabel>
                         <ModernInputBox>
                           <MaterialCommunityIcons name="calendar-clock" size={18} color="#8A99AD" />
                           <ModernTextInput
@@ -1863,11 +1889,11 @@ export function Register() {
                       <ButtonActionsRow>
                         <BackStepButton activeOpacity={0.8} onPress={() => setDriverStep(2)}>
                           <Feather name="arrow-left" size={16} color="rgba(255, 255, 255, 0.8)" />
-                          <BackStepButtonText>Voltar</BackStepButtonText>
+                          <BackStepButtonText>{t('Back', 'Voltar')}</BackStepButtonText>
                         </BackStepButton>
 
                         <NextStepButton activeOpacity={0.8} onPress={handleNextDriverStep}>
-                          <NextStepButtonText>Continuar</NextStepButtonText>
+                          <NextStepButtonText>{t('Continue', 'Continuar')}</NextStepButtonText>
                           <Feather name="arrow-right" size={18} color="#ffffff" />
                         </NextStepButton>
                       </ButtonActionsRow>
@@ -1878,9 +1904,9 @@ export function Register() {
                   {driverStep === 4 && (
                     <View>
                       <DocSectionHeader>
-                        <DocSectionTitle>Documentação dos Estados Unidos</DocSectionTitle>
+                        <DocSectionTitle>{t('United States Documentation', 'Documentação dos Estados Unidos')}</DocSectionTitle>
                         <DocSectionDescription>
-                          A Movy opera nos EUA. Anexe fotos nítidas dos 4 documentos obrigatórios para validação:
+                          {t('Movy operates in the US. Attach clear photos of the 4 required documents for validation:', 'A Movy opera nos EUA. Anexe fotos nítidas dos 4 documentos obrigatórios para validação:')}
                         </DocSectionDescription>
                       </DocSectionHeader>
 
@@ -1891,22 +1917,22 @@ export function Register() {
                             <DocCardIconBadge isAttached={!!dDocLicense}>
                               <Feather name="credit-card" size={16} color={dDocLicense ? '#22c55e' : '#CD2379'} />
                             </DocCardIconBadge>
-                            <DocCardTitle>Carteira de motorista americana</DocCardTitle>
+                            <DocCardTitle>{t('US Driver’s License', 'Carteira de motorista americana')}</DocCardTitle>
                           </DocCardTitleRow>
                           <DocStatusPill isAttached={!!dDocLicense}>
                             <Feather name={dDocLicense ? 'check' : 'clock'} size={12} color={dDocLicense ? '#22c55e' : '#f59e0b'} />
                             <DocStatusPillText isAttached={!!dDocLicense}>
-                              {dDocLicense ? 'Anexado' : 'Pendente'}
+                              {dDocLicense ? t('Attached', 'Anexado') : t('Pending', 'Pendente')}
                             </DocStatusPillText>
                           </DocStatusPill>
                         </DocCardHeader>
-                        <DocRequirementText>O que apresentar: Driver’s License válida.</DocRequirementText>
+                        <DocRequirementText>{t('Requirement: Valid Driver’s License.', 'O que apresentar: Driver’s License válida.')}</DocRequirementText>
                         {dDocLicense && (
                           <DocPreviewContainer>
                             <DocPreviewThumbnail source={{ uri: dDocLicense }} />
                             <DocPreviewInfo>
-                              <DocPreviewFilename>Driver’s License anexada</DocPreviewFilename>
-                              <DocPreviewHint>Toque abaixo para alterar ou remover</DocPreviewHint>
+                              <DocPreviewFilename>{t('Driver’s License attached', 'Driver’s License anexada')}</DocPreviewFilename>
+                              <DocPreviewHint>{t('Tap below to change or remove', 'Toque abaixo para alterar ou remover')}</DocPreviewHint>
                             </DocPreviewInfo>
                             <DocRemoveButton onPress={() => setDDocLicense(null)} activeOpacity={0.7}>
                               <Feather name="trash-2" size={16} color="#ef4444" />
@@ -1916,7 +1942,7 @@ export function Register() {
                         <DocActionsRow>
                           <DocAttachButton variant="camera" activeOpacity={0.8} onPress={() => handlePickDocument('license', true)}>
                             <Feather name="camera" size={14} color="#ffffff" />
-                            <DocAttachButtonText>{dDocLicense ? 'Tirar Outra' : 'Câmera'}</DocAttachButtonText>
+                            <DocAttachButtonText>{dDocLicense ? t('Retake', 'Tirar Outra') : t('Camera', 'Câmera')}</DocAttachButtonText>
                           </DocAttachButton>
                           <DocAttachButton variant="gallery" activeOpacity={0.8} onPress={() => handlePickDocument('license', false)}>
                             <Feather name="image" size={14} color="#ffffff" />
@@ -1933,22 +1959,22 @@ export function Register() {
                             <DocCardIconBadge isAttached={!!dDocRegistration}>
                               <MaterialCommunityIcons name="car-cog" size={18} color={dDocRegistration ? '#22c55e' : '#CD2379'} />
                             </DocCardIconBadge>
-                            <DocCardTitle>Registro do veículo</DocCardTitle>
+                            <DocCardTitle>{t('Vehicle Registration', 'Registro do veículo')}</DocCardTitle>
                           </DocCardTitleRow>
                           <DocStatusPill isAttached={!!dDocRegistration}>
                             <Feather name={dDocRegistration ? 'check' : 'clock'} size={12} color={dDocRegistration ? '#22c55e' : '#f59e0b'} />
                             <DocStatusPillText isAttached={!!dDocRegistration}>
-                              {dDocRegistration ? 'Anexado' : 'Pendente'}
+                              {dDocRegistration ? t('Attached', 'Anexado') : t('Pending', 'Pendente')}
                             </DocStatusPillText>
                           </DocStatusPill>
                         </DocCardHeader>
-                        <DocRequirementText>O que apresentar: Vehicle Registration atualizado.</DocRequirementText>
+                        <DocRequirementText>{t('Requirement: Updated Vehicle Registration.', 'O que apresentar: Vehicle Registration atualizado.')}</DocRequirementText>
                         {dDocRegistration && (
                           <DocPreviewContainer>
                             <DocPreviewThumbnail source={{ uri: dDocRegistration }} />
                             <DocPreviewInfo>
-                              <DocPreviewFilename>Vehicle Registration anexado</DocPreviewFilename>
-                              <DocPreviewHint>Toque abaixo para alterar ou remover</DocPreviewHint>
+                              <DocPreviewFilename>{t('Vehicle Registration attached', 'Vehicle Registration anexado')}</DocPreviewFilename>
+                              <DocPreviewHint>{t('Tap below to change or remove', 'Toque abaixo para alterar ou remover')}</DocPreviewHint>
                             </DocPreviewInfo>
                             <DocRemoveButton onPress={() => setDDocRegistration(null)} activeOpacity={0.7}>
                               <Feather name="trash-2" size={16} color="#ef4444" />
@@ -1958,7 +1984,7 @@ export function Register() {
                         <DocActionsRow>
                           <DocAttachButton variant="camera" activeOpacity={0.8} onPress={() => handlePickDocument('registration', true)}>
                             <Feather name="camera" size={14} color="#ffffff" />
-                            <DocAttachButtonText>{dDocRegistration ? 'Tirar Outra' : 'Câmera'}</DocAttachButtonText>
+                            <DocAttachButtonText>{dDocRegistration ? t('Retake', 'Tirar Outra') : t('Camera', 'Câmera')}</DocAttachButtonText>
                           </DocAttachButton>
                           <DocAttachButton variant="gallery" activeOpacity={0.8} onPress={() => handlePickDocument('registration', false)}>
                             <Feather name="image" size={14} color="#ffffff" />
@@ -1975,22 +2001,22 @@ export function Register() {
                             <DocCardIconBadge isAttached={!!dDocInsurance}>
                               <Feather name="shield" size={16} color={dDocInsurance ? '#22c55e' : '#CD2379'} />
                             </DocCardIconBadge>
-                            <DocCardTitle>Seguro do carro</DocCardTitle>
+                            <DocCardTitle>{t('Vehicle Insurance', 'Seguro do carro')}</DocCardTitle>
                           </DocCardTitleRow>
                           <DocStatusPill isAttached={!!dDocInsurance}>
                             <Feather name={dDocInsurance ? 'check' : 'clock'} size={12} color={dDocInsurance ? '#22c55e' : '#f59e0b'} />
                             <DocStatusPillText isAttached={!!dDocInsurance}>
-                              {dDocInsurance ? 'Anexado' : 'Pendente'}
+                              {dDocInsurance ? t('Attached', 'Anexado') : t('Pending', 'Pendente')}
                             </DocStatusPillText>
                           </DocStatusPill>
                         </DocCardHeader>
-                        <DocRequirementText>O que apresentar: Comprovante de seguro válido.</DocRequirementText>
+                        <DocRequirementText>{t('Requirement: Valid auto insurance policy document.', 'O que apresentar: Comprovante de seguro válido.')}</DocRequirementText>
                         {dDocInsurance && (
                           <DocPreviewContainer>
                             <DocPreviewThumbnail source={{ uri: dDocInsurance }} />
                             <DocPreviewInfo>
-                              <DocPreviewFilename>Seguro de carro anexado</DocPreviewFilename>
-                              <DocPreviewHint>Toque abaixo para alterar ou remover</DocPreviewHint>
+                              <DocPreviewFilename>{t('Vehicle insurance attached', 'Seguro de carro anexado')}</DocPreviewFilename>
+                              <DocPreviewHint>{t('Tap below to change or remove', 'Toque abaixo para alterar ou remover')}</DocPreviewHint>
                             </DocPreviewInfo>
                             <DocRemoveButton onPress={() => setDDocInsurance(null)} activeOpacity={0.7}>
                               <Feather name="trash-2" size={16} color="#ef4444" />
@@ -2000,7 +2026,7 @@ export function Register() {
                         <DocActionsRow>
                           <DocAttachButton variant="camera" activeOpacity={0.8} onPress={() => handlePickDocument('insurance', true)}>
                             <Feather name="camera" size={14} color="#ffffff" />
-                            <DocAttachButtonText>{dDocInsurance ? 'Tirar Outra' : 'Câmera'}</DocAttachButtonText>
+                            <DocAttachButtonText>{dDocInsurance ? t('Retake', 'Tirar Outra') : t('Camera', 'Câmera')}</DocAttachButtonText>
                           </DocAttachButton>
                           <DocAttachButton variant="gallery" activeOpacity={0.8} onPress={() => handlePickDocument('insurance', false)}>
                             <Feather name="image" size={14} color="#ffffff" />
@@ -2017,22 +2043,22 @@ export function Register() {
                             <DocCardIconBadge isAttached={!!dDocResidence}>
                               <Feather name="home" size={16} color={dDocResidence ? '#22c55e' : '#CD2379'} />
                             </DocCardIconBadge>
-                            <DocCardTitle>Comprovante de residência</DocCardTitle>
+                            <DocCardTitle>{t('Proof of Residence', 'Comprovante de residência')}</DocCardTitle>
                           </DocCardTitleRow>
                           <DocStatusPill isAttached={!!dDocResidence}>
                             <Feather name={dDocResidence ? 'check' : 'clock'} size={12} color={dDocResidence ? '#22c55e' : '#f59e0b'} />
                             <DocStatusPillText isAttached={!!dDocResidence}>
-                              {dDocResidence ? 'Anexado' : 'Pendente'}
+                              {dDocResidence ? t('Attached', 'Anexado') : t('Pending', 'Pendente')}
                             </DocStatusPillText>
                           </DocStatusPill>
                         </DocCardHeader>
-                        <DocRequirementText>O que apresentar: Na cidade ou estado onde pretende dirigir.</DocRequirementText>
+                        <DocRequirementText>{t('Requirement: In the city or state where you intend to drive.', 'O que apresentar: Na cidade ou estado onde pretende dirigir.')}</DocRequirementText>
                         {dDocResidence && (
                           <DocPreviewContainer>
                             <DocPreviewThumbnail source={{ uri: dDocResidence }} />
                             <DocPreviewInfo>
-                              <DocPreviewFilename>Comprovante de residência anexado</DocPreviewFilename>
-                              <DocPreviewHint>Toque abaixo para alterar ou remover</DocPreviewHint>
+                              <DocPreviewFilename>{t('Proof of residence attached', 'Comprovante de residência anexado')}</DocPreviewFilename>
+                              <DocPreviewHint>{t('Tap below to change or remove', 'Toque abaixo para alterar ou remover')}</DocPreviewHint>
                             </DocPreviewInfo>
                             <DocRemoveButton onPress={() => setDDocResidence(null)} activeOpacity={0.7}>
                               <Feather name="trash-2" size={16} color="#ef4444" />
@@ -2042,7 +2068,7 @@ export function Register() {
                         <DocActionsRow>
                           <DocAttachButton variant="camera" activeOpacity={0.8} onPress={() => handlePickDocument('residence', true)}>
                             <Feather name="camera" size={14} color="#ffffff" />
-                            <DocAttachButtonText>{dDocResidence ? 'Tirar Outra' : 'Câmera'}</DocAttachButtonText>
+                            <DocAttachButtonText>{dDocResidence ? t('Retake', 'Tirar Outra') : t('Camera', 'Câmera')}</DocAttachButtonText>
                           </DocAttachButton>
                           <DocAttachButton variant="gallery" activeOpacity={0.8} onPress={() => handlePickDocument('residence', false)}>
                             <Feather name="image" size={14} color="#ffffff" />
@@ -2055,11 +2081,11 @@ export function Register() {
                       <ButtonActionsRow>
                         <BackStepButton activeOpacity={0.8} onPress={() => setDriverStep(3)}>
                           <Feather name="arrow-left" size={16} color="rgba(255, 255, 255, 0.8)" />
-                          <BackStepButtonText>Voltar</BackStepButtonText>
+                          <BackStepButtonText>{t('Back', 'Voltar')}</BackStepButtonText>
                         </BackStepButton>
 
                         <NextStepButton activeOpacity={0.8} onPress={handleNextDriverStep}>
-                          <NextStepButtonText>Continuar</NextStepButtonText>
+                          <NextStepButtonText>{t('Continue', 'Continuar')}</NextStepButtonText>
                           <Feather name="arrow-right" size={18} color="#ffffff" />
                         </NextStepButton>
                       </ButtonActionsRow>
@@ -2088,9 +2114,7 @@ export function Register() {
                         </PhotoAvatarWrapper>
 
                         <PhotoTipText>
-                          {dPhoto
-                            ? 'Foto de perfil do motorista selecionada'
-                            : 'Foto nítida do motorista, conforme as orientações (rosto frontal e visível)'}
+                          {dPhoto ? t('Driver profile photo selected', 'Foto de perfil do motorista selecionada') : t('Clear driver photo (front facing and visible)', 'Foto nítida do motorista, conforme as orientações (rosto frontal e visível)')}
                         </PhotoTipText>
 
                         <PhotoActionsRow>
@@ -2100,7 +2124,7 @@ export function Register() {
                             onPress={() => handlePickPhoto(true, true)}
                           >
                             <Feather name="camera" size={14} color="#ffffff" />
-                            <PhotoChoiceButtonText>Tirar Foto</PhotoChoiceButtonText>
+                            <PhotoChoiceButtonText>{t('Take Photo', 'Tirar Foto')}</PhotoChoiceButtonText>
                           </PhotoChoiceButton>
 
                           <PhotoChoiceButton
@@ -2109,24 +2133,24 @@ export function Register() {
                             onPress={() => handlePickPhoto(true, false)}
                           >
                             <Feather name="image" size={14} color="#ffffff" />
-                            <PhotoChoiceButtonText>Galeria</PhotoChoiceButtonText>
+                            <PhotoChoiceButtonText>{t('Gallery', 'Galeria')}</PhotoChoiceButtonText>
                           </PhotoChoiceButton>
                         </PhotoActionsRow>
 
                         {dPhoto && (
                           <PhotoRemoveBtn activeOpacity={0.7} onPress={() => setDPhoto(null)}>
-                            <PhotoRemoveBtnText>Remover Foto</PhotoRemoveBtnText>
+                            <PhotoRemoveBtnText>{t('Remove Photo', 'Remover Foto')}</PhotoRemoveBtnText>
                           </PhotoRemoveBtn>
                         )}
                         {errors.dPhoto && <InputErrorText>{errors.dPhoto}</InputErrorText>}
                       </PhotoUploadSection>
 
                       <InputGroup>
-                        <ModernInputLabel>Senha de Acesso de Motorista *</ModernInputLabel>
+                        <ModernInputLabel>{t('Driver Password *', 'Senha de Acesso de Motorista *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dPassword}>
                           <Feather name="lock" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="Mínimo de 6 caracteres"
+                            placeholder={t('Minimum 6 characters', 'Mínimo de 6 caracteres')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             secureTextEntry={!dShowPassword}
                             value={dPassword}
@@ -2148,11 +2172,11 @@ export function Register() {
                       </InputGroup>
 
                       <InputGroup>
-                        <ModernInputLabel>Confirmar Senha *</ModernInputLabel>
+                        <ModernInputLabel>{t('Confirm Password *', 'Confirmar Senha *')}</ModernInputLabel>
                         <ModernInputBox hasError={!!errors.dConfirmPassword}>
                           <Feather name="lock" size={18} color="#8A99AD" />
                           <ModernTextInput
-                            placeholder="Repita a senha"
+                            placeholder={t('Repeat your password', 'Repita a senha')}
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             secureTextEntry={!dShowPassword}
                             value={dConfirmPassword}
@@ -2168,7 +2192,7 @@ export function Register() {
                       <ButtonActionsRow>
                         <BackStepButton activeOpacity={0.8} onPress={() => setDriverStep(4)}>
                           <Feather name="arrow-left" size={16} color="rgba(255, 255, 255, 0.8)" />
-                          <BackStepButtonText>Voltar</BackStepButtonText>
+                          <BackStepButtonText>{t('Back', 'Voltar')}</BackStepButtonText>
                         </BackStepButton>
 
                         <NextStepButton
@@ -2180,7 +2204,7 @@ export function Register() {
                             <ActivityIndicator size="small" color="#ffffff" />
                           ) : (
                             <>
-                              <NextStepButtonText>Concluir Cadastro</NextStepButtonText>
+                              <NextStepButtonText>{t('Submit Registration', 'Concluir Cadastro')}</NextStepButtonText>
                               <Feather name="check" size={18} color="#ffffff" />
                             </>
                           )}

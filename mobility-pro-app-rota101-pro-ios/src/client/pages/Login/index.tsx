@@ -322,7 +322,7 @@ export default function Login() {
               {/* Logo MOVY em Destaque */}
               <LogoContainer>
                 <LogoImage source={logoMovyWhite} resizeMode="contain" />
-                <TaglineText>Mobilidade urbana inteligente</TaglineText>
+                <TaglineText>{translate('login.tagline') || 'Smart urban mobility'}</TaglineText>
               </LogoContainer>
 
               {/* ===== GRIDS COM AS CORES ROSA COM FUNDO TRANSPARENTE ===== */}
@@ -341,10 +341,10 @@ export default function Login() {
                     />
                   </ProfileIconBadge>
                   <ProfileGridTitle active={!driverSelected}>
-                    PASSAGEIRO
+                    {translate('login.profile_rider') || 'RIDER'}
                   </ProfileGridTitle>
                   <ProfileGridSubtitle active={!driverSelected}>
-                    Quero viajar
+                    {translate('login.profile_rider_subtitle') || 'I want to ride'}
                   </ProfileGridSubtitle>
                 </ProfileGridItem>
 
@@ -362,10 +362,10 @@ export default function Login() {
                     />
                   </ProfileIconBadge>
                   <ProfileGridTitle active={driverSelected}>
-                    MOTORISTA
+                    {translate('login.profile_driver') || 'DRIVER'}
                   </ProfileGridTitle>
                   <ProfileGridSubtitle active={driverSelected}>
-                    Quero dirigir
+                    {translate('login.profile_driver_subtitle') || 'I want to drive'}
                   </ProfileGridSubtitle>
                 </ProfileGridItem>
               </ProfileGridContainer>
@@ -380,7 +380,7 @@ export default function Login() {
                       color="#ff80ab"
                     />
                     <CardHeaderPillText>
-                      {driverSelected ? 'Acesso do Motorista' : 'Acesso do Passageiro'}
+                      {driverSelected ? (translate('login.driver_access') || 'Driver Access') : (translate('login.rider_access') || 'Rider Access')}
                     </CardHeaderPillText>
                   </CardHeaderPill>
                 </CardHeaderRow>
@@ -503,7 +503,9 @@ export default function Login() {
                   onPress={handleSubmit(handleAuth)}
                 >
                   <PrimaryLoginButtonText>
-                    {driverSelected ? 'ENTRAR COMO MOTORISTA' : 'ENTRAR COMO PASSAGEIRO'}
+                    {driverSelected
+                      ? (translate('login.btn_enter_driver') || 'SIGN IN AS DRIVER')
+                      : (translate('login.btn_enter_passenger') || 'SIGN IN AS RIDER')}
                   </PrimaryLoginButtonText>
                 </PrimaryLoginButton>
               </GlassLoginCard>
@@ -572,9 +574,11 @@ export default function Login() {
           >
             <ModalBackdrop>
               <ModalCard>
-                <ModalTitle>Como deseja se cadastrar?</ModalTitle>
+                <ModalTitle>
+                  {translate('login.modal_choice_title') || 'How would you like to sign up?'}
+                </ModalTitle>
                 <ModalSubtitle>
-                  Escolha o seu perfil para iniciar o cadastro na Movy
+                  {translate('login.modal_choice_subtitle') || 'Choose your profile to start registration on Movy'}
                 </ModalSubtitle>
 
                 {/* Opção Passageiro */}
@@ -586,9 +590,11 @@ export default function Login() {
                     <FontAwesome5 name="user" size={RFValue(20)} color="#ffffff" />
                   </ModalChoiceIconBox>
                   <ModalChoiceContent>
-                    <ModalChoiceTitle>Sou passageiro</ModalChoiceTitle>
+                    <ModalChoiceTitle>
+                      {translate('login.modal_choice_rider_title') || 'I am a rider'}
+                    </ModalChoiceTitle>
                     <ModalChoiceDescription>
-                      Viaje com conforto, segurança e economia para qualquer destino.
+                      {translate('login.modal_choice_rider_desc') || 'Ride with comfort, safety, and savings anywhere.'}
                     </ModalChoiceDescription>
                   </ModalChoiceContent>
                   <Feather name="chevron-right" size={22} color="#CD2379" />
@@ -603,9 +609,11 @@ export default function Login() {
                     <MaterialCommunityIcons name="car" size={RFValue(24)} color="#070b14" />
                   </ModalChoiceIconBox>
                   <ModalChoiceContent>
-                    <ModalChoiceTitle>Sou motorista</ModalChoiceTitle>
+                    <ModalChoiceTitle>
+                      {translate('login.modal_choice_driver_title') || 'I am a driver'}
+                    </ModalChoiceTitle>
                     <ModalChoiceDescription>
-                      Dirija no seu horário, seja seu próprio chefe e aumente seus ganhos.
+                      {translate('login.modal_choice_driver_desc') || 'Drive on your schedule, be your own boss, and boost your earnings.'}
                     </ModalChoiceDescription>
                   </ModalChoiceContent>
                   <Feather name="chevron-right" size={22} color="#00F0FF" />
@@ -615,7 +623,9 @@ export default function Login() {
                   activeOpacity={0.7}
                   onPress={() => setModalChoiceRegister(false)}
                 >
-                  <ModalCloseButtonText>Cancelar</ModalCloseButtonText>
+                  <ModalCloseButtonText>
+                    {translate('home.text_cancel') || 'Cancel'}
+                  </ModalCloseButtonText>
                 </ModalCloseButton>
               </ModalCard>
             </ModalBackdrop>

@@ -20,19 +20,20 @@ const normalizeTranslate = {
 };
 
 const androidLanguage = async () => {
+  const v1Migrated = await AsyncStorage.getItem('@app_default_en_v1');
+  if (!v1Migrated) {
+    await AsyncStorage.setItem('@app_default_en_v1', 'true');
+    await AsyncStorage.setItem('@language', 'en_US');
+    return 'en_US';
+  }
   const language = await AsyncStorage.getItem('@language');
   if (language) {
     return language;
   }
 
-  let locale = await NativeModules.I18nManager.localeIdentifier;
-  locale = switchIosLanguage(locale);
-  await AsyncStorage.setItem(
-    '@language',
-    locale || 'en_US',
-  );
-
-  return locale || 'en_US';
+  const defaultLocale = 'en_US';
+  await AsyncStorage.setItem('@language', defaultLocale);
+  return defaultLocale;
 };
 
 const switchIosLanguage = (locale: string) => {
@@ -58,21 +59,16 @@ const switchIosLanguage = (locale: string) => {
 
 const iosSetLanguage = async () => {
   try {
+    const v1Migrated = await AsyncStorage.getItem('@app_default_en_v1');
+    if (!v1Migrated) {
+      await AsyncStorage.setItem('@app_default_en_v1', 'true');
+      await AsyncStorage.setItem('@language', 'en_US');
+      return 'en_US';
+    }
     const locale = await AsyncStorage.getItem('@language');
     if (locale) return locale;
-
-    const settings = NativeModules?.SettingsManager?.settings;
-    const appleLocale =
-      settings?.AppleLocale ||
-      (Array.isArray(settings?.AppleLanguages)
-        ? settings.AppleLanguages[0]
-        : null) ||
-      'en_US';
-
-    const normalizedLocale = switchIosLanguage(String(appleLocale));
-    await AsyncStorage.setItem('@language', normalizedLocale);
-
-    return normalizedLocale;
+    await AsyncStorage.setItem('@language', 'en_US');
+    return 'en_US';
   } catch (error) {
     const fallback = 'en_US';
     try {

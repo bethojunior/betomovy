@@ -331,6 +331,21 @@ export default {
     welcome_back_title: 'Bem-vindo de volta!',
     welcome_back_description:
       'Nossa IA detectou um login já existente em sua conta. Prosseguindo para o acesso de sua conta.',
+    tagline: 'Mobilidade urbana inteligente',
+    profile_rider: 'PASSAGEIRO',
+    profile_rider_subtitle: 'Quero viajar',
+    profile_driver: 'MOTORISTA',
+    profile_driver_subtitle: 'Quero dirigir',
+    rider_access: 'Acesso do Passageiro',
+    driver_access: 'Acesso do Motorista',
+    btn_enter_driver: 'ENTRAR COMO MOTORISTA',
+    btn_enter_passenger: 'ENTRAR COMO PASSAGEIRO',
+    modal_choice_title: 'Como deseja se cadastrar?',
+    modal_choice_subtitle: 'Escolha o seu perfil para iniciar o cadastro na Movy',
+    modal_choice_rider_title: 'Sou passageiro',
+    modal_choice_rider_desc: 'Viaje com conforto, segurança e economia para qualquer destino.',
+    modal_choice_driver_title: 'Sou motorista',
+    modal_choice_driver_desc: 'Dirija no seu horário, seja seu próprio chefe e aumente seus ganhos.',
   },
   myProfile: {
     message_alert_camera_permission:
