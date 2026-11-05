@@ -147,8 +147,11 @@ class CustomerController extends ApiController
             $customer = (new CustomerDao)->findByUser($user->getIdUser());
             $result = $user->toStdClass();
             if ($customer) {
-                $result->idCustomer = $customer->getIdCustomer();
-                $result->customerId = $customer->getIdCustomer();
+                $customerId = is_object($customer) && method_exists($customer, 'getIdCustomer')
+                    ? $customer->getIdCustomer()
+                    : ($customer->idCustomer ?? $customer->customerId ?? null);
+                $result->idCustomer = $customerId;
+                $result->customerId = $customerId;
             }
             echo $this->returnSuccess("Cadastrado com sucesso", $result);
         } catch (Exception $e) {
