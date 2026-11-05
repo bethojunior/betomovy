@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import {
@@ -8,6 +8,7 @@ import {
   TouchableNativeFeedback,
   TouchableOpacity,
   Text,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from '@expo/vector-icons/FontAwesome5';
 import Colors from '../../components/Colors';
@@ -17,33 +18,78 @@ import { useLocal } from '../../contexts/local';
 import { translate } from '../../locales';
 import { styles } from './styles';
 import { useAuth } from '../../../context/auth';
+import * as Location from 'expo-location';
 
 export default function LocalMap({ route, navigation }) {
   const { isGuest } = useAuth();
-  const { places, addPlaceSelected, updateListPlaces } = useLocal();
+  const { places, addPlaceSelected, updateListPlaces, position: contextPosition } = useLocal();
   const { place } = route.params;
   const [position, setPosition] = useState(null);
+  const [loadingGps, setLoadingGps] = useState(true);
 
-  const getValidLatitude = () => {
-    if (position?.latitude) return position.latitude;
-    const lat = parseFloat(place?.latitude);
-    return isNaN(lat) ? -14.235 : lat;
-  };
+  // Inicializa posição a partir do place recebido ou do contexto ou do GPS
+  useEffect(() => {
+    const initPosition = async () => {
+      // 1. Se o place já tem coordenadas válidas, use-as
+      const placeLat = parseFloat(place?.latitude);
+      const placeLng = parseFloat(place?.longitude);
+      if (!isNaN(placeLat) && !isNaN(placeLng) && placeLat !== 0 && placeLng !== 0) {
+        setPosition({ latitude: placeLat, longitude: placeLng, latitudeDelta: 0.0025, longitudeDelta: 0.0025 });
+        setLoadingGps(false);
+        return;
+      }
 
-  const getValidLongitude = () => {
-    if (position?.longitude) return position.longitude;
-    const lng = parseFloat(place?.longitude);
-    return isNaN(lng) ? -51.9253 : lng;
-  };
+      // 2. Se o contexto já tem posição, use-a
+      if (contextPosition?.latitude && contextPosition?.longitude) {
+        setPosition({ latitude: contextPosition.latitude, longitude: contextPosition.longitude, latitudeDelta: 0.0025, longitudeDelta: 0.0025 });
+        setLoadingGps(false);
+        return;
+      }
+
+      // 3. Obter posição do GPS
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const last = await Location.getLastKnownPositionAsync().catch(() => null);
+          if (last?.coords) {
+            setPosition({ latitude: last.coords.latitude, longitude: last.coords.longitude, latitudeDelta: 0.0025, longitudeDelta: 0.0025 });
+            setLoadingGps(false);
+            return;
+          }
+          const current = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }).catch(() => null);
+          if (current?.coords) {
+            setPosition({ latitude: current.coords.latitude, longitude: current.coords.longitude, latitudeDelta: 0.0025, longitudeDelta: 0.0025 });
+          }
+        }
+      } catch (e) {
+        console.warn('LocalMap: erro GPS', e);
+      } finally {
+        setLoadingGps(false);
+      }
+    };
+
+    initPosition();
+  }, []);
+
+  const getValidLatitude = () => position?.latitude ?? 0;
+  const getValidLongitude = () => position?.longitude ?? 0;
 
   const latitude = getValidLatitude();
   const longitude = getValidLongitude();
 
-  if (isNaN(latitude) || isNaN(longitude)) {
+  if (loadingGps) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={Colors.PRIMARY} />
+      </View>
+    );
+  }
+
+  if (!position || isNaN(latitude) || isNaN(longitude) || latitude === 0) {
     return (
       <View style={styles.container}>
         <Text style={{ padding: 20, textAlign: 'center' }}>
-          {translate('localMap.error_invalid_coordinates') || 'Coordenadas inválidas'}
+          {translate('localMap.error_invalid_coordinates') || 'Não foi possível obter sua localização. Verifique as permissões de GPS.'}
         </Text>
       </View>
     );
@@ -65,6 +111,8 @@ export default function LocalMap({ route, navigation }) {
           setPosition(result);
         }}
         userInterfaceStyle="light"
+        showsUserLocation={true}
+        showsMyLocationButton={false}
       />
 
       <Icon

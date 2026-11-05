@@ -23,22 +23,22 @@ export default function AddAddressMap(props) {
 
   const getValidLatitude = () => {
     const lat = typeof position?.latitude === 'number' ? position.latitude : parseFloat(position?.latitude);
-    return isNaN(lat) ? -14.235 : lat;
+    return (!isNaN(lat) && lat !== 0) ? lat : null;
   };
 
   const getValidLongitude = () => {
     const lng = typeof position?.longitude === 'number' ? position.longitude : parseFloat(position?.longitude);
-    return isNaN(lng) ? -51.9253 : lng;
+    return (!isNaN(lng) && lng !== 0) ? lng : null;
   };
 
   const latitude = getValidLatitude();
   const longitude = getValidLongitude();
 
-  if (isNaN(latitude) || isNaN(longitude)) {
+  if (latitude === null || longitude === null) {
     return (
       <View style={styles.container}>
         <Text style={{ padding: 20, textAlign: 'center' }}>
-          {translate('addAddressMap.error_invalid_coordinates') || 'Coordenadas inválidas'}
+          {translate('addAddressMap.error_invalid_coordinates') || 'Coordenadas inválidas. Por favor, habilite o GPS.'}
         </Text>
       </View>
     );
@@ -138,8 +138,8 @@ export default function AddAddressMap(props) {
                 number: numberAddress,
                 complement,
                 referencePoint,
-                latitude: getValidLatitude(),
-                longitude: getValidLongitude(),
+                latitude: latitude,
+                longitude: longitude,
               };
 
               if (requestObject.number.length <= 0) delete requestObject.number;

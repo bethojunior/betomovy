@@ -4,7 +4,7 @@ import MapView from 'react-native-maps';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 
-import { BackHandler } from 'react-native';
+import { BackHandler, ActivityIndicator, View } from 'react-native';
 import { useTrip } from '../../contexts/Trip';
 import { useLocal } from '../../contexts/local';
 import LookUpAddressesModal from '../../components/LookUpAddressesModal';
@@ -87,15 +87,17 @@ export default function Trip({ route }) {
   const [visibleAlertProtect, setVisibleAlertProtect] = useState(false);
   const [visibleWho, setVisibleWho] = useState(false);
   const [visibleArrow, setVisibleArrow] = useState(false);
-  const [region] = useState(
-    position
-      ? {
-          latitude: position.latitude,
-          longitude: position.longitude,
-          latitudeDelta: 0.001,
-          longitudeDelta: 0.001,
-        }
-      : null,
+  const region = useMemo(
+    () =>
+      position
+        ? {
+            latitude: position.latitude,
+            longitude: position.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          }
+        : null,
+    [position?.latitude, position?.longitude],
   );
   const [destinationPerson, setDestinationPerson] = useState(false);
   const [visibleOptionTravel, setVisibleOptionTravel] = useState<boolean>(true);
@@ -567,7 +569,7 @@ export default function Trip({ route }) {
       ? Number(origin[param])
       : Number(lastOrigin[param])
         ? Number(lastOrigin[param])
-        : position[param];
+        : Number(position?.[param] ?? 0);
   };
 
   const handleBackButtonOnAddress = (type: string) => {
@@ -642,6 +644,11 @@ export default function Trip({ route }) {
           handleSubmissModal={handleCloseModalScheduled}
         />
 
+        {!position && (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        )}
         {position && (
           <>
             <TripMap
