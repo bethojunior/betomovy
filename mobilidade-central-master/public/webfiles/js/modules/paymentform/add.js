@@ -34,7 +34,8 @@
                 return;
             }
 
-            if (!ValidateForm.validateCpf(document.getElementById("documentCard").value.replace(/\D/g, ""))) {
+            const rawDoc = (document.getElementById("documentCard")?.value || "").replace(/\D/g, "");
+            if (PaymentCard.isMercadoPagoAcquirer() && rawDoc.length > 0 && !ValidateForm.validateCpf(rawDoc)) {
                 SwalCustom.messageDialog("", "Cpf inválido", undefined, "warning");
                 return false;
             }

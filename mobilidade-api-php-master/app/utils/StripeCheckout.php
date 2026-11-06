@@ -67,9 +67,10 @@ class StripeCheckout implements CheckoutInterface
         $amountInCents = (int) round(((float) $this->value) * 100);
         // Reserva (manual) na criação da viagem; captura real em finishPayment/captureAmount
         $captureMethod = !empty($this->parameters['capture']) ? 'automatic' : 'manual';
+        $currency = strtolower($this->parameters['currency'] ?? 'usd');
         $payload = [
             'amount' => $amountInCents,
-            'currency' => 'brl',
+            'currency' => $currency,
             'description' => $this->description,
             'capture_method' => $captureMethod,
             'confirm' => 'true',
@@ -103,9 +104,10 @@ class StripeCheckout implements CheckoutInterface
     public function reserveAmount()
     {
         $amountInCents = (int) round(((float) $this->value) * 100);
+        $currency = strtolower($this->parameters['currency'] ?? 'usd');
         $payload = [
             'amount' => $amountInCents,
-            'currency' => 'brl',
+            'currency' => $currency,
             'description' => $this->description,
             'capture_method' => 'manual',
             'confirm' => 'true',

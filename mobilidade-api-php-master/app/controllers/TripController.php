@@ -262,12 +262,30 @@ class TripController extends ApiController
                 }
             }
 
-            // 6. Limpa do realtime / redis se existir
+            // 6. Limpa do realtime / redis se existir e notifica motorista e passageiro
             try {
                 $tripRealtime = new \app\realtime\TripRealtime();
                 $tripRealtime->setTripReference($tripReference);
                 $tripRealtime->deleteTrip();
             } catch (\Throwable $eRt) {}
+
+            try {
+                $redis = new \app\utils\RedisUtil();
+                $cancelPayload = json_encode([
+                    'type' => 'removed',
+                    'data' => [
+                        'event' => 'trip-deleted',
+                        'tripReference' => $tripReference,
+                        'status' => 'canceled',
+                        'canceledBy' => 'central',
+                        'userId' => $tripRow['userId'] ?? null,
+                        'driverId' => $tripRow['driverId'] ?? null,
+                    ]
+                ]);
+                $redis->publish('trip-events', $cancelPayload);
+                $redis->publish("trip-canceled-{$tripReference}", $cancelPayload);
+                $redis->publish("trip-updated-{$tripReference}", $cancelPayload);
+            } catch (\Throwable $ePub) {}
 
             echo $this->returnSuccess("Viagem cancelada com sucesso", [
                 'status' => true,

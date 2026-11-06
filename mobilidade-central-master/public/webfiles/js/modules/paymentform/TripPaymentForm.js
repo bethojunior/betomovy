@@ -68,25 +68,41 @@ function initCardsModal() {
     function refreshCardsModalList() {
         return new Promise(resolve => {
             const cards = Session.getLocal("cards") || [];
+            const currentSelected = Session.getLocal("cardSelected") || {};
+            const currentId = currentSelected.idCard || currentSelected.cardId || currentSelected.id || currentSelected.mpCardId;
+
             elementProperty.getElement("#listCardPaymentModal", element => {
                 if (!cards.length) {
-                    element.innerHTML = `<li class="no-cards-msg" style="padding: 16px; text-align: center; color: #64748b; font-size: 14px; cursor: default; list-style: none;">
-                        <i class="material-icons" style="font-size: 32px; color: #94a3b8; display: block; margin: 0 auto 6px;">credit_card_off</i>
-                        Nenhum cartão cadastrado. Clique em Adicionar cartão abaixo.
+                    element.innerHTML = `<li class="no-cards-msg" style="padding: 24px 16px; text-align: center; color: #64748b; font-size: 14px; cursor: default; list-style: none;">
+                        <i class="material-icons" style="font-size: 38px; color: #94a3b8; display: block; margin: 0 auto 8px;">credit_card_off</i>
+                        <strong style="display: block; font-size: 15px; color: #1e293b; margin-bottom: 4px;">Nenhum cartão cadastrado</strong>
+                        <span style="font-size: 13px; color: #64748b;">No cards registered yet. Clique em "Adicionar cartão" abaixo.</span>
                     </li>`;
                     resolve();
                     return;
                 }
 
                 element.innerHTML = cards.map(card => {
+                    const thisId = card.idCard || card.cardId || card.id || card.mpCardId;
+                    const isSelected = currentId && thisId && String(currentId) === String(thisId);
                     const last4 = card.last4 || card.last_four || card.lastFourDigits || card.mpLastFourDigits || (card.number ? String(card.number).slice(-4) : "••••");
-                    const brand = (card.brand || card.paymentMethodName || card.mpPaymentMethodName || card.mpPaymentMethodId || "Cartão").toUpperCase();
+                    const brand = (card.brand || card.paymentMethodName || card.mpPaymentMethodName || card.mpPaymentMethodId || "Card").toUpperCase();
+                    const exp = (card.expirationMonth && card.expirationYear) ? `${String(card.expirationMonth).padStart(2, '0')}/${String(card.expirationYear).slice(-2)}` : "";
                     const safe = JSON.stringify(card).replace(/'/g, "&apos;");
-                    return `<li class="cards-list-select" value='${safe}' style="display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid #eee; cursor: pointer;">
-                        <i class="material-icons" style="margin-right: 14px; font-size: 26px; color: #2563eb;">credit_card</i>
-                        <p style="margin: 0; font-size: 15px; font-weight: 600; color: #1e293b;">
-                            <span style="color: #2563eb; margin-right: 6px;">${brand}</span> •••• ${last4}
-                        </p>
+
+                    return `<li class="cards-list-select ${isSelected ? 'active' : ''}" value='${safe}' style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #e2e8f0; cursor: pointer; background: ${isSelected ? '#eff6ff' : '#ffffff'}; transition: background 0.15s ease;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 44px; height: 30px; border-radius: 6px; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">
+                                ${brand}
+                            </div>
+                            <div>
+                                <p style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a;">•••• •••• •••• ${last4}</p>
+                                <span style="font-size: 12px; color: #64748b;">${exp ? `Exp: ${exp}` : 'Credit/Debit Card'}</span>
+                            </div>
+                        </div>
+                        <button type="button" style="border: none; background: ${isSelected ? '#22c55e' : '#0284c7'}; color: #ffffff; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">
+                            ${isSelected ? '✓ Selecionado' : 'Selecionar'}
+                        </button>
                     </li>`;
                 }).join("");
                 resolve();

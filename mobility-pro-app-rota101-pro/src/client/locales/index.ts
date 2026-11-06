@@ -20,9 +20,9 @@ const normalizeTranslate = {
 };
 
 const androidLanguage = async () => {
-  const v1Migrated = await AsyncStorage.getItem('@app_default_en_v1');
+  const v1Migrated = await AsyncStorage.getItem('@app_default_en_v3');
   if (!v1Migrated) {
-    await AsyncStorage.setItem('@app_default_en_v1', 'true');
+    await AsyncStorage.setItem('@app_default_en_v3', 'true');
     await AsyncStorage.setItem('@language', 'en_US');
     return 'en_US';
   }
@@ -60,9 +60,9 @@ const switchIosLanguage = (locale: string) => {
 
 const iosSetLanguage = async () => {
   try {
-    const v1Migrated = await AsyncStorage.getItem('@app_default_en_v1');
+    const v1Migrated = await AsyncStorage.getItem('@app_default_en_v3');
     if (!v1Migrated) {
-      await AsyncStorage.setItem('@app_default_en_v1', 'true');
+      await AsyncStorage.setItem('@app_default_en_v3', 'true');
       await AsyncStorage.setItem('@language', 'en_US');
       return 'en_US';
     }

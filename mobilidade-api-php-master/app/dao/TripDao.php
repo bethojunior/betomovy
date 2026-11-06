@@ -666,7 +666,7 @@ class TripDao extends BaseDao
                 null;
 
 
-            if ($this->queryTrip->cityConfig->showNetValueForDriverOnCall == 1) {
+            if (!empty($this->queryTrip->cityConfig) && !empty($this->queryTrip->cityConfig->showNetValueForDriverOnCall) && $this->queryTrip->cityConfig->showNetValueForDriverOnCall == 1) {
                 $driverValue = $this->findDriverNetPrice($tripReference)->driverValue ?? null;
 
                 $this->queryTrip->driverValue = $driverValue;

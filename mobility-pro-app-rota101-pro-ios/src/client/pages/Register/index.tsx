@@ -275,9 +275,6 @@ export function Register() {
 
     const showSub = Keyboard.addListener(showEvent, e => {
       setKeyboardHeight(e.endCoordinates.height);
-      setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 100);
     });
     const hideSub = Keyboard.addListener(hideEvent, () => {
       setKeyboardHeight(0);
@@ -613,17 +610,17 @@ export function Register() {
         registered_in: 'mobilidade',
         phone: pPhone.replace(/\D/g, ''),
         password: pPassword,
-        cityId: pCity?.id || 1,
+        cityId: pCity?.id || 5605,
       };
 
       const { data } = await apiMain.post('Customer/Register', {
         stdObject: [payload],
       });
 
-      if (!data || !data.status) {
+      if (!data || data.status !== true) {
         Alert.alert(
-          'Atenção',
-          data?.message || 'Não foi possível concluir o cadastro. Verifique os dados e tente novamente.'
+          t('Attention', 'Atenção'),
+          data?.message || t('Unable to complete registration. Please check your data and try again.', 'Não foi possível concluir o cadastro. Verifique os dados e tente novamente.')
         );
         return;
       }
@@ -791,18 +788,124 @@ export function Register() {
         driverPayload.photo = dPhoto;
       }
 
+      const driverObj = {
+        name: dName.trim(),
+        email: dEmail.trim().toLowerCase(),
+        document: cleanSsn,
+        dateOfBirth: formattedDate,
+        phone: dPhone.replace(/\D/g, ''),
+        password: dPassword,
+        userTypeId: selectedCategoryId,
+        registered_in: 'mobilidade',
+        cityId: dCity?.id || 5605,
+        docs: [
+          { docId: 1, text: "Driver's License" },
+          { docId: 2, text: "Vehicle insurance and registration" },
+          { docId: 6, text: "Proof of residence" },
+          { docId: 10, text: "SCN" },
+        ],
+      };
+
+      const vehicleObj = {
+        licensePlate: dPlate.toUpperCase().trim() || ('MOV' + Math.floor(1000 + Math.random() * 9000)),
+        model: dVehicleModel.trim() || 'Standard',
+        brand: (dVehicleModel.trim().split(' ')[0]) || 'Vehicle',
+        color: dVehicleColor.trim() || 'Black',
+        year: dVehicleYear.trim() || '2022',
+      };
+
+      const formData = new FormData();
+      formData.append('stdObject', JSON.stringify({
+        driver: driverObj,
+        car: vehicleObj,
+      }));
+
+      if (dPhoto) {
+        formData.append('PROFILE', {
+          uri: dPhoto,
+          type: 'image/jpeg',
+          name: 'profile.jpg',
+        } as any);
+      }
+      if (dDocLicense) {
+        formData.append('DOC_1', {
+          uri: dDocLicense,
+          type: 'image/jpeg',
+          name: 'drivers_license.jpg',
+        } as any);
+        formData.append('CNH', {
+          uri: dDocLicense,
+          type: 'image/jpeg',
+          name: 'drivers_license.jpg',
+        } as any);
+      }
+      if (dDocRegistration) {
+        formData.append('DOC_2', {
+          uri: dDocRegistration,
+          type: 'image/jpeg',
+          name: 'vehicle_registration.jpg',
+        } as any);
+        formData.append('CRLV', {
+          uri: dDocRegistration,
+          type: 'image/jpeg',
+          name: 'vehicle_registration.jpg',
+        } as any);
+      }
+      if (dDocResidence) {
+        formData.append('DOC_6', {
+          uri: dDocResidence,
+          type: 'image/jpeg',
+          name: 'proof_of_residence.jpg',
+        } as any);
+        formData.append('DOC_4', {
+          uri: dDocResidence,
+          type: 'image/jpeg',
+          name: 'proof_of_residence.jpg',
+        } as any);
+      }
+      if (dDocInsurance) {
+        formData.append('DOC_10', {
+          uri: dDocInsurance,
+          type: 'image/jpeg',
+          name: 'insurance.jpg',
+        } as any);
+        formData.append('DOC_3', {
+          uri: dDocInsurance,
+          type: 'image/jpeg',
+          name: 'insurance.jpg',
+        } as any);
+      }
+
       let response: any;
       try {
-        response = await apiMain.post('Customer/registerPartner', driverPayload);
-      } catch (errPartner) {
-        response = await apiMain.post('PreRegisterDriverMk/insert', driverPayload);
+        response = await apiMain.post('Driver/Register', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 45000,
+        });
+      } catch (errMultipart) {
+        response = await apiMain.post('Driver/Register', {
+          stdObject: {
+            driver: driverObj,
+            car: vehicleObj,
+          }
+        }, { timeout: 30000 });
+      }
+
+      if (!response?.data || response.data.status !== true) {
+        Alert.alert(
+          t('Attention', 'Atenção'),
+          response?.data?.message || t('Driver registration could not be completed. Please check your data.', 'Não foi possível concluir o cadastro de motorista. Verifique os dados.')
+        );
+        return;
       }
 
       const resolvedId =
         response?.data?.idDriver ||
         response?.data?.driverId ||
-        response?.data?.idCustomer ||
-        response?.data?.customerId ||
+        response?.data?.data?.idDriver ||
+        response?.data?.data?.driverId ||
+        response?.data?.data?.idUser ||
+        response?.data?.data?.userId ||
         response?.data?.idUser ||
         response?.data?.userId ||
         response?.data?.id;
@@ -952,7 +1055,7 @@ export function Register() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
       >
         <ScrollContainer
@@ -2217,6 +2320,34 @@ export function Register() {
             )}
           </ContentWrapper>
         </ScrollContainer>
+        {keyboardHeight > 0 && (
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => Keyboard.dismiss()}
+            style={{
+              position: 'absolute',
+              right: 18,
+              bottom: Platform.OS === 'ios' ? keyboardHeight + 10 : 20,
+              backgroundColor: '#CD2379',
+              paddingVertical: 10,
+              paddingHorizontal: 18,
+              borderRadius: 24,
+              flexDirection: 'row',
+              alignItems: 'center',
+              zIndex: 99999,
+              elevation: 10,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.35,
+              shadowRadius: 6,
+            }}
+          >
+            <Feather name="check" size={16} color="#ffffff" style={{ marginRight: 6 }} />
+            <Text style={{ color: '#ffffff', fontWeight: 'bold', fontSize: 13 }}>
+              {t('Done', 'OK / Fechar')}
+            </Text>
+          </TouchableOpacity>
+        )}
       </KeyboardAvoidingView>
     </BackgroundContainer>
   );

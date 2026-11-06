@@ -657,6 +657,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       try {
         const check = await verifyExistTrip(activeRef);
         if (
+          !check ||
           check?.status === STATUS_CANCELED ||
           check?.status === 'canceled' ||
           check?.status === STATUS_BACK_OFF ||
@@ -666,7 +667,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
           verify(activeRef);
         }
       } catch (err) {}
-    }, 6000);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, [tripAccepted?.tripReference, tripAccepted?.status]);
