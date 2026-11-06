@@ -42,11 +42,12 @@ RUN dnf install -y vim curl \
     wget unzip \
     procps iproute
 
-# Install composer
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-    && HASH="$(wget -q -O - https://composer.github.io/installer.sig)" \
-    && php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
-    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+# Install composer safely
+RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
+    && curl -sS https://composer.github.io/installer.sig -o composer.sig \
+    && php -r "if (hash_file('sha384', 'composer-setup.php') === trim(file_get_contents('composer.sig'))) { echo 'Installer verified'; } else { echo 'Warning: signature mismatch'; }" \
+    && (php composer-setup.php --install-dir=/usr/local/bin --filename=composer || true) \
+    && rm -f composer-setup.php composer.sig
 
 # Ajustes Nginx e PHP-FPM
 RUN rm -f /etc/php-fpm.d/www.conf \

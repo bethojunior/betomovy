@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-10-30 14:20 UTC - Restore monitor/central path routing (was falling to site 404)
+# Deploy trigger: 2026-11-06 20:15 UTC - Deploy pending fixes & optimize container builds
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

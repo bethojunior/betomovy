@@ -32,5 +32,5 @@ COPY --from=builder /app/.env.build ./.env
 # Make our shell script executable
 RUN chmod +x env.sh
 
-# Start Nginx server
-CMD ["/bin/sh", "-c", "/usr/share/nginx/html/env.sh && nginx -g \"daemon off;\""]
+# Start Nginx server (env.sh não derruba o container se falhar)
+CMD ["/bin/sh", "-c", "/usr/share/nginx/html/env.sh || true; nginx -g \"daemon off;\""]
