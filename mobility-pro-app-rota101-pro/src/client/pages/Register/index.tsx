@@ -1105,7 +1105,10 @@ export function Register() {
                 <ProfileGridTitle active={!isDriver}>
                   {(() => {
                     const txt = t('profile_rider') || t('login.profile_rider');
-                    return (!txt || txt === 'profile_rider' || txt === 'login.profile_rider' || txt.includes('missing')) ? 'PASSENGER' : txt;
+                    if (!txt || txt.toLowerCase().includes('rider') || txt.includes('missing')) {
+                      return 'PASSENGER';
+                    }
+                    return txt;
                   })()}
                 </ProfileGridTitle>
                 <ProfileGridSubtitle active={!isDriver}>
