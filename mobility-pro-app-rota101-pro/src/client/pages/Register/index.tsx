@@ -1103,7 +1103,10 @@ export function Register() {
                   />
                 </ProfileIconBadge>
                 <ProfileGridTitle active={!isDriver}>
-                  {t('profile_rider') || 'PASSENGER'}
+                  {(() => {
+                    const txt = t('profile_rider') || t('login.profile_rider');
+                    return (!txt || txt === 'profile_rider' || txt === 'login.profile_rider' || txt.includes('missing')) ? 'PASSENGER' : txt;
+                  })()}
                 </ProfileGridTitle>
                 <ProfileGridSubtitle active={!isDriver}>
                   {t('I want to travel', 'Quero viajar')}
@@ -1124,7 +1127,10 @@ export function Register() {
                   />
                 </ProfileIconBadge>
                 <ProfileGridTitle active={isDriver}>
-                  {t('DRIVER', 'MOTORISTA')}
+                  {(() => {
+                    const txt = t('profile_driver') || t('login.profile_driver');
+                    return (!txt || txt === 'profile_driver' || txt === 'login.profile_driver' || txt.includes('missing')) ? 'DRIVER' : txt;
+                  })()}
                 </ProfileGridTitle>
                 <ProfileGridSubtitle active={isDriver}>
                   {t('I want to drive', 'Quero dirigir')}

@@ -341,10 +341,16 @@ export default function Login() {
                     />
                   </ProfileIconBadge>
                   <ProfileGridTitle active={!driverSelected}>
-                    {translate('login.profile_rider') || 'PASSENGER'}
+                    {(() => {
+                      const txt = translate('login.profile_rider') || translate('profile_rider');
+                      return (!txt || txt === 'login.profile_rider' || txt === 'profile_rider' || txt.includes('missing')) ? 'PASSENGER' : txt;
+                    })()}
                   </ProfileGridTitle>
                   <ProfileGridSubtitle active={!driverSelected}>
-                    {translate('login.profile_rider_subtitle') || 'I want to travel'}
+                    {(() => {
+                      const txt = translate('login.profile_rider_subtitle') || translate('profile_rider_subtitle');
+                      return (!txt || txt === 'login.profile_rider_subtitle' || txt === 'profile_rider_subtitle' || txt.includes('missing')) ? 'I want to travel' : txt;
+                    })()}
                   </ProfileGridSubtitle>
                 </ProfileGridItem>
 
@@ -362,10 +368,16 @@ export default function Login() {
                     />
                   </ProfileIconBadge>
                   <ProfileGridTitle active={driverSelected}>
-                    {translate('login.profile_driver') || 'DRIVER'}
+                    {(() => {
+                      const txt = translate('login.profile_driver') || translate('profile_driver');
+                      return (!txt || txt === 'login.profile_driver' || txt === 'profile_driver' || txt.includes('missing')) ? 'DRIVER' : txt;
+                    })()}
                   </ProfileGridTitle>
                   <ProfileGridSubtitle active={driverSelected}>
-                    {translate('login.profile_driver_subtitle') || 'I want to drive'}
+                    {(() => {
+                      const txt = translate('login.profile_driver_subtitle') || translate('profile_driver_subtitle');
+                      return (!txt || txt === 'login.profile_driver_subtitle' || txt === 'profile_driver_subtitle' || txt.includes('missing')) ? 'I want to drive' : txt;
+                    })()}
                   </ProfileGridSubtitle>
                 </ProfileGridItem>
               </ProfileGridContainer>

@@ -1,4 +1,8 @@
 export default {
+  profile_rider: 'PASSAGEIRO',
+  profile_rider_subtitle: 'Quero viajar',
+  profile_driver: 'MOTORISTA',
+  profile_driver_subtitle: 'Quero dirigir',
   tab: {
     home: 'Home',
     services: 'Serviços',
