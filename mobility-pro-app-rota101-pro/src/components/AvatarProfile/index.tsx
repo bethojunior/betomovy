@@ -7,23 +7,47 @@ import { useTheme } from 'styled-components/native';
 import userImage from '../../client/assets/images/user.png';
 import { AvatarImage, Container, LoadingOverlay, MenuIconBadge } from './styles';
 
-function resolveAvatarUri(rawUri?: string | null): string | null {
-  if (!rawUri || typeof rawUri !== 'string') return null;
+const STORAGE_BASE = 'https://minio.704app.com.br/rota101fb704/';
+
+function photoCandidates(rawUri?: string | null): string[] {
+  if (!rawUri || typeof rawUri !== 'string') return [];
   const trimmed = rawUri.trim();
-  if (!trimmed || trimmed === 'user.png' || trimmed.endsWith('/user.png') || trimmed === 'null' || trimmed === 'undefined') return null;
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('file://')) {
-    return trimmed;
+  if (!trimmed || trimmed === 'user.png' || trimmed.endsWith('/user.png') || trimmed === 'null' || trimmed === 'undefined') {
+    return [];
   }
-  if (trimmed.startsWith('/')) {
-    return `https://api.movymob.com${trimmed}`;
+
+  const urls: string[] = [];
+  const push = (value?: string) => {
+    if (!value || urls.includes(value)) return;
+    urls.push(value);
+  };
+
+  if (trimmed.startsWith('file://')) return [trimmed];
+
+  const markerIndex = ['driver/profile/', 'driver/docs/', 'customer/profile/']
+    .map(marker => trimmed.indexOf(marker))
+    .find(index => index >= 0);
+  const relative = markerIndex !== undefined && markerIndex >= 0
+    ? trimmed.slice(markerIndex)
+    : trimmed.replace(/^\/+/, '');
+
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) push(trimmed);
+  push(`${STORAGE_BASE}${relative.replace(/^\/+/, '')}`);
+  if (relative.includes('/compressed/')) {
+    push(`${STORAGE_BASE}${relative.replace('/compressed/', '/')}`);
+  } else if (relative.includes('profile/')) {
+    push(`${STORAGE_BASE}${relative.replace('profile/', 'profile/compressed/')}`);
   }
-  if (trimmed.includes('customer/profile/') || trimmed.includes('driver/profile/') || trimmed.includes('driver/docs/')) {
-    return `https://api.movymob.com/${trimmed.replace(/^\/+/, '')}`;
+  if (!relative.includes('/')) {
+    push(`${STORAGE_BASE}driver/profile/compressed/${relative}`);
+    push(`${STORAGE_BASE}driver/profile/${relative}`);
   }
-  if (trimmed.startsWith('driver_') || trimmed.includes('driver')) {
-    return `https://api.movymob.com/driver/profile/${trimmed}`;
-  }
-  return `https://api.movymob.com/customer/profile/compressed/${trimmed}`;
+
+  return urls;
+}
+
+function resolveAvatarUri(rawUri?: string | null): string | null {
+  return photoCandidates(rawUri)[0] || null;
 }
 
 function isValidUri(uri?: string | null) {
@@ -51,7 +75,9 @@ export function AvatarProfile({
 }: AvatarProfileProps) {
   const theme = useTheme();
 
-  const resolved = resolveAvatarUri(uri);
+  const candidates = photoCandidates(uri);
+  const [candidateIndex, setCandidateIndex] = useState(0);
+  const resolved = candidates[candidateIndex] || null;
 
   const [displaySource, setDisplaySource] = useState<ImageSourcePropType>(
     !showPreloadOverlay && resolved ? { uri: resolved } : userImage,
@@ -62,7 +88,11 @@ export function AvatarProfile({
   );
 
   useEffect(() => {
-    const freshResolved = resolveAvatarUri(uri);
+    setCandidateIndex(0);
+  }, [uri]);
+
+  useEffect(() => {
+    const freshResolved = photoCandidates(uri)[candidateIndex] || null;
     if (!freshResolved) {
       setDisplaySource(userImage);
       setPendingUri(null);
@@ -75,7 +105,16 @@ export function AvatarProfile({
       setDisplaySource({ uri: freshResolved });
       setPendingUri(null);
     }
-  }, [uri, showPreloadOverlay]);
+  }, [uri, showPreloadOverlay, candidateIndex]);
+
+  const tryNextCandidate = () => {
+    if (candidateIndex + 1 < candidates.length) {
+      setCandidateIndex(candidateIndex + 1);
+      return;
+    }
+    setDisplaySource(userImage);
+    setPendingUri(null);
+  };
 
   const handlePreloadLoad = () => {
     if (!pendingUri) return;
@@ -85,8 +124,7 @@ export function AvatarProfile({
   };
 
   const handlePreloadError = () => {
-    setDisplaySource(userImage);
-    setPendingUri(null);
+    tryNextCandidate();
   };
 
   const isPreloading = pendingUri !== null;
@@ -99,7 +137,7 @@ export function AvatarProfile({
         borderColor={borderColor}
         borderWidth={borderWidth}
         resizeMode="cover"
-        onError={() => setDisplaySource(userImage)}
+        onError={tryNextCandidate}
       />
 
       {isPreloading && (

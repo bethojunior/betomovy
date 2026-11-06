@@ -17,6 +17,7 @@ import Mask from "../../../../services/Mask";
 import IconWhatsApp from "../../../../assets/whatsappIcon.svg";
 import IconGmail from "../../../../assets/gmailIcon.svg";
 import { Constants } from "../../../../utils/constants";
+import { getDriverPhotoUrl } from "../../../../utils/imageUtils";
 
 export const DriverProfile = ({
   profileImage,
@@ -27,9 +28,13 @@ export const DriverProfile = ({
   email,
   message,
 }: DriverProfileProps) => {
-  const imgSrc = profileImage
+  const primary = getDriverPhotoUrl(profileImage) || (profileImage
     ? (profileImage.startsWith("http") ? profileImage : `${baseImageLink || ""}${profileImage}`)
-    : Constants.defaultImgNotFound;
+    : null);
+  const fallback = primary?.includes("/compressed/")
+    ? primary.replace("/compressed/", "/")
+    : null;
+  const imgSrc = primary || Constants.defaultImgNotFound;
 
   return (
     <ProfileCard>
@@ -37,6 +42,10 @@ export const DriverProfile = ({
         <Avatar
           src={imgSrc}
           onError={(e) => {
+            if (fallback && e.currentTarget.src !== fallback) {
+              e.currentTarget.src = fallback;
+              return;
+            }
             e.currentTarget.onerror = null;
             e.currentTarget.src = Constants.defaultImgNotFound;
           }}

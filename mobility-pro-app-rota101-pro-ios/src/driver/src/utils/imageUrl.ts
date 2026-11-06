@@ -20,15 +20,19 @@ export const getProfileImageUrl = (
     return trimmedProfileImage;
   }
 
+  const storageBase = 'https://minio.704app.com.br/rota101fb704/';
+
   if (trimmedProfileImage.startsWith('/')) {
-    return `https://api.movymob.com${trimmedProfileImage}`;
+    return `${storageBase}${trimmedProfileImage.replace(/^\/+/, '')}`;
   }
 
   if (trimmedProfileImage.includes('driver/profile/') || trimmedProfileImage.includes('customer/profile/')) {
-    return `https://api.movymob.com/${trimmedProfileImage.replace(/^\/+/, '')}`;
+    const marker = trimmedProfileImage.includes('driver/profile/') ? 'driver/profile/' : 'customer/profile/';
+    const relative = trimmedProfileImage.slice(trimmedProfileImage.indexOf(marker));
+    return `${storageBase}${relative.replace(/^\/+/, '')}`;
   }
 
-  const host = storageUrl || fallbackHost || 'https://api.movymob.com/driver/profile/';
+  const host = storageUrl || fallbackHost || `${storageBase}driver/profile/compressed/`;
   return `${host.replace(/\/+$/, '')}/${trimmedProfileImage.replace(/^\/+/, '')}`;
 };
 
