@@ -21,7 +21,8 @@ if (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) 
 
 $uriLowerPath = strtolower(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH));
 if (strpos($uriLowerPath, '/customer/profile/') === 0 || strpos($uriLowerPath, '/customer/doc/') === 0 || strpos($uriLowerPath, '/driver/profile/') === 0 || strpos($uriLowerPath, '/driver/docs/') === 0 || strpos($uriLowerPath, '/driver/doc/') === 0) {
-    $staticFile = __DIR__ . parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    $staticFile = __DIR__ . $reqPath;
     if (file_exists($staticFile) && !is_dir($staticFile)) {
         $mime = 'image/jpeg';
         if (substr($staticFile, -4) === '.png') $mime = 'image/png';
@@ -31,6 +32,11 @@ if (strpos($uriLowerPath, '/customer/profile/') === 0 || strpos($uriLowerPath, '
         readfile($staticFile);
         exit(0);
     }
+    // Fallback: redireciona automaticamente para o storage MinIO oficial se não estiver em disco local
+    $s3Url = rtrim(getenv('S3_URL') ?: 'https://minio.704app.com.br/', '/');
+    $bucket = getenv('S3_BUCKET_NAME') ?: 'rota101fb704';
+    header("Location: {$s3Url}/{$bucket}" . $reqPath, true, 302);
+    exit(0);
 }
 if (in_array($uriLowerPath, ['/privacy', '/privacidade', '/privacy-policy', '/politica-de-privacidade', '/privacy.html', '/privacidade.html'])) {
     header("Content-Type: text/html; charset=utf-8");

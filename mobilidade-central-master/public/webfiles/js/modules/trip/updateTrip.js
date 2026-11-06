@@ -138,26 +138,94 @@ function initRace(trip) {
         element.innerHTML = `${brand} ${model} ${color}`.trim();
     });
     viewController.elementProperty.getElement(".image-profile-driver", element => {
-        let photoUrl = "";
-        const rawPhoto = driver.profileImage || driver.profileImageUrl || driver.driverImage || "";
-        if (rawPhoto) {
-            if (rawPhoto.startsWith("http://") || rawPhoto.startsWith("https://")) {
-                photoUrl = rawPhoto;
-            } else if (rawPhoto.startsWith("driver/profile/")) {
-                photoUrl = `https://api.movymob.com/${rawPhoto}`;
-            } else {
-                photoUrl = `https://api.movymob.com/driver/profile/compressed/${rawPhoto}`;
-            }
-        }
-        if (photoUrl) {
-            element.style.backgroundImage = `url('${photoUrl}'), url('/webfiles/img/icon/avatar.png')`;
-        } else {
-            element.style.backgroundImage = `url('/webfiles/img/icon/avatar.png')`;
-        }
         element.style.backgroundColor = '#e2e8f0';
         element.style.backgroundPosition = 'center';
         element.style.backgroundSize = 'cover';
         element.style.backgroundRepeat = 'no-repeat';
+
+        const fallbackAvatar = '/webfiles/img/icon/avatar.png';
+        const rawPhoto = (
+            driver.profileImage ||
+            driver.profileImageUrl ||
+            driver.driverImage ||
+            driver.profilePhoto ||
+            driver.photo ||
+            driver.avatar ||
+            driver.image ||
+            trip.driverPhoto ||
+            trip.driverImage ||
+            trip.driverProfileImage ||
+            trip.driverProfileImageUrl ||
+            ""
+        ).toString().trim();
+
+        if (!rawPhoto || rawPhoto === 'null' || rawPhoto === 'undefined' || rawPhoto === 'user.png' || rawPhoto.endsWith('/user.png')) {
+            element.style.backgroundImage = `url('${fallbackAvatar}')`;
+            return;
+        }
+
+        const candidates = [];
+        const pushCandidate = (url) => {
+            if (url && !candidates.includes(url)) {
+                candidates.push(url);
+            }
+        };
+
+        if (rawPhoto.startsWith('http://') || rawPhoto.startsWith('https://')) {
+            pushCandidate(rawPhoto);
+            if (rawPhoto.includes('/driver/profile/')) {
+                const sub = rawPhoto.slice(rawPhoto.indexOf('/driver/profile/'));
+                pushCandidate(`https://minio.704app.com.br/rota101fb704${sub}`);
+            }
+        } else {
+            const cleanPath = rawPhoto.replace(/^\/+/, '');
+            let subPath = cleanPath;
+            if (subPath.startsWith('driver/profile/')) {
+                subPath = subPath.replace(/^driver\/profile\//, '');
+            }
+            if (subPath.startsWith('compressed/')) {
+                subPath = subPath.replace(/^compressed\//, '');
+            }
+
+            // 1. MinIO rota101fb704 (storage oficial em produção)
+            pushCandidate(`https://minio.704app.com.br/rota101fb704/driver/profile/compressed/${subPath}`);
+            pushCandidate(`https://minio.704app.com.br/rota101fb704/driver/profile/${subPath}`);
+
+            // 2. hostImageDriver configurado no ambiente da central
+            if (typeof environment !== 'undefined' && environment.hosts && environment.hosts.hostImageDriver) {
+                const envBase = environment.hosts.hostImageDriver.replace(/\/+$/, '');
+                pushCandidate(`${envBase}/${subPath}`);
+            }
+
+            // 3. API endpoints com fallback
+            pushCandidate(`https://api.movymob.com/driver/profile/compressed/${subPath}`);
+            pushCandidate(`https://api.movymob.com/driver/profile/${subPath}`);
+            pushCandidate(`https://api.movymob.com/uploads/driver/${subPath}`);
+
+            // 4. S3 direto
+            pushCandidate(`https://s3-sa-east-1.amazonaws.com/rota101fb704/driver/profile/compressed/${subPath}`);
+            pushCandidate(`https://s3-sa-east-1.amazonaws.com/rota101fb704/driver/profile/${subPath}`);
+        }
+
+        // Tentar carregar candidatos em cascata até uma imagem carregar com sucesso
+        let candidateIndex = 0;
+        function tryNextImage() {
+            if (candidateIndex >= candidates.length) {
+                element.style.backgroundImage = `url('${fallbackAvatar}')`;
+                return;
+            }
+            const currentUrl = candidates[candidateIndex++];
+            const testImg = new Image();
+            testImg.onload = function () {
+                element.style.backgroundImage = `url('${currentUrl}')`;
+            };
+            testImg.onerror = function () {
+                tryNextImage();
+            };
+            testImg.src = currentUrl;
+        }
+
+        tryNextImage();
     });
 
     viewController.elementProperty.getElement("#tripClientOriginText", element => {

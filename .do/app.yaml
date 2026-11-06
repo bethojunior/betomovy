@@ -53,9 +53,9 @@ services:
       - key: APP_PARTNER
         value: "true"
       - key: BUCKET_NAME
-        value: voutehomologar
+        value: rota101fb704
       - key: STORAGE_PRIMARY_HOST
-        value: https://s3-sa-east-1.amazonaws.com
+        value: https://minio.704app.com.br
 
   # 3. Monitor (Painel Web Administrativo React + Vite)
   - name: monitor-web

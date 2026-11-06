@@ -178,10 +178,12 @@ function showToastByStatusTrip(trip) {
 
   if (trip.customer == null && trip.centralCustomer == null) return
 
+  const customerName = trip.customer?.name || trip.customer?.fullName || trip.centralCustomer?.name || trip.customerName || trip.userName || "Cliente";
+
   $('#toastAlert')
     .append(`<div class="toast" id="toast${trip.tripReference}" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-                <strong class="mr-auto">Cliente: ${trip.customer != null ? trip.customer.name : trip.centralCustomer.name}</strong>
+                <strong class="mr-auto">Cliente: ${customerName}</strong>
                 <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

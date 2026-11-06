@@ -57,8 +57,8 @@ class Controller
         $apiSocketHost = getenv('API_SOCKET_HOST') ?: 'https://movymob.com/ws/';
         $apiHost = getenv('API_HOST') ?: 'https://api.movymob.com/';
         $appPartner = getenv('APP_PARTNER') ?: 'true';
-        $bucketName = getenv('BUCKET_NAME') ?: 'voutehomologar';
-        $storageHost = getenv('STORAGE_PRIMARY_HOST') ?: 'https://s3-sa-east-1.amazonaws.com';
+        $bucketName = getenv('BUCKET_NAME') ?: 'rota101fb704';
+        $storageHost = getenv('STORAGE_PRIMARY_HOST') ?: 'https://minio.704app.com.br';
 
         $hostUtils = str_replace("<APIAPP_HOST>", $apiAppHost, $hostUtils);
         $hostUtils = str_replace("<API_SOCKET_HOST>", $apiSocketHost, $hostUtils);

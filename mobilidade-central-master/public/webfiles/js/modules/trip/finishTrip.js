@@ -73,8 +73,59 @@ function showEvaluation(trip) {
     });
 
     viewController.elementProperty.getElement(".image-profile-driver", element => {
-        //element.src = PATH_PROFILE_DRIVER + trip.driver.profileImage;
-        element.style.backgroundImage = `url('${environment.hosts.hostImageDriver + trip.driver.profileImage}')`;
+        element.style.backgroundColor = '#e2e8f0';
+        element.style.backgroundPosition = 'center';
+        element.style.backgroundSize = 'cover';
+        element.style.backgroundRepeat = 'no-repeat';
+
+        const fallbackAvatar = '/webfiles/img/icon/avatar.png';
+        const driver = trip?.driver || {};
+        const rawPhoto = (
+            driver.profileImage ||
+            driver.profileImageUrl ||
+            driver.driverImage ||
+            driver.profilePhoto ||
+            driver.photo ||
+            driver.avatar ||
+            trip?.driverPhoto ||
+            ""
+        ).toString().trim();
+
+        if (!rawPhoto || rawPhoto === 'null' || rawPhoto === 'undefined' || rawPhoto === 'user.png' || rawPhoto.endsWith('/user.png')) {
+            element.style.backgroundImage = `url('${fallbackAvatar}')`;
+            return;
+        }
+
+        const candidates = [];
+        const pushCandidate = (url) => {
+            if (url && !candidates.includes(url)) candidates.push(url);
+        };
+
+        if (rawPhoto.startsWith('http://') || rawPhoto.startsWith('https://')) {
+            pushCandidate(rawPhoto);
+        } else {
+            const clean = rawPhoto.replace(/^\/+/, '').replace(/^driver\/profile\//, '').replace(/^compressed\//, '');
+            pushCandidate(`https://minio.704app.com.br/rota101fb704/driver/profile/compressed/${clean}`);
+            pushCandidate(`https://minio.704app.com.br/rota101fb704/driver/profile/${clean}`);
+            if (typeof environment !== 'undefined' && environment.hosts && environment.hosts.hostImageDriver) {
+                pushCandidate(`${environment.hosts.hostImageDriver.replace(/\/+$/, '')}/${clean}`);
+            }
+            pushCandidate(`https://api.movymob.com/driver/profile/compressed/${clean}`);
+        }
+
+        let idx = 0;
+        function tryNext() {
+            if (idx >= candidates.length) {
+                element.style.backgroundImage = `url('${fallbackAvatar}')`;
+                return;
+            }
+            const imgUrl = candidates[idx++];
+            const img = new Image();
+            img.onload = () => { element.style.backgroundImage = `url('${imgUrl}')`; };
+            img.onerror = () => { tryNext(); };
+            img.src = imgUrl;
+        }
+        tryNext();
     });
 
     const evaluation = new Evaluation(trip);
