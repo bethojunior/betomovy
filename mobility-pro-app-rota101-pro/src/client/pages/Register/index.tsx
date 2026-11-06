@@ -1055,7 +1055,7 @@ export function Register() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
       >
         <ScrollContainer
@@ -1063,7 +1063,7 @@ export function Register() {
           contentContainerStyle={{
             flexGrow: 1,
             paddingVertical: 18,
-            paddingBottom: keyboardHeight > 0 ? keyboardHeight + 160 : (Platform.OS === 'ios' ? 140 : 100),
+            paddingBottom: keyboardHeight > 0 ? (Platform.OS === 'ios' ? keyboardHeight + 160 : 260) : (Platform.OS === 'ios' ? 140 : 100),
           }}
           keyboardShouldPersistTaps="handled"
           extraPaddingBottom={
@@ -1489,6 +1489,7 @@ export function Register() {
                             secureTextEntry={!pShowPassword}
                             value={pPassword}
                             onChangeText={setPPassword}
+                            onFocus={() => scrollToInput(300)}
                             autoCorrect={false}
                           />
                           <TouchableOpacity
@@ -1515,6 +1516,7 @@ export function Register() {
                             secureTextEntry={!pShowPassword}
                             value={pConfirmPassword}
                             onChangeText={setPConfirmPassword}
+                            onFocus={() => scrollToInput()}
                             autoCorrect={false}
                           />
                         </ModernInputBox>
@@ -1752,6 +1754,7 @@ export function Register() {
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dPhone}
                             onChangeText={txt => setDPhone(maskPhone(txt))}
+                            onFocus={() => scrollToInput(300)}
                             keyboardType="phone-pad"
                             maxLength={16}
                             autoCorrect={false}
@@ -1769,6 +1772,7 @@ export function Register() {
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dEmail}
                             onChangeText={setDEmail}
+                            onFocus={() => scrollToInput()}
                             keyboardType="email-address"
                             autoCapitalize="none"
                             autoCorrect={false}
@@ -1930,6 +1934,7 @@ export function Register() {
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dPlate}
                             onChangeText={txt => setDPlate(formatPlate(txt))}
+                            onFocus={() => scrollToInput(150)}
                             autoCapitalize="characters"
                             maxLength={8}
                             autoCorrect={false}
@@ -1947,6 +1952,7 @@ export function Register() {
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dVehicleModel}
                             onChangeText={setDVehicleModel}
+                            onFocus={() => scrollToInput(300)}
                             autoCapitalize="words"
                             autoCorrect={false}
                           />
@@ -1965,7 +1971,7 @@ export function Register() {
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dVehicleColor}
                             onChangeText={setDVehicleColor}
-                            onFocus={() => scrollToInput(300)}
+                            onFocus={() => scrollToInput()}
                             autoCapitalize="words"
                             autoCorrect={false}
                           />
@@ -1981,7 +1987,7 @@ export function Register() {
                             placeholderTextColor="rgba(255, 255, 255, 0.35)"
                             value={dVehicleYear}
                             onChangeText={setDVehicleYear}
-                            onFocus={() => scrollToInput(500)}
+                            onFocus={() => scrollToInput()}
                             keyboardType="numeric"
                             maxLength={4}
                             autoCorrect={false}
@@ -2258,6 +2264,7 @@ export function Register() {
                             secureTextEntry={!dShowPassword}
                             value={dPassword}
                             onChangeText={setDPassword}
+                            onFocus={() => scrollToInput(300)}
                             autoCorrect={false}
                           />
                           <TouchableOpacity
@@ -2284,6 +2291,7 @@ export function Register() {
                             secureTextEntry={!dShowPassword}
                             value={dConfirmPassword}
                             onChangeText={setDConfirmPassword}
+                            onFocus={() => scrollToInput()}
                             autoCorrect={false}
                           />
                         </ModernInputBox>
