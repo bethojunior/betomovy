@@ -328,18 +328,18 @@ export default {
     welcome_back_description:
       'Our AI has detected an existing login for your account. Proceeding to your account access.',
     tagline: 'Smart urban mobility',
-    profile_rider: 'RIDER',
-    profile_rider_subtitle: 'I want to ride',
+    profile_rider: 'PASSENGER',
+    profile_rider_subtitle: 'I want to travel',
     profile_driver: 'DRIVER',
     profile_driver_subtitle: 'I want to drive',
-    rider_access: 'Rider Access',
+    rider_access: 'Passenger Access',
     driver_access: 'Driver Access',
     btn_enter_driver: 'SIGN IN AS DRIVER',
-    btn_enter_passenger: 'SIGN IN AS RIDER',
+    btn_enter_passenger: 'SIGN IN AS PASSENGER',
     modal_choice_title: 'How would you like to sign up?',
     modal_choice_subtitle: 'Choose your profile to start registration on Movy',
-    modal_choice_rider_title: 'I am a rider',
-    modal_choice_rider_desc: 'Ride with comfort, safety, and savings anywhere.',
+    modal_choice_rider_title: 'I am a passenger',
+    modal_choice_rider_desc: 'Travel with comfort, safety, and savings anywhere.',
     modal_choice_driver_title: 'I am a driver',
     modal_choice_driver_desc: 'Drive on your schedule, be your own boss, and boost your earnings.',
   },
@@ -774,7 +774,7 @@ export default {
     text_schedule_modal:
       'If you have any changes to your trip, use customer chat or support',
     text_schedule_client_modal:
-      'For any changes to your trip, use the chat with the driver/rider or support.',
+      'For any changes to your trip, use the chat with the driver/passenger or support.',
   },
   favorites: {
     my_job: 'Favorite Professionals',

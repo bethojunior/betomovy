@@ -341,10 +341,10 @@ export default function Login() {
                     />
                   </ProfileIconBadge>
                   <ProfileGridTitle active={!driverSelected}>
-                    {translate('login.profile_rider') || 'RIDER'}
+                    {translate('login.profile_rider') || 'PASSENGER'}
                   </ProfileGridTitle>
                   <ProfileGridSubtitle active={!driverSelected}>
-                    {translate('login.profile_rider_subtitle') || 'I want to ride'}
+                    {translate('login.profile_rider_subtitle') || 'I want to travel'}
                   </ProfileGridSubtitle>
                 </ProfileGridItem>
 
@@ -380,7 +380,7 @@ export default function Login() {
                       color="#ff80ab"
                     />
                     <CardHeaderPillText>
-                      {driverSelected ? (translate('login.driver_access') || 'Driver Access') : (translate('login.rider_access') || 'Rider Access')}
+                      {driverSelected ? (translate('login.driver_access') || 'Driver Access') : (translate('login.rider_access') || 'Passenger Access')}
                     </CardHeaderPillText>
                   </CardHeaderPill>
                 </CardHeaderRow>
@@ -505,7 +505,7 @@ export default function Login() {
                   <PrimaryLoginButtonText>
                     {driverSelected
                       ? (translate('login.btn_enter_driver') || 'SIGN IN AS DRIVER')
-                      : (translate('login.btn_enter_passenger') || 'SIGN IN AS RIDER')}
+                      : (translate('login.btn_enter_passenger') || 'SIGN IN AS PASSENGER')}
                   </PrimaryLoginButtonText>
                 </PrimaryLoginButton>
               </GlassLoginCard>
@@ -591,10 +591,10 @@ export default function Login() {
                   </ModalChoiceIconBox>
                   <ModalChoiceContent>
                     <ModalChoiceTitle>
-                      {translate('login.modal_choice_rider_title') || 'I am a rider'}
+                      {translate('login.modal_choice_rider_title') || 'I am a passenger'}
                     </ModalChoiceTitle>
                     <ModalChoiceDescription>
-                      {translate('login.modal_choice_rider_desc') || 'Ride with comfort, safety, and savings anywhere.'}
+                      {translate('login.modal_choice_rider_desc') || 'Travel with comfort, safety, and savings anywhere.'}
                     </ModalChoiceDescription>
                   </ModalChoiceContent>
                   <Feather name="chevron-right" size={22} color="#CD2379" />
