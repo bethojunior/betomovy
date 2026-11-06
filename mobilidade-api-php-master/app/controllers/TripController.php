@@ -188,11 +188,7 @@ class TripController extends ApiController
                 ?? null;
 
             if (empty($tripReference) || $tripReference === '[]' || $tripReference === 'null' || $tripReference === 'undefined') {
-                echo $this->returnSuccess("Viagem cancelada com sucesso", [
-                    'status' => true,
-                    'tripReference' => null,
-                    'statusTrip' => 'canceled'
-                ]);
+                echo $this->returnError(new \Exception('Viagem não informada'));
                 return;
             }
 
@@ -204,16 +200,14 @@ class TripController extends ApiController
             $tripRow = \app\dao\GenericDao::first("SELECT * FROM trip WHERE tripReference = :ref LIMIT 1", [':ref' => $tripReference]);
 
             if (!$tripRow) {
-                echo $this->returnSuccess("Viagem cancelada", [
-                    'status' => true,
-                    'tripReference' => $tripReference,
-                    'statusTrip' => 'canceled'
-                ]);
+                echo $this->returnError(new \Exception('Viagem não encontrada'));
                 return;
             }
 
-            // 2. Se já estiver cancelada
-            if (in_array(strtolower($tripRow['status'] ?? ''), ['canceled', 'finished', 'driver_canceled', 'customer_canceled', 'not_answered', 'back_off'])) {
+            // 2. Se já estiver cancelada, republica para o app do motorista soltar a corrida.
+            $currentStatus = strtolower($tripRow['status'] ?? '');
+            if (in_array($currentStatus, ['canceled', 'driver_canceled', 'customer_canceled', 'not_answered', 'back_off'])) {
+                $this->publishTripCanceled($tripReference, $tripRow, false);
                 echo $this->returnSuccess("Viagem já cancelada ou finalizada", [
                     'status' => true,
                     'tripReference' => $tripReference,
@@ -222,10 +216,20 @@ class TripController extends ApiController
                 return;
             }
 
+            if ($currentStatus === 'finished') {
+                echo $this->returnSuccess("Viagem já cancelada ou finalizada", [
+                    'status' => true,
+                    'tripReference' => $tripReference,
+                    'statusTrip' => 'finished'
+                ]);
+                return;
+            }
+
             // 3. Se for viagem de estabelecimento comercial com saldo retido
             if (!empty($tripRow['establishmentId'])) {
                 try {
                     $res = $this->tripDao->cancel($tripReference, $dateEnd, $userId ?? $tripRow['userId']);
+                    $this->publishTripCanceled($tripReference, $tripRow);
                     echo $this->returnSuccess("Viagem cancelada com sucesso", $res);
                     return;
                 } catch (\Throwable $eEst) {
@@ -253,21 +257,7 @@ class TripController extends ApiController
 
             \app\dao\GenericDao::execute($updateSql, $updateParams);
 
-            // 5. Se houver motorista vinculado, libera o motorista
-            if (!empty($tripRow['driverId'])) {
-                try {
-                    (new \app\dao\DriverDao())->putAvailable($tripRow['driverId']);
-                } catch (\Throwable $eDriver) {
-                    \app\utils\Logger::error("Erro ao liberar motorista {$tripRow['driverId']}: " . $eDriver->getMessage());
-                }
-            }
-
-            // 6. Limpa do realtime / redis se existir e notifica motorista e passageiro
-            try {
-                $tripRealtime = new \app\realtime\TripRealtime();
-                $tripRealtime->setTripReference($tripReference);
-                $tripRealtime->deleteTrip();
-            } catch (\Throwable $eRt) {}
+            $this->publishTripCanceled($tripReference, $tripRow);
 
             try {
                 $redis = new \app\utils\RedisUtil();
@@ -294,6 +284,34 @@ class TripController extends ApiController
             ]);
         } catch (\Throwable $e) {
             echo $this->returnError($e);
+        }
+    }
+
+    private function publishTripCanceled($tripReference, array $tripRow, $releaseDriver = true): void
+    {
+        if ($releaseDriver && !empty($tripRow['driverId'])) {
+            try {
+                (new \app\dao\DriverDao())->putAvailable($tripRow['driverId']);
+            } catch (\Throwable $eDriver) {
+                \app\utils\Logger::error("Erro ao liberar motorista {$tripRow['driverId']}: " . $eDriver->getMessage());
+            }
+        }
+
+        try {
+            (new \app\realtime\TripRealtime())
+                ->setTripReference($tripReference)
+                ->setStatus('canceled')
+                ->deleteTrip();
+        } catch (\Throwable $eRt) {
+            \app\utils\Logger::error('Erro ao publicar cancelamento no realtime: ' . $eRt->getMessage());
+        }
+
+        try {
+            (new \app\utils\TripFirestore())
+                ->setDocumentId($tripReference)
+                ->delete();
+        } catch (\Throwable $eFs) {
+            \app\utils\Logger::error('Erro ao apagar corrida no Firestore: ' . $eFs->getMessage());
         }
     }
 

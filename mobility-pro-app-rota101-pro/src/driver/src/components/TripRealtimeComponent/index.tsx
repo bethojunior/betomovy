@@ -125,18 +125,18 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
 
   let tripUpdateEvent: string | null = null;
 
-  const verify = async (tripReference: string) => {
-    if (!itsNetwork) {
-      return;
-    }
+  const verify = async (tripReference: string, forceClear = false) => {
+    const response = itsNetwork ? await verifyExistTrip(tripReference) : null;
+    const status = String(response?.status || '');
+    const terminal =
+      status === STATUS_CANCELED ||
+      status === 'canceled' ||
+      status === STATUS_BACK_OFF ||
+      status === 'back_off' ||
+      status === STATUS_FINISHED ||
+      status === 'finished';
 
-    const response = await verifyExistTrip(tripReference);
-
-    if (
-      response?.status === STATUS_CANCELED ||
-      response?.status === STATUS_BACK_OFF ||
-      response?.status === STATUS_FINISHED
-    ) {
+    if (terminal || forceClear) {
       if ((response?.status === STATUS_CANCELED || response?.status === STATUS_BACK_OFF) && tripReference) {
         const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
         if (tripReference) {
@@ -367,14 +367,13 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       try {
         const check = await verifyExistTrip(activeRef);
         if (
-          !check ||
           check?.status === STATUS_CANCELED ||
           check?.status === 'canceled' ||
           check?.status === STATUS_BACK_OFF ||
           check?.status === 'back_off' ||
           check?.status === STATUS_FINISHED
         ) {
-          verify(activeRef);
+          verify(activeRef, true);
         }
       } catch (err) {}
     }, 2500);
@@ -565,7 +564,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       tripReference === tripAcceptedRef.current?.tripReference
     ) {
       openApp();
-      verify(tripReference);
+      verify(tripReference, true);
     }
   };
 
@@ -623,7 +622,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
 
       const tripRef = trip?.tripReference || tripAcceptedRef.current?.tripReference;
       if (tripRef) {
-        verify(tripRef);
+        verify(tripRef, true);
       }
 
       canModifyRoute = true;
