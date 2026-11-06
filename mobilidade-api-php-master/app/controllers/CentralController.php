@@ -995,20 +995,9 @@ class CentralController extends ApiController
             $limit = 20;
             $offset = ($page - 1) * $limit;
 
-            // Show ALL drivers (active, pending, blocked) — only exclude deleted (statusId = 2 on user)
+            // Show ALL registered drivers — only exclude deleted (statusId = 2 on user)
             $where = ["(u.statusId IS NULL OR u.statusId != 2)"];
             $params = [];
-            if ($centralId > 0) {
-                $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM centralDriver WHERE centralId = :cid");
-                $checkStmt->execute([':cid' => $centralId]);
-                $hasExplicit = ((int)$checkStmt->fetchColumn()) > 0;
-
-                if ($hasExplicit) {
-                    $where[] = "(d.idDriver IN (SELECT driverId FROM centralDriver WHERE centralId = :centralId) OR d.centralId = :centralId2)";
-                    $params[':centralId'] = $centralId;
-                    $params[':centralId2'] = $centralId;
-                }
-            }
             $whereSql = implode(' AND ', $where);
 
             $countStmt = $pdo->prepare("SELECT COUNT(*) FROM driver d INNER JOIN user u ON d.userId = u.idUser WHERE {$whereSql}");
@@ -1016,7 +1005,7 @@ class CentralController extends ApiController
             $total = (int)$countStmt->fetchColumn();
             $lastPage = max(1, (int)ceil($total / $limit));
 
-            $stmt = $pdo->prepare("SELECT d.idDriver, d.userId, u.name, u.phone, u.document, u.email, u.created_at, d.status, d.last_lat, d.last_lon, d.profileImageUrl, d.driverRegisterStatusId
+            $stmt = $pdo->prepare("SELECT d.idDriver, d.userId, u.name, u.phone, u.document, u.email, u.created_at, d.status, d.last_lat, d.last_lon, coalesce(d.profileImage, u.profilePhoto, '') as profileImage, d.driverRegisterStatusId
                     FROM driver d
                     INNER JOIN user u ON d.userId = u.idUser
                     WHERE {$whereSql}
@@ -1030,7 +1019,7 @@ class CentralController extends ApiController
                 $formatted[] = [
                     'idDriver' => (int)$d['idDriver'],
                     'userId' => (int)$d['userId'],
-                    'profileImageUrl' => $d['profileImageUrl'] ?? '',
+                    'profileImageUrl' => $d['profileImage'] ?? '',
                     'name' => $d['name'],
                     'driverRegisterStatusId' => (int)($d['driverRegisterStatusId'] ?? 0),
                     'user' => [
@@ -1073,7 +1062,9 @@ class CentralController extends ApiController
         } catch (\Throwable $e) {
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode([
-                'status' => true,
+                'status' => false,
+                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
                 'response' => ['current_page' => 1, 'last_page' => 1, 'total' => 0, 'data' => []],
                 'data' => []
             ]);
