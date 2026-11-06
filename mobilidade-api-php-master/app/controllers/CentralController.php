@@ -1843,8 +1843,207 @@ class CentralController extends ApiController
 
     public function actionPrice()
     {
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['status' => true, 'response' => [], 'data' => []]);
+        $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        try {
+            $pdo = Connection::open(Connection::DB_MYSQL);
+            $uriPath = trim(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
+            $parts = explode('/', $uriPath);
+            $lastPart = end($parts);
+            $idFromPath = is_numeric($lastPart) ? (int)$lastPart : 0;
+
+            // Extract centralId from /central/{id}/price or query
+            $centralId = 0;
+            if (isset($parts[0]) && $parts[0] === 'central' && isset($parts[1]) && is_numeric($parts[1])) {
+                $centralId = (int)$parts[1];
+            }
+            if ($centralId <= 0) {
+                $centralId = (int)($_GET['centralId'] ?? 0);
+            }
+
+            $cityId = (int)($_SERVER['HTTP_CITYID'] ?? ($_SERVER['HTTP_CITY_ID'] ?? ($_GET['cityId'] ?? 0)));
+            if ($cityId <= 0) {
+                $cityId = 5605;
+            }
+
+            if ($method === 'DELETE') {
+                $id = (int)($_GET['id'] ?? $idFromPath);
+                if ($id > 0) {
+                    $pdo->prepare("UPDATE price SET statusId = 2, updated_at = NOW() WHERE id = :id")->execute([':id' => $id]);
+                }
+                echo $this->returnSuccess('Tarifa removida com sucesso', true);
+                return;
+            }
+
+            if ($method === 'POST' || $method === 'PUT') {
+                $raw = file_get_contents('php://input');
+                $data = json_decode($raw, true) ?: $_POST;
+
+                $tripTypeId = (int)($data['tripTypeId'] ?? 0);
+                $tag = (string)($data['tag'] ?? '');
+                $color = (string)($data['color'] ?? '#000000');
+                $min_price = (float)($data['min_price'] ?? 0);
+                $base_price = (float)($data['base_price'] ?? 0);
+                $km_price = (float)($data['km_price'] ?? 0);
+                $minute_price = (float)($data['minute_price'] ?? 0);
+                $tax_price = (float)($data['tax_price'] ?? 0);
+                $another_fee = (float)($data['another_fee'] ?? 0);
+                $waypoint_price = (float)($data['waypoint_price'] ?? 0);
+                $postCityId = (int)($data['cityId'] ?? $cityId);
+
+                $targetId = $idFromPath > 0 ? $idFromPath : (int)($data['id'] ?? 0);
+
+                if ($targetId > 0) {
+                    $upd = $pdo->prepare("
+                        UPDATE price SET
+                            tag = :tag,
+                            color = :color,
+                            min_price = :min_price,
+                            base_price = :base_price,
+                            km_price = :km_price,
+                            minute_price = :minute_price,
+                            tax_price = :tax_price,
+                            another_fee = :another_fee,
+                            waypoint_price = :waypoint_price,
+                            statusId = 1,
+                            updated_at = NOW()
+                        WHERE id = :id
+                    ");
+                    $upd->execute([
+                        ':tag' => $tag,
+                        ':color' => $color,
+                        ':min_price' => $min_price,
+                        ':base_price' => $base_price,
+                        ':km_price' => $km_price,
+                        ':minute_price' => $minute_price,
+                        ':tax_price' => $tax_price,
+                        ':another_fee' => $another_fee,
+                        ':waypoint_price' => $waypoint_price,
+                        ':id' => $targetId
+                    ]);
+                    echo $this->returnSuccess('Tarifa atualizada com sucesso', ['id' => $targetId]);
+                    return;
+                }
+
+                // Check existing active price for this city and tripType
+                $check = $pdo->prepare("SELECT id FROM price WHERE cityId = :cityId AND tripTypeId = :tripTypeId AND statusId = 1 LIMIT 1");
+                $check->execute([':cityId' => $postCityId, ':tripTypeId' => $tripTypeId]);
+                $existing = $check->fetch(PDO::FETCH_ASSOC);
+
+                if ($existing) {
+                    $upd = $pdo->prepare("
+                        UPDATE price SET
+                            tag = :tag,
+                            color = :color,
+                            min_price = :min_price,
+                            base_price = :base_price,
+                            km_price = :km_price,
+                            minute_price = :minute_price,
+                            tax_price = :tax_price,
+                            another_fee = :another_fee,
+                            waypoint_price = :waypoint_price,
+                            updated_at = NOW()
+                        WHERE id = :id
+                    ");
+                    $upd->execute([
+                        ':tag' => $tag,
+                        ':color' => $color,
+                        ':min_price' => $min_price,
+                        ':base_price' => $base_price,
+                        ':km_price' => $km_price,
+                        ':minute_price' => $minute_price,
+                        ':tax_price' => $tax_price,
+                        ':another_fee' => $another_fee,
+                        ':waypoint_price' => $waypoint_price,
+                        ':id' => (int)$existing['id']
+                    ]);
+                    echo $this->returnSuccess('Tarifa atualizada com sucesso', ['id' => (int)$existing['id']]);
+                    return;
+                }
+
+                $ins = $pdo->prepare("
+                    INSERT INTO price (
+                        cityId, tripTypeId, tag, color,
+                        min_price, base_price, km_price, minute_price,
+                        tax_price, another_fee, waypoint_price,
+                        statusId, created_at, updated_at
+                    ) VALUES (
+                        :cityId, :tripTypeId, :tag, :color,
+                        :min_price, :base_price, :km_price, :minute_price,
+                        :tax_price, :another_fee, :waypoint_price,
+                        1, NOW(), NOW()
+                    )
+                ");
+                $ins->execute([
+                    ':cityId' => $postCityId,
+                    ':tripTypeId' => $tripTypeId,
+                    ':tag' => $tag,
+                    ':color' => $color,
+                    ':min_price' => $min_price,
+                    ':base_price' => $base_price,
+                    ':km_price' => $km_price,
+                    ':minute_price' => $minute_price,
+                    ':tax_price' => $tax_price,
+                    ':another_fee' => $another_fee,
+                    ':waypoint_price' => $waypoint_price
+                ]);
+                $newId = (int)$pdo->lastInsertId();
+                echo $this->returnSuccess('Tarifa salva com sucesso', ['id' => $newId]);
+                return;
+            }
+
+            // GET method: list prices
+            $stmt = $pdo->prepare("
+                SELECT 
+                    p.id,
+                    p.cityId,
+                    p.tripTypeId,
+                    p.min_price,
+                    p.base_price,
+                    p.km_price,
+                    p.minute_price,
+                    p.tax_price,
+                    p.tax_price_type,
+                    p.tax_price_description,
+                    p.another_fee,
+                    p.another_fee_type,
+                    p.another_fee_description,
+                    p.waypoint_price,
+                    p.tag,
+                    p.color,
+                    p.statusId,
+                    tt.idTripType,
+                    tt.type,
+                    COALESCE(tt.name, tt.type) as tripTypeName,
+                    tt.description as tripTypeDescription,
+                    tt.picture as tripTypePicture,
+                    COALESCE(tt.serviceOption, 0) as serviceOption
+                FROM price p
+                LEFT JOIN tripType tt ON p.tripTypeId = tt.idTripType
+                WHERE p.statusId = 1
+                  AND (p.cityId = :cityId OR :cityIdZero = 0)
+                ORDER BY p.cityId ASC, (p.`order` IS NULL) ASC, p.`order` ASC, p.id ASC
+            ");
+            $stmt->execute([':cityId' => $cityId, ':cityIdZero' => $cityId]);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            $result = array_map(function ($row) {
+                $tId = (int)($row['idTripType'] ?? $row['tripTypeId']);
+                $row['trip_type'] = [
+                    'idTripType' => $tId,
+                    'id' => $tId,
+                    'type' => $row['type'] ?? $row['tripTypeName'] ?? $row['tag'] ?? ('Tarifa ' . $tId),
+                    'name' => $row['tripTypeName'] ?? $row['type'] ?? $row['tag'] ?? ('Tarifa ' . $tId),
+                    'description' => $row['tripTypeDescription'] ?? '',
+                    'picture' => $row['tripTypePicture'] ?? '',
+                    'serviceOption' => (int)($row['serviceOption'] ?? 0)
+                ];
+                return $row;
+            }, $rows);
+
+            echo $this->returnSuccess('Preços encontrados', $result);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao processar tarifas');
+        }
     }
 
     public function actionPriceRange()
