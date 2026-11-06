@@ -116,6 +116,39 @@
     gap: 8px;
 }
 
+.drv-name-cell > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* ── Status badge ── */
+.drv-status-badge {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.drv-status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.drv-status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.drv-status-blocked {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 .drv-photo {
     width: 40px;
     height: 40px;

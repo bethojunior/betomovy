@@ -995,7 +995,8 @@ class CentralController extends ApiController
             $limit = 20;
             $offset = ($page - 1) * $limit;
 
-            $where = ["(d.driverRegisterStatusId = 1 OR d.driverRegisterStatusId IS NULL)"];
+            // Show ALL drivers (active, pending, blocked) — only exclude deleted (statusId = 2 on user)
+            $where = ["(u.statusId IS NULL OR u.statusId != 2)"];
             $params = [];
             if ($centralId > 0) {
                 $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM centralDriver WHERE centralId = :cid");
@@ -1015,11 +1016,11 @@ class CentralController extends ApiController
             $total = (int)$countStmt->fetchColumn();
             $lastPage = max(1, (int)ceil($total / $limit));
 
-            $stmt = $pdo->prepare("SELECT d.idDriver, d.userId, u.name, u.phone, u.document, u.email, u.created_at, d.status, d.last_lat, d.last_lon, d.profileImageUrl
+            $stmt = $pdo->prepare("SELECT d.idDriver, d.userId, u.name, u.phone, u.document, u.email, u.created_at, d.status, d.last_lat, d.last_lon, d.profileImageUrl, d.driverRegisterStatusId
                     FROM driver d
                     INNER JOIN user u ON d.userId = u.idUser
                     WHERE {$whereSql}
-                    ORDER BY u.name ASC
+                    ORDER BY d.idDriver DESC
                     LIMIT {$limit} OFFSET {$offset}");
             $stmt->execute($params);
             $drivers = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -1031,6 +1032,7 @@ class CentralController extends ApiController
                     'userId' => (int)$d['userId'],
                     'profileImageUrl' => $d['profileImageUrl'] ?? '',
                     'name' => $d['name'],
+                    'driverRegisterStatusId' => (int)($d['driverRegisterStatusId'] ?? 0),
                     'user' => [
                         'name' => $d['name'],
                         'email' => $d['email'],

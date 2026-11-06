@@ -1012,8 +1012,8 @@ export function Register() {
                 </SuccessTitle>
                 <SuccessDescription>
                   {!isDriver
-                    ? 'Sua conta de passageiro na Movy foi criada com sucesso. Agora você já pode solicitar corridas rápidas, seguras e econômicas.'
-                    : 'Recebemos suas informações de motorista parceiro e a documentação completa dos EUA. Nossa equipe está analisando seus documentos para aprovação.'}
+                    ? 'Your Movy rider account has been created successfully. You can now request fast, safe, and affordable rides.'
+                    : 'We received your partner driver information and complete documentation. Our team is reviewing your documents for approval.'}
                 </SuccessDescription>
 
                 <NextStepButton
@@ -1081,7 +1081,7 @@ export function Register() {
               <HeaderTitleContainer>
                 <HeaderLogo source={logoMovyWhite} />
                 <HeaderSubtitle>
-                  {!isDriver ? t('Rider Registration', 'Passo a passo Passageiro') : t('Driver Registration', 'Passo a passo Motorista')}
+                  {!isDriver ? t('Rider Registration', {defaultValue: 'Rider Registration'}) : t('Driver Registration', {defaultValue: 'Driver Registration'})}
                 </HeaderSubtitle>
               </HeaderTitleContainer>
               <View style={{ width: 42 }} />
@@ -1103,7 +1103,7 @@ export function Register() {
                   />
                 </ProfileIconBadge>
                 <ProfileGridTitle active={!isDriver}>
-                  {t('RIDER', 'PASSAGEIRO')}
+                  {t('profile_rider')}
                 </ProfileGridTitle>
                 <ProfileGridSubtitle active={!isDriver}>
                   {t('I want to ride', 'Quero viajar')}
@@ -1182,7 +1182,7 @@ export function Register() {
                   <CardHeaderRow>
                     <CardHeaderPill>
                       <Feather name="user-check" size={14} color="#ff80ab" />
-                      <CardHeaderPillText>{t('Rider Registration', 'Cadastro de Passageiro')}</CardHeaderPillText>
+                      <CardHeaderPillText>{t('Rider Registration')}</CardHeaderPillText>
                     </CardHeaderPill>
                     <StepCounterBadge>{t(`Step ${passengerStep} of 3`, `Passo ${passengerStep} de 3`)}</StepCounterBadge>
                   </CardHeaderRow>

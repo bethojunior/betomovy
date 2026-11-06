@@ -2,17 +2,17 @@
     <div class="drv-page">
 
         <div class="drv-header">
-            <h1 class="drv-title">Motoristas</h1>
+            <h1 class="drv-title">Drivers</h1>
             <div class="drv-toolbar">
                 <button
                     type="button"
                     class="drv-btn"
                     data-toggle="modal"
                     data-target="#modalAddDriverInCentral">
-                    Adicionar motorista
+                    Add Driver
                 </button>
                 <a href="<?php echo Host::getLocal(); ?>driver/signup" class="drv-btn drv-btn--outline">
-                    Cadastrar motorista
+                    Register Driver
                 </a>
             </div>
         </div>
@@ -21,12 +21,12 @@
             <table class="drv-table">
                 <thead>
                     <tr>
-                        <th>Nome</th>
-                        <th>Código</th>
-                        <th>E-mail</th>
-                        <th>Telefone</th>
-                        <th>Criado em</th>
-                        <th>Ação</th>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Registered</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="resultTable"></tbody>
