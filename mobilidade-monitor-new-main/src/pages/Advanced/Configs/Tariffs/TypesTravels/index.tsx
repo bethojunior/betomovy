@@ -428,7 +428,7 @@ export const TypesTravels = () => {
             commissionsPaymentForm: newObjectCommission,
             value: Utils.BrlToNumber(valueCalcDriver, "positive") || 0,
             tripTypeId: tripId,
-            valueType: valueTypeCalcDriver || "%",
+            valueType: valueTypeCalcDriver === "$" ? "$" : "%",
             disableOnPromotion: !!disableOnPromotion,
           };
 
@@ -870,7 +870,7 @@ export const TypesTravels = () => {
                 Comissão
               </div>
               <div style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A' }}>
-                {valueCalcDriver || '0,00'} {valueTypeCalcDriver}
+                {valueCalcDriver || '0,00'} {valueTypeCalcDriver === '$' ? '$' : '%'}
               </div>
             </div>
           </div>

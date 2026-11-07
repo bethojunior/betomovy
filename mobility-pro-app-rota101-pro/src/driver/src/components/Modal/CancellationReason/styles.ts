@@ -7,21 +7,27 @@ interface SelectedProps {
 
 export const Overlay = styled.View`
   flex: 1;
-  background-color: rgba(0, 0, 0, 0.6);
-  justify-content: flex-end;
+  background-color: rgba(0, 0, 0, 0.75);
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 99999;
+  elevation: 99999;
 `;
 
 export const ContainerAll = styled.View`
   background-color: ${({ theme }) => theme.colors.background_global || '#FFFFFF'};
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
-  padding: 20px 20px 28px 20px;
+  border-radius: 24px;
+  padding: 22px 20px 24px 20px;
+  width: 100%;
+  max-width: 420px;
   max-height: 85%;
-  elevation: 32;
+  elevation: 100000;
+  z-index: 100000;
   shadow-color: #000;
-  shadow-offset: 0px -4px;
-  shadow-opacity: 0.25;
-  shadow-radius: 12px;
+  shadow-offset: 0px 8px;
+  shadow-opacity: 0.35;
+  shadow-radius: 16px;
 `;
 
 export const Header = styled.View`

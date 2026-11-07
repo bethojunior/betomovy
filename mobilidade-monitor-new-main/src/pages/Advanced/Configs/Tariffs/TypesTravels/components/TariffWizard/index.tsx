@@ -779,8 +779,8 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
               label="TAXA DE SERVIÇO"
               value={valueCalcDriver}
               onChangeValue={setValueCalcDriver}
-              valueType={valueTypeCalcDriver}
-              onChangeType={setValueTypeCalcDriver}
+              valueType={valueTypeCalcDriver === "$" ? "$" : "%"}
+              onChangeType={(val) => setValueTypeCalcDriver(val === "$" ? "$" : "%")}
               radioGroupName="valueTypeCalcDriver"
             />
             <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "8px" }}>
@@ -1372,7 +1372,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                 </SuccessSummaryCard>
                 <SuccessSummaryCard>
                   <SuccessSummaryLabel>Comissão Motorista</SuccessSummaryLabel>
-                  <SuccessSummaryValue>{`${valueCalcDriver || "0,00"} ${valueTypeCalcDriver}`}</SuccessSummaryValue>
+                  <SuccessSummaryValue>{`${valueCalcDriver || "0,00"} ${valueTypeCalcDriver === "$" ? "$" : "%"}`}</SuccessSummaryValue>
                 </SuccessSummaryCard>
               </SuccessSummaryGrid>
 
@@ -1430,7 +1430,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
                   Comissão & Regras Operacionais
                 </h4>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px" }}>
-                  <div><strong style={{ fontSize: "12px", color: "#64748b" }}>Taxa Serviço Motorista:</strong> <div style={{ fontSize: "15px", fontWeight: 700 }}>{valueCalcDriver || "0,00"} {valueTypeCalcDriver}</div></div>
+                  <div><strong style={{ fontSize: "12px", color: "#64748b" }}>Taxa Serviço Motorista:</strong> <div style={{ fontSize: "15px", fontWeight: 700 }}>{valueCalcDriver || "0,00"} {valueTypeCalcDriver === "$" ? "$" : "%"}</div></div>
                   <div><strong style={{ fontSize: "12px", color: "#64748b" }}>Tolerância Espera:</strong> <div style={{ fontSize: "15px", fontWeight: 700 }}>{waitingToleranceSeconds || "0"}s</div></div>
                   <div><strong style={{ fontSize: "12px", color: "#64748b" }}>Multa Espera:</strong> <div style={{ fontSize: "15px", fontWeight: 700 }}>R$ {waitingPenaltyFee || "0,00"}</div></div>
                   <div><strong style={{ fontSize: "12px", color: "#64748b" }}>Minuto Excedente:</strong> <div style={{ fontSize: "15px", fontWeight: 700 }}>R$ {waitingExtraFeePerMinute || "0,00"}</div></div>

@@ -465,7 +465,7 @@ export const ModalInTrip = ({ visible, setVisible }: ModalProps) => {
       />
 
       <Modal
-        pointerEvents={visible ? 'auto' : 'none'}
+        pointerEvents={visible && !cancellationReasonsModal ? 'auto' : 'none'}
         transition={{
           type: 'timing',
           duration: 900,
@@ -479,7 +479,7 @@ export const ModalInTrip = ({ visible, setVisible }: ModalProps) => {
           },
           shadowOpacity: 0.58,
           shadowRadius: 16.0,
-          elevation: 24,
+          elevation: cancellationReasonsModal ? 0 : 24,
         }}
       >
         <ButtonMinimizeModal

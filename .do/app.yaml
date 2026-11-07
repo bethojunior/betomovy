@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-11-07 15:42 UTC - Fix donut chart alignment, hide colliding svg legend, center total count, full dashboard EN/PT translation
+# Deploy trigger: 2026-11-07 22:52 UTC - Fix rates commission undefined display and driver cancellation modal z-index layer
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

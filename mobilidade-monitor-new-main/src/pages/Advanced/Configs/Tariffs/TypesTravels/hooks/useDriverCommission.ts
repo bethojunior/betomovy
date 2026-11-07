@@ -27,7 +27,7 @@ export const useDriverCommission = (
     CommissionPaymentFormProps[]
   >([]);
 
-  const [valueTypeCalcDriver, setValueTypeCalcDriver] = useState<string>("%");
+  const [valueTypeCalcDriver, setValueTypeCalcDriver] = useState<"%" | "$">("%");
   const [valueCalcDriver, setValueCalcDriver] = useState<string>("0,00");
   const [disableOnPromotion, setDisableOnPromotion] = useState<boolean>(false);
 
@@ -192,7 +192,7 @@ export const useDriverCommission = (
         Mask.setMaskMoneyAlternative(isNaN(numVal) ? 0 : numVal)
       );
       setValueTypeCalcDriver(
-        commissionForSelectedTrip?.valueType === "$" ? "$" : "%"
+        (commissionForSelectedTrip?.valueType === "$" ? "$" : "%")
       );
       setDisableOnPromotion(
         commissionForSelectedTrip?.disableOnPromotion == 1 ||

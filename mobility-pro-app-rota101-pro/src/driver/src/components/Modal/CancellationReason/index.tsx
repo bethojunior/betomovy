@@ -90,8 +90,10 @@ export const ModalCancellationReasons: React.FC<ModalProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={handleClose}
+      statusBarTranslucent={true}
+      hardwareAccelerated={true}
     >
       <TouchableWithoutFeedback onPress={handleClose}>
         <Overlay>
