@@ -208,6 +208,7 @@ return [
         '/address',
         '/address/cache',
         '/mongologs',
+        '/mongologs/status',
         '/mongologs/logsapplication',
         '/mongologs/logstransaction',
         '/eventnotification',

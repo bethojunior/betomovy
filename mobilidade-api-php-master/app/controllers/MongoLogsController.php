@@ -20,6 +20,56 @@ class MongoLogsController extends ApiController
         $this->handleLogsQuery('logs');
     }
 
+    public function actionStatus()
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        $hasExt = class_exists('\\MongoDB\\Driver\\Manager');
+        $uri = getenv('MONGODB_URI') ?: "mongodb+srv://doadmin:1dQ782TVG36Bc09A@movy-mongodb-79fd3aab.mongo.ondigitalocean.com/admin?tls=true&authSource=admin";
+        $safeUri = preg_replace('/:[^:@]+@/', ':***@', $uri);
+
+        $res = [
+            'status' => true,
+            'mongodb_extension' => $hasExt ? 'installed' : 'missing',
+            'configured_host' => getenv('MONGODB_HOST') ?: 'movy-mongodb-79fd3aab.mongo.ondigitalocean.com',
+            'connection_uri' => $safeUri,
+            'connected' => false,
+            'ping' => null,
+            'databases' => [],
+            'error' => null
+        ];
+
+        if (!$hasExt) {
+            $res['error'] = 'PHP mongodb extension is not loaded';
+            echo json_encode($res);
+            return;
+        }
+
+        try {
+            $manager = new \MongoDB\Driver\Manager($uri, [], ['serverSelectionTimeoutMS' => 3000]);
+            $command = new \MongoDB\Driver\Command(['ping' => 1]);
+            $cursor = $manager->executeCommand('admin', $command);
+            $res['connected'] = true;
+            $res['ping'] = (array)$cursor->toArray()[0];
+
+            try {
+                $dbCommand = new \MongoDB\Driver\Command(['listDatabases' => 1]);
+                $dbCursor = $manager->executeCommand('admin', $dbCommand);
+                $res['databases'] = (array)$dbCursor->toArray()[0];
+            } catch (\Throwable $t) {
+                $res['databases_error'] = $t->getMessage();
+            }
+        } catch (\Throwable $e) {
+            $res['connected'] = false;
+            $res['error'] = [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'class' => get_class($e)
+            ];
+        }
+
+        echo json_encode($res);
+    }
+
     public function actionLogsapplication()
     {
         $this->handleLogsQuery('logs_application');
