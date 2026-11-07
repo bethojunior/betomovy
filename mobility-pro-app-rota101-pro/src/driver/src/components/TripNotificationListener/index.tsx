@@ -10,7 +10,7 @@ import { DriverStatusType } from '../../../../interfaces/driver';
 import { readRideCallNotice } from '../../utils/rideCallNotification';
 import { setIniTripModal } from '../../store/iniTripModal';
 import { useSong } from '../../hooks/song';
-import { customToast } from '../../../utils/FlashMessage';
+import { customToast } from '../../../../utils/FlashMessage';
 
 export const TripNotificationListener = () => {
   const {
