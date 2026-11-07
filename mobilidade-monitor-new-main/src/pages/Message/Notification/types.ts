@@ -1,48 +1,49 @@
 import { AlertProps } from "../../../@types";
 
 export interface NotificationUserTypesProps {
-    id: number;
-    idUserType: number;
-    notificationId: number;
-    userType: string;
+  id?: number;
+  idUserType?: number;
+  userTypeId?: number;
+  notificationId?: number;
+  userType?: string;
+  name?: string;
 }
 
 export interface NotificationListProps {
-    city: {
-        estado: number;
-        id: number;
-        nome: string;
-        shortName: string;
-      };
-      cityId: number;
-      created_at: Date;
-      date: string;
-      dateSend: string;
-      idNotification: number;
-      identifyUserInLink: number;
-      image:string;
-      link: string;
-      message: string;
-      notificationTypeId: number;
-      notification_user_types: NotificationUserTypesProps[];
-      statusId: number;
-      title: string;
-      userIdAdministrator: number;
-      userTypeId: number;
-      usersId: number;
+  idNotification: number;
+  title: string;
+  message: string;
+  link?: string | null;
+  image?: string | null;
+  cityId?: string | number | null;
+  identifyUserInLink?: number;
+  created_at?: string | Date;
+  date?: string;
+  dateSend?: string;
+  notification_user_types?: NotificationUserTypesProps[];
+  city?: {
+    id?: number;
+    nome?: string;
+    shortName?: string;
+    estado?: number;
+  };
+  [key: string]: any;
 }
 
-export interface TypesDriversProps   {
-    idUserType: number
-    name: string;
-    isDriver: number;
-    picture:string;
+export interface TypesDriversProps {
+  idUserType: number;
+  name: string;
+  isDriver?: number;
+  picture?: string;
 }
 
 export interface NotificationTableProps {
-    notificationList: NotificationListProps[];
-    alertValues: (message: string, type: AlertProps) => void;
-    setLoading: (val: boolean) => void;
-    currentPage: number;
-    getAllNotification: (val: number) => void;
-  }
+  notificationList: NotificationListProps[];
+  alertValues: (message: string, type: AlertProps) => void;
+  setLoading: (val: boolean) => void;
+  currentPage: number;
+  totalItems: number;
+  pageSize: number;
+  getAllNotification: (val: number) => void;
+  onOpenCreateModal: () => void;
+}
