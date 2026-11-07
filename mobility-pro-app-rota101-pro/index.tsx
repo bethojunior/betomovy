@@ -18,18 +18,10 @@ const OPEN_APP_TAGS = new Set([
 const OPEN_APP_ACTIONS = new Set([PushConstants.PushNotificationAction.OPEN_APP]);
 
 const SUPPRESSED_FOREGROUND_TAGS_IOS = new Set([
-  PushConstants.PushNotificationTags.CHAT_MESSAGE,
   PushConstants.PushNotificationTags.RIDE_REQUEST,
   PushConstants.PushNotificationTags.RIDE_OFFER,
-  PushConstants.PushNotificationTags.RIDE_CANCELLED,
-  PushConstants.PushNotificationTags.SCHEDULED_RIDE,
-  PushConstants.PushNotificationTags.CUSTOMER_CHANGED_ROUTE,
-  PushConstants.PushNotificationTags.DRIVERS_CLOSE,
-  PushConstants.PushNotificationTags.NOTIFY_CUSTOMER_ON_TRIP_EXPIRED,
   PushConstants.PushNotificationTags.REQUEST_UPDATE_DRIVER_LOCATION,
   PushConstants.PushNotificationTags.UPDATE_DRIVER_INFO,
-  PushConstants.PushNotificationTags.STOP_CALL,
-  PushConstants.PushNotificationTags.CUSTOMERS_CLOSE,
 ]);
 
 try {

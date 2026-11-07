@@ -136,6 +136,25 @@ export const TripNotificationListener = () => {
           }
         } catch {}
 
+        const isStopCall =
+          parsedData?.action === 'stop_call' ||
+          parsedData?.tag === 'stop_call' ||
+          data?.action === 'stop_call' ||
+          data?.tag === 'stop_call' ||
+          parsedData?.call === false ||
+          parsedData?.tag === 'trip_expired' ||
+          parsedData?.tag === 'notify_customer_on_trip_expired';
+
+        if (isStopCall) {
+          Notifications.dismissAllNotificationsAsync();
+          dispatchTrip({
+            type: 'update',
+            field: 'callDriverModal',
+            arg: false,
+          });
+          return;
+        }
+
         const notice = readRideCallNotice(parsedData) || readRideCallNotice(data);
         if (!notice) return;
 

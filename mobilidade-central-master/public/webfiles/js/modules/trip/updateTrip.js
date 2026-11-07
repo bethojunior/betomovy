@@ -229,14 +229,55 @@ function initRace(trip) {
     });
 
     viewController.elementProperty.getElement("#tripClientOriginText", element => {
-        element.innerHTML = trip.origin?.address || trip.originAddress || "Local de partida";
+        const originAddr = trip.origin?.address || trip.originAddress || trip.address || "Local de partida";
+        element.innerHTML = originAddr;
     });
     viewController.elementProperty.getElement("#tripClientDestText", element => {
-        element.innerHTML = trip.destination?.address || trip.destAddress || "Destino";
+        let destAddr = trip.destination?.address || trip.destAddress || trip.destinationAddress || trip.destination?.name;
+        // Se por algum motivo o destino vier igual à origem (ex: retorno), resgata o destino real dos waypoints ou do form
+        if ((!destAddr || destAddr === (trip.origin?.address || trip.originAddress)) && trip.waypoints && trip.waypoints.length > 0) {
+            const firstStop = trip.waypoints[0]?.address;
+            if (firstStop && firstStop !== destAddr) {
+                destAddr = firstStop;
+            }
+        }
+        if (!destAddr) {
+            const inputDest = document.querySelector("*[place='destination']");
+            if (inputDest && inputDest.value) destAddr = inputDest.value;
+        }
+        element.innerHTML = destAddr || "Destino";
     });
-    mapService.removeRoute();
 
-    //const positionWait = getDestination(trip);
+    // Renderiza e calcula a rota completa de Origem a Destino no mapa ao aceitar a corrida
+    try {
+        const originLat = parseFloat(trip.origin?.latitude || trip.origin?.lat);
+        const originLng = parseFloat(trip.origin?.longitude || trip.origin?.lng);
+        const destLat = parseFloat(trip.destination?.latitude || trip.destination?.lat);
+        const destLng = parseFloat(trip.destination?.longitude || trip.destination?.lng);
+
+        if (!isNaN(originLat) && !isNaN(originLng)) {
+            const originPos = { lat: originLat, lng: originLng };
+            mapService.addPointClient(originPos);
+
+            if (!isNaN(destLat) && !isNaN(destLng) && (destLat !== originLat || destLng !== originLng)) {
+                const destPos = { lat: destLat, lng: destLng };
+                mapService.addPointDestination(destPos);
+
+                const poly = trip.overview_polyline?.points || trip.polyline;
+                const waypoints = Array.isArray(trip.tripWayPoints)
+                    ? trip.tripWayPoints.filter(w => w?.confirmed === "0").map(w => ({ lat: parseFloat(w.latitude), lng: parseFloat(w.longitude) }))
+                    : (trip.waypoints || []);
+
+                if (poly) {
+                    mapService.showRoute(originPos, destPos, waypoints, poly);
+                } else if (typeof mapService.showRouteDriver === "function") {
+                    mapService.showRouteDriver(originPos, destPos, waypoints);
+                }
+            }
+        }
+    } catch (routeErr) {
+        console.warn("Erro ao desenhar rota na central ao aceitar viagem:", routeErr);
+    }
 
     showStatusTrip(managerTrip.tripCurrent.status);
 
@@ -455,7 +496,8 @@ function populateSearchDriverCard(data) {
                     let km = parseFloat(String(dist || "").replace(",", "."));
                     if (!isNaN(km) && km >= 0) {
                         if (km >= 100) km = km / 1000;
-                        parts.push(`${km.toFixed(2)} km`);
+                        const miles = km * 0.621371;
+                        parts.push(`${miles.toFixed(2)} mi`);
                     }
                     return parts.join(" • ");
                 })();

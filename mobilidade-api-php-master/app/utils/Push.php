@@ -3,6 +3,8 @@
 namespace app\utils;
 
 use app\constant\PushConst;
+use app\constant\PushActionConst;
+use app\constant\PushTagConst;
 use app\exceptions\PushException;
 use app\model\Config;
 use app\utils\Pulse\PulseService;
@@ -92,10 +94,11 @@ class Push
         $data = $this->buildDataPayload();
         $notification = $this->buildNotification();
 
-        $message = CloudMessage::new()
-            ->withTarget('token', $deviceToken)
-            ->withNotification($notification)
-            ->withData($data);
+        $message = $this->withVisibleAlert(
+            CloudMessage::new()
+                ->withTarget('token', $deviceToken)
+                ->withData($data)
+        );
 
         try {
             $result = $this->triggerSingle($message);
@@ -243,13 +246,29 @@ class Push
         try {
             array_map(function ($deviceToken) use ($foreground) {
                 if (strpos($deviceToken, 'ExponentPushToken') === 0) {
+                    $bodyText = $this->body ?: $this->message ?: '';
+                    $titleText = $this->title ?: 'Aviso';
+                    if (empty($bodyText)) {
+                        if ($this->action === PushActionConst::STOP_CALL || $this->tag === PushTagConst::STOP_CALL) {
+                            $titleText = 'Corrida indisponível';
+                            $bodyText = 'A chamada da corrida foi encerrada ou cancelada.';
+                        } elseif ($this->action === PushActionConst::NOTIFY_CUSTOMER_ON_TRIP_EXPIRED) {
+                            $titleText = 'Corrida expirada';
+                            $bodyText = 'Não encontramos motoristas disponíveis no momento.';
+                        }
+                    }
+                    $channel = ($this->action === PushActionConst::STOP_CALL || $this->tag === PushTagConst::STOP_CALL)
+                        ? 'trip_cancel'
+                        : 'tripCall';
+
                     $notification = [
-                        "title"               => $this->title,
-                        "body"                => $this->body,
+                        "title"               => $titleText,
+                        "body"                => $bodyText,
                         "sound"               => 'default',
                         "priority"            => $this->mapExpoPriority(),
-                        "channelId"           => 'tripCall',
+                        "channelId"           => $channel,
                         "displayInForeground" => $foreground,
+                        "_displayInForeground"=> true,
                         "data"                => $this->buildDataPayload(),
                     ];
 
@@ -465,14 +484,34 @@ class Push
         $androidSound = preg_replace('/\.(mp3|wav|caf)$/i', '', $soundFile) ?: 'default';
         $apnsSound = preg_match('/\.(caf|wav|aiff|aif)$/i', $soundFile) ? $soundFile : 'default';
 
+        $title = $this->title;
+        $body = $this->body ?: $this->message;
+
+        if (empty($title) || empty($body)) {
+            if ($this->action === PushActionConst::STOP_CALL || $this->tag === PushTagConst::STOP_CALL) {
+                $title = $title ?: 'Corrida indisponível';
+                $body = $body ?: 'A chamada da corrida foi encerrada ou cancelada.';
+            } elseif ($this->action === PushActionConst::NOTIFY_CUSTOMER_ON_TRIP_EXPIRED) {
+                $title = $title ?: 'Corrida expirada';
+                $body = $body ?: 'Não encontramos motoristas disponíveis no momento.';
+            } else {
+                $title = $title ?: 'Nova corrida';
+                $body = $body ?: 'Há uma corrida disponível';
+            }
+        }
+
+        $channelId = ($this->action === PushActionConst::STOP_CALL || $this->tag === PushTagConst::STOP_CALL)
+            ? 'trip_cancel'
+            : 'tripCall';
+
         return $message
-            ->withNotification(Notification::create($this->title ?: 'Nova corrida', $this->body ?: 'Há uma corrida disponível'))
+            ->withNotification(Notification::create($title, $body))
             ->withAndroidConfig([
                 'priority' => 'high',
                 'notification' => [
-                    'channel_id' => 'tripCall',
+                    'channel_id' => $channelId,
                     'sound' => $androidSound,
-                    'default_sound' => false,
+                    'default_sound' => ($androidSound === 'default'),
                 ],
             ])
             ->withApnsConfig([

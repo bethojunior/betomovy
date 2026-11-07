@@ -490,19 +490,20 @@ document.addEventListener('DOMContentLoaded', function () {
           tripPaymentFormId: managerTrip.paymentFormIdSelected,
           centralId: Session.getValueInSession('centralSelected', 'id'),
           origin: {
-            address: document.querySelector("*[place='origin']").value,
-            latitude: trip.origin.lat,
-            longitude: trip.origin.lng,
-            neighborhood: trip.origin.neighborhood,
+            address: (document.querySelector("*[place='origin']") && document.querySelector("*[place='origin']").value) || (trip.origin && trip.origin.address) || '',
+            latitude: trip.origin ? trip.origin.lat : 0,
+            longitude: trip.origin ? trip.origin.lng : 0,
+            neighborhood: trip.origin ? trip.origin.neighborhood : '',
             cityId: cityConfig.cityId,
           },
           destination: {
             address:
-              managerTrip.typeTaxi.nameNeighborhood ??
-              document.querySelector("*[place='destination']").value,
-            latitude: trip.destination.lat,
-            longitude: trip.destination.lng,
-            neighborhood: trip.origin.neighborhood,
+              (document.querySelector("*[place='destination']") && document.querySelector("*[place='destination']").value.trim().length > 0)
+                ? document.querySelector("*[place='destination']").value.trim()
+                : (managerTrip.typeTaxi.nameNeighborhood || (trip.destination && trip.destination.address) || ''),
+            latitude: trip.destination ? trip.destination.lat : (trip.origin ? trip.origin.lat : 0),
+            longitude: trip.destination ? trip.destination.lng : (trip.origin ? trip.origin.lng : 0),
+            neighborhood: (trip.destination && trip.destination.neighborhood) ? trip.destination.neighborhood : (trip.origin ? trip.origin.neighborhood : ''),
             cityId: cityConfig.cityId,
           },
           priceId: managerTrip.typeTaxi.priceId,
@@ -541,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (config && config.typeMoney) typeMoney = config.typeMoney
       }
       document.getElementById('returnFee').innerHTML =
-        `${typeMoney} ${Mask.maskMoney(fee.feePrice)} ${fee.isByKm ? 'x Km' : 'Fixo'}`
+        `${typeMoney} ${Mask.maskMoney(fee.feePrice)} ${fee.isByKm ? 'x Mi' : 'Fixo'}`
       document.getElementById('finalPrice').innerHTML =
         `${typeMoney} ${Mask.maskMoney(fee.newPrice)}`
     }
@@ -825,8 +826,14 @@ document.addEventListener('DOMContentLoaded', function () {
       preload(false)
       if (res && res.status && res.response) {
         const returnFee = Number(res.response?.returnFee || 0)
+        let distanceInKm = Number(distanceTrip || 0)
+        if (distanceInKm >= 100) {
+          distanceInKm = distanceInKm / 1000
+        }
+        // Distância calculada em milhas (1 km = 0.621371 milhas)
+        const distanceInMiles = distanceInKm * 0.621371
         const fee = res.response?.isByKm
-          ? (distanceTrip / 1000) * returnFee * 1000
+          ? Number((distanceInMiles * returnFee).toFixed(2))
           : returnFee
         const currentPrice = Number(managerTrip.typeTaxi?.price || 0)
         const newPrice = Number(currentPrice + fee).toFixed(2)

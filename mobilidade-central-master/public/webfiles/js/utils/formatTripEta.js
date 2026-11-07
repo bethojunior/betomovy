@@ -26,16 +26,25 @@ function formatTripEta(durationRaw, distanceRaw) {
   if (distanceRaw !== null && distanceRaw !== undefined && distanceRaw !== "") {
     const distStr = String(distanceRaw).trim().replace(",", ".");
     if (!distStr.toLowerCase().includes("nan")) {
-      if (distStr.toLowerCase().includes("km") || distStr.toLowerCase().includes("mi")) {
+      if (distStr.toLowerCase().includes("mi") || distStr.toLowerCase().includes("milha")) {
         parts.push(distStr);
+      } else if (distStr.toLowerCase().includes("km")) {
+        const num = parseFloat(distStr);
+        if (!isNaN(num) && num >= 0) {
+          const miles = num * 0.621371;
+          parts.push(`${miles.toFixed(2)} mi`);
+        } else {
+          parts.push(distStr);
+        }
       } else {
         let km = parseFloat(distStr);
         if (!isNaN(km) && km >= 0) {
-          // metros quando o valor parece grande demais para km urbanos
+          // Metros quando o valor parece grande demais para km urbanos
           if (km >= 100) {
             km = km / 1000;
           }
-          parts.push(`${km.toFixed(2)} km`);
+          const miles = km * 0.621371;
+          parts.push(`${miles.toFixed(2)} mi`);
         }
       }
     }

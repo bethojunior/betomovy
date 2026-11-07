@@ -155,7 +155,12 @@ export const CardInfoDriver = ({
 
             {IsToShowField('destination', cityConfig) && (
               <Address selected={statusTrip === translate('statusTrip.in_progress')}>
-                {tripAccepted?.destination?.name}
+                {tripAccepted?.destination?.address ||
+                  tripAccepted?.destination?.name ||
+                  tripAccepted?.destinationAddress ||
+                  (tripAccepted?.tripWayPoints?.length
+                    ? tripAccepted?.tripWayPoints[tripAccepted?.tripWayPoints.length - 1]?.address
+                    : '')}
               </Address>
             )}
           </AddressBlocks>

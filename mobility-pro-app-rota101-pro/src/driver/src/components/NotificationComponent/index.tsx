@@ -229,6 +229,26 @@ export const NotificationComponent = ({ onPress }: NotificationComponentProps) =
           }
         } catch {}
 
+        const isStopCall =
+          parsedData?.action === 'stop_call' ||
+          parsedData?.tag === 'stop_call' ||
+          data?.action === 'stop_call' ||
+          data?.tag === 'stop_call' ||
+          parsedData?.call === false ||
+          parsedData?.tag === 'trip_expired' ||
+          parsedData?.tag === 'notify_customer_on_trip_expired';
+
+        if (isStopCall) {
+          Notifications.dismissAllNotificationsAsync();
+          dispatchTrip({
+            type: 'update',
+            field: 'callDriverModal',
+            arg: false,
+          });
+          customToast('A corrida foi aceita por outro motorista ou cancelada.', 'info');
+          return;
+        }
+
         const notice = readRideCallNotice(parsedData) || readRideCallNotice(data);
         if (notice) {
           dispatchTrip({

@@ -3032,6 +3032,11 @@ class DriverDao extends BaseDao
 
         $push = new Push();
         $push
+            ->setTitle('Corrida indisponível')
+            ->setMessage('A corrida foi aceita por outro motorista ou cancelada.')
+            ->setBody('A corrida foi aceita por outro motorista ou cancelada.')
+            ->setPriority(\app\constant\PushConst::HIGH_PRIORITY)
+            ->setSoundname('default')
             ->setData(['trip' => $trip->toStdClass(), 'call' => false])
             ->setAction(PushActionConst::STOP_CALL)
             ->setTag(PushTagConst::STOP_CALL);

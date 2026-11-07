@@ -105,7 +105,8 @@ function getTravelCustomer(trip, customer) {
                 let km = parseFloat(String(dist || "").replace(",", "."));
                 if (!isNaN(km) && km >= 0) {
                     if (km >= 100) km = km / 1000;
-                    parts.push(`${km.toFixed(2)} km`);
+                    const miles = km * 0.621371;
+                    parts.push(`${miles.toFixed(2)} mi`);
                 }
                 return parts.join(" • ");
             })();
@@ -195,8 +196,14 @@ function getTravelCustomer(trip, customer) {
 
         if (haveReturn) {
             trip.waypoints = trip.waypoints || [];
-            trip.waypoints.push(trip.destination);
-            trip.destination = trip.origin;
+            // Mantém a origem e o destino corretos; adiciona o ponto de retorno como parada final
+            trip.hasReturn = true;
+            trip.isRoundTrip = true;
+            trip.returnDestination = Object.assign({}, trip.origin);
+            // Garante que o destino não seja sobrescrito com a origem
+            if (!trip.destination || !trip.destination.address) {
+                trip.destination = Object.assign({}, trip.origin);
+            }
         }
 
         // Ativa feedback imediato de busca para o usuario
