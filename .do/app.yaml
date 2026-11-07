@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-11-07 02:50 UTC - Full sync all branches merged into main deploy on ocean
+# Deploy trigger: 2026-11-07 15:42 UTC - Fix donut chart alignment, hide colliding svg legend, center total count, full dashboard EN/PT translation
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
