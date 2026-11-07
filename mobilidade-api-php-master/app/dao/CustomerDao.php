@@ -1374,7 +1374,7 @@ class CustomerDao extends BaseDao
             $logData = (object)[
                 'push' => [
                     'driver' => $trip->driver ?
-                        $this->notifyDriverOnCancel($trip->driver->deviceToken) : null,
+                        $this->notifyDriverOnCancel($trip->driver->deviceToken, $tripReference) : null,
                     'customer' => $status == Trip::NOT_ANSWERED ?
                         $this->service
                         ->notifyOnExpiredTrip($trip->customer->deviceToken ?? null, $scheduledTrip) :
@@ -1399,7 +1399,31 @@ class CustomerDao extends BaseDao
 
             $this->deleteRealtime($trip->tripReference);
 
-            (new RedisUtil)->delete("trip-{$trip->tripReference}");
+            try {
+                (new \app\utils\TripFirestore())
+                    ->setDocumentId($trip->tripReference)
+                    ->delete();
+            } catch (\Throwable $eFs) {}
+
+            try {
+                $redis = new RedisUtil();
+                $redis->delete("trip-{$trip->tripReference}");
+                $cancelPayload = json_encode([
+                    'type' => 'removed',
+                    'data' => [
+                        'event' => 'trip-deleted',
+                        'tripReference' => $trip->tripReference,
+                        'status' => 'canceled',
+                        'canceledBy' => 'customer',
+                        'userId' => $trip->userId ?? null,
+                        'driverId' => $trip->driverId ?? null,
+                    ]
+                ]);
+                $redis->publish('trip-events', $cancelPayload);
+                $redis->publish("trip-canceled-{$trip->tripReference}", $cancelPayload);
+                $redis->publish("trip-updated-{$trip->tripReference}", $cancelPayload);
+            } catch (\Throwable $ePub) {}
+
             Queue::dispatch(MobilityLiteCancelTripJob::class, ['tripReference' => $trip->tripReference]);
             return $trip;
         } catch (Exception $e) {
@@ -1414,7 +1438,7 @@ class CustomerDao extends BaseDao
      * @return array|null
      * @throws PushException
      */
-    private function notifyDriverOnCancel(string $driverDeviceToken): ?array
+    private function notifyDriverOnCancel(string $driverDeviceToken, string $tripReference = ''): ?array
     {
         $push = new Push();
         $push
@@ -1422,6 +1446,11 @@ class CustomerDao extends BaseDao
             ->setBody("A viagem foi cancelada!")
             ->setAction(PushActionConst::OPEN_APP)
             ->setTag(PushTagConst::RIDE_CANCELLED)
+            ->setAdditionalData(json_encode([
+                'tripReference' => $tripReference,
+                'tag' => PushTagConst::RIDE_CANCELLED,
+                'action' => 'rideCancelled',
+            ]))
             ->setForceStart(PushConst::FORCE_START)
             ->setPriority(PushConst::HIGH_PRIORITY);
 

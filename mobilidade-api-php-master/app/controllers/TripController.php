@@ -305,6 +305,11 @@ class TripController extends ApiController
                         ->setBody("A viagem foi cancelada pela central ou pelo cliente!")
                         ->setAction(\app\constant\PushActionConst::OPEN_APP)
                         ->setTag(\app\constant\PushTagConst::RIDE_CANCELLED)
+                        ->setAdditionalData(json_encode([
+                            'tripReference' => $tripReference,
+                            'tag' => \app\constant\PushTagConst::RIDE_CANCELLED,
+                            'action' => 'rideCancelled',
+                        ]))
                         ->setForceStart(\app\constant\PushConst::FORCE_START)
                         ->setPriority(\app\constant\PushConst::HIGH_PRIORITY);
                     $push->sendNotificationWithData($driverRow->deviceToken);

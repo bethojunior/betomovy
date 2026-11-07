@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Alert } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useTripProvider } from '../../context/Trip';
 import { useAuth } from '../../../../context/auth';
@@ -7,14 +8,19 @@ import { emitDriverStatusChange } from '../../utils/driverStatusChangeEmitter';
 import { emitTripStatusChange } from '../../utils/tripStatusChangeEmitter';
 import { DriverStatusType } from '../../../../interfaces/driver';
 import { readRideCallNotice } from '../../utils/rideCallNotification';
+import { setIniTripModal } from '../../store/iniTripModal';
+import { useSong } from '../../hooks/song';
+import { customToast } from '../../../utils/FlashMessage';
 
 export const TripNotificationListener = () => {
   const {
     stateTrip: { trip },
     acceptTrip,
     dispatchTrip,
+    clearDataTrip,
   } = useTripProvider((context) => context);
 
+  const { playSong } = useSong();
   const { userDriverFind, setUserDriverFind } = useUserDriver();
   const { cityConfig } = useAuth();
   const hasFetchedLaunchResponse = useRef(false);
@@ -161,11 +167,18 @@ export const TripNotificationListener = () => {
             arg: false,
           });
           if (isRideCancelled) {
-            dispatchTrip({
-              type: 'update',
-              field: 'cancelTrip',
-              arg: { canceledBy: 'customer', tripReference: parsedData?.tripReference || data?.tripReference },
-            });
+            setIniTripModal(false);
+            dispatchTrip({ type: 'clearTripAccepted' });
+            clearDataTrip().catch(() => {});
+            try {
+              playSong('cancel');
+            } catch {}
+            customToast('A corrida foi cancelada pelo cliente ou pela central', 'warning');
+            Alert.alert(
+              'Corrida Cancelada',
+              'A corrida foi cancelada pelo passageiro ou pela central.',
+              [{ text: 'OK' }],
+            );
           }
           return;
         }

@@ -38,6 +38,7 @@ import { useAuth } from '../../../../../context/auth';
 import { translate } from '../../../../../client/locales';
 import { useUserDriver } from '../../../context/userDriver';
 import { ModalCancellationReasons } from '../CancellationReason';
+import { setIniTripModal } from '../../../store/iniTripModal';
 import { buildApp } from '../../../../../constantBuild/config';
 import { customToast } from '../../../../../utils/FlashMessage';
 import { If } from '../../If';
@@ -242,13 +243,13 @@ export const ModalInTrip = ({ visible, setVisible }: ModalProps) => {
     cancelTrip.driverId = Number(userDriverFind.idDriver);
     dispatchTrip({ type: 'update', field: 'cancelTrip', arg: cancelTrip });
 
-    cancel(false);
-
     hideModalAnimation();
+    setVisible(false);
+    setIniTripModal(false);
 
-    setTimeout(() => {
-      setVisible(false);
-    }, 5000);
+    try {
+      await cancel(false);
+    } catch {}
   };
 
   const progressTrip = async () => {

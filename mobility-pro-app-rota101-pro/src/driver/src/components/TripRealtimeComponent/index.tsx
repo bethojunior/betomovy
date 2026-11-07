@@ -126,7 +126,11 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   let tripUpdateEvent: string | null = null;
 
   const verify = async (tripReference: string, forceClear = false) => {
-    const response = itsNetwork ? await verifyExistTrip(tripReference) : null;
+    let response: any = null;
+    try {
+      response = itsNetwork ? await verifyExistTrip(tripReference) : null;
+    } catch {}
+
     const status = String(response?.status || '');
     const terminal =
       status === STATUS_CANCELED ||
@@ -137,7 +141,13 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       status === 'finished';
 
     if (terminal || forceClear) {
-      if ((response?.status === STATUS_CANCELED || response?.status === STATUS_BACK_OFF) && tripReference) {
+      if (
+        (response?.status === STATUS_CANCELED ||
+          response?.status === STATUS_BACK_OFF ||
+          status === 'canceled' ||
+          forceClear) &&
+        tripReference
+      ) {
         const configCityId = cityConfig?.cityId ? String(cityConfig.cityId) : undefined;
         if (tripReference) {
           emitTripStatusChange(tripReference, 'removed', configCityId);
@@ -151,34 +161,33 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
           : undefined;
       emitDriverLocation(userDriverFind, currentLocation, cityConfig);
 
-      playSong('cancel');
+      try {
+        playSong('cancel');
+      } catch {}
 
       getDriverFind();
 
-      const actualTrip = { ...tripAcceptedRef.current, cancelledBy: 'customer' };
-
-      dispatchTrip({ type: 'update', field: 'tripAccepted', arg: actualTrip });
-
-      const isTripFinished = response?.status === STATUS_FINISHED;
-      if (!isTripFinished) {
-        const actualTrip = { ...tripAcceptedRef.current, cancelledBy: 'customer' };
-        dispatchTrip({ type: 'update', field: 'tripAccepted', arg: actualTrip });
-      }
+      const isTripFinished = response?.status === STATUS_FINISHED || status === 'finished';
 
       const toastType = isTripFinished ? 'success' : 'warning';
 
-      const message = await (isTripFinished
-        ? translate('finishTrip.title_success_finish')
-        : response.canceledBy === 'customer'
-          ? getCancelMessage(response)
-          : translate(`finishTrip.text_trip_cancelled_by_false`));
+      let message = 'A viagem foi cancelada pela central ou pelo cliente.';
+      try {
+        if (isTripFinished) {
+          message = translate('finishTrip.title_success_finish');
+        } else if (response?.canceledBy === 'customer') {
+          message = await getCancelMessage(response);
+        } else if (response?.canceledBy) {
+          message = translate('finishTrip.text_trip_cancelled_by_false');
+        }
+      } catch {}
 
       customToast(message, toastType);
 
       setIniTripModal(false);
       setSwalVisible(false);
 
-      requestAnimationFrame(clearDataTrip);
+      await clearDataTrip();
     }
   };
 
@@ -367,16 +376,19 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       try {
         const check = await verifyExistTrip(activeRef);
         if (
+          !check ||
+          check === false ||
           check?.status === STATUS_CANCELED ||
           check?.status === 'canceled' ||
           check?.status === STATUS_BACK_OFF ||
           check?.status === 'back_off' ||
-          check?.status === STATUS_FINISHED
+          check?.status === STATUS_FINISHED ||
+          check?.status === 'finished'
         ) {
           verify(activeRef, true);
         }
       } catch (err) {}
-    }, 2500);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [tripAccepted?.tripReference, tripAccepted?.status]);
@@ -645,16 +657,12 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
   };
 
   async function clearDriverTripState() {
-    const tripDriver = await AsyncStorage.getItem('tripDriver');
-    if (!tripDriver) return;
+    setIniTripModal(false);
+    setSwalVisible(false);
+    clearTripTaximeter();
 
     await clearDataTrip();
     await getDriverFind();
-
-    clearTripTaximeter();
-
-    setIniTripModal(false);
-    setSwalVisible(false);
   }
 
   async function resolvePreAcceptedTrip(tripReference: string): Promise<Trip> {
@@ -696,7 +704,12 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       }
     }
 
-    if (!activeTrip) return;
+    if (!activeTrip) {
+      if (tripAcceptedRef.current?.tripReference) {
+        verify(tripAcceptedRef.current.tripReference, true);
+      }
+      return;
+    }
 
     try {
       setStatusTrip(translate(`statusTrip.${activeTrip?.status}`));

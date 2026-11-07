@@ -553,6 +553,10 @@ export const TripProvider = ({ children }: TripContextChildren) => {
 
       clearMapSuggestionTimeout();
 
+      try {
+        setIniTripModal(false);
+      } catch {}
+
       dispatchTrip({ type: 'clearTripAccepted' });
       dispatchTrip({ type: 'update', field: 'showMapSuggestion', arg: false });
     } catch (error) {
