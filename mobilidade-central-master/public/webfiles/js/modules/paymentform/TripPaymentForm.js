@@ -73,10 +73,12 @@ function initCardsModal() {
 
             elementProperty.getElement("#listCardPaymentModal", element => {
                 if (!cards.length) {
-                    element.innerHTML = `<li class="no-cards-msg" style="padding: 24px 16px; text-align: center; color: #64748b; font-size: 14px; cursor: default; list-style: none;">
-                        <i class="material-icons" style="font-size: 38px; color: #94a3b8; display: block; margin: 0 auto 8px;">credit_card_off</i>
-                        <strong style="display: block; font-size: 15px; color: #1e293b; margin-bottom: 4px;">Nenhum cartão cadastrado</strong>
-                        <span style="font-size: 13px; color: #64748b;">No cards registered yet. Clique em "Adicionar cartão" abaixo.</span>
+                    element.innerHTML = `<li class="cards-empty-state">
+                        <div class="cards-empty-icon-wrapper">
+                            <i class="material-icons">credit_card</i>
+                        </div>
+                        <h4 class="cards-empty-title">Nenhum cartão cadastrado</h4>
+                        <p class="cards-empty-desc">Cadastre um cartão de crédito para pagar suas viagens de forma rápida e segura.</p>
                     </li>`;
                     resolve();
                     return;
@@ -86,23 +88,41 @@ function initCardsModal() {
                     const thisId = card.idCard || card.cardId || card.id || card.mpCardId;
                     const isSelected = currentId && thisId && String(currentId) === String(thisId);
                     const last4 = card.last4 || card.last_four || card.lastFourDigits || card.mpLastFourDigits || (card.number ? String(card.number).slice(-4) : "••••");
-                    const brand = (card.brand || card.paymentMethodName || card.mpPaymentMethodName || card.mpPaymentMethodId || "Card").toUpperCase();
+                    const rawBrand = (card.brand || card.paymentMethodName || card.mpPaymentMethodName || card.mpPaymentMethodId || "Cartão").toLowerCase();
+                    const brandDisplay = rawBrand.charAt(0).toUpperCase() + rawBrand.slice(1);
                     const exp = (card.expirationMonth && card.expirationYear) ? `${String(card.expirationMonth).padStart(2, '0')}/${String(card.expirationYear).slice(-2)}` : "";
                     const safe = JSON.stringify(card).replace(/'/g, "&apos;");
 
-                    return `<li class="cards-list-select ${isSelected ? 'active' : ''}" value='${safe}' style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #e2e8f0; cursor: pointer; background: ${isSelected ? '#eff6ff' : '#ffffff'}; transition: background 0.15s ease;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 44px; height: 30px; border-radius: 6px; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">
-                                ${brand}
+                    let brandBg = "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)";
+                    if (rawBrand.includes("visa")) {
+                        brandBg = "linear-gradient(135deg, #1a1f71 0%, #0d1242 100%)";
+                    } else if (rawBrand.includes("master")) {
+                        brandBg = "linear-gradient(135deg, #eb001b 0%, #f79e1b 100%)";
+                    } else if (rawBrand.includes("elo")) {
+                        brandBg = "linear-gradient(135deg, #00a4e8 0%, #000000 100%)";
+                    } else if (rawBrand.includes("hiper")) {
+                        brandBg = "linear-gradient(135deg, #b20000 0%, #660000 100%)";
+                    }
+
+                    return `<li class="cards-list-select ${isSelected ? 'active' : ''}" value='${safe}'>
+                        <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+                            <div style="width: 48px; height: 32px; border-radius: 8px; background: ${brandBg}; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.18);">
+                                ${brandDisplay.slice(0, 8)}
                             </div>
-                            <div>
-                                <p style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a;">•••• •••• •••• ${last4}</p>
-                                <span style="font-size: 12px; color: #64748b;">${exp ? `Exp: ${exp}` : 'Credit/Debit Card'}</span>
+                            <div style="display: flex; flex-direction: column; min-width: 0; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 14px; font-weight: 700; color: #0f172a; letter-spacing: 0.5px;">•••• ${last4}</span>
+                                    ${isSelected ? '<span style="display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 700; background: #e0f2fe; color: #0284c7; border-radius: 10px;">Atual</span>' : ''}
+                                </div>
+                                <span style="font-size: 12px; color: #64748b; margin-top: 2px;">${brandDisplay}${exp ? ` • Validade ${exp}` : ''}</span>
                             </div>
                         </div>
-                        <button type="button" style="border: none; background: ${isSelected ? '#22c55e' : '#0284c7'}; color: #ffffff; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">
-                            ${isSelected ? '✓ Selecionado' : 'Selecionar'}
-                        </button>
+                        <div style="display: flex; align-items: center; flex-shrink: 0; margin-left: 12px;">
+                            ${isSelected 
+                                ? '<div style="width: 28px; height: 28px; border-radius: 50%; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center;"><i class="material-icons" style="font-size: 18px;">check</i></div>'
+                                : '<div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #cbd5e1; background: #ffffff;"></div>'
+                            }
+                        </div>
                     </li>`;
                 }).join("");
                 resolve();

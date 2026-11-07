@@ -383,13 +383,25 @@
     </div>
 
     <div class="container-cards" id="containerCardsModal">
-        <div>
-            <span>
-                Selecione um cartão
-                <i class="material-icons close-cards-modal">close</i>
-            </span>
-            <ul id="listCardPaymentModal"></ul>
-            <a id="addCardModal" href="javascript:void(0)">Adicionar cartão</a>
+        <div class="cards-modal-dialog">
+            <div class="cards-modal-header">
+                <div class="cards-modal-header-info">
+                    <span class="cards-modal-title">Selecione um cartão</span>
+                    <span class="cards-modal-subtitle">Escolha o cartão para cobrança desta viagem</span>
+                </div>
+                <button type="button" class="cards-modal-close-btn close-cards-modal" aria-label="Fechar modal">
+                    <i class="material-icons">close</i>
+                </button>
+            </div>
+            <div class="cards-modal-body">
+                <ul id="listCardPaymentModal" class="cards-modal-list"></ul>
+            </div>
+            <div class="cards-modal-footer">
+                <a id="addCardModal" class="cards-modal-add-btn" href="javascript:void(0)">
+                    <i class="material-icons">add_card</i>
+                    <span>Adicionar novo cartão</span>
+                </a>
+            </div>
         </div>
     </div>
 
