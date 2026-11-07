@@ -235,7 +235,7 @@ class DashboardController extends ApiController
                         t.tripReference,
                         DATE_FORMAT(t.date, '%Y-%m-%d %H:%i:%s') as date,
                         DATE_FORMAT(t.date, '%Y-%m-%d %H:%i:%s') as created_at,
-                        DATE_FORMAT(t.updated_at, '%Y-%m-%d %H:%i:%s') as updated_at,
+                        DATE_FORMAT(t.date, '%Y-%m-%d %H:%i:%s') as updated_at,
                         t.price,
                         t.status,
                         t.canceledBy,
@@ -319,8 +319,7 @@ class DashboardController extends ApiController
                     UPDATE trip 
                     SET status = 'canceled', 
                         canceledBy = 'system', 
-                        cancelReason = 'Tempo limite de busca excedido',
-                        updated_at = NOW() 
+                        cancelReason = 'Tempo limite de busca excedido'
                     WHERE status IN ('searching', 'searching_favorite', 'get_bid_by_drivers') 
                       AND date < DATE_SUB(NOW(), INTERVAL 2 HOUR)
                       AND tripReference NOT IN (SELECT tripReference FROM tripScheduled WHERE tripReference IS NOT NULL)
