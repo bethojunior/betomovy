@@ -266,6 +266,7 @@ const translations: Record<LanguageType, Record<string, string>> = {
     "Clientes Pendentes": "Passageiros Pendentes",
     "Clientes Bloqueados": "Passageiros Bloqueados",
     "Méd.": "Méd.",
+    "Gerenciar / Adicionar Tipos": "Gerenciar / Adicionar Tipos",
   },
   en: {
     // Header & User
@@ -522,6 +523,7 @@ const translations: Record<LanguageType, Record<string, string>> = {
     "Clientes Pendentes": "Pending Passengers",
     "Clientes Bloqueados": "Blocked Passengers",
     "Méd.": "Avg.",
+    "Gerenciar / Adicionar Tipos": "Manage / Add Types",
   },
 };
 

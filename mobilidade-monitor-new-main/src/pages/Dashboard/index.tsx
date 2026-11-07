@@ -840,9 +840,29 @@ const DashBoard: FC = () => {
               {driverList.length} {driverList.length === 1 ? t("categoria") : t("categorias")}
             </SectionCounterBadge>
           </SectionHeaderLeft>
-          <SectionDescription>
-            {t("Distribuição de veículos por modalidade de atendimento")}
-          </SectionDescription>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <SectionDescription>
+              {t("Distribuição de veículos por modalidade de atendimento")}
+            </SectionDescription>
+            <Link to="/config/callManagement" style={{ textDecoration: "none" }}>
+              <Button
+                type="primary"
+                style={{
+                  borderRadius: 10,
+                  background: "#00349a",
+                  borderColor: "#00349a",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                <FaCarSide />
+                {t("Gerenciar / Adicionar Tipos")}
+              </Button>
+            </Link>
+          </div>
         </SectionHeader>
 
         {loadingFetchDataDashBoard ? (
