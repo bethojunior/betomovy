@@ -1,69 +1,102 @@
 import { FC, useState, useEffect, useRef } from "react";
 import {
   DashBoardContainer,
-  StatisticContainer,
-  TypesOfDrivers,
-  CardTyperDriverContainer,
-  TypeDriverDataContainer,
-  TypeDriversCard,
-  TypeDriverImageContainer,
-  TypeDriverImage,
-  TypeDriverContainer,
-  StatisticRealTime,
-  TripAndTicketOfToday,
-  ClientsAndDriversRealTime,
-  TopDriversAndClients,
-  CardOfInformations,
-  TextOfCard,
-  ContainerInformationsData,
-  InformationsDataMap,
-  TypeDriverDataLabel,
-  TypeDriverDataItem,
-  TripAndTicketContainer,
-  TripAndTicketData,
-  TripAndTicked,
-  LineConatiner,
-  ContentCardInformations,
-  TripsLabel,
-  TripsItem,
-  ContainerOfCarInformationGlobal,
-  ParagraphBasicGlobal,
-  TopItem,
-  TopContainer,
-  TopName,
-  TypeDriversCarousel,
-  CardContainerMap,
-  CustomersCardWrapper,
-  CustomersCardsRow,
-  CustomerMetricCard,
-  CustomerMetricContent,
-  CustomerMetricLabel,
-  CustomerMetricValue,
+  DashboardHeroHeader,
+  DashboardTitleGroup,
+  DashboardTitle,
+  DashboardSubtitle,
+  HeaderActionsRow,
+  LiveIndicatorPill,
+  PulseDot,
+  CityPill,
+  ModernRefreshBtn,
+  KpiOverviewGrid,
+  ModernKpiCard,
+  KpiIconBadge,
+  KpiDetails,
+  KpiMetricLabel,
+  KpiMetricValue,
+  KpiMetricHint,
+  SectionCard,
+  SectionHeader,
+  SectionHeaderLeft,
+  SectionTitleText,
+  SectionCounterBadge,
+  SectionDescription,
+  ModernDriverTypesGrid,
+  DriverCategoryCard,
+  DriverCategoryHeader,
+  DriverAvatarCircle,
+  DriverCategoryInfo,
+  DriverCategoryName,
+  DriverCategorySubtitle,
+  DriverTotalBanner,
+  DriverTotalLabel,
+  DriverTotalValue,
+  DriverStatusGrid,
+  DriverStatusItem,
+  DriverStatusDot,
+  DriverActiveRatioBar,
+  DriverActiveRatioFill,
+  ModernCustomersGrid,
+  ModernCustomerCard,
+  CustomerCardTop,
+  CustomerCardIconWrap,
+  CustomerCardCount,
+  CustomerCardTitleText,
+  ModernAnalyticsGrid,
+  ModernAnalyticsCard,
+  AnalyticsCardTop,
+  AnalyticsCardTitle,
+  AnalyticsCardBody,
+  AnalyticsDataList,
+  AnalyticsDataItem,
+  AnalyticsItemLeft,
+  AnalyticsColorDot,
+  AnalyticsItemName,
+  AnalyticsItemValue,
+  AnalyticsChartWrap,
+  ModernRankingsGrid,
+  ModernRankingCard,
+  RankingHeaderWrap,
+  RankingFiltersWrap,
+  RankingFilterPill,
+  RankingScrollList,
+  RankingListItem,
+  RankingPositionBadge,
+  RankingUserMeta,
+  RankingUserNameText,
+  RankingStatsPills,
+  RankingStatChip,
+  RankingActionBtns,
+  WhatsAppActionBtn,
+  CelebrateActionBtn,
   SkeletonContainer,
-  TitleNotTypesDrivers,
-  TripsAcceptedContainer,
   ContainerInput,
-  GridButtonRefresh,
-  TopListContainer,
-  TopItemContainer,
-  TopItemContent,
-  TopItemActions,
-  WhatsAppLink,
-  TicketMedioText,
-  LoadingMoreText,
   LoadingMoreSpinner,
-  ButtonParabens,
-  ContentFilteredMonthAndDay,
-  ButtonsFiltered,
-  RankingFilterLabel,
-  CardHeaderRow,
+  LoadingMoreText,
+  TitleNotTypesDrivers,
 } from "./styles";
 import api from "../../services/api";
 import Utils from "../../utils/Utils";
 import DriverCardSkeleton from "../../components/SkeletonDashBoard/DriverCard";
 import { Button, Input, InputRef, Skeleton, Tooltip, Spin } from "antd";
 import { PieChart } from "@mui/x-charts/PieChart";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp, FaCarSide, FaTrophy } from "react-icons/fa";
+import {
+  FiRefreshCw,
+  FiTrendingUp,
+  FiDollarSign,
+  FiUsers,
+  FiUserCheck,
+  FiUserX,
+  FiClock,
+  FiMapPin,
+  FiActivity,
+  FiAward,
+} from "react-icons/fi";
+
+import carDefaultImg from "../../assets/carDefault.png";
 
 import {
   DatasDashboardProps,
@@ -72,9 +105,9 @@ import {
   CurrentQuantitiesProps,
   ApiRankingDriverRaw,
   ApiRankingClientRaw,
-  PercentProps,
   RankingPeriod,
   ModalParabensState,
+  ListCurrentQuantitiesProps,
 } from "./types";
 import { deduplicateByKey } from "../../utils/arrayUtils";
 import swal from "sweetalert";
@@ -88,7 +121,6 @@ import apiApp from "../../services/apiApp";
 import { AxiosError } from "axios";
 import ModalAlertKeysMaps from "../../components/ModalAlertKeysMaps";
 import { ModalPublicity } from "../../components/ModalPublicity";
-import { ListCurrentQuantitiesProps } from "./types";
 import CurrencyUtils from "../../utils/currency/currency";
 import { formatPhoneForWhatsApp, openWhatsApp } from "../../utils/whatsappUtils";
 import { ModalWhatsAppParabens } from "../../components/ModalWhatsAppParabens";
@@ -103,8 +135,7 @@ const DashBoard: FC = () => {
   const [showModalMapKeysThisSession, setShowModalMapKeysThisSession] = useState(false);
   const [datasDashboard, setDatasDashboard] = useState<DatasDashboardProps>({} as DatasDashboardProps);
 
-  const [driversRequest, setDriversRequest] =
-    useState<ListCurrentQuantitiesProps>();
+  const [driversRequest, setDriversRequest] = useState<ListCurrentQuantitiesProps>();
 
   const [driverRank, setDriverRank] = useState<DriversRankingDataProps[]>([]);
   const [clientRank, setClientRank] = useState<ClientRankingDataProps[]>([]);
@@ -118,6 +149,7 @@ const DashBoard: FC = () => {
   const [clientRankPeriod, setClientRankPeriod] = useState<RankingPeriod>("all");
   const [loadingRankingDriver, setLoadingRankingDriver] = useState(false);
   const [loadingRankingClient, setLoadingRankingClient] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string>("");
   const [modalParabens, setModalParabens] = useState<ModalParabensState>({
     open: false,
     name: "",
@@ -129,14 +161,10 @@ const DashBoard: FC = () => {
     loadingPassword: false,
   });
 
-  const [loadingFetchDataDashBoard, setLoadingFetchDataDashBoard] = useState(true)
+  const [loadingFetchDataDashBoard, setLoadingFetchDataDashBoard] = useState(true);
 
-  const [errorMapKey, setErrorMapKey] = useState<ErrorKeysMapsProps | null>(
-    null
-  );
-  const [publicityInformations, setPublicityInfomations] = useState<
-    PublicityProps[]
-  >([]);
+  const [errorMapKey, setErrorMapKey] = useState<ErrorKeysMapsProps | null>(null);
+  const [publicityInformations, setPublicityInfomations] = useState<PublicityProps[]>([]);
 
   const verifyHasFirstLogin = () => {
     const firstLogin = localStorage.getItem("@App:firstPasswordUsed");
@@ -147,14 +175,12 @@ const DashBoard: FC = () => {
   };
 
   useEffect(() => {
-    // Não exibe se o teste ainda não carregou (null)
     if (!errorMapKey) {
       return;
     }
 
     const alreadyShown = sessionStorage.getItem("hasSeenMapKeyModal");
 
-    // Apenas exibe se houver erro real (qualquer serviço diferente de true)
     const hasError =
       errorMapKey.direction !== true ||
       errorMapKey.geocoding !== true ||
@@ -174,7 +200,6 @@ const DashBoard: FC = () => {
 
   const getConfigsModalAdvertsings = async () => {
     try {
-
       const storedKeys = localStorage.getItem("keysApp");
       let keys;
 
@@ -186,24 +211,25 @@ const DashBoard: FC = () => {
           localStorage.removeItem("keysApp");
         }
       }
-      
+
       const responseConfigModalAdvertsings = await api.get("config");
 
-        if (responseConfigModalAdvertsings.status && Array.isArray(responseConfigModalAdvertsings.data?.response)) {
-          const configsGestor = responseConfigModalAdvertsings.data.response.find(
-            (data: KeysAppProps) => data?.type === "GESTOR"
-          );
+      if (responseConfigModalAdvertsings.status && Array.isArray(responseConfigModalAdvertsings.data?.response)) {
+        const configsGestor = responseConfigModalAdvertsings.data.response.find(
+          (data: KeysAppProps) => data?.type === "GESTOR"
+        );
 
-          if (configsGestor?.config && Array.isArray(configsGestor.config)) {
-            keyEnableShowPublicity = configsGestor.config.find(
-              (data: ConfigsKeyAppsProps) => data?.key === "enable_publicity"
-            )?.value;
-          }
+        if (configsGestor?.config && Array.isArray(configsGestor.config)) {
+          keyEnableShowPublicity = configsGestor.config.find(
+            (data: ConfigsKeyAppsProps) => data?.key === "enable_publicity"
+          )?.value;
         }
+      }
     } catch (error) {
       console.error(error);
     }
   };
+
   const getErrorsKeysMaps = async () => {
     try {
       const responseErrorKeysMaps = await apiApp.get("map/allServiceTest/");
@@ -215,133 +241,24 @@ const DashBoard: FC = () => {
         }
       }
     } catch (error) {
-      // Falha de rede ou não autorizado tratada silenciosamente para não interromper a navegação
+      // Ignora erro silenciosamente
     }
   };
 
   const getPublicities = async () => {
     try {
-      const responsePublicities = await api.get(
-        `publicity/advertising/customer`
-      );
+      const responsePublicities = await api.get(`publicity/advertising/customer`);
 
       if (responsePublicities.status) {
         setPublicityInfomations(responsePublicities.data.response);
       }
     } catch (error) {
       const responseError = error as AxiosError;
-
       if (responseError.message === "Não autorizado") {
         return;
       }
-
-      // Modal de erro comentado para apresentação - erro silencioso
-      // swal({
-      //   title: "Error",
-      //   text: "Publicidades não encontradas.",
-      //   icon: "error",
-      // });
     }
   };
-
-  const dataGraphicPie = [
-    {
-      id: 0,
-      label: "Cliente",
-      value: datasDashboard?.canceledbyCustomer || 0,
-    },
-    {
-      id: 1,
-      label: "Motorista",
-      value: datasDashboard?.canceledbyDriver || 0,
-    },
-  ];
-
-  const configGraphicPie = {
-    appendPadding: 10,
-    data: dataGraphicPie,
-    angleField: "value",
-    colorField: "type",
-    radius: 0.75,
-    label: {
-      type: "inner",
-      labelHeight: 28,
-      content: ({ percent }: PercentProps) => `${(percent * 100).toFixed(0)}%`,
-    },
-    interactions: [{ type: "element-selected" }, { type: "element-active" }],
-  };
-
-  const dataGraphicPieTrips = [
-    {
-      id: 0,
-      label: "Aceitas",
-      value: datasDashboard?.tripAccepted || 0,
-    },
-    {
-      id: 1,
-      label: "Finalizadas",
-      value: datasDashboard?.tripFinished || 0,
-    },
-  ];
-
-  const configGraphicPieTrips = {
-    appendPadding: 10,
-    data: dataGraphicPieTrips,
-    angleField: "value",
-    colorField: "type",
-    radius: 0.75,
-    label: {
-      type: "inner",
-      labelHeight: 28,
-      content: ({ percent }: PercentProps) => `${(percent * 100).toFixed(0)}%`,
-    },
-    interactions: [{ type: "element-selected" }, { type: "element-active" }],
-  };
-
-  const dataGraphicPieTypePayment = [
-    {
-      id: 1,
-      label: "Dinheiro",
-      value: datasDashboard?.paidOutMoney || 0,
-    },
-    {
-      id: 2,
-      label: "Voucher",
-      value: datasDashboard?.paidOutVoucher || 0,
-    },
-    {
-      id: 3,
-      label: "Cartão",
-      value: datasDashboard?.paidOutCreditCard || 0,
-    },
-  ];
-
-  const configGraphicPieTypePayment = {
-    appendPadding: 10,
-    data: dataGraphicPieTypePayment,
-    angleField: "value",
-    colorField: "type",
-    radius: 0.75,
-    label: {
-      type: "inner",
-      labelHeight: 28,
-      content: ({ percent }: PercentProps) => `${(percent * 100).toFixed(0)}%`,
-    },
-    interactions: [{ type: "element-selected" }, { type: "element-active" }],
-  };
-
-  function separateIntoContainers<T>(items: T[] | undefined | null): T[][] {
-    const auxCards = [...(items ?? [])];
-    const containerCards: T[][] = [];
-    const deleteCount = Utils.isMobile() ? 1 : 4;
-    while (auxCards.length) {
-      containerCards.push(auxCards.splice(0, deleteCount));
-    }
-    return containerCards;
-  }
-
-  const list = separateIntoContainers<CurrentQuantitiesProps>(driversRequest?.drivers);
-  const listCustomers = separateIntoContainers<CurrentQuantitiesProps>(driversRequest?.customers);
 
   const onFinishChange = () => {
     let parsedUserId: string | null = null;
@@ -387,19 +304,13 @@ const DashBoard: FC = () => {
         modalLottie.current?.closeModal();
       });
   };
- 
-  const switchShowModalAdvertsings = (
-    role: string,
-    keyShowPublicity: string
-  ) => {
+
+  const switchShowModalAdvertsings = (role: string, keyShowPublicity: string) => {
     if (keyShowPublicity === "0") {
       return null;
     }
 
-    if (
-      (role === "admin" && keyShowPublicity === "1") ||
-      keyShowPublicity === "2"
-    ) {
+    if ((role === "admin" && keyShowPublicity === "1") || keyShowPublicity === "2") {
       return (
         publicityInformations.length > 0 && (
           <ModalPublicity publicityInformations={publicityInformations} />
@@ -415,39 +326,40 @@ const DashBoard: FC = () => {
         params: forceCache ? { forceCache: true } : {},
       });
       if (response.status) {
-      
-        const totalBilledFromApi = response.data.response?.totalBilled;
+        const payload = response.data?.data || response.data?.response || {};
+
+        const totalBilledFromApi = payload.totalBilled;
         const parsedBilled = CurrencyUtils.parseMonetaryValue(totalBilledFromApi);
 
-        const statisticsByCity = response.data.response?.statisticsByCity || {};
+        const statisticsByCity = payload.statisticsByCity || {};
         const todayTotalTrips = statisticsByCity.todayTotalTrips || 0;
-        
-        const calculatedTicketMedia = todayTotalTrips > 0 
-          ? parsedBilled / todayTotalTrips 
-          : 0;
-        
+
+        const calculatedTicketMedia = todayTotalTrips > 0 ? parsedBilled / todayTotalTrips : 0;
+
         const ticketMediaFromApi = statisticsByCity?.ticketMedia;
-        const parsedTicketMedia = ticketMediaFromApi 
+        const parsedTicketMedia = ticketMediaFromApi
           ? CurrencyUtils.parseMonetaryValue(ticketMediaFromApi)
           : calculatedTicketMedia;
 
-        const parsedDriverRank = parseDriverRankFromApi((response.data.response?.rankingDriver || []) as ApiRankingDriverRaw[]);
-        const parsedClientRank = parseClientRankFromApi((response.data.response?.rankingCustomer || []) as ApiRankingClientRaw[]);
+        const parsedDriverRank = parseDriverRankFromApi((payload.rankingDriver || []) as ApiRankingDriverRaw[]);
+        const parsedClientRank = parseClientRankFromApi((payload.rankingCustomer || []) as ApiRankingClientRaw[]);
 
         setDatasDashboard({
-          ...statisticsByCity, 
+          ...statisticsByCity,
           totalBilled: parsedBilled,
           ticketMedia: parsedTicketMedia,
-          todayTotalTrips: todayTotalTrips
-        })
-        setDriversRequest(response.data.response?.currentQuantities)
+          todayTotalTrips: todayTotalTrips,
+        });
+        setDriversRequest(payload.currentQuantities || {});
         setDriverRank(parsedDriverRank);
         setClientRank(parsedClientRank);
         setCurrentDriverPage(1);
         setCurrentClientPage(1);
         setHasMoreDrivers(true);
         setHasMoreClients(true);
- 
+        setLastUpdated(
+          new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+        );
       }
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } }; message?: string };
@@ -457,9 +369,9 @@ const DashBoard: FC = () => {
         icon: "error",
       });
     } finally {
-      setLoadingFetchDataDashBoard(false)
+      setLoadingFetchDataDashBoard(false);
     }
-  }
+  };
 
   useEffect(() => {
     verifyHasFirstLogin();
@@ -479,23 +391,52 @@ const DashBoard: FC = () => {
     }
   }, []);
 
-  const driverAllActives = driversRequest?.drivers?.reduce(
-    (oldValue, currentValue) => {
-      return oldValue + currentValue.active;
-    },
-    0
-  );
+  const driverAllActives = (driversRequest?.drivers || []).reduce((acc, curr) => {
+    return acc + (Number(curr.active) || 0);
+  }, 0);
 
-  const customersAllActives = driversRequest?.customers?.reduce(
-    (oldValue, currentValue) => {
-      return oldValue + currentValue.active;
-    },
-    0
-  );
+  const totalVehiclesCount = (driversRequest?.drivers || []).reduce((acc, curr) => {
+    return acc + (Number(curr.total) || 0);
+  }, 0);
+
+  const customersAllActives = (driversRequest?.customers || []).reduce((acc, curr) => {
+    return acc + (Number(curr.active) || 0);
+  }, 0);
+
+  const customersAllTotal = (driversRequest?.customers || []).reduce((acc, curr) => {
+    return acc + (Number(curr.total) || 0);
+  }, 0);
+
+  const customersAllPending = (driversRequest?.customers || []).reduce((acc, curr) => {
+    return acc + (Number(curr.pending) || 0);
+  }, 0);
+
+  const customersAllBlocked = (driversRequest?.customers || []).reduce((acc, curr) => {
+    return acc + (Number(curr.blocked) || 0);
+  }, 0);
 
   const projectName = Utils.capitalizeFirstLetter(import.meta.env.PROJECT_NAME) || "Fortaleza Movel";
 
-  const handleOpenModalParabens = (item: { name: string; quantityTrips: number; phone?: string }, type: "driver" | "client") => {
+  const getSelectedCityLabel = (): string => {
+    try {
+      const raw = Session.getLocal("citySelected");
+      if (!raw) return "Petrolina - PE";
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      const item = Array.isArray(parsed) ? parsed[0] : parsed;
+      if (item?.cityName) {
+        return `${item.cityName}${item.state ? ` - ${item.state}` : ""}`;
+      }
+      if (item?.name) return item.name;
+      return "Petrolina - PE";
+    } catch {
+      return "Petrolina - PE";
+    }
+  };
+
+  const handleOpenModalParabens = (
+    item: { name: string; quantityTrips: number; phone?: string },
+    type: "driver" | "client"
+  ) => {
     setModalParabens({
       open: true,
       name: item.name,
@@ -531,7 +472,12 @@ const DashBoard: FC = () => {
     endpoint: string,
     period: RankingPeriod,
     parse: (items: unknown[]) => T[],
-    setters: { setData: (data: T[]) => void; setPage: (page: number) => void; setHasMore: (value: boolean) => void; setLoading: (value: boolean) => void }
+    setters: {
+      setData: (data: T[]) => void;
+      setPage: (page: number) => void;
+      setHasMore: (value: boolean) => void;
+      setLoading: (value: boolean) => void;
+    }
   ): Promise<void> => {
     setters.setLoading(true);
     try {
@@ -542,7 +488,7 @@ const DashBoard: FC = () => {
           ...buildRankingPeriodParams(period),
         },
       });
-      const raw = response?.data?.response;
+      const raw = response?.data?.data || response?.data?.response;
       const items = Array.isArray(raw) ? raw : [];
       const parsed = parse(items as unknown[]);
       setters.setData(parsed);
@@ -617,14 +563,14 @@ const DashBoard: FC = () => {
     if (loadingMoreDrivers || !hasMoreDrivers) {
       return;
     }
-    
+
     setLoadingMoreDrivers(true);
     const nextPage = currentDriverPage + 1;
-    
+
     try {
       const citySelected = Session.getLocal("citySelected");
       const cityId = Array.isArray(citySelected) ? citySelected[0]?.cityId : citySelected?.cityId;
-      
+
       if (!cityId) {
         setLoadingMoreDrivers(false);
         return;
@@ -637,25 +583,25 @@ const DashBoard: FC = () => {
           ...buildRankingPeriodParams(driverRankPeriod),
         },
       });
-      
-      if (response.status && response.data.response) {
-        const parsedDriverRank = parseDriverRankFromApi(response.data.response as ApiRankingDriverRaw[]);
+
+      const resList = response.data?.data || response.data?.response;
+      if (response.status && resList) {
+        const parsedDriverRank = parseDriverRankFromApi(resList as ApiRankingDriverRaw[]);
 
         if (parsedDriverRank.length === 0) {
           setHasMoreDrivers(false);
         } else {
-          setDriverRank(prev => {
+          setDriverRank((prev) => {
             const safePrev = Array.isArray(prev) ? prev : [];
             const existingIds = new Set(safePrev.map((d: DriversRankingDataProps) => d.idDriver));
             const newDrivers = parsedDriverRank.filter((d: DriversRankingDataProps) => !existingIds.has(d.idDriver));
-            
+
             if (newDrivers.length === 0) {
               setHasMoreDrivers(false);
               return safePrev;
             }
-            
-            const newList = [...safePrev, ...newDrivers];
-            return newList;
+
+            return [...safePrev, ...newDrivers];
           });
           setCurrentDriverPage(nextPage);
           if (parsedDriverRank.length < 10) {
@@ -676,10 +622,10 @@ const DashBoard: FC = () => {
     if (loadingMoreClients || !hasMoreClients) {
       return;
     }
-    
+
     setLoadingMoreClients(true);
     const nextPage = currentClientPage + 1;
-    
+
     try {
       const response = await api.get(`dashboard/rankingCustomer`, {
         params: {
@@ -688,25 +634,25 @@ const DashBoard: FC = () => {
           ...buildRankingPeriodParams(clientRankPeriod),
         },
       });
-      
-      if (response.status && response.data.response) {
-        const parsedClientRank = parseClientRankFromApi(response.data.response as ApiRankingClientRaw[]);
+
+      const resList = response.data?.data || response.data?.response;
+      if (response.status && resList) {
+        const parsedClientRank = parseClientRankFromApi(resList as ApiRankingClientRaw[]);
 
         if (parsedClientRank.length === 0) {
           setHasMoreClients(false);
         } else {
-          setClientRank(prev => {
+          setClientRank((prev) => {
             const safePrev = Array.isArray(prev) ? prev : [];
             const existingIds = new Set(safePrev.map((c: ClientRankingDataProps) => c.idUser));
             const newClients = parsedClientRank.filter((c: ClientRankingDataProps) => !existingIds.has(c.idUser));
-            
+
             if (newClients.length === 0) {
               setHasMoreClients(false);
               return safePrev;
             }
-            
-            const newList = [...safePrev, ...newClients];
-            return newList;
+
+            return [...safePrev, ...newClients];
           });
           setCurrentClientPage(nextPage);
           if (parsedClientRank.length < 10) {
@@ -723,13 +669,10 @@ const DashBoard: FC = () => {
     }
   };
 
-  const handleScroll = (
-    e: React.UIEvent<HTMLDivElement>,
-    type: "driver" | "client"
-  ) => {
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>, type: "driver" | "client") => {
     const target = e.currentTarget;
     const scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
-    
+
     if (scrollBottom < 100) {
       if (type === "driver") {
         if (hasMoreDrivers && !loadingMoreDrivers) {
@@ -743,516 +686,702 @@ const DashBoard: FC = () => {
     }
   };
 
+  // Pie Chart Data Setup
+  const paymentFormsData = [
+    { id: 1, label: "Dinheiro", value: datasDashboard?.paidOutMoney || 0, color: "#10b981" },
+    { id: 2, label: "Voucher", value: datasDashboard?.paidOutVoucher || 0, color: "#6366f1" },
+    { id: 3, label: "Cartão", value: datasDashboard?.paidOutCreditCard || 0, color: "#0284c7" },
+  ];
+  const hasPaymentData = paymentFormsData.some((d) => d.value > 0);
+
+  const tripsStatusData = [
+    { id: 1, label: "Aceitas", value: datasDashboard?.tripAccepted || 0, color: "#0284c7" },
+    { id: 2, label: "Finalizadas", value: datasDashboard?.tripFinished || 0, color: "#10b981" },
+  ];
+  const hasTripsData = tripsStatusData.some((d) => d.value > 0);
+
+  const cancellationsData = [
+    { id: 1, label: "Pelo Motorista", value: datasDashboard?.canceledbyDriver || 0, color: "#f59e0b" },
+    { id: 2, label: "Pelo Passageiro", value: datasDashboard?.canceledbyCustomer || 0, color: "#ef4444" },
+  ];
+  const hasCancellationsData = cancellationsData.some((d) => d.value > 0);
+
+  const driverList = driversRequest?.drivers || [];
+
   return (
     <DashBoardContainer>
-      <GridButtonRefresh>
-        <h2>Tipos de Motorista</h2>
-        <Tooltip title="Os dados são atualizados a cada 2 horas.
-Clique para ver a versão mais recente agora.">
-                        
-                      
-      <Button loading={loadings.loadingPassword}
-              type="primary"
-              onClick={() => {return unifiedDataDashboard({ forceCache: true })}}
-              >Atualizar Dados</Button>
-              </Tooltip>
-      </GridButtonRefresh>
-       <hr />
-      <CardTyperDriverContainer>
-        <TypesOfDrivers>
-          {loadingFetchDataDashBoard == true ? (
-            <DriverCardSkeleton />
-          ) : (
-            <TypeDriversCarousel>
-              {(list || []).map((content, index) => (
-                <CardContainerMap key={index}>
-                  {(!content || content.length === 0)
-                    ? "não tem motorista cadastrado para essa cidade"
-                    : ""}
-                  {(content || []).map((item: CurrentQuantitiesProps, index) => (
-                    <TypeDriversCard key={Number(index)}>
-                      <TypeDriverImageContainer>
-                        <TypeDriverImage preview={false} src={item.picture} />
-                      </TypeDriverImageContainer>
-                      <TypeDriverContainer>{item.type}</TypeDriverContainer>
-                      <div>
-                        <TypeDriverDataContainer>
-                          <TypeDriverDataLabel>
-                            Total de veículos:
-                          </TypeDriverDataLabel>
-                          <TypeDriverDataItem>{item.total}</TypeDriverDataItem>
-                        </TypeDriverDataContainer>
-                        <TypeDriverDataContainer>
-                          <TypeDriverDataLabel>Ativos:</TypeDriverDataLabel>
-                          <TypeDriverDataItem>{item.active}</TypeDriverDataItem>
-                        </TypeDriverDataContainer>
-                        <TypeDriverDataContainer>
-                          <TypeDriverDataLabel>Pendentes:</TypeDriverDataLabel>
-                          <TypeDriverDataItem>
-                            {item.pending}
-                          </TypeDriverDataItem>
-                        </TypeDriverDataContainer>
-                        <TypeDriverDataContainer>
-                          <TypeDriverDataLabel>
-                            Aguardando liberação:
-                          </TypeDriverDataLabel>
-                          <TypeDriverDataItem>
-                            {item.waiting_answer}
-                          </TypeDriverDataItem>
-                        </TypeDriverDataContainer>
-                        <TypeDriverDataContainer>
-                          <TypeDriverDataLabel>Bloqueados:</TypeDriverDataLabel>
-                          <TypeDriverDataItem>
-                            {item.blocked}
-                          </TypeDriverDataItem>
-                        </TypeDriverDataContainer>
-                      </div>
-                    </TypeDriversCard>
-                  ))}
-                </CardContainerMap>
-              ))}
-            </TypeDriversCarousel>
-          )}
-          {list.length === 0 && loadingFetchDataDashBoard === false ? (
-            <TitleNotTypesDrivers>
-              Nenhum tipo de motorista encontrado
-            </TitleNotTypesDrivers>
-          ) : null}
-        </TypesOfDrivers>
-      </CardTyperDriverContainer>
+      {/* ==========================================================================
+          Executive Hero Header
+         ========================================================================== */}
+      <DashboardHeroHeader>
+        <DashboardTitleGroup>
+          <DashboardTitle>
+            <FiActivity /> Dashboard Operacional
+          </DashboardTitle>
+          <DashboardSubtitle>
+            Métricas de frota, status de viagens e faturamento consolidado em tempo real
+          </DashboardSubtitle>
+        </DashboardTitleGroup>
 
-      {listCustomers.length > 0 && (
-        <>
-          <h2>Clientes</h2>
-          <hr />
-          <CardTyperDriverContainer>
-            <TypesOfDrivers>
-              {loadingFetchDataDashBoard ? (
-                <DriverCardSkeleton />
+        <HeaderActionsRow>
+          <LiveIndicatorPill>
+            <PulseDot />
+            Ao vivo
+          </LiveIndicatorPill>
+
+          <CityPill>
+            <FiMapPin />
+            {getSelectedCityLabel()}
+          </CityPill>
+
+          <Tooltip title="Atualiza todos os dados e sincroniza com o servidor em tempo real.">
+            <ModernRefreshBtn
+              $loading={loadingFetchDataDashBoard}
+              disabled={loadingFetchDataDashBoard}
+              onClick={() => unifiedDataDashboard({ forceCache: true })}
+            >
+              <FiRefreshCw className="spin-icon" />
+              <span>{loadingFetchDataDashBoard ? "Atualizando..." : "Atualizar Dados"}</span>
+            </ModernRefreshBtn>
+          </Tooltip>
+        </HeaderActionsRow>
+      </DashboardHeroHeader>
+
+      {/* ==========================================================================
+          KPI Top Cards (Quick Executive Metrics)
+         ========================================================================== */}
+      <KpiOverviewGrid>
+        <ModernKpiCard $variant="primary">
+          <KpiIconBadge $variant="primary">
+            <FaCarSide />
+          </KpiIconBadge>
+          <KpiDetails>
+            <KpiMetricLabel>Viagens Hoje</KpiMetricLabel>
+            {loadingFetchDataDashBoard ? (
+              <Skeleton.Input active size="small" style={{ width: 80 }} />
+            ) : (
+              <KpiMetricValue>{datasDashboard?.todayTotalTrips ?? 0}</KpiMetricValue>
+            )}
+            <KpiMetricHint>Corridas concluídas hoje</KpiMetricHint>
+          </KpiDetails>
+        </ModernKpiCard>
+
+        <ModernKpiCard $variant="success">
+          <KpiIconBadge $variant="success">
+            <FiDollarSign />
+          </KpiIconBadge>
+          <KpiDetails>
+            <KpiMetricLabel>Faturamento Hoje</KpiMetricLabel>
+            {loadingFetchDataDashBoard ? (
+              <Skeleton.Input active size="small" style={{ width: 110 }} />
+            ) : (
+              <KpiMetricValue>
+                {CurrencyUtils.formatCurrency(datasDashboard?.totalBilled ?? 0)}
+              </KpiMetricValue>
+            )}
+            <KpiMetricHint>Receita bruta acumulada hoje</KpiMetricHint>
+          </KpiDetails>
+        </ModernKpiCard>
+
+        <ModernKpiCard $variant="info">
+          <KpiIconBadge $variant="info">
+            <FiTrendingUp />
+          </KpiIconBadge>
+          <KpiDetails>
+            <KpiMetricLabel>Ticket Médio Hoje</KpiMetricLabel>
+            {loadingFetchDataDashBoard ? (
+              <Skeleton.Input active size="small" style={{ width: 90 }} />
+            ) : (
+              <KpiMetricValue>
+                {CurrencyUtils.formatCurrency(datasDashboard?.ticketMedia ?? 0)}
+              </KpiMetricValue>
+            )}
+            <KpiMetricHint>Valor médio por viagem concluída</KpiMetricHint>
+          </KpiDetails>
+        </ModernKpiCard>
+
+        <ModernKpiCard $variant="warning">
+          <KpiIconBadge $variant="warning">
+            <FiUsers />
+          </KpiIconBadge>
+          <KpiDetails>
+            <KpiMetricLabel>Veículos Ativos</KpiMetricLabel>
+            {loadingFetchDataDashBoard ? (
+              <Skeleton.Input active size="small" style={{ width: 80 }} />
+            ) : (
+              <KpiMetricValue>{driverAllActives}</KpiMetricValue>
+            )}
+            <KpiMetricHint>
+              {totalVehiclesCount} veículos registrados na frota
+            </KpiMetricHint>
+          </KpiDetails>
+        </ModernKpiCard>
+      </KpiOverviewGrid>
+
+      {/* ==========================================================================
+          Tipos de Motorista & Categorias
+         ========================================================================== */}
+      <SectionCard>
+        <SectionHeader>
+          <SectionHeaderLeft>
+            <SectionTitleText>
+              <FaCarSide style={{ color: "#00349a" }} /> Tipos de Motorista & Frota
+            </SectionTitleText>
+            <SectionCounterBadge>
+              {driverList.length} {driverList.length === 1 ? "categoria" : "categorias"}
+            </SectionCounterBadge>
+          </SectionHeaderLeft>
+          <SectionDescription>
+            Distribuição de veículos por modalidade de atendimento
+          </SectionDescription>
+        </SectionHeader>
+
+        {loadingFetchDataDashBoard ? (
+          <DriverCardSkeleton />
+        ) : driverList.length === 0 ? (
+          <TitleNotTypesDrivers>
+            Nenhum tipo de motorista encontrado para esta cidade.
+          </TitleNotTypesDrivers>
+        ) : (
+          <ModernDriverTypesGrid>
+            {driverList.map((item: CurrentQuantitiesProps, idx: number) => {
+              const activeCount = Number(item.active) || 0;
+              const waitingCount = Number(item.waiting_answer) || 0;
+              const pendingCount = Number(item.pending) || 0;
+              const blockedCount = Number(item.blocked) || 0;
+              const totalCount = Number(item.total) || 0;
+              const activePercent = totalCount > 0 ? (activeCount / totalCount) * 100 : 0;
+
+              return (
+                <DriverCategoryCard key={`driver-cat-${idx}-${item.type}`}>
+                  <DriverCategoryHeader>
+                    <DriverAvatarCircle>
+                      <img
+                        src={item.picture || carDefaultImg}
+                        alt={item.type}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = carDefaultImg;
+                        }}
+                      />
+                    </DriverAvatarCircle>
+                    <DriverCategoryInfo>
+                      <DriverCategoryName title={item.type}>{item.type}</DriverCategoryName>
+                      <DriverCategorySubtitle>Modalidade de Corrida</DriverCategorySubtitle>
+                    </DriverCategoryInfo>
+                  </DriverCategoryHeader>
+
+                  <DriverTotalBanner>
+                    <DriverTotalLabel>Total de veículos:</DriverTotalLabel>
+                    <DriverTotalValue>{totalCount}</DriverTotalValue>
+                  </DriverTotalBanner>
+
+                  <DriverStatusGrid>
+                    <DriverStatusItem $status="active" title="Veículos disponíveis e ativos">
+                      <span>
+                        <DriverStatusDot $status="active" />
+                        Ativos
+                      </span>
+                      <span>{activeCount}</span>
+                    </DriverStatusItem>
+
+                    <DriverStatusItem $status="waiting" title="Aguardando liberação de cadastro">
+                      <span>
+                        <DriverStatusDot $status="waiting" />
+                        Aguardando
+                      </span>
+                      <span>{waitingCount}</span>
+                    </DriverStatusItem>
+
+                    <DriverStatusItem $status="pending" title="Cadastros pendentes de documento">
+                      <span>
+                        <DriverStatusDot $status="pending" />
+                        Pendentes
+                      </span>
+                      <span>{pendingCount}</span>
+                    </DriverStatusItem>
+
+                    <DriverStatusItem $status="blocked" title="Motoristas bloqueados">
+                      <span>
+                        <DriverStatusDot $status="blocked" />
+                        Bloqueados
+                      </span>
+                      <span>{blockedCount}</span>
+                    </DriverStatusItem>
+                  </DriverStatusGrid>
+
+                  <Tooltip title={`${activePercent.toFixed(0)}% da frota desta categoria está ativa`}>
+                    <DriverActiveRatioBar>
+                      <DriverActiveRatioFill $percent={activePercent} />
+                    </DriverActiveRatioBar>
+                  </Tooltip>
+                </DriverCategoryCard>
+              );
+            })}
+          </ModernDriverTypesGrid>
+        )}
+      </SectionCard>
+
+      {/* ==========================================================================
+          Clientes & Passageiros
+         ========================================================================== */}
+      <SectionCard>
+        <SectionHeader>
+          <SectionHeaderLeft>
+            <SectionTitleText>
+              <FiUsers style={{ color: "#00349a" }} /> Métricas de Clientes & Passageiros
+            </SectionTitleText>
+            <SectionCounterBadge>{customersAllTotal} total</SectionCounterBadge>
+          </SectionHeaderLeft>
+          <SectionDescription>
+            Visão consolidada da base de passageiros registrados
+          </SectionDescription>
+        </SectionHeader>
+
+        {loadingFetchDataDashBoard ? (
+          <Skeleton active paragraph={{ rows: 2 }} />
+        ) : (
+          <ModernCustomersGrid>
+            <ModernCustomerCard $variant="total">
+              <CustomerCardTop>
+                <CustomerCardTitleText>Total de Clientes</CustomerCardTitleText>
+                <CustomerCardIconWrap $variant="total">
+                  <FiUsers />
+                </CustomerCardIconWrap>
+              </CustomerCardTop>
+              <CustomerCardCount>{customersAllTotal}</CustomerCardCount>
+            </ModernCustomerCard>
+
+            <ModernCustomerCard $variant="active">
+              <CustomerCardTop>
+                <CustomerCardTitleText>Clientes Ativos</CustomerCardTitleText>
+                <CustomerCardIconWrap $variant="active">
+                  <FiUserCheck />
+                </CustomerCardIconWrap>
+              </CustomerCardTop>
+              <CustomerCardCount>{customersAllActives}</CustomerCardCount>
+            </ModernCustomerCard>
+
+            <ModernCustomerCard $variant="pending">
+              <CustomerCardTop>
+                <CustomerCardTitleText>Clientes Pendentes</CustomerCardTitleText>
+                <CustomerCardIconWrap $variant="pending">
+                  <FiClock />
+                </CustomerCardIconWrap>
+              </CustomerCardTop>
+              <CustomerCardCount>{customersAllPending}</CustomerCardCount>
+            </ModernCustomerCard>
+
+            <ModernCustomerCard $variant="blocked">
+              <CustomerCardTop>
+                <CustomerCardTitleText>Clientes Bloqueados</CustomerCardTitleText>
+                <CustomerCardIconWrap $variant="blocked">
+                  <FiUserX />
+                </CustomerCardIconWrap>
+              </CustomerCardTop>
+              <CustomerCardCount>{customersAllBlocked}</CustomerCardCount>
+            </ModernCustomerCard>
+          </ModernCustomersGrid>
+        )}
+      </SectionCard>
+
+      {/* ==========================================================================
+          Estatísticas Operacionais & Gráficos
+         ========================================================================== */}
+      <ModernAnalyticsGrid>
+        {/* Card 1: Formas de Pagamento */}
+        <ModernAnalyticsCard>
+          <AnalyticsCardTop>
+            <AnalyticsCardTitle>Formas de Pagamento</AnalyticsCardTitle>
+            <SectionCounterBadge>Corridas</SectionCounterBadge>
+          </AnalyticsCardTop>
+          <AnalyticsCardBody>
+            <AnalyticsDataList>
+              <AnalyticsDataItem>
+                <AnalyticsItemLeft>
+                  <AnalyticsColorDot $color="#10b981" />
+                  <AnalyticsItemName>Em Dinheiro</AnalyticsItemName>
+                </AnalyticsItemLeft>
+                <AnalyticsItemValue>{datasDashboard?.paidOutMoney ?? 0}</AnalyticsItemValue>
+              </AnalyticsDataItem>
+
+              <AnalyticsDataItem>
+                <AnalyticsItemLeft>
+                  <AnalyticsColorDot $color="#6366f1" />
+                  <AnalyticsItemName>Em Voucher</AnalyticsItemName>
+                </AnalyticsItemLeft>
+                <AnalyticsItemValue>{datasDashboard?.paidOutVoucher ?? 0}</AnalyticsItemValue>
+              </AnalyticsDataItem>
+
+              <AnalyticsDataItem>
+                <AnalyticsItemLeft>
+                  <AnalyticsColorDot $color="#0284c7" />
+                  <AnalyticsItemName>Em Cartão</AnalyticsItemName>
+                </AnalyticsItemLeft>
+                <AnalyticsItemValue>{datasDashboard?.paidOutCreditCard ?? 0}</AnalyticsItemValue>
+              </AnalyticsDataItem>
+            </AnalyticsDataList>
+
+            <AnalyticsChartWrap>
+              {hasPaymentData ? (
+                <PieChart
+                  series={[
+                    {
+                      data: paymentFormsData.filter((d) => d.value > 0),
+                      innerRadius: 36,
+                      outerRadius: 76,
+                      paddingAngle: 3,
+                      cornerRadius: 5,
+                    },
+                  ]}
+                  height={180}
+                  margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                />
               ) : (
-                <TypeDriversCarousel>
-                  {(driversRequest?.customers ?? []).map((item: CurrentQuantitiesProps) => (
-                    <CustomersCardWrapper key={`customers-${item.type}`}>
-                      <CustomersCardsRow>
-                        <CustomerMetricCard>
-                          <CustomerMetricContent>
-                            <CustomerMetricLabel>Total de clientes</CustomerMetricLabel>
-                            <CustomerMetricValue>{item.total}</CustomerMetricValue>
-                          </CustomerMetricContent>
-                        </CustomerMetricCard>
-                        <CustomerMetricCard>
-                          <CustomerMetricContent>
-                            <CustomerMetricLabel>Clientes ativos</CustomerMetricLabel>
-                            <CustomerMetricValue>{item.active}</CustomerMetricValue>
-                          </CustomerMetricContent>
-                        </CustomerMetricCard>
-                        <CustomerMetricCard>
-                          <CustomerMetricContent>
-                            <CustomerMetricLabel>Clientes pendentes</CustomerMetricLabel>
-                            <CustomerMetricValue>{item.pending}</CustomerMetricValue>
-                          </CustomerMetricContent>
-                        </CustomerMetricCard>
-                        <CustomerMetricCard>
-                          <CustomerMetricContent>
-                            <CustomerMetricLabel>Clientes bloqueados</CustomerMetricLabel>
-                            <CustomerMetricValue>{item.blocked}</CustomerMetricValue>
-                          </CustomerMetricContent>
-                        </CustomerMetricCard>
-                      </CustomersCardsRow>
-                    </CustomersCardWrapper>
-                  ))}
-                </TypeDriversCarousel>
+                <div style={{ textAlign: "center", color: "#94a3b8", padding: "24px 0", fontSize: 13 }}>
+                  Nenhuma corrida computada no momento
+                </div>
               )}
-            </TypesOfDrivers>
-          </CardTyperDriverContainer>
-        </>
-      )}
+            </AnalyticsChartWrap>
+          </AnalyticsCardBody>
+        </ModernAnalyticsCard>
 
-      <h2>Estatísticas</h2>
-      <hr />
-      <StatisticContainer>
-        <LineConatiner>
-          <StatisticRealTime>
-            <TripAndTicketOfToday>
-              <TripAndTicketContainer>
-                {loadingFetchDataDashBoard ? (
-                  <SkeletonContainer>
-                    <Skeleton paragraph={false} active={true} />
-                    <Skeleton paragraph={false} active={true} />
-                  </SkeletonContainer>
-                ) : (
-                  <>
-                    <TripAndTicketData>
-                      <TripAndTicked>Total de viagens de hoje</TripAndTicked>
-                      {datasDashboard?.todayTotalTrips}
-                    </TripAndTicketData>
-                    <TripAndTicketData>
-                      
-                      <TripAndTicked>Ticket médio de hoje</TripAndTicked>
-                      {CurrencyUtils.formatCurrency(datasDashboard?.ticketMedia ?? 0)}
-                    </TripAndTicketData>
+        {/* Card 2: Status das Viagens */}
+        <ModernAnalyticsCard>
+          <AnalyticsCardTop>
+            <AnalyticsCardTitle>Status das Viagens</AnalyticsCardTitle>
+            <SectionCounterBadge>Operacional</SectionCounterBadge>
+          </AnalyticsCardTop>
+          <AnalyticsCardBody>
+            <AnalyticsDataList>
+              <AnalyticsDataItem>
+                <AnalyticsItemLeft>
+                  <AnalyticsColorDot $color="#0284c7" />
+                  <AnalyticsItemName>Aceitas</AnalyticsItemName>
+                </AnalyticsItemLeft>
+                <AnalyticsItemValue>{datasDashboard?.tripAccepted ?? 0}</AnalyticsItemValue>
+              </AnalyticsDataItem>
 
-                    <TripAndTicketData>
-                      <TripAndTicked>Total faturado de hoje</TripAndTicked>
-                      {CurrencyUtils.formatCurrency(datasDashboard?.totalBilled ?? 0)}
-                    </TripAndTicketData>
-                  </>
+              <AnalyticsDataItem>
+                <AnalyticsItemLeft>
+                  <AnalyticsColorDot $color="#10b981" />
+                  <AnalyticsItemName>Finalizadas</AnalyticsItemName>
+                </AnalyticsItemLeft>
+                <AnalyticsItemValue>{datasDashboard?.tripFinished ?? 0}</AnalyticsItemValue>
+              </AnalyticsDataItem>
+
+              <AnalyticsDataItem>
+                <AnalyticsItemLeft>
+                  <AnalyticsColorDot $color="#475569" />
+                  <AnalyticsItemName>Total de Viagens</AnalyticsItemName>
+                </AnalyticsItemLeft>
+                <AnalyticsItemValue>{datasDashboard?.totalTrips ?? 0}</AnalyticsItemValue>
+              </AnalyticsDataItem>
+            </AnalyticsDataList>
+
+            <AnalyticsChartWrap>
+              {hasTripsData ? (
+                <PieChart
+                  series={[
+                    {
+                      data: tripsStatusData.filter((d) => d.value > 0),
+                      innerRadius: 36,
+                      outerRadius: 76,
+                      paddingAngle: 3,
+                      cornerRadius: 5,
+                    },
+                  ]}
+                  height={180}
+                  margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                />
+              ) : (
+                <div style={{ textAlign: "center", color: "#94a3b8", padding: "24px 0", fontSize: 13 }}>
+                  Nenhuma viagem registrada no período
+                </div>
+              )}
+            </AnalyticsChartWrap>
+          </AnalyticsCardBody>
+        </ModernAnalyticsCard>
+
+        {/* Card 3: Análise de Cancelamentos */}
+        <ModernAnalyticsCard>
+          <AnalyticsCardTop>
+            <AnalyticsCardTitle>Viagens Canceladas</AnalyticsCardTitle>
+            <SectionCounterBadge>Desistências</SectionCounterBadge>
+          </AnalyticsCardTop>
+          <AnalyticsCardBody>
+            <AnalyticsDataList>
+              <AnalyticsDataItem>
+                <AnalyticsItemLeft>
+                  <AnalyticsColorDot $color="#f59e0b" />
+                  <AnalyticsItemName>Pelo Motorista</AnalyticsItemName>
+                </AnalyticsItemLeft>
+                <AnalyticsItemValue>{datasDashboard?.canceledbyDriver ?? 0}</AnalyticsItemValue>
+              </AnalyticsDataItem>
+
+              <AnalyticsDataItem>
+                <AnalyticsItemLeft>
+                  <AnalyticsColorDot $color="#ef4444" />
+                  <AnalyticsItemName>Pelo Cliente</AnalyticsItemName>
+                </AnalyticsItemLeft>
+                <AnalyticsItemValue>{datasDashboard?.canceledbyCustomer ?? 0}</AnalyticsItemValue>
+              </AnalyticsDataItem>
+
+              <AnalyticsDataItem>
+                <AnalyticsItemLeft>
+                  <AnalyticsColorDot $color="#b91c1c" />
+                  <AnalyticsItemName>Total Cancelamentos</AnalyticsItemName>
+                </AnalyticsItemLeft>
+                <AnalyticsItemValue>{datasDashboard?.totalCanceled ?? 0}</AnalyticsItemValue>
+              </AnalyticsDataItem>
+            </AnalyticsDataList>
+
+            <AnalyticsChartWrap>
+              {hasCancellationsData ? (
+                <PieChart
+                  series={[
+                    {
+                      data: cancellationsData.filter((d) => d.value > 0),
+                      innerRadius: 36,
+                      outerRadius: 76,
+                      paddingAngle: 3,
+                      cornerRadius: 5,
+                    },
+                  ]}
+                  height={180}
+                  margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                />
+              ) : (
+                <div style={{ textAlign: "center", color: "#94a3b8", padding: "24px 0", fontSize: 13 }}>
+                  Nenhum cancelamento computado
+                </div>
+              )}
+            </AnalyticsChartWrap>
+          </AnalyticsCardBody>
+        </ModernAnalyticsCard>
+      </ModernAnalyticsGrid>
+
+      {/* ==========================================================================
+          Rankings de Performance (Top Motoristas & Top Clientes)
+         ========================================================================== */}
+      <ModernRankingsGrid>
+        {/* Top Motoristas */}
+        <ModernRankingCard>
+          <RankingHeaderWrap>
+            <SectionTitleText>
+              <FiAward style={{ color: "#f59e0b" }} /> Top Motoristas
+            </SectionTitleText>
+
+            <RankingFiltersWrap>
+              <RankingFilterPill
+                type="button"
+                $active={driverRankPeriod === "day"}
+                onClick={() => handleDriverRankPeriodChange("day")}
+              >
+                Hoje
+              </RankingFilterPill>
+              <RankingFilterPill
+                type="button"
+                $active={driverRankPeriod === "month"}
+                onClick={() => handleDriverRankPeriodChange("month")}
+              >
+                Este Mês
+              </RankingFilterPill>
+              <RankingFilterPill
+                type="button"
+                $active={driverRankPeriod === "all"}
+                onClick={() => handleDriverRankPeriodChange("all")}
+              >
+                Geral
+              </RankingFilterPill>
+            </RankingFiltersWrap>
+          </RankingHeaderWrap>
+
+          <RankingScrollList onScroll={(e) => handleScroll(e, "driver")}>
+            {loadingRankingDriver ? (
+              <LoadingMoreSpinner>
+                <Spin size="small" />
+                <LoadingMoreText style={{ marginLeft: "8px" }}>Carregando ranking...</LoadingMoreText>
+              </LoadingMoreSpinner>
+            ) : driverRank.length === 0 ? (
+              <div style={{ textAlign: "center", color: "#94a3b8", padding: "36px 0", fontSize: 13.5 }}>
+                Nenhum motorista ranqueado no período selecionado.
+              </div>
+            ) : (
+              <>
+                {driverRank.map((item, index) => {
+                  const ticketMedio = calculateTicketMedio(item.totalValue, item.quantityTrips);
+                  const position = index + 1;
+
+                  return (
+                    <RankingListItem key={`driver-${item.idDriver}`}>
+                      <RankingPositionBadge $position={position}>
+                        {position === 1 ? <FaTrophy /> : `#${position}`}
+                      </RankingPositionBadge>
+
+                      <RankingUserMeta>
+                        <RankingUserNameText title={item.name}>{item.name}</RankingUserNameText>
+                        <RankingStatsPills>
+                          <RankingStatChip $variant="trips">
+                            {item.quantityTrips} {item.quantityTrips === 1 ? "viagem" : "viagens"}
+                          </RankingStatChip>
+                          <RankingStatChip $variant="revenue">
+                            {CurrencyUtils.formatCurrency(item.totalValue)}
+                          </RankingStatChip>
+                          <RankingStatChip $variant="avg">
+                            Méd. {CurrencyUtils.formatCurrency(ticketMedio)}
+                          </RankingStatChip>
+                        </RankingStatsPills>
+                      </RankingUserMeta>
+
+                      <RankingActionBtns>
+                        <CelebrateActionBtn
+                          type="button"
+                          onClick={() => handleOpenModalParabens(item, "driver")}
+                          title={`Enviar mensagem de parabéns para ${item.name}`}
+                        >
+                          🎉 Parabéns
+                        </CelebrateActionBtn>
+
+                        <WhatsAppActionBtn
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleWhatsAppClick(item.phone, item.name, "driver");
+                          }}
+                          href="#"
+                          title={`Falar com ${item.name} via WhatsApp`}
+                        >
+                          <FaWhatsapp />
+                        </WhatsAppActionBtn>
+                      </RankingActionBtns>
+                    </RankingListItem>
+                  );
+                })}
+
+                {loadingMoreDrivers && (
+                  <LoadingMoreSpinner>
+                    <Spin size="small" />
+                    <LoadingMoreText style={{ marginLeft: "10px" }}>Carregando mais motoristas...</LoadingMoreText>
+                  </LoadingMoreSpinner>
                 )}
-              </TripAndTicketContainer>
-            </TripAndTicketOfToday>
-            <ClientsAndDriversRealTime>
-              {loadingFetchDataDashBoard == true ? (
-                <SkeletonContainer>
-                  <Skeleton paragraph={false} active={true} />
-                  <Skeleton paragraph={false} active={true} />
-                </SkeletonContainer>
-              ) : (
-                <TripAndTicketContainer>
-                  <TripAndTicketData>
-                    <TripAndTicked>Clientes ativos</TripAndTicked>
-                    <TripAndTicked>{customersAllActives}</TripAndTicked>
-                  </TripAndTicketData>
-                  <TripAndTicketData>
-                    <TripAndTicked>Motoristas ativos</TripAndTicked>
-                    <TripAndTicked>{driverAllActives}</TripAndTicked>
-                  </TripAndTicketData>
-                </TripAndTicketContainer>
-              )}
-            </ClientsAndDriversRealTime>
-          </StatisticRealTime>
-          <CardOfInformations>
-            {loadingFetchDataDashBoard ? (
-              <SkeletonContainer>
-                <Skeleton active={true} />
-              </SkeletonContainer>
-            ) : (
-              <>
-                <TextOfCard>Corridas</TextOfCard>
-                <ContentCardInformations>
-                  <ContainerInformationsData>
-                    <ContainerOfCarInformationGlobal>
-                      <ParagraphBasicGlobal>Em dinheiro</ParagraphBasicGlobal>
-                      <ParagraphBasicGlobal>
-                        {datasDashboard?.paidOutMoney}
-                      </ParagraphBasicGlobal>
-                    </ContainerOfCarInformationGlobal>
-                    <ContainerOfCarInformationGlobal>
-                      <ParagraphBasicGlobal>Em voucher</ParagraphBasicGlobal>
-                      <ParagraphBasicGlobal>
-                        {datasDashboard?.paidOutVoucher}
-                      </ParagraphBasicGlobal>
-                    </ContainerOfCarInformationGlobal>
-                    <ContainerOfCarInformationGlobal
-                      style={{
-                        border: "none",
-                      }}
-                    >
-                      <ParagraphBasicGlobal>Cartão</ParagraphBasicGlobal>
-                      <ParagraphBasicGlobal>
-                        {datasDashboard?.paidOutCreditCard}
-                      </ParagraphBasicGlobal>
-                    </ContainerOfCarInformationGlobal>
-                  </ContainerInformationsData>
-
-                  <PieChart
-                    series={[
-                      {
-                        data: configGraphicPieTypePayment.data as any,
-                      },
-                    ]}
-                    width={350}
-                    height={180}
-                  />
-                </ContentCardInformations>
+                {!hasMoreDrivers && driverRank.length > 0 && !loadingMoreDrivers && (
+                  <LoadingMoreText>Fim dos registros para este filtro.</LoadingMoreText>
+                )}
               </>
             )}
-          </CardOfInformations>
-        </LineConatiner>
-        <LineConatiner>
-          <CardOfInformations>
-            {loadingFetchDataDashBoard ? (
-              <SkeletonContainer>
-                <Skeleton active={true} />
-              </SkeletonContainer>
+          </RankingScrollList>
+        </ModernRankingCard>
+
+        {/* Top Clientes */}
+        <ModernRankingCard>
+          <RankingHeaderWrap>
+            <SectionTitleText>
+              <FiAward style={{ color: "#0284c7" }} /> Top Clientes
+            </SectionTitleText>
+
+            <RankingFiltersWrap>
+              <RankingFilterPill
+                type="button"
+                $active={clientRankPeriod === "day"}
+                onClick={() => handleClientRankPeriodChange("day")}
+              >
+                Hoje
+              </RankingFilterPill>
+              <RankingFilterPill
+                type="button"
+                $active={clientRankPeriod === "month"}
+                onClick={() => handleClientRankPeriodChange("month")}
+              >
+                Este Mês
+              </RankingFilterPill>
+              <RankingFilterPill
+                type="button"
+                $active={clientRankPeriod === "all"}
+                onClick={() => handleClientRankPeriodChange("all")}
+              >
+                Geral
+              </RankingFilterPill>
+            </RankingFiltersWrap>
+          </RankingHeaderWrap>
+
+          <RankingScrollList onScroll={(e) => handleScroll(e, "client")}>
+            {loadingRankingClient ? (
+              <LoadingMoreSpinner>
+                <Spin size="small" />
+                <LoadingMoreText style={{ marginLeft: "8px" }}>Carregando ranking...</LoadingMoreText>
+              </LoadingMoreSpinner>
+            ) : clientRank.length === 0 ? (
+              <div style={{ textAlign: "center", color: "#94a3b8", padding: "36px 0", fontSize: 13.5 }}>
+                Nenhum cliente ranqueado no período selecionado.
+              </div>
             ) : (
               <>
-                <TextOfCard>Viagens canceladas</TextOfCard>
-                <ContentCardInformations>
-                  <ContainerInformationsData>
-                    <InformationsDataMap>
-                      <TripsLabel>Motorista</TripsLabel>
-                      <TripsItem>{datasDashboard?.canceledbyDriver}</TripsItem>
-                    </InformationsDataMap>
-                    <InformationsDataMap>
-                      <TripsLabel>Cliente</TripsLabel>
-                      <TripsItem>
-                        {datasDashboard?.canceledbyCustomer}
-                      </TripsItem>
-                    </InformationsDataMap>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        padding: "10px",
-                      }}
-                    >
-                      <TripsLabel>Total de cancelamento</TripsLabel>
-                      <TripsItem>{datasDashboard?.totalCanceled}</TripsItem>
-                    </div>
-                  </ContainerInformationsData>
+                {clientRank.map((item, index) => {
+                  const ticketMedio = calculateTicketMedio(item.totalValue, item.quantityTrips);
+                  const position = index + 1;
 
-                  <PieChart
-                    series={[
-                      {
-                        data: configGraphicPie.data as any,
-                      },
-                    ]}
-                    width={350}
-                    height={180}
-                  />
-                </ContentCardInformations>
+                  return (
+                    <RankingListItem key={`client-${item.idUser}`}>
+                      <RankingPositionBadge $position={position}>
+                        {position === 1 ? <FaTrophy /> : `#${position}`}
+                      </RankingPositionBadge>
+
+                      <RankingUserMeta>
+                        <RankingUserNameText title={item.name}>{item.name}</RankingUserNameText>
+                        <RankingStatsPills>
+                          <RankingStatChip $variant="trips">
+                            {item.quantityTrips} {item.quantityTrips === 1 ? "viagem" : "viagens"}
+                          </RankingStatChip>
+                          <RankingStatChip $variant="revenue">
+                            {CurrencyUtils.formatCurrency(item.totalValue)}
+                          </RankingStatChip>
+                          <RankingStatChip $variant="avg">
+                            Méd. {CurrencyUtils.formatCurrency(ticketMedio)}
+                          </RankingStatChip>
+                        </RankingStatsPills>
+                      </RankingUserMeta>
+
+                      <RankingActionBtns>
+                        <CelebrateActionBtn
+                          type="button"
+                          onClick={() => handleOpenModalParabens(item, "client")}
+                          title={`Enviar mensagem de parabéns para ${item.name}`}
+                        >
+                          🎉 Parabéns
+                        </CelebrateActionBtn>
+
+                        <WhatsAppActionBtn
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleWhatsAppClick(item.phone, item.name, "client");
+                          }}
+                          href="#"
+                          title={`Falar com ${item.name} via WhatsApp`}
+                        >
+                          <FaWhatsapp />
+                        </WhatsAppActionBtn>
+                      </RankingActionBtns>
+                    </RankingListItem>
+                  );
+                })}
+
+                {loadingMoreClients && (
+                  <LoadingMoreSpinner>
+                    <Spin size="small" />
+                    <LoadingMoreText style={{ marginLeft: "10px" }}>Carregando mais clientes...</LoadingMoreText>
+                  </LoadingMoreSpinner>
+                )}
+                {!hasMoreClients && clientRank.length > 0 && !loadingMoreClients && (
+                  <LoadingMoreText>Fim dos registros para este filtro.</LoadingMoreText>
+                )}
               </>
             )}
-          </CardOfInformations>
-          <CardOfInformations>
-            {loadingFetchDataDashBoard ? (
-              <SkeletonContainer>
-                <Skeleton active={true} />
-              </SkeletonContainer>
-            ) : (
-              <>
-                <TextOfCard>Viagens</TextOfCard>
-                <ContentCardInformations>
-                  <ContainerInformationsData>
-                    <InformationsDataMap>
-                      <TripsLabel>Aceitas</TripsLabel>
-                      <TripsItem>{datasDashboard?.tripAccepted}</TripsItem>
-                    </InformationsDataMap>
+          </RankingScrollList>
+        </ModernRankingCard>
+      </ModernRankingsGrid>
 
-                    <InformationsDataMap>
-                      <TripsLabel>Finalizadas</TripsLabel>
-                      <TripsItem>{datasDashboard?.tripFinished}</TripsItem>
-                    </InformationsDataMap>
-
-                    <TripsAcceptedContainer>
-                      <TripsLabel>Total de viagens</TripsLabel>
-                      <TripsItem>{datasDashboard?.totalTrips}</TripsItem>
-                    </TripsAcceptedContainer>
-                  </ContainerInformationsData>
-
-                  <PieChart
-                    series={[
-                      {
-                        data: configGraphicPieTrips.data as any,
-                      },
-                    ]}
-                    width={350}
-                    height={180}
-                  />
-                </ContentCardInformations>
-              </>
-            )}
-          </CardOfInformations>
-        </LineConatiner>
-        <TopDriversAndClients>
-          <CardOfInformations>
-            {driverRank.length == 0 && loadingFetchDataDashBoard == true ? (
-              <SkeletonContainer>
-                <Skeleton active={true} />
-              </SkeletonContainer>
-            ) : (
-              <>
-                <CardHeaderRow>
-                  <TextOfCard>Top Motoristas</TextOfCard>
-                  <ContentFilteredMonthAndDay>
-                    <RankingFilterLabel>Filtro:</RankingFilterLabel>
-                    <ButtonsFiltered
-                      type="button"
-                      selected={driverRankPeriod === "day"}
-                      onClick={() => handleDriverRankPeriodChange("day")}
-                    >
-                      dia
-                    </ButtonsFiltered>
-                    <ButtonsFiltered
-                      type="button"
-                      selected={driverRankPeriod === "month"}
-                      onClick={() => handleDriverRankPeriodChange("month")}
-                    >
-                      mês
-                    </ButtonsFiltered>
-                    <ButtonsFiltered
-                      type="button"
-                      selected={driverRankPeriod === "all"}
-                      onClick={() => handleDriverRankPeriodChange("all")}
-                    >
-                      geral
-                    </ButtonsFiltered>
-                  </ContentFilteredMonthAndDay>
-                </CardHeaderRow>
-                <TopListContainer onScroll={(e) => handleScroll(e, "driver")}>
-                  {loadingRankingDriver ? (
-                    <LoadingMoreSpinner>
-                      <Spin size="small" />
-                      <LoadingMoreText style={{ marginLeft: "8px" }}>Carregando ranking...</LoadingMoreText>
-                    </LoadingMoreSpinner>
-                  ) : (
-                  <>
-                  {(driverRank || []).map((item) => {
-                    const ticketMedio = calculateTicketMedio(item.totalValue, item.quantityTrips);
-                    return (
-                      <TopItemContainer key={`driver-${item.idDriver}`}>
-                        <TopItemContent>
-                          <TopName>{item.name}</TopName>
-                          <TopContainer>
-                            <TopName>{item.quantityTrips}</TopName>
-                            <TopItem>viagens,</TopItem>
-                            <TopItem>
-                              {CurrencyUtils.formatCurrency(item.totalValue)}
-                            </TopItem>
-                            <TicketMedioText>
-                              tícket Méd. {CurrencyUtils.formatCurrency(ticketMedio)}
-                            </TicketMedioText>
-                          </TopContainer>
-                        </TopItemContent>
-                        <TopItemActions>
-                          <ButtonParabens
-                            type="button"
-                            onClick={() => handleOpenModalParabens(item, "driver")}
-                            title="Enviar mensagem de parabéns"
-                            aria-label={`Enviar mensagem de parabéns para ${item.name}`}
-                          >
-                            Parabéns
-                          </ButtonParabens>
-                          <WhatsAppLink
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleWhatsAppClick(item.phone, item.name, "driver");
-                            }}
-                            href="#"
-                            title={`Falar com ${item.name} via WhatsApp`}
-                          >
-                            <FaWhatsapp />
-                          </WhatsAppLink>
-                        </TopItemActions>
-                      </TopItemContainer>
-                    );
-                  })}
-                  {loadingMoreDrivers && (
-                    <LoadingMoreSpinner>
-                      <Spin size="small" />
-                      <LoadingMoreText style={{ marginLeft: '10px' }}>Carregando mais motoristas...</LoadingMoreText>
-                    </LoadingMoreSpinner>
-                  )}
-                  {!hasMoreDrivers && (driverRank || []).length > 0 && !loadingMoreDrivers && (
-                    <LoadingMoreText>Não há mais motoristas para carregar</LoadingMoreText>
-                  )}
-                  </>
-                  )}
-                </TopListContainer>
-              </>
-            )}
-          </CardOfInformations>
-          <CardOfInformations>
-            {(!clientRank || clientRank.length == 0) && loadingFetchDataDashBoard == true ? (
-              <SkeletonContainer>
-                <Skeleton active={true} />
-              </SkeletonContainer>
-            ) : (
-              <>
-                <CardHeaderRow>
-                  <TextOfCard>Top Clientes</TextOfCard>
-                  <ContentFilteredMonthAndDay>
-                    <RankingFilterLabel>Filtro:</RankingFilterLabel>
-                    <ButtonsFiltered
-                      type="button"
-                      selected={clientRankPeriod === "day"}
-                      onClick={() => handleClientRankPeriodChange("day")}
-                    >
-                      dia
-                    </ButtonsFiltered>
-                    <ButtonsFiltered
-                      type="button"
-                      selected={clientRankPeriod === "month"}
-                      onClick={() => handleClientRankPeriodChange("month")}
-                    >
-                      mês
-                    </ButtonsFiltered>
-                    <ButtonsFiltered
-                      type="button"
-                      selected={clientRankPeriod === "all"}
-                      onClick={() => handleClientRankPeriodChange("all")}
-                    >
-                      geral
-                    </ButtonsFiltered>
-                  </ContentFilteredMonthAndDay>
-                </CardHeaderRow>
-                <TopListContainer onScroll={(e) => handleScroll(e, "client")}>
-                  {loadingRankingClient ? (
-                    <LoadingMoreSpinner>
-                      <Spin size="small" />
-                      <LoadingMoreText style={{ marginLeft: "8px" }}>Carregando ranking...</LoadingMoreText>
-                    </LoadingMoreSpinner>
-                  ) : (
-                  <>
-                  {(clientRank || []).map((item) => {
-                    const ticketMedio = calculateTicketMedio(item.totalValue, item.quantityTrips);
-                    return (
-                      <TopItemContainer key={`client-${item.idUser}`}>
-                        <TopItemContent>
-                          <TopName>{item.name}</TopName>
-                          <TopContainer>
-                            <TopName>{item.quantityTrips}</TopName>
-                            <TopItem>viagens,</TopItem>
-                            <TopItem>
-                              {CurrencyUtils.formatCurrency(item.totalValue)}
-                            </TopItem>
-                            <TicketMedioText>
-                              tícket Méd. {CurrencyUtils.formatCurrency(ticketMedio)}
-                            </TicketMedioText>
-                          </TopContainer>
-                        </TopItemContent>
-                        <TopItemActions>
-                          <ButtonParabens
-                            type="button"
-                            onClick={() => handleOpenModalParabens(item, "client")}
-                            title="Enviar mensagem de parabéns"
-                            aria-label={`Enviar mensagem de parabéns para ${item.name}`}
-                          >
-                            Parabéns
-                          </ButtonParabens>
-                          <WhatsAppLink
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleWhatsAppClick(item.phone, item.name, "client");
-                            }}
-                            href="#"
-                            title={`Falar com ${item.name} via WhatsApp`}
-                          >
-                            <FaWhatsapp />
-                          </WhatsAppLink>
-                        </TopItemActions>
-                      </TopItemContainer>
-                    );
-                  })}
-                  {loadingMoreClients && (
-                    <LoadingMoreSpinner>
-                      <Spin size="small" />
-                      <LoadingMoreText style={{ marginLeft: '10px' }}>Carregando mais clientes...</LoadingMoreText>
-                    </LoadingMoreSpinner>
-                  )}
-                  {!hasMoreClients && clientRank.length > 0 && !loadingMoreClients && (
-                    <LoadingMoreText>Não há mais clientes para carregar</LoadingMoreText>
-                  )}
-                  </>
-                  )}
-                </TopListContainer>
-              </>
-            )}
-          </CardOfInformations>
-        </TopDriversAndClients>
-      </StatisticContainer>
-
+      {/* ==========================================================================
+          System Modals
+         ========================================================================== */}
       {roleUser &&
         keyEnableShowPublicity &&
         switchShowModalAdvertsings(roleUser, keyEnableShowPublicity)}
@@ -1297,7 +1426,6 @@ Clique para ver a versão mais recente agora.">
           type={modalParabens.type}
         />
       )}
-
     </DashBoardContainer>
   );
 };
