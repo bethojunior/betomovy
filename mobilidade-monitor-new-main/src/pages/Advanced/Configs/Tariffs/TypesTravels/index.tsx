@@ -213,7 +213,7 @@ export const TypesTravels = () => {
     getCommissionsDriver,
     getTripPayments,
     handleChangePaymentsCommissions,
-  } = useDriverCommission(cityId, pricesSelected, setLoading);
+  } = useDriverCommission(cityId, pricesSelected, setLoading, travelSelected);
 
   const {
     customOrderList,
@@ -418,6 +418,7 @@ export const TypesTravels = () => {
           });
 
           const objectSendCommission = {
+            cityId: parsedCityId,
             commissionAnotherFee: {
               another_value: Utils.BrlToNumber(valueSurchase, "positive") || 0,
               taxValueType: typeTaxRate || "%",
@@ -474,7 +475,7 @@ export const TypesTravels = () => {
 
           try {
             const freshTypes = await getTypesTravels();
-            await getCommissionsDriver();
+            await getCommissionsDriver(parsedCityId);
             await getPrices();
 
             const updatedTripType = (freshTypes || []).find(

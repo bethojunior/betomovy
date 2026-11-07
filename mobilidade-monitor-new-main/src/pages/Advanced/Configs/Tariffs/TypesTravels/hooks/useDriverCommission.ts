@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import swal from "sweetalert";
-
 import api from "../../../../../../services/api";
 import Mask from "../../../../../../services/Mask";
 import {
@@ -8,6 +6,7 @@ import {
   CommissionPaymentFormProps,
   ListPricesProps,
   TripPaymentsFormsProps,
+  TypesTravelsProps,
 } from "../types";
 
 // Comissão do motorista (valor base por tipo de viagem) + taxa por forma de
@@ -15,7 +14,8 @@ import {
 export const useDriverCommission = (
   cityId: number,
   pricesSelected: ListPricesProps | null | undefined,
-  setLoading: (loading: boolean) => void
+  setLoading: (loading: boolean) => void,
+  travelSelected?: TypesTravelsProps
 ) => {
   const [tripPaymentsForms, setTripPaymentsForms] = useState<
     TripPaymentsFormsProps[]
@@ -31,109 +31,185 @@ export const useDriverCommission = (
   const [valueCalcDriver, setValueCalcDriver] = useState<string>("0,00");
   const [disableOnPromotion, setDisableOnPromotion] = useState<boolean>(false);
 
-  const commissionForSelectedTrip = useMemo(
-    () =>
-      driverCommissions.find(
-        (data) => data.tripTypeId === pricesSelected?.tripTypeId
-      ),
-    [driverCommissions, pricesSelected?.tripTypeId]
-  );
+  const targetTripId = useMemo(() => {
+    const raw =
+      travelSelected?.idTripType ??
+      (travelSelected as any)?.id ??
+      pricesSelected?.tripTypeId ??
+      (pricesSelected as any)?.trip_type?.idTripType;
+    const n = Number(raw);
+    return !isNaN(n) && n > 0 ? n : 0;
+  }, [travelSelected, pricesSelected]);
 
-  const getCommissionsDriver = async () => {
-    if (!cityId) return;
+  const commissionForSelectedTrip = useMemo(() => {
+    if (!targetTripId) return undefined;
+    return driverCommissions.find(
+      (data) => Number(data.tripTypeId) === targetTripId
+    );
+  }, [driverCommissions, targetTripId]);
+
+  const getCommissionsDriver = async (forcedCityId?: number) => {
+    const activeCityId = Number(forcedCityId ?? cityId);
+    if (!activeCityId || isNaN(activeCityId) || activeCityId <= 0) return [];
     setLoading(true);
+    let commissionsList: CommissionDriverProps[] = [];
     try {
       const responseCommissionDriver = await api.get(
-        `driverCommission/${cityId}`
+        `driverCommission/${activeCityId}`
       );
 
-      if (responseCommissionDriver.data?.response) {
-        const rawCommissions = responseCommissionDriver.data.response;
-        setDriverCommissions(Array.isArray(rawCommissions) ? rawCommissions : []);
+      const raw =
+        responseCommissionDriver.data?.response ??
+        responseCommissionDriver.data?.data;
+      if (Array.isArray(raw)) {
+        commissionsList = raw;
+        setDriverCommissions(raw);
       }
     } catch (error) {
-      console.log("Aviso ao buscar comissões de motorista:", error);
+      console.warn("Aviso ao buscar comissões de motorista:", error);
     } finally {
       setLoading(false);
     }
+    return commissionsList;
   };
 
   const getTripPayments = async () => {
     setLoading(true);
     try {
       const responseTripPayments = await api.get("tripPaymentForm");
-      const rawPayments = responseTripPayments.data?.response;
-      const paymentList = Array.isArray(rawPayments) ? rawPayments : [];
+      const rawPayments =
+        responseTripPayments.data?.response ??
+        responseTripPayments.data?.data;
+      const paymentList: TripPaymentsFormsProps[] = Array.isArray(rawPayments)
+        ? rawPayments
+        : [];
       setTripPaymentsForms(paymentList);
 
+      const savedPaymentForms =
+        commissionForSelectedTrip?.commissions_payment_form ??
+        commissionForSelectedTrip?.commissionsPaymentForm ??
+        [];
+
       const listCommission: CommissionPaymentFormProps[] = paymentList.map(
-        (value: TripPaymentsFormsProps) => ({
-          tripPaymentFormId: String(value.idTripPaymentForm),
-          value: "0,00",
-          valueType: "%",
-        })
+        (value: TripPaymentsFormsProps) => {
+          const formIdStr = String(value.idTripPaymentForm);
+          const saved = savedPaymentForms.find(
+            (item: any) =>
+              String(item.tripPaymentFormId ?? item.id) === formIdStr
+          );
+          if (saved) {
+            const num = Number(saved.value ?? 0);
+            return {
+              tripPaymentFormId: formIdStr,
+              value: Mask.setMaskMoneyAlternative(isNaN(num) ? 0 : num),
+              valueType: saved.valueType === "$" ? "$" : "%",
+            };
+          }
+          return {
+            tripPaymentFormId: formIdStr,
+            value: "0,00",
+            valueType: "%",
+          };
+        }
       );
       setCommissionPaymentForms(listCommission);
     } catch (error) {
-      console.log("Erro ao buscar formas de pagamento:", error);
+      console.warn("Erro ao buscar formas de pagamento:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleChangePaymentsCommissions = (
-    index: number,
-    field: "tripPaymentFormId" | "value" | "valueType",
+    formId: string | number,
+    field: "value" | "valueType",
     value: string
   ) => {
+    const formIdStr = String(formId);
     setCommissionPaymentForms((current) => {
-      if (!current[index]) return current;
-
-      const updated = [...current];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
+      const exists = current.some(
+        (f) => String(f.tripPaymentFormId) === formIdStr
+      );
+      if (!exists) {
+        return [
+          ...current,
+          {
+            tripPaymentFormId: formIdStr,
+            value: field === "value" ? value : "0,00",
+            valueType: field === "valueType" ? value : "%",
+          },
+        ];
+      }
+      return current.map((item) => {
+        if (String(item.tripPaymentFormId) === formIdStr) {
+          return { ...item, [field]: value };
+        }
+        return item;
+      });
     });
   };
 
   useEffect(() => {
-    if (pricesSelected) {
+    if (targetTripId > 0) {
       const savedPaymentForms =
-        commissionForSelectedTrip?.commissions_payment_form ?? [];
+        commissionForSelectedTrip?.commissions_payment_form ??
+        commissionForSelectedTrip?.commissionsPaymentForm ??
+        [];
 
-      setCommissionPaymentForms((current) =>
-        current.map((form) => {
+      setCommissionPaymentForms((current) => {
+        const baseList =
+          current.length > 0
+            ? current
+            : tripPaymentsForms.map((p) => ({
+                tripPaymentFormId: String(p.idTripPaymentForm),
+                value: "0,00",
+                valueType: "%",
+              }));
+
+        return baseList.map((form) => {
           const saved = savedPaymentForms.find(
-            (item) => String(item.tripPaymentFormId) === form.tripPaymentFormId
+            (item: any) =>
+              String(item.tripPaymentFormId ?? item.id) ===
+              String(form.tripPaymentFormId)
           );
 
-          return saved
-            ? {
-                ...form,
-                value: Mask.setMaskMoneyAlternative(Number(saved.value || 0)),
-                valueType: saved.valueType,
-              }
-            : { ...form, value: "0,00", valueType: "%" };
-        })
-      );
+          if (saved) {
+            const num = Number(saved.value ?? 0);
+            return {
+              ...form,
+              value: Mask.setMaskMoneyAlternative(isNaN(num) ? 0 : num),
+              valueType: saved.valueType === "$" ? "$" : "%",
+            };
+          }
+          return { ...form, value: "0,00", valueType: "%" };
+        });
+      });
 
+      const rawVal = commissionForSelectedTrip?.value;
+      const numVal =
+        typeof rawVal === "number" ? rawVal : Number(rawVal ?? 0);
       setValueCalcDriver(
-        Mask.setMaskMoneyAlternative(commissionForSelectedTrip?.value ?? 0)
+        Mask.setMaskMoneyAlternative(isNaN(numVal) ? 0 : numVal)
       );
-      setValueTypeCalcDriver(commissionForSelectedTrip?.valueType as string);
+      setValueTypeCalcDriver(
+        commissionForSelectedTrip?.valueType === "$" ? "$" : "%"
+      );
       setDisableOnPromotion(
-        commissionForSelectedTrip?.disableOnPromotion === 1 ? true : false
+        commissionForSelectedTrip?.disableOnPromotion == 1 ||
+          commissionForSelectedTrip?.disableOnPromotion === true
       );
     } else {
       setValueCalcDriver("0,00");
       setValueTypeCalcDriver("%");
       setDisableOnPromotion(false);
     }
-  }, [pricesSelected, commissionForSelectedTrip]);
+  }, [targetTripId, commissionForSelectedTrip, tripPaymentsForms]);
 
   return {
     tripPaymentsForms,
     driverCommissions,
     commissionPaymentForms,
+    setCommissionPaymentForms,
     valueTypeCalcDriver,
     setValueTypeCalcDriver,
     valueCalcDriver,

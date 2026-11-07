@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
-import { Switch, Radio, Select as SelectAntd, Checkbox } from "antd";
+import {
+  AiOutlineInfoCircle, Switch, Radio, Select as SelectAntd, Checkbox } from "antd";
 import {
   AiOutlineClose,
   AiOutlineCheck,
@@ -193,29 +194,30 @@ const StepInstructionBanner: React.FC<StepInstructionBannerProps> = ({ title, ch
       display: 'flex',
       alignItems: 'flex-start',
       gap: '12px',
-      background: '#FFF1F2',
-      border: '1.5px solid #F43F5E',
+      background: '#F8FAFC',
+      border: '1px solid #E2E8F0',
+      borderLeft: '4px solid #00349A',
       borderRadius: '10px',
       padding: '0.85rem 1.15rem',
       marginBottom: '1.25rem',
-      boxShadow: '0 2px 8px rgba(244, 63, 94, 0.08)',
+      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
     }}
   >
-    <span style={{ fontSize: '20px', lineHeight: 1 }}>⚠️</span>
+    <AiOutlineInfoCircle size={20} color="#00349A" style={{ marginTop: '2px', flexShrink: 0 }} />
     <div style={{ flex: 1 }}>
       <div
         style={{
           fontSize: '13px',
           fontWeight: 800,
-          color: '#E11D48',
+          color: '#0F172A',
           textTransform: 'uppercase',
-          letterSpacing: '0.5px',
+          letterSpacing: '0.4px',
           marginBottom: '4px',
         }}
       >
-        {title}
+        {title.replace(/Instruções Obrigatórias em Vermelho - /gi, "")}
       </div>
-      <div style={{ fontSize: '13px', color: '#9F1239', lineHeight: 1.5 }}>
+      <div style={{ fontSize: '13px', color: '#475569', lineHeight: 1.55 }}>
         {children}
       </div>
     </div>
@@ -419,7 +421,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
       {currentStep === 1 && (
         <WizardStepContent>
           <WizardStepTitle>1. Política de Preço & Tarifas</WizardStepTitle>
-          <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Como Preencher as Tarifas:">
+          <StepInstructionBanner title="Diretrizes e Regras das Tarifas Principais:">
             <div>• <strong>PREÇO MÍNIMO (Obrigatório)*:</strong> Digite o valor mínimo cobrado pela corrida (ex: 12,00). Deve ser maior que 0.</div>
             <div>• <strong>PREÇO BASE*:</strong> Valor da bandeirada ao iniciar o chamado (ex: 0,00 ou 5,00).</div>
             <div>• <strong>PREÇO KM*:</strong> Valor cobrado por cada quilômetro rodado (ex: 2,50). Se a modalidade tiver taxa fixa por entrega, digite 0,00.</div>
@@ -708,7 +710,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
       {currentStep === 2 && (
         <WizardStepContent>
           <WizardStepTitle>2. Tempo em Espera & Tolerância</WizardStepTitle>
-          <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Tempo em Espera:">
+          <StepInstructionBanner title="Diretrizes para Tempo em Espera & Tolerância:">
             <div>• <strong>TOLERÂNCIA DE ESPERA (segundos):</strong> Quantidade de segundos que o motorista aguarda gratuitamente no embarque (ex: 180s = 3 minutos, 300s = 5 minutos).</div>
             <div>• <strong>MULTA DE ESPERA (R$):</strong> Cobrança fixa cobrada do cliente caso ultrapasse o tempo de tolerância gratuito (ex: 5,00).</div>
             <div>• <strong>MINUTO EXCEDENTE (R$):</strong> Valor adicional cobrado a cada minuto que passar após a tolerância (ex: 0,50).</div>
@@ -765,7 +767,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
       {currentStep === 3 && (
         <WizardStepContent>
           <WizardStepTitle>3. Cálculos de Motoristas & Comissões</WizardStepTitle>
-          <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Comissão do Motorista:">
+          <StepInstructionBanner title="Diretrizes para Cálculos de Motoristas & Comissões:">
             <div>• <strong>TAXA DE SERVIÇO GERAL:</strong> Porcentagem (%) ou valor fixo ($) que a central retém por viagem finalizada (ex: 15% ou R$ 2,00).</div>
             <div>• <strong>TIPO DE CÁLCULO:</strong> Escolha "%" para reter percentual ou "$" para valor fixo por corrida.</div>
             <div>• <strong>COMISSÕES POR FORMA DE PAGAMENTO:</strong> Configure taxas personalizadas para Dinheiro, PIX, Cartão ou Saldo do App.</div>
@@ -852,7 +854,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
       {currentStep === 4 && (
         <WizardStepContent>
           <WizardStepTitle>4. Cashback, Faixa de Preços & Taxas Extras</WizardStepTitle>
-          <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Taxas Extras e Cashback:">
+          <StepInstructionBanner title="Diretrizes para Taxas Extras, Sobretaxa e Cashback:">
             <div>• <strong>TAXA ADICIONAL / SOBRETAXA:</strong> Taxa administrativa fixa ou percentual somada ao valor final da corrida (opcional).</div>
             <div>• <strong>CASHBACK AO PASSAGEIRO:</strong> Ative se desejar creditar saldo promocional ao passageiro para usar em viagens futuras.</div>
             <div>• <strong>FAIXA DE PREÇO (PRICE RANGE):</strong> Crie tabelas de preços com valores diferenciados por distância ou horário.</div>
@@ -1399,7 +1401,7 @@ export const TariffWizard: React.FC<TariffWizardProps> = ({
           ) : (
             <>
               <WizardStepTitle>5. Resumo e Confirmação da Tarifa</WizardStepTitle>
-              <StepInstructionBanner title="Instruções Obrigatórias em Vermelho - Como Atualizar e Salvar:">
+              <StepInstructionBanner title="Como Atualizar e Confirmar a Tarifa:">
                 <div>• <strong>1. Revise com Atenção:</strong> Verifique os valores de Preço Mínimo, Base, KM e Comissões nos cartões abaixo.</div>
                 <div>• <strong>2. Gravar no Banco:</strong> Para salvar definitivamente no banco de dados e aplicar no app, clique no botão azul abaixo:</div>
                 <div style={{ margin: "4px 0", fontWeight: 800, fontSize: "14px" }}>👉 CLIQUE EM "ATUALIZAR E SALVAR TARIFA"</div>
