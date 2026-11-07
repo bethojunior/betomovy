@@ -102,6 +102,106 @@ class DashboardController extends ApiController
         }
     }
 
+    private function formatPhotoUrl(?string $photo, string $type = 'customer'): ?string
+    {
+        if (!$photo || $photo === 'user.png' || $photo === 'default.png') {
+            return null;
+        }
+        if (str_starts_with($photo, 'http://') || str_starts_with($photo, 'https://')) {
+            return $photo;
+        }
+        $sub = ($type === 'driver') ? 'driver/profile/compressed/' : 'customer/profile/compressed/';
+        return 'https://api.movymob.com/' . $sub . ltrim($photo, '/');
+    }
+
+    /**
+     * GET /dashboard/tripQuantities
+     */
+    public function actionTripQuantities()
+    {
+        try {
+            $pdo = $this->getPdo();
+            $cityId = $this->getCityId();
+            $date = $_GET['date'] ?? date('Y-m-d');
+
+            $cityWhere = $cityId ? "AND cityId = :cityId" : "";
+            $params = [':date' => $date];
+            if ($cityId) {
+                $params[':cityId'] = $cityId;
+            }
+
+            $sql = "
+                SELECT 
+                    COALESCE(COUNT(idTrip), 0) AS totalTodayTrips,
+                    COALESCE(SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END), 0) AS totalAcceptedTrips,
+                    COALESCE(SUM(CASE WHEN status = 'finished' THEN 1 ELSE 0 END), 0) AS quantityTripsFinished,
+                    COALESCE(SUM(CASE WHEN status = 'canceled' AND canceledBy = 'driver' THEN 1 ELSE 0 END), 0) AS totalCanceledByDriver,
+                    COALESCE(SUM(CASE WHEN status = 'canceled' AND (canceledBy = 'customer' OR canceledBy IS NULL) THEN 1 ELSE 0 END), 0) AS totalCanceledByCustomer,
+                    COALESCE(SUM(CASE WHEN status = 'canceled' AND (canceledBy = 'admin' OR canceledBy = 'system') THEN 1 ELSE 0 END), 0) AS totalCanceledByAdmin,
+                    COALESCE(SUM(CASE WHEN tripPaymentFormId = 1 OR tripPaymentFormId IS NULL THEN 1 ELSE 0 END), 0) AS totalMoneyTrips,
+                    COALESCE(SUM(CASE WHEN tripPaymentFormId = 2 THEN 1 ELSE 0 END), 0) AS totalVoucherTrips,
+                    COALESCE(SUM(CASE WHEN tripPaymentFormId = 3 THEN 1 ELSE 0 END), 0) AS totalCardTrips,
+                    COALESCE(SUM(CASE WHEN status IN ('searching', 'searching_favorite') THEN 1 ELSE 0 END), 0) AS quantityTripsNotAnswered,
+                    COALESCE(COUNT(DISTINCT CASE WHEN status IN ('searching', 'searching_favorite') THEN userId END), 0) AS quantityCustomersNotAnswered,
+                    0 AS lostCustomersNotAnswered,
+                    COALESCE(SUM(price), 0) AS totalPrice,
+                    COALESCE(SUM(CASE WHEN status = 'finished' THEN price ELSE 0 END), 0) AS totalPriceFinished
+                FROM trip
+                WHERE DATE(date) = :date {$cityWhere}
+            ";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $formatted = [
+                'totalTodayTrips' => (int)($row['totalTodayTrips'] ?? 0),
+                'totalAcceptedTrips' => (int)($row['totalAcceptedTrips'] ?? 0),
+                'quantityTripsFinished' => (int)($row['quantityTripsFinished'] ?? 0),
+                'totalCanceledByDriver' => (int)($row['totalCanceledByDriver'] ?? 0),
+                'totalCanceledByCustomer' => (int)($row['totalCanceledByCustomer'] ?? 0),
+                'totalCanceledByAdmin' => (int)($row['totalCanceledByAdmin'] ?? 0),
+                'totalMoneyTrips' => (int)($row['totalMoneyTrips'] ?? 0),
+                'totalVoucherTrips' => (int)($row['totalVoucherTrips'] ?? 0),
+                'totalCardTrips' => (int)($row['totalCardTrips'] ?? 0),
+                'quantityTripsNotAnswered' => (int)($row['quantityTripsNotAnswered'] ?? 0),
+                'quantityCustomersNotAnswered' => (int)($row['quantityCustomersNotAnswered'] ?? 0),
+                'lostCustomersNotAnswered' => (int)($row['lostCustomersNotAnswered'] ?? 0),
+                'totalPrice' => number_format((float)($row['totalPrice'] ?? 0), 2, ',', '.'),
+                'totalPriceFinished' => number_format((float)($row['totalPriceFinished'] ?? 0), 2, ',', '.')
+            ];
+
+            echo $this->returnSuccess('Quantidades de viagens', [$formatted]);
+        } catch (Exception $e) {
+            echo $this->returnError($e);
+        }
+    }
+
+    /**
+     * GET /dashboard/canceledTrips
+     */
+    public function actionCanceledTrips()
+    {
+        $_GET['status'] = 'canceled';
+        return $this->actionTripsByStatus();
+    }
+
+    /**
+     * GET /dashboard/unattendedTrips
+     */
+    public function actionUnattendedTrips()
+    {
+        $_GET['status'] = 'unattended';
+        return $this->actionTripsByStatus();
+    }
+
+    /**
+     * GET /dashboard/abandonedTrips
+     */
+    public function actionAbandonedTrips()
+    {
+        echo $this->returnSuccess('Simulações abandonadas', ['summary' => [], 'items' => []]);
+    }
+
     /**
      * GET /dashboard/tripsByStatus or quantityTripsByStatus
      */
@@ -110,6 +210,58 @@ class DashboardController extends ApiController
         try {
             $pdo = $this->getPdo();
             $cityId = $this->getCityId();
+
+            if (!empty($_GET['status'])) {
+                $statusFilter = (string)$_GET['status'];
+                $date = $_GET['date'] ?? date('Y-m-d');
+                $where = ["DATE(t.date) = :date"];
+                $params = [':date' => $date];
+                if ($cityId) {
+                    $where[] = "t.cityId = :cityId";
+                    $params[':cityId'] = $cityId;
+                }
+                if ($statusFilter === 'canceled') {
+                    $where[] = "t.status = 'canceled'";
+                } elseif ($statusFilter === 'unattended') {
+                    $where[] = "t.status IN ('searching', 'searching_favorite', 'canceled') AND (t.driverId IS NULL OR t.canceledBy = 'system')";
+                } else {
+                    $where[] = "t.status = :status";
+                    $params[':status'] = $statusFilter;
+                }
+                $whereStr = implode(' AND ', $where);
+                $stmt = $pdo->prepare("
+                    SELECT 
+                        t.idTrip as id,
+                        t.tripReference,
+                        DATE_FORMAT(t.date, '%Y-%m-%d %H:%i:%s') as date,
+                        DATE_FORMAT(t.created_at, '%Y-%m-%d %H:%i:%s') as created_at,
+                        t.price,
+                        t.status,
+                        t.canceledBy,
+                        COALESCE(t.cancelReason, '') as cancelReason,
+                        COALESCE(u.name, '') as customerName,
+                        COALESCE(u.phone, '') as customerPhone,
+                        o.address as originAddress,
+                        dest.address as destinationAddress,
+                        tt.type as tripTypeName
+                    FROM trip t
+                    LEFT JOIN user u ON t.userId = u.idUser
+                    LEFT JOIN origin o ON t.originId = o.idOrigin
+                    LEFT JOIN destination dest ON t.destinationId = dest.idDestination
+                    LEFT JOIN tripType tt ON t.tripTypeId = tt.idTripType
+                    WHERE {$whereStr}
+                    ORDER BY t.idTrip DESC
+                    LIMIT 100
+                ");
+                $stmt->execute($params);
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+                $mapped = array_map(function($r) {
+                    $r['customer'] = ['name' => $r['customerName']];
+                    return $r;
+                }, $rows);
+                echo $this->returnSuccess('Viagens encontradas', $mapped);
+                return;
+            }
 
             $cityWhere = $cityId ? "AND cityId = {$cityId}" : "";
             $sql = "
@@ -160,6 +312,22 @@ class DashboardController extends ApiController
             $pdo = $this->getPdo();
             $cityId = $this->getCityId();
 
+            // Auto-cancel zombie on-demand searches older than 2 hours that are NOT scheduled
+            try {
+                $pdo->exec("
+                    UPDATE trip 
+                    SET status = 'canceled', 
+                        canceledBy = 'system', 
+                        cancelReason = 'Tempo limite de busca excedido',
+                        updated_at = NOW() 
+                    WHERE status IN ('searching', 'searching_favorite', 'get_bid_by_drivers') 
+                      AND date < DATE_SUB(NOW(), INTERVAL 2 HOUR)
+                      AND tripReference NOT IN (SELECT tripReference FROM tripScheduled WHERE tripReference IS NOT NULL)
+                ");
+            } catch (Exception $eClean) {
+                // Ignore cleanup errors
+            }
+
             // Detect if a single tripReference was requested:
             // e.g., /dashboard/activeTrips/{tripReference}
             $targetRef = $_GET['tripReference'] ?? $_GET['reference'] ?? null;
@@ -184,12 +352,12 @@ class DashboardController extends ApiController
                         t.userId,
                         COALESCE(u.name, '') AS customerName,
                         COALESCE(u.phone, '') AS customerPhone,
-                        u.profilePhoto AS customerPhoto,
+                        COALESCE(NULLIF(cust.profilePhoto, ''), NULLIF(u.profilePhoto, '')) AS customerPhoto,
                         t.driverId,
                         d.userId AS driverUserId,
                         COALESCE(du.name, '') AS driverName,
                         COALESCE(du.phone, '') AS driverPhone,
-                        du.profilePhoto AS driverPhoto,
+                        COALESCE(NULLIF(d.profilePhoto, ''), NULLIF(du.profilePhoto, '')) AS driverPhoto,
                         c.plate AS carPlate,
                         t.tripTypeId,
                         tt.type AS tripType,
@@ -207,6 +375,7 @@ class DashboardController extends ApiController
                         t.callingDriver
                     FROM trip t
                     LEFT JOIN user u ON t.userId = u.idUser
+                    LEFT JOIN customer cust ON cust.userId = u.idUser
                     LEFT JOIN driver d ON t.driverId = d.idDriver
                     LEFT JOIN user du ON d.userId = du.idUser
                     LEFT JOIN car c ON d.idDriver = c.driverId AND c.deleted_at IS NULL
@@ -239,6 +408,9 @@ class DashboardController extends ApiController
                 $dcStmt->execute([':ref' => $r['tripReference']]);
                 $driversCalled = $dcStmt->fetchAll(PDO::FETCH_ASSOC);
 
+                $customerPhotoUrl = $this->formatPhotoUrl($r['customerPhoto'], 'customer');
+                $driverPhotoUrl = $this->formatPhotoUrl($r['driverPhoto'], 'driver');
+
                 $detail = [
                     'idTrip' => (int)$r['idTrip'],
                     'tripReference' => $r['tripReference'],
@@ -248,12 +420,12 @@ class DashboardController extends ApiController
                     'userId' => (int)$r['userId'],
                     'customerName' => $r['customerName'],
                     'customerPhone' => $r['customerPhone'],
-                    'customerPhoto' => $r['customerPhoto'],
+                    'customerPhoto' => $customerPhotoUrl,
                     'driverId' => $r['driverId'] ? (int)$r['driverId'] : null,
                     'driverUserId' => $r['driverUserId'] ? (int)$r['driverUserId'] : null,
                     'driverName' => $r['driverName'],
                     'driverPhone' => $r['driverPhone'],
-                    'driverPhoto' => $r['driverPhoto'],
+                    'driverPhoto' => $driverPhotoUrl,
                     'carPlate' => $r['carPlate'],
                     'tripTypeId' => $r['tripTypeId'] ? (int)$r['tripTypeId'] : null,
                     'tripType' => $r['tripType'],
@@ -279,13 +451,13 @@ class DashboardController extends ApiController
                         'idCustomer' => (int)$r['userId'],
                         'name' => $r['customerName'],
                         'phone' => $r['customerPhone'],
-                        'profileImage' => $r['customerPhoto'],
+                        'profileImage' => $customerPhotoUrl,
                     ],
                     'driver' => $r['driverId'] ? [
                         'driverId' => (int)$r['driverId'],
                         'name' => $r['driverName'],
                         'phone' => $r['driverPhone'],
-                        'profileImage' => $r['driverPhoto'],
+                        'profileImage' => $driverPhotoUrl,
                     ] : null,
                     'schedule' => $r['schedule'] ? ['schedule' => $r['schedule']] : null,
                     'callingDriver' => $r['callingDriver'] ? explode(',', $r['callingDriver']) : [],
@@ -301,7 +473,10 @@ class DashboardController extends ApiController
             $perPage = max(1, (int)($_GET['perPage'] ?? 20));
             $offset = ($page - 1) * $perPage;
 
-            $where = ["t.status NOT IN ('finished', 'canceled')"];
+            $where = [
+                "t.status NOT IN ('finished', 'canceled')",
+                "(t.status NOT IN ('searching', 'searching_favorite', 'get_bid_by_drivers') OR t.date >= DATE_SUB(NOW(), INTERVAL 2 HOUR) OR t.status = 'scheduled' OR ts.tripReference IS NOT NULL)"
+            ];
             $params = [];
 
             if ($cityId) {
@@ -368,12 +543,12 @@ class DashboardController extends ApiController
                     t.userId,
                     COALESCE(u.name, '') AS customerName,
                     COALESCE(u.phone, '') AS customerPhone,
-                    u.profilePhoto AS customerPhoto,
+                    COALESCE(NULLIF(cust.profilePhoto, ''), NULLIF(u.profilePhoto, '')) AS customerPhoto,
                     t.driverId,
                     d.userId AS driverUserId,
                     COALESCE(du.name, '') AS driverName,
                     COALESCE(du.phone, '') AS driverPhone,
-                    du.profilePhoto AS driverPhoto,
+                    COALESCE(NULLIF(d.profilePhoto, ''), NULLIF(du.profilePhoto, '')) AS driverPhoto,
                     c.plate AS carPlate,
                     t.tripTypeId,
                     tt.type AS tripType,
@@ -391,6 +566,7 @@ class DashboardController extends ApiController
                     t.callingDriver
                 FROM trip t
                 LEFT JOIN user u ON t.userId = u.idUser
+                LEFT JOIN customer cust ON cust.userId = u.idUser
                 LEFT JOIN driver d ON t.driverId = d.idDriver
                 LEFT JOIN user du ON d.userId = du.idUser
                 LEFT JOIN car c ON d.idDriver = c.driverId AND c.deleted_at IS NULL
@@ -435,6 +611,9 @@ class DashboardController extends ApiController
             $mapped = [];
             foreach ($rows as $r) {
                 $ref = $r['tripReference'];
+                $customerPhotoUrl = $this->formatPhotoUrl($r['customerPhoto'], 'customer');
+                $driverPhotoUrl = $this->formatPhotoUrl($r['driverPhoto'], 'driver');
+
                 $mapped[] = [
                     'idTrip' => (int)$r['idTrip'],
                     'tripReference' => $r['tripReference'],
@@ -444,12 +623,12 @@ class DashboardController extends ApiController
                     'userId' => (int)$r['userId'],
                     'customerName' => $r['customerName'],
                     'customerPhone' => $r['customerPhone'],
-                    'customerPhoto' => $r['customerPhoto'],
+                    'customerPhoto' => $customerPhotoUrl,
                     'driverId' => $r['driverId'] ? (int)$r['driverId'] : null,
                     'driverUserId' => $r['driverUserId'] ? (int)$r['driverUserId'] : null,
                     'driverName' => $r['driverName'],
                     'driverPhone' => $r['driverPhone'],
-                    'driverPhoto' => $r['driverPhoto'],
+                    'driverPhoto' => $driverPhotoUrl,
                     'carPlate' => $r['carPlate'],
                     'tripTypeId' => $r['tripTypeId'] ? (int)$r['tripTypeId'] : null,
                     'tripType' => $r['tripType'],
@@ -475,13 +654,13 @@ class DashboardController extends ApiController
                         'idCustomer' => (int)$r['userId'],
                         'name' => $r['customerName'],
                         'phone' => $r['customerPhone'],
-                        'profileImage' => $r['customerPhoto'],
+                        'profileImage' => $customerPhotoUrl,
                     ],
                     'driver' => $r['driverId'] ? [
                         'driverId' => (int)$r['driverId'],
                         'name' => $r['driverName'],
                         'phone' => $r['driverPhone'],
-                        'profileImage' => $r['driverPhoto'],
+                        'profileImage' => $driverPhotoUrl,
                     ] : null,
                     'schedule' => $r['schedule'] ? ['schedule' => $r['schedule']] : null,
                     'callingDriver' => $r['callingDriver'] ? explode(',', $r['callingDriver']) : [],
