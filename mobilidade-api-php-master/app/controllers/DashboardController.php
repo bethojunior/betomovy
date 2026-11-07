@@ -239,7 +239,7 @@ class DashboardController extends ApiController
                         t.price,
                         t.status,
                         t.canceledBy,
-                        COALESCE(t.cancelReason, '') as cancelReason,
+                        '' as cancelReason,
                         COALESCE(u.name, '') as customerName,
                         COALESCE(u.phone, '') as customerPhone,
                         o.address as originAddress,
@@ -318,8 +318,7 @@ class DashboardController extends ApiController
                 $pdo->exec("
                     UPDATE trip 
                     SET status = 'canceled', 
-                        canceledBy = 'system', 
-                        cancelReason = 'Tempo limite de busca excedido'
+                        canceledBy = 'system'
                     WHERE status IN ('searching', 'searching_favorite', 'get_bid_by_drivers') 
                       AND date < DATE_SUB(NOW(), INTERVAL 2 HOUR)
                       AND tripReference NOT IN (SELECT tripReference FROM tripScheduled WHERE tripReference IS NOT NULL)
