@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Dimensions, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 import {
   useNavigation,
   NavigationProp,
@@ -185,6 +186,7 @@ export default function ModalCallTrip({
     } catch (error) {
       console.log('erro', error);
     }
+    Notifications.dismissAllNotificationsAsync().catch(() => {});
     receivedNotification = true;
     setTotalBonus(0);
     defaultAnimationValue();
@@ -221,6 +223,7 @@ export default function ModalCallTrip({
     } catch (error) {
       console.log('erro', error);
     }
+    Notifications.dismissAllNotificationsAsync().catch(() => {});
     defaultAnimationValue();
     setPreloadVisible(true);
     await acceptTrip(

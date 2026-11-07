@@ -1,4 +1,5 @@
 import { FC, useState, useEffect, useRef } from "react";
+import { Link, useHistory } from "react-router-dom";
 import {
   DashBoardContainer,
   DashboardHeroHeader,
@@ -56,6 +57,9 @@ import {
   AnalyticsItemName,
   AnalyticsItemValue,
   AnalyticsChartWrap,
+  ChartCenterHole,
+  ChartCenterValue,
+  ChartCenterLabel,
   ModernRankingsGrid,
   ModernRankingCard,
   RankingHeaderWrap,
@@ -125,11 +129,13 @@ import CurrencyUtils from "../../utils/currency/currency";
 import { formatPhoneForWhatsApp, openWhatsApp } from "../../utils/whatsappUtils";
 import { ModalWhatsAppParabens } from "../../components/ModalWhatsAppParabens";
 import { buildRankingPeriodParams } from "../../utils/dashboard-ranking-date";
+import { useLanguage } from "../../contexts/language";
 
 let keyEnableShowPublicity: string | null = null;
 let roleUser: string | null = null;
 
 const DashBoard: FC = () => {
+  const { t, language } = useLanguage();
   const modalLottie = useRef<ModalRefProps>(null);
   const inputRefPassword = useRef<InputRef>(null);
   const [showModalMapKeysThisSession, setShowModalMapKeysThisSession] = useState(false);
@@ -688,23 +694,26 @@ const DashBoard: FC = () => {
 
   // Pie Chart Data Setup
   const paymentFormsData = [
-    { id: 1, label: "Dinheiro", value: datasDashboard?.paidOutMoney || 0, color: "#10b981" },
-    { id: 2, label: "Voucher", value: datasDashboard?.paidOutVoucher || 0, color: "#6366f1" },
-    { id: 3, label: "Cartão", value: datasDashboard?.paidOutCreditCard || 0, color: "#0284c7" },
+    { id: 1, label: t("Dinheiro"), value: datasDashboard?.paidOutMoney || 0, color: "#10b981" },
+    { id: 2, label: t("Voucher"), value: datasDashboard?.paidOutVoucher || 0, color: "#6366f1" },
+    { id: 3, label: t("Cartão"), value: datasDashboard?.paidOutCreditCard || 0, color: "#0284c7" },
   ];
   const hasPaymentData = paymentFormsData.some((d) => d.value > 0);
+  const totalPaymentSlices = paymentFormsData.reduce((acc, curr) => acc + (curr.value || 0), 0);
 
   const tripsStatusData = [
-    { id: 1, label: "Aceitas", value: datasDashboard?.tripAccepted || 0, color: "#0284c7" },
-    { id: 2, label: "Finalizadas", value: datasDashboard?.tripFinished || 0, color: "#10b981" },
+    { id: 1, label: t("Aceitas"), value: datasDashboard?.tripAccepted || 0, color: "#0284c7" },
+    { id: 2, label: t("Finalizadas"), value: datasDashboard?.tripFinished || 0, color: "#10b981" },
   ];
   const hasTripsData = tripsStatusData.some((d) => d.value > 0);
+  const totalTripSlices = datasDashboard?.totalTrips ?? tripsStatusData.reduce((acc, curr) => acc + (curr.value || 0), 0);
 
   const cancellationsData = [
-    { id: 1, label: "Pelo Motorista", value: datasDashboard?.canceledbyDriver || 0, color: "#f59e0b" },
-    { id: 2, label: "Pelo Passageiro", value: datasDashboard?.canceledbyCustomer || 0, color: "#ef4444" },
+    { id: 1, label: t("Pelo Motorista"), value: datasDashboard?.canceledbyDriver || 0, color: "#f59e0b" },
+    { id: 2, label: t("Pelo Passageiro"), value: datasDashboard?.canceledbyCustomer || 0, color: "#ef4444" },
   ];
   const hasCancellationsData = cancellationsData.some((d) => d.value > 0);
+  const totalCancellationSlices = datasDashboard?.totalCanceled ?? cancellationsData.reduce((acc, curr) => acc + (curr.value || 0), 0);
 
   const driverList = driversRequest?.drivers || [];
 
@@ -716,17 +725,17 @@ const DashBoard: FC = () => {
       <DashboardHeroHeader>
         <DashboardTitleGroup>
           <DashboardTitle>
-            <FiActivity /> Dashboard Operacional
+            <FiActivity /> {t("Dashboard Operacional")}
           </DashboardTitle>
           <DashboardSubtitle>
-            Métricas de frota, status de viagens e faturamento consolidado em tempo real
+            {t("Métricas de frota, status de viagens e faturamento consolidado em tempo real")}
           </DashboardSubtitle>
         </DashboardTitleGroup>
 
         <HeaderActionsRow>
           <LiveIndicatorPill>
             <PulseDot />
-            Ao vivo
+            {t("Ao vivo")}
           </LiveIndicatorPill>
 
           <CityPill>
@@ -734,14 +743,14 @@ const DashBoard: FC = () => {
             {getSelectedCityLabel()}
           </CityPill>
 
-          <Tooltip title="Atualiza todos os dados e sincroniza com o servidor em tempo real.">
+          <Tooltip title={t("Atualizar Dados")}>
             <ModernRefreshBtn
               $loading={loadingFetchDataDashBoard}
               disabled={loadingFetchDataDashBoard}
               onClick={() => unifiedDataDashboard({ forceCache: true })}
             >
               <FiRefreshCw className="spin-icon" />
-              <span>{loadingFetchDataDashBoard ? "Atualizando..." : "Atualizar Dados"}</span>
+              <span>{loadingFetchDataDashBoard ? t("Atualizando...") : t("Atualizar Dados")}</span>
             </ModernRefreshBtn>
           </Tooltip>
         </HeaderActionsRow>
@@ -756,13 +765,13 @@ const DashBoard: FC = () => {
             <FaCarSide />
           </KpiIconBadge>
           <KpiDetails>
-            <KpiMetricLabel>Viagens Hoje</KpiMetricLabel>
+            <KpiMetricLabel>{t("Viagens Hoje")}</KpiMetricLabel>
             {loadingFetchDataDashBoard ? (
               <Skeleton.Input active size="small" style={{ width: 80 }} />
             ) : (
               <KpiMetricValue>{datasDashboard?.todayTotalTrips ?? 0}</KpiMetricValue>
             )}
-            <KpiMetricHint>Corridas concluídas hoje</KpiMetricHint>
+            <KpiMetricHint>{t("Corridas concluídas hoje")}</KpiMetricHint>
           </KpiDetails>
         </ModernKpiCard>
 
@@ -771,7 +780,7 @@ const DashBoard: FC = () => {
             <FiDollarSign />
           </KpiIconBadge>
           <KpiDetails>
-            <KpiMetricLabel>Faturamento Hoje</KpiMetricLabel>
+            <KpiMetricLabel>{t("Faturamento Hoje")}</KpiMetricLabel>
             {loadingFetchDataDashBoard ? (
               <Skeleton.Input active size="small" style={{ width: 110 }} />
             ) : (
@@ -779,7 +788,7 @@ const DashBoard: FC = () => {
                 {CurrencyUtils.formatCurrency(datasDashboard?.totalBilled ?? 0)}
               </KpiMetricValue>
             )}
-            <KpiMetricHint>Receita bruta acumulada hoje</KpiMetricHint>
+            <KpiMetricHint>{t("Receita bruta acumulada hoje")}</KpiMetricHint>
           </KpiDetails>
         </ModernKpiCard>
 
@@ -788,7 +797,7 @@ const DashBoard: FC = () => {
             <FiTrendingUp />
           </KpiIconBadge>
           <KpiDetails>
-            <KpiMetricLabel>Ticket Médio Hoje</KpiMetricLabel>
+            <KpiMetricLabel>{t("Ticket Médio Hoje")}</KpiMetricLabel>
             {loadingFetchDataDashBoard ? (
               <Skeleton.Input active size="small" style={{ width: 90 }} />
             ) : (
@@ -796,7 +805,7 @@ const DashBoard: FC = () => {
                 {CurrencyUtils.formatCurrency(datasDashboard?.ticketMedia ?? 0)}
               </KpiMetricValue>
             )}
-            <KpiMetricHint>Valor médio por viagem concluída</KpiMetricHint>
+            <KpiMetricHint>{t("Valor médio por viagem concluída")}</KpiMetricHint>
           </KpiDetails>
         </ModernKpiCard>
 
@@ -805,14 +814,14 @@ const DashBoard: FC = () => {
             <FiUsers />
           </KpiIconBadge>
           <KpiDetails>
-            <KpiMetricLabel>Veículos Ativos</KpiMetricLabel>
+            <KpiMetricLabel>{t("Veículos Ativos")}</KpiMetricLabel>
             {loadingFetchDataDashBoard ? (
               <Skeleton.Input active size="small" style={{ width: 80 }} />
             ) : (
               <KpiMetricValue>{driverAllActives}</KpiMetricValue>
             )}
             <KpiMetricHint>
-              {totalVehiclesCount} veículos registrados na frota
+              {totalVehiclesCount} {t("veículos registrados na frota")}
             </KpiMetricHint>
           </KpiDetails>
         </ModernKpiCard>
@@ -825,14 +834,14 @@ const DashBoard: FC = () => {
         <SectionHeader>
           <SectionHeaderLeft>
             <SectionTitleText>
-              <FaCarSide style={{ color: "#00349a" }} /> Tipos de Motorista & Frota
+              <FaCarSide style={{ color: "#00349a" }} /> {t("Tipos de Motorista & Frota")}
             </SectionTitleText>
             <SectionCounterBadge>
-              {driverList.length} {driverList.length === 1 ? "categoria" : "categorias"}
+              {driverList.length} {driverList.length === 1 ? t("categoria") : t("categorias")}
             </SectionCounterBadge>
           </SectionHeaderLeft>
           <SectionDescription>
-            Distribuição de veículos por modalidade de atendimento
+            {t("Distribuição de veículos por modalidade de atendimento")}
           </SectionDescription>
         </SectionHeader>
 
@@ -866,12 +875,12 @@ const DashBoard: FC = () => {
                     </DriverAvatarCircle>
                     <DriverCategoryInfo>
                       <DriverCategoryName title={item.type}>{item.type}</DriverCategoryName>
-                      <DriverCategorySubtitle>Modalidade de Corrida</DriverCategorySubtitle>
+                      <DriverCategorySubtitle>{t("Modalidade de Corrida")}</DriverCategorySubtitle>
                     </DriverCategoryInfo>
                   </DriverCategoryHeader>
 
                   <DriverTotalBanner>
-                    <DriverTotalLabel>Total de veículos:</DriverTotalLabel>
+                    <DriverTotalLabel>{t("Total de veículos:")}</DriverTotalLabel>
                     <DriverTotalValue>{totalCount}</DriverTotalValue>
                   </DriverTotalBanner>
 
@@ -879,7 +888,7 @@ const DashBoard: FC = () => {
                     <DriverStatusItem $status="active" title="Veículos disponíveis e ativos">
                       <span>
                         <DriverStatusDot $status="active" />
-                        Ativos
+                        {t("Ativos")}
                       </span>
                       <span>{activeCount}</span>
                     </DriverStatusItem>
@@ -887,7 +896,7 @@ const DashBoard: FC = () => {
                     <DriverStatusItem $status="waiting" title="Aguardando liberação de cadastro">
                       <span>
                         <DriverStatusDot $status="waiting" />
-                        Aguardando
+                        {t("Aguardando")}
                       </span>
                       <span>{waitingCount}</span>
                     </DriverStatusItem>
@@ -895,7 +904,7 @@ const DashBoard: FC = () => {
                     <DriverStatusItem $status="pending" title="Cadastros pendentes de documento">
                       <span>
                         <DriverStatusDot $status="pending" />
-                        Pendentes
+                        {t("Pendentes")}
                       </span>
                       <span>{pendingCount}</span>
                     </DriverStatusItem>
@@ -903,7 +912,7 @@ const DashBoard: FC = () => {
                     <DriverStatusItem $status="blocked" title="Motoristas bloqueados">
                       <span>
                         <DriverStatusDot $status="blocked" />
-                        Bloqueados
+                        {t("Bloqueados")}
                       </span>
                       <span>{blockedCount}</span>
                     </DriverStatusItem>
@@ -928,12 +937,12 @@ const DashBoard: FC = () => {
         <SectionHeader>
           <SectionHeaderLeft>
             <SectionTitleText>
-              <FiUsers style={{ color: "#00349a" }} /> Métricas de Clientes & Passageiros
+              <FiUsers style={{ color: "#00349a" }} /> {t("Métricas de Clientes & Passageiros")}
             </SectionTitleText>
-            <SectionCounterBadge>{customersAllTotal} total</SectionCounterBadge>
+            <SectionCounterBadge>{customersAllTotal} {t("Total")}</SectionCounterBadge>
           </SectionHeaderLeft>
           <SectionDescription>
-            Visão consolidada da base de passageiros registrados
+            {t("Visão consolidada da base de passageiros registrados")}
           </SectionDescription>
         </SectionHeader>
 
@@ -943,7 +952,7 @@ const DashBoard: FC = () => {
           <ModernCustomersGrid>
             <ModernCustomerCard $variant="total">
               <CustomerCardTop>
-                <CustomerCardTitleText>Total de Clientes</CustomerCardTitleText>
+                <CustomerCardTitleText>{t("Total de Clientes")}</CustomerCardTitleText>
                 <CustomerCardIconWrap $variant="total">
                   <FiUsers />
                 </CustomerCardIconWrap>
@@ -953,7 +962,7 @@ const DashBoard: FC = () => {
 
             <ModernCustomerCard $variant="active">
               <CustomerCardTop>
-                <CustomerCardTitleText>Clientes Ativos</CustomerCardTitleText>
+                <CustomerCardTitleText>{t("Clientes Ativos")}</CustomerCardTitleText>
                 <CustomerCardIconWrap $variant="active">
                   <FiUserCheck />
                 </CustomerCardIconWrap>
@@ -963,7 +972,7 @@ const DashBoard: FC = () => {
 
             <ModernCustomerCard $variant="pending">
               <CustomerCardTop>
-                <CustomerCardTitleText>Clientes Pendentes</CustomerCardTitleText>
+                <CustomerCardTitleText>{t("Clientes Pendentes")}</CustomerCardTitleText>
                 <CustomerCardIconWrap $variant="pending">
                   <FiClock />
                 </CustomerCardIconWrap>
@@ -973,7 +982,7 @@ const DashBoard: FC = () => {
 
             <ModernCustomerCard $variant="blocked">
               <CustomerCardTop>
-                <CustomerCardTitleText>Clientes Bloqueados</CustomerCardTitleText>
+                <CustomerCardTitleText>{t("Clientes Bloqueados")}</CustomerCardTitleText>
                 <CustomerCardIconWrap $variant="blocked">
                   <FiUserX />
                 </CustomerCardIconWrap>
@@ -991,15 +1000,15 @@ const DashBoard: FC = () => {
         {/* Card 1: Formas de Pagamento */}
         <ModernAnalyticsCard>
           <AnalyticsCardTop>
-            <AnalyticsCardTitle>Formas de Pagamento</AnalyticsCardTitle>
-            <SectionCounterBadge>Corridas</SectionCounterBadge>
+            <AnalyticsCardTitle>{t("Formas de Pagamento")}</AnalyticsCardTitle>
+            <SectionCounterBadge>{t("Corridas")}</SectionCounterBadge>
           </AnalyticsCardTop>
           <AnalyticsCardBody>
             <AnalyticsDataList>
               <AnalyticsDataItem>
                 <AnalyticsItemLeft>
                   <AnalyticsColorDot $color="#10b981" />
-                  <AnalyticsItemName>Em Dinheiro</AnalyticsItemName>
+                  <AnalyticsItemName>{t("Em Dinheiro")}</AnalyticsItemName>
                 </AnalyticsItemLeft>
                 <AnalyticsItemValue>{datasDashboard?.paidOutMoney ?? 0}</AnalyticsItemValue>
               </AnalyticsDataItem>
@@ -1007,7 +1016,7 @@ const DashBoard: FC = () => {
               <AnalyticsDataItem>
                 <AnalyticsItemLeft>
                   <AnalyticsColorDot $color="#6366f1" />
-                  <AnalyticsItemName>Em Voucher</AnalyticsItemName>
+                  <AnalyticsItemName>{t("Em Voucher")}</AnalyticsItemName>
                 </AnalyticsItemLeft>
                 <AnalyticsItemValue>{datasDashboard?.paidOutVoucher ?? 0}</AnalyticsItemValue>
               </AnalyticsDataItem>
@@ -1015,7 +1024,7 @@ const DashBoard: FC = () => {
               <AnalyticsDataItem>
                 <AnalyticsItemLeft>
                   <AnalyticsColorDot $color="#0284c7" />
-                  <AnalyticsItemName>Em Cartão</AnalyticsItemName>
+                  <AnalyticsItemName>{t("Em Cartão")}</AnalyticsItemName>
                 </AnalyticsItemLeft>
                 <AnalyticsItemValue>{datasDashboard?.paidOutCreditCard ?? 0}</AnalyticsItemValue>
               </AnalyticsDataItem>
@@ -1023,22 +1032,29 @@ const DashBoard: FC = () => {
 
             <AnalyticsChartWrap>
               {hasPaymentData ? (
-                <PieChart
-                  series={[
-                    {
-                      data: paymentFormsData.filter((d) => d.value > 0),
-                      innerRadius: 36,
-                      outerRadius: 76,
-                      paddingAngle: 3,
-                      cornerRadius: 5,
-                    },
-                  ]}
-                  height={180}
-                  margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                />
+                <>
+                  <PieChart
+                    series={[
+                      {
+                        data: paymentFormsData.filter((d) => d.value > 0),
+                        innerRadius: 46,
+                        outerRadius: 74,
+                        paddingAngle: 3,
+                        cornerRadius: 5,
+                      },
+                    ]}
+                    height={180}
+                    slotProps={{ legend: { hidden: true } }}
+                    margin={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  />
+                  <ChartCenterHole>
+                    <ChartCenterValue>{totalPaymentSlices}</ChartCenterValue>
+                    <ChartCenterLabel>{t("Total")}</ChartCenterLabel>
+                  </ChartCenterHole>
+                </>
               ) : (
                 <div style={{ textAlign: "center", color: "#94a3b8", padding: "24px 0", fontSize: 13 }}>
-                  Nenhuma corrida computada no momento
+                  {t("Nenhuma corrida computada no momento")}
                 </div>
               )}
             </AnalyticsChartWrap>
@@ -1048,15 +1064,15 @@ const DashBoard: FC = () => {
         {/* Card 2: Status das Viagens */}
         <ModernAnalyticsCard>
           <AnalyticsCardTop>
-            <AnalyticsCardTitle>Status das Viagens</AnalyticsCardTitle>
-            <SectionCounterBadge>Operacional</SectionCounterBadge>
+            <AnalyticsCardTitle>{t("Status das Viagens")}</AnalyticsCardTitle>
+            <SectionCounterBadge>{t("Operacional")}</SectionCounterBadge>
           </AnalyticsCardTop>
           <AnalyticsCardBody>
             <AnalyticsDataList>
               <AnalyticsDataItem>
                 <AnalyticsItemLeft>
                   <AnalyticsColorDot $color="#0284c7" />
-                  <AnalyticsItemName>Aceitas</AnalyticsItemName>
+                  <AnalyticsItemName>{t("Aceitas")}</AnalyticsItemName>
                 </AnalyticsItemLeft>
                 <AnalyticsItemValue>{datasDashboard?.tripAccepted ?? 0}</AnalyticsItemValue>
               </AnalyticsDataItem>
@@ -1064,7 +1080,7 @@ const DashBoard: FC = () => {
               <AnalyticsDataItem>
                 <AnalyticsItemLeft>
                   <AnalyticsColorDot $color="#10b981" />
-                  <AnalyticsItemName>Finalizadas</AnalyticsItemName>
+                  <AnalyticsItemName>{t("Finalizadas")}</AnalyticsItemName>
                 </AnalyticsItemLeft>
                 <AnalyticsItemValue>{datasDashboard?.tripFinished ?? 0}</AnalyticsItemValue>
               </AnalyticsDataItem>
@@ -1072,7 +1088,7 @@ const DashBoard: FC = () => {
               <AnalyticsDataItem>
                 <AnalyticsItemLeft>
                   <AnalyticsColorDot $color="#475569" />
-                  <AnalyticsItemName>Total de Viagens</AnalyticsItemName>
+                  <AnalyticsItemName>{t("Total de Viagens")}</AnalyticsItemName>
                 </AnalyticsItemLeft>
                 <AnalyticsItemValue>{datasDashboard?.totalTrips ?? 0}</AnalyticsItemValue>
               </AnalyticsDataItem>
@@ -1080,22 +1096,29 @@ const DashBoard: FC = () => {
 
             <AnalyticsChartWrap>
               {hasTripsData ? (
-                <PieChart
-                  series={[
-                    {
-                      data: tripsStatusData.filter((d) => d.value > 0),
-                      innerRadius: 36,
-                      outerRadius: 76,
-                      paddingAngle: 3,
-                      cornerRadius: 5,
-                    },
-                  ]}
-                  height={180}
-                  margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                />
+                <>
+                  <PieChart
+                    series={[
+                      {
+                        data: tripsStatusData.filter((d) => d.value > 0),
+                        innerRadius: 46,
+                        outerRadius: 74,
+                        paddingAngle: 3,
+                        cornerRadius: 5,
+                      },
+                    ]}
+                    height={180}
+                    slotProps={{ legend: { hidden: true } }}
+                    margin={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  />
+                  <ChartCenterHole>
+                    <ChartCenterValue>{totalTripSlices}</ChartCenterValue>
+                    <ChartCenterLabel>{t("Total")}</ChartCenterLabel>
+                  </ChartCenterHole>
+                </>
               ) : (
                 <div style={{ textAlign: "center", color: "#94a3b8", padding: "24px 0", fontSize: 13 }}>
-                  Nenhuma viagem registrada no período
+                  {t("Nenhuma viagem registrada no período")}
                 </div>
               )}
             </AnalyticsChartWrap>
@@ -1105,15 +1128,15 @@ const DashBoard: FC = () => {
         {/* Card 3: Análise de Cancelamentos */}
         <ModernAnalyticsCard>
           <AnalyticsCardTop>
-            <AnalyticsCardTitle>Viagens Canceladas</AnalyticsCardTitle>
-            <SectionCounterBadge>Desistências</SectionCounterBadge>
+            <AnalyticsCardTitle>{t("Viagens Canceladas")}</AnalyticsCardTitle>
+            <SectionCounterBadge>{t("Desistências")}</SectionCounterBadge>
           </AnalyticsCardTop>
           <AnalyticsCardBody>
             <AnalyticsDataList>
               <AnalyticsDataItem>
                 <AnalyticsItemLeft>
                   <AnalyticsColorDot $color="#f59e0b" />
-                  <AnalyticsItemName>Pelo Motorista</AnalyticsItemName>
+                  <AnalyticsItemName>{t("Pelo Motorista")}</AnalyticsItemName>
                 </AnalyticsItemLeft>
                 <AnalyticsItemValue>{datasDashboard?.canceledbyDriver ?? 0}</AnalyticsItemValue>
               </AnalyticsDataItem>
@@ -1121,7 +1144,7 @@ const DashBoard: FC = () => {
               <AnalyticsDataItem>
                 <AnalyticsItemLeft>
                   <AnalyticsColorDot $color="#ef4444" />
-                  <AnalyticsItemName>Pelo Cliente</AnalyticsItemName>
+                  <AnalyticsItemName>{t("Pelo Passageiro")}</AnalyticsItemName>
                 </AnalyticsItemLeft>
                 <AnalyticsItemValue>{datasDashboard?.canceledbyCustomer ?? 0}</AnalyticsItemValue>
               </AnalyticsDataItem>
@@ -1129,7 +1152,7 @@ const DashBoard: FC = () => {
               <AnalyticsDataItem>
                 <AnalyticsItemLeft>
                   <AnalyticsColorDot $color="#b91c1c" />
-                  <AnalyticsItemName>Total Cancelamentos</AnalyticsItemName>
+                  <AnalyticsItemName>{t("Total Cancelamentos")}</AnalyticsItemName>
                 </AnalyticsItemLeft>
                 <AnalyticsItemValue>{datasDashboard?.totalCanceled ?? 0}</AnalyticsItemValue>
               </AnalyticsDataItem>
@@ -1137,22 +1160,29 @@ const DashBoard: FC = () => {
 
             <AnalyticsChartWrap>
               {hasCancellationsData ? (
-                <PieChart
-                  series={[
-                    {
-                      data: cancellationsData.filter((d) => d.value > 0),
-                      innerRadius: 36,
-                      outerRadius: 76,
-                      paddingAngle: 3,
-                      cornerRadius: 5,
-                    },
-                  ]}
-                  height={180}
-                  margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                />
+                <>
+                  <PieChart
+                    series={[
+                      {
+                        data: cancellationsData.filter((d) => d.value > 0),
+                        innerRadius: 46,
+                        outerRadius: 74,
+                        paddingAngle: 3,
+                        cornerRadius: 5,
+                      },
+                    ]}
+                    height={180}
+                    slotProps={{ legend: { hidden: true } }}
+                    margin={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  />
+                  <ChartCenterHole>
+                    <ChartCenterValue>{totalCancellationSlices}</ChartCenterValue>
+                    <ChartCenterLabel>{t("Total")}</ChartCenterLabel>
+                  </ChartCenterHole>
+                </>
               ) : (
                 <div style={{ textAlign: "center", color: "#94a3b8", padding: "24px 0", fontSize: 13 }}>
-                  Nenhum cancelamento computado
+                  {t("Nenhum cancelamento computado")}
                 </div>
               )}
             </AnalyticsChartWrap>
@@ -1161,14 +1191,14 @@ const DashBoard: FC = () => {
       </ModernAnalyticsGrid>
 
       {/* ==========================================================================
-          Rankings de Performance (Top Motoristas & Top Clientes)
+          Rankings de Performance (Top Motoristas & Top Passageiros)
          ========================================================================== */}
       <ModernRankingsGrid>
         {/* Top Motoristas */}
         <ModernRankingCard>
           <RankingHeaderWrap>
             <SectionTitleText>
-              <FiAward style={{ color: "#f59e0b" }} /> Top Motoristas
+              <FiAward style={{ color: "#f59e0b" }} /> {t("Top Motoristas")}
             </SectionTitleText>
 
             <RankingFiltersWrap>
@@ -1177,21 +1207,21 @@ const DashBoard: FC = () => {
                 $active={driverRankPeriod === "day"}
                 onClick={() => handleDriverRankPeriodChange("day")}
               >
-                Hoje
+                {t("Hoje")}
               </RankingFilterPill>
               <RankingFilterPill
                 type="button"
                 $active={driverRankPeriod === "month"}
                 onClick={() => handleDriverRankPeriodChange("month")}
               >
-                Este Mês
+                {t("Este Mês")}
               </RankingFilterPill>
               <RankingFilterPill
                 type="button"
                 $active={driverRankPeriod === "all"}
                 onClick={() => handleDriverRankPeriodChange("all")}
               >
-                Geral
+                {t("Geral")}
               </RankingFilterPill>
             </RankingFiltersWrap>
           </RankingHeaderWrap>
@@ -1200,11 +1230,11 @@ const DashBoard: FC = () => {
             {loadingRankingDriver ? (
               <LoadingMoreSpinner>
                 <Spin size="small" />
-                <LoadingMoreText style={{ marginLeft: "8px" }}>Carregando ranking...</LoadingMoreText>
+                <LoadingMoreText style={{ marginLeft: "8px" }}>{t("Carregando ranking...")}</LoadingMoreText>
               </LoadingMoreSpinner>
             ) : driverRank.length === 0 ? (
               <div style={{ textAlign: "center", color: "#94a3b8", padding: "36px 0", fontSize: 13.5 }}>
-                Nenhum motorista ranqueado no período selecionado.
+                {t("Nenhum motorista ranqueado no período selecionado.")}
               </div>
             ) : (
               <>
@@ -1222,13 +1252,13 @@ const DashBoard: FC = () => {
                         <RankingUserNameText title={item.name}>{item.name}</RankingUserNameText>
                         <RankingStatsPills>
                           <RankingStatChip $variant="trips">
-                            {item.quantityTrips} {item.quantityTrips === 1 ? "viagem" : "viagens"}
+                            {item.quantityTrips} {item.quantityTrips === 1 ? t("viagem") : t("viagens")}
                           </RankingStatChip>
                           <RankingStatChip $variant="revenue">
                             {CurrencyUtils.formatCurrency(item.totalValue)}
                           </RankingStatChip>
                           <RankingStatChip $variant="avg">
-                            Méd. {CurrencyUtils.formatCurrency(ticketMedio)}
+                            {t("Méd.")} {CurrencyUtils.formatCurrency(ticketMedio)}
                           </RankingStatChip>
                         </RankingStatsPills>
                       </RankingUserMeta>
@@ -1239,7 +1269,7 @@ const DashBoard: FC = () => {
                           onClick={() => handleOpenModalParabens(item, "driver")}
                           title={`Enviar mensagem de parabéns para ${item.name}`}
                         >
-                          🎉 Parabéns
+                          🎉 {t("Parabéns")}
                         </CelebrateActionBtn>
 
                         <WhatsAppActionBtn
@@ -1260,22 +1290,22 @@ const DashBoard: FC = () => {
                 {loadingMoreDrivers && (
                   <LoadingMoreSpinner>
                     <Spin size="small" />
-                    <LoadingMoreText style={{ marginLeft: "10px" }}>Carregando mais motoristas...</LoadingMoreText>
+                    <LoadingMoreText style={{ marginLeft: "10px" }}>{t("Carregando mais motoristas...")}</LoadingMoreText>
                   </LoadingMoreSpinner>
                 )}
                 {!hasMoreDrivers && driverRank.length > 0 && !loadingMoreDrivers && (
-                  <LoadingMoreText>Fim dos registros para este filtro.</LoadingMoreText>
+                  <LoadingMoreText>{t("Fim dos registros para este filtro.")}</LoadingMoreText>
                 )}
               </>
             )}
           </RankingScrollList>
         </ModernRankingCard>
 
-        {/* Top Clientes */}
+        {/* Top Passageiros */}
         <ModernRankingCard>
           <RankingHeaderWrap>
             <SectionTitleText>
-              <FiAward style={{ color: "#0284c7" }} /> Top Clientes
+              <FiAward style={{ color: "#0284c7" }} /> {t("Top Passageiros")}
             </SectionTitleText>
 
             <RankingFiltersWrap>
@@ -1284,21 +1314,21 @@ const DashBoard: FC = () => {
                 $active={clientRankPeriod === "day"}
                 onClick={() => handleClientRankPeriodChange("day")}
               >
-                Hoje
+                {t("Hoje")}
               </RankingFilterPill>
               <RankingFilterPill
                 type="button"
                 $active={clientRankPeriod === "month"}
                 onClick={() => handleClientRankPeriodChange("month")}
               >
-                Este Mês
+                {t("Este Mês")}
               </RankingFilterPill>
               <RankingFilterPill
                 type="button"
                 $active={clientRankPeriod === "all"}
                 onClick={() => handleClientRankPeriodChange("all")}
               >
-                Geral
+                {t("Geral")}
               </RankingFilterPill>
             </RankingFiltersWrap>
           </RankingHeaderWrap>
@@ -1307,11 +1337,11 @@ const DashBoard: FC = () => {
             {loadingRankingClient ? (
               <LoadingMoreSpinner>
                 <Spin size="small" />
-                <LoadingMoreText style={{ marginLeft: "8px" }}>Carregando ranking...</LoadingMoreText>
+                <LoadingMoreText style={{ marginLeft: "8px" }}>{t("Carregando ranking...")}</LoadingMoreText>
               </LoadingMoreSpinner>
             ) : clientRank.length === 0 ? (
               <div style={{ textAlign: "center", color: "#94a3b8", padding: "36px 0", fontSize: 13.5 }}>
-                Nenhum cliente ranqueado no período selecionado.
+                {t("Nenhum passageiro ranqueado no período selecionado.")}
               </div>
             ) : (
               <>
@@ -1329,13 +1359,13 @@ const DashBoard: FC = () => {
                         <RankingUserNameText title={item.name}>{item.name}</RankingUserNameText>
                         <RankingStatsPills>
                           <RankingStatChip $variant="trips">
-                            {item.quantityTrips} {item.quantityTrips === 1 ? "viagem" : "viagens"}
+                            {item.quantityTrips} {item.quantityTrips === 1 ? t("viagem") : t("viagens")}
                           </RankingStatChip>
                           <RankingStatChip $variant="revenue">
                             {CurrencyUtils.formatCurrency(item.totalValue)}
                           </RankingStatChip>
                           <RankingStatChip $variant="avg">
-                            Méd. {CurrencyUtils.formatCurrency(ticketMedio)}
+                            {t("Méd.")} {CurrencyUtils.formatCurrency(ticketMedio)}
                           </RankingStatChip>
                         </RankingStatsPills>
                       </RankingUserMeta>
@@ -1346,7 +1376,7 @@ const DashBoard: FC = () => {
                           onClick={() => handleOpenModalParabens(item, "client")}
                           title={`Enviar mensagem de parabéns para ${item.name}`}
                         >
-                          🎉 Parabéns
+                          🎉 {t("Parabéns")}
                         </CelebrateActionBtn>
 
                         <WhatsAppActionBtn
@@ -1367,11 +1397,11 @@ const DashBoard: FC = () => {
                 {loadingMoreClients && (
                   <LoadingMoreSpinner>
                     <Spin size="small" />
-                    <LoadingMoreText style={{ marginLeft: "10px" }}>Carregando mais clientes...</LoadingMoreText>
+                    <LoadingMoreText style={{ marginLeft: "10px" }}>{t("Carregando mais passageiros...")}</LoadingMoreText>
                   </LoadingMoreSpinner>
                 )}
                 {!hasMoreClients && clientRank.length > 0 && !loadingMoreClients && (
-                  <LoadingMoreText>Fim dos registros para este filtro.</LoadingMoreText>
+                  <LoadingMoreText>{t("Fim dos registros para este filtro.")}</LoadingMoreText>
                 )}
               </>
             )}

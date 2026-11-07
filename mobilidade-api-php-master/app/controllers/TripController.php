@@ -295,6 +295,23 @@ class TripController extends ApiController
             } catch (\Throwable $eDriver) {
                 \app\utils\Logger::error("Erro ao liberar motorista {$tripRow['driverId']}: " . $eDriver->getMessage());
             }
+
+            try {
+                $driverRow = (new \app\dao\DriverDao())->find($tripRow['driverId']);
+                if ($driverRow && !empty($driverRow->deviceToken)) {
+                    $push = new \app\utils\Push();
+                    $push
+                        ->setTitle(strtoupper(\app\utils\Config::get('app_title') ?? 'CANCELAMENTO DE VIAGEM'))
+                        ->setBody("A viagem foi cancelada pela central ou pelo cliente!")
+                        ->setAction(\app\constant\PushActionConst::OPEN_APP)
+                        ->setTag(\app\constant\PushTagConst::RIDE_CANCELLED)
+                        ->setForceStart(\app\constant\PushConst::FORCE_START)
+                        ->setPriority(\app\constant\PushConst::HIGH_PRIORITY);
+                    $push->sendNotificationWithData($driverRow->deviceToken);
+                }
+            } catch (\Throwable $ePush) {
+                \app\utils\Logger::error("Erro ao enviar push de cancelamento ao motorista {$tripRow['driverId']}: " . $ePush->getMessage());
+            }
         }
 
         try {

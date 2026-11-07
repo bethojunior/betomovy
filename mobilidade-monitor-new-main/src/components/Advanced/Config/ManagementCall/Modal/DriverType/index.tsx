@@ -244,12 +244,17 @@ const DriverTypeModal: FC<ModalProps> = ({
 
     const rawFile = (selectedFile && typeof selectedFile !== "string" && selectedFile[0])
       || (values.image && (values.image as any)?.target?.files?.[0])
-      || (values.image as any)?.[0];
+      || (values.image && (values.image as any)?.[0])
+      || (values.image instanceof File ? values.image : null);
 
     if (rawFile) {
-      resizeFile(rawFile, 250, 250)
-        .then((res) => submitCreate(res as Blob))
-        .catch(() => submitCreate(null));
+      if (rawFile.type === 'image/svg+xml' || (rawFile.name && rawFile.name.endsWith('.svg'))) {
+        submitCreate(rawFile);
+      } else {
+        resizeFile(rawFile, 250, 250)
+          .then((res) => submitCreate(res as Blob))
+          .catch(() => submitCreate(rawFile));
+      }
     } else {
       submitCreate(null);
     }
@@ -306,42 +311,45 @@ const DriverTypeModal: FC<ModalProps> = ({
       }
     };
 
-    if (typeof values.image === "string") {
-      formData.append("name", values.name);
-      formData.append("isActive", values.status === true ? "1" : "0");
-      formData.append("iconMapDriverId", values.iconMap);
-      formData.append("isDeliveryMan", values.exclusivity || "0");
-      formData.append("boardingText", values.boardingText);
-      formData.append("acceptedText", values.acceptedText);
-      formData.append("inProgressText", values.inProgressText);
+    formData.append("name", values.name);
+    formData.append("isActive", values.status === true ? "1" : "0");
+    formData.append("iconMapDriverId", values.iconMap ? String(values.iconMap) : "1");
+    formData.append(
+      "isDeliveryMan",
+      import.meta.env.ISSPEEDMOB == "true" ? "0" : (values.exclusivity ? String(values.exclusivity) : "0")
+    );
+    formData.append("boardingText", values.boardingText || "Seu carro está te aguardando");
+    formData.append("acceptedText", values.acceptedText || "Seu motorista vai chegar em breve");
+    formData.append("inProgressText", values.inProgressText || "Você está no percurso do seu destino");
+    formData.append("cancellationText", values.cancellationText || "Sua viagem foi cancelada");
+    formData.append("vehicleType", values.vehicleType || "car");
 
-      idsAppPartners.forEach((id) => {
-        formData.append("idsAppPartners[]", String(id));
-      });
-      formData.append("cancellationText", values.cancellationText);
-      formData.append("vehicleType", values.vehicleType || "car");
-      submitUpdate();
-    } else {
-      resizeFile(values.image.target.files[0], 250, 250).then((result) => {
-        formData.append("picture", result as Blob);
-        formData.append("name", values.name);
-        formData.append("boardingText", values.boardingText);
-        formData.append("acceptedText", values.acceptedText);
-        formData.append("inProgressText", values.inProgressText);
-        formData.append("cancellationText", values.cancellationText);
-        formData.append("vehicleType", values.vehicleType || "car");
-        formData.append("isActive", values.status === true ? "1" : "0");
-        formData.append("iconMapDriverId", values.iconMap);
-        formData.append(
-          "isDeliveryMan",
-          import.meta.env.ISSPEEDMOB == "true" ? "0" : values.exclusivity || "0"
-        );
+    idsAppPartners.forEach((id) => {
+      formData.append("idsAppPartners[]", String(id));
+    });
 
-        idsAppPartners.forEach((id) => {
-          formData.append("idsAppPartners[]", String(id));
-        });
+    const rawFile = (selectedFile && typeof selectedFile !== "string" && selectedFile[0])
+      || (values.image && (values.image as any)?.target?.files?.[0])
+      || (values.image && (values.image as any)?.[0])
+      || (values.image instanceof File ? values.image : null);
+
+    if (rawFile) {
+      if (rawFile.type === 'image/svg+xml' || (rawFile.name && rawFile.name.endsWith('.svg'))) {
+        formData.append("picture", rawFile);
         submitUpdate();
-      });
+      } else {
+        resizeFile(rawFile, 250, 250)
+          .then((result) => {
+            formData.append("picture", result as Blob);
+            submitUpdate();
+          })
+          .catch(() => {
+            formData.append("picture", rawFile);
+            submitUpdate();
+          });
+      }
+    } else {
+      submitUpdate();
     }
   };
 
@@ -489,12 +497,17 @@ const DriverTypeModal: FC<ModalProps> = ({
           <ContentImage>
             <Form.Item
               name="image"
-              label="Ícone do chamado"
+              label="Ícone do chamado (opcional)"
               valuePropName="file"
+              getValueFromEvent={(e) => {
+                if (e?.target?.files) {
+                  return e.target.files;
+                }
+                return e;
+              }}
               rules={[
                 {
-                  required: true,
-                  message: "Escolha um ícone para o motorista",
+                  required: false,
                 },
               ]}
             >

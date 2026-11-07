@@ -39,12 +39,16 @@ export const Modal = styled(MotiView)`
   align-self: center;
   position: absolute;
   bottom: 0;
-  border-radius: 8px;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
   z-index: 10;
-  elevation: 5;
+  elevation: 12;
+  shadow-color: #000;
+  shadow-offset: 0px -4px;
+  shadow-opacity: 0.18;
+  shadow-radius: 12px;
   min-height: 350px;
-  padding: 15px 10px 10px 10px;
-  border-radius: 10px;
+  padding: 16px 14px 14px 14px;
 `;
 
 export const Photo = styled.Image`
@@ -85,8 +89,11 @@ export const AddressSection = styled.View`
 export const SectionInfo = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  padding: 0 10px;
+  padding: 8px 12px;
   align-items: center;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  margin-bottom: 8px;
 `;
 
 export const DynamicContent = styled.View`
@@ -104,11 +111,12 @@ export const Section = styled.View<SectionProps>`
 `;
 
 export const Price = styled.Text`
-  font-weight: bold;
-  font-size: ${RFValue(23)}px;
+  font-weight: 800;
+  font-size: ${RFValue(21)}px;
   justify-content: center;
-  color: ${({theme}) => theme.colors.primaryText};
-  font-family: MavenPro_400Regular;
+  color: #ffffff;
+  font-family: MavenPro_700Bold;
+  letter-spacing: 0.3px;
 `;
 
 export const Bonus = styled.Text`
@@ -120,33 +128,44 @@ export const Bonus = styled.Text`
 `;
 
 export const AddressContent = styled.View`
-  margin-top: 15px;
+  margin-top: 10px;
   flex-direction: row;
+  background-color: #f8fafc;
+  border-radius: 14px;
+  padding: 10px 12px;
 `;
 
 export const PointsContent = styled.View`
-  padding: 10px 0;
+  padding: 6px 0;
+  align-items: center;
 `;
 
 export const Ball = styled.View`
-  width: 10px;
-  height: 10px;
-  background-color: ${({theme}) => theme.colors.primary};
-  border-radius: 50px;
+  width: 12px;
+  height: 12px;
+  background-color: #10b981;
+  border-radius: 6px;
+  border-width: 2px;
+  border-color: #ffffff;
+  elevation: 2;
 `;
 
 export const Square = styled.View`
-  width: 10px;
-  height: 10px;
-  background-color: ${({theme}) => theme.colors.primary};
+  width: 12px;
+  height: 12px;
+  background-color: #ef4444;
+  border-radius: 3px;
+  border-width: 2px;
+  border-color: #ffffff;
+  elevation: 2;
 `;
 
 export const Line = styled.View`
-  border-right-width: 1px;
-  border-right-color: ${({theme}) => theme.colors.secondary};
-  min-height: 10px;
+  border-right-width: 1.5px;
+  border-right-color: #cbd5e1;
+  min-height: 20px;
   flex: 1;
-  width: 0.5px;
+  width: 1px;
   align-self: center;
   border-style: ${Platform.OS === 'ios' ? 'solid' : 'dashed'};
 `;
@@ -160,21 +179,21 @@ export const Toll = styled.Text`
 `;
 
 export const Address = styled.Text<AddressProps>`
-  padding: 5px;
-  font-size: ${({waypoint}) => (waypoint ? '14px' : '16px')};
-  font-family: MavenPro_400Regular;
-  color: ${({theme, riskArea}) => (riskArea ? 'red' : theme.colors.secondary)};
-  text-align: justify;
+  padding: 2px 6px;
+  font-size: ${({waypoint}) => (waypoint ? '13px' : '14px')};
+  font-family: MavenPro_500Medium;
+  color: ${({riskArea}) => (riskArea ? '#ef4444' : '#1e293b')};
+  line-height: 18px;
 `;
 
 export const ButtonContent = styled.View`
-  margin-top: 20px;
+  margin-top: 14px;
   width: 100%;
   align-self: center;
   align-items: stretch;
   flex-direction: row;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   padding: 0 4px;
 `;
 
@@ -188,10 +207,10 @@ export const ButtonRefuse = styled.TouchableOpacity`
 export const ButtonReject = styled.TouchableOpacity`
   flex: 1;
   height: 52px;
-  border-color: #c62828;
-  background-color: transparent;
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.06);
   border-width: 1.5px;
-  border-radius: 8px;
+  border-radius: 14px;
   align-items: center;
   justify-content: center;
 `;
@@ -199,58 +218,63 @@ export const ButtonReject = styled.TouchableOpacity`
 export const ButtonAccept = styled.TouchableOpacity`
   flex: 1.4;
   height: 52px;
-  border-color: ${({theme}) => theme.colors.primary};
-  background-color: ${({theme}) => theme.colors.primary};
-  border-width: 0.5px;
-  border-radius: 8px;
+  border-color: #00349a;
+  background-color: #00349a;
+  border-width: 1px;
+  border-radius: 14px;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
+  elevation: 4;
+  shadow-color: #00349a;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.3;
+  shadow-radius: 8px;
 `;
 
 export const ProgressBarrer = styled.View<ProgressProps>`
-  transition: 1.5s all;
-  height: 50px;
+  height: 52px;
   width: ${({width}) => (width >= 100 ? '100%' : `${width}%`)};
   align-self: flex-start;
-  height: 49px;
-  border-radius: 5px;
-  background-color: ${({theme}) => blockedColor(theme.colors.primary)};
+  border-radius: 14px;
+  background-color: rgba(255, 255, 255, 0.22);
   position: absolute;
 `;
 
 export const TextButton = styled.Text`
-  color: ${({theme}) => theme.colors.primary};
-  font-family: MavenPro_500Medium;
-  font-size: 20px;
+  color: #ffffff;
+  font-family: MavenPro_700Bold;
+  font-size: 18px;
+  letter-spacing: 0.5px;
 `;
 
 export const SimpleText = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
-  font-family: MavenPro_400Regular;
-  font-size: 15px;
+  color: #0f172a;
+  font-family: MavenPro_700Bold;
+  font-size: 16px;
 `;
 
 export const Label = styled.Text`
-  font-size: 15px;
-  font-family: MavenPro_400Regular;
-  color: ${({theme}) => theme.colors.secondary};
+  font-size: 11px;
+  font-family: MavenPro_500Medium;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 export const Info = styled.Text`
-  font-size: 17px;
-  font-family: MavenPro_500Medium;
-  color: ${({theme}) => theme.colors.secondary};
+  font-size: 15px;
+  font-family: MavenPro_700Bold;
+  color: #0f172a;
 `;
 
 export const Distance = styled.Text`
-  font-family: MavenPro_400Regular;
-  padding-left: 7px;
-  margin-top: -5px;
-  font-size: ${RFValue(18)}px;
-  font-weight: bold;
-  color: ${({theme}) => theme.colors.secondary};
+  font-family: MavenPro_700Bold;
+  padding-left: 6px;
+  margin-top: 1px;
+  font-size: ${RFValue(13)}px;
+  color: #00349a;
 `;
 
 export const FavoriteText = styled.Text<FavoriteTextProps>`

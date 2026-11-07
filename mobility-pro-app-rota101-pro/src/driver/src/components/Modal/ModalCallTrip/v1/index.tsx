@@ -3,6 +3,7 @@ import { useTheme } from 'styled-components';
 import { ActivityIndicator, NativeTouchEvent, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Fragment, useEffect, useState } from 'react';
+import * as Notifications from 'expo-notifications';
 import {
   Address,
   AddressContent,
@@ -191,9 +192,45 @@ export const V1ModalCallTrip = ({
   };
 
   const handleRefuse = () => {
+    Notifications.dismissAllNotificationsAsync().catch(() => {});
     setLoading(false);
     dispatchTrip({ type: 'update', field: 'callDriverModal', arg: false });
     refuseTrip(Number(driverId), trip?.tripReference).then(() => getDriverFind());
+  };
+
+  const getFormattedPickupEta = () => {
+    if (!trip?.estimative) return '';
+    const isMiles = Helper.generalSettingsActive(
+      generalSettings,
+      'enable_transform_km_for_mi',
+    );
+    let distText = trip?.estimative?.distance?.text || '';
+    if (isMiles && distText) {
+      const rawMeters = Number(trip?.estimative?.distance?.value);
+      if (rawMeters && !isNaN(rawMeters)) {
+        const km = rawMeters / 1000;
+        distText = `${(km * 0.621371).toFixed(2)} mi`;
+      } else if (distText.toLowerCase().includes('km')) {
+        const km = parseFloat(distText.replace(/[^0-9.]/g, ''));
+        if (!isNaN(km)) distText = `${(km * 0.621371).toFixed(2)} mi`;
+      }
+    }
+    const durText = trip?.estimative?.duration?.text
+      ? trip.estimative.duration.text.replace('mins', 'min').trim()
+      : '';
+    if (distText && durText) return `${distText} • ${durText}`;
+    return distText || durText;
+  };
+
+  const getFormattedDropoffEta = () => {
+    const isMiles = Helper.generalSettingsActive(
+      generalSettings,
+      'enable_transform_km_for_mi',
+    );
+    const dist = Helper.kmToMiles(Number(trip?.distance), isMiles);
+    const time = trip?.estimatedTripTime ? `${trip.estimatedTripTime} min` : '';
+    if (dist && time) return `${dist} • ${time}`;
+    return dist || time;
   };
 
   const hasRiskArea = Boolean(trip?.riskArea?.destination || trip?.riskArea?.origin);
@@ -355,19 +392,11 @@ export const V1ModalCallTrip = ({
                   >
                     {trip?.startAddress}
                   </Address>
-                  <If condition={trip?.estimative}>
+                  {Boolean(getFormattedPickupEta()) && (
                     <Distance>
-                      {IsToShowField('estimatedDistance', cityConfig) &&
-                        trip?.estimative?.distance?.text &&
-                        trip?.estimative?.distance?.text}{' '}
-                      {IsToShowField('estimatedDistance', cityConfig) &&
-                        trip.estimative?.duration?.text &&
-                        `, ${trip.estimative?.duration?.text?.replace(
-                          'mins',
-                          'min',
-                        )}`}
+                      {getFormattedPickupEta()}
                     </Distance>
-                  </If>
+                  )}
                 </If>
               </View>
               <If
@@ -389,16 +418,11 @@ export const V1ModalCallTrip = ({
                       {trip?.endAddress}
                     </Address>
                     <AddressSection>
-                      <Distance>
-                        {Helper.kmToMiles(
-                          Number(trip?.distance),
-                          Helper.generalSettingsActive(
-                            generalSettings,
-                            'enable_transform_km_for_mi',
-                          ),
-                        )}
-                        , {trip?.estimatedTripTime} min
-                      </Distance>
+                      {Boolean(getFormattedDropoffEta()) && (
+                        <Distance>
+                          {getFormattedDropoffEta()}
+                        </Distance>
+                      )}
                       {trip?.tolls?.length !== 0 && (
                         <Toll>pedágio: {trip?.tolls?.length}</Toll>
                       )}

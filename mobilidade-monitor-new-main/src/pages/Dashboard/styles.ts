@@ -667,6 +667,7 @@ export const ModernAnalyticsGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-bottom: 28px;
+  align-items: stretch;
 
   @media (max-width: 1200px) {
     grid-template-columns: 1fr;
@@ -681,6 +682,7 @@ export const ModernAnalyticsCard = styled.div`
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
+  height: 100%;
   transition: all 0.22s ease;
 
   &:hover {
@@ -709,6 +711,7 @@ export const AnalyticsCardTitle = styled.h3`
 export const AnalyticsCardBody = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 16px;
   flex: 1;
 `;
@@ -759,7 +762,39 @@ export const AnalyticsChartWrap = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 190px;
+  min-height: 180px;
+  width: 100%;
+  position: relative;
+`;
+
+export const ChartCenterHole = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
+`;
+
+export const ChartCenterValue = styled.span`
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+`;
+
+export const ChartCenterLabel = styled.span`
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
 `;
 
 /* ==========================================================================

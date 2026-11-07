@@ -17,32 +17,45 @@ interface ProgressBarrerProps {
 
 export const Modal = styled(MotiView)`
   background-color: ${({theme}) => theme.colors.background_global};
-  width: 95%;
-  padding: 5px;
+  width: 96%;
+  padding: 12px 14px 10px 14px;
   align-self: center;
   position: absolute;
-  bottom: 20px;
-  border-radius: 8px;
-
-  border: 0.5px solid ${({theme}) => theme.colors.border};
-  z-index: 1;
+  bottom: 16px;
+  border-radius: 24px;
+  border-width: 1px;
+  border-color: rgba(226, 232, 240, 0.8);
+  z-index: 10;
+  elevation: 12;
+  shadow-color: #000;
+  shadow-offset: 0px 6px;
+  shadow-opacity: 0.2;
+  shadow-radius: 12px;
 `;
 
 export const SimpleText = styled.Text`
-  font-family: MavenPro_500Medium;
-  color: ${({theme}) => theme.colors.secondary};
-  font-size: ${RFValue(12)}px;
+  font-family: MavenPro_700Bold;
+  color: #0f172a;
+  font-size: ${RFValue(13)}px;
 `;
 
 export const MoreInfo = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  padding: 15px 10px 0 10px;
+  padding: 10px 14px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  margin-top: 10px;
+  margin-bottom: 8px;
 `;
 
 export const SimpleTitle = styled.Text`
-  font-family: MavenPro_400Regular;
-  color: ${({theme}) => theme.colors.secondary};
+  font-family: MavenPro_500Medium;
+  color: #64748b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
 `;
 
 export const ClientContent = styled.TouchableOpacity`
@@ -97,23 +110,30 @@ export const AddressContent = styled.View`
 `;
 
 export const Ball = styled.View`
-  width: 13px;
-  height: 13px;
-  border-radius: 100px;
-  background-color: ${({theme}) => theme.colors.primary};
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background-color: #10b981;
+  border-width: 2px;
+  border-color: #ffffff;
+  elevation: 2;
 `;
 
 export const Line = styled.View`
   height: auto;
-  border-left-width: 0.5px;
-  border-color: ${({theme}) => theme.colors.primary};
+  border-left-width: 1.5px;
+  border-color: #cbd5e1;
   flex: 1;
 `;
 
 export const Square = styled.View`
-  width: 10px;
-  height: 10px;
-  background-color: ${({theme}) => theme.colors.primary};
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background-color: #ef4444;
+  border-width: 2px;
+  border-color: #ffffff;
+  elevation: 2;
   margin-bottom: 5px;
 `;
 
@@ -143,15 +163,20 @@ export const Address = styled.Text<AddressProps>`
 
 export const ButtonMinimizeModal = styled.Pressable`
   align-self: center;
-  background-color: ${({theme}) => theme.colors.primary};
+  background-color: #00349a;
   border-radius: 50px;
   align-items: center;
   justify-content: center;
-  width: 33px;
-  height: 33px;
-  margin-top: -20px;
-
-  elevation: 5;
+  width: 32px;
+  height: 32px;
+  margin-top: -24px;
+  elevation: 6;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.2;
+  shadow-radius: 4px;
+  border-width: 2px;
+  border-color: #ffffff;
 `;
 
 export const StatusButton = styled.View`

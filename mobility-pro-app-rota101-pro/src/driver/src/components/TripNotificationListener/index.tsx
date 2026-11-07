@@ -145,13 +145,28 @@ export const TripNotificationListener = () => {
           parsedData?.tag === 'trip_expired' ||
           parsedData?.tag === 'notify_customer_on_trip_expired';
 
-        if (isStopCall) {
-          Notifications.dismissAllNotificationsAsync();
+        const isRideCancelled =
+          parsedData?.tag === 'rideCancelled' ||
+          parsedData?.tag === 'RIDE_CANCELLED' ||
+          data?.tag === 'rideCancelled' ||
+          data?.tag === 'RIDE_CANCELLED' ||
+          parsedData?.action === 'rideCancelled' ||
+          data?.action === 'rideCancelled';
+
+        if (isStopCall || isRideCancelled) {
+          Notifications.dismissAllNotificationsAsync().catch(() => {});
           dispatchTrip({
             type: 'update',
             field: 'callDriverModal',
             arg: false,
           });
+          if (isRideCancelled) {
+            dispatchTrip({
+              type: 'update',
+              field: 'cancelTrip',
+              arg: { canceledBy: 'customer', tripReference: parsedData?.tripReference || data?.tripReference },
+            });
+          }
           return;
         }
 
