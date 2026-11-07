@@ -60,25 +60,28 @@ export const FooterBar = styled.div<FooterBarProps>`
 `;
 
 export const FooterReloadButton = styled.button`
-  background: #007bff;
+  background: #0284c7;
   color: #fff;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   position: absolute;
-  top: 0px;
-  right: 12px;
-  padding: 5px 10px;
+  top: 10px;
+  right: 14px;
+  padding: 6px 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+  transition: all 0.2s ease;
 
   &.rotating svg {
     animation: ${rotate} 1s linear infinite;
   }
 
   &:hover {
-    background: #0056b3;
+    background: #0369a1;
+    transform: translateY(-1px);
   }
 
   @media (max-width: ${MOBILE_BREAKPOINT}px) {
@@ -89,21 +92,27 @@ export const FooterReloadButton = styled.button`
   }
 `;
 
-
 export const FooterToggleButton = styled.button<{ $hidden?: boolean }>`
-  background: #007bff;
+  background: #0f172a;
   color: #fff;
-  border: none;
-  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px 12px 0 0;
   position: absolute;
-  top: -25px;
-  padding: 5px 10px;
+  top: -30px;
+  padding: 6px 16px;
   cursor: pointer;
   z-index: ${UI_LAYER.footerContent};
   white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.15);
+  transition: all 0.2s ease;
 
   &:hover {
-    background: #0056b3;
+    background: #1e293b;
   }
 
   @media (max-width: ${MOBILE_BREAKPOINT}px) {
@@ -217,13 +226,16 @@ export const FooterContent = styled.div<{ $dropdownOpen?: boolean }>`
   width: 100%;
   min-width: 100%;
   overflow: visible;
-  gap: 16px;
+  gap: 14px;
   position: relative;
-  padding: 20px 15px;
+  padding: 16px 20px;
   z-index: ${UI_LAYER.footerContent};
-  background-color: rgb(236, 236, 236);
-  border-top: 1px solid #e0e0e0;
-  border-radius: 8px 8px 0 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid #e2e8f0;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
   min-height: auto;
   box-sizing: border-box;
   margin: 0;
@@ -319,9 +331,9 @@ export const CardsWrapper = styled.div`
 `;
 
 const BaseCard = styled.div`
-  background: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   padding: 12px 16px;
   display: flex;
   flex-direction: column;
@@ -332,11 +344,16 @@ const BaseCard = styled.div`
   min-width: 160px;
   flex: 1 1 0;
   max-width: 100%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: visible;
   word-wrap: break-word;
   box-sizing: border-box;
+
+  &:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  }
 
   @media (min-width: 1401px) {
     min-width: 160px;

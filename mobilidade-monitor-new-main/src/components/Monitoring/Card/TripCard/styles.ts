@@ -20,11 +20,19 @@ import {
 } from '../sharedStyles'
 
 export const CardTripList = styled.div`
-  background-color: #fff;
-  border-radius: 13px;
+  background-color: #ffffff;
+  border-radius: 16px;
   align-self: center;
-  box-shadow: 1px 2px 10px #a2a2a2;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
   box-sizing: border-box;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  }
 `
 
 export const CardHeader = styled.div`
@@ -36,39 +44,41 @@ export const CardHeader = styled.div`
 
 export const StatusTrip = styled.div<{ layout?: string }>`
   align-items: center;
-  color: black;
+  color: #ffffff;
   width: 100%;
-  padding: 10px 10px;
-  border-radius: 5px 5px 0 0;
+  padding: 10px 14px;
+  border-radius: 14px 14px 0 0;
   display: flex;
   justify-content: space-between;
-  margin-bottom: ${({ layout }) => layout === 'simple' ? '20px' : '0px'};
+  margin-bottom: ${({ layout }) => layout === 'simple' ? '16px' : '0px'};
 
   &.gradientRed {
-    background-image: linear-gradient(to right, #ff3232, #ff7f7f);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   }
 
   &.gradientYellow {
-    background-image: linear-gradient(to right, #d8931b, #f3b641);
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   }
 
   &.gradientGreen {
-    background-image: linear-gradient(to right, #007300, #4ca64c);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   }
 
   &.gradientScheduled {
-    background-image: linear-gradient(to right, #024d24, #028a51);
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   }
 
   @media (max-width: 800px) {
-    padding: 8px 5px;
+    padding: 8px 10px;
   }
 `
 
 export const StatusTripTitle = styled.span`
-  margin-left: 10px;
-  font-size: 17px;
-  color: white;
+  margin-left: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #ffffff;
 `
 
 export const HeaderActions = styled.div`

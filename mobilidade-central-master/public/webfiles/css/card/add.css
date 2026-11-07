@@ -130,7 +130,9 @@
 
 /* Empty state styling */
 .container-cards .cards-empty-state,
-.container-cards > div > ul > li.cards-empty-state {
+.container-cards > div > ul > li.cards-empty-state,
+.container-cards .no-cards-msg,
+.container-cards > div > ul > li.no-cards-msg {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -145,6 +147,42 @@
     margin: 6px 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
+}
+
+.container-cards .no-cards-msg i,
+.container-cards > div > ul > li.no-cards-msg i {
+    font-size: 38px !important;
+    color: #0284c7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 auto 12px auto !important;
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12) !important;
+}
+
+.container-cards .no-cards-msg strong,
+.container-cards > div > ul > li.no-cards-msg strong {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 0 0 6px 0 !important;
+    display: block !important;
+    text-align: center !important;
+}
+
+.container-cards .no-cards-msg span,
+.container-cards > div > ul > li.no-cards-msg span {
+    font-size: 13px !important;
+    color: #64748b !important;
+    line-height: 1.5 !important;
+    margin: 0 auto !important;
+    max-width: 290px !important;
+    display: block !important;
+    text-align: center !important;
 }
 
 .container-cards .cards-empty-icon-wrapper {

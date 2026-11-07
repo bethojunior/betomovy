@@ -1,7 +1,7 @@
 import { FC, useContext, useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from "react";
-import { Tooltip, Button, Spin } from "antd";
+import { Tooltip, Button, Spin, Input } from "antd";
 import { useHistory } from "react-router-dom";
-import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
+import { EyeOutlined, EyeInvisibleOutlined, SearchOutlined, CarOutlined } from "@ant-design/icons";
 import {
   IconArrowLeft,
   ColumnTrips,
@@ -158,6 +158,17 @@ const Monitoring: FC = () => {
   const [filterLoading, setFilterLoading] = useState(false);
   const [scheduledTotal, setScheduledTotal] = useState(0);
   const scheduledCountedRef = useRef<Set<string>>(new Set());
+  const [quickSearch, setQuickSearch] = useState("");
+  const runningCount = useMemo(() => {
+    return (trips || []).filter(t => t.status !== 'scheduled').length;
+  }, [trips]);
+  const inProgressCount = useMemo(() => {
+    return (trips || []).filter(t => t.status === 'in_progress' || t.status === 'boarding').length;
+  }, [trips]);
+  const searchingCount = useMemo(() => {
+    return (trips || []).filter(t => t.status === 'searching' || t.status === 'pre_accepted').length;
+  }, [trips]);
+
   const [hasMoreTrips, setHasMoreTrips] = useState(true);
   const [loadingMoreTrips, setLoadingMoreTrips] = useState(false);
   const pageRef = useRef(1);
@@ -312,10 +323,33 @@ const Monitoring: FC = () => {
 
   const shouldHideTrip = (trip: TripDto) => {
     if (filterType === 'scheduled') {
-      return trip.status !== "scheduled";
+      if (trip.status !== "scheduled") return true;
+    } else if (filterType === 'running') {
+      if (trip.status === "scheduled") return true;
+    } else if (filterType === 'in_progress') {
+      if (trip.status !== "in_progress" && trip.status !== "boarding") return true;
+    } else if (filterType === 'searching') {
+      if (trip.status !== "searching" && trip.status !== "pre_accepted") return true;
     }
-    return trip.status === "scheduled";
+
+    if (quickSearch.trim()) {
+      const q = quickSearch.toLowerCase().trim();
+      const cName = String(trip.customerName || "").toLowerCase();
+      const dName = String(trip.driverName || "").toLowerCase();
+      const ref = String(trip.tripReference || "").toLowerCase();
+      const origin = String(trip.origin || "").toLowerCase();
+      const dest = String(trip.destination || "").toLowerCase();
+      if (!cName.includes(q) && !dName.includes(q) && !ref.includes(q) && !origin.includes(q) && !dest.includes(q)) {
+        return true;
+      }
+    }
+
+    return false;
   };
+
+  const visibleTripsCount = useMemo(() => {
+    return (trips || []).filter(t => !shouldHideTrip(t)).length;
+  }, [trips, filterType, quickSearch]);
 
 
   const handleRenderCardTripByStatus = (trip: TripDto) => {
@@ -923,50 +957,154 @@ const Monitoring: FC = () => {
           xl={menuMobile ? 24 : existTrips ? 7 : 0}
         >
           <ContainerMenuDesktop>
-            <Tooltip title="Voltar para o dashboard" placement="right">
-              <Button
-                onClick={() => {
-                  history.push("/");
-                }}
-                type="text"
-                icon={<IconArrowLeft style={{ fontSize: 25 }} />}
-                size="large"
-              />
-            </Tooltip>
-            
-            <Tooltip title={filterType === 'running' ? "Mostrar Agendadas" : "Ocultar Agendadas"} placement="left">
+            <div className="top-bar-row">
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Tooltip title="Voltar ao início">
+                  <Button
+                    onClick={() => history.push("/")}
+                    type="text"
+                    icon={<IconArrowLeft />}
+                    size="middle"
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 8,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "#f1f5f9",
+                    }}
+                  />
+                </Tooltip>
+                <div className="brand-badge">
+                  <span className="brand-text">Despacho</span>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: "2px 8px",
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                      borderRadius: 10,
+                    }}
+                  >
+                    {runningCount} ativas
+                  </span>
+                </div>
+              </div>
+
+              <ActiveTripsActions>
+                <ActiveTripsFilter onApply={setActiveTripsFilters} />
+                <Tooltip title="Ocultar painel de viagens">
+                  <Button
+                    type="text"
+                    icon={<IconMenuTrips />}
+                    size="middle"
+                    onClick={visibilityMenuDesktop}
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 8,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "#f1f5f9",
+                    }}
+                  />
+                </Tooltip>
+              </ActiveTripsActions>
+            </div>
+
+            <div className="filter-tabs-row">
               <FilterButton
                 type="text"
-                onClick={() => setFilterType(filterType === 'running' ? 'scheduled' : 'running')}
-                size="large"
+                $active={filterType === 'running'}
+                onClick={() => setFilterType('running')}
               >
-                <ScheduledCounter>
-                  {scheduledTotal}
-                </ScheduledCounter>
-                Agendadas
-                {filterType === 'scheduled' ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                Todas ({runningCount})
               </FilterButton>
-            </Tooltip>
 
-            <ActiveTripsActions>
-              <ActiveTripsFilter onApply={setActiveTripsFilters} />
+              <FilterButton
+                type="text"
+                $active={filterType === 'in_progress'}
+                onClick={() => setFilterType('in_progress')}
+              >
+                Em Viagem ({inProgressCount})
+              </FilterButton>
 
-              <Tooltip title="Fechar listagem de viagens" placement="left">
-                <Button
-                  type="text"
-                  icon={<IconMenuTrips style={{ fontSize: 25 }} />}
-                  size="large"
-                  onClick={visibilityMenuDesktop}
-                />
-              </Tooltip>
-            </ActiveTripsActions>
+              <FilterButton
+                type="text"
+                $active={filterType === 'searching'}
+                onClick={() => setFilterType('searching')}
+              >
+                Buscando ({searchingCount})
+              </FilterButton>
+
+              <FilterButton
+                type="text"
+                $active={filterType === 'scheduled'}
+                onClick={() => setFilterType('scheduled')}
+              >
+                <ScheduledCounter>{scheduledTotal}</ScheduledCounter>
+                Agendadas
+              </FilterButton>
+            </div>
+
+            <div className="search-row">
+              <Input
+                placeholder="Buscar por cliente, motorista ou rota..."
+                prefix={<SearchOutlined style={{ color: "#94a3b8" }} />}
+                value={quickSearch}
+                onChange={(e) => setQuickSearch(e.target.value)}
+                allowClear
+                size="small"
+                style={{
+                  borderRadius: 8,
+                  background: "#f8fafc",
+                  border: "1px solid #e2e8f0",
+                  height: 34,
+                }}
+              />
+            </div>
           </ContainerMenuDesktop>
+
           <ContainerTrips ref={tripsContainerRef} onScroll={handleTripsScroll}>
             {(loadingTrips || filterLoading) && (
               <LoadingTripContainer>
-                <Spin size="small" style={{ color: "red" }} />
+                <Spin size="default" />
+                <span>Sincronizando viagens em tempo real...</span>
               </LoadingTripContainer>
             )}
+
+            {visibleTripsCount === 0 && !loadingTrips && !filterLoading && (
+              <div style={{ textAlign: "center", padding: "48px 16px", color: "#64748b" }}>
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: "50%",
+                    background: "#e0f2fe",
+                    color: "#0284c7",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 14px auto",
+                    fontSize: 26,
+                  }}
+                >
+                  <CarOutlined />
+                </div>
+                <h4 style={{ margin: "0 0 6px 0", fontWeight: 700, fontSize: 14, color: "#0f172a" }}>
+                  {quickSearch ? "Nenhuma viagem encontrada com esses termos" : "Nenhuma viagem ativa no momento"}
+                </h4>
+                <p style={{ margin: 0, fontSize: 12, color: "#94a3b8", lineHeight: 1.5, maxWidth: 260, marginInline: "auto" }}>
+                  {quickSearch
+                    ? "Tente ajustar ou limpar o termo de busca para visualizar as corridas."
+                    : "Aguardando novos chamados de passageiros em tempo real."}
+                </p>
+              </div>
+            )}
+
             {(trips || []).length > 0 && (trips || []).map(trip => (
               <TripCardWrapper
                 key={trip.tripReference}
@@ -976,6 +1114,7 @@ const Monitoring: FC = () => {
                 {handleRenderCardTripByStatus(trip)}
               </TripCardWrapper>
             ))}
+
             {loadingMoreTrips && (
               <LoadingMoreTripsContainer>
                 <Spin size="small" />
