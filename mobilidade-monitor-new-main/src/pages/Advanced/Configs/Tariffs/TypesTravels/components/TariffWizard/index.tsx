@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
-import {
-  AiOutlineInfoCircle, Switch, Radio, Select as SelectAntd, Checkbox } from "antd";
+import { Switch, Radio, Select as SelectAntd, Checkbox } from "antd";
 import {
   AiOutlineClose,
   AiOutlineCheck,
@@ -9,6 +8,7 @@ import {
   AiOutlineCheckCircle,
   AiOutlineEdit,
   AiOutlinePlus,
+  AiOutlineInfoCircle,
 } from "react-icons/ai";
 
 import Mask from "../../../../../../../services/Mask";
