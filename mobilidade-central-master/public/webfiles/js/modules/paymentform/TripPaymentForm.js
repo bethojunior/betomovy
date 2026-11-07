@@ -23,8 +23,15 @@ function initCardsModal() {
     const elementProperty = new ElementProperty();
     let callbackSelectCard = null;
 
-    elementProperty.addEventInElement(".close-cards-modal", "onclick", function () {
+    elementProperty.addEventInElement(".close-cards-modal", "onclick", function (e) {
+        if (e) e.stopPropagation();
         elementProperty.removeClass(".container-cards", "active");
+    });
+
+    elementProperty.addEventInElement("#containerCardsModal", "onclick", function (e) {
+        if (e.target === this) {
+            elementProperty.removeClass(".container-cards", "active");
+        }
     });
 
     window.showModalCards = function (callback) {
@@ -73,12 +80,12 @@ function initCardsModal() {
 
             elementProperty.getElement("#listCardPaymentModal", element => {
                 if (!cards.length) {
-                    element.innerHTML = `<li class="cards-empty-state">
-                        <div class="cards-empty-icon-wrapper">
-                            <i class="material-icons">credit_card</i>
+                    element.innerHTML = `<li class="cards-empty-state" style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; padding: 36px 20px 28px !important; margin: 4px 0 !important; background: #f8fafc !important; border: 1.5px dashed #cbd5e1 !important; border-radius: 16px !important; list-style: none !important; width: 100% !important; box-sizing: border-box !important;">
+                        <div class="cards-empty-icon-wrapper" style="width: 64px !important; height: 64px !important; border-radius: 16px !important; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important; color: #0284c7 !important; display: flex !important; align-items: center !important; justify-content: center !important; margin: 0 auto 16px auto !important; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12) !important;">
+                            <i class="material-icons" style="font-size: 32px !important; color: #0284c7 !important; line-height: 1 !important;">credit_card</i>
                         </div>
-                        <h4 class="cards-empty-title">Nenhum cartão cadastrado</h4>
-                        <p class="cards-empty-desc">Cadastre um cartão de crédito para pagar suas viagens de forma rápida e segura.</p>
+                        <h4 class="cards-empty-title" style="font-size: 16px !important; font-weight: 700 !important; color: #0f172a !important; margin: 0 0 6px 0 !important; font-family: inherit !important;">Nenhum cartão cadastrado</h4>
+                        <p class="cards-empty-desc" style="font-size: 13px !important; color: #64748b !important; line-height: 1.5 !important; margin: 0 auto !important; max-width: 280px !important; font-family: inherit !important;">Cadastre um cartão de crédito para pagar suas viagens de forma rápida e segura.</p>
                     </li>`;
                     resolve();
                     return;
@@ -104,23 +111,23 @@ function initCardsModal() {
                         brandBg = "linear-gradient(135deg, #b20000 0%, #660000 100%)";
                     }
 
-                    return `<li class="cards-list-select ${isSelected ? 'active' : ''}" value='${safe}'>
-                        <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
-                            <div style="width: 48px; height: 32px; border-radius: 8px; background: ${brandBg}; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.18);">
+                    return `<li class="cards-list-select ${isSelected ? 'active' : ''}" value='${safe}' style="display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 14px 16px !important; border: 1.5px solid ${isSelected ? '#0284c7' : '#e2e8f0'} !important; border-radius: 14px !important; background: ${isSelected ? '#f0f9ff' : '#ffffff'} !important; cursor: pointer !important; margin-bottom: 10px !important; list-style: none !important; box-sizing: border-box !important;">
+                        <div style="display: flex !important; align-items: center !important; gap: 14px !important; min-width: 0 !important;">
+                            <div style="width: 48px !important; height: 32px !important; border-radius: 8px !important; background: ${brandBg} !important; color: #ffffff !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 11px !important; font-weight: 800 !important; letter-spacing: 0.5px !important; flex-shrink: 0 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important;">
                                 ${brandDisplay.slice(0, 8)}
                             </div>
-                            <div style="display: flex; flex-direction: column; min-width: 0; text-align: left;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 14px; font-weight: 700; color: #0f172a; letter-spacing: 0.5px;">•••• ${last4}</span>
-                                    ${isSelected ? '<span style="display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 700; background: #e0f2fe; color: #0284c7; border-radius: 10px;">Atual</span>' : ''}
+                            <div style="display: flex !important; flex-direction: column !important; min-width: 0 !important; text-align: left !important;">
+                                <div style="display: flex !important; align-items: center !important; gap: 8px !important;">
+                                    <span style="font-size: 14px !important; font-weight: 700 !important; color: #0f172a !important; letter-spacing: 0.5px !important;">•••• ${last4}</span>
+                                    ${isSelected ? '<span style="display: inline-block !important; padding: 2px 8px !important; font-size: 10px !important; font-weight: 700 !important; background: #e0f2fe !important; color: #0284c7 !important; border-radius: 10px !important;">Atual</span>' : ''}
                                 </div>
-                                <span style="font-size: 12px; color: #64748b; margin-top: 2px;">${brandDisplay}${exp ? ` • Validade ${exp}` : ''}</span>
+                                <span style="font-size: 12px !important; color: #64748b !important; margin-top: 2px !important;">${brandDisplay}${exp ? ` • Validade ${exp}` : ''}</span>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; flex-shrink: 0; margin-left: 12px;">
+                        <div style="display: flex !important; align-items: center !important; flex-shrink: 0 !important; margin-left: 12px !important;">
                             ${isSelected 
-                                ? '<div style="width: 28px; height: 28px; border-radius: 50%; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center;"><i class="material-icons" style="font-size: 18px;">check</i></div>'
-                                : '<div style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #cbd5e1; background: #ffffff;"></div>'
+                                ? '<div style="width: 28px !important; height: 28px !important; border-radius: 50% !important; background: #0284c7 !important; color: #ffffff !important; display: flex !important; align-items: center !important; justify-content: center !important;"><i class="material-icons" style="font-size: 18px !important; line-height: 1 !important;">check</i></div>'
+                                : '<div style="width: 28px !important; height: 28px !important; border-radius: 50% !important; border: 2px solid #cbd5e1 !important; background: #ffffff !important;"></div>'
                             }
                         </div>
                     </li>`;

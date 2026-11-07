@@ -382,62 +382,68 @@
         <a id="addPaymentForm" class="add-payment-form" href="javascript:void(0)">Adicionar cartão de crédito</a>
     </div>
 
-    <div class="container-cards" id="containerCardsModal">
-        <div class="cards-modal-dialog">
-            <div class="cards-modal-header">
-                <div class="cards-modal-header-info">
-                    <span class="cards-modal-title">Selecione um cartão</span>
-                    <span class="cards-modal-subtitle">Escolha o cartão para cobrança desta viagem</span>
+    <div class="container-cards" id="containerCardsModal" style="position: fixed; inset: 0; z-index: 1200; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box;">
+        <div class="cards-modal-dialog" style="background: #ffffff; border-radius: 20px; width: 100%; max-width: 440px; border: 1px solid rgba(226, 232, 240, 0.9); box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25), 0 8px 16px -6px rgba(15, 23, 42, 0.08); overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box;">
+            <div class="cards-modal-header" style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #f1f5f9; background: #ffffff;">
+                <div class="cards-modal-header-info" style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+                    <span class="cards-modal-title" style="font-size: 18px; font-weight: 700; color: #0f172a; line-height: 1.25; letter-spacing: -0.2px;">Selecione um cartão</span>
+                    <span class="cards-modal-subtitle" style="font-size: 13px; color: #64748b; font-weight: 500; line-height: 1.3;">Escolha o cartão para cobrança desta viagem</span>
                 </div>
-                <button type="button" class="cards-modal-close-btn close-cards-modal" aria-label="Fechar modal">
-                    <i class="material-icons">close</i>
+                <button type="button" class="cards-modal-close-btn close-cards-modal" aria-label="Fechar modal" style="width: 36px; height: 36px; border-radius: 50%; border: none; background: #f1f5f9; color: #475569; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0;">
+                    <i class="material-icons" style="font-size: 20px; line-height: 1;">close</i>
                 </button>
             </div>
-            <div class="cards-modal-body">
-                <ul id="listCardPaymentModal" class="cards-modal-list"></ul>
+            <div class="cards-modal-body" style="padding: 16px 20px; max-height: 360px; overflow-y: auto;">
+                <ul id="listCardPaymentModal" class="cards-modal-list" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px;"></ul>
             </div>
-            <div class="cards-modal-footer">
-                <a id="addCardModal" class="cards-modal-add-btn" href="javascript:void(0)">
-                    <i class="material-icons">add_card</i>
+            <div class="cards-modal-footer" style="padding: 16px 20px 20px; background: #ffffff; border-top: 1px solid #f1f5f9;">
+                <a id="addCardModal" class="cards-modal-add-btn" href="javascript:void(0)" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px 20px; border-radius: 12px; background: #0f172a; color: #ffffff !important; font-size: 14px; font-weight: 700; text-decoration: none; box-sizing: border-box; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);">
+                    <i class="material-icons" style="font-size: 20px; line-height: 1;">add_card</i>
                     <span>Adicionar novo cartão</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <div class="container-add-card" id="containerAddCard">
-        <div>
-            <nav>
-                <i class="material-icons" id="backPaymentForm">arrow_back</i>
-                <p>Adicionar cartão</p>
+    <div class="container-add-card" id="containerAddCard" style="position: fixed; inset: 0; width: 100%; height: 100%; display: none; z-index: 1300; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); justify-content: center; align-items: center; padding: 16px; box-sizing: border-box;">
+        <div style="background: #ffffff; width: min(460px, 94vw); max-height: 92vh; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25); border: 1px solid rgba(226, 232, 240, 0.9);">
+            <nav style="min-height: 60px; background: #0f172a; width: 100%; padding: 14px 20px; color: #fff; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" id="backPaymentForm" style="width: 34px; height: 34px; border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.12); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
+                        <i class="material-icons" style="font-size: 20px; line-height: 1;">arrow_back</i>
+                    </button>
+                    <div>
+                        <p style="margin: 0; font-size: 16px; font-weight: 700; color: #ffffff; line-height: 1.2;">Adicionar cartão</p>
+                        <span style="font-size: 12px; color: #94a3b8;">Cartão de crédito para cobrança</span>
+                    </div>
+                </div>
             </nav>
-            <form method="post" id="addCard" name="addCard" autocomplete="off">
-                <div>
-                    <label for="cardholderName">Nome no cartão</label>
-                    <input type="text" id="cardholderName" data-checkout="cardholderName" placeholder="NOME COMPLETO"/>
+            <form method="post" id="addCard" name="addCard" autocomplete="off" style="overflow-y: auto; padding: 22px 24px 24px; margin: 0;">
+                <div style="margin-bottom: 18px;">
+                    <label for="cardholderName" style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569;">Nome impresso no cartão</label>
+                    <input type="text" id="cardholderName" data-checkout="cardholderName" placeholder="Ex: JOÃO DA SILVA" style="width: 100%; height: 46px; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 0 14px; font-size: 14px; color: #0f172a; text-transform: uppercase; outline: none; box-sizing: border-box;" />
                 </div>
-                <div class="divider-container">
+                <div class="divider-container" style="margin-bottom: 18px;">
                     <div>
-                        <label for="documentCard">CPF</label>
-                        <input type="tel" id="documentCard" placeholder="###.###.###-##"/>
+                        <label for="documentCard" style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569;">CPF do titular</label>
+                        <input type="tel" id="documentCard" placeholder="000.000.000-00" style="width: 100%; height: 46px; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 0 14px; font-size: 14px; color: #0f172a; outline: none; box-sizing: border-box;" />
                     </div>
                 </div>
-                <div>
-                    <label for="cardNumber">Número do cartão</label>
-                    <div>
-                        <i class="material-icons">credit_card</i>
-                        <input type="tel" id="cardNumber" data-checkout="cardNumber" placeholder="•••• •••• •••• ••••"
-                               autocomplete="off"/>
+                <div style="margin-bottom: 18px;">
+                    <label for="cardNumber" style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569;">Número do cartão</label>
+                    <div style="position: relative;">
+                        <i class="material-icons" style="position: absolute; left: 14px; top: 13px; color: #94a3b8; font-size: 20px;">credit_card</i>
+                        <input type="tel" id="cardNumber" data-checkout="cardNumber" placeholder="0000 0000 0000 0000" autocomplete="off" style="width: 100%; height: 46px; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 0 14px 0 44px; font-size: 14px; letter-spacing: 1px; color: #0f172a; outline: none; box-sizing: border-box;" />
                     </div>
                 </div>
-                <div class="divider-container">
-                    <div>
-                        <label for="dateMonthYear">Validade</label>
-                        <input type="tel" id="dateMonthYear" placeholder="MM/AA"/>
+                <div class="divider-container" style="display: flex; gap: 14px; margin-bottom: 22px;">
+                    <div style="flex: 1;">
+                        <label for="dateMonthYear" style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569;">Validade</label>
+                        <input type="tel" id="dateMonthYear" placeholder="MM/AA" style="width: 100%; height: 46px; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 0 14px; font-size: 14px; text-align: center; color: #0f172a; outline: none; box-sizing: border-box;" />
                     </div>
-                    <div>
-                        <label for="securityCode">CVV</label>
-                        <input type="tel" id="securityCode" data-checkout="securityCode" placeholder="CVV" autocomplete="off"/>
+                    <div style="flex: 1;">
+                        <label for="securityCode" style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569;">CVV</label>
+                        <input type="tel" id="securityCode" data-checkout="securityCode" placeholder="123" autocomplete="off" style="width: 100%; height: 46px; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 0 14px; font-size: 14px; text-align: center; color: #0f172a; outline: none; box-sizing: border-box;" />
                     </div>
                 </div>
                 <div hidden>
@@ -446,7 +452,9 @@
                     <input type="text" id="docNumber" data-checkout="docNumber"/>
                     <select id="docType" data-checkout="docType"><option value="CPF" selected>CPF</option></select>
                 </div>
-                <button type="submit">Salvar cartão</button>
+                <button type="submit" style="width: 100%; height: 48px; border: none; background: #0284c7; color: #ffffff; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);">
+                    Salvar cartão
+                </button>
             </form>
         </div>
     </div>

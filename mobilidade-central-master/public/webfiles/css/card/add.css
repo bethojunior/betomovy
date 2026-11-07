@@ -129,51 +129,62 @@
 }
 
 /* Empty state styling */
-.container-cards .cards-empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 32px 20px 24px;
-    cursor: default;
-    list-style: none;
-    background: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 16px;
-    margin: 6px 0;
+.container-cards .cards-empty-state,
+.container-cards > div > ul > li.cards-empty-state {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 36px 20px 28px !important;
+    cursor: default !important;
+    list-style: none !important;
+    background: #f8fafc !important;
+    border: 1.5px dashed #cbd5e1 !important;
+    border-radius: 16px !important;
+    margin: 6px 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .container-cards .cards-empty-icon-wrapper {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-    color: #0284c7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+    color: #0284c7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 auto 16px auto !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12) !important;
 }
 
 .container-cards .cards-empty-icon-wrapper i {
-    font-size: 32px;
+    font-size: 32px !important;
+    line-height: 1 !important;
+    color: #0284c7 !important;
 }
 
 .container-cards .cards-empty-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0 0 6px 0;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 0 0 6px 0 !important;
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
 }
 
 .container-cards .cards-empty-desc {
-    font-size: 13px;
-    color: #64748b;
-    line-height: 1.5;
-    margin: 0;
-    max-width: 290px;
+    font-size: 13px !important;
+    color: #64748b !important;
+    line-height: 1.5 !important;
+    margin: 0 auto !important;
+    max-width: 290px !important;
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
 }
 
 /* Card item list */
