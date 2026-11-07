@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-11-06 20:15 UTC - Deploy pending fixes & optimize container builds
+# Deploy trigger: 2026-11-07 02:50 UTC - Full sync all branches merged into main deploy on ocean
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
