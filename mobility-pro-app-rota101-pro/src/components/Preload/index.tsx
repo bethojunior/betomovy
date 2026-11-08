@@ -156,7 +156,7 @@ const BrandDefault = () => {
           ]}
         />
 
-        {/* Texto Movy Branco idêntico ao vídeo, sem qualquer corte */}
+        {/* Texto Movy em Azul Escuro idêntico ao solicitado */}
         <Animated.Image
           source={splashTextMovyWhite}
           resizeMode="contain"
@@ -165,6 +165,7 @@ const BrandDefault = () => {
             {
               opacity: textFade,
               transform: [{ translateX: textTranslateX }],
+              tintColor: '#002244',
             },
           ]}
         />

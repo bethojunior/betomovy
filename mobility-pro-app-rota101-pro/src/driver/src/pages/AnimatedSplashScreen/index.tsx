@@ -13,7 +13,7 @@ import { AlertLocationRefused } from '../../components/AlertLocationRefused';
 import { useNetwork } from '~/context/ConfigGlobal';
 import { useBackgroundLocationPermission } from '../../hooks/useBackgroundLocationPermission';
 
-const SPLASH_MAX_WAIT_MS = 12000;
+const SPLASH_MAX_WAIT_MS = 2000;
 
 const AnimatedSplashScreen = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -26,19 +26,27 @@ const AnimatedSplashScreen = () => {
   const { itsNetwork: network } = useNetwork();
   const prevNetworkRef = useRef<boolean | null>(null);
   const { checkBackgroundLocationPermission } = useBackgroundLocationPermission();
+  const navigatedRef = useRef(false);
 
   const handleNavigation = async () => {
-    const hasLocationPermission = await checkBackgroundLocationPermission();
-    if (!hasLocationPermission) {
-      navigation.reset({ index: 0, routes: [{ name: 'BackgroundLocationPermission' }] });
-      return;
-    }
+    if (navigatedRef.current) return;
+    navigatedRef.current = true;
+    setFirstLoading(true);
+    setisVisible(false);
+
+    try {
+      const hasLocationPermission = await checkBackgroundLocationPermission();
+      if (!hasLocationPermission) {
+        navigation.reset({ index: 0, routes: [{ name: 'BackgroundLocationPermission' }] });
+        return;
+      }
+    } catch {}
 
     navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
   };
 
   useEffect(() => {
-    if (firstLoading || !location?.coords?.latitude) return;
+    if (navigatedRef.current) return;
 
     const hasData =
       userDriverFind &&
@@ -47,23 +55,17 @@ const AnimatedSplashScreen = () => {
       Object.keys(cityConfig).length > 0;
 
     if (hasData || network === false) {
-      setFirstLoading(true);
       handleNavigation();
-      setisVisible(false);
     }
   }, [userDriverFind, cityConfig, location, network]);
 
   useEffect(() => {
-    if (firstLoading || !location?.coords?.latitude) return;
-
     const fallback = setTimeout(() => {
-      setFirstLoading(true);
       handleNavigation();
-      setisVisible(false);
     }, SPLASH_MAX_WAIT_MS);
 
     return () => clearTimeout(fallback);
-  }, [firstLoading, location]);
+  }, []);
 
   useEffect(() => {
     const networkJustCameBack = network && prevNetworkRef.current === false;

@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-11-08 01:12 UTC - Fix driver deletion, reset balance, user observation, limit hours and driver list sync
+# Deploy trigger: 2026-11-08 01:38 UTC - Fix splash loading speed, timeouts and dark blue movy text
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
