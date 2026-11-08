@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-11-07 23:41 UTC - Fix AiOutlineInfoCircle import from react-icons/ai
+# Deploy trigger: 2026-11-08 01:12 UTC - Fix driver deletion, reset balance, user observation, limit hours and driver list sync
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

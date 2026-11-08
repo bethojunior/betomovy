@@ -454,4 +454,35 @@ class UserController extends ApiController
             ]);
         }
     }
+    /**
+     * PUT /user/:id/observation
+     */
+    public function actionObservation()
+    {
+        try {
+            $userId = (int)($_GET['id'] ?? 0);
+            if ($userId <= 0) {
+                throw new \Exception("ID do usuário não informado");
+            }
+
+            $rawInput = file_get_contents('php://input');
+            $data = json_decode($rawInput, true);
+            if (!is_array($data)) {
+                $data = $_POST;
+            }
+
+            $observation = isset($data['observation']) ? (string)$data['observation'] : '';
+
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+            $stmt = $pdo->prepare("UPDATE user SET observation = :obs, updated_at = NOW() WHERE idUser = :userId");
+            $stmt->execute([
+                ':obs' => $observation,
+                ':userId' => $userId
+            ]);
+
+            echo $this->returnSuccess('Anotação salva com sucesso', ['observation' => $observation]);
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao salvar anotação');
+        }
+    }
 }

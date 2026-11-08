@@ -446,19 +446,20 @@ const ListDrivers = () => {
       );
       if (!values) return;
 
-      if (values.data.status) {
-        setMessageAlert("Motorista excluído com sucesso!");
+      if (values.data?.status) {
+        setListDirectly((prev) => prev.filter((d) => d.idDriver !== idDriver));
+        setMessageAlert(values.data?.message || "Motorista excluído com sucesso!");
         refreshDrivers();
         setTypeAlert("success");
         return setShowAlert(true);
       }
       setTypeAlert("error");
-      setMessageAlert("Erro ao tentar excluir");
+      setMessageAlert(values.data?.message || "Erro ao tentar excluir");
       return setShowAlert(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       setTypeAlert("error");
-      setMessageAlert("Erro ao tentar excluir");
+      setMessageAlert(error?.response?.data?.message || "Erro ao tentar excluir");
       setShowAlert(true);
     }
   };

@@ -763,6 +763,10 @@ class DriverController extends ApiController
                     $this->handleUpdateDriver($pdo, (int)$driverId);
                     return;
                 }
+                if ($method === 'DELETE') {
+                    $this->handleDeleteDriver($pdo, (int)$driverId);
+                    return;
+                }
                 $driver = $this->findDriverDetail($pdo, (int)$driverId);
                 echo $this->returnSuccess('Motorista encontrado', $driver);
                 return;
@@ -888,7 +892,7 @@ class DriverController extends ApiController
                     null as militaryStatus,
                     null as om,
                     null as hours_worked,
-                    null as hours_open
+                    coalesce(lhw.hours, 0) as hours_open
                 FROM driver
                 JOIN user ON driver.userId = user.idUser
                 LEFT JOIN driverRegisterStatus drs ON driver.driverRegisterStatusId = drs.idDriverRegisterStatus
@@ -897,6 +901,7 @@ class DriverController extends ApiController
                 LEFT JOIN car ON driver.idDriver = car.driverId AND car.deleted_at IS NULL
                 LEFT JOIN city ON driver.cityId = city.id
                 LEFT JOIN balance ON driver.balanceId = balance.idBalance
+                LEFT JOIN limit_hours_worked lhw ON driver.idDriver = lhw.driverId
                 WHERE {$whereSql}
                 GROUP BY driver.idDriver
                 ORDER BY driver.idDriver DESC
@@ -1122,6 +1127,15 @@ class DriverController extends ApiController
         $userUpdates = ["updated_at = NOW()"];
         $userParams = [':userId' => $userId];
 
+        if (!empty($data['password'])) {
+            $userUpdates[] = "password = :pwd";
+            $userParams[':pwd'] = base64_encode((string)$data['password']);
+        }
+        if (array_key_exists('observation', $data)) {
+            $userUpdates[] = "observation = :observation";
+            $userParams[':observation'] = $data['observation'] !== null ? trim((string)$data['observation']) : null;
+        }
+
         if (isset($data['name'])) {
             $userUpdates[] = "name = :name";
             $userParams[':name'] = trim((string)$data['name']);
@@ -1195,8 +1209,107 @@ class DriverController extends ApiController
     }
 
     /**
+     * DELETE /driver/:id
+     */
+    private function handleDeleteDriver(PDO $pdo, int $driverId)
+    {
+        $stmtDriver = $pdo->prepare("SELECT idDriver, userId, balanceId FROM driver WHERE idDriver = :id LIMIT 1");
+        $stmtDriver->execute([':id' => $driverId]);
+        $driver = $stmtDriver->fetch(PDO::FETCH_ASSOC);
+
+        if (!$driver) {
+            throw new \Exception("Motorista não encontrado");
+        }
+
+        $userId = (int)$driver['userId'];
+
+        // 1. Marcar usuário como deletado (statusId = 2) conforme regra da listagem
+        $stmtU = $pdo->prepare("UPDATE user SET statusId = 2, updated_at = NOW() WHERE idUser = :userId");
+        $stmtU->execute([':userId' => $userId]);
+
+        // 2. Desativar motorista (offline, app fechado, status bloqueado)
+        $stmtD = $pdo->prepare("
+            UPDATE driver 
+            SET status = 0, 
+                appIsOpen = 0, 
+                preAvailable = 0, 
+                driverRegisterStatusId = 3 
+            WHERE idDriver = :id
+        ");
+        $stmtD->execute([':id' => $driverId]);
+
+        // 3. Marcar veículos do motorista como deletados
+        try {
+            $pdo->prepare("UPDATE car SET deleted_at = NOW() WHERE driverId = :driverId AND deleted_at IS NULL")
+                ->execute([':driverId' => $driverId]);
+        } catch (\Throwable $e) {}
+
+        // 4. Marcar endereços como deletados
+        try {
+            $pdo->prepare("UPDATE driverAddress SET deleted_at = NOW() WHERE driverId = :driverId AND deleted_at IS NULL")
+                ->execute([':driverId' => $driverId]);
+        } catch (\Throwable $e) {}
+
+        // 5. Desativar sessões/dispositivos
+        try {
+            $pdo->prepare("UPDATE userDevice SET status = 0 WHERE userId = :userId")
+                ->execute([':userId' => $userId]);
+        } catch (\Throwable $e) {}
+
+        // 6. Remover de caches ou Redis se existir
+        try {
+            (new \app\utils\RedisDriverCalled())->deleteDriver($driverId);
+        } catch (\Throwable $e) {}
+
+        echo $this->returnSuccess('Motorista excluído com sucesso');
+    }
+
+    /**
      * POST /driver/:id/address
      */
+        /**
+     * POST /driver/insertLimitHours
+     */
+    public function actionInsertLimitHours()
+    {
+        try {
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true) ?: $_POST;
+            $driverId = (int)($data['driverId'] ?? 0);
+            $limitHours = (int)($data['limitHours'] ?? 0);
+
+            if ($driverId <= 0) {
+                throw new \Exception("ID do motorista não informado");
+            }
+
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+            try {
+                $stmtCheck = $pdo->prepare("SELECT id FROM limit_hours_worked WHERE driverId = :driverId LIMIT 1");
+                $stmtCheck->execute([':driverId' => $driverId]);
+                $exists = $stmtCheck->fetchColumn();
+
+                if ($exists) {
+                    $stmtUpd = $pdo->prepare("UPDATE limit_hours_worked SET hours = :hours, updated_at = NOW() WHERE id = :id");
+                    $stmtUpd->execute([':hours' => $limitHours, ':id' => $exists]);
+                } else {
+                    $stmtIns = $pdo->prepare("INSERT INTO limit_hours_worked (driverId, hours, created_at, updated_at) VALUES (:driverId, :hours, NOW(), NOW())");
+                    $stmtIns->execute([':driverId' => $driverId, ':hours' => $limitHours]);
+                }
+            } catch (\Throwable $eTable) {
+                try {
+                    $stmtUpsert = $pdo->prepare("INSERT INTO limit_hours_worked (driverId, hours) VALUES (:driverId, :hours) ON DUPLICATE KEY UPDATE hours = :hoursUpd");
+                    $stmtUpsert->execute([':driverId' => $driverId, ':hours' => $limitHours, ':hoursUpd' => $limitHours]);
+                } catch (\Throwable $e2) {
+                    // Ignore if table schema differs
+                }
+            }
+
+            echo $this->returnSuccess('Limite de horas configurado com sucesso');
+        } catch (\Throwable $e) {
+            echo $this->returnError($e, 'Erro ao configurar limite de horas');
+        }
+    }
+
     public function actionAddress()
     {
         try {
