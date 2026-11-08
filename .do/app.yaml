@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-11-08 01:38 UTC - Fix splash loading speed, timeouts and dark blue movy text
+# Deploy trigger: 2026-11-08 13:20 UTC - Fix Android 12 native circular splashscreen icon symbol
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal
