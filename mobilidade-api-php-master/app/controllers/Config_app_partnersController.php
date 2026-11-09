@@ -47,7 +47,7 @@ class Config_app_partnersController extends ApiController
     {
         try {
             $pdo = Connection::open(Connection::DB_MYSQL_RO);
-            $stmt = $pdo->query("SELECT id, name_app, `key`, logo_app, primary_color, secondary_color, text_color, phone_support, statusId FROM config_apps_partners WHERE (statusId = 1 OR statusId IS NULL) ORDER BY name_app ASC");
+            $stmt = $pdo->query("SELECT id, name_app, `key`, logo_app, primary_color, secondary_color, text_color, phone_support FROM config_apps_partners ORDER BY name_app ASC");
             $partners = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($partners as &$p) {
@@ -90,11 +90,11 @@ class Config_app_partnersController extends ApiController
 
             $pdo = Connection::open(Connection::DB_MYSQL_RO);
 
-            $countStmt = $pdo->query("SELECT COUNT(*) FROM config_apps_partners WHERE (statusId = 1 OR statusId IS NULL)");
+            $countStmt = $pdo->query("SELECT COUNT(*) FROM config_apps_partners");
             $total = (int)$countStmt->fetchColumn();
             $lastPage = max(1, ceil($total / $limit));
 
-            $stmt = $pdo->prepare("SELECT id, name_app, `key`, logo_app, primary_color, secondary_color, text_color, phone_support, statusId, created_at, updated_at FROM config_apps_partners WHERE (statusId = 1 OR statusId IS NULL) ORDER BY id DESC LIMIT :limit OFFSET :offset");
+            $stmt = $pdo->prepare("SELECT id, name_app, `key`, logo_app, primary_color, secondary_color, text_color, phone_support, created_at, updated_at FROM config_apps_partners ORDER BY id DESC LIMIT :limit OFFSET :offset");
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
@@ -139,7 +139,7 @@ class Config_app_partnersController extends ApiController
     {
         try {
             $pdo = Connection::open(Connection::DB_MYSQL_RO);
-            $stmt = $pdo->prepare("SELECT id, name_app, `key`, logo_app, primary_color, secondary_color, text_color, phone_support, statusId FROM config_apps_partners WHERE id = :id LIMIT 1");
+            $stmt = $pdo->prepare("SELECT id, name_app, `key`, logo_app, primary_color, secondary_color, text_color, phone_support FROM config_apps_partners WHERE id = :id LIMIT 1");
             $stmt->execute([':id' => $id]);
             $partner = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -192,7 +192,7 @@ class Config_app_partnersController extends ApiController
             }
 
             $pdo = Connection::open(Connection::DB_MYSQL);
-            $stmt = $pdo->prepare("INSERT INTO config_apps_partners (`key`, name_app, logo_app, primary_color, secondary_color, text_color, phone_support, statusId, created_at, updated_at) VALUES (:key, :name_app, :logo_app, :primary_color, :secondary_color, :text_color, :phone_support, 1, NOW(), NOW())");
+            $stmt = $pdo->prepare("INSERT INTO config_apps_partners (`key`, name_app, logo_app, primary_color, secondary_color, text_color, phone_support, created_at, updated_at) VALUES (:key, :name_app, :logo_app, :primary_color, :secondary_color, :text_color, :phone_support, NOW(), NOW())");
             $stmt->execute([
                 ':key' => $key,
                 ':name_app' => $nameApp,
@@ -299,8 +299,7 @@ class Config_app_partnersController extends ApiController
     {
         try {
             $pdo = Connection::open(Connection::DB_MYSQL);
-            // Soft delete if statusId exists, otherwise hard delete
-            $stmt = $pdo->prepare("UPDATE config_apps_partners SET statusId = 2, updated_at = NOW() WHERE id = :id");
+            $stmt = $pdo->prepare("DELETE FROM config_apps_partners WHERE id = :id");
             $stmt->execute([':id' => $id]);
 
             header('Content-Type: application/json; charset=utf-8');
