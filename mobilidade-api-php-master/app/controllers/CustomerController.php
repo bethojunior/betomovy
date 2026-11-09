@@ -213,10 +213,29 @@ class CustomerController extends ApiController
 
             $status = $request->status ?? Trip::CANCELED;
 
-            echo $this->returnSuccess("Viagem cancelada",
-                (new CustomerDao)->cancelTrip($request->tripReference, $request->dateEnd, $request->userId,
-                    $status, $request->scheduledTrip ?? false, $request->cancellationReasonsId ?? null)
+            $result = (new CustomerDao)->cancelTrip(
+                $request->tripReference,
+                $request->dateEnd ?? date('Y-m-d H:i:s'),
+                $request->userId ?? \app\utils\Headers::getUserId() ?? null,
+                $status,
+                $request->scheduledTrip ?? false,
+                $request->cancellationReasonsId ?? null
             );
+
+            // Garantir sincronização completa em tempo real para o app do motorista
+            try {
+                $tripRow = \app\dao\GenericDao::first("SELECT * FROM trip WHERE tripReference = :ref LIMIT 1", [':ref' => $request->tripReference]);
+                if ($tripRow) {
+                    $tripCtl = new TripController();
+                    $refMethod = new \ReflectionMethod($tripCtl, 'publishTripCanceled');
+                    $refMethod->setAccessible(true);
+                    $refMethod->invoke($tripCtl, $request->tripReference, $tripRow, true);
+                }
+            } catch (\Throwable $eSync) {
+                \app\utils\Logger::error("Erro ao sincronizar cancelamento no CustomerController: " . $eSync->getMessage());
+            }
+
+            echo $this->returnSuccess("Viagem cancelada", $result);
         } catch (Exception $e) {
             echo $this->returnError($e);
         }

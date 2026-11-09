@@ -204,10 +204,10 @@ class TripController extends ApiController
                 return;
             }
 
-            // 2. Se já estiver cancelada, republica para o app do motorista soltar a corrida.
+            // 2. Se já estiver cancelada, republica para o app do motorista soltar a corrida e garantir liberação.
             $currentStatus = strtolower($tripRow['status'] ?? '');
             if (in_array($currentStatus, ['canceled', 'driver_canceled', 'customer_canceled', 'not_answered', 'back_off'])) {
-                $this->publishTripCanceled($tripReference, $tripRow, false);
+                $this->publishTripCanceled($tripReference, $tripRow, true);
                 echo $this->returnSuccess("Viagem já cancelada ou finalizada", [
                     'status' => true,
                     'tripReference' => $tripReference,

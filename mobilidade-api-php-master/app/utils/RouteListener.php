@@ -82,12 +82,24 @@ class RouteListener extends ApiController
             return null;
         }
 
-        $cleanSlug = str_replace(['-', '_'], '', $path[$index]);
-        $classNameController = $cleanSlug . 'Controller';
+        $cleanSlug = strtolower(str_replace(['-', '_'], '', $path[$index]));
+        $classNameController = $cleanSlug . 'controller';
 
         $classArray = array_filter(scandir("../app/controllers"), function ($classFile) use ($classNameController) {
-            return strtolower($classFile) === strtolower($classNameController) . '.php';
+            $cleanFile = strtolower(str_replace(['-', '_'], '', $classFile));
+            return $cleanFile === $classNameController . '.php';
         });
+
+        if (empty($classArray)) {
+            if (substr($cleanSlug, -1) === 's') {
+                $singularSlug = substr($cleanSlug, 0, -1);
+                $singularNameController = $singularSlug . 'controller';
+                $classArray = array_filter(scandir("../app/controllers"), function ($classFile) use ($singularNameController) {
+                    $cleanFile = strtolower(str_replace(['-', '_'], '', $classFile));
+                    return $cleanFile === $singularNameController . '.php';
+                });
+            }
+        }
 
         if (empty($classArray)) {
             return null;
@@ -172,7 +184,15 @@ class RouteListener extends ApiController
                 if (is_numeric($path[1])) {
                     $_GET['id'] = $path[1];
                 }
-                $action = "action" . ucfirst($path[1]);
+                $rawAction = "action" . ucfirst($path[1]);
+                $camelAction = "action" . str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $path[1])));
+                if (method_exists($class, $rawAction)) {
+                    $action = $rawAction;
+                } elseif (method_exists($class, $camelAction)) {
+                    $action = $camelAction;
+                } else {
+                    $action = $rawAction;
+                }
             }
         }
 
