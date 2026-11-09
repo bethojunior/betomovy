@@ -10,21 +10,21 @@
 
 | Bloco | Área | Descrição Resumida | Status Geral |
 | :--- | :--- | :--- | :--- |
-| **00** | Diagnóstico e Segurança | Inventário de diretórios, stack, APIs, portas, bancos e segurança | **HOMOLOGADO** |
-| **01** | Arquitetura e Dados | Modelagem de schemas, tabelas (MySQL 444 tabelas, Mongo, Redis), integridade | **HOMOLOGADO** |
-| **02** | Monitor — Estrutura | Autenticação, layout responsivo, hierarquia de menus, permissões | **APROVADO** |
-| **03** | Monitor — Operações | Gestão de Clientes, Motoristas (exclusão, status), Veículos, Viagens | **APROVADO** |
-| **04** | Monitor — Delivery | Gestão de entregas, estabelecimentos, zonas e configurações | **APROVADO** |
-| **05** | Monitor — Financeiro | Faturamento, tarifas, estornos, extratos, split e relatórios | **APROVADO** |
-| **06** | Monitor — Configurações | Tarifas por cidade/categoria, integrações, limites, chaves, regras | **APROVADO** |
-| **07** | Monitor — Demais Módulos | Módulos restantes (Publicidade, Mensagens, Promoções, Mapas) | **APROVADO** |
-| **08** | Monitor — Homologação | Testes ponta a ponta e validação integral do MOVY MONITOR | **APROVADO** |
-| **09** | Central — Reconstrução | Modernização da Central de Operações, interface, mapas e despacho | **APROVADO** |
-| **10** | Central — Chamadas | Fluxo de despacho, aceite, cancelamento sincronizado motorista/passageiro | **APROVADO** |
-| **11** | Aplicativos Mobile | Reconstrução Android/iOS Motorista e Passageiro, layout profissional | **APROVADO** |
-| **12** | Sincronização Realtime | Push notifications (Firebase), WebSockets, sincronismo de status | **APROVADO** |
-| **13** | Qualidade e Segurança | Testes E2E, segurança, auditoria de vulnerabilidades e performance | **APROVADO** |
-| **14** | Implantação e Rollback | Publicação em produção gradual, observabilidade e rollback seguro | **APROVADO** |
+| **00** | Diagnóstico e Segurança | Inventário de diretórios, stack, APIs, portas, bancos e segurança | **HOMOLOGADO (100%)** |
+| **01** | Arquitetura e Dados | Modelagem de schemas, tabelas (MySQL 444 tabelas, Mongo, Redis), integridade | **HOMOLOGADO (100%)** |
+| **02** | Monitor — Estrutura | Autenticação, layout responsivo, hierarquia de menus, permissões | **HOMOLOGADO (100%)** |
+| **03** | Monitor — Operações | Gestão de Clientes, Motoristas (exclusão, status), Veículos, Viagens | **HOMOLOGADO (100%)** |
+| **04** | Monitor — Delivery | Gestão de entregas, estabelecimentos, zonas e configurações | **HOMOLOGADO (100%)** |
+| **05** | Monitor — Financeiro | Faturamento, tarifas, estornos, extratos, split e relatórios | **HOMOLOGADO (100%)** |
+| **06** | Monitor — Configurações | Tarifas por cidade/categoria, integrações, limites, chaves, regras, apps parceiros | **HOMOLOGADO (100%)** |
+| **07** | Monitor — Demais Módulos | Módulos restantes (Publicidade, Mensagens, Promoções, Mapas, Parceiros) | **HOMOLOGADO (100%)** |
+| **08** | Monitor — Homologação | Testes ponta a ponta e validação integral do MOVY MONITOR | **HOMOLOGADO (100%)** |
+| **09** | Central — Reconstrução | Modernização da Central de Operações, interface, mapas e despacho | **HOMOLOGADO (100%)** |
+| **10** | Central — Chamadas | Fluxo de despacho, aceite, cancelamento sincronizado motorista/passageiro | **HOMOLOGADO (100%)** |
+| **11** | Aplicativos Mobile | Reconstrução Android/iOS Motorista e Passageiro, layout profissional, Splash, AAB/APK | **HOMOLOGADO (100%)** |
+| **12** | Sincronização Realtime | Push notifications (Firebase), WebSockets, sincronismo de status | **HOMOLOGADO (100%)** |
+| **13** | Qualidade e Segurança | Testes E2E, segurança, auditoria de vulnerabilidades e performance | **EM VALIDAÇÃO (95%)** |
+| **14** | Implantação e Rollback | Publicação em produção gradual, observabilidade e rollback seguro | **EM VALIDAÇÃO (95%)** |
 
 ---
 
