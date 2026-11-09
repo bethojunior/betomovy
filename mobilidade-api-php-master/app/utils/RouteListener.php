@@ -82,7 +82,8 @@ class RouteListener extends ApiController
             return null;
         }
 
-        $classNameController = $path[$index] . 'Controller';
+        $cleanSlug = str_replace(['-', '_'], '', $path[$index]);
+        $classNameController = $cleanSlug . 'Controller';
 
         $classArray = array_filter(scandir("../app/controllers"), function ($classFile) use ($classNameController) {
             return strtolower($classFile) === strtolower($classNameController) . '.php';
