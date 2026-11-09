@@ -240,14 +240,21 @@ export function Register() {
 
   // Perfil selecionado (false = Passageiro, true = Motorista)
   const isPt = (I18n.locale || '').startsWith('pt');
-  const t = (enText: string, ptText?: any) => {
-    if (typeof ptText === 'object' && ptText !== null && 'defaultValue' in ptText) {
-      return isPt ? (ptText.defaultValue || enText) : enText;
+  const t = (enText: any, ptText?: any): string => {
+    let enVal = '';
+    if (typeof enText === 'string') {
+      enVal = enText;
+    } else if (typeof enText === 'object' && enText !== null) {
+      enVal = enText.defaultValue || enText.message || '';
     }
     if (typeof ptText === 'string') {
-      return isPt ? ptText : enText;
+      return isPt ? ptText : enVal;
     }
-    return enText;
+    if (typeof ptText === 'object' && ptText !== null) {
+      const ptVal = ptText.defaultValue || ptText.message || '';
+      return isPt ? (ptVal || enVal) : enVal;
+    }
+    return enVal;
   };
 
   const formatCategoryName = (rawName: string) => {

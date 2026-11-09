@@ -100,7 +100,25 @@ export const setLanguageToI18n = async () => {
 
 setLanguageToI18n();
 
-export const translate = (key: I18n.Scope, options?: any) =>
-  I18n.t(key, options);
+export const translate = (key: I18n.Scope, options?: any): string => {
+  try {
+    const res = I18n.t(key, options);
+    if (typeof res === 'string') return res;
+    if (res && typeof res === 'object') {
+      if ('defaultValue' in res) return String((res as any).defaultValue);
+      if ('message' in res) return String((res as any).message);
+      if (options && typeof options === 'object' && 'defaultValue' in options) {
+        return String(options.defaultValue);
+      }
+      return '';
+    }
+    return res !== undefined && res !== null ? String(res) : '';
+  } catch {
+    if (options && typeof options === 'object' && 'defaultValue' in options) {
+      return String(options.defaultValue);
+    }
+    return '';
+  }
+};
 
 export default I18n;
