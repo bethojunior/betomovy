@@ -3,6 +3,10 @@ import {RFValue} from 'react-native-responsive-fontsize';
 export default {
   colors: {
     primary: '#00349a',
+    brand_blue: '#00349A',
+    brand_cyan: '#04F3FA',
+    brand_dark: '#0B1220',
+    cyan: '#04F3FA',
     secondary: '#000',
     background_global: '#f1f1f1',
 

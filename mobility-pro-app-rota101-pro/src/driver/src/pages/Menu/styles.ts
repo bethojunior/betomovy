@@ -21,22 +21,26 @@ export const ProfileButton = styled.TouchableOpacity`
 
 export const PerfilContainer = styled.View`
   margin: -10px -5px 0 -5px;
-  padding: 10px;
-  background-color: ${({theme}) => theme.colors.primary};
+  padding: 16px 12px 18px 12px;
+  background-color: ${({theme}) => theme.colors.brand_dark || '#0B1220'};
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 `;
 
 export const EditProfileContainer = styled.View`
   flex-direction: row;
-  padding: 10px;
+  padding: 6px 4px;
   justify-content: space-between;
   align-items: center;
 `;
 
 export const CloseModalButton = styled.TouchableOpacity`
-  height: 50px;
-  width: 30px;
+  height: 44px;
+  width: 44px;
+  border-radius: 22px;
   align-items: center;
   justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
 `;
 
 export const TextProfile = styled.Text`
@@ -49,10 +53,15 @@ export const NameContainer = styled.View`
 `;
 
 export const CarDetails = styled.View`
-  margin-top: ${RFValue(10)}px;
+  margin-top: ${RFValue(12)}px;
   background-color: ${({theme}) => theme.colors.white};
-  padding: ${RFValue(4)}px ${RFValue(12)}px;
-  border-radius: ${RFValue(14)}px;
+  padding: ${RFValue(10)}px ${RFValue(14)}px;
+  border-radius: 16px;
+  shadow-color: #000;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.1;
+  shadow-radius: 8px;
+  elevation: 4;
 `;
 
 export const TitleDetails = styled.Text`

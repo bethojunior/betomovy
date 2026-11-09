@@ -1,6 +1,6 @@
 name: movy-app
 region: nyc
-# Deploy trigger: 2026-11-08 13:20 UTC - Fix Android 12 native circular splashscreen icon symbol
+# Deploy trigger: 2026-11-09 13:05 UTC - Deploy MOVY Mobile Pro, Splash Obsidian Navy, i18n pt_BR and Central fixes
 
 services:
   # 1. Site Institucional (React SPA) - Rota Principal

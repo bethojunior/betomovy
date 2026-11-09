@@ -3,13 +3,13 @@
     "name": "Movy",
     "scheme": "rota101pro",
     "slug": "expoappv2",
-    "version": "8.3.7",
+    "version": "8.3.8",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "splash": {
       "image": "./assets/logo-on-dark.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0B1220"
+      "backgroundColor": "#CF227B"
     },
     "jsEngine": "hermes",
     "plugins": [
@@ -73,7 +73,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "buildNumber": "80307",
+      "buildNumber": "80308",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSCameraUsageDescription": "A câmera é usada durante o cadastro para tirar sua foto de perfil e fotografar os documentos necessários para o cadastro. Ela também é usada quando você troca sua foto de perfil no aplicativo.",
@@ -97,7 +97,7 @@
     "android": {
       "package": "br.com.client.rota101",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 80307,
+      "versionCode": 80308,
       "edgeToEdgeEnabled": true,
       "config": {
         "googleMaps": {

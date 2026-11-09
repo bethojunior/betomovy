@@ -392,7 +392,7 @@ export default function Login() {
                     <Feather
                       name={driverSelected ? 'navigation' : 'user'}
                       size={13}
-                      color="#ff80ab"
+                      color="#04F3FA"
                     />
                     <CardHeaderPillText>
                       {driverSelected ? (translate('login.driver_access') || 'Driver Access') : (translate('login.rider_access') || 'Passenger Access')}
@@ -414,7 +414,7 @@ export default function Login() {
                         <Feather
                           name="mail"
                           size={18}
-                          color={emailFocused ? '#CD2379' : 'rgba(255, 255, 255, 0.55)'}
+                          color={emailFocused ? '#04F3FA' : 'rgba(255, 255, 255, 0.55)'}
                         />
                         <ModernTextInput
                           value={value}
@@ -450,7 +450,7 @@ export default function Login() {
                         <Feather
                           name="lock"
                           size={18}
-                          color={passwordFocused ? '#CD2379' : 'rgba(255, 255, 255, 0.55)'}
+                          color={passwordFocused ? '#04F3FA' : 'rgba(255, 255, 255, 0.55)'}
                         />
                         <ModernTextInput
                           value={value}
@@ -612,7 +612,7 @@ export default function Login() {
                       {translate('login.modal_choice_rider_desc') || 'Travel with comfort, safety, and savings anywhere.'}
                     </ModalChoiceDescription>
                   </ModalChoiceContent>
-                  <Feather name="chevron-right" size={22} color="#CD2379" />
+                  <Feather name="chevron-right" size={22} color="#04F3FA" />
                 </ModalChoiceCard>
 
                 {/* Opção Motorista */}

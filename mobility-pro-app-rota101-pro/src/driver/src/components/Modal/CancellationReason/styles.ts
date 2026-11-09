@@ -43,7 +43,7 @@ export const Header = styled.View`
 export const HeaderTitle = styled.Text`
   font-size: ${RFValue(16)}px;
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.primaryText || '#111827'};
+  color: #111827;
 `;
 
 export const CloseButton = styled.TouchableOpacity`
@@ -81,7 +81,7 @@ export const ReasonName = styled.Text<SelectedProps>`
   font-size: ${RFValue(14)}px;
   font-weight: ${({ selected }) => (selected ? '700' : '500')};
   color: ${({ selected, theme }) =>
-    selected ? (theme.colors.primary || '#00349a') : (theme.colors.primaryText || '#1F2937')};
+    selected ? (theme.colors.primary || '#00349a') : '#1F2937'};
   flex: 1;
   padding-right: 12px;
 `;

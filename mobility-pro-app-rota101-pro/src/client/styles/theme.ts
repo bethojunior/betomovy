@@ -53,7 +53,12 @@ export default {
     serene_green: '#7fcf91',
     coral_rose: '#f77b72',
     blue: "#007AFF",
-    blueLight: '#D6E9FF'
+    blueLight: '#D6E9FF',
+    cyan: '#04F3FA',
+    brand_cyan: '#04F3FA',
+    brand_blue: '#00349A',
+    brand_dark: '#0B1220',
+    card_dark: '#111827',
   },
   toast: {
     secondary_light: '#ff872c4d',

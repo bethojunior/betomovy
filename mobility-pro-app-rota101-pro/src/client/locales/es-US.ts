@@ -1286,6 +1286,8 @@ export default {
     text_warning: 'Advertencia',
     text_warning_message:
       'Tienes una carrera en marcha, ¿te gustaría retirarte?',
+    tempo_ao_volante: 'Tiempo al volante',
+    qrcode_fiscalizacao: 'Código QR de Fiscalización',
     text_copy_error: 'Error al copiar',
   },
   callTrip: {

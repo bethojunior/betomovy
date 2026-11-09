@@ -68,17 +68,22 @@ export const Bottom = styled.View<BottomProps>`
   padding-right: ${RFValue(20)}px;
   width: 100%;
   background-color: ${({theme}) => theme.colors.white};
-  border-top-left-radius: ${RFValue(25)}px;
-  border-top-right-radius: ${RFValue(25)}px;
+  border-top-left-radius: ${RFValue(24)}px;
+  border-top-right-radius: ${RFValue(24)}px;
   position: absolute;
   bottom: 0;
+  shadow-color: #000;
+  shadow-offset: 0px -4px;
+  shadow-opacity: 0.12;
+  shadow-radius: 12px;
+  elevation: 16;
 `;
 
 export const HeaderBottom = styled.View`
-  padding-top: ${RFValue(8)}px;
-  padding-bottom: ${RFValue(8)}px;
+  padding-top: ${RFValue(10)}px;
+  padding-bottom: ${RFValue(10)}px;
   border-bottom-width: 1px;
-  border-bottom-color: ${({theme}) => theme.colors.black};
+  border-bottom-color: #E2E8F0;
 `;
 
 export const HeaderBottomTitle = styled.Text`

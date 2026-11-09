@@ -4,10 +4,17 @@ import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex-direction: column;
-  padding: ${({theme}) => theme.spacing.large}px;
-  margin: ${({theme}) => theme.spacing.medium}px 0;
-  border-radius: ${({theme}) => theme.borderRadius.medium}px;
-  background-color: ${({theme}) => shade(0.05, theme.colors.background_global)};
+  padding: ${({theme}) => theme.spacing.xlarge}px;
+  margin: ${({theme}) => theme.spacing.medium}px ${({theme}) => theme.spacing.large}px;
+  border-radius: 16px;
+  background-color: ${({theme}) => theme.colors.white};
+  border-width: 1px;
+  border-color: #E2E8F0;
+  shadow-color: #000;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.08;
+  shadow-radius: 8px;
+  elevation: 4;
 `;
 export const ContainerHeader = styled.View`
   flex-direction: column;
@@ -41,13 +48,13 @@ export const ContainerCancel = styled.View`
 export const ButtonCancel = styled(Button)``;
 
 export const ButtonAction = styled.TouchableOpacity<{bg: string, isDisable: boolean}>`
-  background-color: ${({bg, theme}) => bg || theme.colors.primary};
+  background-color: ${({bg, theme}) => bg || theme.colors.brand_blue || theme.colors.primary};
   padding: ${({theme}) => theme.spacing.medium}px;
-  border-radius: ${({theme}) => theme.borderRadius.medium}px;
+  border-radius: 12px;
   align-items: center;
   justify-content: center;
   flex: 1;
-  height: 40px;
+  height: 48px;
   margin-right: ${({theme}) => theme.spacing.small}px;
   opacity: ${({isDisable}) => isDisable ? 0.6 : 1};
 `;

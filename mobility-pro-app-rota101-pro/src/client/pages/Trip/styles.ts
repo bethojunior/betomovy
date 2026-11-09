@@ -52,35 +52,38 @@ export const ContainerCardAddres = styled.View`
 `;
 
 export const ContainerCard = styled.View`
-  background-color: ${({theme}) => shade(0.05, theme.colors.background_global)};
-  border-radius: 5px;
+  background-color: ${({theme}) => theme.colors.white};
+  border-radius: 14px;
+  border-width: 1px;
+  border-color: #E2E8F0;
   flex-direction: row;
   align-items: center;
   margin: 10px 20px;
   flex: 1;
 
-  elevation: 5;
+  elevation: 4;
 
-  shadow-color: ${({theme}) => theme.colors.secondary};
-  shadow-offset: 0px 0px;
-  shadow-opacity: 0.2;
-  shadow-radius: 2px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.08;
+  shadow-radius: 6px;
 `;
 
 export const ContainerMinutes = styled.View`
-  background-color: ${({theme}) => theme.colors.primary};
+  background-color: ${({theme}) => theme.colors.brand_blue || theme.colors.primary};
   width: 50px;
   flex: 1;
+  border-radius: 12px;
   align-items: center;
   justify-content: center;
   height: 100%;
 
-  elevation: 5;
+  elevation: 3;
 
-  shadow-color: ${({theme}) => theme.colors.secondary};
-  shadow-offset: 0px 0px;
-  shadow-opacity: 0.2;
-  shadow-radius: 2px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
 `;
 
 export const ContainerButton = styled.TouchableOpacity`

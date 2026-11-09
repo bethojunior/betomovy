@@ -98,9 +98,9 @@ export const SelectedProfileBanner = styled.View<{ isDriver: boolean }>`
   align-items: center;
   justify-content: space-between;
   background-color: ${({ isDriver }) =>
-    isDriver ? 'rgba(0, 240, 255, 0.12)' : 'rgba(205, 35, 121, 0.15)'};
+    isDriver ? 'rgba(4, 243, 250, 0.12)' : 'rgba(0, 52, 154, 0.20)'};
   border-width: 1.5px;
-  border-color: ${({ isDriver }) => (isDriver ? '#00F0FF' : '#CD2379')};
+  border-color: ${({ isDriver }) => (isDriver ? '#04F3FA' : '#00349A')};
   border-radius: ${RFValue(16)}px;
   padding: ${RFValue(12)}px ${RFValue(14)}px;
   margin-bottom: ${RFValue(16)}px;
@@ -116,7 +116,7 @@ export const SelectedProfileIconBox = styled.View<{ isDriver: boolean }>`
   width: ${RFValue(42)}px;
   height: ${RFValue(42)}px;
   border-radius: ${RFValue(21)}px;
-  background-color: ${({ isDriver }) => (isDriver ? '#00F0FF' : '#CD2379')};
+  background-color: ${({ isDriver }) => (isDriver ? '#04F3FA' : '#00349A')};
   align-items: center;
   justify-content: center;
   margin-right: ${RFValue(10)}px;
@@ -135,7 +135,7 @@ export const SelectedProfileTitle = styled.Text<{ isDriver: boolean }>`
 
 export const SelectedProfileSubtitle = styled.Text<{ isDriver: boolean }>`
   font-size: ${RFValue(10)}px;
-  color: ${({ isDriver }) => (isDriver ? '#00F0FF' : '#ff80ab')};
+  color: ${({ isDriver }) => (isDriver ? '#04F3FA' : '#94a3b8')};
   margin-top: 1px;
 `;
 
@@ -170,10 +170,10 @@ export const ProfileGridItem = styled.TouchableOpacity<{ active: boolean }>`
   flex: 1;
   min-height: ${RFValue(92)}px;
   background-color: ${({ active }) =>
-    active ? 'rgba(205, 35, 121, 0.18)' : 'rgba(255, 255, 255, 0.05)'};
+    active ? 'rgba(4, 243, 250, 0.12)' : 'rgba(255, 255, 255, 0.05)'};
   border-width: 1.5px;
   border-color: ${({ active }) =>
-    active ? '#CD2379' : 'rgba(255, 255, 255, 0.14)'};
+    active ? '#04F3FA' : 'rgba(255, 255, 255, 0.14)'};
   border-radius: ${RFValue(18)}px;
   padding-vertical: ${RFValue(12)}px;
   padding-horizontal: ${RFValue(8)}px;
@@ -187,7 +187,7 @@ export const ProfileIconBadge = styled.View<{ active: boolean }>`
   height: ${RFValue(40)}px;
   border-radius: ${RFValue(20)}px;
   background-color: ${({ active }) =>
-    active ? '#CD2379' : 'rgba(255, 255, 255, 0.08)'};
+    active ? '#00349A' : 'rgba(255, 255, 255, 0.08)'};
   align-items: center;
   justify-content: center;
   margin-bottom: 6px;
@@ -204,7 +204,7 @@ export const ProfileGridTitle = styled.Text<{ active: boolean }>`
 export const ProfileGridSubtitle = styled.Text<{ active: boolean }>`
   font-size: ${RFValue(10)}px;
   font-weight: 500;
-  color: ${({ active }) => (active ? '#ff80ab' : 'rgba(255, 255, 255, 0.45)')};
+  color: ${({ active }) => (active ? '#04F3FA' : 'rgba(255, 255, 255, 0.45)')};
   margin-top: 2px;
   text-align: center;
 `;
@@ -229,13 +229,13 @@ export const StepCircle = styled.TouchableOpacity<{ active: boolean; completed: 
   border-radius: ${RFValue(16)}px;
   background-color: ${({ completed, active }) =>
     completed
-      ? '#CD2379'
+      ? '#00349A'
       : active
-      ? 'rgba(205, 35, 121, 0.35)'
+      ? 'rgba(4, 243, 250, 0.25)'
       : 'rgba(255, 255, 255, 0.08)'};
   border-width: ${({ active }) => (active ? '2px' : '1px')};
   border-color: ${({ completed, active }) =>
-    completed || active ? '#CD2379' : 'rgba(255, 255, 255, 0.20)'};
+    completed || active ? '#04F3FA' : 'rgba(255, 255, 255, 0.20)'};
   align-items: center;
   justify-content: center;
 `;
@@ -251,7 +251,7 @@ export const StepLine = styled.View<{ completed: boolean }>`
   width: ${RFValue(24)}px;
   height: 2px;
   background-color: ${({ completed }) =>
-    completed ? '#CD2379' : 'rgba(255, 255, 255, 0.15)'};
+    completed ? '#04F3FA' : 'rgba(255, 255, 255, 0.15)'};
   margin-horizontal: 4px;
 `;
 
@@ -331,7 +331,7 @@ export const ModernInputBox = styled.View<{ hasError?: boolean; isFocused?: bool
     hasError
       ? '#ef4444'
       : isFocused
-      ? '#CD2379'
+      ? '#04F3FA'
       : 'rgba(255, 255, 255, 0.12)'};
   border-radius: ${RFValue(12)}px;
   padding-horizontal: 12px;
@@ -355,10 +355,10 @@ export const InputErrorText = styled.Text`
 /* ===== CARDS DE SELEÇÃO DE CATEGORIA DE MOTORISTA ===== */
 export const CategoryOptionCard = styled.TouchableOpacity<{ isSelected: boolean }>`
   background-color: ${({ isSelected }) =>
-    isSelected ? 'rgba(205, 35, 121, 0.20)' : 'rgba(255, 255, 255, 0.04)'};
+    isSelected ? 'rgba(4, 243, 250, 0.15)' : 'rgba(255, 255, 255, 0.04)'};
   border-width: ${({ isSelected }) => (isSelected ? '2px' : '1px')};
   border-color: ${({ isSelected }) =>
-    isSelected ? '#CD2379' : 'rgba(255, 255, 255, 0.12)'};
+    isSelected ? '#04F3FA' : 'rgba(255, 255, 255, 0.12)'};
   border-radius: ${RFValue(14)}px;
   padding: ${RFValue(14)}px;
   margin-bottom: ${RFValue(10)}px;
@@ -371,7 +371,7 @@ export const CategoryIconContainer = styled.View<{ isSelected: boolean }>`
   height: ${RFValue(48)}px;
   border-radius: ${RFValue(12)}px;
   background-color: ${({ isSelected }) =>
-    isSelected ? '#CD2379' : 'rgba(255, 255, 255, 0.08)'};
+    isSelected ? '#00349A' : 'rgba(255, 255, 255, 0.08)'};
   align-items: center;
   justify-content: center;
   margin-right: 12px;
@@ -398,10 +398,10 @@ export const CategoryCheckBadge = styled.View<{ isSelected: boolean }>`
   height: ${RFValue(24)}px;
   border-radius: ${RFValue(12)}px;
   background-color: ${({ isSelected }) =>
-    isSelected ? '#CD2379' : 'transparent'};
+    isSelected ? '#04F3FA' : 'transparent'};
   border-width: 1.5px;
   border-color: ${({ isSelected }) =>
-    isSelected ? '#CD2379' : 'rgba(255, 255, 255, 0.25)'};
+    isSelected ? '#04F3FA' : 'rgba(255, 255, 255, 0.25)'};
   align-items: center;
   justify-content: center;
   margin-left: 8px;
@@ -438,13 +438,15 @@ export const NextStepButton = styled.TouchableOpacity<{ disabled?: boolean }>`
   flex: 2;
   height: ${RFValue(48)}px;
   border-radius: ${RFValue(12)}px;
-  background-color: ${({ disabled }) => (disabled ? '#64748b' : '#CD2379')};
+  background-color: ${({ disabled }) => (disabled ? '#64748b' : '#00349A')};
+  border-width: 1px;
+  border-color: ${({ disabled }) => (disabled ? 'transparent' : '#04F3FA')};
   align-items: center;
   justify-content: center;
   flex-direction: row;
-  shadow-color: #CD2379;
+  shadow-color: #04F3FA;
   shadow-offset: 0px 4px;
-  shadow-opacity: 0.4;
+  shadow-opacity: 0.35;
   shadow-radius: 8px;
   elevation: 4;
 `;
@@ -529,7 +531,7 @@ export const PhotoAvatarImage = styled.Image`
   height: ${RFValue(100)}px;
   border-radius: ${RFValue(50)}px;
   border-width: 3px;
-  border-color: #CD2379;
+  border-color: #04F3FA;
 `;
 
 export const PhotoAvatarPlaceholder = styled.View`
@@ -551,9 +553,9 @@ export const PhotoCameraBadge = styled.View`
   width: ${RFValue(32)}px;
   height: ${RFValue(32)}px;
   border-radius: ${RFValue(16)}px;
-  background-color: #CD2379;
+  background-color: #00349A;
   border-width: 2px;
-  border-color: #0d1322;
+  border-color: #04F3FA;
   align-items: center;
   justify-content: center;
 `;
@@ -569,10 +571,10 @@ export const PhotoChoiceButton = styled.TouchableOpacity<{ variant?: 'camera' | 
   flex-direction: row;
   align-items: center;
   background-color: ${({ variant }) =>
-    variant === 'camera' ? 'rgba(205, 35, 121, 0.25)' : 'rgba(255, 255, 255, 0.08)'};
+    variant === 'camera' ? 'rgba(4, 243, 250, 0.15)' : 'rgba(255, 255, 255, 0.08)'};
   border-width: 1px;
   border-color: ${({ variant }) =>
-    variant === 'camera' ? '#CD2379' : 'rgba(255, 255, 255, 0.20)'};
+    variant === 'camera' ? '#04F3FA' : 'rgba(255, 255, 255, 0.20)'};
   border-radius: ${RFValue(10)}px;
   padding-horizontal: ${RFValue(14)}px;
   padding-vertical: ${RFValue(8)}px;
@@ -739,10 +741,10 @@ export const DocAttachButton = styled.TouchableOpacity<{ variant?: 'camera' | 'g
   align-items: center;
   justify-content: center;
   background-color: ${({ variant }) =>
-    variant === 'camera' ? 'rgba(205, 35, 121, 0.22)' : 'rgba(255, 255, 255, 0.08)'};
+    variant === 'camera' ? 'rgba(4, 243, 250, 0.15)' : 'rgba(255, 255, 255, 0.08)'};
   border-width: 1px;
   border-color: ${({ variant }) =>
-    variant === 'camera' ? '#CD2379' : 'rgba(255, 255, 255, 0.20)'};
+    variant === 'camera' ? '#04F3FA' : 'rgba(255, 255, 255, 0.20)'};
   border-radius: ${RFValue(10)}px;
   padding-vertical: ${RFValue(8)}px;
 `;

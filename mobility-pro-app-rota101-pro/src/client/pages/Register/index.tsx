@@ -226,7 +226,15 @@ export function Register() {
 
   // Perfil selecionado (false = Passageiro, true = Motorista)
   const isPt = (I18n.locale || '').startsWith('pt');
-  const t = (enText: string, ptText: string) => (isPt ? ptText : enText);
+  const t = (enText: string, ptText?: any) => {
+    if (typeof ptText === 'object' && ptText !== null && 'defaultValue' in ptText) {
+      return isPt ? (ptText.defaultValue || enText) : enText;
+    }
+    if (typeof ptText === 'string') {
+      return isPt ? ptText : enText;
+    }
+    return enText;
+  };
 
   const formatCategoryName = (rawName: string) => {
     if (isPt) return rawName;
@@ -1081,7 +1089,7 @@ export function Register() {
               <HeaderTitleContainer>
                 <HeaderLogo source={logoMovyWhite} />
                 <HeaderSubtitle>
-                  {!isDriver ? t('Passenger Registration', {defaultValue: 'Passenger Registration'}) : t('Driver Registration', {defaultValue: 'Driver Registration'})}
+                  {!isDriver ? t('Passenger Registration', 'Cadastro de Passageiro') : t('Driver Registration', 'Cadastro de Motorista')}
                 </HeaderSubtitle>
               </HeaderTitleContainer>
               <View style={{ width: 42 }} />
@@ -1103,13 +1111,7 @@ export function Register() {
                   />
                 </ProfileIconBadge>
                 <ProfileGridTitle active={!isDriver}>
-                  {(() => {
-                    const txt = t('profile_rider') || t('login.profile_rider');
-                    if (!txt || txt.toLowerCase().includes('rider') || txt.includes('missing')) {
-                      return 'PASSENGER';
-                    }
-                    return txt;
-                  })()}
+                  {t('PASSENGER', 'PASSAGEIRO')}
                 </ProfileGridTitle>
                 <ProfileGridSubtitle active={!isDriver}>
                   {t('I want to travel', 'Quero viajar')}
@@ -1130,10 +1132,7 @@ export function Register() {
                   />
                 </ProfileIconBadge>
                 <ProfileGridTitle active={isDriver}>
-                  {(() => {
-                    const txt = t('profile_driver') || t('login.profile_driver');
-                    return (!txt || txt === 'profile_driver' || txt === 'login.profile_driver' || txt.includes('missing')) ? 'DRIVER' : txt;
-                  })()}
+                  {t('DRIVER', 'MOTORISTA')}
                 </ProfileGridTitle>
                 <ProfileGridSubtitle active={isDriver}>
                   {t('I want to drive', 'Quero dirigir')}
@@ -1191,7 +1190,7 @@ export function Register() {
                   <CardHeaderRow>
                     <CardHeaderPill>
                       <Feather name="user-check" size={14} color="#ff80ab" />
-                      <CardHeaderPillText>{t('Passenger Registration', {defaultValue: 'Passenger Registration'})}</CardHeaderPillText>
+                      <CardHeaderPillText>{t('Passenger Registration', 'Cadastro de Passageiro')}</CardHeaderPillText>
                     </CardHeaderPill>
                     <StepCounterBadge>{t(`Step ${passengerStep} of 3`, `Passo ${passengerStep} de 3`)}</StepCounterBadge>
                   </CardHeaderRow>
@@ -2033,7 +2032,7 @@ export function Register() {
                         <DocCardHeader>
                           <DocCardTitleRow>
                             <DocCardIconBadge isAttached={!!dDocLicense}>
-                              <Feather name="credit-card" size={16} color={dDocLicense ? '#22c55e' : '#CD2379'} />
+                              <Feather name="credit-card" size={16} color={dDocLicense ? '#22c55e' : '#04F3FA'} />
                             </DocCardIconBadge>
                             <DocCardTitle>{t('US Driver’s License', 'Carteira de motorista americana')}</DocCardTitle>
                           </DocCardTitleRow>
@@ -2075,7 +2074,7 @@ export function Register() {
                         <DocCardHeader>
                           <DocCardTitleRow>
                             <DocCardIconBadge isAttached={!!dDocRegistration}>
-                              <MaterialCommunityIcons name="car-cog" size={18} color={dDocRegistration ? '#22c55e' : '#CD2379'} />
+                              <MaterialCommunityIcons name="car-cog" size={18} color={dDocRegistration ? '#22c55e' : '#04F3FA'} />
                             </DocCardIconBadge>
                             <DocCardTitle>{t('Vehicle Registration', 'Registro do veículo')}</DocCardTitle>
                           </DocCardTitleRow>
@@ -2117,7 +2116,7 @@ export function Register() {
                         <DocCardHeader>
                           <DocCardTitleRow>
                             <DocCardIconBadge isAttached={!!dDocInsurance}>
-                              <Feather name="shield" size={16} color={dDocInsurance ? '#22c55e' : '#CD2379'} />
+                              <Feather name="shield" size={16} color={dDocInsurance ? '#22c55e' : '#04F3FA'} />
                             </DocCardIconBadge>
                             <DocCardTitle>{t('Vehicle Insurance', 'Seguro do carro')}</DocCardTitle>
                           </DocCardTitleRow>
@@ -2159,7 +2158,7 @@ export function Register() {
                         <DocCardHeader>
                           <DocCardTitleRow>
                             <DocCardIconBadge isAttached={!!dDocResidence}>
-                              <Feather name="home" size={16} color={dDocResidence ? '#22c55e' : '#CD2379'} />
+                              <Feather name="home" size={16} color={dDocResidence ? '#22c55e' : '#04F3FA'} />
                             </DocCardIconBadge>
                             <DocCardTitle>{t('Proof of Residence', 'Comprovante de residência')}</DocCardTitle>
                           </DocCardTitleRow>
@@ -2345,7 +2344,9 @@ export function Register() {
               position: 'absolute',
               right: 18,
               bottom: Platform.OS === 'ios' ? keyboardHeight + 10 : 20,
-              backgroundColor: '#CD2379',
+              backgroundColor: '#00349A',
+              borderWidth: 1,
+              borderColor: '#04F3FA',
               paddingVertical: 10,
               paddingHorizontal: 18,
               borderRadius: 24,

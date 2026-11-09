@@ -156,7 +156,7 @@ const BrandDefault = () => {
           ]}
         />
 
-        {/* Texto Movy em Azul Escuro idêntico ao solicitado */}
+        {/* Texto Movy em Branco com contraste perfeito */}
         <Animated.Image
           source={splashTextMovyWhite}
           resizeMode="contain"
@@ -165,7 +165,6 @@ const BrandDefault = () => {
             {
               opacity: textFade,
               transform: [{ translateX: textTranslateX }],
-              tintColor: '#002244',
             },
           ]}
         />
@@ -181,7 +180,7 @@ const brand = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#CD2379',
+    backgroundColor: '#CF227B',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -212,14 +211,14 @@ const brand = StyleSheet.create({
 });
 
 const FullSplashImage = () => (
-  <Splash style={{ backgroundColor: '#CD2379' }}>
+  <Splash style={{ backgroundColor: '#CF227B' }}>
     <SplashImage source={splash} resizeMode="cover" />
   </Splash>
 );
 
 const Spinner = () => (
   <SpinnerContainer>
-    <ActivityIndicator size={Platform.OS === 'ios' ? 'large' : 48} color="#fff" />
+    <ActivityIndicator size={Platform.OS === 'ios' ? 'large' : 48} color="#04F3FA" />
   </SpinnerContainer>
 );
 
@@ -234,7 +233,7 @@ export default function Preload({
     <Portal>
       <Container
         transparent={transparent}
-        style={!transparent && type === 'brand' ? { backgroundColor: '#CD2379' } : undefined}
+        style={!transparent && type === 'brand' ? { backgroundColor: '#CF227B' } : undefined}
       >
         {type === 'brand' && <BrandDefault />}
         {type === 'splash' && <FullSplashImage />}

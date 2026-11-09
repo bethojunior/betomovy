@@ -67,10 +67,10 @@ export const ProfileGridItem = styled.TouchableOpacity<{ active: boolean }>`
   flex: 1;
   min-height: ${RFValue(92)}px;
   background-color: ${({ active }) =>
-    active ? 'rgba(205, 35, 121, 0.18)' : 'rgba(255, 255, 255, 0.05)'};
+    active ? 'rgba(4, 243, 250, 0.12)' : 'rgba(255, 255, 255, 0.05)'};
   border-width: 1.5px;
   border-color: ${({ active }) =>
-    active ? '#CD2379' : 'rgba(255, 255, 255, 0.14)'};
+    active ? '#04F3FA' : 'rgba(255, 255, 255, 0.14)'};
   border-radius: ${RFValue(18)}px;
   padding-vertical: ${RFValue(12)}px;
   padding-horizontal: ${RFValue(8)}px;
@@ -84,7 +84,7 @@ export const ProfileIconBadge = styled.View<{ active: boolean }>`
   height: ${RFValue(40)}px;
   border-radius: ${RFValue(20)}px;
   background-color: ${({ active }) =>
-    active ? '#CD2379' : 'rgba(255, 255, 255, 0.08)'};
+    active ? '#00349A' : 'rgba(255, 255, 255, 0.08)'};
   align-items: center;
   justify-content: center;
   margin-bottom: 6px;
@@ -167,7 +167,7 @@ export const ModernInputBox = styled.View<{ hasError?: boolean; isFocused?: bool
     hasError
       ? '#ef4444'
       : isFocused
-      ? '#CD2379'
+      ? '#04F3FA'
       : 'rgba(255, 255, 255, 0.12)'};
   border-radius: ${RFValue(12)}px;
   padding-horizontal: 12px;
@@ -204,7 +204,7 @@ export const ForgotPasswordBtn = styled.TouchableOpacity`
 export const ForgotPasswordText = styled.Text`
   font-size: ${RFValue(11)}px;
   font-weight: 600;
-  color: #ff80ab;
+  color: #04F3FA;
 `;
 
 export const BiometryRow = styled.View`
@@ -224,15 +224,17 @@ export const BiometryText = styled.Text`
 
 /* ===== BOTÃO PRINCIPAL DE LOGIN ===== */
 export const PrimaryLoginButton = styled.TouchableOpacity`
-  background-color: #CD2379;
+  background-color: #00349A;
+  border-width: 1px;
+  border-color: #04F3FA;
   border-radius: ${RFValue(14)}px;
   height: ${RFValue(50)}px;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  shadow-color: #CD2379;
+  shadow-color: #04F3FA;
   shadow-offset: 0px 4px;
-  shadow-opacity: 0.45;
+  shadow-opacity: 0.35;
   shadow-radius: 12px;
   elevation: 6;
 `;
@@ -268,7 +270,7 @@ export const RegisterPillTextNormal = styled.Text`
 export const RegisterPillTextHighlight = styled.Text`
   font-size: ${RFValue(13)}px;
   font-weight: bold;
-  color: #ff4081;
+  color: #04F3FA;
   margin-left: 6px;
   text-decoration-line: underline;
 `;
@@ -351,14 +353,14 @@ export const ModalBackdrop = styled.View`
 export const ModalCard = styled.View`
   background-color: #0c1220;
   border-width: 1.5px;
-  border-color: #CD2379;
+  border-color: #04F3FA;
   border-radius: ${RFValue(22)}px;
   padding: ${RFValue(22)}px;
   width: 100%;
   max-width: 420px;
-  shadow-color: #CD2379;
+  shadow-color: #04F3FA;
   shadow-offset: 0px 8px;
-  shadow-opacity: 0.45;
+  shadow-opacity: 0.35;
   shadow-radius: 20px;
   elevation: 12;
 `;
@@ -381,9 +383,9 @@ export const ModalSubtitle = styled.Text`
 export const ModalChoiceCard = styled.TouchableOpacity<{ color?: string; bgColor?: string }>`
   flex-direction: row;
   align-items: center;
-  background-color: ${({ bgColor }) => (bgColor ? bgColor : 'rgba(205, 35, 121, 0.16)')};
+  background-color: ${({ bgColor }) => (bgColor ? bgColor : 'rgba(4, 243, 250, 0.10)')};
   border-width: 1.5px;
-  border-color: ${({ color }) => (color ? color : '#CD2379')};
+  border-color: ${({ color }) => (color ? color : '#04F3FA')};
   border-radius: ${RFValue(16)}px;
   padding: ${RFValue(14)}px;
   margin-bottom: ${RFValue(12)}px;
@@ -393,7 +395,7 @@ export const ModalChoiceIconBox = styled.View<{ color?: string }>`
   width: ${RFValue(48)}px;
   height: ${RFValue(48)}px;
   border-radius: ${RFValue(24)}px;
-  background-color: ${({ color }) => (color ? color : '#CD2379')};
+  background-color: ${({ color }) => (color ? color : '#00349A')};
   align-items: center;
   justify-content: center;
   margin-right: 14px;

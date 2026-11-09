@@ -1284,6 +1284,7 @@ export default {
     text_warning_message:
       'You have a race running, would you like to withdraw?',
     tempo_ao_volante: 'Driving Time',
+    qrcode_fiscalizacao: 'Inspection QR Code',
     text_copy_error: 'Error copying',
   },
   callTrip: {
