@@ -26,7 +26,7 @@ class CompanyDeliveryConfigController extends ApiController
                                c.fantasyName,
                                COALESCE(c.establishmentCollectionManagementId, 0) AS establishmentCollectionManagementId
                         FROM companyDeliveryConfig cdc
-                        INNER JOIN company c ON c.idCompany = cdc.companyId
+                        INNER JOIN company c ON c.id = cdc.companyId
                         WHERE cdc.deleted_at IS NULL
                         ORDER BY cdc.id DESC";
                 
@@ -68,7 +68,7 @@ class CompanyDeliveryConfigController extends ApiController
 
             // Atualiza perfil na empresa
             if ($perfilId > 0) {
-                GenericDao::execute("UPDATE company SET establishmentCollectionManagementId = :perfil WHERE idCompany = :cid", [
+                GenericDao::execute("UPDATE company SET establishmentCollectionManagementId = :perfil WHERE id = :cid", [
                     ':perfil' => $perfilId,
                     ':cid' => $companyId
                 ]);

@@ -1224,13 +1224,13 @@ class DriverController extends ApiController
         $userId = (int)$driver['userId'];
 
         // 1. Marcar usuário como deletado (statusId = 2) conforme regra da listagem
-        $stmtU = $pdo->prepare("UPDATE user SET statusId = 2, updated_at = NOW() WHERE idUser = :userId");
+        $stmtU = $pdo->prepare("UPDATE user SET statusId = 2, blocked = 1, updated_at = NOW() WHERE idUser = :userId");
         $stmtU->execute([':userId' => $userId]);
 
         // 2. Desativar motorista (offline, app fechado, status bloqueado)
         $stmtD = $pdo->prepare("
             UPDATE driver 
-            SET status = 0, 
+            SET status = 'desligado', 
                 appIsOpen = 0, 
                 preAvailable = 0, 
                 driverRegisterStatusId = 3 

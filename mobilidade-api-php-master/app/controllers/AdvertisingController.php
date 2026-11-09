@@ -27,7 +27,7 @@ class AdvertisingController extends ApiController
                            c.fantasyName AS companyFantasyName,
                            ci.nome AS cityName
                     FROM advertising a
-                    LEFT JOIN company c ON c.idCompany = a.companyId
+                    LEFT JOIN company c ON c.id = a.companyId
                     LEFT JOIN city ci ON ci.id = a.cityId
                     WHERE {$whereStr}
                     ORDER BY a.id DESC";
