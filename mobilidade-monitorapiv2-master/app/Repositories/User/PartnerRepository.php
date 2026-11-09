@@ -28,22 +28,19 @@ class PartnerRepository extends AbstractRepository
 
     public function findAll(array $request, User $user, int $cityId = null): Paginator
     {
-        return $this->getModel()::join('user', 'user.idUser', 'partner.userId')
-            ->join('customer', 'customer.userId', 'user.idUser')
-            ->join('partnerRegisterStatus', 'partnerRegisterStatus.id', 'partner.partnerRegisterStatusId')
-            ->join('cityArea', function (JoinClause $join) use ($cityId, $user) {
-                $join->on('cityArea.statusId', DB::raw(StatusConst::ACTIVE))
-                    ->when(!$user->role->support && isset($cityId), function (\Illuminate\Database\Query\Builder $query) use ($cityId) {
-                        $query->where('cityArea.cityId', $cityId);
-                    })
-                    ->whereIn('cityArea.cityId', function (\Illuminate\Database\Query\Builder $query) use ($user) {
-                        $query->select('cityId')
-                            ->from('roleCity')
-                            ->where('roleCity.roleId', $user->roleId);
-                    })
-                    ->where(function (\Illuminate\Database\Query\Builder $query) {
-                        $query->whereRaw('ST_Contains(cityArea.polygon, POINT(user.last_lat, user.last_lon))');
-                    });
+        return $this->getModel()::leftJoin('user', 'user.idUser', 'partner.userId')
+            ->leftJoin('customer', 'customer.userId', 'user.idUser')
+            ->leftJoin('partnerRegisterStatus', 'partnerRegisterStatus.id', 'partner.partnerRegisterStatusId')
+            ->when(!$user->role->support && isset($cityId), function ($query) use ($cityId, $user) {
+                $query->leftJoin('cityArea', function (JoinClause $join) use ($cityId, $user) {
+                    $join->on('cityArea.statusId', DB::raw(StatusConst::ACTIVE))
+                        ->where('cityArea.cityId', $cityId)
+                        ->whereIn('cityArea.cityId', function (\Illuminate\Database\Query\Builder $subQuery) use ($user) {
+                            $subQuery->select('cityId')
+                                ->from('roleCity')
+                                ->where('roleCity.roleId', $user->roleId);
+                        });
+                });
             })
             ->when(isset($request['email']), function (Builder $query) use ($request) {
                 $query->where('user.email', 'like', "%{$request['email']}%");

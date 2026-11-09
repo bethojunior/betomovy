@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\constant\PartnerRegisterStatusConst;
 use app\dao\GenericDao;
 use app\services\PartnerService;
 use app\services\PartnerTripService;
@@ -16,8 +17,9 @@ class PartnerController extends ApiController
             $name = isset($_GET['name']) ? trim($_GET['name']) : '';
             $phone = isset($_GET['phone']) ? trim($_GET['phone']) : '';
             $email = isset($_GET['email']) ? trim($_GET['email']) : '';
+            $status = isset($_GET['partnerRegisterStatusId']) ? (int)$_GET['partnerRegisterStatusId'] : null;
 
-            $where = ["p.statusId != 3"];
+            $where = ["p.statusId != 2"]; // 2 = EXCLUIDO
             $params = [];
 
             if (!empty($name)) {
@@ -32,6 +34,10 @@ class PartnerController extends ApiController
                 $where[] = "u.email LIKE :email";
                 $params[':email'] = "%{$email}%";
             }
+            if ($status !== null && $status > 0) {
+                $where[] = "p.partnerRegisterStatusId = :statusId";
+                $params[':statusId'] = $status;
+            }
 
             $whereStr = implode(" AND ", $where);
             $sql = "SELECT p.idPartner AS id,
@@ -42,11 +48,21 @@ class PartnerController extends ApiController
                            p.statusId,
                            p.partnerRegisterStatusId,
                            p.created_at,
-                           u.name AS partnerName,
-                           u.phone AS partnerPhone,
-                           u.email AS partnerEmail
+                           COALESCE(u.name, p.nameEstablishment, 'Sem Nome') AS name,
+                           COALESCE(u.phone, '') AS phone,
+                           COALESCE(u.email, '') AS email,
+                           COALESCE(u.profileImage, '') AS profileImage,
+                           COALESCE(prs.name, 
+                               CASE p.partnerRegisterStatusId
+                                   WHEN 1 THEN 'ATIVO'
+                                   WHEN 2 THEN 'PENDENTE'
+                                   WHEN 3 THEN 'BLOQUEADO'
+                                   ELSE 'ATIVO'
+                               END
+                           ) AS partnerRegister
                     FROM partner p
                     LEFT JOIN user u ON u.idUser = p.userId
+                    LEFT JOIN partnerRegisterStatus prs ON prs.id = p.partnerRegisterStatusId
                     WHERE {$whereStr}
                     ORDER BY p.idPartner DESC
                     LIMIT 200";
@@ -60,6 +76,10 @@ class PartnerController extends ApiController
                 $r['userId'] = (int)$r['userId'];
                 $r['statusId'] = (int)$r['statusId'];
                 $r['partnerRegisterStatusId'] = (int)$r['partnerRegisterStatusId'];
+                // Compatibilidade com ambos os formatos esperados pelos componentes do Monitor
+                $r['partnerName'] = $r['name'];
+                $r['partnerPhone'] = $r['phone'];
+                $r['partnerEmail'] = $r['email'];
                 $result[] = $r;
             }
 
@@ -74,21 +94,38 @@ class PartnerController extends ApiController
         try {
             $id = isset($_GET['id']) ? (int)$_GET['id'] : null;
             if (!$id) {
+                $rawInput = file_get_contents('php://input');
+                $body = json_decode($rawInput, true);
+                if (!empty($body['id'])) {
+                    $id = (int)$body['id'];
+                }
+            }
+            if (!$id) {
                 throw new Exception("ID do parceiro não informado.");
             }
 
-            $partner = GenericDao::first("SELECT idPartner, statusId FROM partner WHERE idPartner = :id", [':id' => $id]);
+            $partner = GenericDao::first("SELECT idPartner, statusId, partnerRegisterStatusId FROM partner WHERE idPartner = :id", [':id' => $id]);
             if (!$partner) {
                 throw new Exception("Parceiro não encontrado.");
             }
 
-            $newStatus = ((int)$partner['statusId'] === 1) ? 2 : 1;
-            GenericDao::execute("UPDATE partner SET statusId = :statusId, updated_at = NOW() WHERE idPartner = :id", [
+            $isCurrentlyBlocked = ((int)$partner['partnerRegisterStatusId'] === PartnerRegisterStatusConst::BLOCKED);
+            $newRegisterStatus = $isCurrentlyBlocked ? PartnerRegisterStatusConst::ACTIVE : PartnerRegisterStatusConst::BLOCKED;
+            $newStatus = $isCurrentlyBlocked ? 1 : 2;
+
+            GenericDao::execute("UPDATE partner SET statusId = :statusId, partnerRegisterStatusId = :regStatus, updated_at = NOW() WHERE idPartner = :id", [
                 ':statusId' => $newStatus,
+                ':regStatus' => $newRegisterStatus,
                 ':id' => $id
             ]);
 
-            echo $this->returnSuccess("Status do parceiro atualizado com sucesso");
+            $statusText = ($newRegisterStatus === PartnerRegisterStatusConst::BLOCKED) ? 'BLOQUEADO' : 'ATIVO';
+
+            echo $this->returnSuccess("Status do parceiro atualizado com sucesso", [
+                'idPartner' => $id,
+                'partnerRegisterStatusId' => $newRegisterStatus,
+                'partnerRegister' => $statusText
+            ]);
         } catch (Exception $e) {
             echo $this->returnError($e);
         }

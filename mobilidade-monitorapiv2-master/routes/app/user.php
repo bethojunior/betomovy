@@ -140,6 +140,7 @@ Route::group(['middleware' => 'auth:api'], function() {
 
     Route::group(['prefix' => 'partner'], function () {
         Route::get('', 'User\PartnerController@findAll');
+        Route::put('{id}/changeStatus', 'User\PartnerController@changeStatus');
     });
 
     /**

@@ -11,7 +11,11 @@ import avatarFallback from "../../../../assets/avatar2.png";
 
 const { Option } = Select;
 
-const S3_BASE_URL = "https://s3.amazonaws.com/nodes-voutehomologar-dev/customer/profile/compressed/";
+const getImageUrl = (img?: string) => {
+    if (!img) return avatarFallback;
+    if (img.startsWith("http://") || img.startsWith("https://")) return img;
+    return `https://api.movymob.com/customer/profile/${img}`;
+};
 
 const ListPartner = () => {
          
@@ -37,41 +41,55 @@ const ListPartner = () => {
             dataIndex: "profileImage",
             key: "profileImage",
             width: 100,
-            render: (text: string) => (
-                <div style={{ position: "relative" }}>
-                    <img
-                        src={text ? `${S3_BASE_URL}${text}` : avatarFallback}
-                        alt="Profile"
-                        onError={(e: any) => e.target.src = avatarFallback}
-                        style={{ width: 100, height: 100, borderRadius: '10%', cursor: 'pointer' }}
-                        onClick={() => handleImageClick(`${S3_BASE_URL}${text}`)}
-                    />
-                </div>
-            ),
+            render: (text: string) => {
+                const imgUrl = getImageUrl(text);
+                return (
+                    <div style={{ position: "relative" }}>
+                        <img
+                            src={imgUrl}
+                            alt="Profile"
+                            onError={(e: any) => { e.currentTarget.src = avatarFallback; }}
+                            style={{ width: 80, height: 80, borderRadius: "10%", objectFit: "cover", cursor: "pointer" }}
+                            onClick={() => handleImageClick(imgUrl)}
+                        />
+                    </div>
+                );
+            },
         },
         {
             title: "Nome",
             dataIndex: "name",
             key: "name",
             width: 200,
+            render: (text: string, record: any) => text || record.partnerName || record.nameEstablishment || "-",
         },
         {
             title: "Email",
             dataIndex: "email",
             key: "email",
             width: 200,
+            render: (text: string, record: any) => text || record.partnerEmail || "-",
         },
         {
             title: "Telefone",
             dataIndex: "phone",
             key: "phone",
             width: 150,
+            render: (text: string, record: any) => text || record.partnerPhone || "-",
         },
         {
             title: "Status",
             dataIndex: "partnerRegister",
             key: "partnerRegister",
             width: 100,
+            render: (text: string) => (
+                <span style={{ 
+                    fontWeight: "bold",
+                    color: text === "BLOQUEADO" ? "#ef4444" : (text === "PENDENTE" ? "#f59e0b" : "#10b981") 
+                }}>
+                    {text || "ATIVO"}
+                </span>
+            ),
         },
         {
             title: "Ações",
@@ -121,7 +139,7 @@ const ListPartner = () => {
 
     const handleChangeStatus = async (id: number) => {
         swal({
-            title: "Deseja bloquear este parceiro?",
+            title: "Deseja alterar o status deste parceiro?",
             icon: "warning",
             buttons: ["Cancelar", "Confirmar"],
         }).then(async (confirm) => {
@@ -131,16 +149,17 @@ const ListPartner = () => {
             try {
                 const response = await api.put(`/partner/${id}/changeStatus`);
                 if (response.data.status) {
-                    setMessageAlert("Parceiro bloqueado com sucesso!");
+                    setMessageAlert(response.data.message || "Status do parceiro atualizado com sucesso!");
                     setTypeAlert("success");
+                    setShowAlert(true);
                     fetchPartners({ [searchType]: searchText, partnerRegisterStatusId: status });
                 } else {
-                    setMessageAlert("Erro ao bloquear parceiro");
+                    setMessageAlert(response.data.message || "Erro ao alterar status do parceiro");
                     setTypeAlert("error");
                     setShowAlert(true);
                 }
             } catch (error) {
-                setMessageAlert("Erro ao bloquear parceiro");
+                setMessageAlert("Erro ao alterar status do parceiro");
                 setTypeAlert("error");
                 setShowAlert(true);
             } finally {

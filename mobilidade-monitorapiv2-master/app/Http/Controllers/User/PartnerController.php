@@ -29,4 +29,23 @@ class PartnerController extends Controller
 
         return ApiResponse::success($data);
     }
+
+    public function changeStatus(Request $request, int $id): JsonResponse
+    {
+        try {
+            $partner = \App\Models\User\Partner::findOrFail($id);
+            $newStatus = ((int)$partner->partnerRegisterStatusId === 3) ? 1 : 3;
+            $partner->partnerRegisterStatusId = $newStatus;
+            $partner->statusId = ($newStatus === 3) ? 2 : 1;
+            $partner->save();
+
+            return ApiResponse::success([
+                'idPartner' => $id,
+                'partnerRegisterStatusId' => $newStatus,
+                'partnerRegister' => ($newStatus === 3) ? 'BLOQUEADO' : 'ATIVO'
+            ], "Status do parceiro atualizado com sucesso");
+        } catch (\Exception $e) {
+            return ApiResponse::error($e, "Erro ao alterar status do parceiro");
+        }
+    }
 }
