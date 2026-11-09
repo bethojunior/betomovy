@@ -766,7 +766,7 @@ class CustomerController extends ApiController
                         $c['profileImageLink'] = $storageBase . 'customer/profile/compressed/' . ltrim($photo, '/');
                     }
                 } else {
-                    $c['profileImageLink'] = null;
+                    $c['profileImageLink'] = $storageBase . 'default.jpg';
                 }
                 return $c;
             }, $customers);

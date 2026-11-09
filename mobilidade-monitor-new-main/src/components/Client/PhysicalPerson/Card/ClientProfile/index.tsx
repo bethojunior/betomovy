@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useState } from "react";
 import {
   ProfileCard,
   ContentImage,
@@ -12,39 +11,51 @@ import Mask from "../../../../../services/Mask";
 
 import IconWhatsApp from "../../../../../assets/whatsappIcon.svg";
 import IconGmail from "../../../../../assets/gmailIcon.svg";
-import AvatarDefault from "../../../../../assets/avatar.png";
-import { getCustomerPhotoCandidates } from "../../../../../utils/imageUtils";
+import { Constants } from "../../../../../utils/constants";
+import { getCustomerPhotoUrl, isPlaceholderPhoto } from "../../../../../utils/imageUtils";
+
+const MINIO_DEFAULT_AVATAR = "https://minio.704app.com.br/rota101fb704/default.jpg";
 
 export const ClientProfile = ({
   profileImage,
   profileImageLink,
+  baseImageLink,
   phone,
   email,
   message,
 }: ClientProfileProps) => {
-  const candidates = useMemo(
-    () => getCustomerPhotoCandidates(profileImage, profileImageLink),
-    [profileImage, profileImageLink]
-  );
-  const [candidateIndex, setCandidateIndex] = useState(0);
+  const isCustomPhoto = !isPlaceholderPhoto(profileImage);
 
-  useEffect(() => {
-    setCandidateIndex(0);
-  }, [profileImage, profileImageLink]);
+  const primary =
+    (profileImageLink && !isPlaceholderPhoto(profileImageLink) ? profileImageLink : null) ||
+    (isCustomPhoto ? getCustomerPhotoUrl(profileImage) : null) ||
+    (isCustomPhoto && baseImageLink ? `${baseImageLink}${profileImage}` : null) ||
+    MINIO_DEFAULT_AVATAR;
 
-  const hasCandidate = candidates.length > 0 && candidateIndex < candidates.length;
-  const resolvedPhoto = hasCandidate ? candidates[candidateIndex] : AvatarDefault;
+  const fallback = primary?.includes("/compressed/")
+    ? primary.replace("/compressed/", "/")
+    : (primary !== MINIO_DEFAULT_AVATAR ? MINIO_DEFAULT_AVATAR : Constants.defaultImgNotFound);
+
+  const imgSrc = primary || MINIO_DEFAULT_AVATAR;
 
   return (
     <ProfileCard>
       <ContentImage>
         <Avatar
-          key={resolvedPhoto}
-          src={resolvedPhoto}
-          preview={hasCandidate}
-          fallback={AvatarDefault}
-          onError={() => {
-            setCandidateIndex((prev) => prev + 1);
+          src={imgSrc}
+          fallback={Constants.defaultImgNotFound}
+          preview={Boolean(isCustomPhoto && imgSrc !== MINIO_DEFAULT_AVATAR && imgSrc !== Constants.defaultImgNotFound)}
+          onError={(e) => {
+            if (fallback && e.currentTarget.src !== fallback) {
+              e.currentTarget.src = fallback;
+              return;
+            }
+            if (e.currentTarget.src !== MINIO_DEFAULT_AVATAR) {
+              e.currentTarget.src = MINIO_DEFAULT_AVATAR;
+              return;
+            }
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = Constants.defaultImgNotFound;
           }}
         />
       </ContentImage>
