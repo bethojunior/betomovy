@@ -1,0 +1,10 @@
+const password = process.argv[2];
+const login = await fetch("http://localhost:4173/api/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: "admin@movy.com", password, franchiseId: "miami" }) });
+const session = await login.json();
+const headers = { authorization: `Bearer ${session.token}` };
+const list = await (await fetch("http://localhost:4173/api/centrals", { headers })).json();
+const first = (list.items || []).find((item) => item.status === "active");
+const desk = await (await fetch(`http://localhost:4173/api/central/desk?centralId=${encodeURIComponent(first.id)}`, { headers })).json();
+const trip = (desk.activeTrips || [])[0];
+const detail = trip ? await (await fetch(`http://localhost:4173/api/central/trip?centralId=${encodeURIComponent(first.id)}&tripId=${encodeURIComponent(trip.id)}`, { headers })).json() : {};
+console.log(JSON.stringify({ desk: Boolean(desk.central), active: (desk.activeTrips || []).length, detail: detail.reference || detail.error || "" }));
