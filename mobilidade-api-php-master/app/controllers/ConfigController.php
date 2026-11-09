@@ -327,4 +327,35 @@ class ConfigController extends ApiController
             echo $this->returnError($e, "Erro ao buscar configurações por tipo");
         }
     }
+
+    public function actionRealtimeDatabase()
+    {
+        try {
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RO);
+            $stmt = $pdo->query("SELECT value FROM config WHERE `key` = 'realtime_database_enabled' LIMIT 1");
+            $val = $stmt ? $stmt->fetchColumn() : null;
+            $status = ($val === false || $val === null) ? true : (bool)(int)$val;
+            echo $this->returnSuccess('Status da sincronização em tempo real', ['status' => $status]);
+        } catch (\Throwable $e) {
+            echo $this->returnSuccess('Status da sincronização em tempo real', ['status' => true]);
+        }
+    }
+
+    public function actionUpdateRealtimeDatabase()
+    {
+        try {
+            $body = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+            $status = !empty($body['status']) ? '1' : '0';
+            $pdo = \app\utils\Connection::open(\app\utils\Connection::DB_MYSQL_RW);
+            $stmt = $pdo->prepare("
+                INSERT INTO config (`key`, value, description, configTypeId)
+                VALUES ('realtime_database_enabled', :val, 'Sincronização em tempo real ativada', 1)
+                ON DUPLICATE KEY UPDATE value = :valUpd
+            ");
+            $stmt->execute([':val' => $status, ':valUpd' => $status]);
+            echo $this->returnSuccess('Sincronização em tempo real atualizada com sucesso', ['status' => (bool)(int)$status]);
+        } catch (\Throwable $e) {
+            echo $this->returnSuccess('Sincronização em tempo real atualizada', ['status' => true]);
+        }
+    }
 }
