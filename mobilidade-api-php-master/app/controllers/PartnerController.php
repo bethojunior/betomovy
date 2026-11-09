@@ -51,7 +51,7 @@ class PartnerController extends ApiController
                            COALESCE(u.name, p.nameEstablishment, 'Sem Nome') AS name,
                            COALESCE(u.phone, '') AS phone,
                            COALESCE(u.email, '') AS email,
-                           COALESCE(u.profileImage, '') AS profileImage,
+                           COALESCE(c.profileImage, '') AS profileImage,
                            COALESCE(prs.name, 
                                CASE p.partnerRegisterStatusId
                                    WHEN 1 THEN 'ATIVO'
@@ -62,6 +62,7 @@ class PartnerController extends ApiController
                            ) AS partnerRegister
                     FROM partner p
                     LEFT JOIN user u ON u.idUser = p.userId
+                    LEFT JOIN customer c ON c.userId = p.userId
                     LEFT JOIN partnerRegisterStatus prs ON prs.id = p.partnerRegisterStatusId
                     WHERE {$whereStr}
                     ORDER BY p.idPartner DESC
