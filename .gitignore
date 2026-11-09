@@ -103,6 +103,15 @@ desktop.ini
 *.swo
 *~
 vrificar se tem banco de dados/
+BACKUP DE BANCO DE DADOS E INFORMAÇOES/
+ERRO LOGS APLICATIVO CORRIGIR IOS/
+PRINTS DE ERROS A CORRIGIR/
+VIDEO PAGINA SPLASH/
+AUDITORIA DO PROJETO COMPLETO PARA RECRIAR TUDO QUE EXISTE DO ZERO/
+movy-database-v2/
+movy-backend-v2/
+movy-mobile-app-v2/
+movy-web-v2/
 
 # 9. Binarios de release e bundletool
 *.apk
