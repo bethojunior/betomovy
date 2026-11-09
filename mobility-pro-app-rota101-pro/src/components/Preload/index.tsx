@@ -14,7 +14,7 @@ import { Container, Splash, SplashImage, SpinnerContainer } from './styles';
 import { Portal } from 'react-native-paper';
 import splashRingsBg from '~/../assets/splash_rings_bg.png';
 import splashIconMovy from '~/../assets/splash_icon_movy.png';
-import splashTextMovyWhite from '~/../assets/splash_text_movy_white.png';
+import splashTextMovyDarkBlue from '~/../assets/splash_text_movy_dark_blue.png';
 import splash from '~/../assets/splash.png';
 
 interface PreloadProps {
@@ -158,7 +158,7 @@ const BrandDefault = () => {
 
         {/* Texto Movy em Branco com contraste perfeito */}
         <Animated.Image
-          source={splashTextMovyWhite}
+          source={splashTextMovyDarkBlue}
           resizeMode="contain"
           style={[
             brand.textWhite,

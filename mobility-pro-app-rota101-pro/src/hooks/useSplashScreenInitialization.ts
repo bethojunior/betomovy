@@ -4,7 +4,7 @@ import {useAuth} from '../context/auth';
 import {useTerms} from '../context/terms';
 import useCachedResources from '../hooks/useCachedResources';
 
-const MAX_INIT_WAIT_MS = 2500; // Trava máxima de 2.5s para nunca travar a tela de splash
+const MAX_INIT_WAIT_MS = 600; // Liberação imediata sem prender o usuário
 
 export default function useSplashScreenInitialization() {
   const [isSplashReady, setSplashReady] = useState(false);
@@ -27,12 +27,11 @@ export default function useSplashScreenInitialization() {
   useEffect(() => {
     if (held.current) return;
     if (!loadingSession && !isTermsLoading && isResourcesLoaded) {
-      const t = setTimeout(finishSplash, 200);
-      return () => clearTimeout(t);
+      finishSplash();
     }
   }, [loadingSession, isTermsLoading, isResourcesLoaded]);
 
-  // Fallback de segurança: se rede ou sessão demorarem, libera o app após MAX_INIT_WAIT_MS
+  // Fallback de segurança: se rede ou sessão demorarem, libera o app imediatamente
   useEffect(() => {
     const fallback = setTimeout(() => {
       finishSplash();

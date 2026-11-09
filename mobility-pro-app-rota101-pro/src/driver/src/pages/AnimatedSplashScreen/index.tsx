@@ -13,7 +13,7 @@ import { AlertLocationRefused } from '../../components/AlertLocationRefused';
 import { useNetwork } from '~/context/ConfigGlobal';
 import { useBackgroundLocationPermission } from '../../hooks/useBackgroundLocationPermission';
 
-const SPLASH_MAX_WAIT_MS = 2000;
+const SPLASH_MAX_WAIT_MS = 50;
 
 const AnimatedSplashScreen = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();

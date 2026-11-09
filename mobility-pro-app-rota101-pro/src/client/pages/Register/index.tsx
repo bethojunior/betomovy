@@ -162,14 +162,28 @@ const DEFAULT_DRIVER_CATEGORIES: DriverCategoryItem[] = [
 
 const getCategoryIconName = (categoryName: string): any => {
   const name = (categoryName || '').toLowerCase().trim();
-  if (name.includes('moto') || name.includes('duas rodas')) {
+
+  // Regra estrita MOVY: SOMENTE mototaxista ou moto táxi deve ter ícone de moto
+  // A palavra 'motorista' começa com 'moto', portanto NUNCA deve ser tratada como moto
+  const isMotoOnly =
+    name.includes('mototaxista') ||
+    name.includes('mototaxi') ||
+    name.includes('mototáxi') ||
+    name.includes('moto taxi') ||
+    name.includes('moto táxi') ||
+    name.includes('duas rodas') ||
+    (/\bmoto\b/i.test(name) && !name.includes('motorista'));
+
+  if (isMotoOnly) {
     return 'motorbike';
   }
+
+  // Todos os demais são ícones de carro de acordo com o nicho
   if (name.includes('utilit') || name.includes('furg') || name.includes('carga')) {
     return 'car-estate';
   }
   if (name.includes('delivery') || name.includes('entrega') || name.includes('encomenda')) {
-    return 'car-back';
+    return 'car';
   }
   if (name.includes('mulher') || name.includes('feminino') || name.includes('rosa')) {
     return 'car-side';
