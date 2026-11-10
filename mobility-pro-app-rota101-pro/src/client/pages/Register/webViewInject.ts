@@ -109,7 +109,7 @@ export const injectDynamic = (titleElement: string) => {
         for (var i = 0; i < brandImgs.length; i++) {
           var img = brandImgs[i];
           if (img.getAttribute('data-logo-applied') !== 'true') {
-            img.src = 'https://minio.704app.com.br/rota101fb704/default.jpg';
+            img.src = 'https://api.movymob.com/default.jpg';
             img.setAttribute('data-logo-applied', 'true');
           }
         }

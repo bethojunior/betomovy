@@ -17,7 +17,7 @@ class WhatsAppService
     public function __construct()
     {
         $this->sessionName = env('APP_NAME', 'dev');
-        $this->endPoint = env('API_WHATS_APP_SEND_MESSAGE', 'https://api-notifier.704app.com.br/whatsapp/send-message');
+        $this->endPoint = env('API_WHATS_APP_SEND_MESSAGE', 'https://api.movymob.com/whatsapp/send-message');
         $this->requestHeaderToken = env('API_WHATS_REQUEST_HEADER_TOKEN', '704apps');
         $this->pulseService = new PulseService(env('APP_NAME', 'monitor-api-v2'), 'd5096670-ac06-482d-8919-36901ac36e92');
     }

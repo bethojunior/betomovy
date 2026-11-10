@@ -55,7 +55,7 @@ services:
       - key: BUCKET_NAME
         value: rota101fb704
       - key: STORAGE_PRIMARY_HOST
-        value: https://minio.704app.com.br
+        value: https://api.movymob.com
 
   # 3. Monitor (Painel Web Administrativo React + Vite)
   - name: monitor-web
@@ -121,9 +121,9 @@ services:
       - key: S3_REGION
         value: sa-east-1
       - key: S3_URL
-        value: https://minio.704app.com.br/
+        value: https://api.movymob.com/
       - key: S3_ENDPOINT
-        value: https://minio.704app.com.br
+        value: https://api.movymob.com
       - key: S3_ACCESS_KEY
         value: suporte
       - key: S3_ACCESS_SECRET
@@ -135,7 +135,7 @@ services:
       - key: APP_NAME
         value: Movy
       - key: ADMIN704APPS_API_URL
-        value: https://admin.704apps.com.br
+        value: https://movymonitor.com
       - key: ADMIN704APPS_API_ID
         value: movy-app
       - key: ADMIN704APPS_API_SECRET

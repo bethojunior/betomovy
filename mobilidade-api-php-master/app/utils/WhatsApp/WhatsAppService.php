@@ -13,8 +13,8 @@ class WhatsAppService
     public function __construct()
     {
         $this->sessionName = (string)(env("APP_NAME") ?: (Config::get('app_title') ?: 'Movy'));
-        $this->endPoint = 'https://api-notifier.704app.com.br/whatsapp/send-message';
-        $this->endPointGroup = 'https://api-notifier.704app.com.br/whatsapp/send-message-group';
+        $this->endPoint = env('API_WHATS_APP_SEND_MESSAGE') ?: 'https://api.movymob.com/whatsapp/send-message';
+        $this->endPointGroup = env('API_WHATS_APP_SEND_MESSAGE_GROUP') ?: 'https://api.movymob.com/whatsapp/send-message-group';
     }
 
     public function handle($phoneNumber, $message): bool

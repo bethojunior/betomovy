@@ -70,7 +70,7 @@ export function AppRoutes() {
       <RouteTraveledProvider>
         <FinishTripProvider>
           <Navigator
-            initialRouteName="AnimatedSplashScreen"
+            initialRouteName="Home"
             screenOptions={{
               gestureEnabled: true,
               gestureDirection: 'horizontal',
@@ -86,13 +86,6 @@ export function AppRoutes() {
               },
             }}
           >
-            <Screen
-              name="AnimatedSplashScreen"
-              component={AnimatedSplashScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
             <Screen
               name="Home"
               component={Home}

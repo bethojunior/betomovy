@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
     params.keyAppPartner = keyAppPartner
 
     try {
-      const execute = await fetch('https://api-whatsapp-mobilidade.704app.com.br/admin', {
+      const execute = await fetch('https://api.movymob.com/admin-whatsapp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
   async function fetchConfigs(params) {
     try {
       const response = await fetch(
-        `https://api-whatsapp-mobilidade.704app.com.br/admin/${params}`,
+        `https://api.movymob.com/admin-whatsapp/${params}`,
         {
           method: 'GET',
         }

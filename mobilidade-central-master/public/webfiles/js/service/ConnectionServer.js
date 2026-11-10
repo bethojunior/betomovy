@@ -439,7 +439,7 @@ class ConnectionServer {
     reject = undefined,
     responseType = "json",
   ) {
-    const MAIN_URL = "https://api-notifier.704app.com.br/";
+    const MAIN_URL = "https://api.movymob.com/";
     let fetchOptions = {
       method: method,
       headers: {

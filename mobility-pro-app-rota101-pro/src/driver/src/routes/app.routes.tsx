@@ -87,13 +87,6 @@ export function AppRoutes() {
             }}
           >
             <Screen
-              name="AnimatedSplashScreen"
-              component={AnimatedSplashScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Screen
               name="Home"
               component={Home}
               options={{

@@ -4,7 +4,7 @@ namespace App\Providers;
 
 class PulseProvider
 {
-    private string $endpoint = 'https://api-pulse.704app.com.br/logs';
+    private string $endpoint = 'https://api.movymob.com/logs';
     private string $app;
     private string $groupId;
 

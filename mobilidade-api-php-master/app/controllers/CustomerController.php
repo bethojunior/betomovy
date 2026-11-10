@@ -766,7 +766,7 @@ class CustomerController extends ApiController
             $stmt->execute($params);
             $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $storageBase = rtrim((string)(\app\model\Config::get('link_storage_pictures') ?: 'https://minio.704app.com.br/rota101fb704/'), '/') . '/';
+            $storageBase = rtrim((string)(\app\model\Config::get('link_storage_pictures') ?: 'https://api.movymob.com/'), '/') . '/';
 
             $formatted = array_map(function ($c) use ($storageBase) {
                 $c['idCustomer'] = (int)$c['idCustomer'];
@@ -779,7 +779,7 @@ class CustomerController extends ApiController
                 $c['zafiraValidated'] = (int)$c['zafiraValidated'];
 
                 $photo = trim((string)($c['profileImage'] ?? ''));
-                if ($photo !== '' && $photo !== 'user.png') {
+                if ($photo !== '' && $photo !== 'user.png' && $photo !== 'default.jpg') {
                     if (stripos($photo, 'http://') === 0 || stripos($photo, 'https://') === 0) {
                         $c['profileImageLink'] = $photo;
                     } elseif (stripos($photo, 'customer/profile/') === 0) {
@@ -788,7 +788,7 @@ class CustomerController extends ApiController
                         $c['profileImageLink'] = $storageBase . 'customer/profile/compressed/' . ltrim($photo, '/');
                     }
                 } else {
-                    $c['profileImageLink'] = $storageBase . 'default.jpg';
+                    $c['profileImageLink'] = null;
                 }
                 return $c;
             }, $customers);

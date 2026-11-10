@@ -2,7 +2,7 @@ import { ActivityIndicator, Image, Platform, StyleSheet, View } from 'react-nati
 import { Container, Splash, SplashImage, SpinnerContainer } from './styles';
 
 import { Portal } from 'react-native-paper';
-import logoMovyWhite from '~/../assets/logo_movy_white_text.png';
+import logoMovyDarkBlue from '~/../assets/logo_movy_stacked_dark_blue.png';
 import splash from '~/../assets/splash.png';
 
 interface PreloadProps {
@@ -15,7 +15,7 @@ const BrandDefault = () => {
   return (
     <View style={brand.screen}>
       <Image
-        source={logoMovyWhite}
+        source={logoMovyDarkBlue}
         resizeMode="contain"
         style={brand.logo}
       />
@@ -35,8 +35,8 @@ const brand = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 260,
-    height: 70,
+    width: 220,
+    height: 185,
   },
 });
 

@@ -260,7 +260,7 @@ export default function Login() {
     try {
       const dataId: any = await createId();
       const browser = await WebBrowser.openAuthSessionAsync(
-        `https://login-social.prod.704apps.com.br?id=${dataId.id}&deviceToken=${dataId.deviceToken}`,
+        `https://api.movymob.com/login-social?id=${dataId.id}&deviceToken=${dataId.deviceToken}`,
       );
       if (browser.type === 'dismiss') {
         const dataUser = await getIdApi(dataId.id);
@@ -278,7 +278,7 @@ export default function Login() {
     try {
       const dataId: any = await createId();
       const browser = await WebBrowser.openAuthSessionAsync(
-        `https://login-social.prod.704apps.com.br/google?id=${dataId.id}&deviceToken=${dataId.deviceToken}`,
+        `https://api.movymob.com/login-social/google?id=${dataId.id}&deviceToken=${dataId.deviceToken}`,
       );
       if (browser.type === 'dismiss') {
         const dataUser = await getIdApi(dataId.id);

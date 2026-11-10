@@ -1052,7 +1052,7 @@ class DriverController extends ApiController
         $stmtDocs->execute([':userId' => $driver['userId']]);
         $docs = $stmtDocs->fetchAll(PDO::FETCH_ASSOC);
 
-        $storageUrl = 'https://minio.704app.com.br/rota101fb704/';
+        $storageUrl = rtrim((string)(\app\model\Config::get('link_storage_pictures') ?: 'https://api.movymob.com/'), '/') . '/';
         foreach ($docs as &$docItem) {
             $docItem['id'] = (int)$docItem['id'];
             $docItem['docId'] = (int)$docItem['docId'];

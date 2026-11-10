@@ -27,7 +27,7 @@ class Host
 
     public static function getPathImageDefault(): string
     {
-        $baseUrl = rtrim((string) (getenv('STORAGE_BASE_URL') ?: 'https://minio.704app.com.br'), '/');
+        $baseUrl = rtrim((string) (getenv('STORAGE_BASE_URL') ?: 'https://api.movymob.com'), '/');
         $bucket = getenv('BUCKET_NAME') ?: self::BUCKET;
         return $baseUrl . '/' . $bucket . '/default.jpg';
     }

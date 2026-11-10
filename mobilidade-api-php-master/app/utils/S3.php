@@ -32,7 +32,7 @@ class S3
         $region = env("S3_REGION") ?: getenv("S3_REGION") ?: 'sa-east-1';
         $accessKey = env("S3_ACCESS_KEY") ?: getenv("S3_ACCESS_KEY") ?: 'suporte';
         $accessSecret = env("S3_ACCESS_SECRET") ?: getenv("S3_ACCESS_SECRET") ?: 'projeto704';
-        $endpoint = env("S3_ENDPOINT") ?: getenv("S3_ENDPOINT") ?: 'https://minio.704app.com.br';
+        $endpoint = env("S3_ENDPOINT") ?: getenv("S3_ENDPOINT") ?: 'https://api.movymob.com';
         $usePathStyle = env("S3_USE_PATH_STYLE_ENDPOINT") !== false;
 
         $data = [

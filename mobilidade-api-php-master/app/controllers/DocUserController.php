@@ -199,7 +199,7 @@ class DocUserController extends ApiController
                 ':id' => $id
             ]);
 
-            $storageUrl = 'https://minio.704app.com.br/rota101fb704/';
+            $storageUrl = rtrim((string)(\app\model\Config::get('link_storage_pictures') ?: 'https://api.movymob.com/'), '/') . '/';
             $imageUrl = $storageUrl . 'user/' . $doc['userId'] . '/docs/' . $filename;
 
             echo $this->returnSuccess("Imagem do documento enviada com sucesso", [

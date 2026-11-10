@@ -36,7 +36,7 @@ export const buildApp = () => {
 
     const HOST_IMAGE_TRIP_TYPE = `https://${nameApp}teste.s3.sa-east-1.amazonaws.com/tripType/`;
 
-    const HOST_IMAGE_LOGO = `https://minio.704app.com.br/rota101fb704/default.jpg`;
+    const HOST_IMAGE_LOGO = `https://api.movymob.com/default.jpg`;
 
     const PULSE_CODE = pulseCodeHomolog;
 
@@ -71,38 +71,38 @@ export const buildApp = () => {
     const HOST_API_IFOOD = 'https://api-ifood.704app.com.br/ifood/';
     const HOST_API_CENTRAL = `https://movycentral.com/`;
 
-    let HOST_AUDIO_MESSAGE = `https://minio.704app.com.br/rota101fb704/chat/trip/`;
-    let HOST_IMAGE_DRIVER = `https://minio.704app.com.br/rota101fb704/driver/profile/compressed/`;
-    let HOST_IMAGE_CUSTOMER = `https://minio.704app.com.br/rota101fb704/customer/profile/compressed/`;
+    let HOST_AUDIO_MESSAGE = `https://api.movymob.com/chat/trip/`;
+    let HOST_IMAGE_DRIVER = `https://api.movymob.com/driver/profile/compressed/`;
+    let HOST_IMAGE_CUSTOMER = `https://api.movymob.com/customer/profile/compressed/`;
 
-    let PATH_IMAGE_TEMP = `https://minio.704app.com.br/rota101fb704/driver/profile/temp/`;
+    let PATH_IMAGE_TEMP = `https://api.movymob.com/driver/profile/temp/`;
 
     let HOST_IMAGE_TRIP_TYPE = `https://nodes-${nameBucket}-dev.s3.amazonaws.com/tripType/`;
 
-    let HOST_IMAGE_LOGO = `https://minio.704app.com.br/rota101fb704/default.jpg`;
+    let HOST_IMAGE_LOGO = `https://api.movymob.com/default.jpg`;
 
     const PULSE_CODE = pulseCodeHomolog;
 
     if (isMigrated) {
-      HOST_AUDIO_MESSAGE = `https://minio.704app.com.br/rota101fb704/chat/trip/`;
-      HOST_IMAGE_DRIVER = `https://minio.704app.com.br/rota101fb704/driver/profile/compressed/`;
-      HOST_IMAGE_CUSTOMER = `https://minio.704app.com.br/rota101fb704/customer/profile/compressed/`;
+      HOST_AUDIO_MESSAGE = `https://api.movymob.com/chat/trip/`;
+      HOST_IMAGE_DRIVER = `https://api.movymob.com/driver/profile/compressed/`;
+      HOST_IMAGE_CUSTOMER = `https://api.movymob.com/customer/profile/compressed/`;
 
-      PATH_IMAGE_TEMP = `https://minio.704app.com.br/rota101fb704/driver/profile/temp/`;
+      PATH_IMAGE_TEMP = `https://api.movymob.com/driver/profile/temp/`;
 
       HOST_IMAGE_TRIP_TYPE = `https://${nameBucket}.s3.sa-east-1.amazonaws.com/tripType/`;
 
-      HOST_IMAGE_LOGO = `https://minio.704app.com.br/rota101fb704/default.jpg`;
+      HOST_IMAGE_LOGO = `https://api.movymob.com/default.jpg`;
     } else {
-      HOST_AUDIO_MESSAGE = `https://minio.704app.com.br/rota101fb704/chat/trip/`;
-      HOST_IMAGE_DRIVER = `https://minio.704app.com.br/rota101fb704/driver/profile/compressed/`;
-      HOST_IMAGE_CUSTOMER = `https://minio.704app.com.br/rota101fb704/customer/profile/compressed/`;
+      HOST_AUDIO_MESSAGE = `https://api.movymob.com/chat/trip/`;
+      HOST_IMAGE_DRIVER = `https://api.movymob.com/driver/profile/compressed/`;
+      HOST_IMAGE_CUSTOMER = `https://api.movymob.com/customer/profile/compressed/`;
 
-      PATH_IMAGE_TEMP = `https://minio.704app.com.br/rota101fb704/driver/profile/temp/`;
+      PATH_IMAGE_TEMP = `https://api.movymob.com/driver/profile/temp/`;
 
       HOST_IMAGE_TRIP_TYPE = `https://nodes-${nameBucket}-dev.s3.amazonaws.com/tripType/`;
 
-      HOST_IMAGE_LOGO = `https://minio.704app.com.br/rota101fb704/default.jpg`;
+      HOST_IMAGE_LOGO = `https://api.movymob.com/default.jpg`;
     }
 
     return {
@@ -134,15 +134,15 @@ export const buildApp = () => {
   const HOST_SITE = `https://movymob.com/`;
   const HOST_API_CENTRAL = `https://movycentral.com/`;
 
-  const HOST_AUDIO_MESSAGE = `https://minio.704app.com.br/rota101fb704/chat/trip/`;
-  const HOST_IMAGE_DRIVER = `https://minio.704app.com.br/rota101fb704/driver/profile/compressed/`;
-  const HOST_IMAGE_CUSTOMER = `https://minio.704app.com.br/rota101fb704/customer/profile/compressed/`;
+  const HOST_AUDIO_MESSAGE = `https://api.movymob.com/chat/trip/`;
+  const HOST_IMAGE_DRIVER = `https://api.movymob.com/driver/profile/compressed/`;
+  const HOST_IMAGE_CUSTOMER = `https://api.movymob.com/customer/profile/compressed/`;
 
-  const PATH_IMAGE_TEMP = `https://minio.704app.com.br/rota101fb704/driver/profile/temp/`;
+  const PATH_IMAGE_TEMP = `https://api.movymob.com/driver/profile/temp/`;
 
   const HOST_IMAGE_TRIP_TYPE = `https://${nameBucket}.s3.sa-east-1.amazonaws.com/tripType/`;
 
-  const HOST_IMAGE_LOGO = `https://minio.704app.com.br/rota101fb704/default.jpg`;
+  const HOST_IMAGE_LOGO = `https://api.movymob.com/default.jpg`;
 
   const PULSE_CODE = pulseCode704;
 

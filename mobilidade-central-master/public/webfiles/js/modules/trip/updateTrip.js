@@ -175,7 +175,7 @@ function initRace(trip) {
             pushCandidate(rawPhoto);
             if (rawPhoto.includes('/driver/profile/')) {
                 const sub = rawPhoto.slice(rawPhoto.indexOf('/driver/profile/'));
-                pushCandidate(`https://minio.704app.com.br/rota101fb704${sub}`);
+                pushCandidate(`https://api.movymob.com${sub}`);
             }
         } else {
             const cleanPath = rawPhoto.replace(/^\/+/, '');
@@ -187,9 +187,9 @@ function initRace(trip) {
                 subPath = subPath.replace(/^compressed\//, '');
             }
 
-            // 1. MinIO rota101fb704 (storage oficial em produção)
-            pushCandidate(`https://minio.704app.com.br/rota101fb704/driver/profile/compressed/${subPath}`);
-            pushCandidate(`https://minio.704app.com.br/rota101fb704/driver/profile/${subPath}`);
+            // 1. Storage oficial Movy
+            pushCandidate(`https://api.movymob.com/driver/profile/compressed/${subPath}`);
+            pushCandidate(`https://api.movymob.com/driver/profile/${subPath}`);
 
             // 2. hostImageDriver configurado no ambiente da central
             if (typeof environment !== 'undefined' && environment.hosts && environment.hosts.hostImageDriver) {

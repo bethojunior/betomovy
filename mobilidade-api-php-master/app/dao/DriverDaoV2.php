@@ -963,50 +963,76 @@ class DriverDaoV2 extends BaseDao
                 return $trip;
             }
 
-            $tripDao->cancelByDriver($tripReference, $cancellationReasonsId);
+            // FLUXO UBER: Quando motorista cancela, a corrida NÃO é destruída.
+            // O motorista é liberado (disponível), registrado na recusa, e a corrida volta para 'searching'
+            // buscando o próximo motorista automaticamente em tempo real para Cliente e Central.
+            try {
+                $this->driverCalledService->updateStatusDriver($tripReference, $driverId, DriverCalledConst::REFUSED);
+            } catch (\Throwable $eDc) {}
 
-            $customerCancelFee = $generateCancellationFee ? $this->tripCancellationCustomerFeeService
-                ->insert(new Trip($trip), new Driver($trip->driver), new Location($trip->origin)) : null;
+            if ((bool)Config::get('block_customer_driver')) {
+                try {
+                    $this->insertCustomerRefused($driverId, $tripReference, $trip->userId);
+                } catch (\Throwable $eCr) {}
+            }
 
-            $wasScheduled = ($trip->status == Trip::SCHEDULED);
-
-            $trip->status = Trip::CANCELED;
-            $trip->canceledBy = Trip::CANCELED_BY_DRIVER;
-
+            // 1. Libera o motorista que cancelou imediatamente para ficar disponível
             $this->putAvailable($driverId);
 
-            $this->penaltyService->insertByCancellation(Headers::getUserId(), $tripReference, $customerCancelFee);
-
-            if ((bool)Config::get('block_customer_driver'))
-                $this->insertCustomerRefused($driverId, $tripReference, $trip->userId);
-
-            $this->manageTripPaymentOnCancel(new Trip($trip), $customerCancelFee);
-
-            $customerUser = (new UserDao)
-                ->find($trip->userId, ['deviceToken']);
-
-            $this->notifyCustomerOnCancelTrip($customerUser->deviceToken, $driverId, $cancellationReasonsId, $wasScheduled);
-
-            $logData = (object)[
-                'tripReference' => $trip->tripReference,
-                'userId' => Headers::getUserId(),
-                'data' => $trip
-            ];
-
-            $this->createLogDriver(
-                $logData,
-                $trip->tripReference,
-                Headers::getUserId(),
-                "VIAGEM CANCELADA PELO MOTORISTA",
-                LogCriticalType::AVISO
+            // 2. Retorna a corrida para o estado 'searching' no MySQL
+            \app\dao\GenericDao::execute(
+                "UPDATE trip SET status = 'searching', driverId = NULL, dateAccept = NULL, callingDriver = NULL, canceledBy = NULL WHERE tripReference = :ref",
+                [':ref' => $tripReference]
             );
 
-            (new IntegrationPartnersServiceDao())->sendTripDataToPartners($trip);
+            // 3. Atualiza Redis e publica eventos em tempo real para Cliente, Central e Monitor
+            $redis = new RedisUtil();
+            $redisPayload = json_encode([
+                'type' => 'modified',
+                'data' => [
+                    'event' => 'trip-searching',
+                    'tripReference' => $tripReference,
+                    'status' => 'searching',
+                    'driverId' => null,
+                    'message' => 'O motorista cancelou. Buscando outro motorista próximo...'
+                ]
+            ]);
+            try {
+                $redis->publish('trip-events', $redisPayload);
+                $redis->publish("trip-updated-{$tripReference}", $redisPayload);
+                $redis->publish("trip-searching-{$tripReference}", $redisPayload);
+            } catch (\Throwable $ePub) {}
 
-            $this->deleteRealtime($trip->tripReference);
-            (new RedisUtil)->delete("trip-{$trip->tripReference}");
+            $customerUser = (new UserDao())->find($trip->userId, ['deviceToken']);
 
             $this->commit();
+
+            // 4. Notifica o passageiro via Push com a informação de redistribuição da corrida
+            if ($customerUser && !empty($customerUser->deviceToken)) {
+                try {
+                    $push = new \app\utils\Push();
+                    $push
+                        ->setTitle(strtoupper(\app\utils\Config::get('app_title') ?? 'MOVY'))
+                        ->setBody("Seu motorista cancelou. Estamos procurando outro motorista para você!")
+                        ->setAction(\app\constant\PushActionConst::OPEN_APP)
+                        ->setTag(\app\constant\PushTagConst::TRIP_SEARCHING)
+                        ->setAdditionalData(json_encode([
+                            'tripReference' => $tripReference,
+                            'status' => 'searching',
+                            'tag' => \app\constant\PushTagConst::TRIP_SEARCHING,
+                            'action' => 'tripSearching',
+                        ]))
+                        ->setForceStart(\app\constant\PushConst::FORCE_START)
+                        ->setPriority(\app\constant\PushConst::HIGH_PRIORITY);
+                    $push->sendNotificationWithData($customerUser->deviceToken);
+                } catch (\Throwable $ePush) {}
+            }
+
+            $trip->status = Trip::SEARCHING;
+            $trip->driverId = null;
+            $trip->driver = null;
+
+            return $trip;
 
             return $trip;
         } catch (Exception $e) {

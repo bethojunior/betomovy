@@ -7,7 +7,7 @@ import { useTheme } from 'styled-components/native';
 import userImage from '../../client/assets/images/user.png';
 import { AvatarImage, Container, LoadingOverlay, MenuIconBadge } from './styles';
 
-const STORAGE_BASE = 'https://minio.704app.com.br/rota101fb704/';
+const STORAGE_BASE = 'https://api.movymob.com/';
 
 function photoCandidates(rawUri?: string | null): string[] {
   if (!rawUri || typeof rawUri !== 'string') return [];

@@ -13,7 +13,7 @@ class PulseService
 
     public function __construct($app, $groupId, $requestHeaderToken = null)
     {
-        $this->endpoint = 'https://api-pulse.704app.com.br/logs';
+        $this->endpoint = env('API_PULSE_URL') ?: 'https://api.movymob.com/logs';
         $this->app = $app;
         $this->groupId = $groupId;
         $this->requestHeaderToken = $requestHeaderToken;

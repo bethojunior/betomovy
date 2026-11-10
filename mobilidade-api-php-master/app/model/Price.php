@@ -657,7 +657,7 @@ class Price extends BaseModel
             } catch (\Throwable $t) {}
 
             if (empty($storage)) {
-                $storage = 'https://minio.704app.com.br/rota101fb704/';
+                $storage = 'https://api.movymob.com/';
             }
             return rtrim($storage, '/') . '/tripType/' . ltrim($this->picture, '/');
         }

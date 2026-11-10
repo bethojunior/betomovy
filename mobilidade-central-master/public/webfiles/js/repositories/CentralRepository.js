@@ -306,7 +306,7 @@ class CentralRepository {
   }
 
   static async fetchUberPrices(props) {
-    const response = await fetch('https://au-central.704app.com.br/api/precos-uber', {
+    const response = await fetch('https://api.movymob.com/api/precos-uber', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

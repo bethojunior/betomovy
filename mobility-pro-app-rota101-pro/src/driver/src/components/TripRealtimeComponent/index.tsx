@@ -123,6 +123,7 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
     tripPreAcceptedRef.current = tripPreAccepted;
   }, [tripPreAccepted]);
 
+  const handledCancellationsRef = useRef<Set<string>>(new Set());
   let tripUpdateEvent: string | null = null;
 
   const verify = async (tripReference: string, forceClear = false) => {
@@ -141,6 +142,18 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
       status === 'finished';
 
     if (terminal || forceClear) {
+      // 1. Interrompe som de chamada/whistle imediatamente
+      try {
+        await stopSongActive();
+      } catch {}
+
+      // 2. Previne loop de alertas repetidos
+      const cancelKey = `cancel:${tripReference}:${status || 'term'}`;
+      const alreadyHandled = handledCancellationsRef.current.has(cancelKey);
+      if (!alreadyHandled) {
+        handledCancellationsRef.current.add(cancelKey);
+      }
+
       if (
         (response?.status === STATUS_CANCELED ||
           response?.status === STATUS_BACK_OFF ||
@@ -161,33 +174,33 @@ export const TripRealtimeComponent: React.FC<TripRealtimeProps> = ({
           : undefined;
       emitDriverLocation(userDriverFind, currentLocation, cityConfig);
 
-      try {
-        playSong('cancel');
-      } catch {}
-
-      getDriverFind();
-
-      const isTripFinished = response?.status === STATUS_FINISHED || status === 'finished';
-
-      const toastType = isTripFinished ? 'success' : 'warning';
-
-      let message = 'A viagem foi cancelada pela central ou pelo cliente.';
-      try {
-        if (isTripFinished) {
-          message = translate('finishTrip.title_success_finish');
-        } else if (response?.canceledBy === 'customer') {
-          message = await getCancelMessage(response);
-        } else if (response?.canceledBy) {
-          message = translate('finishTrip.text_trip_cancelled_by_false');
-        }
-      } catch {}
-
-      customToast(message, toastType);
-
       setIniTripModal(false);
       setSwalVisible(false);
-
       await clearDataTrip();
+      getDriverFind();
+
+      // Dispara som e toast de cancelamento uma única vez (sem repetição)
+      if (!alreadyHandled) {
+        try {
+          playSong('cancel');
+        } catch {}
+
+        const isTripFinished = response?.status === STATUS_FINISHED || status === 'finished';
+        const toastType = isTripFinished ? 'success' : 'warning';
+
+        let message = 'A viagem foi cancelada pela central ou pelo cliente.';
+        try {
+          if (isTripFinished) {
+            message = translate('finishTrip.title_success_finish');
+          } else if (response?.canceledBy === 'customer') {
+            message = await getCancelMessage(response);
+          } else if (response?.canceledBy) {
+            message = translate('finishTrip.text_trip_cancelled_by_false');
+          }
+        } catch {}
+
+        customToast(message, toastType);
+      }
     }
   };
 

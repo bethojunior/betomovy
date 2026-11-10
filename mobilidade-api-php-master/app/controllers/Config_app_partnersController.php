@@ -352,7 +352,7 @@ class Config_app_partnersController extends ApiController
         if (strpos($url, 'http://') === 0 || strpos($url, 'https://') === 0) {
             return $url;
         }
-        $minio = 'https://minio.704app.com.br/rota101fb704/';
+        $minio = rtrim((string)(\app\model\Config::get('link_storage_pictures') ?: 'https://api.movymob.com/'), '/') . '/';
         return $minio . ltrim($url, '/');
     }
 }

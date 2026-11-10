@@ -156,7 +156,7 @@ const NotificationTable: React.FC<NotificationTableProps> = ({
     if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
       return imagePath;
     }
-    const s3 = (import.meta.env.S3_LINK as string | undefined)?.replace(/\/$/, "") || "https://minio.704app.com.br/rota101fb704";
+    const s3 = (import.meta.env.S3_LINK as string | undefined)?.replace(/\/$/, "") || "https://api.movymob.com";
     return `${s3}/${imagePath.replace(/^\//, "")}`;
   };
 

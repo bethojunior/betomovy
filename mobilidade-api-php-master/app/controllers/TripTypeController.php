@@ -114,7 +114,7 @@ class TripTypeController extends ApiController
                 }
             } catch (\Throwable $t) {}
 
-            $storage = 'https://minio.704app.com.br/rota101fb704/';
+            $storage = 'https://api.movymob.com/';
             try {
                 $storageVal = \app\model\Config::get('link_storage_pictures');
                 if (!empty($storageVal)) {

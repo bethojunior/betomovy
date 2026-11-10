@@ -7,7 +7,7 @@ function getEnvironment() {
             hostRequestApi: "<APIAPP_HOST>",
             hostSocketApi: "<API_SOCKET_HOST>",
             hostRequest: "<API_HOST>",
-            hostNodeWhats : "https://api-notifier.704app.com.br/",
+            hostNodeWhats : "https://api.movymob.com/",
             hostImageDriver: "https://s3<S3_BUCKET_REGION>.amazonaws.com/<BUCKET_NAME>/driver/profile/compressed/",
             hostImageClient: "https://s3<S3_BUCKET_REGION>.amazonaws.com/<BUCKET_NAME>/customer/profile/compressed/",
             hostImageDefault: "https://s3<S3_BUCKET_REGION>.amazonaws.com/<BUCKET_NAME>/default.jpg",

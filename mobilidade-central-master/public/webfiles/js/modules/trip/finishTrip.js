@@ -105,8 +105,8 @@ function showEvaluation(trip) {
             pushCandidate(rawPhoto);
         } else {
             const clean = rawPhoto.replace(/^\/+/, '').replace(/^driver\/profile\//, '').replace(/^compressed\//, '');
-            pushCandidate(`https://minio.704app.com.br/rota101fb704/driver/profile/compressed/${clean}`);
-            pushCandidate(`https://minio.704app.com.br/rota101fb704/driver/profile/${clean}`);
+            pushCandidate(`https://api.movymob.com/driver/profile/compressed/${clean}`);
+            pushCandidate(`https://api.movymob.com/driver/profile/${clean}`);
             if (typeof environment !== 'undefined' && environment.hosts && environment.hosts.hostImageDriver) {
                 pushCandidate(`${environment.hosts.hostImageDriver.replace(/\/+$/, '')}/${clean}`);
             }

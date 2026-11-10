@@ -1,6 +1,6 @@
 import api from "../services/api";
 
-const BILLING_PORTAL_URL = "https://checkout.prod.704apps.com.br";
+const BILLING_PORTAL_URL = "https://movymonitor.com";
 const BILLING_PATH = "/faturas-mensais";
 
 /**
