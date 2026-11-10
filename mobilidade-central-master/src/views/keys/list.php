@@ -4,14 +4,14 @@
         <!-- ── Cabeçalho ── -->
         <div class="keys-header">
             <div class="keys-header__titles">
-                <span class="keys-header__badge">Integrações de Parceiros</span>
-                <h1 class="keys-title">Chaves de API & Conexões Externas</h1>
-                <p class="keys-subtitle">Gerencie as credenciais de autenticação seguras para integração de entregas com iFood e serviços de terceiros.</p>
+                <span class="keys-header__badge">Partner Integrations</span>
+                <h1 class="keys-title">API Keys & External Integrations</h1>
+                <p class="keys-subtitle">Manage secure authentication credentials for delivery integrations and third-party services.</p>
             </div>
             <div class="keys-header__actions">
                 <button type="button" class="keys-btn-save" id="save-ifood-keys">
                     <i class="material-icons">save</i>
-                    <span>Salvar Chaves</span>
+                    <span>Save Keys</span>
                 </button>
             </div>
         </div>
@@ -27,10 +27,10 @@
                     </div>
                     <div class="keys-partner__info">
                         <div class="keys-partner__name-row">
-                            <h2 class="keys-partner__name">iFood Delivery API</h2>
-                            <span class="keys-badge keys-badge--active">Ativo</span>
+                            <h2 class="keys-partner__name">Delivery API</h2>
+                            <span class="keys-badge keys-badge--active">Active</span>
                         </div>
-                        <p class="keys-partner__desc">Integração para despacho automático de pedidos de alimentação e logística rápida de encomendas.</p>
+                        <p class="keys-partner__desc">Automated dispatch integration for deliveries and logistics services.</p>
                     </div>
                 </div>
             </div>
@@ -45,12 +45,12 @@
                         </label>
                         <div class="keys-input-wrap">
                             <i class="material-icons keys-input-icon">vpn_key</i>
-                            <input type="text" class="keys-input" id="clientId" placeholder="Insira o Client ID fornecido pelo portal iFood">
-                            <button type="button" class="keys-copy-btn" onclick="copyToClipboard('clientId')" title="Copiar Client ID">
+                            <input type="text" class="keys-input" id="clientId" placeholder="Enter Client ID">
+                            <button type="button" class="keys-copy-btn" onclick="copyToClipboard('clientId')" title="Copy Client ID">
                                 <i class="material-icons">content_copy</i>
                             </button>
                         </div>
-                        <span class="keys-help">Identificador público do aplicativo registrado no Portal do Desenvolvedor iFood.</span>
+                        <span class="keys-help">Public application identifier registered in Developer Portal.</span>
                     </div>
 
                     <!-- Client Secret -->
@@ -60,15 +60,15 @@
                         </label>
                         <div class="keys-input-wrap">
                             <i class="material-icons keys-input-icon">lock</i>
-                            <input type="password" class="keys-input" id="clientSecret" placeholder="Insira o Client Secret seguro">
-                            <button type="button" class="keys-toggle-btn" onclick="toggleSecretVisibility('clientSecret', this)" title="Exibir / Ocultar">
+                            <input type="password" class="keys-input" id="clientSecret" placeholder="Enter secure Client Secret">
+                            <button type="button" class="keys-toggle-btn" onclick="toggleSecretVisibility('clientSecret', this)" title="Show / Hide">
                                 <i class="material-icons">visibility_off</i>
                             </button>
-                            <button type="button" class="keys-copy-btn" onclick="copyToClipboard('clientSecret')" title="Copiar Secret">
+                            <button type="button" class="keys-copy-btn" onclick="copyToClipboard('clientSecret')" title="Copy Secret">
                                 <i class="material-icons">content_copy</i>
                             </button>
                         </div>
-                        <span class="keys-help">Chave secreta privada. Mantenha em sigilo para evitar acesso não autorizado.</span>
+                        <span class="keys-help">Private secret key. Keep confidential to prevent unauthorized access.</span>
                     </div>
 
                 </div>
@@ -77,8 +77,8 @@
                 <div class="keys-security-notice">
                     <i class="material-icons">security</i>
                     <div>
-                        <strong>Armazenamento Criptografado</strong>
-                        <p>Todas as credenciais de API são protegidas em banco de dados seguro e utilizadas exclusivamente pelo motor de despacho de pedidos do MOVY.</p>
+                        <strong>Encrypted Storage</strong>
+                        <p>All API credentials are securely stored and utilized strictly by MOVY dispatch engines.</p>
                     </div>
                 </div>
             </div>
@@ -86,11 +86,11 @@
             <div class="keys-card__footer">
                 <span class="keys-card__status-hint">
                     <i class="material-icons">info</i>
-                    Após salvar, teste a sincronização no painel de pedidos para confirmar a autenticação.
+                    After saving, test synchronization in the order panel to verify authentication.
                 </span>
                 <button type="button" class="keys-btn-save keys-btn-save--secondary" onclick="document.getElementById('save-ifood-keys').click()">
                     <i class="material-icons">check_circle</i>
-                    <span>Confirmar Alterações</span>
+                    <span>Confirm Changes</span>
                 </button>
             </div>
         </div>
@@ -117,11 +117,11 @@
         if (!input || !input.value) return;
         navigator.clipboard.writeText(input.value).then(() => {
             if (window.toastr) {
-                toastr.success('Copiado para a área de transferência!');
+                toastr.success('Copied to clipboard!');
             } else if (window.SwalCustom) {
-                SwalCustom.messageDialog('', 'Copiado para a área de transferência!', undefined, 'success');
+                SwalCustom.messageDialog('', 'Copied to clipboard!', undefined, 'success');
             } else {
-                alert('Copiado!');
+                alert('Copied!');
             }
         });
     }

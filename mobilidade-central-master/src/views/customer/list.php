@@ -2,29 +2,29 @@
     <div class="cust-page">
 
         <div class="cust-header">
-            <h1 class="cust-title">Clientes</h1>
+            <h1 class="cust-title">Customers</h1>
             <button type="button" class="cust-btn-add" id="openAddCustomer">
-                <i class="material-icons">add</i> Novo cliente
+                <i class="material-icons">add</i> New Customer
             </button>
         </div>
 
         <div class="cust-toolbar">
             <div class="cust-search">
                 <i class="material-icons cust-search__icon">search</i>
-                <input type="text" id="filterCustomer" class="cust-search__input" placeholder="Buscar cliente...">
+                <input type="text" id="filterCustomer" class="cust-search__input" placeholder="Search customer...">
             </div>
             <div class="cust-filter-group">
                 <label class="cust-filter-pill">
                     <input type="radio" class="radio-type-filter" name="typeFilter" value="name" checked>
-                    <span>Nome</span>
+                    <span>Name</span>
                 </label>
                 <label class="cust-filter-pill">
                     <input type="radio" class="radio-type-filter" name="typeFilter" value="phone">
-                    <span>Telefone</span>
+                    <span>Phone</span>
                 </label>
                 <label class="cust-filter-pill">
                     <input type="radio" class="radio-type-filter" name="typeFilter" value="document">
-                    <span>CPF / CNPJ</span>
+                    <span>Tax ID / Document</span>
                 </label>
             </div>
         </div>
@@ -33,12 +33,12 @@
             <table class="cust-table">
                 <thead>
                     <tr>
-                        <th>Nome</th>
-                        <th>CPF / CNPJ</th>
-                        <th>Telefone</th>
-                        <th>Nascimento / Cadastro</th>
+                        <th>Name</th>
+                        <th>Tax ID / Doc</th>
+                        <th>Phone</th>
+                        <th>Birthday / Registered</th>
                         <th>Status</th>
-                        <th></th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="resultTable"></tbody>

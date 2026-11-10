@@ -98,22 +98,22 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
 </nav>
 
 <!-- Mobile Touch Bottom Navigation Bar (PWA Experience) -->
-<nav class="movy-mobile-nav" aria-label="Navegação móvel">
+<nav class="movy-mobile-nav" aria-label="Mobile Navigation">
     <button type="button" class="movy-mobile-nav-item active" id="mNavDispatch" onclick="window.MovyNav && window.MovyNav.showDispatch()">
         <i class="material-icons">send</i>
-        <span>Despacho</span>
+        <span>Dispatch</span>
     </button>
     <button type="button" class="movy-mobile-nav-item" id="mNavTrips" onclick="window.MovyNav && window.MovyNav.showTrips()">
         <i class="material-icons">directions_car</i>
-        <span>Viagens</span>
+        <span>Trips</span>
     </button>
     <button type="button" class="movy-mobile-nav-item" id="mNavDrivers" onclick="window.MovyNav && window.MovyNav.showDrivers()">
         <i class="material-icons">people</i>
-        <span>Motoristas</span>
+        <span>Drivers</span>
     </button>
     <button type="button" class="movy-mobile-nav-item" id="mNavMenu" onclick="window.MovyNav && window.MovyNav.toggleMenu()">
         <i class="material-icons">menu</i>
-        <span>Mais</span>
+        <span>More</span>
     </button>
 </nav>
 
@@ -173,7 +173,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>">
                         <i class="material-icons nav-icon">home</i>
-                        Início
+                        Home
                     </a>
                 </div>
             </li>
@@ -181,7 +181,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>trip/list">
                         <i class="material-icons nav-icon">directions_car</i>
-                        Viagens
+                        Trips
                     </a>
                 </div>
             </li>
@@ -189,7 +189,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>district/list">
                         <i class="material-icons nav-icon">location_on</i>
-                        Bairros
+                        Districts
                     </a>
                 </div>
             </li>
@@ -197,7 +197,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>neighborhoodRides/list">
                         <i class="material-icons nav-icon">swap_horiz</i>
-                        Bairro para bairro
+                        District to District
                     </a>
                 </div>
             </li>
@@ -205,20 +205,20 @@ window.MovyNav = {
                 <div>
                     <a>
                         <i class="material-icons nav-icon">people</i>
-                        Clientes
+                        Customers
                     </a>
                     <p class="menu-accordion-btn"><span class="material-icons">expand_more</span></p>
                 </div>
                 <ul>
-                    <li id="registerClient"><a>Cadastro</a></li>
-                    <li><a href="<?php echo Host::getLocal() ?>customer/list">Listagem</a></li>
+                    <li id="registerClient"><a>Register</a></li>
+                    <li><a href="<?php echo Host::getLocal() ?>customer/list">All Customers</a></li>
                 </ul>
             </li>
             <li>
                 <div>
                     <a href="<?php echo Host::getLocal() ?>voucher/list">
                         <i class="material-icons nav-icon">card_giftcard</i>
-                        Voucher
+                        Vouchers
                     </a>
                 </div>
             </li>
@@ -226,7 +226,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>driver/list">
                         <i class="material-icons nav-icon">person</i>
-                        Motoristas
+                        Drivers
                     </a>
                 </div>
             </li>
@@ -234,7 +234,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>rate/add">
                         <i class="material-icons nav-icon">attach_money</i>
-                        Tarifas
+                        Fares & Rates
                     </a>
                 </div>
             </li>
@@ -242,7 +242,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>radius">
                         <i class="material-icons nav-icon">track_changes</i>
-                        Raio de Atendimento
+                        Service Radius
                     </a>
                 </div>
             </li>
@@ -250,7 +250,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>keys/list">
                         <i class="material-icons nav-icon">vpn_key</i>
-                        Chaves de Integração
+                        API Keys
                     </a>
                 </div>
             </li>
@@ -258,7 +258,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>dynamicfields/list">
                         <i class="material-icons nav-icon">settings</i>
-                        Campos dinâmicos
+                        Dynamic Fields
                     </a>
                 </div>
             </li>
@@ -266,7 +266,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>language/management">
                         <i class="material-icons nav-icon">language</i>
-                        Idiomas da Plataforma
+                        Platform Languages
                     </a>
                 </div>
             </li>
@@ -274,7 +274,7 @@ window.MovyNav = {
                 <div>
                     <a onclick="modal()">
                         <i class="material-icons nav-icon">cached</i>
-                        Limpar cache
+                        Clear Cache
                     </a>
                 </div>
             </li>
@@ -290,10 +290,10 @@ window.MovyNav = {
                 </div>
                 <ul>
                     <li>
-                        <a href="<?php echo Host::getLocal() ?>whatsapp/management">Configurações</a>
+                        <a href="<?php echo Host::getLocal() ?>whatsapp/management">Settings</a>
                     </li>
                     <li>
-                        <a href="<?php echo Host::getLocal() ?>whatsapp/groups">Grupos</a>
+                        <a href="<?php echo Host::getLocal() ?>whatsapp/groups">Groups</a>
                     </li>
                 </ul>
             </li>
@@ -302,7 +302,7 @@ window.MovyNav = {
                 <div>
                     <a href="<?php echo Host::getLocal() ?>logout">
                         <i class="material-icons nav-icon">exit_to_app</i>
-                        Sair
+                        Sign Out
                     </a>
                 </div>
             </li>
