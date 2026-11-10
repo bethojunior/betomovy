@@ -63,9 +63,9 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
             <span>LIVE DISPATCH</span>
         </div>
 
-        <button type="button" class="btn-install-pwa" id="btnInstallPWA" title="Instalar aplicativo MOVY Central">
+        <button type="button" class="btn-install-pwa" id="btnInstallPWA" title="Install MOVY Central App">
             <i class="material-icons" style="font-size: 16px;">get_app</i>
-            <span>Instalar App</span>
+            <span>Install App</span>
         </button>
 
         <select class="app-header__select" id="selectCentralChange">
