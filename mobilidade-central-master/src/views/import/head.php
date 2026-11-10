@@ -18,20 +18,19 @@
           crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/variables.css?v=<?php echo Host::getVersion('css/variables.css'); ?>">
     <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/default.css?v=<?php echo Host::getVersion('css/default.css'); ?>">
-    <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/movy-central-v3.css?v=<?php echo Host::getVersion('css/movy-central-v3.css'); ?>">
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/6.3.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.10.1/firebase-firestore.js"></script>
 
-    <!-- Moment.js (adiciona aqui) -->
+    <!-- Moment.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/locale/pt-br.js"></script>
     <script>moment.locale('pt-br');</script>
 
     <!-- Mapbox GL JS -->
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
-    <!-- Mapbox GL Draw (páginas com desenho de polígono) -->
+    <!-- Mapbox GL Draw -->
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css">
 
     <?php
@@ -41,4 +40,7 @@
         echo "<link rel='stylesheet' href='{$host}webfiles/css/{$file}.css?v={$version}'/>";
     }
     ?>
+
+    <!-- MOVY Central Master Design System v3 (Carregado por último para sobrepor com autoridade máxima) -->
+    <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/movy-central-v3.css?v=<?php echo Host::getVersion('css/movy-central-v3.css'); ?>">
 </head>
