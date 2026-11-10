@@ -15,25 +15,34 @@ export const CardCart = ({
   selectedCard,
   setVisibleSecondModal,
 }: Props) => {
-  const isSelected = selectedCard === card.idCard;
+  const isSelected = String(selectedCard) === String(card?.idCard);
 
   const storageCard = () => {
-    AsyncStorage.setItem('cardSelected', JSON.stringify(card));
+    try {
+      AsyncStorage.setItem('cardSelected', JSON.stringify(card));
+    } catch (_) {}
   };
+
+  const cardNumber = String(card?.number || card?.lastFourDigits || card?.mpLastFourDigits || '');
+  const lastFour = cardNumber.length >= 4 ? cardNumber.slice(-4) : (cardNumber || '****');
 
   return (
     <CardContent
+      activeOpacity={0.7}
       onPress={() => {
-        setCardSelected(card.idCard);
-        storageCard();
+        if (card?.idCard) {
+          setCardSelected(String(card.idCard));
+          storageCard();
+        }
         setVisibleSecondModal(false);
       }}
       selected={isSelected}
     >
-      <CardPaymentForm>
+      <CardPaymentForm pointerEvents="none">
         <Icon source={Card1} />
-        <TextPaymentType selected={isSelected}>****{card.number.substr(-4)}</TextPaymentType>
+        <TextPaymentType selected={isSelected}>****{lastFour}</TextPaymentType>
       </CardPaymentForm>
     </CardContent>
   );
 };
+

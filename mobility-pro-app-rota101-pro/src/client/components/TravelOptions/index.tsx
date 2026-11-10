@@ -95,7 +95,7 @@ export default function TravelOptions({
   const [visible, setVisible] = useState(false);
   const [modalInfo, setModalInfo] = useState(false);
   const [modalCoupon, setModalCoupon] = useState(false);
-  const [selectedCard, setSelectedCard] = useState<any>({});
+  const [selectedCard, setSelectedCard] = useState<string>('');
   const [hasInDriver, setHasInDriver] = useState({});
   const [modalSchedule, setModalSchedule] = useState(false);
   const [modalCard, setModalCard] = useState(false);
@@ -193,13 +193,20 @@ export default function TravelOptions({
     try {
       const response = await getCards();
       if (response && response.length > 0) {
+        const firstId = String(response[0].idCard);
         AsyncStorage.setItem("cardSelected", JSON.stringify(response[0]));
-        setSelectedCard(response[0].idCard);
+        setSelectedCard((prev: any) => (!prev || typeof prev === 'object' || prev === '' ? firstId : String(prev)));
       }
     } catch (e) {
       console.log('Error listing cards in TravelOptions', e);
     }
   };
+
+  useEffect(() => {
+    if (modalCard) {
+      listCards();
+    }
+  }, [modalCard]);
 
   const listFavorites = async () => {
     await getFavorites();
@@ -636,6 +643,7 @@ export default function TravelOptions({
         isSpeedmob={init !== 'Speedmob'}
         visible={visible}
         setVisible={setVisible}
+        onSelectCard={() => setModalCard(true)}
       />
       <BackButton onPress={handleBack}>
         <Ionicons name="close" size={24} color={theme.colors.primaryText} />
@@ -815,13 +823,18 @@ export default function TravelOptions({
         onPressConfirm={() => setModalCard(false)}
         onClose={() => setModalCard(false)}
         hideConfirm
+        closeIcon={true}
         title={translate('appRoutes.title_card_list')}
       >
         <ScrollView
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled={true}
+          showsVerticalScrollIndicator={false}
           style={{
-            maxHeight: 300,
+            maxHeight: 320,
             marginTop: 10,
             marginBottom: 10,
+            width: '100%',
           }}
         >
           {cards.length > 0 ? (

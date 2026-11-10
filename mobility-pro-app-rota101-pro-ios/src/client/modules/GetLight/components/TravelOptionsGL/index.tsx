@@ -295,7 +295,12 @@ export default function TravelOptionsGL({ hide }) {
             </ButtonOpenPaymentMethodModal>
           </PaymentMethodContainer>
 
-          <If condition={selectedPaymentMethod?.idTripPaymentForm === '3'}>
+          <If condition={
+            Number(selectedPaymentMethod?.paymentFormTypeId) === 3 ||
+            Number(selectedPaymentMethod?.idTripPaymentForm) === 18 ||
+            Number(selectedPaymentMethod?.idTripPaymentForm) === 3 ||
+            String(selectedPaymentMethod?.name || '').toUpperCase().includes('STRIPE')
+          }>
             <IconClock>
               <PaymentMethodContainer>
                 <ButtonOpenPaymentMethodModal onPress={handleCartModal}>

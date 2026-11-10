@@ -109,35 +109,35 @@ const TravelOptionsContainer = ({
   } = stateTripCustomer;
 
   const cardFind = (cardID: any) => {
-    if (!cardID) {
-      return cards.length > 0 ? ` ${Helper.maskCardNumber(cards[0].number)}` : ' (Cadastrar cartão)';
-    }
-    const card = cards.find(item => item.idCard === cardID || item.idCard == cardID);
-    if (card) {
-      return ` ${Helper.maskCardNumber(card.number)}`;
-    }
-    if (cards.length > 0) {
-      return ` ${Helper.maskCardNumber(cards[0].number)}`;
+    const rawId = typeof cardID === 'object' ? '' : String(cardID || '');
+    const foundCard = rawId ? cards.find(item => String(item.idCard) === rawId) : (cards.length > 0 ? cards[0] : null);
+    if (foundCard) {
+      const num = foundCard.number || foundCard.lastFourDigits || foundCard.mpLastFourDigits;
+      return ` ${Helper.maskCardNumber(num)}`;
     }
     return ' (Cadastrar cartão)';
   };
 
   const shouldRequireCreditCardSelection = (): boolean => {
-    const isCreditCard = String(selectedPaymentMethod?.paymentFormTypeId) === '3' || 
-                         selectedPaymentMethod?.name?.toLowerCase().includes('cart') ||
-                         selectedPaymentMethod?.name?.toLowerCase().includes('crédito');
+    const typeId = Number(selectedPaymentMethod?.paymentFormTypeId);
+    const idTrip = Number(selectedPaymentMethod?.idTripPaymentForm);
+    const name = String(selectedPaymentMethod?.name || '').toLowerCase();
+    const isCreditCard = typeId === 3 || idTrip === 18 || idTrip === 3 || name.includes('stripe') || name.includes('cart') || name.includes('crédito') || name.includes('card');
     if (!isCreditCard) return false;
-    const hasCardSelected = selectedCard && (typeof selectedCard === 'number' || (typeof selectedCard === 'string' && selectedCard !== '') || (typeof selectedCard === 'object' && Object.keys(selectedCard).length > 0));
-    return !hasCardSelected && cards.length === 0;
+
+    if (!cards || cards.length === 0) {
+      return true;
+    }
+    return false;
   };
 
   const handleOpenCreditCardSelectorAlert = (): void => {
     Alert.alert(
-      translate('trip.select_credit_card_title'),
-      translate('trip.select_credit_card_description'),
+      translate('trip.select_credit_card_title') || 'Cartão de crédito',
+      translate('trip.select_credit_card_description') || 'Cadastre um cartão para prosseguir',
       [
         {
-          text: translate('trip.ok'),
+          text: translate('trip.ok') || 'OK',
           onPress: () => setModalCard(true),
         },
       ],
@@ -457,7 +457,13 @@ const TravelOptionsContainer = ({
                   color={theme.colors.secondary}
                 />
               </ButtonOpenPaymentMethodModal>
-              <If condition={selectedPaymentMethod?.paymentFormTypeId === '3'}>
+              <If condition={
+                Number(selectedPaymentMethod?.paymentFormTypeId) === 3 ||
+                Number(selectedPaymentMethod?.idTripPaymentForm) === 18 ||
+                Number(selectedPaymentMethod?.idTripPaymentForm) === 3 ||
+                String(selectedPaymentMethod?.name || '').toUpperCase().includes('STRIPE') ||
+                String(selectedPaymentMethod?.name || '').toUpperCase().includes('CART')
+              }>
                 <ButtonOpenPaymentMethodRight onPress={() => setModalCard(true)}>
                   <PaymentMethodSelected>
                     <AntDesign name="credit-card" size={20} />

@@ -18,11 +18,13 @@ interface PaymentMethodModalProps {
   visible: boolean;
   setVisible: (data: boolean) => void;
   isSpeedmob?: boolean;
+  onSelectCard?: () => void;
 }
 
 export default function PaymentMethodModal({
   visible,
   setVisible,
+  onSelectCard,
 }: PaymentMethodModalProps) {
   const {
     handleSelectedPaymentMethod,
@@ -98,6 +100,12 @@ export default function PaymentMethodModal({
         onPress={() => {
           handleSelectedPaymentMethod(item);
           setVisible(false);
+          const typeId = Number(item?.paymentFormTypeId);
+          const idTrip = Number(item?.idTripPaymentForm);
+          const isCard = typeId === 3 || idTrip === 18 || idTrip === 3 || String(item?.name || '').toUpperCase().includes('STRIPE');
+          if (isCard && typeof onSelectCard === 'function') {
+            setTimeout(() => onSelectCard(), 300);
+          }
         }}
         style={[styles.itemCard, selected && styles.itemCardSelected]}
       >
