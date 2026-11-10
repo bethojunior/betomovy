@@ -1023,9 +1023,9 @@ export default {
     edit_route_subtitle: 'Add stops or change the trip destination',
     origin_address_cannot_change: 'The origin address cannot be removed or changed after the trip has started.',
     risk_area: 'RISK AREA',
-    original_rs: 'Original R$ = ',
-    km_rs: 'KM/R$ = ',
-    hr_rs: 'Hour R$ = ',
+    original_rs: 'Original $ = ',
+    km_rs: 'KM/$ = ',
+    hr_rs: 'Hour $ = ',
     turbo: 'Turbo',
     turbo_mode: 'Turbo mode',
     turbo_mode_description:
@@ -1775,7 +1775,7 @@ export default {
     validation_recently_done:
       'Validation was performed recently. Wait a few minutes before validating again.',
     insufficient_balance_for_validation:
-      'Insufficient balance. You need R$ {{required}} to validate the registration. Current balance: R$ {{current}}.',
+      'Insufficient balance. You need $ {{required}} to validate the registration. Current balance: $ {{current}}.',
     insufficient_balance_for_validation_generic:
       'Insufficient balance to validate the registration.',
     zafira_not_enabled_in_city:

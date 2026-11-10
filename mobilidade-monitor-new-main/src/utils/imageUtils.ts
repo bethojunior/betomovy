@@ -28,8 +28,8 @@ const candidateBases = (): string[] => {
   }
 
   push(Constants.base_url_nodes)
+  push('https://api.movymob.com/')
   push(Constants.url_photo_customer.replace(/customer\/profile\/compressed\/?$/, ''))
-  push('https://minio.704app.com.br/rota101fb704/')
 
   const envCustomer = (import.meta.env.CLIENT_PHOTO as string | undefined)?.trim()
   if (envCustomer) {

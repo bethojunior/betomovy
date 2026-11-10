@@ -14,8 +14,6 @@ import IconGmail from "../../../../../assets/gmailIcon.svg";
 import { Constants } from "../../../../../utils/constants";
 import { getCustomerPhotoUrl, isPlaceholderPhoto } from "../../../../../utils/imageUtils";
 
-const MINIO_DEFAULT_AVATAR = "https://minio.704app.com.br/rota101fb704/default.jpg";
-
 export const ClientProfile = ({
   profileImage,
   profileImageLink,
@@ -30,13 +28,13 @@ export const ClientProfile = ({
     (profileImageLink && !isPlaceholderPhoto(profileImageLink) ? profileImageLink : null) ||
     (isCustomPhoto ? getCustomerPhotoUrl(profileImage) : null) ||
     (isCustomPhoto && baseImageLink ? `${baseImageLink}${profileImage}` : null) ||
-    MINIO_DEFAULT_AVATAR;
+    Constants.defaultImgNotFound;
 
   const fallback = primary?.includes("/compressed/")
     ? primary.replace("/compressed/", "/")
-    : (primary !== MINIO_DEFAULT_AVATAR ? MINIO_DEFAULT_AVATAR : Constants.defaultImgNotFound);
+    : Constants.defaultImgNotFound;
 
-  const imgSrc = primary || MINIO_DEFAULT_AVATAR;
+  const imgSrc = primary || Constants.defaultImgNotFound;
 
   return (
     <ProfileCard>
@@ -44,14 +42,10 @@ export const ClientProfile = ({
         <Avatar
           src={imgSrc}
           fallback={Constants.defaultImgNotFound}
-          preview={Boolean(isCustomPhoto && imgSrc !== MINIO_DEFAULT_AVATAR && imgSrc !== Constants.defaultImgNotFound)}
+          preview={Boolean(isCustomPhoto && imgSrc !== Constants.defaultImgNotFound)}
           onError={(e) => {
-            if (fallback && e.currentTarget.src !== fallback) {
+            if (fallback && e.currentTarget.src !== fallback && fallback !== Constants.defaultImgNotFound) {
               e.currentTarget.src = fallback;
-              return;
-            }
-            if (e.currentTarget.src !== MINIO_DEFAULT_AVATAR) {
-              e.currentTarget.src = MINIO_DEFAULT_AVATAR;
               return;
             }
             e.currentTarget.onerror = null;
