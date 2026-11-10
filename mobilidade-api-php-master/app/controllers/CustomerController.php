@@ -236,6 +236,9 @@ class CustomerController extends ApiController
             }
 
             echo $this->returnSuccess("Viagem cancelada", $result);
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
         } catch (Exception $e) {
             echo $this->returnError($e);
         }

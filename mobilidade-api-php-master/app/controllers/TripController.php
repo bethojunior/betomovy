@@ -257,8 +257,6 @@ class TripController extends ApiController
 
             \app\dao\GenericDao::execute($updateSql, $updateParams);
 
-            $this->publishTripCanceled($tripReference, $tripRow);
-
             try {
                 $redis = new \app\utils\RedisUtil();
                 $cancelPayload = json_encode([
@@ -282,6 +280,12 @@ class TripController extends ApiController
                 'tripReference' => $tripReference,
                 'statusTrip' => 'canceled'
             ]);
+
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
+
+            $this->publishTripCanceled($tripReference, $tripRow);
         } catch (\Throwable $e) {
             echo $this->returnError($e);
         }

@@ -21,8 +21,12 @@ export function createAuthInterceptor(
 
       const status = error?.response?.status;
       const skipSessionCheck = error?.config?.metadata?.skipSessionCheck;
+      const url = error?.config?.url || '';
 
-      if (status !== 401 || skipSessionCheck) {
+      // Nunca deslogar em requisições de delivery, analytics ou notificações secundárias
+      const isSecondaryRoute = /notification|delivery|ifood|config|places|search/i.test(url);
+
+      if (status !== 401 || skipSessionCheck || isSecondaryRoute) {
         return Promise.reject(error);
       }
 

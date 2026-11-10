@@ -692,16 +692,12 @@ export const AuthProvider = ({ children }: any) => {
     const driverInterceptor = createAuthInterceptor(apiMainDriver, () =>
       showExpiredSessionAlert(signOut),
     );
-    const deliveryInterceptor = createAuthInterceptor(apiDelivery, () =>
-      showExpiredSessionAlert(signOut),
-    );
     const clientInterceptor = createAuthInterceptor(apiMain, () =>
       showExpiredSessionAlert(signOut),
     );
 
     return () => {
       detachAuthInterceptor(apiMainDriver, driverInterceptor);
-      detachAuthInterceptor(apiDelivery, deliveryInterceptor);
       detachAuthInterceptor(apiMain, clientInterceptor);
     };
   }, [showExpiredSessionAlert]);
