@@ -397,7 +397,7 @@
                 <ul id="listCardPaymentModal" class="cards-modal-list" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px;"></ul>
             </div>
             <div class="cards-modal-footer" style="padding: 16px 20px 20px; background: #ffffff; border-top: 1px solid #f1f5f9;">
-                <a id="addCardModal" class="cards-modal-add-btn" href="javascript:void(0)" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px 20px; border-radius: 12px; background: #0f172a; color: #ffffff !important; font-size: 14px; font-weight: 700; text-decoration: none; box-sizing: border-box; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);">
+                <a id="addCardModal" class="cards-modal-add-btn" href="javascript:void(0)" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px 20px; border-radius: 12px; background: #2563eb; color: #ffffff !important; font-size: 14px; font-weight: 700; text-decoration: none; box-sizing: border-box; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);">
                     <i class="material-icons" style="font-size: 20px; line-height: 1;">add_card</i>
                     <span>Add New Card</span>
                 </a>
@@ -405,9 +405,9 @@
         </div>
     </div>
 
-    <div class="container-add-card" id="containerAddCard" style="position: fixed; inset: 0; width: 100%; height: 100%; display: none; z-index: 1300; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); justify-content: center; align-items: center; padding: 16px; box-sizing: border-box;">
-        <div style="background: #ffffff; width: min(460px, 94vw); max-height: 92vh; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25); border: 1px solid rgba(226, 232, 240, 0.9);">
-            <nav style="min-height: 60px; background: #0f172a; width: 100%; padding: 14px 20px; color: #fff; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;">
+    <div class="container-add-card" id="containerAddCard" style="position: fixed; inset: 0; width: 100%; height: 100%; display: none; z-index: 1300; background-color: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); justify-content: center; align-items: center; padding: 16px; box-sizing: border-box;">
+        <div style="background: #ffffff; width: min(460px, 94vw); max-height: 92vh; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.15); border: 1px solid #e2e8f0;">
+            <nav style="min-height: 60px; background: #2563eb; width: 100%; padding: 14px 20px; color: #fff; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <button type="button" id="backPaymentForm" style="width: 34px; height: 34px; border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.12); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
                         <i class="material-icons" style="font-size: 20px; line-height: 1;">arrow_back</i>
