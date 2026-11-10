@@ -190,6 +190,16 @@ export default function ModalCallTrip({
     receivedNotification = true;
     setTotalBonus(0);
     defaultAnimationValue();
+    dispatchTrip({
+      type: 'update',
+      field: 'callDriverModal',
+      arg: false,
+    });
+    dispatchTrip({
+      type: 'update',
+      field: 'trip',
+      arg: {},
+    });
     await AsyncStorage.removeItem('trip');
     await AsyncStorage.removeItem('tripError');
   };
@@ -235,9 +245,11 @@ export default function ModalCallTrip({
       .then(result => {
         setPreloadVisible(false);
 
-        if (!result.status) {
+        if (!result?.status) {
           AsyncStorage.setItem('tripError', 'indisponivel');
-          customToast(translate('driverTrip.text_error_accept_trip'), 'warning');
+          customToast(result?.message || translate('driverTrip.text_error_accept_trip'), 'warning');
+          closeCall();
+          setLoading(false);
           return;
         }
 
@@ -254,12 +266,13 @@ export default function ModalCallTrip({
         return result.isPreAcceptedTrip ? undefined : navigate('Home');
       })
       .catch(() => {
-        translateY.value = withTiming(0, { duration: 800 });
-        opacity.value = withTiming(1, { duration: 800 });
         setPreloadVisible(false);
-        song.pauseAsync();
+        try {
+          song?.stopAsync();
+        } catch {}
         showInitModal(false);
         receivedNotification = true;
+        setLoading(false);
         return closeCall();
       });
   };

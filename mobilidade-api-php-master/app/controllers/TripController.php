@@ -204,10 +204,9 @@ class TripController extends ApiController
                 return;
             }
 
-            // 2. Se já estiver cancelada, republica para o app do motorista soltar a corrida e garantir liberação.
+            // 2. Se já estiver cancelada, apenas confirma sem reenviar notificações repetidas
             $currentStatus = strtolower($tripRow['status'] ?? '');
             if (in_array($currentStatus, ['canceled', 'driver_canceled', 'customer_canceled', 'not_answered', 'back_off'])) {
-                $this->publishTripCanceled($tripReference, $tripRow, true);
                 echo $this->returnSuccess("Viagem já cancelada ou finalizada", [
                     'status' => true,
                     'tripReference' => $tripReference,
@@ -238,7 +237,7 @@ class TripController extends ApiController
             }
 
             // 4. Cancelamento de corrida padrão / central / app de passageiro
-            $updateSql = "UPDATE trip SET status = 'canceled', canceledBy = :canceledBy, endDate = :endDate WHERE tripReference = :ref";
+            $updateSql = "UPDATE trip SET status = 'canceled', canceledBy = :canceledBy, endDate = :endDate, callingDriver = NULL WHERE tripReference = :ref";
             $updateParams = [
                 ':canceledBy' => 'customer',
                 ':endDate' => $dateEnd,
@@ -293,20 +292,53 @@ class TripController extends ApiController
 
     private function publishTripCanceled($tripReference, array $tripRow, $releaseDriver = true): void
     {
-        if ($releaseDriver && !empty($tripRow['driverId'])) {
-            try {
-                (new \app\dao\DriverDao())->putAvailable($tripRow['driverId']);
-            } catch (\Throwable $eDriver) {
-                \app\utils\Logger::error("Erro ao liberar motorista {$tripRow['driverId']}: " . $eDriver->getMessage());
+        // 1. Coletar motorista designado e motorista em chamada
+        $driversToNotify = [];
+        if (!empty($tripRow['driverId'])) {
+            $driversToNotify[] = (int)$tripRow['driverId'];
+        }
+        if (!empty($tripRow['callingDriver'])) {
+            $driversToNotify[] = (int)$tripRow['callingDriver'];
+        }
+
+        // Buscar motoristas vinculados na tabela driverCalled
+        try {
+            $calledList = \app\dao\GenericDao::all(
+                "SELECT driverId FROM driverCalled WHERE tripReference = :ref AND status IN ('calling', 'waiting', 'accepted')",
+                [':ref' => $tripReference]
+            );
+            if (!empty($calledList)) {
+                foreach ($calledList as $cd) {
+                    if (!empty($cd['driverId']) && !in_array((int)$cd['driverId'], $driversToNotify)) {
+                        $driversToNotify[] = (int)$cd['driverId'];
+                    }
+                }
+            }
+        } catch (\Throwable $eCd) {}
+
+        // Limpar callingDriver da tabela trip e marcar chamadas como canceladas
+        try {
+            \app\dao\GenericDao::execute("UPDATE trip SET callingDriver = NULL WHERE tripReference = :ref", [':ref' => $tripReference]);
+            \app\dao\GenericDao::execute("UPDATE driverCalled SET status = 'cancelled' WHERE tripReference = :ref", [':ref' => $tripReference]);
+        } catch (\Throwable $eUp) {}
+
+        // 2. Liberar motoristas e notificar via Push imediato
+        foreach ($driversToNotify as $dId) {
+            if ($releaseDriver) {
+                try {
+                    (new \app\dao\DriverDao())->putAvailable($dId);
+                } catch (\Throwable $eDriver) {
+                    \app\utils\Logger::error("Erro ao liberar motorista {$dId}: " . $eDriver->getMessage());
+                }
             }
 
             try {
-                $driverRow = (new \app\dao\DriverDao())->find($tripRow['driverId']);
+                $driverRow = (new \app\dao\DriverDao())->find($dId);
                 if ($driverRow && !empty($driverRow->deviceToken)) {
                     $push = new \app\utils\Push();
                     $push
-                        ->setTitle(strtoupper(\app\utils\Config::get('app_title') ?? 'CANCELAMENTO DE VIAGEM'))
-                        ->setBody("A viagem foi cancelada pela central ou pelo cliente!")
+                        ->setTitle(strtoupper(\app\utils\Config::get('app_title') ?? 'MOVY'))
+                        ->setBody("A corrida foi cancelada pela central ou pelo cliente.")
                         ->setAction(\app\constant\PushActionConst::OPEN_APP)
                         ->setTag(\app\constant\PushTagConst::RIDE_CANCELLED)
                         ->setAdditionalData(json_encode([
@@ -319,7 +351,7 @@ class TripController extends ApiController
                     $push->sendNotificationWithData($driverRow->deviceToken);
                 }
             } catch (\Throwable $ePush) {
-                \app\utils\Logger::error("Erro ao enviar push de cancelamento ao motorista {$tripRow['driverId']}: " . $ePush->getMessage());
+                \app\utils\Logger::error("Erro ao enviar push de cancelamento ao motorista {$dId}: " . $ePush->getMessage());
             }
         }
 

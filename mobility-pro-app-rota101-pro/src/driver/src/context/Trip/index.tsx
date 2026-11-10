@@ -107,6 +107,7 @@ const reducer: ReducerType = (state, action) => {
         tripAccepted: {} as TripInfo,
         polyline: [],
         trip: {} as TripInfo,
+        callDriverModal: false,
       };
 
     case 'initTripPreAccepted':
@@ -114,6 +115,7 @@ const reducer: ReducerType = (state, action) => {
         ...state,
         tripAccepted: action.arg,
         tripPreAccepted: {} as TripInfo,
+        callDriverModal: false,
       };
 
     case 'acceptTrip':
@@ -121,6 +123,7 @@ const reducer: ReducerType = (state, action) => {
         ...state,
         tripAccepted: action.arg,
         trip: {} as TripInfo,
+        callDriverModal: false,
       };
 
     case 'addOrUpdateList': {
@@ -300,6 +303,12 @@ export const TripProvider = ({ children }: TripContextChildren) => {
         }
         notifyTripAccepted(response.data, isPreAcceptedTrip ? 2 : 1);
         startMapSuggestionTimeout();
+      } else {
+        dispatchTrip({ type: 'update', field: 'callDriverModal', arg: false });
+        dispatchTrip({ type: 'update', field: 'trip', arg: {} });
+        if (response?.message) {
+          customToast(response.message, 'warning');
+        }
       }
 
       try {
@@ -309,6 +318,8 @@ export const TripProvider = ({ children }: TripContextChildren) => {
       }
       return { ...response, isPreAcceptedTrip };
     } catch (error) {
+      dispatchTrip({ type: 'update', field: 'callDriverModal', arg: false });
+      dispatchTrip({ type: 'update', field: 'trip', arg: {} });
       return customToast(
         translate('driverTrip.text_error_accept_trip'),
         'warning',

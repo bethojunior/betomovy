@@ -166,7 +166,20 @@ export const TripNotificationListener = () => {
             field: 'callDriverModal',
             arg: false,
           });
+          dispatchTrip({
+            type: 'update',
+            field: 'trip',
+            arg: {},
+          });
+
           if (isRideCancelled) {
+            const tripRefToCancel = parsedData?.tripReference || data?.tripReference;
+            const cancelDedupeKey = `cancel:${tripRefToCancel || 'any'}`;
+            if (processedNoticesRef.current.has(cancelDedupeKey)) {
+              return;
+            }
+            processedNoticesRef.current.add(cancelDedupeKey);
+
             setIniTripModal(false);
             dispatchTrip({ type: 'clearTripAccepted' });
             clearDataTrip().catch(() => {});
@@ -174,11 +187,6 @@ export const TripNotificationListener = () => {
               playSong('cancel');
             } catch {}
             customToast('A corrida foi cancelada pelo cliente ou pela central', 'warning');
-            Alert.alert(
-              'Corrida Cancelada',
-              'A corrida foi cancelada pelo passageiro ou pela central.',
-              [{ text: 'OK' }],
-            );
           }
           return;
         }

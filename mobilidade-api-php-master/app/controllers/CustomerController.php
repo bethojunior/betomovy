@@ -222,6 +222,11 @@ class CustomerController extends ApiController
                 $request->cancellationReasonsId ?? null
             );
 
+            echo $this->returnSuccess("Viagem cancelada", $result);
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
+
             // Garantir sincronização completa em tempo real para o app do motorista
             try {
                 $tripRow = \app\dao\GenericDao::first("SELECT * FROM trip WHERE tripReference = :ref LIMIT 1", [':ref' => $request->tripReference]);
@@ -233,11 +238,6 @@ class CustomerController extends ApiController
                 }
             } catch (\Throwable $eSync) {
                 \app\utils\Logger::error("Erro ao sincronizar cancelamento no CustomerController: " . $eSync->getMessage());
-            }
-
-            echo $this->returnSuccess("Viagem cancelada", $result);
-            if (function_exists('fastcgi_finish_request')) {
-                fastcgi_finish_request();
             }
         } catch (Exception $e) {
             echo $this->returnError($e);
