@@ -6,7 +6,7 @@ class CurrencyFormat {
     if (typeof value === 'number') {
       return value
     }
-    let s = String(value).trim().replace(/R\$\s*/gi, '').trim()
+    let s = String(value).trim().replace(/R\$\s*/gi, '').replace(/\$\s*/g, '').trim()
     if (!s) {
       return NaN
     }
@@ -26,11 +26,20 @@ class CurrencyFormat {
     return parseFloat(s)
   }
 
-  static formatBRL(value) {
+  static formatUSD(value) {
     const n = CurrencyFormat.parsePriceToNumber(value)
     if (Number.isNaN(n)) {
       return String(value ?? '')
     }
-    return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    return n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+  }
+
+  static formatBRL(value) {
+    // MOVY Global USD requirement: format as USD $
+    return CurrencyFormat.formatUSD(value)
+  }
+
+  static format(value) {
+    return CurrencyFormat.formatUSD(value)
   }
 }

@@ -115,7 +115,7 @@
                             </li>
                             <li class="td-receipt-item">
                                 <span class="td-receipt-item__name">Pedágios & Encargos Extras</span>
-                                <span class="td-receipt-item__value">R$ 0,00</span>
+                                <span class="td-receipt-item__value">$0.00</span>
                             </li>
                         </ul>
 

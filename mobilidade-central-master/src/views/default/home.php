@@ -620,8 +620,8 @@
             <div class="stat-card" id="revenueCard">
                 <p class="sc-title">Faturamento</p>
                 <div class="stat-details stat-details--1">
-                    <p>Total <span id="totalRevenue">R$ 0,00</span></p>
-                    <p>Líquido <span id="netRevenue">R$ 0,00</span></p>
+                    <p>Total <span id="totalRevenue">$0.00</span></p>
+                    <p>Líquido <span id="netRevenue">$0.00</span></p>
                 </div>
             </div>
 

@@ -89,7 +89,7 @@
                                     Preço Mínimo <span class="rate-required">*</span>
                                 </label>
                                 <div class="rate-input-prefix-wrap">
-                                    <span class="rate-currency-prefix">R$</span>
+                                    <span class="rate-currency-prefix">$</span>
                                     <input type="tel" class="rate-input input-value-price" id="min_price" placeholder="0,00">
                                 </div>
                                 <span class="rate-help">Cobrança mínima por qualquer corrida realizada.</span>
@@ -100,7 +100,7 @@
                                     Preço Base (Bandeirada) <span class="rate-required">*</span>
                                 </label>
                                 <div class="rate-input-prefix-wrap">
-                                    <span class="rate-currency-prefix">R$</span>
+                                    <span class="rate-currency-prefix">$</span>
                                     <input type="tel" class="rate-input input-value-price" id="base_price" placeholder="0,00">
                                 </div>
                                 <span class="rate-help">Valor de partida adicionado no início da viagem.</span>
@@ -111,7 +111,7 @@
                                     Preço por KM <span class="rate-required">*</span>
                                 </label>
                                 <div class="rate-input-prefix-wrap">
-                                    <span class="rate-currency-prefix">R$</span>
+                                    <span class="rate-currency-prefix">$</span>
                                     <input type="tel" class="rate-input input-value-price" id="km_price" placeholder="0,00">
                                 </div>
                                 <span class="rate-help">Valor adicionado por cada quilômetro rodado.</span>
@@ -122,7 +122,7 @@
                                     Preço por Minuto <span class="rate-required">*</span>
                                 </label>
                                 <div class="rate-input-prefix-wrap">
-                                    <span class="rate-currency-prefix">R$</span>
+                                    <span class="rate-currency-prefix">$</span>
                                     <input type="tel" class="rate-input input-value-price" id="minute_price" placeholder="0,00">
                                 </div>
                                 <span class="rate-help">Valor somado para cada minuto de duração.</span>
@@ -145,7 +145,7 @@
                             <div class="rate-field">
                                 <label class="rate-label" for="tax_price">Taxa Adicional 1</label>
                                 <div class="rate-input-prefix-wrap">
-                                    <span class="rate-currency-prefix">R$</span>
+                                    <span class="rate-currency-prefix">$</span>
                                     <input type="tel" class="rate-input input-value-price" id="tax_price" placeholder="0,00">
                                 </div>
                                 <span class="rate-help">Taxa fixa operacional ou de embarque.</span>
@@ -154,7 +154,7 @@
                             <div class="rate-field">
                                 <label class="rate-label" for="another_fee">Taxa Adicional 2</label>
                                 <div class="rate-input-prefix-wrap">
-                                    <span class="rate-currency-prefix">R$</span>
+                                    <span class="rate-currency-prefix">$</span>
                                     <input type="tel" class="rate-input input-value-price" id="another_fee" placeholder="0,00">
                                 </div>
                                 <span class="rate-help">Taxa de retorno, pedágio base ou contingência.</span>
@@ -163,7 +163,7 @@
                             <div class="rate-field rate-field--full-span">
                                 <label class="rate-label" for="waypoint_price">Taxa por Parada Intermediária</label>
                                 <div class="rate-input-prefix-wrap">
-                                    <span class="rate-currency-prefix">R$</span>
+                                    <span class="rate-currency-prefix">$</span>
                                     <input type="tel" class="rate-input input-value-price" id="waypoint_price" placeholder="0,00">
                                 </div>
                                 <span class="rate-help">Valor fixo cobrado por cada ponto de parada adicional inserido pelo passageiro.</span>

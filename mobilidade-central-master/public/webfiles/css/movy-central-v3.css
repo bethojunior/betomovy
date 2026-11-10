@@ -1,0 +1,631 @@
+/**
+ * MOVY CENTRAL OPERATIONAL — DESIGN SYSTEM v3.0 (Desktop & Mobile/PWA)
+ * Novo layout profissional para Despacho, Monitoramento e Gestão de Frotas MOVY.
+ * Compatível com todos os IDs e manipuladores de eventos JavaScript originais.
+ */
+
+:root {
+  --movy-bg-dark: #090d16;
+  --movy-bg-card: #0f172a;
+  --movy-bg-card-glass: rgba(15, 23, 42, 0.88);
+  --movy-bg-surface: #1e293b;
+  --movy-bg-input: #0f172a;
+  --movy-border: rgba(255, 255, 255, 0.08);
+  --movy-border-strong: rgba(255, 255, 255, 0.16);
+  --movy-border-accent: rgba(37, 99, 235, 0.4);
+  
+  --movy-blue: #2563eb;
+  --movy-blue-hover: #1d4ed8;
+  --movy-cyan: #04f3fa;
+  --movy-green: #10b981;
+  --movy-amber: #f59e0b;
+  --movy-red: #ef4444;
+  --movy-purple: #8b5cf6;
+
+  --movy-text-main: #f8fafc;
+  --movy-text-sub: #94a3b8;
+  --movy-text-muted: #64748b;
+  --movy-text-inverse: #090d16;
+
+  --movy-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --movy-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --movy-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --movy-shadow-glow: 0 0 20px rgba(4, 243, 250, 0.25);
+
+  --movy-radius-sm: 8px;
+  --movy-radius-md: 12px;
+  --movy-radius-lg: 18px;
+  --movy-radius-xl: 24px;
+  --movy-radius-pill: 9999px;
+
+  --movy-header-height: 64px;
+  --movy-mobile-nav-height: 60px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. RESET & TIPOGRAFIA
+   ═══════════════════════════════════════════════════════════════════════════ */
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  background-color: var(--movy-bg-dark) !important;
+  color: var(--movy-text-main) !important;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. EXECUTIVE TOPBAR / HEADER (.app-header)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.app-header {
+  height: var(--movy-header-height) !important;
+  background: rgba(9, 13, 22, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid var(--movy-border) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 20px !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.app-header__brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  text-decoration: none !important;
+  color: #fff !important;
+}
+
+.app-header__logo {
+  height: 34px !important;
+  width: auto !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 2px 8px rgba(4, 243, 250, 0.3));
+}
+
+.app-header__name {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  background: linear-gradient(135deg, #ffffff 30%, var(--movy-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.app-header__select {
+  background: var(--movy-bg-card) !important;
+  color: var(--movy-text-main) !important;
+  border: 1px solid var(--movy-border-strong) !important;
+  border-radius: var(--movy-radius-pill) !important;
+  padding: 8px 18px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+.app-header__select:hover {
+  border-color: var(--movy-blue) !important;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Indicador de Conexão WebSocket Live */
+.header-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 6px 14px;
+  border-radius: var(--movy-radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--movy-green);
+}
+
+.header-live-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--movy-green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--movy-green);
+  animation: pulse-live 1.8s infinite;
+}
+
+@keyframes pulse-live {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+/* Botão de Instalação PWA */
+.btn-install-pwa {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, var(--movy-blue), #1d4ed8);
+  color: #fff !important;
+  border: none;
+  padding: 6px 14px;
+  border-radius: var(--movy-radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.btn-install-pwa:hover {
+  transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. MENU LATERAL / SIDEBAR RETRÁTIL (.container-menu-options)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.container-menu-options {
+  background: rgba(9, 13, 22, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  border-right: 1px solid var(--movy-border) !important;
+  box-shadow: var(--movy-shadow-lg) !important;
+  width: 280px !important;
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 1200 !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#containerMenuOptions {
+  padding: 24px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+
+.info-user {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 16px !important;
+  background: var(--movy-bg-card) !important;
+  border: 1px solid var(--movy-border) !important;
+  border-radius: var(--movy-radius-md) !important;
+  margin-bottom: 24px !important;
+}
+
+#imageUserMenu {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  background-size: cover !important;
+  background-position: center !important;
+  border: 2px solid var(--movy-cyan) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+  background-color: var(--movy-surface) !important;
+}
+
+#menuOptionUser {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+#menuOptionUser li a {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 12px 16px !important;
+  border-radius: var(--movy-radius-md) !important;
+  color: var(--movy-text-sub) !important;
+  text-decoration: none !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+#menuOptionUser li a:hover,
+#menuOptionUser li.active a {
+  background: rgba(37, 99, 235, 0.15) !important;
+  color: #fff !important;
+  border-left: 3px solid var(--movy-cyan) !important;
+}
+
+#menuOptionUser li a .nav-icon {
+  font-size: 20px !important;
+  color: var(--movy-cyan) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. MAPA & AMBIENTE DE DESPACHO
+   ═══════════════════════════════════════════════════════════════════════════ */
+.container-main-map {
+  position: absolute !important;
+  top: var(--movy-header-height) !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+}
+
+#mapWrapper, #mapClient {
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #0b1120 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. PAINEL DE DESPACHO RÁPIDO (FLOATING DISPATCH PANEL)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.container-menu {
+  position: absolute !important;
+  top: 20px !important;
+  left: 20px !important;
+  width: 400px !important;
+  max-width: calc(100vw - 40px) !important;
+  background: var(--movy-bg-card-glass) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--movy-border-strong) !important;
+  border-radius: var(--movy-radius-lg) !important;
+  box-shadow: var(--movy-shadow-lg) !important;
+  z-index: 100 !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.trip-panel-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 16px !important;
+}
+
+.trip-panel-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  margin: 0 !important;
+}
+
+.address-fields {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  position: relative !important;
+}
+
+.input-custom {
+  width: 100% !important;
+  height: 48px !important;
+  background: var(--movy-bg-input) !important;
+  border: 1px solid var(--movy-border-strong) !important;
+  border-radius: var(--movy-radius-md) !important;
+  padding: 0 42px 0 16px !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+.input-custom:focus {
+  border-color: var(--movy-cyan) !important;
+  box-shadow: 0 0 14px rgba(4, 243, 250, 0.2) !important;
+}
+
+.swap-address-btn {
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: var(--movy-surface) !important;
+  border: 1px solid var(--movy-border-strong) !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  transition: all 0.2s !important;
+}
+.swap-address-btn:hover {
+  background: var(--movy-blue) !important;
+  transform: translateY(-50%) rotate(180deg) !important;
+}
+
+.btn-route-advance {
+  width: 100% !important;
+  height: 48px !important;
+  background: linear-gradient(135deg, var(--movy-blue), #1d4ed8) !important;
+  border: none !important;
+  border-radius: var(--movy-radius-md) !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  cursor: pointer !important;
+  margin-top: 14px !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4) !important;
+}
+.btn-route-advance:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. SELEÇÃO DE CATEGORIAS E VALORES (.footer-container-trip)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.footer-container-trip {
+  position: absolute !important;
+  left: 20px !important;
+  bottom: 24px !important;
+  width: 440px !important;
+  max-width: calc(100vw - 40px) !important;
+  background: var(--movy-bg-card-glass) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--movy-border-strong) !important;
+  border-radius: var(--movy-radius-lg) !important;
+  box-shadow: var(--movy-shadow-lg) !important;
+  z-index: 100 !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+}
+
+.type-cars {
+  display: flex !important;
+  gap: 10px !important;
+  overflow-x: auto !important;
+  padding-bottom: 8px !important;
+  margin-bottom: 16px !important;
+}
+
+.type-cars::-webkit-scrollbar {
+  height: 4px;
+}
+.type-cars::-webkit-scrollbar-thumb {
+  background: var(--movy-border-strong);
+  border-radius: 4px;
+}
+
+.uber-payment-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 10px 14px !important;
+  background: var(--movy-bg-input) !important;
+  border: 1px solid var(--movy-border) !important;
+  border-radius: var(--movy-radius-md) !important;
+  cursor: pointer !important;
+  margin-bottom: 14px !important;
+}
+
+.btn-search-trip {
+  width: 100% !important;
+  height: 52px !important;
+  background: linear-gradient(135deg, #04f3fa 0%, #2563eb 100%) !important;
+  color: #090d16 !important;
+  font-weight: 800 !important;
+  font-size: 16px !important;
+  letter-spacing: 0.5px !important;
+  border: none !important;
+  border-radius: var(--movy-radius-md) !important;
+  cursor: pointer !important;
+  box-shadow: var(--movy-shadow-glow) !important;
+  transition: all 0.2s ease !important;
+}
+.btn-search-trip:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.1) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. DRAWER DE VIAGENS ATIVAS (.list-trips-active-partner)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.list-trips-active-partner {
+  position: absolute !important;
+  top: 20px !important;
+  right: 20px !important;
+  width: 380px !important;
+  max-width: calc(100vw - 40px) !important;
+  max-height: calc(100vh - var(--movy-header-height) - 100px) !important;
+  background: var(--movy-bg-card-glass) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--movy-border-strong) !important;
+  border-radius: var(--movy-radius-lg) !important;
+  box-shadow: var(--movy-shadow-lg) !important;
+  z-index: 100 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.header-trips {
+  padding: 16px 20px !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-bottom: 1px solid var(--movy-border) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.body-trips {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 12px 16px !important;
+}
+
+#listTripPartner {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+#listTripPartner li {
+  background: var(--movy-bg-input) !important;
+  border: 1px solid var(--movy-border) !important;
+  border-radius: var(--movy-radius-md) !important;
+  padding: 14px !important;
+  transition: all 0.2s ease !important;
+}
+#listTripPartner li:hover {
+  border-color: var(--movy-border-accent) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. MONITORING HUD BAR (.footer-monitoring-trip)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.footer-monitoring-trip {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 52px !important;
+  background: rgba(9, 13, 22, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  border-top: 1px solid var(--movy-border) !important;
+  z-index: 950 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  padding: 0 24px !important;
+}
+
+.monitoring-cards {
+  display: flex !important;
+  align-items: center !important;
+  gap: 32px !important;
+  width: 100% !important;
+  justify-content: space-around !important;
+}
+
+.stat-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  font-size: 13px !important;
+}
+
+.sc-title {
+  color: var(--movy-text-sub) !important;
+  margin: 0 !important;
+  font-weight: 600 !important;
+}
+
+.stat-card span {
+  font-weight: 800 !important;
+  color: #fff !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9. MOBILE & PWA ADAPTAÇÕES ESPECÍFICAS
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  :root {
+    --movy-header-height: 56px;
+  }
+
+  .container-menu {
+    top: auto !important;
+    bottom: 60px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    border-radius: var(--movy-radius-lg) var(--movy-radius-lg) 0 0 !important;
+    max-height: 75vh !important;
+    overflow-y: auto !important;
+  }
+
+  .footer-container-trip {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 60px !important;
+    width: auto !important;
+    border-radius: var(--movy-radius-lg) var(--movy-radius-lg) 0 0 !important;
+  }
+
+  .list-trips-active-partner {
+    top: auto !important;
+    bottom: 60px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-height: 75vh !important;
+  }
+
+  .footer-monitoring-trip {
+    display: none !important;
+  }
+
+  /* Barra de navegação inferior móvel (Touch Bottom Navigation Bar) */
+  .movy-mobile-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: var(--movy-mobile-nav-height) !important;
+    background: rgba(9, 13, 22, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    border-top: 1px solid var(--movy-border) !important;
+    z-index: 1100 !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+  }
+
+  .movy-mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--movy-text-sub);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  .movy-mobile-nav-item.active,
+  .movy-mobile-nav-item:hover {
+    color: var(--movy-cyan);
+  }
+
+  .movy-mobile-nav-item i {
+    font-size: 22px;
+  }
+}
+
+@media (min-width: 769px) {
+  .movy-mobile-nav {
+    display: none !important;
+  }
+}

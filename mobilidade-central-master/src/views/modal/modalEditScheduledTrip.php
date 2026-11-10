@@ -26,7 +26,7 @@
 
             <div class="edit-scheduled-row">
                 <div class="edit-scheduled-field">
-                    <label>Valor (R$)</label>
+                    <label>Valor ($ USD)</label>
                     <div class="edit-scheduled-price-row">
                         <input type="text" id="editScheduledPrice" class="input-value-price">
                         <button type="button" id="btnRecalculateScheduledPrice" class="edit-scheduled-recalculate-btn" aria-disabled="true">

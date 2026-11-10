@@ -1,20 +1,24 @@
 <head>
-    <title>Central</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
-    <meta name="theme-color" content="#ffffff">
-    <link rel="icon" type="image/jpeg" href="<?php echo htmlspecialchars(Host::getCentral() . 'default.jpg', ENT_QUOTES, 'UTF-8'); ?>">
+    <title>MOVY Central Operacional</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover' />
+    <meta name="msapplication-TileColor" content="#090d16">
+    <meta name="theme-color" content="#090d16">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MOVY Central">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="<?php echo Host::getLocal(); ?>webfiles/img/logo/logo-movy-transparent.png">
 
     <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/google/Popup.css?v=<?php echo Host::getVersion('css/google/Popup.css'); ?>">
     <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/font/toastr.min.css?v=<?php echo Host::getVersion('css/font/toastr.min.css'); ?>">
     <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/bootstrap/bootstrap.min.css?v=<?php echo Host::getVersion('css/bootstrap/bootstrap.min.css'); ?>">
     <link href="<?php echo Host::getLocal(); ?>webfiles/css/google/icon.css?v=<?php echo Host::getVersion('css/google/icon.css'); ?>" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@100;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
           crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/variables.css?v=<?php echo Host::getVersion('css/variables.css'); ?>">
     <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/default.css?v=<?php echo Host::getVersion('css/default.css'); ?>">
+    <link rel="stylesheet" href="<?php echo Host::getLocal(); ?>webfiles/css/movy-central-v3.css?v=<?php echo Host::getVersion('css/movy-central-v3.css'); ?>">
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/6.3.4/firebase-app.js"></script>

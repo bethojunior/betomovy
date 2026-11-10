@@ -52,3 +52,34 @@ foreach ($this->filesJs as $file) {
     echo "<script type='text/javascript' src='{$host}webfiles/js/{$file}.js?v={$version}'></script>";
 
 } ?>
+
+<!-- MOVY Central PWA Service Worker Registration & Mobile Install Banner -->
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+            console.log('[MOVY PWA] ServiceWorker registered with scope:', registration.scope);
+        }).catch(function(err) {
+            console.warn('[MOVY PWA] ServiceWorker registration failed:', err);
+        });
+    });
+}
+
+// Suporte para instalação PWA
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.getElementById('btnInstallPWA');
+    if (installBtn) {
+        installBtn.style.display = 'inline-flex';
+        installBtn.addEventListener('click', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                deferredPrompt = null;
+            });
+        });
+    }
+});
+</script>

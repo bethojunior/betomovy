@@ -104,7 +104,7 @@
                 <!-- Valor + Tipo -->
                 <div class="nr-form-row">
                     <div class="app-field">
-                        <label class="app-label" for="price">Valor (R$)</label>
+                        <label class="app-label" for="price">Valor ($ USD)</label>
                         <input type="number" class="app-input form-control"
                                id="price" placeholder="0,00">
                     </div>

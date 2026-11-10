@@ -13,7 +13,7 @@
         </div>
 
         <div class="info-trip-finish">
-            <span class="value-trip-finish">R$ <span id="priceTrip"></span></span>
+            <span class="value-trip-finish">$ <span id="priceTrip"></span></span>
             <span class="payment-form-trip-finish">
                 Valor fixo em <b><span id="tripPaymentForm"></span></b>
             </span>

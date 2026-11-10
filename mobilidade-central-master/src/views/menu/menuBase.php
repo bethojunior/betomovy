@@ -41,7 +41,7 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
 $isOnWhatsappRoute = strpos($currentUri, 'whatsapp') !== false;
 $showWhatsappMenuItem = $isOnWhatsappRoute;
 ?>
-<nav class="app-header" style="z-index: 100">
+<nav class="app-header">
 
     <div class="menu-close" id="optionMenu" aria-label="Abrir menu">
         <span></span>
@@ -50,40 +50,99 @@ $showWhatsappMenuItem = $isOnWhatsappRoute;
     </div>
 
     <a class="app-header__brand" href="<?php echo Host::getLocal(); ?>">
-        <img src="/webfiles/img/logo/logo.png"
+        <img src="/webfiles/img/logo/logo-movy-transparent.png"
              onerror="this.onerror=null; this.src='/webfiles/img/logo/logo.png';"
              alt="MOVY"
              class="app-header__logo">
-        <span class="app-header__name">MOVY</span>
+        <span class="app-header__name">MOVY CENTRAL</span>
     </a>
 
-    <select class="app-header__select" id="selectCentralChange">
-        <?php
-        $centrals_user = Session::get("centrals");
-        if (is_array($centrals_user)) {
-            foreach ($centrals_user as $item) {
-                if (is_array($item)) {
-                    $item = (object) $item;
+    <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="header-live-badge" title="Status de conexão em tempo real">
+            <span class="header-live-dot"></span>
+            <span>LIVE DISPATCH</span>
+        </div>
+
+        <button type="button" class="btn-install-pwa" id="btnInstallPWA" title="Instalar aplicativo MOVY Central">
+            <i class="material-icons" style="font-size: 16px;">get_app</i>
+            <span>Instalar App</span>
+        </button>
+
+        <select class="app-header__select" id="selectCentralChange">
+            <?php
+            $centrals_user = Session::get("centrals");
+            if (is_array($centrals_user)) {
+                foreach ($centrals_user as $item) {
+                    if (is_array($item)) {
+                        $item = (object) $item;
+                    }
+                    $c = null;
+                    if (isset($item->central)) {
+                        $c = is_array($item->central) ? (object)$item->central : $item->central;
+                    } else {
+                        $c = $item;
+                    }
+                    if (!is_object($c)) continue;
+                    $cId = $c->id ?? null;
+                    $cName = $c->name ?? 'Central';
+                    $selected = ($central->id !== null && $central->id == $cId) ? "selected" : "";
+                    $value = htmlspecialchars(json_encode($c), ENT_QUOTES, 'UTF-8');
+                    $name  = htmlspecialchars($cName, ENT_QUOTES, 'UTF-8');
+                    echo "<option value='{$value}' {$selected}>{$name}</option>";
                 }
-                $c = null;
-                if (isset($item->central)) {
-                    $c = is_array($item->central) ? (object)$item->central : $item->central;
-                } else {
-                    $c = $item;
-                }
-                if (!is_object($c)) continue;
-                $cId = $c->id ?? null;
-                $cName = $c->name ?? 'Central';
-                $selected = ($central->id !== null && $central->id == $cId) ? "selected" : "";
-                $value = htmlspecialchars(json_encode($c), ENT_QUOTES, 'UTF-8');
-                $name  = htmlspecialchars($cName, ENT_QUOTES, 'UTF-8');
-                echo "<option value='{$value}' {$selected}>{$name}</option>";
             }
-        }
-        ?>
-    </select>
+            ?>
+        </select>
+    </div>
 
 </nav>
+
+<!-- Mobile Touch Bottom Navigation Bar (PWA Experience) -->
+<nav class="movy-mobile-nav" aria-label="Navegação móvel">
+    <button type="button" class="movy-mobile-nav-item active" id="mNavDispatch" onclick="window.MovyNav && window.MovyNav.showDispatch()">
+        <i class="material-icons">send</i>
+        <span>Despacho</span>
+    </button>
+    <button type="button" class="movy-mobile-nav-item" id="mNavTrips" onclick="window.MovyNav && window.MovyNav.showTrips()">
+        <i class="material-icons">directions_car</i>
+        <span>Viagens</span>
+    </button>
+    <button type="button" class="movy-mobile-nav-item" id="mNavDrivers" onclick="window.MovyNav && window.MovyNav.showDrivers()">
+        <i class="material-icons">people</i>
+        <span>Motoristas</span>
+    </button>
+    <button type="button" class="movy-mobile-nav-item" id="mNavMenu" onclick="window.MovyNav && window.MovyNav.toggleMenu()">
+        <i class="material-icons">menu</i>
+        <span>Mais</span>
+    </button>
+</nav>
+
+<script>
+window.MovyNav = {
+    showDispatch: function() {
+        $('.movy-mobile-nav-item').removeClass('active');
+        $('#mNavDispatch').addClass('active');
+        $('#containerMenu').show();
+        $('.list-trips-active-partner').hide();
+    },
+    showTrips: function() {
+        $('.movy-mobile-nav-item').removeClass('active');
+        $('#mNavTrips').addClass('active');
+        $('#containerMenu').hide();
+        $('.list-trips-active-partner').show();
+    },
+    showDrivers: function() {
+        if ($('#openModalFindDriver').length) {
+            $('#openModalFindDriver').click();
+        } else {
+            window.location.href = '/driver/list';
+        }
+    },
+    toggleMenu: function() {
+        $('#optionMenu').click();
+    }
+};
+</script>
 <div class="container-menu-options">
     <div id="containerMenuOptions">
         <nav class="navbar navbar-dark bg-dark menu-drawer-navbar" aria-label="Menu lateral">

@@ -4,7 +4,7 @@
         <!-- ── Cabeçalho ── -->
         <div class="vc-header">
             <h1 class="vc-title">Vouchers</h1>
-            <span class="vc-balance" id="saldVoucher">Saldo: R$ 0,00</span>
+            <span class="vc-balance" id="saldVoucher">Saldo: $0.00</span>
         </div>
 
         <!-- ── Grid de vouchers (preenchido pelo JS) ── -->
