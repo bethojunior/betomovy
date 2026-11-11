@@ -2,7 +2,7 @@ import { ActivityIndicator, Image, Platform, StyleSheet, View } from 'react-nati
 import { Container, Splash, SplashImage, SpinnerContainer } from './styles';
 
 import { Portal } from 'react-native-paper';
-import logoMovyDarkBlue from '~/../assets/logo_movy_stacked_dark_blue.png';
+import logoMovyWhiteText from '~/../assets/logo_movy_white_text.png';
 import splash from '~/../assets/splash.png';
 
 interface PreloadProps {
@@ -15,7 +15,7 @@ const BrandDefault = () => {
   return (
     <View style={brand.screen}>
       <Image
-        source={logoMovyDarkBlue}
+        source={logoMovyWhiteText}
         resizeMode="contain"
         style={brand.logo}
       />
@@ -30,7 +30,7 @@ const brand = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#CF227B',
+    backgroundColor: '#070A1A',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -41,7 +41,7 @@ const brand = StyleSheet.create({
 });
 
 const FullSplashImage = () => (
-  <Splash style={{ backgroundColor: '#CF227B' }}>
+  <Splash style={{ backgroundColor: '#070A1A' }}>
     <SplashImage source={splash} resizeMode="cover" />
   </Splash>
 );
@@ -63,7 +63,7 @@ export default function Preload({
     <Portal>
       <Container
         transparent={transparent}
-        style={!transparent && type === 'brand' ? { backgroundColor: '#CF227B' } : undefined}
+        style={!transparent && type === 'brand' ? { backgroundColor: '#070A1A' } : undefined}
       >
         {type === 'brand' && <BrandDefault />}
         {type === 'splash' && <FullSplashImage />}

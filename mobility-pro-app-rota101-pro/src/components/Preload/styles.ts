@@ -25,7 +25,7 @@ export const Splash = styled.View`
   left: 0px;
   right: 0px;
   bottom: 0px;
-  background-color: #CF227B;
+  background-color: #070A1A;
 `;
 
 export const LogoImage = styled.Image`

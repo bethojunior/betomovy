@@ -68,3 +68,10 @@
 ### Pendente de commit
 
 `src/components/movy/`, `driver/src/components/ButtonOnAndOff/`, `driver/src/components/Home/V2/styles.ts` + esta doc.
+
+### Sessão 3 (cont.) — eliminação do rosa residual
+
+- `#CF227B` removido de **todo** `src/`, `app.json` e `index.tsx` (verificado por grep — zero ocorrências).
+- `src/components/Preload`: splash/preload agora navy `#070A1A` + logo `logo_movy_white_text.png` (antes rosa + logo azul-escuro, que ficaria ilegível no navy).
+- `src/client/components/Splash/styles.ts`: fundo navy.
+- Verificado: `TripTypeCard` (seleção de categoria) e `CardOffer` (oferta do motorista) **já utilizam** a paleta slate/royal do novo design — não precisaram de reescrita.
