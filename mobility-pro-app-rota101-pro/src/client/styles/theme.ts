@@ -3,7 +3,7 @@ import {buildApp} from '../../constantBuild/config';
 
 export default {
   colors: {
-    primary: '#00349a',
+    primary: '#00349A',
     secondary: '#000000',
     background_global: '#f1f1f1',
     primaryText: '#f1f1f1',
@@ -58,7 +58,18 @@ export default {
     brand_cyan: '#04F3FA',
     brand_blue: '#00349A',
     brand_dark: '#0B1220',
-    card_dark: '#111827',
+    card_dark: '#0B1220',
+    // MOVY Executive Design System — new palette tokens
+    navy_deep: '#070A1A',
+    cyan_electric: '#04F3FA',
+    blue_royal: '#00349A',
+    gray_canvas: '#F8F9FA',
+    gray_border: '#E2E8F0',
+    dark_border: '#1E293B',
+    gray_muted: '#64748B',
+    success_emerald: '#10B981',
+    danger_crimson: '#EF4444',
+    warning_amber: '#F59E0B',
   },
   toast: {
     secondary_light: '#ff872c4d',

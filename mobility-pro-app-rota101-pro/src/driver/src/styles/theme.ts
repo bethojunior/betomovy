@@ -2,11 +2,23 @@ import {RFValue} from 'react-native-responsive-fontsize';
 //
 export default {
   colors: {
-    primary: '#00349a',
+    primary: '#00349A',
     brand_blue: '#00349A',
     brand_cyan: '#04F3FA',
     brand_dark: '#0B1220',
+    card_dark: '#0B1220',
     cyan: '#04F3FA',
+    // MOVY Executive Design System — new palette tokens
+    navy_deep: '#070A1A',
+    cyan_electric: '#04F3FA',
+    blue_royal: '#00349A',
+    gray_canvas: '#F8F9FA',
+    gray_border: '#E2E8F0',
+    dark_border: '#1E293B',
+    gray_muted: '#64748B',
+    success_emerald: '#10B981',
+    danger_crimson: '#EF4444',
+    warning_amber: '#F59E0B',
     secondary: '#000',
     background_global: '#f1f1f1',
 
