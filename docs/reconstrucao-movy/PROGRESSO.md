@@ -81,3 +81,12 @@
 - Auditoria de estilos: `client/pages/Trip`, `client/pages/DetailsTrip`, `driver/src/pages/DetailsTrip`, `components/TripTypeCard`, `driver/src/components/CardOffer`, `driver/src/pages/TripsOffer` — **já usam a paleta slate/royal/cyan do novo design** (zero hex legado, tema-driven).
 - Conclusão: a migração visual está bem mais avançada que o estimado — commits anteriores já modernizaram a maioria das telas-chave. Esta sessão eliminou os últimos resíduos rosa e uniformizou toggle/painel/splash.
 - **Resta verificar em device/emulador**: compilação visual real das telas restantes e fluxos completos (não há como garantir 100% sem executar o app).
+
+---
+
+## 5. Sessão 4 — Build de homologação (2026-11-11)
+
+- `gradlew bundleRelease` **BUILD SUCCESSFUL** (5h21min). Artefatos gerados com todo o novo design (v8.4.0 / versionCode 80309):
+  - **APK universal:** `movy-app-universal.apk` (72,85 MB) — raiz do repo e `android/app/release/`
+  - **AAB release assinado:** `mobility-pro-app-rota101-pro/android/app/release/app-release.aab` (52,63 MB) — pronto para upload Play Console
+- Pendente: validação visual em device/emulador pelo usuário; ajuste fino de telas que restarem fora do padrão.
