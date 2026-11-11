@@ -9,7 +9,7 @@ export const Container = styled(Animated.View)`
   border-top-left-radius: ${RFValue(25)}px;
   border-top-right-radius: ${RFValue(25)}px;
   overflow: hidden;
-  background-color: ${({ theme }) => theme.colors.background_global};
+  background-color: ${({ theme }) => theme.colors.white ?? '#FFFFFF'};
   shadow-color: ${({ theme }) => theme.colors.black};
   shadow-offset: 0px -2px;
   shadow-opacity: 0.1;
@@ -22,7 +22,7 @@ export const Handle = styled.View`
   width: ${RFValue(40)}px;
   height: ${RFValue(4)}px;
   border-radius: ${RFValue(2)}px;
-  background-color: ${({theme}) => theme.colors.border};
+  background-color: ${({theme}) => theme.colors.gray_border ?? '#E2E8F0'};
   margin-top: ${({theme}) => theme.spacing.medium}px;
   margin-bottom: ${({theme}) => theme.spacing.small}px;
 `;
@@ -80,7 +80,7 @@ export const ButtonCancel = styled.TouchableOpacity`
   width: ${RFValue(200)}px;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
+  border-radius: 14px;
   margin-bottom: ${RFValue(16)}px;
 `;
 
