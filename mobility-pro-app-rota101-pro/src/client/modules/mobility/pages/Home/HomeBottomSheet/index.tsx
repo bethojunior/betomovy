@@ -58,7 +58,7 @@ export function HomeBottomSheet({
       </GestureDetector>
 
       <MyLocationViewer
-        backgroundColor={colors.primary}
+        backgroundColor={colors.navy_deep ?? '#070A1A'}
         onPress={handleMyLocationPress}
         activeOpacity={0.8}
       >

@@ -19,9 +19,11 @@ export const ModuleIconWrapper = styled.View`
   width: ${RFValue(48)}px;
   height: ${RFValue(48)}px;
   border-radius: ${RFValue(24)}px;
-  background-color: ${({theme}) => `${theme.colors.primary}1A`};
+  background-color: ${({theme}) =>
+    `${theme.colors.navy_deep ?? '#070A1A'}1A`};
   border-width: ${RFValue(2)}px;
-  border-color: ${({theme}) => `${theme.colors.primary}4D`};
+  border-color: ${({theme}) =>
+    `${theme.colors.navy_deep ?? '#070A1A'}4D`};
   align-items: center;
   justify-content: center;
   overflow: hidden;

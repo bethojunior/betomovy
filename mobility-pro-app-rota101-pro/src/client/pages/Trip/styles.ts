@@ -21,11 +21,13 @@ export const ContainerDuration = styled.View`
   position: absolute;
   top: 10px;
   align-self: center;
-  width: 100px;
+  min-width: 100px;
   align-items: center;
-  background-color: ${({theme}) => theme.colors.primary};
-  border-radius: 10px;
-  padding: ${({theme}) => theme.spacing.small}px;
+  background-color: ${({theme}) => theme.colors.navy_deep ?? '#070A1A'};
+  border-radius: 999px;
+  padding: ${({theme}) => theme.spacing.small}px ${RFValue(14)}px;
+  border-width: 1px;
+  border-color: ${({theme}) => theme.colors.cyan_electric ?? '#04F3FA'}55;
 
   shadow-color: ${({theme}) => theme.colors.secondary};
   shadow-offset: 0px 0px;

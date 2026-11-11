@@ -9,21 +9,22 @@ export const Container = styled.View`
 `;
 
 export const GreetingPill = styled.View`
-  background-color: ${({theme}) => theme.colors.white};
+  background-color: ${({theme}) => theme.colors.navy_deep ?? '#070A1A'};
   border-radius: ${({theme}) => theme.borderRadius.xxlarge}px;
-  padding: ${({theme}) => theme.spacing.medium}px
-    ${({theme}) => theme.spacing.large}px;
-  shadow-color: ${({theme}) => theme.colors.black};
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.1;
-  shadow-radius: ${RFValue(4)}px;
-  elevation: 4;
+  padding: ${RFValue(10)}px ${({theme}) => theme.spacing.large}px;
+  border-width: 1px;
+  border-color: ${({theme}) => theme.colors.cyan_electric ?? '#04F3FA'}33;
+  shadow-color: #000;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.25;
+  shadow-radius: ${RFValue(8)}px;
+  elevation: 6;
 `;
 
 export const GreetingText = styled.Text`
   font-size: ${({theme}) => theme.fontSizes.medium}px;
-  color: ${({theme}) => theme.colors.secondary};
-  font-weight: 600;
+  color: ${({theme}) => theme.colors.cyan_electric ?? '#04F3FA'};
+  font-family: ${({theme}) => theme.fonts.bold};
 `;
 
 export const RightActions = styled.View`
@@ -33,15 +34,17 @@ export const RightActions = styled.View`
 `;
 
 export const NotificationButtonWrapper = styled.View`
-  background-color: ${({theme}) => theme.colors.white};
-  width: ${RFValue(38)}px;
-  height: ${RFValue(38)}px;
-  border-radius: ${RFValue(19)}px;
+  background-color: ${({theme}) => theme.colors.navy_deep ?? '#070A1A'};
+  width: ${RFValue(40)}px;
+  height: ${RFValue(40)}px;
+  border-radius: ${RFValue(20)}px;
   align-items: center;
   justify-content: center;
-  shadow-color: ${({theme}) => theme.colors.black};
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.1;
-  shadow-radius: ${RFValue(4)}px;
-  elevation: 4;
+  border-width: 1px;
+  border-color: ${({theme}) => theme.colors.cyan_electric ?? '#04F3FA'}33;
+  shadow-color: #000;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.25;
+  shadow-radius: ${RFValue(8)}px;
+  elevation: 6;
 `;

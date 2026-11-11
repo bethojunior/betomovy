@@ -4,10 +4,17 @@ import styled from 'styled-components/native';
 // margin-top separa do input de busca (mesmo valor do ContentAddress, HomeBottomSheet/styles.ts)
 // — sem isso os dois cards (mesmo bg) se colam.
 export const ListCard = styled.View`
-  background-color: ${({theme}) => theme.colors.background_white};
-  border-radius: ${({theme}) => theme.borderRadius.large}px;
+  background-color: ${({theme}) => theme.colors.white ?? '#FFFFFF'};
+  border-radius: ${({theme}) => theme.borderRadius.xlarge}px;
+  border-width: 1px;
+  border-color: ${({theme}) => theme.colors.gray_border ?? '#E2E8F0'};
   padding: ${({theme}) => theme.spacing.medium}px;
   margin-top: ${({theme}) => theme.spacing.large}px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.06;
+  shadow-radius: 8px;
+  elevation: 3;
 `;
 
 // ~1 card e meio de altura — o resto só aparece rolando, sinalizando que tem mais.

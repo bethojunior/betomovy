@@ -32,7 +32,12 @@ export const CardContainer = styled.View`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  border-radius: 10px;
+  border-radius: 18px;
   width: 100%;
   background-color: ${({theme}) => theme.colors.primary};
+  shadow-color: #000;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.2;
+  shadow-radius: 10px;
+  elevation: 8;
 `;

@@ -32,7 +32,7 @@ export function DestinationSearchBar({
 
       <MicButton onPress={onMicPress} activeOpacity={0.9}>
         {micPulse}
-        <Ionicons name="mic" size={RFValue(22)} color={colors.secondary} />
+        <Ionicons name="mic" size={RFValue(22)} color={colors.navy_deep ?? '#070A1A'} />
       </MicButton>
     </Container>
   );

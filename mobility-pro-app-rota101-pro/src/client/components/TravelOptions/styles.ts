@@ -10,18 +10,16 @@ interface ConfirmButtonProps {
 }
 
 export const Container = styled.View`
-  padding: 0 ${RFValue(10)}px ${RFValue(10)}px ${RFValue(10)}px;
-  /* border: 0.1px solid ${({theme}) => theme.colors.black}; */
-  background-color: ${({theme}) => theme.colors.background_global};
+  padding: 0 ${RFValue(16)}px ${RFValue(16)}px ${RFValue(16)}px;
+  background-color: ${({theme}) => theme.colors.white ?? '#FFFFFF'};
+  border-top-left-radius: ${({theme}) => theme.borderRadius.xxxlarge ?? 24}px;
+  border-top-right-radius: ${({theme}) => theme.borderRadius.xxxlarge ?? 24}px;
 
-  elevation: 6;
-  border: ${RFValue(0.1)}px solid black;
-  shadow-color: ${({theme}) => theme.colors.black};
-  shadow-offset: 0px 0px;
-  shadow-opacity: 0.1;
-  shadow-radius: ${RFValue(2)}px;
-  border-radius: ${RFValue(2)}px;
-  /* shadow-color: ${({theme}) => theme.colors.black}; */
+  elevation: 8;
+  shadow-color: #000;
+  shadow-offset: 0px -4px;
+  shadow-opacity: 0.12;
+  shadow-radius: 16px;
 `;
 
 export const Header = styled.View`
@@ -53,7 +51,7 @@ export const ButtonNavigate = styled.TouchableOpacity`
 `;
 
 export const HeaderTitle = styled.Text`
-  color: ${({theme}) => theme.colors.primary};
+  color: ${({theme}) => theme.colors.navy_deep ?? '#070A1A'};
   font-weight: bold;
   font-size: ${RFValue(14)}px;
 `;
@@ -108,9 +106,9 @@ export const ConfirmButton = styled.TouchableOpacity<ConfirmButtonProps>`
       ? props.backgroundColor
       : ({theme}) => theme.colors.primary};
   padding: ${RFValue(10)}px;
-  border-radius: ${RFValue(5)}px;
+  border-radius: ${RFValue(16)}px;
   flex: 1;
-  height: ${RFValue(55)}px;
+  height: ${RFValue(56)}px;
   justify-content: center;
   align-items: center;
 `;
@@ -128,8 +126,10 @@ export const ConfirmButtonText = styled.Text`
 export const OptionalButton = styled.TouchableOpacity<{turbined?: boolean}>`
   margin-right: ${RFValue(5)}px;
   background-color: ${({theme, turbined}) =>
-    turbined ? theme.colors.primary : theme.colors.background_global};
-  border-radius: ${RFValue(5)}px;
+    turbined
+      ? theme.colors.primary
+      : (theme.colors.gray_border ?? '#F1F5F9')};
+  border-radius: ${RFValue(14)}px;
   max-width: 18%;
   padding: ${RFValue(10)}px 0;
   flex: 1;
@@ -160,14 +160,12 @@ export const OptionTravelItem = styled.TouchableOpacity<{selected?: boolean}>`
   ${({selected, theme}) =>
     selected &&
     css`
-      background-color: ${({theme}) => lighten(0.54, theme.colors.primary)};
-      border: ${RFValue(1)}px solid
-        ${shade(0.5, theme.colors.background_global)};
-      elevation: 1;
-      border-top-left-radius: ${RFValue(6)}px;
-      border-top-right-radius: ${RFValue(6)}px;
-      border-bottom-left-radius: ${RFValue(6)}px;
-      border-bottom-right-radius: ${RFValue(6)}px;
+      background-color: ${({theme}) =>
+        `${theme.colors.cyan_electric ?? '#04F3FA'}26`};
+      border: ${RFValue(1.5)}px solid
+        ${({theme}) => theme.colors.cyan_electric ?? '#04F3FA'};
+      elevation: 2;
+      border-radius: ${RFValue(14)}px;
       z-index: 1;
     `}
 `;
@@ -279,9 +277,9 @@ export const CancelationFeeContainer = styled.View`
 
 export const PaymentMethodContainer = styled.View`
   border-top-width: ${RFValue(1)}px;
-  border-top-color: ${({theme}) => theme.colors.border};
+  border-top-color: ${({theme}) => theme.colors.gray_border ?? '#E2E8F0'};
   border-bottom-width: ${RFValue(1)}px;
-  border-bottom-color: ${({theme}) => theme.colors.border};
+  border-bottom-color: ${({theme}) => theme.colors.gray_border ?? '#E2E8F0'};
   flex-direction: row;
   align-items: center;
 `;

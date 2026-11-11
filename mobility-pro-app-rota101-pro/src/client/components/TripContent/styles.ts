@@ -7,9 +7,14 @@ interface ContainerProps {
 
 export const Container = styled.View<ContainerProps>`
   width: 100%;
-  border-top-right-radius: 10px;
-  border-top-left-radius: 10px;
-  background-color: ${({theme}) => theme.colors.background_global};
+  border-top-right-radius: ${({theme}) => theme.borderRadius.xxxlarge ?? 24}px;
+  border-top-left-radius: ${({theme}) => theme.borderRadius.xxxlarge ?? 24}px;
+  background-color: ${({theme}) => theme.colors.white ?? '#FFFFFF'};
+  shadow-color: #000;
+  shadow-offset: 0px -4px;
+  shadow-opacity: 0.1;
+  shadow-radius: 16px;
+  elevation: 8;
 `;
 
 export const LoadingContainer = styled.View`
