@@ -1,0 +1,1109 @@
+[
+  {
+    "url": "acquirer",
+    "file": "Advanced\\Configs\\Acquirer\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 11760,
+    "parsedStatus": true,
+    "parsedMessage": "Adquirentes listadas com sucesso",
+    "rawSnippet": "{\"status\":true,\"message\":\"Adquirentes listadas com sucesso\",\"data\":[{\"idFinancialIntermediary\":1,\"name\":\"MERCADO PAGO\",\"active\":0,\"acquirer_meta_data\""
+  },
+  {
+    "url": "acquirer/city",
+    "file": "Advanced\\Configs\\AcquirerByCity\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 11760,
+    "parsedStatus": true,
+    "parsedMessage": "Adquirentes listadas com sucesso",
+    "rawSnippet": "{\"status\":true,\"message\":\"Adquirentes listadas com sucesso\",\"data\":[{\"idFinancialIntermediary\":1,\"name\":\"MERCADO PAGO\",\"active\":0,\"acquirer_meta_data\""
+  },
+  {
+    "url": "config/additional",
+    "file": "Advanced\\Configs\\AdditionalSettings\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 20424,
+    "parsedStatus": true,
+    "parsedMessage": "Configurações adicionais encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00f5es adicionais encontradas\",\"data\":[{\"idConfig\":\"105\",\"configTypeId\":\"20\",\"typeName\":\"PR\\u00c9-PAGO\",\"ke"
+  },
+  {
+    "url": "role",
+    "file": "Advanced\\Configs\\Admin\\UserRegistration\\EditModal\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 663,
+    "parsedStatus": true,
+    "parsedMessage": "Perfis carregados com sucesso",
+    "rawSnippet": "{\"status\":true,\"message\":\"Perfis carregados com sucesso\",\"data\":[{\"id\":1,\"name\":\"Super Administrador\",\"support\":0,\"isRoot\":1,\"active\":1},{\"id\":2,\"name"
+  },
+  {
+    "url": "doc",
+    "file": "Advanced\\Configs\\AppDocuments\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 2006,
+    "parsedStatus": true,
+    "parsedMessage": "Documentos encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Documentos encontrados\",\"data\":[{\"id\":\"1\",\"label\":\"Driver's License\",\"description\":\"Valid state driver's license\",\"image\":\"1"
+  },
+  {
+    "url": "country",
+    "file": "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 16582,
+    "parsedStatus": true,
+    "parsedMessage": "Lista de países",
+    "rawSnippet": "{\"status\":true,\"message\":\"Lista de pa\\u00edses\",\"data\":[{\"id\":1,\"name\":\"Brasil\",\"nome\":\"Brasil\",\"shortName\":\"BR\"},{\"id\":2,\"name\":\"Estados Unidos\",\"nom"
+  },
+  {
+    "url": "city?estateId=",
+    "file": "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 0,
+    "parsedStatus": null,
+    "parsedMessage": null,
+    "rawSnippet": ""
+  },
+  {
+    "url": "city/actives/fully",
+    "file": "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 379081,
+    "parsedStatus": true,
+    "parsedMessage": "Cidades encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Cidades encontradas\",\"data\":[{\"id\":\"5605\",\"nome\":\"Boston\",\"shortName\":\"Boston\",\"estado\":\"122\",\"active\":\"1\",\"statusId\":\"1\",\"p"
+  },
+  {
+    "url": "callGroup",
+    "file": "Advanced\\Configs\\CallGroup\\LinkedDrivers\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 84,
+    "parsedStatus": true,
+    "parsedMessage": "Grupos de chamados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Grupos de chamados\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "callGroup/searchDriver",
+    "file": "Advanced\\Configs\\CallGroup\\LinkedDrivers\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 154,
+    "parsedStatus": true,
+    "parsedMessage": "Motoristas encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Motoristas encontrados\",\"data\":{\"data\":[],\"last_page\":1,\"total\":0},\"response\":{\"data\":[],\"last_page\":1,\"total\":0},\"errors\":n"
+  },
+  {
+    "url": "config_app_partners/find",
+    "file": "Advanced\\Configs\\CallManagement\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 287,
+    "parsedStatus": false,
+    "parsedMessage": "Rota não existe: config_app_partners/find",
+    "rawSnippet": "{\"status\":false,\"message\":\"Rota n\\u00e3o existe: config_app_partners\\/find\",\"data\":null,\"response\":[\"Rota n\\u00e3o existe: config_app_partners\\/find\"]"
+  },
+  {
+    "url": "appConfig",
+    "file": "Advanced\\Configs\\ConfigApp\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:10\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "city/actives",
+    "file": "Advanced\\Configs\\ConfigByCities\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 6059,
+    "parsedStatus": true,
+    "parsedMessage": "Cidades encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Cidades encontradas\",\"data\":[{\"id\":\"5605\",\"nome\":\"Boston\",\"shortName\":\"Boston\",\"estado\":\"122\",\"active\":\"1\",\"statusId\":\"1\",\"i"
+  },
+  {
+    "url": "smtpServer",
+    "file": "Advanced\\Configs\\ConfigServiceSMTP\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:10\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "config_app_partners/find_all?page=",
+    "file": "Advanced\\Configs\\ConfigsAppPartner\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 299,
+    "parsedStatus": false,
+    "parsedMessage": "Rota não existe: config_app_partners/find_all",
+    "rawSnippet": "{\"status\":false,\"message\":\"Rota n\\u00e3o existe: config_app_partners\\/find_all\",\"data\":null,\"response\":[\"Rota n\\u00e3o existe: config_app_partners\\/fi"
+  },
+  {
+    "url": "userType/drivers",
+    "file": "Advanced\\Configs\\ConfigsRegister\\AddDocumentsByCategory\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 5908,
+    "parsedStatus": true,
+    "parsedMessage": "Tipos de motoristas ativos",
+    "rawSnippet": "{\"status\":true,\"message\":\"Tipos de motoristas ativos\",\"response\":[{\"idUserType\":18,\"name\":\"Delivery\",\"isDriver\":1,\"isDeliveryMan\":0,\"description\":null"
+  },
+  {
+    "url": "config/formStep",
+    "file": "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 109,
+    "parsedStatus": true,
+    "parsedMessage": "Configuração 'formStep' vazia",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00e3o 'formStep' vazia\",\"data\":null,\"response\":null,\"errors\":null}"
+  },
+  {
+    "url": "requiredField/confirmationCodeCustomer",
+    "file": "Advanced\\Configs\\ConfirmationCode\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:11\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "externalServiceActiveChannel",
+    "file": "Advanced\\Configs\\ConfirmationCode\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:11\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "externalServiceType?externalServiceGroupId=1",
+    "file": "Advanced\\Configs\\ConfirmationCode\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:12\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "integration-partners",
+    "file": "Advanced\\Configs\\CredentialsIntegrationExternal\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:12\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "/databaseVersion",
+    "file": "Advanced\\Configs\\FirebaseVerification\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:12\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "/config/realtimeDatabase",
+    "file": "Advanced\\Configs\\FirebaseVerification\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 139,
+    "parsedStatus": true,
+    "parsedMessage": "Status da sincronização em tempo real",
+    "rawSnippet": "{\"status\":true,\"message\":\"Status da sincroniza\\u00e7\\u00e3o em tempo real\",\"data\":{\"status\":true},\"response\":{\"status\":true},\"errors\":null}"
+  },
+  {
+    "url": "config",
+    "file": "Advanced\\Configs\\KeysApp\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 100341,
+    "parsedStatus": true,
+    "parsedMessage": "Configurações encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00f5es encontradas\",\"data\":[{\"idConfig\":\"65\",\"configTypeId\":\"10\",\"typeName\":\"APP\",\"key\":\"allowed_genres\",\"v"
+  },
+  {
+    "url": "config_list_phone_general/config",
+    "file": "Advanced\\Configs\\ListPhonesGeneral\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:12\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "list_contacts_general/list",
+    "file": "Advanced\\Configs\\ListPhonesGeneral\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:13\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "managementWppNotifications",
+    "file": "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:13\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "tripType",
+    "file": "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+    "statusCode": 200,
+    "bodyLength": 6131,
+    "parsedStatus": true,
+    "parsedMessage": "Tipos de viagem encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Tipos de viagem encontrados\",\"data\":[{\"idTripType\":\"29\",\"id\":\"29\",\"type\":\"PARTICULAR CENTRAL\",\"name\":\"PARTICULAR CENTRAL\",\"d"
+  },
+  {
+    "url": "chatBotTrip",
+    "file": "Advanced\\Configs\\MessagesChatDriver\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:13\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "chatBotTripType",
+    "file": "Advanced\\Configs\\MessagesChatDriver\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:13\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "/tripPaymentForm",
+    "file": "Advanced\\Configs\\MethodsPayments\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 1862,
+    "parsedStatus": true,
+    "parsedMessage": "Listando formas de pagamento da viagem",
+    "rawSnippet": "{\"status\":true,\"message\":\"Listando formas de pagamento da viagem\",\"data\":[{\"idTripPaymentForm\":18,\"name\":\"STRIPE\",\"paymentFormTypeId\":3,\"active\":1,\"st"
+  },
+  {
+    "url": "/paymentFormType",
+    "file": "Advanced\\Configs\\MethodsPayments\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 3832,
+    "parsedStatus": true,
+    "parsedMessage": "Tipos de formas de pagamento encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Tipos de formas de pagamento encontradas\",\"data\":[{\"id\":\"1\",\"name\":\"Pagamento em Voucher\",\"description\":\"Pagamentos realizad"
+  },
+  {
+    "url": "appModule",
+    "file": "Advanced\\Configs\\ModulesActives\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 962,
+    "parsedStatus": true,
+    "parsedMessage": "Módulos encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"M\\u00f3dulos encontrados\",\"data\":[{\"id\":1,\"moduleId\":1,\"name\":\"Mobilidade\",\"moduleName\":\"Mobilidade\",\"isActive\":1,\"logo\":\"\"}"
+  },
+  {
+    "url": "adminNotification?page=",
+    "file": "Advanced\\Configs\\NotificationsAdmin\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:15\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "adminNotificationType",
+    "file": "Advanced\\Configs\\NotificationsAdmin\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:14\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "userPenaltiesType",
+    "file": "Advanced\\Configs\\PendencyDriver\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:15\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "cancellationReasons",
+    "file": "Advanced\\Configs\\ReasonsForCancellations\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:15\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "externalServiceType/fully?cityId=",
+    "file": "Advanced\\Configs\\ServicesExternalByCity\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:15\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "externalServiceType/fully",
+    "file": "Advanced\\Configs\\ServicesExternalGlobal\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:15\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "webhook?page=",
+    "file": "Advanced\\Configs\\ServicesExternalWebhook\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:15\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "dynamicArea",
+    "file": "Advanced\\Configs\\Tariffs\\DynamicPerArea\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 103,
+    "parsedStatus": true,
+    "parsedMessage": "Áreas dinâmicas encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"\\u00c1reas din\\u00e2micas encontradas\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "cashback?cityId=",
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:16\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "price/range?cityId=",
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 1158,
+    "parsedStatus": true,
+    "parsedMessage": "Faixas de preço encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Faixas de pre\\u00e7o encontradas\",\"data\":[{\"id\":\"1\",\"min_value\":\"0\",\"max_value\":\"0\",\"new_value\":\"0\",\"priceId\":null,\"cityId\":"
+  },
+  {
+    "url": "tax?cityId=",
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:16\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "price?cityId=",
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 172433,
+    "parsedStatus": true,
+    "parsedMessage": "Preços encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Pre\\u00e7os encontrados\",\"data\":[{\"id\":\"4200\",\"min_price\":\"3.78\",\"base_price\":\"1.3\",\"km_price\":\"0.66\",\"minute_price\":\"0.06\","
+  },
+  {
+    "url": "tripPaymentForm",
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 1862,
+    "parsedStatus": true,
+    "parsedMessage": "Listando formas de pagamento da viagem",
+    "rawSnippet": "{\"status\":true,\"message\":\"Listando formas de pagamento da viagem\",\"data\":[{\"idTripPaymentForm\":18,\"name\":\"STRIPE\",\"paymentFormTypeId\":3,\"active\":1,\"st"
+  },
+  {
+    "url": "price/dynamic?cityId=",
+    "file": "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 3238910,
+    "parsedStatus": true,
+    "parsedMessage": "Tarifas dinâmicas encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Tarifas din\\u00e2micas encontradas\",\"data\":[{\"id\":5484,\"idPriceDynamic\":5484,\"cityId\":5695,\"dayOfWeek\":7,\"multiplierValue\":1"
+  },
+  {
+    "url": "priceDynamicScheduled",
+    "file": "Advanced\\Configs\\Tariffs\\TariffTrigger\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 73253,
+    "parsedStatus": true,
+    "parsedMessage": "Gatilhos de dinâmica encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Gatilhos de din\\u00e2mica encontrados\",\"data\":[{\"id\":\"30677\",\"cityId\":\"5695\",\"city\":\"Petrolina - PE\",\"tripTypeId\":\"2\",\"tripT"
+  },
+  {
+    "url": "config/travel_only_by_offer",
+    "file": "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useInDriverConfig.ts",
+    "statusCode": 200,
+    "bodyLength": 210,
+    "parsedStatus": true,
+    "parsedMessage": "Configuração encontrada",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00e3o encontrada\",\"data\":\"0\",\"response\":\"0\",\"config\":{\"key\":\"travel_only_by_offer\",\"value\":\"0\",\"description"
+  },
+  {
+    "url": "city",
+    "file": "Advanced\\Configs\\Tariffs\\TypesTravels\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 0,
+    "parsedStatus": null,
+    "parsedMessage": null,
+    "rawSnippet": ""
+  },
+  {
+    "url": "termsUsePolicy",
+    "file": "Advanced\\Configs\\UsagePolicy\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:18\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "deliveryInfoSuggestion",
+    "file": "Advanced\\Delivery\\Items\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 892,
+    "parsedStatus": true,
+    "parsedMessage": "Sugestões encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Sugest\\u00f5es encontradas\",\"data\":{\"tripItemType\":[{\"id\":\"7\",\"name\":\"FOODY\",\"picture\":\"https:\\/\\/minio.704app.com.br\\/rota1"
+  },
+  {
+    "url": "item",
+    "file": "Advanced\\Frete\\ListItens\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:19\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "price/obstacle?cityId=",
+    "file": "Advanced\\Frete\\LoadAccessibility\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 172433,
+    "parsedStatus": true,
+    "parsedMessage": "Preços encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Pre\\u00e7os encontrados\",\"data\":[{\"id\":\"4200\",\"min_price\":\"3.78\",\"base_price\":\"1.3\",\"km_price\":\"0.66\",\"minute_price\":\"0.06\","
+  },
+  {
+    "url": "price/help?cityId=",
+    "file": "Advanced\\Frete\\ServicesExtras\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 172433,
+    "parsedStatus": true,
+    "parsedMessage": "Preços encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Pre\\u00e7os encontrados\",\"data\":[{\"id\":\"4200\",\"min_price\":\"3.78\",\"base_price\":\"1.3\",\"km_price\":\"0.66\",\"minute_price\":\"0.06\","
+  },
+  {
+    "url": "mapService",
+    "file": "Advanced\\Maps\\ConfigCity\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 416,
+    "parsedStatus": true,
+    "parsedMessage": "Lista de serviços de mapa",
+    "rawSnippet": "{\"status\":true,\"message\":\"Lista de servi\\u00e7os de mapa\",\"data\":[{\"groupCode\":\"7c87d7bf-9cba-4f32-86ee-c75d05eef18f\",\"type\":\"google\",\"keys\":[{\"key\":\""
+  },
+  {
+    "url": "mapService/types",
+    "file": "Advanced\\Maps\\ConfigCity\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 1636,
+    "parsedStatus": true,
+    "parsedMessage": "Tipos de serviços de mapa",
+    "rawSnippet": "{\"status\":true,\"message\":\"Tipos de servi\\u00e7os de mapa\",\"data\":[{\"id\":1,\"name\":\"google\",\"description\":\"Google\",\"map_service_meta_data\":[{\"id\":1,\"map"
+  },
+  {
+    "url": "config/type/13",
+    "file": "Advanced\\Maps\\ConfigMaps\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 12436,
+    "parsedStatus": true,
+    "parsedMessage": "Configurações do tipo 13 encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00f5es do tipo 13 encontradas\",\"data\":[{\"key\":\"google_api_key\",\"value\":\"AIzaSyAfuClMhN-kjwhbFHlFzByKebNguXq"
+  },
+  {
+    "url": "config/type/21",
+    "file": "Advanced\\Maps\\ConfigMaps\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 5824,
+    "parsedStatus": true,
+    "parsedMessage": "Configurações do tipo 21 encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00f5es do tipo 21 encontradas\",\"data\":[{\"key\":\"radius_places_cache\",\"value\":\"25\",\"description\":\"Tamanho do "
+  },
+  {
+    "url": "addressBlacklist",
+    "file": "Advanced\\Maps\\GerencyAddress\\AddressIrregular\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:19\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "address?q=",
+    "file": "Advanced\\Maps\\GerencyAddress\\RegisterLocal\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 3397,
+    "parsedStatus": true,
+    "parsedMessage": "Endereços encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Endere\\u00e7os encontrados\",\"response\":{\"data\":[{\"id\":9366,\"address\":\"Destino Cancel Test\",\"name\":\"Destino Cancel Test\",\"lat"
+  },
+  {
+    "url": "dashboard/lastDynamicsPlaces?limit=30&cityId=",
+    "file": "Advanced\\Maps\\HeatMap\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 100,
+    "parsedStatus": true,
+    "parsedMessage": "Últimos locais dinâmicos",
+    "rawSnippet": "{\"status\":true,\"message\":\"\\u00daltimos locais din\\u00e2micos\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "dashboard/expensiveDynamicsPlaces?limit=30&cityId=",
+    "file": "Advanced\\Maps\\HeatMap\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 98,
+    "parsedStatus": true,
+    "parsedMessage": "Locais dinâmicos mais caros",
+    "rawSnippet": "{\"status\":true,\"message\":\"Locais din\\u00e2micos mais caros\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "dashboard/placesMoreTripsDayAgo?limit=30",
+    "file": "Advanced\\Maps\\HeatMap\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 95,
+    "parsedStatus": true,
+    "parsedMessage": "Locais com mais viagens ontem",
+    "rawSnippet": "{\"status\":true,\"message\":\"Locais com mais viagens ontem\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "dashboard/placesMoreTripsWeekAgo?limit=30",
+    "file": "Advanced\\Maps\\HeatMap\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 104,
+    "parsedStatus": true,
+    "parsedMessage": "Locais com mais viagens semana passada",
+    "rawSnippet": "{\"status\":true,\"message\":\"Locais com mais viagens semana passada\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "config/enable_custom_mode_of_map_services",
+    "file": "Advanced\\Maps\\MapSequencer\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 235,
+    "parsedStatus": true,
+    "parsedMessage": "Configuração encontrada",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00e3o encontrada\",\"data\":\"1\",\"response\":\"1\",\"config\":{\"key\":\"enable_custom_mode_of_map_services\",\"value\":\"1"
+  },
+  {
+    "url": "monitoringArea",
+    "file": "Advanced\\Maps\\MonitoringArea\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 102,
+    "parsedStatus": true,
+    "parsedMessage": "Lista de áreas de monitoramento",
+    "rawSnippet": "{\"status\":true,\"message\":\"Lista de \\u00e1reas de monitoramento\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "riskArea?page=1",
+    "file": "Advanced\\Maps\\RiskArea\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:21\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "webMapKey",
+    "file": "Advanced\\Maps\\RiskArea\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:21\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "config/route_optimization_google",
+    "file": "Advanced\\Maps\\RouteOptimization\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 219,
+    "parsedStatus": true,
+    "parsedMessage": "Configuração encontrada",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00e3o encontrada\",\"data\":\"time\",\"response\":\"time\",\"config\":{\"key\":\"route_optimization_google\",\"value\":\"time"
+  },
+  {
+    "url": "config/route_optimization_here",
+    "file": "Advanced\\Maps\\RouteOptimization\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 215,
+    "parsedStatus": true,
+    "parsedMessage": "Configuração encontrada",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00e3o encontrada\",\"data\":\"time\",\"response\":\"time\",\"config\":{\"key\":\"route_optimization_here\",\"value\":\"time\","
+  },
+  {
+    "url": "config/route_optimization_mapbox",
+    "file": "Advanced\\Maps\\RouteOptimization\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 219,
+    "parsedStatus": true,
+    "parsedMessage": "Configuração encontrada",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00e3o encontrada\",\"data\":\"time\",\"response\":\"time\",\"config\":{\"key\":\"route_optimization_mapbox\",\"value\":\"time"
+  },
+  {
+    "url": "/partner",
+    "file": "Advanced\\Partners\\ListPartner\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:22\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "/audit",
+    "file": "Advanced\\Partners\\MessagePartner\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:22\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "sale",
+    "file": "Advanced\\Promotions\\TripPromotions\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:22\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "company?cityId=",
+    "file": "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts",
+    "statusCode": 200,
+    "bodyLength": 11468,
+    "parsedStatus": true,
+    "parsedMessage": "Empresas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Empresas\",\"data\":{\"current_page\":1,\"data\":[{\"id\":10,\"name\":\"Congelados DuFrio\",\"fantasyName\":\"Congelados DuFrio\",\"address\":\""
+  },
+  {
+    "url": "gender",
+    "file": "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:22\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "app",
+    "file": "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts",
+    "statusCode": 200,
+    "bodyLength": 1207,
+    "parsedStatus": true,
+    "parsedMessage": "Aplicativos",
+    "rawSnippet": "{\"status\":true,\"message\":\"Aplicativos\",\"data\":[{\"idApp\":2,\"name\":\"DRIVER\",\"version\":\"1.10.0\",\"isCritical\":\"0\",\"link_store\":\"https:\\/\\/play.google.com\\"
+  },
+  {
+    "url": "advertisingAppSite",
+    "file": "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:22\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "menuApp/getPro",
+    "file": "Advanced\\Publicity\\LinkExtern\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:23\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "menuApp/types",
+    "file": "Advanced\\Publicity\\LinkExtern\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:23\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "advertising?cityId=",
+    "file": "Advanced\\Publicity\\ListPublicity\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:24\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "publicitiesApp",
+    "file": "Advanced\\Publicity\\PublicityAppList\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:23\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "appVersion?page=",
+    "file": "Advanced\\Versions\\useVersions.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:24\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "publicity/advertising/customer",
+    "file": "Dashboard\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 78,
+    "parsedStatus": true,
+    "parsedMessage": "Publicidades",
+    "rawSnippet": "{\"status\":true,\"message\":\"Publicidades\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "dashboard/rankingDriver",
+    "file": "Dashboard\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 307,
+    "parsedStatus": true,
+    "parsedMessage": "Ranking de motoristas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Ranking de motoristas\",\"data\":[{\"idDriver\":1037,\"name\":\"ALEX DENV MOTOR\",\"phone\":\"+55 87 98808 3762\",\"quantityTrips\":12,\"tot"
+  },
+  {
+    "url": "dashboard/rankingCustomer",
+    "file": "Dashboard\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 707,
+    "parsedStatus": true,
+    "parsedMessage": "Ranking de clientes",
+    "rawSnippet": "{\"status\":true,\"message\":\"Ranking de clientes\",\"data\":[{\"idUser\":4666,\"name\":\"Alex Desenvolvedor \",\"phone\":\"5587999272064\",\"quantityTrips\":6,\"totalVal"
+  },
+  {
+    "url": "/driver/positions",
+    "file": "Monitoring\\_components\\TripFooterStats.tsx",
+    "statusCode": 200,
+    "bodyLength": 1123,
+    "parsedStatus": true,
+    "parsedMessage": "Posições dos motoristas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Posi\\u00e7\\u00f5es dos motoristas\",\"data\":[{\"idDriver\":1037,\"userId\":4688,\"cityId\":5695,\"latitude\":-9.3698235,\"longitude\":-4"
+  },
+  {
+    "url": "driver/positions",
+    "file": "Monitoring\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 1123,
+    "parsedStatus": true,
+    "parsedMessage": "Posições dos motoristas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Posi\\u00e7\\u00f5es dos motoristas\",\"data\":[{\"idDriver\":1037,\"userId\":4688,\"cityId\":5695,\"latitude\":-9.3698235,\"longitude\":-4"
+  },
+  {
+    "url": "config/whatsapp_message_driver",
+    "file": "Client\\Legal\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 300,
+    "parsedStatus": true,
+    "parsedMessage": "Configuração encontrada",
+    "rawSnippet": "{\"status\":true,\"message\":\"Configura\\u00e7\\u00e3o encontrada\",\"data\":\"Ol\\u00e1, seja bem vindo a Movy\",\"response\":\"Ol\\u00e1, seja bem vindo a Movy\",\"co"
+  },
+  {
+    "url": "estate",
+    "file": "Client\\Legal\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 14400,
+    "parsedStatus": true,
+    "parsedMessage": "Listando estados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Listando estados\",\"data\":[{\"id\":1,\"country_id\":1,\"countryId\":1,\"name\":\"Acre\",\"nome\":\"Acre\",\"sigla\":\"AC\"},{\"id\":2,\"country_id"
+  },
+  {
+    "url": "report/select/driverRegisterStatus",
+    "file": "Driver\\List\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:27\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "docStatus",
+    "file": "Driver\\List\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 262,
+    "parsedStatus": true,
+    "parsedMessage": "Status de documentos",
+    "rawSnippet": "{\"status\":true,\"message\":\"Status de documentos\",\"data\":[{\"id\":1,\"name\":\"APROVADO\"},{\"id\":2,\"name\":\"EM AN\\u00c1LISE\"},{\"id\":3,\"name\":\"REPROVADO\"}],\"res"
+  },
+  {
+    "url": "tripRating?driverId=",
+    "file": "Driver\\List\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:27\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "driver?page=1&driverRegisterStatusId=",
+    "file": "Driver\\List\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 16913,
+    "parsedStatus": true,
+    "parsedMessage": "Lista de motoristas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Lista de motoristas\",\"response\":{\"current_page\":1,\"data\":[{\"idDriver\":1043,\"idUser\":4729,\"name\":\"Gilberto Teste\",\"nickname\":"
+  },
+  {
+    "url": "/userType/drivers",
+    "file": "Driver\\RequestDocuments\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 5908,
+    "parsedStatus": true,
+    "parsedMessage": "Tipos de motoristas ativos",
+    "rawSnippet": "{\"status\":true,\"message\":\"Tipos de motoristas ativos\",\"response\":[{\"idUserType\":18,\"name\":\"Delivery\",\"isDriver\":1,\"isDeliveryMan\":0,\"description\":null"
+  },
+  {
+    "url": "driver",
+    "file": "Driver\\RequestDocuments\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 16913,
+    "parsedStatus": true,
+    "parsedMessage": "Lista de motoristas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Lista de motoristas\",\"response\":{\"current_page\":1,\"data\":[{\"idDriver\":1043,\"idUser\":4729,\"name\":\"Gilberto Teste\",\"nickname\":"
+  },
+  {
+    "url": "formStep/getByUserType?userTypeId=",
+    "file": "Driver\\Signup\\FormRegisterDriver.tsx",
+    "statusCode": 200,
+    "bodyLength": 84,
+    "parsedStatus": true,
+    "parsedMessage": "Campos encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Campos encontrados\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "docUserType/findByUserType?userTypeId=",
+    "file": "Driver\\Signup\\FormRegisterDriver.tsx",
+    "statusCode": 200,
+    "bodyLength": 88,
+    "parsedStatus": true,
+    "parsedMessage": "Documentos encontrados",
+    "rawSnippet": "{\"status\":true,\"message\":\"Documentos encontrados\",\"data\":[],\"response\":[],\"errors\":null}"
+  },
+  {
+    "url": "driver?name=",
+    "file": "Financial\\CancellationFee\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 16913,
+    "parsedStatus": true,
+    "parsedMessage": "Lista de motoristas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Lista de motoristas\",\"response\":{\"current_page\":1,\"data\":[{\"idDriver\":1043,\"idUser\":4729,\"name\":\"Gilberto Teste\",\"nickname\":"
+  },
+  {
+    "url": "customer?name=",
+    "file": "Financial\\CancellationFee\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 15763,
+    "parsedStatus": true,
+    "parsedMessage": "Lista de clientes",
+    "rawSnippet": "{\"status\":true,\"message\":\"Lista de clientes\",\"data\":{\"current_page\":1,\"data\":[{\"idCustomer\":3683,\"idUser\":4633,\"name\":\"Central Saugus\",\"nickname\":\"\",\""
+  },
+  {
+    "url": "creditPrepaid",
+    "file": "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:31\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "paymentForm",
+    "file": "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:31\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "balanceFlowType/searchable",
+    "file": "Financial\\Charge\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:32\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "balancePosting",
+    "file": "Financial\\Charge\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:31\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "referralMonetization",
+    "file": "Financial\\CommissionManagement\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:32\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "report/driver/synthetic?dateStart=",
+    "file": "Financial\\ReportsFinancial\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:33\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "driver?page=0&name=",
+    "file": "Financial\\ReportsFinancial\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 16913,
+    "parsedStatus": true,
+    "parsedMessage": "Lista de motoristas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Lista de motoristas\",\"response\":{\"current_page\":1,\"data\":[{\"idDriver\":1043,\"idUser\":4729,\"name\":\"Gilberto Teste\",\"nickname\":"
+  },
+  {
+    "url": "userIndication/report/referredUsers?name=",
+    "file": "Financial\\ReportsFinancial\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:33\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "userIndication/report/referralEarnings?dateStart=",
+    "file": "Financial\\ReportsFinancial\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:33\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "withdraw?page=1&name=",
+    "file": "Financial\\TransferRequests\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 10051,
+    "parsedStatus": true,
+    "parsedMessage": "Solicitações de transferências",
+    "rawSnippet": "{\"status\":true,\"message\":\"Solicita\\u00e7\\u00f5es de transfer\\u00eancias\",\"data\":{\"data\":[{\"created_at\":\"2022-01-27 09:35:59\",\"name\":\"Alex Fabiano Pime"
+  },
+  {
+    "url": "withdraw?page=",
+    "file": "Financial\\TransferRequests\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 10051,
+    "parsedStatus": true,
+    "parsedMessage": "Solicitações de transferências",
+    "rawSnippet": "{\"status\":true,\"message\":\"Solicita\\u00e7\\u00f5es de transfer\\u00eancias\",\"data\":{\"data\":[{\"created_at\":\"2022-01-27 09:35:59\",\"name\":\"Alex Fabiano Pime"
+  },
+  {
+    "url": "trip?page=1&driverId=",
+    "file": "Trip\\List\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 8541,
+    "parsedStatus": true,
+    "parsedMessage": "Listagem de viagens encontradas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Listagem de viagens encontradas\",\"data\":{\"trips\":{\"current_page\":1,\"data\":[{\"idTrip\":\"16089\",\"tripReference\":\"c8c072d6-f4b2-"
+  },
+  {
+    "url": "deliveryAcquirer/token",
+    "file": "Delivery\\AsaasConfiguration\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 202,
+    "parsedStatus": true,
+    "parsedMessage": "Token encontrado",
+    "rawSnippet": "{\"status\":true,\"message\":\"Token encontrado\",\"data\":\"$2y$10$0S1RybgxHutUBGmywdl.A.FWQ2yhTV215aiegJJw7jdHoqTt9D4NK\",\"response\":\"$2y$10$0S1RybgxHutUBGmyw"
+  },
+  {
+    "url": "driverAttachmentType",
+    "file": "Delivery\\Config\\DeliveryAccessories\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:35\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "typeDeliveryCategory",
+    "file": "Delivery\\Config\\Establishments\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:37\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "deliverySection/all",
+    "file": "Delivery\\Config\\Establishments\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:37\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "deliveryNeighborhood?cityId=",
+    "file": "Delivery\\Config\\ManageDeliveryZone\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:37\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "deliveryCallConfig",
+    "file": "Delivery\\ConfigCall\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:37\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "driver/delivery",
+    "file": "Delivery\\Monitoring\\index.tsx",
+    "statusCode": 200,
+    "bodyLength": 16913,
+    "parsedStatus": true,
+    "parsedMessage": "Lista de motoristas",
+    "rawSnippet": "{\"status\":true,\"message\":\"Lista de motoristas\",\"response\":{\"current_page\":1,\"data\":[{\"idDriver\":1043,\"idUser\":4729,\"name\":\"Gilberto Teste\",\"nickname\":"
+  },
+  {
+    "url": "companyDeliveryConfig/company",
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:39\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "establishmentCollectionManagement",
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:39\",\"updated_at\":\"2026-1"
+  },
+  {
+    "url": "companyAddress?companyId=",
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "statusCode": 401,
+    "bodyLength": 500,
+    "parsedStatus": false,
+    "parsedMessage": "Token inválido",
+    "rawSnippet": "{\"status\":false,\"message\":\"Token inv\\u00e1lido\",\"data\":null,\"response\":{\"user\":{\"statusId\":\"1\",\"created_at\":\"2026-11-09 15:57:39\",\"updated_at\":\"2026-1"
+  }
+]

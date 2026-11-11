@@ -1,0 +1,758 @@
+[
+  {
+    "key": "clientes-1",
+    "name": "Lista de pessoa física",
+    "to": "/client/list",
+    "hasRoute": true
+  },
+  {
+    "key": "clientes-2",
+    "name": "Lista de pessoa jurídica",
+    "to": "/client/legalPerson",
+    "hasRoute": true
+  },
+  {
+    "key": "exclusion-client",
+    "name": "Solicitação de exclusão da conta",
+    "to": "/client/solicitations-exclusion",
+    "hasRoute": true
+  },
+  {
+    "key": "motoristas-1",
+    "name": "Lista",
+    "to": "/driver/list",
+    "hasRoute": true
+  },
+  {
+    "key": "cadastro-motorista",
+    "name": "Cadastro de Motorista",
+    "to": "/driver/signup",
+    "hasRoute": true
+  },
+  {
+    "key": "cars-pending",
+    "name": "Solicitação de mudança de veículos",
+    "to": "/car/pending",
+    "hasRoute": true
+  },
+  {
+    "key": "request-documents",
+    "name": "Solicitar documentos",
+    "to": "/driver/request-documents",
+    "hasRoute": true
+  },
+  {
+    "key": "exclusion-driver",
+    "name": "Solicitação de exclusão da conta",
+    "to": "/driver/solicitations-exclusion",
+    "hasRoute": true
+  },
+  {
+    "key": "viagem-1",
+    "name": "Lista",
+    "to": "/trip/list/0",
+    "hasRoute": false
+  },
+  {
+    "key": "delivery-monitoring",
+    "name": "Monitoramento",
+    "to": "/delivery/monitoring",
+    "hasRoute": true
+  },
+  {
+    "key": "delivery_sections",
+    "name": "Seções",
+    "to": "/delivery/config/sections",
+    "hasRoute": true
+  },
+  {
+    "key": "categories-of-establishments",
+    "name": "Categorias de estabelecimentos",
+    "to": "/delivery/config/establisments",
+    "hasRoute": true
+  },
+  {
+    "key": "financial managment",
+    "name": "Gestão Financeira",
+    "to": "/delivery/financial",
+    "hasRoute": true
+  },
+  {
+    "key": "manage-delivery-zone",
+    "name": "Gerenciar Zona de Entrega",
+    "to": "/delivery/config/zone-delivery",
+    "hasRoute": true
+  },
+  {
+    "key": "delivery-accessories",
+    "name": "Acessórios de entrega",
+    "to": "/delivery/config/deliveryAccessories",
+    "hasRoute": true
+  },
+  {
+    "key": "delivery-general-config",
+    "name": "Configurações Gerais",
+    "to": "/delivery/config",
+    "hasRoute": true
+  },
+  {
+    "key": "delivery-configuration",
+    "name": "Configuração Delivery",
+    "to": "/delivery/deliveryConfiguration",
+    "hasRoute": true
+  },
+  {
+    "key": "asaas-configuration",
+    "name": "Configuração do Token ASAAS",
+    "to": "/delivery/config/asaas",
+    "hasRoute": true
+  },
+  {
+    "key": "register-establishments",
+    "name": "Cadastro de estabelecimentos",
+    "to": "/delivery/registerEstablishments",
+    "hasRoute": true
+  },
+  {
+    "key": "delivery_call_config",
+    "name": "Configurações do chamado",
+    "to": "/delivery/config/configCall",
+    "hasRoute": true
+  },
+  {
+    "key": "financial-1",
+    "name": "Produção do motorista",
+    "to": "/financial/report-production-driver/0",
+    "hasRoute": false
+  },
+  {
+    "key": "financial-2",
+    "name": "Taxa de Cancelamento",
+    "to": "/financial/cancellation-fee",
+    "hasRoute": true
+  },
+  {
+    "key": "financial-3",
+    "name": "Lançamento financeiro",
+    "to": "/financial/charge",
+    "hasRoute": true
+  },
+  {
+    "key": "financial-4",
+    "name": "Compra de crédito",
+    "to": "/financial/prepaid",
+    "hasRoute": true
+  },
+  {
+    "key": "financial-5",
+    "name": "Gestão de Comissão",
+    "to": "/financial/commision",
+    "hasRoute": true
+  },
+  {
+    "key": "financial-6",
+    "name": "Solicitações de Transferências",
+    "to": "/financial/list",
+    "hasRoute": true
+  },
+  {
+    "key": "financial-7",
+    "name": "Relatórios",
+    "to": "/financial/reports",
+    "hasRoute": true
+  },
+  {
+    "key": "financial-8",
+    "name": "Dashboard Adquirente",
+    "to": "/financial/dashboard",
+    "hasRoute": true
+  },
+  {
+    "key": "financial-8-1",
+    "name": "Visão Geral",
+    "to": "/financial/dashboard",
+    "hasRoute": true
+  },
+  {
+    "key": "financial-8-2",
+    "name": "Transações",
+    "to": "/financial/dashboard?tab=transacoes",
+    "hasRoute": false
+  },
+  {
+    "key": "financial-8-4",
+    "name": "Relatórios",
+    "to": "/financial/dashboard?tab=relatorios",
+    "hasRoute": false
+  },
+  {
+    "key": "message-1",
+    "name": "Notificação",
+    "to": "/message/Notification",
+    "hasRoute": true
+  },
+  {
+    "key": "message-2",
+    "name": "Notificações de aniversário",
+    "to": "/message/birthdayNotification",
+    "hasRoute": true
+  },
+  {
+    "key": "talkToUs-1",
+    "name": "Cliente",
+    "to": "/pages/TalkToUs/Client",
+    "hasRoute": true
+  },
+  {
+    "key": "talkToUs-2",
+    "name": "Viagens",
+    "to": "/pages/TalkToUs/Trip",
+    "hasRoute": true
+  },
+  {
+    "key": "report-1",
+    "name": "Gerar",
+    "to": "/report/create",
+    "hasRoute": true
+  },
+  {
+    "key": "report-2",
+    "name": "Listagem",
+    "to": "/report/list",
+    "hasRoute": true
+  },
+  {
+    "key": "callGroupList",
+    "name": "Listagem",
+    "to": "/callGroups/listCallGroups",
+    "hasRoute": true
+  },
+  {
+    "key": "callGroupLinkedDrivers",
+    "name": "Motoristas Vinculados",
+    "to": "/callGroups/linkedDrivers",
+    "hasRoute": true
+  },
+  {
+    "key": "add-city",
+    "name": "Adicionar Cidade",
+    "to": "/config/areasCity/addCity",
+    "hasRoute": true
+  },
+  {
+    "key": "edit-city",
+    "name": "Editar Cidade",
+    "to": "/config/areasCity/editCity",
+    "hasRoute": true
+  },
+  {
+    "key": "admin-2",
+    "name": "Perfis",
+    "to": "/config/admin/profile",
+    "hasRoute": true
+  },
+  {
+    "key": "admin-3",
+    "name": "Usuários",
+    "to": "/config/admin/createUser/",
+    "hasRoute": false
+  },
+  {
+    "key": "acquirer",
+    "name": "Adquirente global",
+    "to": "/config/acquirer",
+    "hasRoute": true
+  },
+  {
+    "key": "confirmation_code",
+    "name": "Confirmação de Código",
+    "to": "/config/confirmationCode",
+    "hasRoute": true
+  },
+  {
+    "key": "acquirerByCity",
+    "name": "Adquirente por cidade",
+    "to": "/config/acquirerByCity",
+    "hasRoute": true
+  },
+  {
+    "key": "whatsapp-session",
+    "name": "Conectar whatsapp",
+    "to": "/config/whatsapp-session",
+    "hasRoute": true
+  },
+  {
+    "key": "keys-whatsapp",
+    "name": "Chaves WhatsApp",
+    "to": "/chaves-whatsapp",
+    "hasRoute": true
+  },
+  {
+    "key": "whatsapp-scheduled-trip",
+    "name": "Notificações de viagem (WhatsApp)",
+    "to": "/config/whatsapp-scheduled-trip-notifications",
+    "hasRoute": true
+  },
+  {
+    "key": "callManagement",
+    "name": "Chamado",
+    "to": "/config/callManagement",
+    "hasRoute": true
+  },
+  {
+    "key": "MethodsPayments",
+    "name": "Formas de Pagamentos",
+    "to": "/config/methodPayments",
+    "hasRoute": true
+  },
+  {
+    "key": "keysapp",
+    "name": "Chaves do app",
+    "to": "/config/keysApp",
+    "hasRoute": true
+  },
+  {
+    "key": "logsMongo",
+    "name": "Ver Logs do Mongo",
+    "to": "/config/logsMongo",
+    "hasRoute": true
+  },
+  {
+    "key": "radius",
+    "name": "Raio de chamado por cidade",
+    "to": "/config/radius",
+    "hasRoute": true
+  },
+  {
+    "key": "byCity",
+    "name": "Por cidade",
+    "to": "/config/configByCities",
+    "hasRoute": true
+  },
+  {
+    "key": "manage-toll",
+    "name": "Gerenciar Pedágio",
+    "to": "/config/manage-toll",
+    "hasRoute": false
+  },
+  {
+    "key": "terms",
+    "name": "Termos",
+    "to": "/config/terms",
+    "hasRoute": true
+  },
+  {
+    "key": "configApp",
+    "name": "Configurações de apps",
+    "to": "/config/appConfig",
+    "hasRoute": true
+  },
+  {
+    "key": "versions-from-config",
+    "name": "Versões",
+    "to": "/settings/versions",
+    "hasRoute": true
+  },
+  {
+    "key": "configAppPartner",
+    "name": "Configurações de apps parceiros",
+    "to": "/config/config-app-partner",
+    "hasRoute": true
+  },
+  {
+    "key": "list_phones",
+    "name": "Lista telefonica",
+    "to": "/config/list-phones-general",
+    "hasRoute": true
+  },
+  {
+    "key": "firebase-verification",
+    "name": "Verificação Firebase",
+    "to": "/config/FirebaseVerification",
+    "hasRoute": false
+  },
+  {
+    "key": "config-smtp",
+    "name": "Configurações de serviço SMTP",
+    "to": "/config/smtp",
+    "hasRoute": true
+  },
+  {
+    "key": "pendencyDriver",
+    "name": "Penalidade de ações do motorista",
+    "to": "/config/pendencyDriver",
+    "hasRoute": true
+  },
+  {
+    "key": "reasonsForCancellations",
+    "name": "Motivos de cancelamento",
+    "to": "/config/reasonCancellation",
+    "hasRoute": true
+  },
+  {
+    "key": "additionalSettings",
+    "name": "Configurações adicionais",
+    "to": "/config/additionalSettings",
+    "hasRoute": true
+  },
+  {
+    "key": "confis-externals-globals",
+    "name": "Serviços Externos Globais",
+    "to": "/config/services-externals-globals",
+    "hasRoute": false
+  },
+  {
+    "key": "confis-externals-by-city",
+    "name": "Serviços Externos Por Cidade",
+    "to": "/config/services-externals-by-city",
+    "hasRoute": false
+  },
+  {
+    "key": "confis-externals-by-webhook",
+    "name": "Serviços Externos Webhook",
+    "to": "/config/services-externals-webhook",
+    "hasRoute": false
+  },
+  {
+    "key": "usagePolicy",
+    "name": "Política de uso do aplicativo",
+    "to": "/config/usagePolicy",
+    "hasRoute": true
+  },
+  {
+    "key": "messageDriverChatbot",
+    "name": "Mensagens do chat - Motorista",
+    "to": "/config/chatbot",
+    "hasRoute": true
+  },
+  {
+    "key": "modulesActives",
+    "name": "Módulos Ativos",
+    "to": "/config/modulesActives",
+    "hasRoute": true
+  },
+  {
+    "key": "config-register-driver",
+    "name": "Config. Tela de Cadastro Motorista",
+    "to": "/config/configs-register/config-register-driver",
+    "hasRoute": true
+  },
+  {
+    "key": "documents-by-category",
+    "name": "Adicionar Documentos Por Categoria",
+    "to": "/config/configs-register/documents-by-category",
+    "hasRoute": true
+  },
+  {
+    "key": "link-documents-client",
+    "name": "Vincular Documento No Cadastro Do Cliente",
+    "to": "/config/configs-register/link-documents-client",
+    "hasRoute": true
+  },
+  {
+    "key": "documents-app",
+    "name": "Documentos Do App",
+    "to": "/config/configs-register/documents-app",
+    "hasRoute": true
+  },
+  {
+    "key": "credentials-integration-external",
+    "name": "Credenciais de integração externa",
+    "to": "/config/credentials-integration-external",
+    "hasRoute": true
+  },
+  {
+    "key": "import-clients",
+    "name": "Clientes",
+    "to": "/setting/importClient",
+    "hasRoute": true
+  },
+  {
+    "key": "import-drivers",
+    "name": "Motoristas",
+    "to": "/setting/importDriver",
+    "hasRoute": true
+  },
+  {
+    "key": "import-drivers-blocked",
+    "name": "Bloqueio em massa de Prestadores",
+    "to": "/setting/importDriversBlocked",
+    "hasRoute": true
+  },
+  {
+    "key": "import-drivers-unblocked",
+    "name": "Desbloqueio em massa de Prestadores por CPF",
+    "to": "/setting/importDriversUnblocked",
+    "hasRoute": true
+  },
+  {
+    "key": "items",
+    "name": "Gerenciar Itens",
+    "to": "/simpledelivery/items",
+    "hasRoute": true
+  },
+  {
+    "key": "suggestion-text",
+    "name": "Sugestão de Texto",
+    "to": "/simpledelivery/suggestion-text",
+    "hasRoute": true
+  },
+  {
+    "key": "typesTravels",
+    "name": "Tipos de Viagem",
+    "to": "/config/rates",
+    "hasRoute": true
+  },
+  {
+    "key": "typesServices",
+    "name": "Tipos de Serviços",
+    "to": "/config/services",
+    "hasRoute": true
+  },
+  {
+    "key": "tariffTrigger",
+    "name": "Gatilho de Tarifa",
+    "to": "/config/trigger",
+    "hasRoute": true
+  },
+  {
+    "key": "flagTariff",
+    "name": "Bandeira de Tarifa",
+    "to": "/config/triggerLabel",
+    "hasRoute": true
+  },
+  {
+    "key": "dynamicPerArea",
+    "name": "Dinâmica por Área",
+    "to": "/config/dynamicByArea",
+    "hasRoute": true
+  },
+  {
+    "key": "listPartner",
+    "name": "Listagem",
+    "to": "/partner/listPartner",
+    "hasRoute": true
+  },
+  {
+    "key": "messagePartner",
+    "name": "Mensagens da Ouvidoria",
+    "to": "/partner/messagePartner",
+    "hasRoute": true
+  },
+  {
+    "key": "promotion1",
+    "name": "Cupons",
+    "to": "/promotion/listCupom",
+    "hasRoute": true
+  },
+  {
+    "key": "promotion2",
+    "name": "Voucher",
+    "to": "/promotion/voucherList",
+    "hasRoute": true
+  },
+  {
+    "key": "promotion3",
+    "name": "Promoções por Viagem",
+    "to": "/promotion/saleTrip",
+    "hasRoute": true
+  },
+  {
+    "key": "manager-1",
+    "name": "Lista de Gestores",
+    "to": "/manager",
+    "hasRoute": true
+  },
+  {
+    "key": "manager-2",
+    "name": "Motoristas por Gestor",
+    "to": "/manager/drivers",
+    "hasRoute": true
+  },
+  {
+    "key": "central-list",
+    "name": "Listagem",
+    "to": "/central",
+    "hasRoute": true
+  },
+  {
+    "key": "central-users",
+    "name": "Listagem de usuários",
+    "to": "/central/listCustomer",
+    "hasRoute": true
+  },
+  {
+    "key": "central-neighborhoods",
+    "name": "Bairros",
+    "to": "/central/neighborhoods",
+    "hasRoute": true
+  },
+  {
+    "key": "central-config",
+    "name": "Configurações",
+    "to": "/central/setting",
+    "hasRoute": true
+  },
+  {
+    "key": "register-item",
+    "name": "Cadastro de Item",
+    "to": "/frete/register-item",
+    "hasRoute": true
+  },
+  {
+    "key": "list-itens-frete",
+    "name": "Listagem de Itens",
+    "to": "/frete/list-itens",
+    "hasRoute": true
+  },
+  {
+    "key": "services-extras",
+    "name": "Serviços Extras",
+    "to": "/frete/services-extras",
+    "hasRoute": true
+  },
+  {
+    "key": "load-accessibility",
+    "name": "Acessibilidade Carga",
+    "to": "/frete/load-accessibility",
+    "hasRoute": true
+  },
+  {
+    "key": "listPublicity",
+    "name": "Listar Publicidade",
+    "to": "/marketing/listPublicidade",
+    "hasRoute": true
+  },
+  {
+    "key": "linkMarketingExternal",
+    "name": "Link Para Menu Externo",
+    "to": "/marketing/menuLinkExternal",
+    "hasRoute": true
+  },
+  {
+    "key": "publicityAppList",
+    "name": "Lista de Publicidade App Pro",
+    "to": "/marketing/publicidadeAppList",
+    "hasRoute": true
+  },
+  {
+    "key": "publicityApp",
+    "name": "Inserir Publicidade App Pro",
+    "to": "/marketing/publicidadeApp",
+    "hasRoute": true
+  },
+  {
+    "key": "manageItems",
+    "name": "Gerenciar Itens",
+    "to": "/route/items",
+    "hasRoute": true
+  },
+  {
+    "key": "routeRegister",
+    "name": "Cadastrar",
+    "to": "/route/routeRegister",
+    "hasRoute": true
+  },
+  {
+    "key": "routeList",
+    "name": "Listagem",
+    "to": "/route/routeList",
+    "hasRoute": true
+  },
+  {
+    "key": "releaseDrivers",
+    "name": "Liberar Motoristas",
+    "to": "/route/releaseDrivers",
+    "hasRoute": true
+  },
+  {
+    "key": "promotionalBanner",
+    "name": "Banners",
+    "to": "/route/promotionalBanner",
+    "hasRoute": true
+  },
+  {
+    "key": "registerLocal",
+    "name": "Cadastrar Locais",
+    "to": "/setting/address",
+    "hasRoute": true
+  },
+  {
+    "key": "addressIrregular",
+    "name": "Endereços Irregulares",
+    "to": "/setting/addressblacklist",
+    "hasRoute": true
+  },
+  {
+    "key": "addressCache",
+    "name": "Endereços Em Cache",
+    "to": "/setting/cacheAddress",
+    "hasRoute": false
+  },
+  {
+    "key": "configMaps",
+    "name": "Configurações Gerais",
+    "to": "/mapSetting/configMaps",
+    "hasRoute": true
+  },
+  {
+    "key": "configCity",
+    "name": "Configurações Por Cidade",
+    "to": "/mapSetting/configbycity",
+    "hasRoute": true
+  },
+  {
+    "key": "testsServiceMaps",
+    "name": "Teste Serviço De Mapa",
+    "to": "/mapSetting/tests",
+    "hasRoute": true
+  },
+  {
+    "key": "routesOptimization",
+    "name": "Otimização De Rota",
+    "to": "/mapSetting/routeOptimization",
+    "hasRoute": true
+  },
+  {
+    "key": "webmap-key-management",
+    "name": "Gerenciar Chaves De Mapa Web",
+    "to": "/mapSetting/keys",
+    "hasRoute": true
+  },
+  {
+    "key": "mapSequencer",
+    "name": "Sequenciador De Mapas",
+    "to": "/mapSetting/mapSequencer",
+    "hasRoute": true
+  },
+  {
+    "key": "riskArea",
+    "name": "Area De Risco",
+    "to": "/mapSetting/riskArea",
+    "hasRoute": true
+  },
+  {
+    "key": "heatMaps",
+    "name": "Áreas De Calor Do Mapa",
+    "to": "/mapSetting/heatMap",
+    "hasRoute": true
+  },
+  {
+    "key": "monitoringArea",
+    "name": "Área de Monitoramento",
+    "to": "/mapSetting/monitoringArea",
+    "hasRoute": true
+  },
+  {
+    "key": "configs-layouts",
+    "name": "Configurações de layouts",
+    "to": "/settings/config-layouts",
+    "hasRoute": true
+  },
+  {
+    "key": "versions",
+    "name": "Versões",
+    "to": "/settings/versions",
+    "hasRoute": true
+  }
+]

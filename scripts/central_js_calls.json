@@ -1,0 +1,18 @@
+[
+  {
+    "url": "/admin",
+    "file": "public\\webfiles\\js\\modules\\whatsapp\\management.js"
+  },
+  {
+    "url": "/admin/$%7Bparams%7D",
+    "file": "public\\webfiles\\js\\modules\\whatsapp\\management.js"
+  },
+  {
+    "url": "/api/precos-uber",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "url": "/",
+    "file": "public\\webfiles\\js\\service\\Position.js"
+  }
+]

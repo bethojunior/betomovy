@@ -1,0 +1,1110 @@
+[
+  {
+    "key": "dashboard",
+    "name": "Dashboard",
+    "children": [],
+    "to": "/"
+  },
+  {
+    "key": "monitoring",
+    "name": "Monitoramento",
+    "children": [],
+    "to": "/monitoring"
+  },
+  {
+    "key": "clientes",
+    "name": "Clientes",
+    "children": [
+      {
+        "key": "clientes-1",
+        "name": "Lista de pessoa física",
+        "children": [],
+        "to": "/client/list",
+        "hasChildren": true
+      },
+      {
+        "key": "clientes-2",
+        "name": "Lista de pessoa jurídica",
+        "children": [],
+        "to": "/client/legalPerson",
+        "hasChildren": true
+      },
+      {
+        "key": "exclusion-client",
+        "name": "Solicitação de exclusão da conta",
+        "children": [],
+        "to": "/client/solicitations-exclusion",
+        "hasChildren": true
+      }
+    ],
+    "hasChildren": true
+  },
+  {
+    "key": "motoristas",
+    "name": "Motoristas",
+    "children": [
+      {
+        "key": "motoristas-1",
+        "name": "Lista",
+        "children": [],
+        "to": "/driver/list",
+        "hasChildren": true
+      },
+      {
+        "key": "cadastro-motorista",
+        "name": "Cadastro de Motorista",
+        "children": [],
+        "to": "/driver/signup",
+        "hasChildren": true
+      },
+      {
+        "key": "cars-pending",
+        "name": "Solicitação de mudança de veículos",
+        "children": [],
+        "to": "/car/pending",
+        "hasChildren": true
+      },
+      {
+        "key": "request-documents",
+        "name": "Solicitar documentos",
+        "children": [],
+        "to": "/driver/request-documents",
+        "hasChildren": true
+      },
+      {
+        "key": "exclusion-driver",
+        "name": "Solicitação de exclusão da conta",
+        "children": [],
+        "to": "/driver/solicitations-exclusion",
+        "hasChildren": true
+      }
+    ],
+    "hasChildren": true
+  },
+  {
+    "key": "viagem",
+    "name": "Viagens",
+    "children": [
+      {
+        "key": "viagem-1",
+        "name": "Lista",
+        "children": [],
+        "to": "/trip/list/0",
+        "hasChildren": true
+      }
+    ],
+    "hasChildren": true
+  },
+  {
+    "key": "delivery",
+    "name": "Delivery",
+    "children": [
+      {
+        "key": "delivery-monitoring",
+        "name": "Monitoramento",
+        "children": [],
+        "to": "/delivery/monitoring",
+        "hasChildren": true
+      },
+      {
+        "key": "delivery_config",
+        "name": "Configurações",
+        "children": [
+          {
+            "key": "delivery_sections",
+            "name": "Seções",
+            "children": [],
+            "to": "/delivery/config/sections",
+            "hasChildren": true
+          },
+          {
+            "key": "categories-of-establishments",
+            "name": "Categorias de estabelecimentos",
+            "children": [],
+            "to": "/delivery/config/establisments",
+            "hasChildren": true
+          },
+          {
+            "key": "financial managment",
+            "name": "Gestão Financeira",
+            "children": [],
+            "to": "/delivery/financial",
+            "hasChildren": true
+          },
+          {
+            "key": "manage-delivery-zone",
+            "name": "Gerenciar Zona de Entrega",
+            "children": [],
+            "to": "/delivery/config/zone-delivery",
+            "hasChildren": true
+          },
+          {
+            "key": "delivery-accessories",
+            "name": "Acessórios de entrega",
+            "children": [],
+            "to": "/delivery/config/deliveryAccessories",
+            "hasChildren": true
+          },
+          {
+            "key": "delivery-general-config",
+            "name": "Configurações Gerais",
+            "children": [],
+            "to": "/delivery/config",
+            "hasChildren": true
+          },
+          {
+            "key": "delivery-configuration",
+            "name": "Configuração Delivery",
+            "children": [],
+            "to": "/delivery/deliveryConfiguration",
+            "hasChildren": true
+          },
+          {
+            "key": "asaas-configuration",
+            "name": "Configuração do Token ASAAS",
+            "children": [],
+            "to": "/delivery/config/asaas",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "register-establishments",
+        "name": "Cadastro de estabelecimentos",
+        "children": [],
+        "to": "/delivery/registerEstablishments",
+        "hasChildren": true
+      },
+      {
+        "key": "delivery_call_config",
+        "name": "Configurações do chamado",
+        "children": [],
+        "to": "/delivery/config/configCall",
+        "hasChildren": true
+      }
+    ],
+    "hasChildren": true
+  },
+  {
+    "key": "financial",
+    "name": "Financeiro",
+    "children": [
+      {
+        "key": "financial-1",
+        "name": "Produção do motorista",
+        "children": [],
+        "to": "/financial/report-production-driver/0",
+        "hasChildren": true
+      },
+      {
+        "key": "financial-2",
+        "name": "Taxa de Cancelamento",
+        "children": [],
+        "to": "/financial/cancellation-fee",
+        "hasChildren": true
+      },
+      {
+        "key": "financial-3",
+        "name": "Lançamento financeiro",
+        "children": [],
+        "to": "/financial/charge",
+        "hasChildren": true
+      },
+      {
+        "key": "financial-4",
+        "name": "Compra de crédito",
+        "children": [],
+        "to": "/financial/prepaid",
+        "hasChildren": true
+      },
+      {
+        "key": "financial-5",
+        "name": "Gestão de Comissão",
+        "children": [],
+        "to": "/financial/commision",
+        "hasChildren": true
+      },
+      {
+        "key": "financial-6",
+        "name": "Solicitações de Transferências",
+        "children": [],
+        "to": "/financial/list",
+        "hasChildren": true
+      },
+      {
+        "key": "financial-7",
+        "name": "Relatórios",
+        "children": [],
+        "to": "/financial/reports",
+        "hasChildren": true
+      },
+      {
+        "key": "financial-8",
+        "name": "Dashboard Adquirente",
+        "children": [
+          {
+            "key": "financial-8-1",
+            "name": "Visão Geral",
+            "children": [],
+            "to": "/financial/dashboard",
+            "hasChildren": true
+          },
+          {
+            "key": "financial-8-2",
+            "name": "Transações",
+            "children": [],
+            "to": "/financial/dashboard?tab=transacoes",
+            "hasChildren": true
+          },
+          {
+            "key": "financial-8-4",
+            "name": "Relatórios",
+            "children": [],
+            "to": "/financial/dashboard?tab=relatorios",
+            "hasChildren": true
+          }
+        ],
+        "to": "/financial/dashboard",
+        "hasChildren": true
+      }
+    ],
+    "hasChildren": true
+  },
+  {
+    "key": "message",
+    "name": "Mensagem",
+    "children": [
+      {
+        "key": "message-1",
+        "name": "Notificação",
+        "children": [],
+        "to": "/message/Notification",
+        "hasChildren": true
+      },
+      {
+        "key": "message-2",
+        "name": "Notificações de aniversário",
+        "children": [],
+        "to": "/message/birthdayNotification",
+        "hasChildren": true
+      }
+    ],
+    "hasChildren": true
+  },
+  {
+    "key": "talkToUs",
+    "name": "Fale conosco",
+    "children": [
+      {
+        "key": "talkToUs-1",
+        "name": "Cliente",
+        "children": [],
+        "to": "/pages/TalkToUs/Client",
+        "hasChildren": true
+      },
+      {
+        "key": "talkToUs-2",
+        "name": "Viagens",
+        "children": [],
+        "to": "/pages/TalkToUs/Trip",
+        "hasChildren": true
+      }
+    ],
+    "hasChildren": true
+  },
+  {
+    "key": "report",
+    "name": "Relatórios",
+    "children": [
+      {
+        "key": "report-1",
+        "name": "Gerar",
+        "children": [],
+        "to": "/report/create",
+        "hasChildren": true
+      },
+      {
+        "key": "report-2",
+        "name": "Listagem",
+        "children": [],
+        "to": "/report/list",
+        "hasChildren": true
+      }
+    ],
+    "hasChildren": true
+  },
+  {
+    "key": "callGroup",
+    "name": "Grupos de chamados",
+    "children": [
+      {
+        "key": "callGroupList",
+        "name": "Listagem",
+        "children": [],
+        "to": "/callGroups/listCallGroups"
+      },
+      {
+        "key": "callGroupLinkedDrivers",
+        "name": "Motoristas Vinculados",
+        "children": [],
+        "to": "/callGroups/linkedDrivers"
+      }
+    ],
+    "to": "/callGroups",
+    "hasChildren": true
+  },
+  {
+    "key": "notifications-admins",
+    "name": "Notificações Admins",
+    "children": [],
+    "to": "/config/notifications-admin"
+  },
+  {
+    "key": "advanced",
+    "name": "Avançadas",
+    "children": [
+      {
+        "key": "config",
+        "name": "Configurações",
+        "children": [
+          {
+            "key": "config-city",
+            "name": "Áreas de Cidade",
+            "children": [
+              {
+                "key": "add-city",
+                "name": "Adicionar Cidade",
+                "children": [],
+                "to": "/config/areasCity/addCity",
+                "hasChildren": true
+              },
+              {
+                "key": "edit-city",
+                "name": "Editar Cidade",
+                "children": [],
+                "to": "/config/areasCity/editCity",
+                "hasChildren": true
+              }
+            ],
+            "hasChildren": true
+          },
+          {
+            "key": "admin",
+            "name": "Administrador",
+            "children": [
+              {
+                "key": "admin-2",
+                "name": "Perfis",
+                "children": [],
+                "to": "/config/admin/profile",
+                "hasChildren": true
+              },
+              {
+                "key": "admin-3",
+                "name": "Usuários",
+                "children": [],
+                "to": "/config/admin/createUser/",
+                "hasChildren": true
+              }
+            ],
+            "hasChildren": true
+          },
+          {
+            "key": "acquirer",
+            "name": "Adquirente global",
+            "children": [],
+            "to": "/config/acquirer",
+            "hasChildren": true
+          },
+          {
+            "key": "confirmation_code",
+            "name": "Confirmação de Código",
+            "children": [],
+            "to": "/config/confirmationCode",
+            "hasChildren": true
+          },
+          {
+            "key": "acquirerByCity",
+            "name": "Adquirente por cidade",
+            "children": [],
+            "to": "/config/acquirerByCity",
+            "hasChildren": true
+          },
+          {
+            "key": "whatsapp",
+            "name": "Whatsapp",
+            "children": [
+              {
+                "key": "whatsapp-session",
+                "name": "Conectar whatsapp",
+                "children": [],
+                "to": "/config/whatsapp-session",
+                "hasChildren": true
+              },
+              {
+                "key": "keys-whatsapp",
+                "name": "Chaves WhatsApp",
+                "children": [],
+                "to": "/chaves-whatsapp",
+                "hasChildren": true
+              },
+              {
+                "key": "whatsapp-scheduled-trip",
+                "name": "Notificações de viagem (WhatsApp)",
+                "children": [],
+                "to": "/config/whatsapp-scheduled-trip-notifications",
+                "hasChildren": true
+              }
+            ],
+            "hasChildren": true
+          },
+          {
+            "key": "callManagement",
+            "name": "Chamado",
+            "children": [],
+            "to": "/config/callManagement",
+            "hasChildren": true
+          },
+          {
+            "key": "MethodsPayments",
+            "name": "Formas de Pagamentos",
+            "children": [],
+            "to": "/config/methodPayments",
+            "hasChildren": true
+          },
+          {
+            "key": "keysapp",
+            "name": "Chaves do app",
+            "children": [],
+            "to": "/config/keysApp",
+            "hasChildren": true
+          },
+          {
+            "key": "logsMongo",
+            "name": "Ver Logs do Mongo",
+            "children": [],
+            "to": "/config/logsMongo",
+            "hasChildren": true
+          },
+          {
+            "key": "radius",
+            "name": "Raio de chamado por cidade",
+            "children": [],
+            "to": "/config/radius",
+            "hasChildren": true
+          },
+          {
+            "key": "byCity",
+            "name": "Por cidade",
+            "children": [],
+            "to": "/config/configByCities",
+            "hasChildren": true
+          },
+          {
+            "key": "manage-toll",
+            "name": "Gerenciar Pedágio",
+            "children": [],
+            "to": "/config/manage-toll",
+            "hasChildren": true
+          },
+          {
+            "key": "terms",
+            "name": "Termos",
+            "children": [],
+            "to": "/config/terms",
+            "hasChildren": true
+          },
+          {
+            "key": "configApp",
+            "name": "Configurações de apps",
+            "children": [],
+            "to": "/config/appConfig",
+            "hasChildren": true
+          },
+          {
+            "key": "versions-from-config",
+            "name": "Versões",
+            "children": [],
+            "to": "/settings/versions",
+            "hasChildren": true
+          },
+          {
+            "key": "configAppPartner",
+            "name": "Configurações de apps parceiros",
+            "children": [],
+            "to": "/config/config-app-partner",
+            "hasChildren": true
+          },
+          {
+            "key": "list_phones",
+            "name": "Lista telefonica",
+            "children": [],
+            "to": "/config/list-phones-general",
+            "hasChildren": true
+          },
+          {
+            "key": "firebase-verification",
+            "name": "Verificação Firebase",
+            "children": [],
+            "to": "/config/FirebaseVerification",
+            "hasChildren": true
+          },
+          {
+            "key": "config-smtp",
+            "name": "Configurações de serviço SMTP",
+            "children": [],
+            "to": "/config/smtp",
+            "hasChildren": true
+          },
+          {
+            "key": "pendencyDriver",
+            "name": "Penalidade de ações do motorista",
+            "children": [],
+            "to": "/config/pendencyDriver",
+            "hasChildren": true
+          },
+          {
+            "key": "reasonsForCancellations",
+            "name": "Motivos de cancelamento",
+            "children": [],
+            "to": "/config/reasonCancellation",
+            "hasChildren": true
+          },
+          {
+            "key": "additionalSettings",
+            "name": "Configurações adicionais",
+            "children": [],
+            "to": "/config/additionalSettings",
+            "hasChildren": true
+          },
+          {
+            "key": "confis-externals-globals",
+            "name": "Serviços Externos Globais",
+            "children": [],
+            "to": "/config/services-externals-globals",
+            "hasChildren": true
+          },
+          {
+            "key": "confis-externals-by-city",
+            "name": "Serviços Externos Por Cidade",
+            "children": [],
+            "to": "/config/services-externals-by-city",
+            "hasChildren": true
+          },
+          {
+            "key": "confis-externals-by-webhook",
+            "name": "Serviços Externos Webhook",
+            "children": [],
+            "to": "/config/services-externals-webhook",
+            "hasChildren": true
+          },
+          {
+            "key": "usagePolicy",
+            "name": "Política de uso do aplicativo",
+            "children": [],
+            "to": "/config/usagePolicy",
+            "hasChildren": true
+          },
+          {
+            "key": "messageDriverChatbot",
+            "name": "Mensagens do chat - Motorista",
+            "children": [],
+            "to": "/config/chatbot",
+            "hasChildren": true
+          },
+          {
+            "key": "modulesActives",
+            "name": "Módulos Ativos",
+            "children": [],
+            "to": "/config/modulesActives",
+            "hasChildren": true
+          },
+          {
+            "key": "configsRegister",
+            "name": "Configurações do Cadastro",
+            "children": [
+              {
+                "key": "config-register-driver",
+                "name": "Config. Tela de Cadastro Motorista",
+                "children": [],
+                "to": "/config/configs-register/config-register-driver",
+                "hasChildren": true
+              },
+              {
+                "key": "documents-by-category",
+                "name": "Adicionar Documentos Por Categoria",
+                "children": [],
+                "to": "/config/configs-register/documents-by-category",
+                "hasChildren": true
+              },
+              {
+                "key": "link-documents-client",
+                "name": "Vincular Documento No Cadastro Do Cliente",
+                "children": [],
+                "to": "/config/configs-register/link-documents-client",
+                "hasChildren": true
+              },
+              {
+                "key": "documents-app",
+                "name": "Documentos Do App",
+                "children": [],
+                "to": "/config/configs-register/documents-app",
+                "hasChildren": true
+              }
+            ],
+            "hasChildren": true
+          },
+          {
+            "key": "credentials-integration-external",
+            "name": "Credenciais de integração externa",
+            "children": [],
+            "to": "/config/credentials-integration-external",
+            "hasChildren": true
+          },
+          {
+            "key": "import",
+            "name": "Importações e Definições",
+            "children": [
+              {
+                "key": "import-clients",
+                "name": "Clientes",
+                "children": [],
+                "to": "/setting/importClient",
+                "hasChildren": true
+              },
+              {
+                "key": "import-drivers",
+                "name": "Motoristas",
+                "children": [],
+                "to": "/setting/importDriver",
+                "hasChildren": true
+              },
+              {
+                "key": "import-drivers-blocked",
+                "name": "Bloqueio em massa de Prestadores",
+                "children": [],
+                "to": "/setting/importDriversBlocked",
+                "hasChildren": true
+              },
+              {
+                "key": "import-drivers-unblocked",
+                "name": "Desbloqueio em massa de Prestadores por CPF",
+                "children": [],
+                "to": "/setting/importDriversUnblocked",
+                "hasChildren": true
+              },
+              {
+                "key": "reset-balance",
+                "name": "Zerar Saldo dos Motoristas",
+                "children": [],
+                "hasChildren": true
+              },
+              {
+                "key": "reset-rating",
+                "name": "Zerar Nota dos Motoristas",
+                "children": [],
+                "hasChildren": true
+              }
+            ],
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "deliveryItens",
+        "name": "Entrega",
+        "children": [
+          {
+            "key": "items",
+            "name": "Gerenciar Itens",
+            "children": [],
+            "to": "/simpledelivery/items",
+            "hasChildren": true
+          },
+          {
+            "key": "suggestion-text",
+            "name": "Sugestão de Texto",
+            "children": [],
+            "to": "/simpledelivery/suggestion-text",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "tariffsItems",
+        "name": "Tarifas",
+        "children": [
+          {
+            "key": "typesTravels",
+            "name": "Tipos de Viagem",
+            "children": [],
+            "to": "/config/rates",
+            "hasChildren": true
+          },
+          {
+            "key": "typesServices",
+            "name": "Tipos de Serviços",
+            "children": [],
+            "to": "/config/services",
+            "hasChildren": true
+          },
+          {
+            "key": "tariffTrigger",
+            "name": "Gatilho de Tarifa",
+            "children": [],
+            "to": "/config/trigger",
+            "hasChildren": true
+          },
+          {
+            "key": "flagTariff",
+            "name": "Bandeira de Tarifa",
+            "children": [],
+            "to": "/config/triggerLabel",
+            "hasChildren": true
+          },
+          {
+            "key": "dynamicPerArea",
+            "name": "Dinâmica por Área",
+            "children": [],
+            "to": "/config/dynamicByArea",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "partners",
+        "name": "Parceiros",
+        "children": [
+          {
+            "key": "listPartner",
+            "name": "Listagem",
+            "children": [],
+            "to": "/partner/listPartner",
+            "hasChildren": true
+          },
+          {
+            "key": "messagePartner",
+            "name": "Mensagens da Ouvidoria",
+            "children": [],
+            "to": "/partner/messagePartner",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "promotion",
+        "name": "Promoções",
+        "children": [
+          {
+            "key": "promotion1",
+            "name": "Cupons",
+            "children": [],
+            "to": "/promotion/listCupom",
+            "hasChildren": true
+          },
+          {
+            "key": "promotion2",
+            "name": "Voucher",
+            "children": [],
+            "to": "/promotion/voucherList",
+            "hasChildren": true
+          },
+          {
+            "key": "promotion3",
+            "name": "Promoções por Viagem",
+            "children": [],
+            "to": "/promotion/saleTrip",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "manager",
+        "name": "Gestor",
+        "children": [
+          {
+            "key": "manager-1",
+            "name": "Lista de Gestores",
+            "children": [],
+            "to": "/manager",
+            "hasChildren": true
+          },
+          {
+            "key": "manager-2",
+            "name": "Motoristas por Gestor",
+            "children": [],
+            "to": "/manager/drivers",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "central",
+        "name": "Central",
+        "children": [
+          {
+            "key": "central-list",
+            "name": "Listagem",
+            "children": [],
+            "to": "/central",
+            "hasChildren": true
+          },
+          {
+            "key": "central-users",
+            "name": "Listagem de usuários",
+            "children": [],
+            "to": "/central/listCustomer",
+            "hasChildren": true
+          },
+          {
+            "key": "central-neighborhoods",
+            "name": "Bairros",
+            "children": [],
+            "to": "/central/neighborhoods",
+            "hasChildren": true
+          },
+          {
+            "key": "central-config",
+            "name": "Configurações",
+            "children": [],
+            "to": "/central/setting",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "frete",
+        "name": "Frete",
+        "children": [
+          {
+            "key": "register-item",
+            "name": "Cadastro de Item",
+            "children": [],
+            "to": "/frete/register-item",
+            "hasChildren": true
+          },
+          {
+            "key": "list-itens-frete",
+            "name": "Listagem de Itens",
+            "children": [],
+            "to": "/frete/list-itens",
+            "hasChildren": true
+          },
+          {
+            "key": "services-extras",
+            "name": "Serviços Extras",
+            "children": [],
+            "to": "/frete/services-extras",
+            "hasChildren": true
+          },
+          {
+            "key": "load-accessibility",
+            "name": "Acessibilidade Carga",
+            "children": [],
+            "to": "/frete/load-accessibility",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "publicity",
+        "name": "Publicidade",
+        "children": [
+          {
+            "key": "listPublicity",
+            "name": "Listar Publicidade",
+            "children": [],
+            "to": "/marketing/listPublicidade",
+            "hasChildren": true
+          },
+          {
+            "key": "linkMarketingExternal",
+            "name": "Link Para Menu Externo",
+            "children": [],
+            "to": "/marketing/menuLinkExternal",
+            "hasChildren": true
+          },
+          {
+            "key": "publicityAppList",
+            "name": "Lista de Publicidade App Pro",
+            "children": [],
+            "to": "/marketing/publicidadeAppList",
+            "hasChildren": true
+          },
+          {
+            "key": "publicityApp",
+            "name": "Inserir Publicidade App Pro",
+            "children": [],
+            "to": "/marketing/publicidadeApp",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "routes",
+        "name": "Rotas",
+        "children": [
+          {
+            "key": "manageItems",
+            "name": "Gerenciar Itens",
+            "children": [],
+            "to": "/route/items",
+            "hasChildren": true
+          },
+          {
+            "key": "routeRegister",
+            "name": "Cadastrar",
+            "children": [],
+            "to": "/route/routeRegister",
+            "hasChildren": true
+          },
+          {
+            "key": "routeList",
+            "name": "Listagem",
+            "children": [],
+            "to": "/route/routeList",
+            "hasChildren": true
+          },
+          {
+            "key": "releaseDrivers",
+            "name": "Liberar Motoristas",
+            "children": [],
+            "to": "/route/releaseDrivers",
+            "hasChildren": true
+          },
+          {
+            "key": "promotionalBanner",
+            "name": "Banners",
+            "children": [],
+            "to": "/route/promotionalBanner",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "maps",
+        "name": "Mapas",
+        "children": [
+          {
+            "key": "gerencyAddress",
+            "name": "Gerenciar Endereços",
+            "children": [
+              {
+                "key": "registerLocal",
+                "name": "Cadastrar Locais",
+                "children": [],
+                "to": "/setting/address",
+                "hasChildren": true
+              },
+              {
+                "key": "addressIrregular",
+                "name": "Endereços Irregulares",
+                "children": [],
+                "to": "/setting/addressblacklist",
+                "hasChildren": true
+              },
+              {
+                "key": "addressCache",
+                "name": "Endereços Em Cache",
+                "children": [],
+                "to": "/setting/cacheAddress",
+                "hasChildren": true
+              }
+            ],
+            "hasChildren": true
+          },
+          {
+            "key": "configMaps",
+            "name": "Configurações Gerais",
+            "children": [],
+            "to": "/mapSetting/configMaps",
+            "hasChildren": true
+          },
+          {
+            "key": "configCity",
+            "name": "Configurações Por Cidade",
+            "children": [],
+            "to": "/mapSetting/configbycity",
+            "hasChildren": true
+          },
+          {
+            "key": "testsServiceMaps",
+            "name": "Teste Serviço De Mapa",
+            "children": [],
+            "to": "/mapSetting/tests",
+            "hasChildren": true
+          },
+          {
+            "key": "routesOptimization",
+            "name": "Otimização De Rota",
+            "children": [],
+            "to": "/mapSetting/routeOptimization",
+            "hasChildren": true
+          },
+          {
+            "key": "webmap-key-management",
+            "name": "Gerenciar Chaves De Mapa Web",
+            "children": [],
+            "to": "/mapSetting/keys",
+            "hasChildren": true
+          },
+          {
+            "key": "mapSequencer",
+            "name": "Sequenciador De Mapas",
+            "children": [],
+            "to": "/mapSetting/mapSequencer",
+            "hasChildren": true
+          },
+          {
+            "key": "riskArea",
+            "name": "Area De Risco",
+            "children": [],
+            "to": "/mapSetting/riskArea",
+            "hasChildren": true
+          },
+          {
+            "key": "heatMaps",
+            "name": "Áreas De Calor Do Mapa",
+            "children": [],
+            "to": "/mapSetting/heatMap",
+            "hasChildren": true
+          },
+          {
+            "key": "monitoringArea",
+            "name": "Área de Monitoramento",
+            "children": [],
+            "to": "/mapSetting/monitoringArea",
+            "hasChildren": true
+          }
+        ],
+        "hasChildren": true
+      },
+      {
+        "key": "configs-layouts",
+        "name": "Configurações de layouts",
+        "children": [],
+        "to": "/settings/config-layouts",
+        "hasChildren": true
+      },
+      {
+        "key": "versions",
+        "name": "Versões",
+        "children": [],
+        "to": "/settings/versions",
+        "hasChildren": true
+      }
+    ],
+    "hasChildren": true
+  }
+]

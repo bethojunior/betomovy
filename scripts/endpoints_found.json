@@ -1,0 +1,1818 @@
+{
+  "GET acquirer": {
+    "file": "Advanced\\Configs\\Acquirer\\index.tsx",
+    "method": "GET",
+    "url": "acquirer",
+    "callers": [
+      "Advanced\\Configs\\Acquirer\\index.tsx"
+    ]
+  },
+  "PUT acquirer/": {
+    "file": "Advanced\\Configs\\Acquirer\\index.tsx",
+    "method": "PUT",
+    "url": "acquirer/",
+    "callers": [
+      "Advanced\\Configs\\Acquirer\\index.tsx"
+    ]
+  },
+  "GET acquirer/city": {
+    "file": "Advanced\\Configs\\AcquirerByCity\\index.tsx",
+    "method": "GET",
+    "url": "acquirer/city",
+    "callers": [
+      "Advanced\\Configs\\AcquirerByCity\\index.tsx"
+    ]
+  },
+  "PUT acquirer/city": {
+    "file": "Advanced\\Configs\\AcquirerByCity\\index.tsx",
+    "method": "PUT",
+    "url": "acquirer/city",
+    "callers": [
+      "Advanced\\Configs\\AcquirerByCity\\index.tsx"
+    ]
+  },
+  "GET config/additional": {
+    "file": "Advanced\\Configs\\AdditionalSettings\\index.tsx",
+    "method": "GET",
+    "url": "config/additional",
+    "callers": [
+      "Advanced\\Configs\\AdditionalSettings\\index.tsx"
+    ]
+  },
+  "DELETE role/": {
+    "file": "Advanced\\Configs\\Admin\\UserProfile\\List\\index.tsx",
+    "method": "DELETE",
+    "url": "role/",
+    "callers": [
+      "Advanced\\Configs\\Admin\\UserProfile\\List\\index.tsx"
+    ]
+  },
+  "POST role": {
+    "file": "Advanced\\Configs\\Admin\\UserProfile\\Modal\\index.tsx",
+    "method": "POST",
+    "url": "role",
+    "callers": [
+      "Advanced\\Configs\\Admin\\UserProfile\\Modal\\index.tsx"
+    ]
+  },
+  "PUT role/": {
+    "file": "Advanced\\Configs\\Admin\\UserProfile\\Modal\\index.tsx",
+    "method": "PUT",
+    "url": "role/",
+    "callers": [
+      "Advanced\\Configs\\Admin\\UserProfile\\Modal\\index.tsx"
+    ]
+  },
+  "GET role": {
+    "file": "Advanced\\Configs\\Admin\\UserRegistration\\EditModal\\index.tsx",
+    "method": "GET",
+    "url": "role",
+    "callers": [
+      "Advanced\\Configs\\Admin\\UserRegistration\\EditModal\\index.tsx",
+      "Advanced\\Configs\\Admin\\UserRegistration\\Modal\\index.tsx"
+    ]
+  },
+  "PUT admin/": {
+    "file": "Advanced\\Configs\\Admin\\UserRegistration\\EditModal\\index.tsx",
+    "method": "PUT",
+    "url": "admin/",
+    "callers": [
+      "Advanced\\Configs\\Admin\\UserRegistration\\EditModal\\index.tsx"
+    ]
+  },
+  "DELETE user/": {
+    "file": "Advanced\\Configs\\Admin\\UserRegistration\\List\\index.tsx",
+    "method": "DELETE",
+    "url": "user/",
+    "callers": [
+      "Advanced\\Configs\\Admin\\UserRegistration\\List\\index.tsx"
+    ]
+  },
+  "GET admin/": {
+    "file": "Advanced\\Configs\\Admin\\UserRegistration\\List\\index.tsx",
+    "method": "GET",
+    "url": "admin/",
+    "callers": [
+      "Advanced\\Configs\\Admin\\UserRegistration\\List\\index.tsx"
+    ]
+  },
+  "POST admin": {
+    "file": "Advanced\\Configs\\Admin\\UserRegistration\\Modal\\index.tsx",
+    "method": "POST",
+    "url": "admin",
+    "callers": [
+      "Advanced\\Configs\\Admin\\UserRegistration\\Modal\\index.tsx"
+    ]
+  },
+  "GET doc": {
+    "file": "Advanced\\Configs\\AppDocuments\\index.tsx",
+    "method": "GET",
+    "url": "doc",
+    "callers": [
+      "Advanced\\Configs\\AppDocuments\\index.tsx",
+      "Advanced\\Configs\\ConfigsRegister\\AddDocumentsByCategory\\index.tsx",
+      "Advanced\\Configs\\ConfigsRegister\\DocumentsApp\\index.tsx",
+      "Advanced\\Configs\\ConfigsRegister\\LinkDocumentClient\\index.tsx",
+      "Driver\\List\\index.tsx"
+    ]
+  },
+  "DELETE doc/": {
+    "file": "Advanced\\Configs\\AppDocuments\\index.tsx",
+    "method": "DELETE",
+    "url": "doc/",
+    "callers": [
+      "Advanced\\Configs\\AppDocuments\\index.tsx"
+    ]
+  },
+  "GET country": {
+    "file": "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+    "method": "GET",
+    "url": "country",
+    "callers": [
+      "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx"
+    ]
+  },
+  "GET estate/country/": {
+    "file": "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+    "method": "GET",
+    "url": "estate/country/",
+    "callers": [
+      "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx"
+    ]
+  },
+  "GET city?estateId=": {
+    "file": "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+    "method": "GET",
+    "url": "city?estateId=",
+    "callers": [
+      "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+      "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+      "Client\\Legal\\index.tsx",
+      "Client\\Legal\\index.tsx"
+    ]
+  },
+  "GET city/actives/fully": {
+    "file": "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+    "method": "GET",
+    "url": "city/actives/fully",
+    "callers": [
+      "Advanced\\Configs\\AreasCity\\AddCity\\index.tsx",
+      "Advanced\\Configs\\AreasCity\\EditCity\\index.tsx",
+      "Advanced\\Configs\\ConfigByCities\\index.tsx",
+      "Advanced\\Promotions\\TripPromotions\\index.tsx",
+      "Driver\\Signup\\Forms\\SelectionState\\index.tsx",
+      "Financial\\BuyCredit\\index.tsx",
+      "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx",
+      "Financial\\ReportsFinancial\\index.tsx"
+    ]
+  },
+  "GET city/": {
+    "file": "Advanced\\Configs\\AreasCity\\EditCity\\index.tsx",
+    "method": "GET",
+    "url": "city/",
+    "callers": [
+      "Advanced\\Configs\\AreasCity\\EditCity\\index.tsx",
+      "Advanced\\Configs\\CallRadius\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TariffTrigger\\index.tsx"
+    ]
+  },
+  "DELETE role/city/delete/": {
+    "file": "Advanced\\Configs\\AreasCity\\EditCity\\index.tsx",
+    "method": "DELETE",
+    "url": "role/city/delete/",
+    "callers": [
+      "Advanced\\Configs\\AreasCity\\EditCity\\index.tsx"
+    ]
+  },
+  "GET callGroup": {
+    "file": "Advanced\\Configs\\CallGroup\\LinkedDrivers\\index.tsx",
+    "method": "GET",
+    "url": "callGroup",
+    "callers": [
+      "Advanced\\Configs\\CallGroup\\LinkedDrivers\\index.tsx",
+      "Advanced\\Configs\\CallGroup\\ListCallGroups\\index.tsx",
+      "Advanced\\Configs\\CallManagement\\index.tsx"
+    ]
+  },
+  "GET callGroup/linkedDrivers/": {
+    "file": "Advanced\\Configs\\CallGroup\\LinkedDrivers\\index.tsx",
+    "method": "GET",
+    "url": "callGroup/linkedDrivers/",
+    "callers": [
+      "Advanced\\Configs\\CallGroup\\LinkedDrivers\\index.tsx"
+    ]
+  },
+  "GET callGroup/searchDriver": {
+    "file": "Advanced\\Configs\\CallGroup\\LinkedDrivers\\index.tsx",
+    "method": "GET",
+    "url": "callGroup/searchDriver",
+    "callers": [
+      "Advanced\\Configs\\CallGroup\\LinkedDrivers\\index.tsx"
+    ]
+  },
+  "GET config_app_partners/find": {
+    "file": "Advanced\\Configs\\CallManagement\\index.tsx",
+    "method": "GET",
+    "url": "config_app_partners/find",
+    "callers": [
+      "Advanced\\Configs\\CallManagement\\index.tsx"
+    ]
+  },
+  "PUT city/": {
+    "file": "Advanced\\Configs\\CallRadius\\index.tsx",
+    "method": "PUT",
+    "url": "city/",
+    "callers": [
+      "Advanced\\Configs\\CallRadius\\index.tsx"
+    ]
+  },
+  "GET appConfig": {
+    "file": "Advanced\\Configs\\ConfigApp\\index.tsx",
+    "method": "GET",
+    "url": "appConfig",
+    "callers": [
+      "Advanced\\Configs\\ConfigApp\\index.tsx",
+      "Advanced\\Configs\\ModulesActives\\index.tsx",
+      "Advanced\\Configs\\ReasonsForCancellations\\index.tsx"
+    ]
+  },
+  "DELETE appConfig/": {
+    "file": "Advanced\\Configs\\ConfigApp\\index.tsx",
+    "method": "DELETE",
+    "url": "appConfig/",
+    "callers": [
+      "Advanced\\Configs\\ConfigApp\\index.tsx"
+    ]
+  },
+  "GET city/actives": {
+    "file": "Advanced\\Configs\\ConfigByCities\\index.tsx",
+    "method": "GET",
+    "url": "city/actives",
+    "callers": [
+      "Advanced\\Configs\\ConfigByCities\\index.tsx"
+    ]
+  },
+  "GET smtpServer": {
+    "file": "Advanced\\Configs\\ConfigServiceSMTP\\index.tsx",
+    "method": "GET",
+    "url": "smtpServer",
+    "callers": [
+      "Advanced\\Configs\\ConfigServiceSMTP\\index.tsx"
+    ]
+  },
+  "GET config_app_partners/find_all?page=": {
+    "file": "Advanced\\Configs\\ConfigsAppPartner\\index.tsx",
+    "method": "GET",
+    "url": "config_app_partners/find_all?page=",
+    "callers": [
+      "Advanced\\Configs\\ConfigsAppPartner\\index.tsx"
+    ]
+  },
+  "GET userType/drivers": {
+    "file": "Advanced\\Configs\\ConfigsRegister\\AddDocumentsByCategory\\index.tsx",
+    "method": "GET",
+    "url": "userType/drivers",
+    "callers": [
+      "Advanced\\Configs\\ConfigsRegister\\AddDocumentsByCategory\\index.tsx",
+      "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx",
+      "Driver\\List\\index.tsx",
+      "Driver\\List\\index.tsx",
+      "Financial\\Charge\\index.tsx"
+    ]
+  },
+  "GET doc/userType/": {
+    "file": "Advanced\\Configs\\ConfigsRegister\\AddDocumentsByCategory\\index.tsx",
+    "method": "GET",
+    "url": "doc/userType/",
+    "callers": [
+      "Advanced\\Configs\\ConfigsRegister\\AddDocumentsByCategory\\index.tsx",
+      "Advanced\\Configs\\ConfigsRegister\\LinkDocumentClient\\index.tsx"
+    ]
+  },
+  "POST doc/userType/": {
+    "file": "Advanced\\Configs\\ConfigsRegister\\AddDocumentsByCategory\\index.tsx",
+    "method": "POST",
+    "url": "doc/userType/",
+    "callers": [
+      "Advanced\\Configs\\ConfigsRegister\\AddDocumentsByCategory\\index.tsx",
+      "Advanced\\Configs\\ConfigsRegister\\LinkDocumentClient\\index.tsx"
+    ]
+  },
+  "POST config/formStepUserType": {
+    "file": "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx",
+    "method": "POST",
+    "url": "config/formStepUserType",
+    "callers": [
+      "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx"
+    ]
+  },
+  "GET config/formStep": {
+    "file": "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx",
+    "method": "GET",
+    "url": "config/formStep",
+    "callers": [
+      "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx"
+    ]
+  },
+  "DELETE config/formStepUserType/": {
+    "file": "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx",
+    "method": "DELETE",
+    "url": "config/formStepUserType/",
+    "callers": [
+      "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx"
+    ]
+  },
+  "GET config/formStep/userType/": {
+    "file": "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx",
+    "method": "GET",
+    "url": "config/formStep/userType/",
+    "callers": [
+      "Advanced\\Configs\\ConfigsRegister\\ConfigRegisterDriver\\index.tsx"
+    ]
+  },
+  "GET requiredField/confirmationCodeCustomer": {
+    "file": "Advanced\\Configs\\ConfirmationCode\\index.tsx",
+    "method": "GET",
+    "url": "requiredField/confirmationCodeCustomer",
+    "callers": [
+      "Advanced\\Configs\\ConfirmationCode\\index.tsx"
+    ]
+  },
+  "GET externalServiceActiveChannel": {
+    "file": "Advanced\\Configs\\ConfirmationCode\\index.tsx",
+    "method": "GET",
+    "url": "externalServiceActiveChannel",
+    "callers": [
+      "Advanced\\Configs\\ConfirmationCode\\index.tsx"
+    ]
+  },
+  "GET externalServiceType?externalServiceGroupId=1": {
+    "file": "Advanced\\Configs\\ConfirmationCode\\index.tsx",
+    "method": "GET",
+    "url": "externalServiceType?externalServiceGroupId=1",
+    "callers": [
+      "Advanced\\Configs\\ConfirmationCode\\index.tsx"
+    ]
+  },
+  "PUT requiredField/changeConfirmationCode": {
+    "file": "Advanced\\Configs\\ConfirmationCode\\index.tsx",
+    "method": "PUT",
+    "url": "requiredField/changeConfirmationCode",
+    "callers": [
+      "Advanced\\Configs\\ConfirmationCode\\index.tsx"
+    ]
+  },
+  "PUT externalServiceActiveChannel/": {
+    "file": "Advanced\\Configs\\ConfirmationCode\\index.tsx",
+    "method": "PUT",
+    "url": "externalServiceActiveChannel/",
+    "callers": [
+      "Advanced\\Configs\\ConfirmationCode\\index.tsx"
+    ]
+  },
+  "GET integration-partners": {
+    "file": "Advanced\\Configs\\CredentialsIntegrationExternal\\index.tsx",
+    "method": "GET",
+    "url": "integration-partners",
+    "callers": [
+      "Advanced\\Configs\\CredentialsIntegrationExternal\\index.tsx"
+    ]
+  },
+  "POST integration-partners": {
+    "file": "Advanced\\Configs\\CredentialsIntegrationExternal\\index.tsx",
+    "method": "POST",
+    "url": "integration-partners",
+    "callers": [
+      "Advanced\\Configs\\CredentialsIntegrationExternal\\index.tsx"
+    ]
+  },
+  "PUT integration-partners/": {
+    "file": "Advanced\\Configs\\CredentialsIntegrationExternal\\index.tsx",
+    "method": "PUT",
+    "url": "integration-partners/",
+    "callers": [
+      "Advanced\\Configs\\CredentialsIntegrationExternal\\index.tsx"
+    ]
+  },
+  "DELETE integration-partners/": {
+    "file": "Advanced\\Configs\\CredentialsIntegrationExternal\\index.tsx",
+    "method": "DELETE",
+    "url": "integration-partners/",
+    "callers": [
+      "Advanced\\Configs\\CredentialsIntegrationExternal\\index.tsx"
+    ]
+  },
+  "GET /databaseVersion": {
+    "file": "Advanced\\Configs\\FirebaseVerification\\index.tsx",
+    "method": "GET",
+    "url": "/databaseVersion",
+    "callers": [
+      "Advanced\\Configs\\FirebaseVerification\\index.tsx"
+    ]
+  },
+  "GET /config/realtimeDatabase": {
+    "file": "Advanced\\Configs\\FirebaseVerification\\index.tsx",
+    "method": "GET",
+    "url": "/config/realtimeDatabase",
+    "callers": [
+      "Advanced\\Configs\\FirebaseVerification\\index.tsx"
+    ]
+  },
+  "PUT /config/updateRealtimeDatabase": {
+    "file": "Advanced\\Configs\\FirebaseVerification\\index.tsx",
+    "method": "PUT",
+    "url": "/config/updateRealtimeDatabase",
+    "callers": [
+      "Advanced\\Configs\\FirebaseVerification\\index.tsx"
+    ]
+  },
+  "GET config": {
+    "file": "Advanced\\Configs\\KeysApp\\index.tsx",
+    "method": "GET",
+    "url": "config",
+    "callers": [
+      "Advanced\\Configs\\KeysApp\\index.tsx",
+      "Dashboard\\index.tsx",
+      "Driver\\List\\index.tsx",
+      "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx"
+    ]
+  },
+  "PUT config": {
+    "file": "Advanced\\Configs\\KeysApp\\index.tsx",
+    "method": "PUT",
+    "url": "config",
+    "callers": [
+      "Advanced\\Configs\\KeysApp\\index.tsx",
+      "Advanced\\Maps\\MapSequencer\\index.tsx",
+      "Advanced\\Maps\\RouteOptimization\\index.tsx",
+      "Advanced\\Maps\\RouteOptimization\\index.tsx",
+      "Advanced\\Maps\\RouteOptimization\\index.tsx",
+      "Advanced\\Maps\\TestsServiceMaps\\index.tsx",
+      "Advanced\\Maps\\TestsServiceMaps\\index.tsx",
+      "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx"
+    ]
+  },
+  "GET config_list_phone_general/config": {
+    "file": "Advanced\\Configs\\ListPhonesGeneral\\index.tsx",
+    "method": "GET",
+    "url": "config_list_phone_general/config",
+    "callers": [
+      "Advanced\\Configs\\ListPhonesGeneral\\index.tsx"
+    ]
+  },
+  "GET list_contacts_general/list": {
+    "file": "Advanced\\Configs\\ListPhonesGeneral\\index.tsx",
+    "method": "GET",
+    "url": "list_contacts_general/list",
+    "callers": [
+      "Advanced\\Configs\\ListPhonesGeneral\\index.tsx"
+    ]
+  },
+  "POST whatsapp/test": {
+    "file": "Advanced\\Configs\\ListPhonesGeneral\\index.tsx",
+    "method": "POST",
+    "url": "whatsapp/test",
+    "callers": [
+      "Advanced\\Configs\\ListPhonesGeneral\\index.tsx"
+    ]
+  },
+  "POST whatsapp/send_many": {
+    "file": "Advanced\\Configs\\ListPhonesGeneral\\index.tsx",
+    "method": "POST",
+    "url": "whatsapp/send_many",
+    "callers": [
+      "Advanced\\Configs\\ListPhonesGeneral\\index.tsx"
+    ]
+  },
+  "DELETE list_contacts_general/delete/": {
+    "file": "Advanced\\Configs\\ListPhonesGeneral\\index.tsx",
+    "method": "DELETE",
+    "url": "list_contacts_general/delete/",
+    "callers": [
+      "Advanced\\Configs\\ListPhonesGeneral\\index.tsx"
+    ]
+  },
+  "GET managementWppNotifications": {
+    "file": "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+    "method": "GET",
+    "url": "managementWppNotifications",
+    "callers": [
+      "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+      "Advanced\\Configs\\ManagementWppScheduledTrip\\use-management-wpp-scheduled-trip.ts"
+    ]
+  },
+  "GET tripType": {
+    "file": "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+    "method": "GET",
+    "url": "tripType",
+    "callers": [
+      "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TariffTrigger\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\index.tsx",
+      "Financial\\CommissionManagement\\index.tsx"
+    ]
+  },
+  "PUT managementWppNotifications/": {
+    "file": "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+    "method": "PUT",
+    "url": "managementWppNotifications/",
+    "callers": [
+      "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+      "Advanced\\Configs\\ManagementWppScheduledTrip\\use-management-wpp-scheduled-trip.ts"
+    ]
+  },
+  "POST managementWppNotifications": {
+    "file": "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+    "method": "POST",
+    "url": "managementWppNotifications",
+    "callers": [
+      "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts"
+    ]
+  },
+  "DELETE managementWppNotifications/": {
+    "file": "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts",
+    "method": "DELETE",
+    "url": "managementWppNotifications/",
+    "callers": [
+      "Advanced\\Configs\\ManagementWppScheduledTrip\\SpecificNotifications\\use-specific-notifications.ts"
+    ]
+  },
+  "GET chatBotTrip": {
+    "file": "Advanced\\Configs\\MessagesChatDriver\\index.tsx",
+    "method": "GET",
+    "url": "chatBotTrip",
+    "callers": [
+      "Advanced\\Configs\\MessagesChatDriver\\index.tsx"
+    ]
+  },
+  "GET chatBotTripType": {
+    "file": "Advanced\\Configs\\MessagesChatDriver\\index.tsx",
+    "method": "GET",
+    "url": "chatBotTripType",
+    "callers": [
+      "Advanced\\Configs\\MessagesChatDriver\\index.tsx"
+    ]
+  },
+  "POST chatBotTrip": {
+    "file": "Advanced\\Configs\\MessagesChatDriver\\index.tsx",
+    "method": "POST",
+    "url": "chatBotTrip",
+    "callers": [
+      "Advanced\\Configs\\MessagesChatDriver\\index.tsx"
+    ]
+  },
+  "DELETE chatBotTrip/": {
+    "file": "Advanced\\Configs\\MessagesChatDriver\\index.tsx",
+    "method": "DELETE",
+    "url": "chatBotTrip/",
+    "callers": [
+      "Advanced\\Configs\\MessagesChatDriver\\index.tsx"
+    ]
+  },
+  "GET /tripPaymentForm": {
+    "file": "Advanced\\Configs\\MethodsPayments\\index.tsx",
+    "method": "GET",
+    "url": "/tripPaymentForm",
+    "callers": [
+      "Advanced\\Configs\\MethodsPayments\\index.tsx"
+    ]
+  },
+  "GET /paymentFormType": {
+    "file": "Advanced\\Configs\\MethodsPayments\\index.tsx",
+    "method": "GET",
+    "url": "/paymentFormType",
+    "callers": [
+      "Advanced\\Configs\\MethodsPayments\\index.tsx"
+    ]
+  },
+  "GET appModule": {
+    "file": "Advanced\\Configs\\ModulesActives\\index.tsx",
+    "method": "GET",
+    "url": "appModule",
+    "callers": [
+      "Advanced\\Configs\\ModulesActives\\index.tsx"
+    ]
+  },
+  "GET adminNotification?page=": {
+    "file": "Advanced\\Configs\\NotificationsAdmin\\index.tsx",
+    "method": "GET",
+    "url": "adminNotification?page=",
+    "callers": [
+      "Advanced\\Configs\\NotificationsAdmin\\index.tsx"
+    ]
+  },
+  "GET adminNotificationType": {
+    "file": "Advanced\\Configs\\NotificationsAdmin\\index.tsx",
+    "method": "GET",
+    "url": "adminNotificationType",
+    "callers": [
+      "Advanced\\Configs\\NotificationsAdmin\\index.tsx"
+    ]
+  },
+  "GET userPenaltiesType": {
+    "file": "Advanced\\Configs\\PendencyDriver\\index.tsx",
+    "method": "GET",
+    "url": "userPenaltiesType",
+    "callers": [
+      "Advanced\\Configs\\PendencyDriver\\index.tsx"
+    ]
+  },
+  "GET cancellationReasons": {
+    "file": "Advanced\\Configs\\ReasonsForCancellations\\index.tsx",
+    "method": "GET",
+    "url": "cancellationReasons",
+    "callers": [
+      "Advanced\\Configs\\ReasonsForCancellations\\index.tsx"
+    ]
+  },
+  "POST cancellationReasons/insert": {
+    "file": "Advanced\\Configs\\ReasonsForCancellations\\index.tsx",
+    "method": "POST",
+    "url": "cancellationReasons/insert",
+    "callers": [
+      "Advanced\\Configs\\ReasonsForCancellations\\index.tsx"
+    ]
+  },
+  "GET externalServiceType/fully?cityId=": {
+    "file": "Advanced\\Configs\\ServicesExternalByCity\\index.tsx",
+    "method": "GET",
+    "url": "externalServiceType/fully?cityId=",
+    "callers": [
+      "Advanced\\Configs\\ServicesExternalByCity\\index.tsx"
+    ]
+  },
+  "PUT externalService/": {
+    "file": "Advanced\\Configs\\ServicesExternalByCity\\index.tsx",
+    "method": "PUT",
+    "url": "externalService/",
+    "callers": [
+      "Advanced\\Configs\\ServicesExternalByCity\\index.tsx",
+      "Advanced\\Configs\\ServicesExternalGlobal\\index.tsx"
+    ]
+  },
+  "GET externalServiceType/fully": {
+    "file": "Advanced\\Configs\\ServicesExternalGlobal\\index.tsx",
+    "method": "GET",
+    "url": "externalServiceType/fully",
+    "callers": [
+      "Advanced\\Configs\\ServicesExternalGlobal\\index.tsx"
+    ]
+  },
+  "GET webhook?page=": {
+    "file": "Advanced\\Configs\\ServicesExternalWebhook\\index.tsx",
+    "method": "GET",
+    "url": "webhook?page=",
+    "callers": [
+      "Advanced\\Configs\\ServicesExternalWebhook\\index.tsx"
+    ]
+  },
+  "GET dynamicArea": {
+    "file": "Advanced\\Configs\\Tariffs\\DynamicPerArea\\index.tsx",
+    "method": "GET",
+    "url": "dynamicArea",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\DynamicPerArea\\index.tsx"
+    ]
+  },
+  "GET driverCommission/": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "GET",
+    "url": "driverCommission/",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useDriverCommission.ts"
+    ]
+  },
+  "GET cashback?cityId=": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "GET",
+    "url": "cashback?cityId=",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useCashback.ts"
+    ]
+  },
+  "GET price/range?cityId=": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "GET",
+    "url": "price/range?cityId=",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\usePriceRange.ts"
+    ]
+  },
+  "GET tax?cityId=": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "GET",
+    "url": "tax?cityId=",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useTripRates.ts"
+    ]
+  },
+  "POST driverCommission/": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "POST",
+    "url": "driverCommission/",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\index.tsx"
+    ]
+  },
+  "POST price": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "POST",
+    "url": "price",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\index.tsx"
+    ]
+  },
+  "POST tax": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "POST",
+    "url": "tax",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useTripRates.ts"
+    ]
+  },
+  "POST cashback": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "POST",
+    "url": "cashback",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useCashback.ts"
+    ]
+  },
+  "POST price/range": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "POST",
+    "url": "price/range",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\usePriceRange.ts"
+    ]
+  },
+  "GET price?cityId=": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "GET",
+    "url": "price?cityId=",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useTariffPricing.ts"
+    ]
+  },
+  "GET tripPaymentForm": {
+    "file": "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+    "method": "GET",
+    "url": "tripPaymentForm",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\ServicesApps\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useDriverCommission.ts"
+    ]
+  },
+  "GET price/dynamic?cityId=": {
+    "file": "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx",
+    "method": "GET",
+    "url": "price/dynamic?cityId=",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx"
+    ]
+  },
+  "PUT price/dynamic/": {
+    "file": "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx",
+    "method": "PUT",
+    "url": "price/dynamic/",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx",
+      "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx"
+    ]
+  },
+  "DELETE price/dynamic/": {
+    "file": "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx",
+    "method": "DELETE",
+    "url": "price/dynamic/",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\TariffFlag\\index.tsx"
+    ]
+  },
+  "GET priceDynamicScheduled": {
+    "file": "Advanced\\Configs\\Tariffs\\TariffTrigger\\index.tsx",
+    "method": "GET",
+    "url": "priceDynamicScheduled",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\TariffTrigger\\index.tsx"
+    ]
+  },
+  "PUT price/update-order": {
+    "file": "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useCustomOrderList.ts",
+    "method": "PUT",
+    "url": "price/update-order",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useCustomOrderList.ts"
+    ]
+  },
+  "GET config/travel_only_by_offer": {
+    "file": "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useInDriverConfig.ts",
+    "method": "GET",
+    "url": "config/travel_only_by_offer",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\hooks\\useInDriverConfig.ts"
+    ]
+  },
+  "GET city": {
+    "file": "Advanced\\Configs\\Tariffs\\TypesTravels\\index.tsx",
+    "method": "GET",
+    "url": "city",
+    "callers": [
+      "Advanced\\Configs\\Tariffs\\TypesTravels\\index.tsx"
+    ]
+  },
+  "GET termsUsePolicy": {
+    "file": "Advanced\\Configs\\UsagePolicy\\index.tsx",
+    "method": "GET",
+    "url": "termsUsePolicy",
+    "callers": [
+      "Advanced\\Configs\\UsagePolicy\\index.tsx"
+    ]
+  },
+  "GET deliveryInfoSuggestion": {
+    "file": "Advanced\\Delivery\\Items\\index.tsx",
+    "method": "GET",
+    "url": "deliveryInfoSuggestion",
+    "callers": [
+      "Advanced\\Delivery\\Items\\index.tsx",
+      "Advanced\\Delivery\\SuggestionText\\index.tsx"
+    ]
+  },
+  "DELETE tripItemType/": {
+    "file": "Advanced\\Delivery\\Items\\index.tsx",
+    "method": "DELETE",
+    "url": "tripItemType/",
+    "callers": [
+      "Advanced\\Delivery\\Items\\index.tsx"
+    ]
+  },
+  "POST deliveryInfoSuggestion": {
+    "file": "Advanced\\Delivery\\SuggestionText\\index.tsx",
+    "method": "POST",
+    "url": "deliveryInfoSuggestion",
+    "callers": [
+      "Advanced\\Delivery\\SuggestionText\\index.tsx"
+    ]
+  },
+  "GET item": {
+    "file": "Advanced\\Frete\\ListItens\\index.tsx",
+    "method": "GET",
+    "url": "item",
+    "callers": [
+      "Advanced\\Frete\\ListItens\\index.tsx"
+    ]
+  },
+  "GET price/obstacle?cityId=": {
+    "file": "Advanced\\Frete\\LoadAccessibility\\index.tsx",
+    "method": "GET",
+    "url": "price/obstacle?cityId=",
+    "callers": [
+      "Advanced\\Frete\\LoadAccessibility\\index.tsx"
+    ]
+  },
+  "POST item": {
+    "file": "Advanced\\Frete\\RegisterItem\\index.tsx",
+    "method": "POST",
+    "url": "item",
+    "callers": [
+      "Advanced\\Frete\\RegisterItem\\index.tsx"
+    ]
+  },
+  "GET price/help?cityId=": {
+    "file": "Advanced\\Frete\\ServicesExtras\\index.tsx",
+    "method": "GET",
+    "url": "price/help?cityId=",
+    "callers": [
+      "Advanced\\Frete\\ServicesExtras\\index.tsx"
+    ]
+  },
+  "GET mapService": {
+    "file": "Advanced\\Maps\\ConfigCity\\index.tsx",
+    "method": "GET",
+    "url": "mapService",
+    "callers": [
+      "Advanced\\Maps\\ConfigCity\\index.tsx"
+    ]
+  },
+  "GET mapService/types": {
+    "file": "Advanced\\Maps\\ConfigCity\\index.tsx",
+    "method": "GET",
+    "url": "mapService/types",
+    "callers": [
+      "Advanced\\Maps\\ConfigCity\\index.tsx"
+    ]
+  },
+  "GET config/type/13": {
+    "file": "Advanced\\Maps\\ConfigMaps\\index.tsx",
+    "method": "GET",
+    "url": "config/type/13",
+    "callers": [
+      "Advanced\\Maps\\ConfigMaps\\index.tsx",
+      "Advanced\\Maps\\TestsServiceMaps\\index.tsx"
+    ]
+  },
+  "GET config/type/21": {
+    "file": "Advanced\\Maps\\ConfigMaps\\index.tsx",
+    "method": "GET",
+    "url": "config/type/21",
+    "callers": [
+      "Advanced\\Maps\\ConfigMaps\\index.tsx"
+    ]
+  },
+  "POST address/cache": {
+    "file": "Advanced\\Maps\\GerencyAddress\\AddressCache\\index.tsx",
+    "method": "POST",
+    "url": "address/cache",
+    "callers": [
+      "Advanced\\Maps\\GerencyAddress\\AddressCache\\index.tsx"
+    ]
+  },
+  "GET addressBlacklist": {
+    "file": "Advanced\\Maps\\GerencyAddress\\AddressIrregular\\index.tsx",
+    "method": "GET",
+    "url": "addressBlacklist",
+    "callers": [
+      "Advanced\\Maps\\GerencyAddress\\AddressIrregular\\index.tsx"
+    ]
+  },
+  "GET address?q=": {
+    "file": "Advanced\\Maps\\GerencyAddress\\RegisterLocal\\index.tsx",
+    "method": "GET",
+    "url": "address?q=",
+    "callers": [
+      "Advanced\\Maps\\GerencyAddress\\RegisterLocal\\index.tsx"
+    ]
+  },
+  "GET customer/": {
+    "file": "Advanced\\Maps\\HeatMap\\index.tsx",
+    "method": "GET",
+    "url": "customer/",
+    "callers": [
+      "Advanced\\Maps\\HeatMap\\index.tsx"
+    ]
+  },
+  "GET dashboard/lastDynamicsPlaces?limit=30&cityId=": {
+    "file": "Advanced\\Maps\\HeatMap\\index.tsx",
+    "method": "GET",
+    "url": "dashboard/lastDynamicsPlaces?limit=30&cityId=",
+    "callers": [
+      "Advanced\\Maps\\HeatMap\\index.tsx"
+    ]
+  },
+  "GET dashboard/expensiveDynamicsPlaces?limit=30&cityId=": {
+    "file": "Advanced\\Maps\\HeatMap\\index.tsx",
+    "method": "GET",
+    "url": "dashboard/expensiveDynamicsPlaces?limit=30&cityId=",
+    "callers": [
+      "Advanced\\Maps\\HeatMap\\index.tsx"
+    ]
+  },
+  "GET dashboard/placesMoreTripsDayAgo?limit=30": {
+    "file": "Advanced\\Maps\\HeatMap\\index.tsx",
+    "method": "GET",
+    "url": "dashboard/placesMoreTripsDayAgo?limit=30",
+    "callers": [
+      "Advanced\\Maps\\HeatMap\\index.tsx"
+    ]
+  },
+  "GET dashboard/placesMoreTripsWeekAgo?limit=30": {
+    "file": "Advanced\\Maps\\HeatMap\\index.tsx",
+    "method": "GET",
+    "url": "dashboard/placesMoreTripsWeekAgo?limit=30",
+    "callers": [
+      "Advanced\\Maps\\HeatMap\\index.tsx"
+    ]
+  },
+  "GET config/enable_custom_mode_of_map_services": {
+    "file": "Advanced\\Maps\\MapSequencer\\index.tsx",
+    "method": "GET",
+    "url": "config/enable_custom_mode_of_map_services",
+    "callers": [
+      "Advanced\\Maps\\MapSequencer\\index.tsx"
+    ]
+  },
+  "GET monitoringArea": {
+    "file": "Advanced\\Maps\\MonitoringArea\\index.tsx",
+    "method": "GET",
+    "url": "monitoringArea",
+    "callers": [
+      "Advanced\\Maps\\MonitoringArea\\index.tsx"
+    ]
+  },
+  "PUT monitoringArea/": {
+    "file": "Advanced\\Maps\\MonitoringArea\\index.tsx",
+    "method": "PUT",
+    "url": "monitoringArea/",
+    "callers": [
+      "Advanced\\Maps\\MonitoringArea\\index.tsx",
+      "Advanced\\Maps\\MonitoringArea\\index.tsx"
+    ]
+  },
+  "GET riskArea?page=1": {
+    "file": "Advanced\\Maps\\RiskArea\\index.tsx",
+    "method": "GET",
+    "url": "riskArea?page=1",
+    "callers": [
+      "Advanced\\Maps\\RiskArea\\index.tsx"
+    ]
+  },
+  "GET webMapKey": {
+    "file": "Advanced\\Maps\\RiskArea\\index.tsx",
+    "method": "GET",
+    "url": "webMapKey",
+    "callers": [
+      "Advanced\\Maps\\RiskArea\\index.tsx",
+      "Advanced\\Maps\\WebmapKeyManagment\\index.tsx"
+    ]
+  },
+  "GET config/route_optimization_google": {
+    "file": "Advanced\\Maps\\RouteOptimization\\index.tsx",
+    "method": "GET",
+    "url": "config/route_optimization_google",
+    "callers": [
+      "Advanced\\Maps\\RouteOptimization\\index.tsx"
+    ]
+  },
+  "GET config/route_optimization_here": {
+    "file": "Advanced\\Maps\\RouteOptimization\\index.tsx",
+    "method": "GET",
+    "url": "config/route_optimization_here",
+    "callers": [
+      "Advanced\\Maps\\RouteOptimization\\index.tsx"
+    ]
+  },
+  "GET config/route_optimization_mapbox": {
+    "file": "Advanced\\Maps\\RouteOptimization\\index.tsx",
+    "method": "GET",
+    "url": "config/route_optimization_mapbox",
+    "callers": [
+      "Advanced\\Maps\\RouteOptimization\\index.tsx"
+    ]
+  },
+  "POST config": {
+    "file": "Advanced\\Maps\\TestsServiceMaps\\index.tsx",
+    "method": "POST",
+    "url": "config",
+    "callers": [
+      "Advanced\\Maps\\TestsServiceMaps\\index.tsx",
+      "Advanced\\Maps\\TestsServiceMaps\\index.tsx"
+    ]
+  },
+  "GET /partner": {
+    "file": "Advanced\\Partners\\ListPartner\\index.tsx",
+    "method": "GET",
+    "url": "/partner",
+    "callers": [
+      "Advanced\\Partners\\ListPartner\\index.tsx",
+      "Advanced\\Partners\\ListPartner\\index.tsx"
+    ]
+  },
+  "PUT /partner/": {
+    "file": "Advanced\\Partners\\ListPartner\\index.tsx",
+    "method": "PUT",
+    "url": "/partner/",
+    "callers": [
+      "Advanced\\Partners\\ListPartner\\index.tsx"
+    ]
+  },
+  "GET /audit": {
+    "file": "Advanced\\Partners\\MessagePartner\\index.tsx",
+    "method": "GET",
+    "url": "/audit",
+    "callers": [
+      "Advanced\\Partners\\MessagePartner\\index.tsx"
+    ]
+  },
+  "DELETE discountCoupon/": {
+    "file": "Advanced\\Promotions\\Coupon\\index.tsx",
+    "method": "DELETE",
+    "url": "discountCoupon/",
+    "callers": [
+      "Advanced\\Promotions\\Coupon\\index.tsx"
+    ]
+  },
+  "PUT discountCoupon/": {
+    "file": "Advanced\\Promotions\\Coupon\\index.tsx",
+    "method": "PUT",
+    "url": "discountCoupon/",
+    "callers": [
+      "Advanced\\Promotions\\Coupon\\index.tsx",
+      "Advanced\\Promotions\\Coupon\\index.tsx"
+    ]
+  },
+  "GET sale": {
+    "file": "Advanced\\Promotions\\TripPromotions\\index.tsx",
+    "method": "GET",
+    "url": "sale",
+    "callers": [
+      "Advanced\\Promotions\\TripPromotions\\index.tsx"
+    ]
+  },
+  "DELETE sale/": {
+    "file": "Advanced\\Promotions\\TripPromotions\\index.tsx",
+    "method": "DELETE",
+    "url": "sale/",
+    "callers": [
+      "Advanced\\Promotions\\TripPromotions\\index.tsx"
+    ]
+  },
+  "PUT sale/": {
+    "file": "Advanced\\Promotions\\TripPromotions\\index.tsx",
+    "method": "PUT",
+    "url": "sale/",
+    "callers": [
+      "Advanced\\Promotions\\TripPromotions\\index.tsx"
+    ]
+  },
+  "POST sale": {
+    "file": "Advanced\\Promotions\\TripPromotions\\index.tsx",
+    "method": "POST",
+    "url": "sale",
+    "callers": [
+      "Advanced\\Promotions\\TripPromotions\\index.tsx"
+    ]
+  },
+  "DELETE voucherPromotion/": {
+    "file": "Advanced\\Promotions\\Voucher\\index.tsx",
+    "method": "DELETE",
+    "url": "voucherPromotion/",
+    "callers": [
+      "Advanced\\Promotions\\Voucher\\index.tsx"
+    ]
+  },
+  "PUT voucherPromotion/": {
+    "file": "Advanced\\Promotions\\Voucher\\index.tsx",
+    "method": "PUT",
+    "url": "voucherPromotion/",
+    "callers": [
+      "Advanced\\Promotions\\Voucher\\index.tsx"
+    ]
+  },
+  "POST voucherPromotion": {
+    "file": "Advanced\\Promotions\\Voucher\\index.tsx",
+    "method": "POST",
+    "url": "voucherPromotion",
+    "callers": [
+      "Advanced\\Promotions\\Voucher\\index.tsx"
+    ]
+  },
+  "GET company?cityId=": {
+    "file": "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts",
+    "method": "GET",
+    "url": "company?cityId=",
+    "callers": [
+      "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts",
+      "Delivery\\RegisterEstablishments\\index.tsx"
+    ]
+  },
+  "GET gender": {
+    "file": "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts",
+    "method": "GET",
+    "url": "gender",
+    "callers": [
+      "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts"
+    ]
+  },
+  "GET app": {
+    "file": "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts",
+    "method": "GET",
+    "url": "app",
+    "callers": [
+      "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts"
+    ]
+  },
+  "GET advertisingAppSite": {
+    "file": "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts",
+    "method": "GET",
+    "url": "advertisingAppSite",
+    "callers": [
+      "Advanced\\Publicity\\InsertPublicity\\useInsertPublicity.ts"
+    ]
+  },
+  "GET menuApp/getPro": {
+    "file": "Advanced\\Publicity\\LinkExtern\\index.tsx",
+    "method": "GET",
+    "url": "menuApp/getPro",
+    "callers": [
+      "Advanced\\Publicity\\LinkExtern\\index.tsx"
+    ]
+  },
+  "GET menuApp/types": {
+    "file": "Advanced\\Publicity\\LinkExtern\\index.tsx",
+    "method": "GET",
+    "url": "menuApp/types",
+    "callers": [
+      "Advanced\\Publicity\\LinkExtern\\index.tsx"
+    ]
+  },
+  "GET advertising?cityId=": {
+    "file": "Advanced\\Publicity\\ListPublicity\\index.tsx",
+    "method": "GET",
+    "url": "advertising?cityId=",
+    "callers": [
+      "Advanced\\Publicity\\ListPublicity\\index.tsx"
+    ]
+  },
+  "DELETE advertising/": {
+    "file": "Advanced\\Publicity\\ListPublicity\\index.tsx",
+    "method": "DELETE",
+    "url": "advertising/",
+    "callers": [
+      "Advanced\\Publicity\\ListPublicity\\index.tsx"
+    ]
+  },
+  "PUT advertising/": {
+    "file": "Advanced\\Publicity\\ListPublicity\\index.tsx",
+    "method": "PUT",
+    "url": "advertising/",
+    "callers": [
+      "Advanced\\Publicity\\ListPublicity\\index.tsx",
+      "Advanced\\Publicity\\ListPublicity\\index.tsx"
+    ]
+  },
+  "PUT advertising/update-order": {
+    "file": "Advanced\\Publicity\\ListPublicity\\index.tsx",
+    "method": "PUT",
+    "url": "advertising/update-order",
+    "callers": [
+      "Advanced\\Publicity\\ListPublicity\\index.tsx"
+    ]
+  },
+  "POST publicitiesApp": {
+    "file": "Advanced\\Publicity\\PublicityApp\\index.tsx",
+    "method": "POST",
+    "url": "publicitiesApp",
+    "callers": [
+      "Advanced\\Publicity\\PublicityApp\\index.tsx"
+    ]
+  },
+  "GET publicitiesApp": {
+    "file": "Advanced\\Publicity\\PublicityAppList\\index.tsx",
+    "method": "GET",
+    "url": "publicitiesApp",
+    "callers": [
+      "Advanced\\Publicity\\PublicityAppList\\index.tsx"
+    ]
+  },
+  "GET appVersion?page=": {
+    "file": "Advanced\\Versions\\useVersions.tsx",
+    "method": "GET",
+    "url": "appVersion?page=",
+    "callers": [
+      "Advanced\\Versions\\useVersions.tsx"
+    ]
+  },
+  "GET publicity/advertising/customer": {
+    "file": "Dashboard\\index.tsx",
+    "method": "GET",
+    "url": "publicity/advertising/customer",
+    "callers": [
+      "Dashboard\\index.tsx"
+    ]
+  },
+  "GET dashboard/rankingDriver": {
+    "file": "Dashboard\\index.tsx",
+    "method": "GET",
+    "url": "dashboard/rankingDriver",
+    "callers": [
+      "Dashboard\\index.tsx"
+    ]
+  },
+  "GET dashboard/rankingCustomer": {
+    "file": "Dashboard\\index.tsx",
+    "method": "GET",
+    "url": "dashboard/rankingCustomer",
+    "callers": [
+      "Dashboard\\index.tsx"
+    ]
+  },
+  "GET /driver/positions": {
+    "file": "Monitoring\\_components\\TripFooterStats.tsx",
+    "method": "GET",
+    "url": "/driver/positions",
+    "callers": [
+      "Monitoring\\_components\\TripFooterStats.tsx"
+    ]
+  },
+  "GET driver/positions": {
+    "file": "Monitoring\\index.tsx",
+    "method": "GET",
+    "url": "driver/positions",
+    "callers": [
+      "Monitoring\\index.tsx"
+    ]
+  },
+  "GET config/whatsapp_message_driver": {
+    "file": "Client\\Legal\\index.tsx",
+    "method": "GET",
+    "url": "config/whatsapp_message_driver",
+    "callers": [
+      "Client\\Legal\\index.tsx"
+    ]
+  },
+  "PUT company/": {
+    "file": "Client\\Legal\\index.tsx",
+    "method": "PUT",
+    "url": "company/",
+    "callers": [
+      "Client\\Legal\\index.tsx",
+      "Client\\Legal\\index.tsx"
+    ]
+  },
+  "DELETE company/": {
+    "file": "Client\\Legal\\index.tsx",
+    "method": "DELETE",
+    "url": "company/",
+    "callers": [
+      "Client\\Legal\\index.tsx"
+    ]
+  },
+  "GET estate": {
+    "file": "Client\\Legal\\index.tsx",
+    "method": "GET",
+    "url": "estate",
+    "callers": [
+      "Client\\Legal\\index.tsx",
+      "Client\\Legal\\index.tsx"
+    ]
+  },
+  "GET company/": {
+    "file": "Client\\Legal\\index.tsx",
+    "method": "GET",
+    "url": "company/",
+    "callers": [
+      "Client\\Legal\\index.tsx"
+    ]
+  },
+  "GET report/select/driverRegisterStatus": {
+    "file": "Driver\\List\\index.tsx",
+    "method": "GET",
+    "url": "report/select/driverRegisterStatus",
+    "callers": [
+      "Driver\\List\\index.tsx"
+    ]
+  },
+  "GET driver/": {
+    "file": "Driver\\List\\index.tsx",
+    "method": "GET",
+    "url": "driver/",
+    "callers": [
+      "Driver\\List\\index.tsx",
+      "Driver\\List\\index.tsx",
+      "Driver\\List\\index.tsx",
+      "Driver\\List\\index.tsx",
+      "Driver\\Monitoring\\index.tsx"
+    ]
+  },
+  "GET docStatus": {
+    "file": "Driver\\List\\index.tsx",
+    "method": "GET",
+    "url": "docStatus",
+    "callers": [
+      "Driver\\List\\index.tsx"
+    ]
+  },
+  "DELETE driver/": {
+    "file": "Driver\\List\\index.tsx",
+    "method": "DELETE",
+    "url": "driver/",
+    "callers": [
+      "Driver\\List\\index.tsx"
+    ]
+  },
+  "GET tripRating?driverId=": {
+    "file": "Driver\\List\\index.tsx",
+    "method": "GET",
+    "url": "tripRating?driverId=",
+    "callers": [
+      "Driver\\List\\index.tsx"
+    ]
+  },
+  "GET driver?page=1&driverRegisterStatusId=": {
+    "file": "Driver\\List\\index.tsx",
+    "method": "GET",
+    "url": "driver?page=1&driverRegisterStatusId=",
+    "callers": [
+      "Driver\\List\\index.tsx"
+    ]
+  },
+  "PUT driver/documents/requestDocuments": {
+    "file": "Driver\\RequestDocuments\\index.tsx",
+    "method": "PUT",
+    "url": "driver/documents/requestDocuments",
+    "callers": [
+      "Driver\\RequestDocuments\\index.tsx"
+    ]
+  },
+  "GET /userType/drivers": {
+    "file": "Driver\\RequestDocuments\\index.tsx",
+    "method": "GET",
+    "url": "/userType/drivers",
+    "callers": [
+      "Driver\\RequestDocuments\\index.tsx"
+    ]
+  },
+  "GET driver": {
+    "file": "Driver\\RequestDocuments\\index.tsx",
+    "method": "GET",
+    "url": "driver",
+    "callers": [
+      "Driver\\RequestDocuments\\index.tsx"
+    ]
+  },
+  "GET formStep/getByUserType?userTypeId=": {
+    "file": "Driver\\Signup\\FormRegisterDriver.tsx",
+    "method": "GET",
+    "url": "formStep/getByUserType?userTypeId=",
+    "callers": [
+      "Driver\\Signup\\FormRegisterDriver.tsx"
+    ]
+  },
+  "GET docUserType/findByUserType?userTypeId=": {
+    "file": "Driver\\Signup\\FormRegisterDriver.tsx",
+    "method": "GET",
+    "url": "docUserType/findByUserType?userTypeId=",
+    "callers": [
+      "Driver\\Signup\\FormRegisterDriver.tsx"
+    ]
+  },
+  "POST https://apiteste.taxireturn.com.br/Driver/CheckEmail": {
+    "file": "Driver\\Signup\\Forms\\DataPersonal\\index.tsx",
+    "method": "POST",
+    "url": "https://apiteste.taxireturn.com.br/Driver/CheckEmail",
+    "callers": [
+      "Driver\\Signup\\Forms\\DataPersonal\\index.tsx"
+    ]
+  },
+  "POST https://apiteste.taxireturn.com.br/Driver/CheckDocument": {
+    "file": "Driver\\Signup\\Forms\\DataPersonal\\index.tsx",
+    "method": "POST",
+    "url": "https://apiteste.taxireturn.com.br/Driver/CheckDocument",
+    "callers": [
+      "Driver\\Signup\\Forms\\DataPersonal\\index.tsx"
+    ]
+  },
+  "PUT creditPrepaidPurchase/": {
+    "file": "Financial\\BuyCredit\\index.tsx",
+    "method": "PUT",
+    "url": "creditPrepaidPurchase/",
+    "callers": [
+      "Financial\\BuyCredit\\index.tsx",
+      "Financial\\BuyCredit\\index.tsx"
+    ]
+  },
+  "GET driver?name=": {
+    "file": "Financial\\CancellationFee\\index.tsx",
+    "method": "GET",
+    "url": "driver?name=",
+    "callers": [
+      "Financial\\CancellationFee\\index.tsx",
+      "Financial\\DriverProduction\\index.tsx"
+    ]
+  },
+  "GET customer?name=": {
+    "file": "Financial\\CancellationFee\\index.tsx",
+    "method": "GET",
+    "url": "customer?name=",
+    "callers": [
+      "Financial\\CancellationFee\\index.tsx"
+    ]
+  },
+  "DELETE trip/cancellationFee/": {
+    "file": "Financial\\CancellationFee\\index.tsx",
+    "method": "DELETE",
+    "url": "trip/cancellationFee/",
+    "callers": [
+      "Financial\\CancellationFee\\index.tsx"
+    ]
+  },
+  "GET creditPrepaid": {
+    "file": "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx",
+    "method": "GET",
+    "url": "creditPrepaid",
+    "callers": [
+      "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx"
+    ]
+  },
+  "GET paymentForm": {
+    "file": "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx",
+    "method": "GET",
+    "url": "paymentForm",
+    "callers": [
+      "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx"
+    ]
+  },
+  "PUT creditPrepaid/": {
+    "file": "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx",
+    "method": "PUT",
+    "url": "creditPrepaid/",
+    "callers": [
+      "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx"
+    ]
+  },
+  "POST creditPrepaid": {
+    "file": "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx",
+    "method": "POST",
+    "url": "creditPrepaid",
+    "callers": [
+      "Financial\\Charge\\hooks\\usePrepaidCreditTypes.tsx"
+    ]
+  },
+  "GET balanceFlowType/searchable": {
+    "file": "Financial\\Charge\\index.tsx",
+    "method": "GET",
+    "url": "balanceFlowType/searchable",
+    "callers": [
+      "Financial\\Charge\\index.tsx"
+    ]
+  },
+  "GET balancePosting": {
+    "file": "Financial\\Charge\\index.tsx",
+    "method": "GET",
+    "url": "balancePosting",
+    "callers": [
+      "Financial\\Charge\\index.tsx",
+      "Financial\\Charge\\index.tsx"
+    ]
+  },
+  "PUT driver/balance": {
+    "file": "Financial\\Charge\\index.tsx",
+    "method": "PUT",
+    "url": "driver/balance",
+    "callers": [
+      "Financial\\Charge\\index.tsx"
+    ]
+  },
+  "DELETE balancePosting/": {
+    "file": "Financial\\Charge\\index.tsx",
+    "method": "DELETE",
+    "url": "balancePosting/",
+    "callers": [
+      "Financial\\Charge\\index.tsx"
+    ]
+  },
+  "GET referralMonetization": {
+    "file": "Financial\\CommissionManagement\\index.tsx",
+    "method": "GET",
+    "url": "referralMonetization",
+    "callers": [
+      "Financial\\CommissionManagement\\index.tsx",
+      "Financial\\ReportsFinancial\\index.tsx"
+    ]
+  },
+  "GET report/driver/synthetic?dateStart=": {
+    "file": "Financial\\ReportsFinancial\\index.tsx",
+    "method": "GET",
+    "url": "report/driver/synthetic?dateStart=",
+    "callers": [
+      "Financial\\ReportsFinancial\\index.tsx"
+    ]
+  },
+  "GET driver?page=0&name=": {
+    "file": "Financial\\ReportsFinancial\\index.tsx",
+    "method": "GET",
+    "url": "driver?page=0&name=",
+    "callers": [
+      "Financial\\ReportsFinancial\\index.tsx"
+    ]
+  },
+  "GET userIndication/report/referredUsers?name=": {
+    "file": "Financial\\ReportsFinancial\\index.tsx",
+    "method": "GET",
+    "url": "userIndication/report/referredUsers?name=",
+    "callers": [
+      "Financial\\ReportsFinancial\\index.tsx"
+    ]
+  },
+  "GET userIndication/report/referralEarnings?dateStart=": {
+    "file": "Financial\\ReportsFinancial\\index.tsx",
+    "method": "GET",
+    "url": "userIndication/report/referralEarnings?dateStart=",
+    "callers": [
+      "Financial\\ReportsFinancial\\index.tsx"
+    ]
+  },
+  "GET withdraw/": {
+    "file": "Financial\\TransferRequests\\index.tsx",
+    "method": "GET",
+    "url": "withdraw/",
+    "callers": [
+      "Financial\\TransferRequests\\index.tsx"
+    ]
+  },
+  "GET withdraw?page=1&name=": {
+    "file": "Financial\\TransferRequests\\index.tsx",
+    "method": "GET",
+    "url": "withdraw?page=1&name=",
+    "callers": [
+      "Financial\\TransferRequests\\index.tsx"
+    ]
+  },
+  "GET withdraw?page=": {
+    "file": "Financial\\TransferRequests\\index.tsx",
+    "method": "GET",
+    "url": "withdraw?page=",
+    "callers": [
+      "Financial\\TransferRequests\\index.tsx"
+    ]
+  },
+  "PUT withdraw/": {
+    "file": "Financial\\TransferRequests\\index.tsx",
+    "method": "PUT",
+    "url": "withdraw/",
+    "callers": [
+      "Financial\\TransferRequests\\index.tsx"
+    ]
+  },
+  "GET trip?page=1&driverId=": {
+    "file": "Trip\\List\\index.tsx",
+    "method": "GET",
+    "url": "trip?page=1&driverId=",
+    "callers": [
+      "Trip\\List\\index.tsx"
+    ]
+  },
+  "GET deliveryAcquirer/token": {
+    "file": "Delivery\\AsaasConfiguration\\index.tsx",
+    "method": "GET",
+    "url": "deliveryAcquirer/token",
+    "callers": [
+      "Delivery\\AsaasConfiguration\\index.tsx"
+    ]
+  },
+  "PUT deliveryAcquirer/token": {
+    "file": "Delivery\\AsaasConfiguration\\index.tsx",
+    "method": "PUT",
+    "url": "deliveryAcquirer/token",
+    "callers": [
+      "Delivery\\AsaasConfiguration\\index.tsx"
+    ]
+  },
+  "GET driverAttachmentType": {
+    "file": "Delivery\\Config\\DeliveryAccessories\\index.tsx",
+    "method": "GET",
+    "url": "driverAttachmentType",
+    "callers": [
+      "Delivery\\Config\\DeliveryAccessories\\index.tsx"
+    ]
+  },
+  "POST driverAttachmentType": {
+    "file": "Delivery\\Config\\DeliveryAccessories\\index.tsx",
+    "method": "POST",
+    "url": "driverAttachmentType",
+    "callers": [
+      "Delivery\\Config\\DeliveryAccessories\\index.tsx"
+    ]
+  },
+  "PUT driverAttachmentType/": {
+    "file": "Delivery\\Config\\DeliveryAccessories\\index.tsx",
+    "method": "PUT",
+    "url": "driverAttachmentType/",
+    "callers": [
+      "Delivery\\Config\\DeliveryAccessories\\index.tsx",
+      "Delivery\\Config\\DeliveryAccessories\\index.tsx"
+    ]
+  },
+  "POST driverAttachmentType/": {
+    "file": "Delivery\\Config\\DeliveryAccessories\\index.tsx",
+    "method": "POST",
+    "url": "driverAttachmentType/",
+    "callers": [
+      "Delivery\\Config\\DeliveryAccessories\\index.tsx"
+    ]
+  },
+  "GET typeDeliveryCategory": {
+    "file": "Delivery\\Config\\Establishments\\index.tsx",
+    "method": "GET",
+    "url": "typeDeliveryCategory",
+    "callers": [
+      "Delivery\\Config\\Establishments\\index.tsx"
+    ]
+  },
+  "GET deliverySection/all": {
+    "file": "Delivery\\Config\\Establishments\\index.tsx",
+    "method": "GET",
+    "url": "deliverySection/all",
+    "callers": [
+      "Delivery\\Config\\Establishments\\index.tsx",
+      "Delivery\\Config\\Sections\\index.tsx"
+    ]
+  },
+  "GET typeDeliveryCategoryBySection/": {
+    "file": "Delivery\\Config\\Establishments\\index.tsx",
+    "method": "GET",
+    "url": "typeDeliveryCategoryBySection/",
+    "callers": [
+      "Delivery\\Config\\Establishments\\index.tsx"
+    ]
+  },
+  "GET deliveryNeighborhood?cityId=": {
+    "file": "Delivery\\Config\\ManageDeliveryZone\\index.tsx",
+    "method": "GET",
+    "url": "deliveryNeighborhood?cityId=",
+    "callers": [
+      "Delivery\\Config\\ManageDeliveryZone\\index.tsx"
+    ]
+  },
+  "GET deliveryCallConfig": {
+    "file": "Delivery\\ConfigCall\\index.tsx",
+    "method": "GET",
+    "url": "deliveryCallConfig",
+    "callers": [
+      "Delivery\\ConfigCall\\index.tsx"
+    ]
+  },
+  "GET driver/delivery": {
+    "file": "Delivery\\Monitoring\\index.tsx",
+    "method": "GET",
+    "url": "driver/delivery",
+    "callers": [
+      "Delivery\\Monitoring\\index.tsx"
+    ]
+  },
+  "GET deliveryOrder/": {
+    "file": "Delivery\\Monitoring\\index.tsx",
+    "method": "GET",
+    "url": "deliveryOrder/",
+    "callers": [
+      "Delivery\\Monitoring\\index.tsx"
+    ]
+  },
+  "POST companyDeliveryConfig": {
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "method": "POST",
+    "url": "companyDeliveryConfig",
+    "callers": [
+      "Delivery\\RegisterEstablishments\\index.tsx"
+    ]
+  },
+  "POST companyDeliveryConfig/company/": {
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "method": "POST",
+    "url": "companyDeliveryConfig/company/",
+    "callers": [
+      "Delivery\\RegisterEstablishments\\index.tsx",
+      "Delivery\\RegisterEstablishments\\index.tsx"
+    ]
+  },
+  "GET companyDeliveryConfig/company": {
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "method": "GET",
+    "url": "companyDeliveryConfig/company",
+    "callers": [
+      "Delivery\\RegisterEstablishments\\index.tsx"
+    ]
+  },
+  "GET establishmentCollectionManagement": {
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "method": "GET",
+    "url": "establishmentCollectionManagement",
+    "callers": [
+      "Delivery\\RegisterEstablishments\\index.tsx"
+    ]
+  },
+  "GET companyAddress?companyId=": {
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "method": "GET",
+    "url": "companyAddress?companyId=",
+    "callers": [
+      "Delivery\\RegisterEstablishments\\index.tsx"
+    ]
+  },
+  "PUT companyAddress/": {
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "method": "PUT",
+    "url": "companyAddress/",
+    "callers": [
+      "Delivery\\RegisterEstablishments\\index.tsx"
+    ]
+  },
+  "DELETE companyAddress/": {
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "method": "DELETE",
+    "url": "companyAddress/",
+    "callers": [
+      "Delivery\\RegisterEstablishments\\index.tsx"
+    ]
+  },
+  "POST companyAddress": {
+    "file": "Delivery\\RegisterEstablishments\\index.tsx",
+    "method": "POST",
+    "url": "companyAddress",
+    "callers": [
+      "Delivery\\RegisterEstablishments\\index.tsx"
+    ]
+  }
+}

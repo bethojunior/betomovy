@@ -1,0 +1,638 @@
+[
+  {
+    "key": "dashboard",
+    "name": "Dashboard"
+  },
+  {
+    "key": "monitoring",
+    "name": "Monitoramento"
+  },
+  {
+    "key": "clientes",
+    "name": "Clientes"
+  },
+  {
+    "key": "clientes-1",
+    "name": "Lista de pessoa física"
+  },
+  {
+    "key": "clientes-2",
+    "name": "Lista de pessoa jurídica"
+  },
+  {
+    "key": "exclusion-client",
+    "name": "Solicitação de exclusão da conta"
+  },
+  {
+    "key": "motoristas",
+    "name": "Motoristas"
+  },
+  {
+    "key": "motoristas-1",
+    "name": "Lista"
+  },
+  {
+    "key": "cadastro-motorista",
+    "name": "Cadastro de Motorista"
+  },
+  {
+    "key": "cars-pending",
+    "name": "Solicitação de mudança de veículos"
+  },
+  {
+    "key": "request-documents",
+    "name": "Solicitar documentos"
+  },
+  {
+    "key": "exclusion-driver",
+    "name": "Solicitação de exclusão da conta"
+  },
+  {
+    "key": "viagem",
+    "name": "Viagens"
+  },
+  {
+    "key": "viagem-1",
+    "name": "Lista"
+  },
+  {
+    "key": "delivery",
+    "name": "Delivery"
+  },
+  {
+    "key": "delivery-monitoring",
+    "name": "Monitoramento"
+  },
+  {
+    "key": "delivery_config",
+    "name": "Configurações"
+  },
+  {
+    "key": "delivery_sections",
+    "name": "Seções"
+  },
+  {
+    "key": "categories-of-establishments",
+    "name": "Categorias de estabelecimentos"
+  },
+  {
+    "key": "financial managment",
+    "name": "Gestão Financeira"
+  },
+  {
+    "key": "manage-delivery-zone",
+    "name": "Gerenciar Zona de Entrega"
+  },
+  {
+    "key": "delivery-accessories",
+    "name": "Acessórios de entrega"
+  },
+  {
+    "key": "delivery-general-config",
+    "name": "Configurações Gerais"
+  },
+  {
+    "key": "delivery-configuration",
+    "name": "Configuração Delivery"
+  },
+  {
+    "key": "asaas-configuration",
+    "name": "Configuração do Token ASAAS"
+  },
+  {
+    "key": "register-establishments",
+    "name": "Cadastro de estabelecimentos"
+  },
+  {
+    "key": "delivery_call_config",
+    "name": "Configurações do chamado"
+  },
+  {
+    "key": "financial",
+    "name": "Financeiro"
+  },
+  {
+    "key": "financial-1",
+    "name": "Produção do motorista"
+  },
+  {
+    "key": "financial-2",
+    "name": "Taxa de Cancelamento"
+  },
+  {
+    "key": "financial-3",
+    "name": "Lançamento financeiro"
+  },
+  {
+    "key": "financial-4",
+    "name": "Compra de crédito"
+  },
+  {
+    "key": "financial-5",
+    "name": "Gestão de Comissão"
+  },
+  {
+    "key": "financial-6",
+    "name": "Solicitações de Transferências"
+  },
+  {
+    "key": "financial-7",
+    "name": "Relatórios"
+  },
+  {
+    "key": "financial-8",
+    "name": "Dashboard Adquirente"
+  },
+  {
+    "key": "financial-8-1",
+    "name": "Visão Geral"
+  },
+  {
+    "key": "financial-8-2",
+    "name": "Transações"
+  },
+  {
+    "key": "financial-8-4",
+    "name": "Relatórios"
+  },
+  {
+    "key": "message",
+    "name": "Mensagem"
+  },
+  {
+    "key": "message-1",
+    "name": "Notificação"
+  },
+  {
+    "key": "message-2",
+    "name": "Notificações de aniversário"
+  },
+  {
+    "key": "talkToUs",
+    "name": "Fale conosco"
+  },
+  {
+    "key": "talkToUs-1",
+    "name": "Cliente"
+  },
+  {
+    "key": "talkToUs-2",
+    "name": "Viagens"
+  },
+  {
+    "key": "report",
+    "name": "Relatórios"
+  },
+  {
+    "key": "report-1",
+    "name": "Gerar"
+  },
+  {
+    "key": "report-2",
+    "name": "Listagem"
+  },
+  {
+    "key": "callGroup",
+    "name": "Grupos de chamados"
+  },
+  {
+    "key": "callGroupList",
+    "name": "Listagem"
+  },
+  {
+    "key": "callGroupLinkedDrivers",
+    "name": "Motoristas Vinculados"
+  },
+  {
+    "key": "notifications-admins",
+    "name": "Notificações Admins"
+  },
+  {
+    "key": "advanced",
+    "name": "Avançadas"
+  },
+  {
+    "key": "config",
+    "name": "Configurações"
+  },
+  {
+    "key": "config-city",
+    "name": "Áreas de Cidade"
+  },
+  {
+    "key": "add-city",
+    "name": "Adicionar Cidade"
+  },
+  {
+    "key": "edit-city",
+    "name": "Editar Cidade"
+  },
+  {
+    "key": "admin",
+    "name": "Administrador"
+  },
+  {
+    "key": "admin-2",
+    "name": "Perfis"
+  },
+  {
+    "key": "admin-3",
+    "name": "Usuários"
+  },
+  {
+    "key": "acquirer",
+    "name": "Adquirente global"
+  },
+  {
+    "key": "confirmation_code",
+    "name": "Confirmação de Código"
+  },
+  {
+    "key": "acquirerByCity",
+    "name": "Adquirente por cidade"
+  },
+  {
+    "key": "whatsapp",
+    "name": "Whatsapp"
+  },
+  {
+    "key": "whatsapp-session",
+    "name": "Conectar whatsapp"
+  },
+  {
+    "key": "keys-whatsapp",
+    "name": "Chaves WhatsApp"
+  },
+  {
+    "key": "whatsapp-scheduled-trip",
+    "name": "Notificações de viagem (WhatsApp)"
+  },
+  {
+    "key": "callManagement",
+    "name": "Chamado"
+  },
+  {
+    "key": "MethodsPayments",
+    "name": "Formas de Pagamentos"
+  },
+  {
+    "key": "keysapp",
+    "name": "Chaves do app"
+  },
+  {
+    "key": "logsMongo",
+    "name": "Ver Logs do Mongo"
+  },
+  {
+    "key": "radius",
+    "name": "Raio de chamado por cidade"
+  },
+  {
+    "key": "byCity",
+    "name": "Por cidade"
+  },
+  {
+    "key": "manage-toll",
+    "name": "Gerenciar Pedágio"
+  },
+  {
+    "key": "terms",
+    "name": "Termos"
+  },
+  {
+    "key": "configApp",
+    "name": "Configurações de apps"
+  },
+  {
+    "key": "versions-from-config",
+    "name": "Versões"
+  },
+  {
+    "key": "configAppPartner",
+    "name": "Configurações de apps parceiros"
+  },
+  {
+    "key": "list_phones",
+    "name": "Lista telefonica"
+  },
+  {
+    "key": "firebase-verification",
+    "name": "Verificação Firebase"
+  },
+  {
+    "key": "config-smtp",
+    "name": "Configurações de serviço SMTP"
+  },
+  {
+    "key": "pendencyDriver",
+    "name": "Penalidade de ações do motorista"
+  },
+  {
+    "key": "reasonsForCancellations",
+    "name": "Motivos de cancelamento"
+  },
+  {
+    "key": "additionalSettings",
+    "name": "Configurações adicionais"
+  },
+  {
+    "key": "confis-externals-globals",
+    "name": "Serviços Externos Globais"
+  },
+  {
+    "key": "confis-externals-by-city",
+    "name": "Serviços Externos Por Cidade"
+  },
+  {
+    "key": "confis-externals-by-webhook",
+    "name": "Serviços Externos Webhook"
+  },
+  {
+    "key": "usagePolicy",
+    "name": "Política de uso do aplicativo"
+  },
+  {
+    "key": "messageDriverChatbot",
+    "name": "Mensagens do chat - Motorista"
+  },
+  {
+    "key": "modulesActives",
+    "name": "Módulos Ativos"
+  },
+  {
+    "key": "configsRegister",
+    "name": "Configurações do Cadastro"
+  },
+  {
+    "key": "config-register-driver",
+    "name": "Config. Tela de Cadastro Motorista"
+  },
+  {
+    "key": "documents-by-category",
+    "name": "Adicionar Documentos Por Categoria"
+  },
+  {
+    "key": "link-documents-client",
+    "name": "Vincular Documento No Cadastro Do Cliente"
+  },
+  {
+    "key": "documents-app",
+    "name": "Documentos Do App"
+  },
+  {
+    "key": "credentials-integration-external",
+    "name": "Credenciais de integração externa"
+  },
+  {
+    "key": "import",
+    "name": "Importações e Definições"
+  },
+  {
+    "key": "import-clients",
+    "name": "Clientes"
+  },
+  {
+    "key": "import-drivers",
+    "name": "Motoristas"
+  },
+  {
+    "key": "import-drivers-blocked",
+    "name": "Bloqueio em massa de Prestadores"
+  },
+  {
+    "key": "import-drivers-unblocked",
+    "name": "Desbloqueio em massa de Prestadores por CPF"
+  },
+  {
+    "key": "reset-balance",
+    "name": "Zerar Saldo dos Motoristas"
+  },
+  {
+    "key": "reset-rating",
+    "name": "Zerar Nota dos Motoristas"
+  },
+  {
+    "key": "deliveryItens",
+    "name": "Entrega"
+  },
+  {
+    "key": "items",
+    "name": "Gerenciar Itens"
+  },
+  {
+    "key": "suggestion-text",
+    "name": "Sugestão de Texto"
+  },
+  {
+    "key": "tariffsItems",
+    "name": "Tarifas"
+  },
+  {
+    "key": "typesTravels",
+    "name": "Tipos de Viagem"
+  },
+  {
+    "key": "typesServices",
+    "name": "Tipos de Serviços"
+  },
+  {
+    "key": "tariffTrigger",
+    "name": "Gatilho de Tarifa"
+  },
+  {
+    "key": "flagTariff",
+    "name": "Bandeira de Tarifa"
+  },
+  {
+    "key": "dynamicPerArea",
+    "name": "Dinâmica por Área"
+  },
+  {
+    "key": "partners",
+    "name": "Parceiros"
+  },
+  {
+    "key": "listPartner",
+    "name": "Listagem"
+  },
+  {
+    "key": "messagePartner",
+    "name": "Mensagens da Ouvidoria"
+  },
+  {
+    "key": "promotion",
+    "name": "Promoções"
+  },
+  {
+    "key": "promotion1",
+    "name": "Cupons"
+  },
+  {
+    "key": "promotion2",
+    "name": "Voucher"
+  },
+  {
+    "key": "promotion3",
+    "name": "Promoções por Viagem"
+  },
+  {
+    "key": "manager",
+    "name": "Gestor"
+  },
+  {
+    "key": "manager-1",
+    "name": "Lista de Gestores"
+  },
+  {
+    "key": "manager-2",
+    "name": "Motoristas por Gestor"
+  },
+  {
+    "key": "central",
+    "name": "Central"
+  },
+  {
+    "key": "central-list",
+    "name": "Listagem"
+  },
+  {
+    "key": "central-users",
+    "name": "Listagem de usuários"
+  },
+  {
+    "key": "central-neighborhoods",
+    "name": "Bairros"
+  },
+  {
+    "key": "central-config",
+    "name": "Configurações"
+  },
+  {
+    "key": "frete",
+    "name": "Frete"
+  },
+  {
+    "key": "register-item",
+    "name": "Cadastro de Item"
+  },
+  {
+    "key": "list-itens-frete",
+    "name": "Listagem de Itens"
+  },
+  {
+    "key": "services-extras",
+    "name": "Serviços Extras"
+  },
+  {
+    "key": "load-accessibility",
+    "name": "Acessibilidade Carga"
+  },
+  {
+    "key": "publicity",
+    "name": "Publicidade"
+  },
+  {
+    "key": "listPublicity",
+    "name": "Listar Publicidade"
+  },
+  {
+    "key": "linkMarketingExternal",
+    "name": "Link Para Menu Externo"
+  },
+  {
+    "key": "publicityAppList",
+    "name": "Lista de Publicidade App Pro"
+  },
+  {
+    "key": "publicityApp",
+    "name": "Inserir Publicidade App Pro"
+  },
+  {
+    "key": "routes",
+    "name": "Rotas"
+  },
+  {
+    "key": "manageItems",
+    "name": "Gerenciar Itens"
+  },
+  {
+    "key": "routeRegister",
+    "name": "Cadastrar"
+  },
+  {
+    "key": "routeList",
+    "name": "Listagem"
+  },
+  {
+    "key": "releaseDrivers",
+    "name": "Liberar Motoristas"
+  },
+  {
+    "key": "promotionalBanner",
+    "name": "Banners"
+  },
+  {
+    "key": "maps",
+    "name": "Mapas"
+  },
+  {
+    "key": "gerencyAddress",
+    "name": "Gerenciar Endereços"
+  },
+  {
+    "key": "registerLocal",
+    "name": "Cadastrar Locais"
+  },
+  {
+    "key": "addressIrregular",
+    "name": "Endereços Irregulares"
+  },
+  {
+    "key": "addressCache",
+    "name": "Endereços Em Cache"
+  },
+  {
+    "key": "configMaps",
+    "name": "Configurações Gerais"
+  },
+  {
+    "key": "configCity",
+    "name": "Configurações Por Cidade"
+  },
+  {
+    "key": "testsServiceMaps",
+    "name": "Teste Serviço De Mapa"
+  },
+  {
+    "key": "routesOptimization",
+    "name": "Otimização De Rota"
+  },
+  {
+    "key": "webmap-key-management",
+    "name": "Gerenciar Chaves De Mapa Web"
+  },
+  {
+    "key": "mapSequencer",
+    "name": "Sequenciador De Mapas"
+  },
+  {
+    "key": "riskArea",
+    "name": "Area De Risco"
+  },
+  {
+    "key": "heatMaps",
+    "name": "Áreas De Calor Do Mapa"
+  },
+  {
+    "key": "monitoringArea",
+    "name": "Área de Monitoramento"
+  },
+  {
+    "key": "configs-layouts",
+    "name": "Configurações de layouts"
+  },
+  {
+    "key": "versions",
+    "name": "Versões"
+  }
+]

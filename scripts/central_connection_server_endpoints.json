@@ -1,0 +1,742 @@
+[
+  {
+    "endpoint": "central/centralCallTypes/findAll",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\CentralController.js"
+  },
+  {
+    "endpoint": "central/voucherPurchasePayment/findAllActives",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\CentralVoucherPurchasePaymentController.js"
+  },
+  {
+    "endpoint": "City/GetConfig",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CityController.js"
+  },
+  {
+    "endpoint": "Cooperative/GetByStation",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CooperativeController.js"
+  },
+  {
+    "endpoint": "Customer/loginPartner",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/GetCurrentTrips",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/NewTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/getBalance",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/CancelTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/SocialLoginPartner",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/GetPartnerTrips",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "CustomerPartner/EditProfile",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "User/CheckEmail",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/login",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/LoginSocial",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/Register",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "user/${userId}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/GetTrips",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/SendConfirmationCode",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/CheckEmail",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "customer/checkcancellationfee",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/ForgotPassword",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/ChangePassword",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "Customer/HelpMeEmail",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerController.js"
+  },
+  {
+    "endpoint": "CustomerPlace/Insert",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerPlaceController.js"
+  },
+  {
+    "endpoint": "CustomerPlace/getAll",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\CustomerPlaceController.js"
+  },
+  {
+    "endpoint": "CustomerPlace/delete",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\CustomerPlaceController.js"
+  },
+  {
+    "endpoint": "Driver/Find",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/Find",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/FindWithPendencies",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/Authenticate",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/StatusApp",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/searchTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/FindWithAccountInfo",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/DefaultStation",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/AcceptTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/ToggleStatus",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/CancelTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/InformArrival",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/InitTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/FinishTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/FinishTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/Find",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/SendConfirmationCode",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/RefuseTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/GetTrips",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/CheckPassword",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/ForgotPassword",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/ChangePassword",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/Edit",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/CheckEmail",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/UpdateVersion",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/CheckDocument",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/PutPreAvailable",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "Driver/ConfirmWaypoint",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DriverController.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/tripInfoQuestion",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\DynamicFieldsController.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/tripInfoQuestion",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\DynamicFieldsController.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/tripInfoQuestion/${idQuestion}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\DynamicFieldsController.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/tripInfoQuestion/${idQuestion}",
+    "method": "DELETE",
+    "file": "public\\webfiles\\js\\controllers\\DynamicFieldsController.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/tripInfoQuestion/${idQuestion}",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\controllers\\DynamicFieldsController.js"
+  },
+  {
+    "endpoint": "FavoriteDriver/Insert",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\FavoriteDriverController.js"
+  },
+  {
+    "endpoint": "FavoriteDriver/list",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\FavoriteDriverController.js"
+  },
+  {
+    "endpoint": "FavoriteDriver/Delete",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\FavoriteDriverController.js"
+  },
+  {
+    "endpoint": "neighborhood?lat=${lat}&lng=${lng}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\NeighborhoodController.js"
+  },
+  {
+    "endpoint": "tripType",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\NeighborhoodController.js"
+  },
+  {
+    "endpoint": "centralNeighborhood/${id}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\NeighborhoodController.js"
+  },
+  {
+    "endpoint": "centralNeighborhood",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\NeighborhoodController.js"
+  },
+  {
+    "endpoint": "centralNeighborhood/${id}",
+    "method": "DELETE",
+    "file": "public\\webfiles\\js\\controllers\\NeighborhoodController.js"
+  },
+  {
+    "endpoint": "NeighborhoodRides/central/${idCentral}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\NeighborhoodController.js"
+  },
+  {
+    "endpoint": "NeighborhoodRides/insert",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\NeighborhoodController.js"
+  },
+  {
+    "endpoint": "NeighborhoodRides/${id}",
+    "method": "DELETE",
+    "file": "public\\webfiles\\js\\controllers\\NeighborhoodController.js"
+  },
+  {
+    "endpoint": "NeighborhoodRides/${id}",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\controllers\\NeighborhoodController.js"
+  },
+  {
+    "endpoint": "Partner/FindByUser",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\PartnerController.js"
+  },
+  {
+    "endpoint": "Partner/NewTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\PartnerController.js"
+  },
+  {
+    "endpoint": "Partner/GetActiveTrips",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\PartnerController.js"
+  },
+  {
+    "endpoint": "PricePartner/Calculate",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\PriceController.js"
+  },
+  {
+    "endpoint": "requiredfield/get?userTypeId=${userTypeId}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\RequiredFieldController.js"
+  },
+  {
+    "endpoint": "Station/GetByCity",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\StationController.js"
+  },
+  {
+    "endpoint": "Station/GetByDriver",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\StationController.js"
+  },
+  {
+    "endpoint": "Station/InsertByDriver",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\StationController.js"
+  },
+  {
+    "endpoint": "Station/Edit",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\StationController.js"
+  },
+  {
+    "endpoint": "StationType/Get",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\StationTypeController.js"
+  },
+  {
+    "endpoint": "Support/GetHelpCode",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\SupportController.js"
+  },
+  {
+    "endpoint": "Trip/New",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "Trip/Get",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "Trip/Cancel",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "Trip/IncreaseArea",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "Trip/Get",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "Trip/Get",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "Trip/GetById",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "trip/rating/driver",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "TripItemType/all",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "trip/${tripReference}/driverPositions",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "Trip/GetShareLink?tripReference=${tripReference}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "Driver/FinishTrip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "trip/fee",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\TripController.js"
+  },
+  {
+    "endpoint": "TripPaymentForm/GetAll",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\TripPaymentFormController.js"
+  },
+  {
+    "endpoint": "usertype/drivers",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\UserTypeController.js"
+  },
+  {
+    "endpoint": "usertype/driversbyapppartners?app_partner=${appPartner}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\UserTypeController.js"
+  },
+  {
+    "endpoint": "voucherPromotion/findAll?latitude=${lat}&longitude=${lng}&user=central",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\controllers\\VoucherController.js"
+  },
+  {
+    "endpoint": "voucher/buyWithCard",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\VoucherController.js"
+  },
+  {
+    "endpoint": "voucher/generateChargePix",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\controllers\\VoucherController.js"
+  },
+  {
+    "endpoint": "central/${centralId}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "getBalance/${id}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/driver",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/price",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/price/${id}",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/price",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "PricePartner/Calculate",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/zone",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/zone",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/customer",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/customer/${customerId}",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${idCentral}/zone/${idZone}",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/customer/${id}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/customer${search}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/customer/${customerId}/block",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/customer/${customerId}/release",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/customer/${customerId}",
+    "method": "delete",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/trip",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "Price/CalculateAll",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/price/neighborhood/calculate?origin=${origin.latitude},${origin.longitude}&destination=${origin.latitude},${origin.longitude}&neighborhoodId=${neighborhoodId}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/price/neighborhoodRides/calculate?origin=${origin.latitude},${origin.longitude}&destination=${destiny.latitude},${destiny.longitude}&neighborhoodId=${neighborhoodId}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "holdVoucherBalance",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "whatsapp-group/store",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "whatsapp-group/notification/store",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\CentralRepository.js"
+  },
+  {
+    "endpoint": "chatTrip/${tripReference}/message",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\ChatRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/driver/positions?status=disponivel,corrida",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\DriverRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/driver/${driverId}",
+    "method": "DELETE",
+    "file": "public\\webfiles\\js\\repositories\\DriverRepository.js"
+  },
+  {
+    "endpoint": "driver/blockDriver",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\DriverRepository.js"
+  },
+  {
+    "endpoint": "driver/unblockDriver/${idBlock}",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\repositories\\DriverRepository.js"
+  },
+  {
+    "endpoint": "central/favorite/driver",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\repositories\\FavoriteDriver.js"
+  },
+  {
+    "endpoint": "central/monitoring/${centralId}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\MonitoringRepository.js"
+  },
+  {
+    "endpoint": "central/${centralId}/driver/positions?status=disponivel,corrida",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\MonitoringRepository.js"
+  },
+  {
+    "endpoint": "estate",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\PlaceRepository.js"
+  },
+  {
+    "endpoint": "city?estateId=${estate}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\PlaceRepository.js"
+  },
+  {
+    "endpoint": "place/search?q=${encodeURIComponent(text)}&latlng=${lat},${lng}${extraParams}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\PlaceRepository.js"
+  },
+  {
+    "endpoint": "Place/Search?latlng=${lat},${lng}&q=${encodeURIComponent(address)}${extraParams}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\PlaceRepository.js"
+  },
+  {
+    "endpoint": "tripPaymentForm",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\TripPaymentFormRepository.js"
+  },
+  {
+    "endpoint": "tripType",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\TripRepository.js"
+  },
+  {
+    "endpoint": "trip",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\TripRepository.js"
+  },
+  {
+    "endpoint": "trip/${tripReference}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\repositories\\TripRepository.js"
+  },
+  {
+    "endpoint": "trip/${tripReference}/schedule",
+    "method": "PUT",
+    "file": "public\\webfiles\\js\\repositories\\TripRepository.js"
+  },
+  {
+    "endpoint": "login",
+    "method": "POST",
+    "file": "public\\webfiles\\js\\repositories\\UserRepository.js"
+  },
+  {
+    "endpoint": "config/mapbox_access_token",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\service\\MapService.js"
+  },
+  {
+    "endpoint": "geocoding/search?latlng=${lat},${lng}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\service\\MapService.js"
+  },
+  {
+    "endpoint": "geocoding/search?latlng=${lat},${lng}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\service\\MapService.js"
+  },
+  {
+    "endpoint": "geocoding/search?address=${address}",
+    "method": "GET",
+    "file": "public\\webfiles\\js\\service\\MapService.js"
+  }
+]
