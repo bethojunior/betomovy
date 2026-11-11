@@ -37,12 +37,16 @@ export const ContentButton = styled.View`
 
   padding: 0 20px 20px 20px;
 
-  background-color: ${({theme}) => theme.colors.background_global};
+  background-color: ${({theme}) => theme.colors.white ?? '#FFFFFF'};
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
 
-  elevation: 5;
+  elevation: 8;
 
-  shadow-color: ${({theme}) => theme.colors.black};
-  shadow-opacity: 0.25;
+  shadow-color: #000;
+  shadow-opacity: 0.12;
+  shadow-radius: 12px;
+  shadow-offset: 0px -4px;
 `;
 
 export const ButtonOnAndOff = styled.View`
@@ -156,26 +160,30 @@ export const HeaderBottom = styled.View`
   padding-top: ${RFValue(8)}px;
   padding-bottom: ${RFValue(8)}px;
   border-bottom-width: 1px;
-  border-bottom-color: ${({theme}) => theme.colors.black};
+  border-bottom-color: ${({theme}) => theme.colors.dark_border ?? '#1E293B'};
 `;
 
 export const HeaderBottomTitle = styled.Text`
   font-size: ${({theme}) => theme.fontSizes.large}px;
-  color: ${({theme}) => theme.colors.black};
-  font-family: ${({theme}) => theme.fonts.regular};
+  color: ${({theme}) => theme.colors.cyan_electric ?? '#04F3FA'};
+  font-family: ${({theme}) => theme.fonts.bold ?? theme.fonts.regular};
   text-align: center;
 `;
 
 export const ContainerTopTrip = styled.View`
-  background-color: ${({theme}) => theme.colors.background_global};
+  background-color: ${({theme}) => theme.colors.navy_deep ?? '#070A1A'};
 
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  margin-horizontal: 16px;
+  margin-top: 8px;
 
-  shadow-color: ${({theme}) => theme.colors.black};
-  shadow-opacity: 0.25;
+  shadow-color: #000;
+  shadow-opacity: 0.3;
+  shadow-radius: 8px;
+  shadow-offset: 0px 4px;
 
-  elevation: 5;
+  elevation: 6;
 `;
 
 export const InfoTrip = styled.View`
@@ -190,8 +198,8 @@ export const InfoTrip = styled.View`
 
 export const InfoTripTitle = styled.Text`
   font-size: ${({theme}) => theme.fontSizes.large}px;
-  color: ${({theme}) => theme.colors.black};
-  font-family: ${({theme}) => theme.fonts.regular};
+  color: ${({theme}) => theme.colors.cyan_electric ?? '#04F3FA'};
+  font-family: ${({theme}) => theme.fonts.bold ?? theme.fonts.regular};
 `;
 
 export const ButtonBottom = styled.TouchableOpacity`

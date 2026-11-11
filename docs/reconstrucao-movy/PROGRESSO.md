@@ -46,3 +46,25 @@
 - **Correção de inventário**: `DataUserSignUp` está ATIVO (fluxo telefone→OTP via `UserNumberPhone`/`VerificationOTP`), não é dead code — documentado em `CADASTRO_CLIENTE.md` §5 e `PENDENCIAS.md`.
 - **Discrepância**: `versionCode` segue `80308` (docs citavam 80309); bump pendente antes de release.
 - Pendente de commit (aguardando autorização): `src/utils/Test/ConfigThemeGlobal.tsx`, `ModalTransference.test.tsx`, `docs/reconstrucao-movy/`.
+
+---
+
+## 4. Sessão 3 — Início da reconstrução visual real (2026-11-10)
+
+**Decisão do cliente:** tudo deve ser real no app de produção (`mobility-pro-app-rota101-pro` → `api.movymob.com`); nada paralelo. `movy-mobile-app-v2`/`movy-backend-v2` descartados como trilha.
+
+### Implementado nesta sessão
+
+- **Kit UI MOVY Executive** criado em `src/components/movy/`: `MovyButton` (primary/accent/outline/danger/ghost, 52–56px), `MovyInput` (54px, foco cyan, ícones), `MovyCard` (raio 16, sombra suave, variante dark navy), `MovyBadge` (tons success/warning/danger/info/neutral), helper `movy` de tokens com fallback — compatível com temas cliente e motorista.
+- **Motorista — toggle Online/Offline** (`ButtonOnAndOff`): visual executivo — offline em navy `#070A1A`, online em cyan `#04F3FA` com texto navy, inativos em branco/cinza, borda 1.5px. Lógica, disabled e handlers **inalterados**.
+- **Motorista — painel V2 da Home** (`components/Home/V2/styles.ts`): card de resumo em navy com contadores (agendadas/ofertas) em cyan, rodapé branco com radius 24 e sombra suave.
+
+### Estado real da reconstrução
+
+- Login/Register já usavam o visual navy/cyan/royal (commits anteriores).
+- Demais ~75 telas ainda no visual antigo — reconstrução tela a tela **em andamento**, não concluída.
+- Matriz de paridade segue como referência; marcar ✅ só após implementação real + teste.
+
+### Pendente de commit
+
+`src/components/movy/`, `driver/src/components/ButtonOnAndOff/`, `driver/src/components/Home/V2/styles.ts` + esta doc.

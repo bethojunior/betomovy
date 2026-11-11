@@ -15,6 +15,13 @@ interface Props {
   initLocationX: number;
 }
 
+const C = theme.colors as any;
+const NAVY = C.navy_deep ?? '#070A1A';
+const CYAN = C.cyan_electric ?? '#04F3FA';
+const MUTED = C.gray_muted ?? '#64748B';
+const BORDER = C.gray_border ?? '#E2E8F0';
+const INACTIVE_BG = '#FFFFFF';
+
 export const ButtonV2 = ({
   setOn,
   setInitLocationX,
@@ -23,16 +30,20 @@ export const ButtonV2 = ({
 }: Props) => {
   const {userDriverFind, loadingButton} = useUserDriver();
 
+  const isOnline = userDriverFind.status === 'disponivel';
+  const isOffline = userDriverFind.status === 'desligado';
+
+  // Estado ativo: "Desativado" destaca em navy quando offline; "Ativado" destaca em cyan quando online.
+  const leftActive = isOffline;
+  const rightActive = isOnline;
+
   return (
     <ButtonOnAndOff pointerEvents={loadingButton ? 'box-none' : null}>
       <ButtonView
         activeOpacity={0.8}
-        color={
-          userDriverFind.status === 'desligado'
-            ? theme.colors.primary
-            : theme.colors.background_global
-        }
-        disabled={userDriverFind.status === 'disponivel'}
+        color={leftActive ? NAVY : INACTIVE_BG}
+        borderColor={leftActive ? NAVY : BORDER}
+        disabled={isOnline}
         onPressIn={e => {
           setInitLocationX(Number(e.nativeEvent.locationX.toFixed(2)));
         }}
@@ -44,11 +55,7 @@ export const ButtonV2 = ({
         }}
       >
         <TextEdit
-          color={
-            userDriverFind.status === 'desligado'
-              ? theme.colors.background_global
-              : theme.colors.secondary
-          }
+          color={leftActive ? '#FFFFFF' : MUTED}
           size={'large'}
         >
           {translate('driverhome.deactivate')}
@@ -57,18 +64,15 @@ export const ButtonV2 = ({
           <MaterialIcons
             name="arrow-forward-ios"
             size={RFValue(20)}
-            color={theme.colors.background_global}
+            color={leftActive ? '#FFFFFF' : MUTED}
           />
         </IfLoaderInsideScreen>
       </ButtonView>
       <ButtonView
         activeOpacity={0.8}
-        disabled={userDriverFind.status === 'desligado'}
-        color={
-          userDriverFind.status === 'disponivel'
-            ? theme.colors.primary
-            : theme.colors.background_global
-        }
+        disabled={isOffline}
+        color={rightActive ? CYAN : INACTIVE_BG}
+        borderColor={rightActive ? CYAN : BORDER}
         onPressIn={e => {
           setInitLocationX(Number(e.nativeEvent.locationX.toFixed(2)));
         }}
@@ -83,16 +87,12 @@ export const ButtonV2 = ({
           <MaterialIcons
             name="arrow-back-ios"
             size={RFValue(20)}
-            color={theme.colors.background_global}
+            color={rightActive ? NAVY : MUTED}
           />
         </IfLoaderInsideScreen>
 
         <TextEdit
-          color={
-            userDriverFind.status === 'desligado'
-              ? theme.colors.secondary
-              : theme.colors.background_global
-          }
+          color={rightActive ? NAVY : MUTED}
           size={'large'}
         >
           {translate('driverhome.activated')}

@@ -2,13 +2,14 @@ import styled from 'styled-components/native';
 
 interface ButtonView {
   color: string;
+  borderColor?: string;
   selected?: any;
 }
 
 export const ButtonOnAndOff = styled.View`
-  background-color: ${({theme}) => theme.colors.background_global};
+  background-color: transparent;
 
-  border-radius: 15px;
+  border-radius: 16px;
   align-items: center;
   justify-content: center;
 
@@ -17,14 +18,19 @@ export const ButtonOnAndOff = styled.View`
 
   flex-direction: row;
 
-  elevation: 5;
+  border-width: 1.5px;
+  border-color: ${({theme}) => theme.colors.gray_border ?? '#E2E8F0'};
 
-  shadow-color: ${({theme}) => theme.colors.black};
-  shadow-opacity: 0.25;
+  elevation: 4;
+
+  shadow-color: #000;
+  shadow-opacity: 0.08;
+  shadow-radius: 8px;
+  shadow-offset: 0px 4px;
 `;
 export const ButtonView = styled.TouchableOpacity<ButtonView>`
   background-color: ${({color}) => color};
-  border-radius: 15px;
+  border-radius: 14px;
   width: 50%;
 
   height: 100%;
@@ -32,4 +38,7 @@ export const ButtonView = styled.TouchableOpacity<ButtonView>`
   justify-content: center;
 
   flex-direction: row;
+
+  border-width: 1.5px;
+  border-color: ${({borderColor}) => borderColor ?? 'transparent'};
 `;
