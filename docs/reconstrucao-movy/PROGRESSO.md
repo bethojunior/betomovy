@@ -75,3 +75,9 @@
 - `src/components/Preload`: splash/preload agora navy `#070A1A` + logo `logo_movy_white_text.png` (antes rosa + logo azul-escuro, que ficaria ilegível no navy).
 - `src/client/components/Splash/styles.ts`: fundo navy.
 - Verificado: `TripTypeCard` (seleção de categoria) e `CardOffer` (oferta do motorista) **já utilizam** a paleta slate/royal do novo design — não precisaram de reescrita.
+
+### Sessão 3 (cont.2) — verificação de cobertura do novo design
+
+- Auditoria de estilos: `client/pages/Trip`, `client/pages/DetailsTrip`, `driver/src/pages/DetailsTrip`, `components/TripTypeCard`, `driver/src/components/CardOffer`, `driver/src/pages/TripsOffer` — **já usam a paleta slate/royal/cyan do novo design** (zero hex legado, tema-driven).
+- Conclusão: a migração visual está bem mais avançada que o estimado — commits anteriores já modernizaram a maioria das telas-chave. Esta sessão eliminou os últimos resíduos rosa e uniformizou toggle/painel/splash.
+- **Resta verificar em device/emulador**: compilação visual real das telas restantes e fluxos completos (não há como garantir 100% sem executar o app).
