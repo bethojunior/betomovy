@@ -28,3 +28,8 @@
 - [x] Testes Jest: corrigido `node_modules/jest-snapshot/node_modules/semver` corrompido (removido para usar semver 7.8.1 da raiz), adicionado `SafeAreaProvider initialMetrics` em `ConfigThemeGlobal.tsx` e mock de `BottomSheetModal` (Modal nativo não renderiza em test renderer). `ModalTransference.test.tsx` ✅ passando.
 - [ ] `versionCode` ainda em `80308` (app.json e build.gradle) — bump para `80309` pendente antes de release (PENDENCIAS anterior citava 80309 como confirmado, mas o código não foi alterado).
 - [ ] Documentação `docs/reconstrucao-movy/` e correções de teste **não commitadas** — aguardando autorização (regra do projeto).
+
+## Segurança (novo)
+
+- [ ] **Senha do keystore de release em texto plano** em `mobility-pro-app-rota101-pro/android/app/build.gradle` (signingConfigs.release, fallback). Já está versionada no git — recomendo migrar para `gradle.properties`/variáveis de ambiente (`MOVY_RELEASE_*` já suportadas) e rotacionar a senha. Não alterei para não quebrar o pipeline de build.
+- [ ] Build de homologação em andamento (sessão 3) para validação visual do novo design em device.
