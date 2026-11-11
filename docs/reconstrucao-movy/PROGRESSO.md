@@ -90,3 +90,19 @@
   - **APK universal:** `movy-app-universal.apk` (72,85 MB) — raiz do repo e `android/app/release/`
   - **AAB release assinado:** `mobility-pro-app-rota101-pro/android/app/release/app-release.aab` (52,63 MB) — pronto para upload Play Console
 - Pendente: validação visual em device/emulador pelo usuário; ajuste fino de telas que restarem fora do padrão.
+
+## 2025-11-11 — Redesign executivo passageiro (commits a2ff9f8df, fc8e44449)
+
+- HomeMapHeader: pill de saudação navy + texto/borda cyan, badge de notificação navy.
+- DestinationSearchBar: container branco com borda, botão de microfone cyan com ícone navy.
+- HomeBottomSheet: radius xxxlarge, sombra suave, handle cinza slate, FAB de localização navy.
+- Places (histórico): card branco com borda gray_border + sombra.
+- ModuleGrid: ícones com tint navy.
+- TravelOptions (painel de corrida): container branco radius 24, ConfirmButton radius 16, OptionalButton radius 14, item selecionado com borda/fundo cyan, título navy, separadores gray_border.
+- Trip/styles: badge de duração navy pill com borda cyan.
+- DestinationCard: radius 18 + sombra.
+- TripContent (corrida ativa): sheet branco radius 24 + sombra.
+- DriverSearch: fundo branco, botão cancelar radius 14, handle slate.
+- CardOffer (motorista): já estava no padrão executivo — sem alteração necessária.
+
+Pendente: rebuild APK/AAB com estas mudanças; continuar redesign das telas restantes (cadastros, perfil, histórico, entrega, SpeedMob).
